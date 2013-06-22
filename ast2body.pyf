@@ -1,0 +1,13 @@
+!    -*- f90 -*-
+! Author: Juan Luis Cano
+
+python module _ast2body ! in 
+    interface  ! in :ast2body
+        subroutine kepler(ro,vo,dtsec,mu,r,v,error) ! in :ast2body:ast2body.for
+            real*8, dimension(3), intent(in) :: ro, vo
+            real*8, intent(in) :: dtsec, mu
+            real*8, dimension(3), intent(out) :: r, v
+            character*12 intent(out) :: error
+        end subroutine kepler
+    end interface 
+end python module _ast2body

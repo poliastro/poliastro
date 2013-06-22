@@ -1,0 +1,21 @@
+!    -*- f90 -*-
+! Author: Juan Luis Cano
+
+python module _astiod ! in 
+    interface  ! in :astiod
+        subroutine lambertbattin(ro,r,dm,overrev,dtsec,mu,vo,v,error) ! in :astiod:astiod.for
+            real*8, dimension(3), intent(in) :: ro, r
+            character, intent(in) :: dm, overrev
+            real*8, intent(in) :: dtsec, mu
+            real*8, dimension(3), intent(out) :: vo, v
+            character*12, intent(out) :: error
+        end subroutine lambertbattin
+        subroutine lambertuniv(ro,r,dm,overrev,dtsec,mu,vo,v,error) ! in :astiod:astiod.for
+            real*8, dimension(3), intent(in) :: ro, r
+            character, intent(in) :: dm, overrev
+            real*8, intent(in) :: dtsec, mu
+            real*8, dimension(3), intent(out) :: vo, v
+            character*12, intent(out) :: error
+        end subroutine lambertuniv
+    end interface 
+end python module _astiod

@@ -1,0 +1,41 @@
+# Makefile for Python extension modules
+
+FC = gfortran
+F2PY = f2py3
+SO_EXT = .cpython-33m
+FFLAGS =
+
+REQS := ast2body astreduc astmath asttime
+REQS_OBJ := $(addsuffix .o, $(REQS))
+REQS_SRC := $(addsuffix .for, $(REQS))
+
+.PHONY: all
+all: astiod.cpython-33m.so ast2body.cpython-33m.so
+
+astiod.cpython-33m.so: astiod.for $(REQS_SRC) astiod.pyf
+	$(F2PY) -c $< $(REQS_SRC) -m astiod astiod.pyf
+
+ast2body.cpython-33m.so: $(REQS_SRC) ast2body.pyf
+	$(F2PY) -c $(REQS_SRC) -m ast2body ast2body.pyf
+
+.PHONY: test
+test: test_lambert test_lambert2
+
+test_lambert: astiod.o
+test_lambert2: astiod.o
+
+# Implicit rule for test programs
+test_%: test_%.o $(REQS_OBJ)
+	$(FC) $^ -o $@
+
+# Implicit rule for shared libraries
+%.so: %$(SO_EXT).so
+	ln -s $< $@
+
+# Implicit rule for object files
+%.o: %.for
+	$(FC) -c $(FFLAGS) $<
+
+.PHONY: clean
+clean:
+	rm -f *.o
