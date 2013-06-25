@@ -17,5 +17,12 @@ python module _astiod ! in
             real*8, dimension(3), intent(out) :: vo, v
             character*12, intent(out) :: error
         end subroutine lambertuniv
+        subroutine target(rint,vint,rtgt,vtgt,dm,kind,dtsec,mu,v1t,v2t,dv1,dv2,error) ! in :astiod:astiod.for
+            real*8, dimension(3), intent(in) :: rint, vint, rtgt, vtgt
+            character, intent(in) :: dm, kind
+            real*8, intent(in) :: dtsec, mu
+            real*8, dimension(3), intent(out) :: v1t, v2t, dv1, dv2
+            character*12, intent(out) :: error
+        end subroutine target
     end interface 
 end python module _astiod
