@@ -53,7 +53,6 @@ Python 2 support might be accomplished with little syntax changes using
 
 .. _3to2: https://pypi.python.org/pypi/3to2
 
-.. TODO: Unify and repair tests
 .. TODO: Change argument order
 .. TODO: Test in different systems
 .. TODO: Add license
