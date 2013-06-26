@@ -38,9 +38,11 @@ If installed correctly, this should work::
 
   $ python
   >>> import poliastro
-  >>> dir(poliastro)
-  ['M2nu', '__builtins__', '__cached__', ...
-  'rv2coe', 'target', 'twobody', 'util']
+  >>> poliastro.test()
+  ...
+  OK
+  ...
+  >>> 
 
 poliastro has been tested under
 
