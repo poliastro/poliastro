@@ -73,8 +73,8 @@ def target(k, r0, v0, r0_tg, v0_tg, tof):
     # Propagate target trajectory
     rf, vf, err = twobody.kepler(k, r0_tg, v0_tg, tof)
     # Solve Lambert's problem
-    va_s, vb_s = lambert(k, r0, rf, 'short', tof)
-    va_l, vb_l = lambert(k, r0, rf, 'long', tof)
+    va_s, vb_s = lambert(k, r0, rf, tof, True)
+    va_l, vb_l = lambert(k, r0, rf, tof, False)
     # Compute delta velocity for short and long trajectories
     dva_s = va_s - v0
     dvb_s = vf - vb_s
