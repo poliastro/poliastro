@@ -58,17 +58,6 @@ def lambert(k, r0, rf, tof, short=True):
     return va, vb
 
 
-def target2(k, r0, v0, r0_tg, v0_tg, tof):
-    """Solves the targetting problem.
-
-    """
-    v1t, v2t, dv1, dv2, error = _astiod.target(r0, v0, r0_tg, v0_tg, 'S', 'K', tof, k)
-    error = error.strip().decode('ascii')
-    if error != 'ok':
-        raise RuntimeError("There was an error: {}".format(error))
-    return v1t, v2t, dv1, dv2, error
-
-
 def target(k, r0, v0, r0_tg, v0_tg, tof):
     # Propagate target trajectory
     rf, vf, err = twobody.kepler(k, r0_tg, v0_tg, tof)
