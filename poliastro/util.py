@@ -4,13 +4,7 @@
 
 import numpy as np
 
-__all__ = ['days_from_epoch', 'rotate']
-
-
-def days_from_epoch(d):
-    # TODO: Docstring
-    delta = d - EPOCH
-    return delta.days
+__all__ = ['rotate']
 
 
 def rotate(vec, ax, angle):
