@@ -2,8 +2,6 @@
 
 from os.path import join
 
-__version__ = '0.0.1-dev'
-
 
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
@@ -27,7 +25,7 @@ def configuration(parent_package='', top_path=None):
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    setup(version=__version__,
+    setup(version='0.0.1-dev',
           description="poliastro - Utilities and Python wrappers for"
                       "Orbital Mechanics",
           author="Juan Luis Cano",
