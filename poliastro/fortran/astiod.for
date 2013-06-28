@@ -1918,7 +1918,7 @@ c     &         ( 3.0D0 + Sum1 / ( 1.0D0+eta*sum1 ) )
           See= 1.0D0 / ((1.0D0/(8.0D0*(1.0D0+sqrtopv))) *
      &         ( 3.0D0 + sum1 / ( 1.0D0+eta*sum1 ) ) )
       RETURN
-      END   ! Internal FUNCTION See
+      END
 
 
       REAL*8 FUNCTION k      ( v )
@@ -1967,7 +1967,7 @@ c     &         ( 3.0D0 + Sum1 / ( 1.0D0+eta*sum1 ) )
 
           k= Sum1
       RETURN
-      END  ! Internal SUBROUTINE K
+      END
 *
 * ------------------------------------------------------------------------------
 *
