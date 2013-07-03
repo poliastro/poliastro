@@ -9,5 +9,9 @@ python module _ast2body ! in
             real*8, dimension(3), intent(out) :: r, v
             character*12 intent(out) :: error
         end subroutine kepler
+        subroutine newtonm(ecc,m,e0,nu) ! in :_ast2body:ast2body.for
+            real*8, intent(in) :: ecc, m
+            real*8, intent(out) :: e0, nu
+        end subroutine newtonm
     end interface 
 end python module _ast2body

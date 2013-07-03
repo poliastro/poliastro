@@ -4,7 +4,9 @@
 
 import numpy as np
 
-from ._octave import octave
+from ._ast2body import newtonm as M2nu
+
+# TODO: Either create Python wrapper for M2nu or assign its docstring
 
 __all__ = ['fp_angle', 'M2nu', 'nu2M']
 
@@ -16,11 +18,6 @@ def fp_angle(ecc, nu):
     
     """
     return np.arctan2(ecc * np.sin(nu), 1 + ecc * np.cos(nu))
-
-
-def M2nu(ecc, M):
-    E0, nu = octave.call("newtonm", ecc, M)
-    return E0, nu
 
 
 def nu2M(ecc, nu):
