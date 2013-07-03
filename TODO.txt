@@ -2,8 +2,6 @@
   The Gauss VOP equations use a, and the only reason to use p is for coe2rv
   function. OTOH, I might have to change the anomaly too.
 
-* Create pythonic interface for uplanet_2013, adding constants for the bodies
-
 * Try in Windows
 
 * Remove all trace of MATLAB scripts: replace rv2coe with Fortran version
