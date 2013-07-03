@@ -2,7 +2,8 @@
 
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import wraps
 
 import numpy as np
 
@@ -12,7 +13,22 @@ __all__ = ['planet_ephem']
 
 EPOCH = datetime(2000, 1, 1, 0, 0)
 
+_cache = {}
 
+def _memoize(key, cache):
+    def _decorator(func):
+        @wraps(func)
+        def _inner(jd, body):
+            cache_key = "{:s}:{:.1f}:{:d}".format(key, jd, body)
+            if cache_key in cache:
+                return cache[cache_key]
+            ret = func(jd, body)
+            _cache[cache_key] = ret
+            return ret
+        return _inner
+    return _decorator
+
+@_memoize("ephem", _cache)
 def planet_ephem(jd, body):
     """Returns the ephemerides of a given body given a Julian date.
 
@@ -46,7 +62,7 @@ def planet_ephem(jd, body):
 
 
 def time_from_epoch(dd=None, epoch=EPOCH):
-    """Returns timedelta object from EPOCH.
+    """Returns timedelta object from datetime subtracting EPOCH.
 
     If called without arguments, use datetime.today().
     Use module EPOCH by default, but custom epoch may be provided.
@@ -57,3 +73,18 @@ def time_from_epoch(dd=None, epoch=EPOCH):
     else:
         delta = datetime.today() - epoch
     return delta
+
+
+def delta2date(td, epoch=EPOCH):
+    """Returns date object from timedelta or seconds, adding EPOCH.
+
+    TODO: The naming in this module is quite inconsistent.
+    TODO: Refactor
+
+    """
+    try:
+        dd = EPOCH + td
+    except TypeError:
+        td = timedelta(seconds=td)
+        dd = EPOCH + td
+    return dd
