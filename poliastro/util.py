@@ -1,4 +1,4 @@
-"""Function helpers
+"""Function helpers.
 
 """
 
@@ -22,6 +22,7 @@ def rotate(vec, ax, angle):
     """
     # TODO: Accept arbitrary axis
     # http://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+    # TODO: Change default behaviour to rotate vector?
     assert vec.shape == (3,)
     rot = np.eye(3)
     if ax == 1:

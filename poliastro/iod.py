@@ -40,7 +40,6 @@ def lambert(k, r0, rf, tof, short=True):
     Multiple revolutions not supported.
 
     """
-    # TODO: Raise custom exceptions
     r0 = np.asanyarray(r0).astype(np.float)
     rf = np.asanyarray(rf).astype(np.float)
     tof = float(tof)
@@ -59,24 +58,24 @@ def lambert(k, r0, rf, tof, short=True):
 
 
 def target(k, r0, v0, r0_tg, v0_tg, tof):
-    # Propagate target trajectory
-    rf, vf, err = twobody.kepler(k, r0_tg, v0_tg, tof)
-    # Solve Lambert's problem
-    va_s, vb_s = lambert(k, r0, rf, tof, True)
-    va_l, vb_l = lambert(k, r0, rf, tof, False)
-    # Compute delta velocity for short and long trajectories
-    dva_s = va_s - v0
-    dvb_s = vf - vb_s
-    dv_s = norm(dva_s) + norm(dvb_s)
-    dva_l = va_l - v0
-    dvb_l = vf - vb_l
-    dv_l = norm(dva_l) + norm(dvb_l)
-    # Short or long solution
-    if dv_s < dv_l:
-        va, vb = va_s, vb_s
-        deltav = dv_s
+    # TODO: Docstring
+    rf, vf = twobody.kepler(k, r0_tg, v0_tg, tof)
+    va_short, vb_short = lambert(k, r0, rf, tof, True)
+    va_long, vb_long = lambert(k, r0, rf, tof, False)
+    dva_short = va_short - v0
+    dvb_short = vf - vb_short
+    dv_short = norm(dva_short) + norm(dvb_short)
+    dva_long = va_long - v0
+    dvb_long = vf - vb_long
+    dv_long = norm(dva_long) + norm(dvb_long)
+    # Choose short or long solution
+    if dv_short < dv_long:
+        va, vb = va_short, vb_short
+        dva, dvb = dva_short, dvb_short
+        #deltav = dv_short
     else:
-        va, vb = va_l, vb_l
-        deltav = dv_l
+        va, vb = va_long, vb_long
+        dva, dvb = dva_long, dvb_long
+        #deltav = dv_long
 
-    return rf, vf, va, vb, deltav
+    return rf, vf, va, vb, dva, dvb

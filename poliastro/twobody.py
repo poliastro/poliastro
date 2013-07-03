@@ -46,7 +46,6 @@ def coe2rv(k, p, ecc, inc, omega, argp, nu,
 
     """
     # TODO: Include special cases with extra arguments
-    # First, vectors in perifocal coordinate system
     r_pqw = np.array([
         p * np.cos(nu) / (1 + ecc * np.cos(nu)),
         p * np.sin(nu) / (1 + ecc * np.cos(nu)),
@@ -57,7 +56,6 @@ def coe2rv(k, p, ecc, inc, omega, argp, nu,
         np.sqrt(k / p) * (ecc + np.cos(nu)),
         0
     ])
-    # Now, we rotate both
     r_ijk = rotate(r_pqw, 3, -argp)
     r_ijk = rotate(r_ijk, 1, -inc)
     r_ijk = rotate(r_ijk, 3, -omega)
@@ -114,7 +112,6 @@ def kepler(k, r0, v0, tof):
         If the status of the subroutine is not 'ok'.
 
     """
-    # FIXME: Not giving the same results as kepler. Why?
     r0 = np.asanyarray(r0).astype(np.float)
     v0 = np.asanyarray(v0).astype(np.float)
     tof = float(tof)
@@ -124,4 +121,4 @@ def kepler(k, r0, v0, tof):
     error = error.strip().decode('ascii')
     if error != 'ok':
         raise RuntimeError("There was an error: {}".format(error))
-    return r, v, error
+    return r, v
