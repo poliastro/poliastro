@@ -5,7 +5,6 @@
 import numpy as np
 
 from .util import rotate
-from ._octave import octave
 from . import _ast2body
 
 __all__ = ['coe2rv', 'rv2coe', 'kepler']

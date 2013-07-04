@@ -2,12 +2,20 @@
 
 """
 
+import os.path
 from datetime import datetime, timedelta
 from functools import wraps
 
 import numpy as np
 
-from ._octave import octave
+try:
+    from oct2py import octave
+    OCTAVE_PATH = os.path.join(os.path.dirname(__file__), "octave")
+    octave.addpath(OCTAVE_PATH)
+except ImportError as e:
+    e.args += ("oct2py not found, ephemerides won't work!",)
+    raise e
+
 
 __all__ = ['planet_ephem']
 

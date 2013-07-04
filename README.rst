@@ -3,39 +3,44 @@ poliastro
 =========
 
 Overview
---------
+========
 
 These are some Python wrappers to Fortran and MATLAB subroutines useful in
-Orbital Mechanics, most of them coming from the `companion software of
-Vallado`__.
+Orbital Mechanics
+
+Fortran subroutines
+-------------------
+
+The core of poliastro is possible thanks to several Fortran subroutines,
+written by David A. Vallado for his book "Fundamentals of Astrodynamics and
+Applications" and available on the Internet as the `companion software of
+the book`__.
 
 .. __: http://celestrak.com/software/vallado-sw.asp
+
+The author explicitly gave permission to redistribute these subroutines
+in this project under the current license.
 
 Some of them were slightly modified due to errors in the build process,
 the handling of relative errors in comparisons and to make them more
 suitable to use with different gravitational parameters.
 
 Requirements
-------------
+============
 
-The software required by poliastro is:
+poliastro requires NumPy and SciPy and is usually tested in these
+environments:
 
-* Python 3
-* Octave
-* A Fortran compiler, e.g. gfortran
-
-Also, this Python packages must be present in the system:
-
-* NumPy
-* SciPy
-* oct2py
-
-poliastro has been tested under
-
-* Linux
+* Linux 64-bit
 * Python 3.3
+* NumPy 1.7.1
+* SciPy 0.12.0
+* oct2py 0.4.0 (optional, for numerical computation of bodies ephemerides)
 
-but there is no reason it shouldn't work under Windows or Mac OS X with
+Besides, a Fortran compiler is needed to build the extensions. poliastro
+is usually built with gfortran.
+
+There is no reason it shouldn't work under Windows or Mac OS X with
 properly configured tools (not tested).
 
 Python 2 compatibility might be accomplished with little syntax changes using
@@ -44,7 +49,7 @@ Python 2 compatibility might be accomplished with little syntax changes using
 .. _3to2: https://pypi.python.org/pypi/3to2
 
 Installation
-------------
+============
 
 To install poliastro, just type::
 
@@ -71,17 +76,43 @@ are using `virtualenv`_  or `local installations`_.
 .. _`local installations`: http://stackoverflow.com/a/4325047/554319
 
 Testing
--------
+=======
 
 If installed correctly, this should work::
 
-  $ python
-  >>> import poliastro
-  >>> poliastro.test()
-  ...
+  $ python -c "import poliastro; poliastro.test()"
+  Running unit tests for poliastro
+  [...]
   OK
-  ...
-  >>> 
+  $ 
 
-.. TODO: NOT MULTIPROCESSING SAFE, due to oct2py
-.. TODO: Ask about libraries and extensions
+Bug reporting
+=============
+
+I am one of those that writes bug-free code every single time, but if you
+think you've found one please refer to the `issue tracker`_ on GitHub.
+
+.. _`issue tracker`: https://github.com/Pybonacci/poliastro/issues
+
+Citing
+======
+
+If you use scikit-aero on your project, please
+`drop me a line <mailto:juanlu001@gmail.com>`_.
+
+License
+=======
+
+poliastro is released under a 2-clause BSD license, hence allowing commercial
+use of the library. Please refer to the COPYING file.
+
+TODO
+====
+
+These tasks are in my checklist:
+
+* Test in Windows
+* Look for better ephemeris
+* Expand constants module
+* Investigate astropy integration
+* Add examples
