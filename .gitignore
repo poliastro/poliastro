@@ -1,3 +1,6 @@
+MANIFEST
+
+dist/*
 build/*
 
 __pycache__/

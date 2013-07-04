@@ -5,8 +5,15 @@ poliastro
 Overview
 ========
 
+:Name: poliastro
+:Website: https://github.com/Pybonacci/poliastro
+:Author: Juan Luis Cano <juanlu001@gmail.com>
+:Version: 0.1.0
+
 These are some Python wrappers to Fortran and MATLAB subroutines useful in
-Orbital Mechanics
+Orbital Mechanics, such as orbit propagation, solution of the Lambert's
+problem, conversion between position and velocity vectors and classical
+orbital elements and orbit plotting.
 
 Fortran subroutines
 -------------------
@@ -51,7 +58,7 @@ Python 2 compatibility might be accomplished with little syntax changes using
 Installation
 ============
 
-To install poliastro, just type::
+To install poliastro from source, just type::
 
   $ python setup.py install
 
@@ -59,7 +66,9 @@ This might require superuser privileges. To install in a local directory::
 
   $ python setup.py install --user
 
-Remember to put this directory in the :code:`$PYTHONPATH` if it is not already.
+Installations through PyPI are also supported::
+
+  $ pip install poliastro --user
 
 It is recommended that you **never ever use sudo** with distutils, pip,
 setuptools and friends in Linux because you might seriously break your
@@ -116,3 +125,26 @@ These tasks are in my checklist:
 * Expand constants module
 * Investigate astropy integration
 * Add examples
+
+FAQ
+===
+
+Does it work on Windows?
+------------------------
+
+I had some problems to find a free Fortran compiler for Windows 64-bit
+(but I am `not alone`__). And probably configuring the paths to make
+oct2py and Octave work will be a pain too.
+
+.. __: http://spyder-ide.blogspot.it/2012/08/scientific-python-distribution-for.html
+
+Have you considered `choosing another operative system`__?
+
+.. __: http://www.ubuntu.com/
+
+What's up with the name?
+------------------------
+
+poliastro comes from Polimi, which is the shortened name of the Politecnico di
+Milano, the Italian university where I've been studying while writing this
+software. It's my tiny tribute to a place I've come to love. *Grazie mille!*
