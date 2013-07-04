@@ -25,10 +25,6 @@ def configuration(parent_package='', top_path=None):
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    data_files = ['poliastro/octave/{}'.format(fn) for fn in
-                  ('angl.m', 'constmath.m', 'mag.m',
-                   'newtonm.m', 'newtonnu.m',
-                   'rv2coe.m', 'uplanet_2013.m')]
     setup(version='0.1.0',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
@@ -41,7 +37,8 @@ if __name__ == '__main__':
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
           requires=["numpy", "scipy"],
-          data_files=[('poliastro/octave', data_files)],
+          data_files=[('poliastro/octave',
+                       ['poliastro/octave/uplanet_2013.m'])],
           packages=['poliastro'],
           classifiers=[
               "Development Status :: 2 - Pre-Alpha",
