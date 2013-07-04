@@ -15,11 +15,12 @@ class TestCoe2rv(TestCase):
         k = k_Earth
         p = 11067.790
         ecc = 0.83285
+        a = p / (1 - ecc ** 2)
         inc = radians(87.87)
         omega = radians(227.89)
         argp = radians(53.38)
         nu = radians(92.335)
-        r, v = coe2rv(k, p, ecc, inc, omega, argp, nu)
+        r, v = coe2rv(k, a, ecc, inc, omega, argp, nu)
         assert_array_almost_equal(r, np.array([6525.344, 6861.535, 6449.125]), decimal=1)
         assert_array_almost_equal(v, np.array([4.902276, 5.533124, -1.975709]), decimal=4)
 
@@ -29,7 +30,8 @@ class TestRv2coe(TestCase):
         k = k_Earth
         r = np.array([6524.384, 6862.875, 6448.296])
         v = np.array([4.901327, 5.533756, -1.976341])
-        p, ecc, inc, omega, argp, nu = rv2coe(k, r, v)
+        a, ecc, inc, omega, argp, nu = rv2coe(k, r, v)
+        p = a * (1 - ecc ** 2)
         assert_almost_equal(p, 11067.79, decimal=0)
         assert_almost_equal(ecc, 0.832853, decimal=4)
         assert_almost_equal(inc, radians(87.870), decimal=4)

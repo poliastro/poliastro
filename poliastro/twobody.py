@@ -11,7 +11,7 @@ from . import _ast2body
 __all__ = ['coe2rv', 'rv2coe', 'kepler']
 
 
-def coe2rv(k, p, ecc, inc, omega, argp, nu,
+def coe2rv(k, a, ecc, inc, omega, argp, nu,
            arglat=None, truelon=None, lonper=None):
     """Converts classical orbital elements to r, v IJK vectors.
 
@@ -19,8 +19,8 @@ def coe2rv(k, p, ecc, inc, omega, argp, nu,
     ----------
     k : float
         Standard gravitational parameter (km^3 / s^2)
-    p : float
-        Semilatus rectum (km).
+    a : float
+        Semi-major axis (km).
     ecc : float
         Eccentricity.
     inc : float
@@ -46,6 +46,7 @@ def coe2rv(k, p, ecc, inc, omega, argp, nu,
 
     """
     # TODO: Include special cases with extra arguments
+    p = a * (1 - ecc ** 2)
     r_pqw = np.array([
         p * np.cos(nu) / (1 + ecc * np.cos(nu)),
         p * np.sin(nu) / (1 + ecc * np.cos(nu)),
@@ -86,14 +87,14 @@ def rv2coe(k, r, v):
     # TODO: Extend for additional arguments arglat, truelon, lonper
     r = np.asanyarray(r).astype(np.float)
     v = np.asanyarray(v).astype(np.float)
-    p, _, ecc, inc, omega, argp, nu, _ = _ast2body.rv2coe(r, v, k)
-    return p, ecc, inc, omega, argp, nu
+    _, a, ecc, inc, omega, argp, nu, _ = _ast2body.rv2coe(r, v, k)
+    return a, ecc, inc, omega, argp, nu
 
 
 def kepler(k, r0, v0, tof):
     """Propagates orbit.
 
-    This is a wrapper around KEPLER from AST2BODY.FOR.
+    This is a wrapper around kepler from ast2body.for.
 
     Parameters
     ----------
