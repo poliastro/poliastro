@@ -167,11 +167,15 @@
 *
 * ------------------------------------------------------------------------------
 
-      SUBROUTINE rv2coe      ( R, V, P, A, Ecc, Incl, Omega, Argp, Nu,
-     &                         M, ArgLat, TrueLon, LonPer )
+      SUBROUTINE rv2coe      ( R, V, mu, P, A, Ecc, Incl, Omega, Argp,
+     &                         Nu, M, ArgLat, TrueLon, LonPer )
         IMPLICIT NONE
-        REAL*8 R(3), V(3), P, A, Ecc, Incl, Omega, Argp, Nu, M, ArgLat,
-     &         TrueLon, LonPer
+        REAL*8 R(3), V(3), mu, P, A, Ecc, Incl, Omega, Argp, Nu, M,
+     &         ArgLat, TrueLon, LonPer
+cf2py real*8, intent(in), dimension(3) :: r, v
+cf2py real*8, intent(in) :: mu
+cf2py real*8, intent(out) :: P, A, Ecc, Incl, Omega, Argp, Nu, M
+cf2py real*8, intent(out), optional :: ArgLat, TrueLon, LonPer
         EXTERNAL DOT, MAG
 * -----------------------------  Locals  ------------------------------
         REAL*8 c1, RDotV, hk, SME, Hbar(3), Ebar(3), Nbar(3),
@@ -184,11 +188,11 @@
         REAL*8 Small,    Rad2Deg,  Deg2Rad,  HalfPi,
      &         Pi,       TwoPi,    Infinite, Undefined
 
-        REAL*8     rekm,     mu,     omegaearth, flat,     EESqrd, auer
+        REAL*8     rekm,     omegaearth, flat,     EESqrd, auer
 
         DATA rekm       /6378.137D0/
 c        DATA mu         /398600.4418D0/
-        DATA mu         /1.32712440018D11/       ! Sun
+!         DATA mu         /1.32712440018D11/       ! Sun
         DATA omegaearth /7.2921158553D-5/
         DATA flat       /0.003352810665D0/       ! f = 1.0/298.257223563
         DATA EESqrd     /0.006694379990D0/       ! 2f - f**2

@@ -4,8 +4,7 @@
 
 * Try in Windows
 
-* Remove all trace of MATLAB scripts: replace rv2coe with Fortran version
-  and write Meeus numerical ephemeris.
+* Remove all trace of MATLAB scripts: write Meeus numerical ephemeris.
 
 * Add examples
 

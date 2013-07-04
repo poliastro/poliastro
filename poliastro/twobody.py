@@ -70,7 +70,7 @@ def coe2rv(k, p, ecc, inc, omega, argp, nu,
 def rv2coe(k, r, v):
     """Converts r, v to classical orbital elements.
 
-    This is a wrapper around `rv2coe.m`.
+    This is a wrapper around rv2coe from ast2body.for.
 
     Examples
     --------
@@ -86,7 +86,7 @@ def rv2coe(k, r, v):
     # TODO: Extend for additional arguments arglat, truelon, lonper
     r = np.asanyarray(r).astype(np.float)
     v = np.asanyarray(v).astype(np.float)
-    p, _, ecc, inc, omega, argp, nu, _ = octave.call("rv2coe", r, v, k)
+    p, _, ecc, inc, omega, argp, nu, _ = _ast2body.rv2coe(r, v, k)
     return p, ecc, inc, omega, argp, nu
 
 
