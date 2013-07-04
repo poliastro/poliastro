@@ -44,7 +44,7 @@ class TestKepler(TestCase):
         r0 = np.array([1131.340, -2282.343, 6672.423])
         v0 = np.array([-5.64305, 4.30333, 2.42879])
         tof = 40 * 60.0
-        r, v, error = kepler(k, r0, v0, tof)
+        r, v = kepler(k, r0, v0, tof)
         assert_array_almost_equal(r, np.array([-4219.7527, 4363.0292, -3958.7666]), decimal=4)
         assert_array_almost_equal(v, np.array([3.689866, -1.916735, -6.112511]))
 
