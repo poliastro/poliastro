@@ -55,22 +55,20 @@ def planet_ephem(jd, body):
 
     Returns
     -------
-    p, ecc, inc, omega, argp, nu
+    a, ecc, inc, omega, argp, nu
 
-    TODO: Refactor to use constants instead of codes
-    E.g.: ephem.ephem(jd, ephem.EARTH)
+    TODO: Use real date, and compute difference from EPOCH in function body
 
     """
     assert type(body) is int
     jd = float(jd)
     data_up = octave.call("uplanet_2013", jd, body)
     a, ecc, inc, omega, argp, nu = data_up[0]
-    p = a * (1 - ecc ** 2)
     inc = np.deg2rad(inc)
     omega = np.deg2rad(omega)
     argp = np.deg2rad(argp)
     nu = np.deg2rad(nu)
-    return p, ecc, inc, omega, argp, nu
+    return a, ecc, inc, omega, argp, nu
 
 
 def time_from_epoch(dd=None, epoch=EPOCH):
