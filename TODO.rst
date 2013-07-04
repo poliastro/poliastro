@@ -7,4 +7,6 @@
 * Remove all trace of MATLAB scripts: replace rv2coe with Fortran version
   and write Meeus numerical ephemeris.
 
+* Add examples
+
 * Release
