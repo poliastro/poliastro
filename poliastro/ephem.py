@@ -27,6 +27,7 @@ SUN = 10
 
 _cache = {}
 
+
 def _memoize(key, cache):
     def _decorator(func):
         @wraps(func)
@@ -39,6 +40,7 @@ def _memoize(key, cache):
             return ret
         return _inner
     return _decorator
+
 
 @_memoize("ephem", _cache)
 def planet_ephem(jd, body):

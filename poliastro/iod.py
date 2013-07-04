@@ -12,15 +12,14 @@ __all__ = ['lambert', 'target']
 
 
 def lambert(k, r0, rf, tof, short=True):
-    """
-    Solves the Lambert problem.
+    """Solves the Lambert problem.
 
-    This is a wrapper around LAMBERTUNIV from ASTIOD.FOR.
+    This is a wrapper around lambertuniv from astiod.for.
 
     Parameters
     ----------
     k : float
-        Gravitational constant of main attractor (km^3/s^2).
+        Gravitational constant of main attractor (km^3 / s^2).
     r0 : array
         Initial position (km).
     r : array
@@ -28,7 +27,7 @@ def lambert(k, r0, rf, tof, short=True):
     tof : float
         Time of flight (s).
     short : boolean
-        Find out the short path. Default to True.
+        Find out the short path, default to True. If False, find long path.
 
     Raises
     ------
@@ -58,7 +57,43 @@ def lambert(k, r0, rf, tof, short=True):
 
 
 def target(k, r0, v0, r0_tg, v0_tg, tof):
-    # TODO: Docstring
+    """Solves the targetting problem.
+
+    Given the departure position and the initial position of the target body,
+    finds the trajectory between the departure and the final position of
+    the target.
+
+    Parameters
+    ----------
+    k : float
+        Gravitational constant of main attractor (km^3 / s^2).
+    r0 : array
+        Departure position (km).
+    v0 : array
+        Velocity at departure position (km / s).
+    r0_tg : array
+        Position of target at departure (km).
+    v0_tg : array
+        Velocity of target at departure (km / s).
+    tof : array
+        Time of flight (s).
+
+    Returns
+    -------
+    rf : array
+        Final position of target (km).
+    vf : array
+        Velocity of target at final position (km / s).
+    va : array
+        Departure velocity (km / s).
+    vb : array
+        Arrival velocity (km / s).
+    dva : array
+        Change of velocity at departure (km / s).
+    dvb : array
+        Change of velocity at arrival (km / s).
+
+    """
     rf, vf = twobody.kepler(k, r0_tg, v0_tg, tof)
     va_short, vb_short = lambert(k, r0, rf, tof, True)
     va_long, vb_long = lambert(k, r0, rf, tof, False)
@@ -68,14 +103,11 @@ def target(k, r0, v0, r0_tg, v0_tg, tof):
     dva_long = va_long - v0
     dvb_long = vf - vb_long
     dv_long = norm(dva_long) + norm(dvb_long)
-    # Choose short or long solution
     if dv_short < dv_long:
         va, vb = va_short, vb_short
         dva, dvb = dva_short, dvb_short
-        #deltav = dv_short
     else:
         va, vb = va_long, vb_long
         dva, dvb = dva_long, dvb_long
-        #deltav = dv_long
 
     return rf, vf, va, vb, dva, dvb

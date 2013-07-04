@@ -1,6 +1,10 @@
 * Try in Windows
 
-* Remove all trace of MATLAB scripts: write Meeus numerical ephemeris.
+* Look for better ephemeris
+
+* Expand constants module
+
+* Investigate astropy integration
 
 * Add examples
 

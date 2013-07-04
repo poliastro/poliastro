@@ -8,6 +8,7 @@ from poliastro.constants import k_Earth, k_Sun
 from poliastro.twobody import coe2rv, rv2coe, kepler
 
 # TODO: Low precision in some results, why? Use canonical units?
+# TODO: Test for exceptions
 
 
 class TestCoe2rv(TestCase):
@@ -21,8 +22,10 @@ class TestCoe2rv(TestCase):
         argp = radians(53.38)
         nu = radians(92.335)
         r, v = coe2rv(k, a, ecc, inc, omega, argp, nu)
-        assert_array_almost_equal(r, np.array([6525.344, 6861.535, 6449.125]), decimal=1)
-        assert_array_almost_equal(v, np.array([4.902276, 5.533124, -1.975709]), decimal=4)
+        assert_array_almost_equal(r, np.array([6525.344, 6861.535, 6449.125]),
+                                  decimal=1)
+        assert_array_almost_equal(v, np.array([4.902276, 5.533124, -1.975709]),
+                                  decimal=4)
 
 
 class TestRv2coe(TestCase):
@@ -47,7 +50,8 @@ class TestKepler(TestCase):
         v0 = np.array([-5.64305, 4.30333, 2.42879])
         tof = 40 * 60.0
         r, v = kepler(k, r0, v0, tof)
-        assert_array_almost_equal(r, np.array([-4219.7527, 4363.0292, -3958.7666]), decimal=4)
+        assert_array_almost_equal(r, np.array([-4219.7527, 4363.0292, -3958.7666]),
+                                  decimal=4)
         assert_array_almost_equal(v, np.array([3.689866, -1.916735, -6.112511]))
 
 

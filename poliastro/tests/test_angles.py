@@ -5,6 +5,7 @@ from numpy.testing import TestCase, assert_array_almost_equal, \
 
 from poliastro.angles import M2nu
 
+
 class TestM2nu(TestCase):
     def test_data(self):
         # Data from Schlesinger & Udick, 1912

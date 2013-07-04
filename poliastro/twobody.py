@@ -18,7 +18,7 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu,
     Parameters
     ----------
     k : float
-        Standard gravitational parameter (km^3 / s^2)
+        Standard gravitational parameter (km^3 / s^2).
     a : float
         Semi-major axis (km).
     ecc : float
@@ -32,17 +32,22 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu,
     nu : float
         True anomaly (rad).
     arglat : float (optional)
-        Argument of latitude (rad).
+        Argument of latitude (rad), default to None.
     truelon : float (optional)
-        True longitude (rad).
+        True longitude (rad), default to None.
     lonper : float (optional)
-        Longitude of periapsis (rad).
+        Longitude of periapsis (rad), default to None.
 
     Examples
     --------
     From Vallado 2007, ex. 2-6
-    >>> r, v = coe2rv(3.986e5, 11067.790, 0.83285, np.deg2rad(87.87),
-    ... np.deg2rad(227.89), np.deg2rad(53.38), np.deg2rad(92.335))
+    >>> p = 11067.790
+    >>> ecc = 0.83285
+    >>> a = p / (1 - ecc ** 2)
+    >>> coe2rv(3.986e5, a, 0.83285, np.radians(87.87),
+    ... np.radians(227.89), np.radians(53.38), np.radians(92.335))
+    (array([ 6525.36812099,  6861.5318349 ,  6449.11861416]),
+    array([ 4.90227593,  5.5331365 , -1.975709  ]))
 
     """
     # TODO: Include special cases with extra arguments
@@ -73,14 +78,23 @@ def rv2coe(k, r, v):
 
     This is a wrapper around rv2coe from ast2body.for.
 
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter (km^3 / s^2).
+    r : array
+        Position vector (km).
+    v : array
+        Velocity vector (km / s).
+
     Examples
     --------
     Vallado 2001, example 2-5
     >>> r = [6524.834, 6862.875, 6448.296]
     >>> v = [4.901327, 5.533756, -1.976341]
     >>> k = 3.986e5
-    >>> util.rv2coe(k, r, v)
-    (11067.810609980706, 0.83285427644495158, 1.5336055626394494,
+    >>> rv2coe(k, r, v)
+    (36127.55012131963, 0.83285427644495158, 1.5336055626394494,
     3.9775750028016947, 0.93174413995595795, 1.6115511711293014)
 
     """
@@ -99,7 +113,7 @@ def kepler(k, r0, v0, tof):
     Parameters
     ----------
     k : float
-        Gravitational constant of main attractor (km^3/s^2).
+        Gravitational constant of main attractor (km^3 / s^2).
     r0 : array
         Initial position (km).
     v0 : array
