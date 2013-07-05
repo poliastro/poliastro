@@ -7,7 +7,7 @@ Utilities and Python wrappers for Orbital Mechanics
 
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0-dev'
 
 from . import angles
 from . import iod

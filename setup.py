@@ -25,12 +25,13 @@ def configuration(parent_package='', top_path=None):
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    setup(version='0.1.0',
+    setup(version='0.2.0-dev',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
           author="Juan Luis Cano",
           author_email="juanlu001@gmail.com",
-          url="https://github.com/Pybonacci/poliastro",
+          url="http://pybonacci.github.io/poliastro/",
+          download_url="https://github.com/Pybonacci/poliastro",
           license="BSD",
           keywords=[
               "aero", "aerospace", "engineering",
@@ -50,7 +51,8 @@ if __name__ == '__main__':
               "Programming Language :: Python :: 3",
               "Programming Language :: Python :: Implementation :: CPython",
               "Topic :: Scientific/Engineering",
-              "Topic :: Scientific/Engineering :: Physics"
+              "Topic :: Scientific/Engineering :: Physics",
+              "Topic :: Scientific/Engineering :: Astronomy",
           ],
           long_description=open('README.rst').read(),
           configuration=configuration)
