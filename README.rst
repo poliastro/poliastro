@@ -42,7 +42,8 @@ environments:
 * Python 3.3
 * NumPy 1.7.1
 * SciPy 0.12.0
-* oct2py 0.4.0 (optional, for numerical computation of bodies ephemerides)
+* angles 1.1
+* jdcal 1.0 (optional, for numerical computation of bodies ephemerides)
 
 Besides, a Fortran compiler is needed to build the extensions. poliastro
 is usually built with gfortran.
@@ -121,10 +122,10 @@ TODO
 These tasks are in my checklist:
 
 * Test in Windows
-* Look for better ephemeris
 * Expand constants module
 * Investigate astropy integration
 * Add examples
+* Be more careful about angle normalization within the package
 
 FAQ
 ===
@@ -133,8 +134,7 @@ Does it work on Windows?
 ------------------------
 
 I had some problems to find a free Fortran compiler for Windows 64-bit
-(but I am `not alone`__). And probably configuring the paths to make
-oct2py and Octave work will be a pain too.
+(but I am `not alone`__).
 
 .. __: http://spyder-ide.blogspot.it/2012/08/scientific-python-distribution-for.html
 

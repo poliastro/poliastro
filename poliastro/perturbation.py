@@ -20,7 +20,7 @@ def gauss(x, t, k, fp, kw_fp):
     x : array_like
         Vector of classical orbital elements: a, ecc, inc, omega, argp, M.
     t : float
-        Seconds elapsed from EPOCH.
+        Time (s).
     k : float
         Gravitational parameter.
     fp : function
