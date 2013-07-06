@@ -109,10 +109,10 @@ ephem_coeffs = {
 
 
 def planet_ephem(dd, nbody):
-    """Returns the orbital elements of a planet given a date.
+    """Returns the mean orbital elements of a planet for a given date.
 
-    The orbital elements are referred to the ecliptic and mean equinox of the
-    date.
+    The orbital elements are referred to the mean equator and mean equinox of
+    the date.
 
     Parameters
     ----------
