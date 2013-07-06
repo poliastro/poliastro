@@ -2,5 +2,9 @@ MANIFEST
 
 dist/*
 build/*
+*.egg-info/*
+
+poliastro/_*.so
+poliastro/_*.c
 
 __pycache__/

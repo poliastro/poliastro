@@ -2,6 +2,11 @@
 
 from os.path import join
 
+try:
+    import setuptools
+except ImportError:
+    pass
+from numpy.distutils.core import setup
 
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
@@ -24,7 +29,6 @@ def configuration(parent_package='', top_path=None):
     return config
 
 if __name__ == '__main__':
-    from numpy.distutils.core import setup
     setup(version='0.2.0-dev',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
