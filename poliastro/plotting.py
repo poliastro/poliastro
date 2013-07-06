@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from poliastro import twobody
+from . import twobody
 
 __all__ = ['plot_orbit']
 

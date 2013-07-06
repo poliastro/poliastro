@@ -5,8 +5,8 @@
 import numpy as np
 from numpy import sin, cos, tan, sqrt
 
-from poliastro import angles
-from poliastro.logging import logger
+from . import angles
+from .logging import logger
 
 
 def gauss(x, t, k, fp, kw_fp):
