@@ -18,7 +18,7 @@ except ImportError as e:
     raise e
 
 
-__all__ = ['J2000', 'planet_ephem', 'jd']
+__all__ = ['J2000', 'ephem', 'jd']
 
 J2000 = jdcal.MJD_0 + jdcal.MJD_JD2000
 
@@ -108,7 +108,7 @@ ephem_coeffs = {
 }
 
 
-def planet_ephem(dd, nbody):
+def ephem(dd, nbody):
     """Returns the mean orbital elements of a planet for a given date.
 
     The orbital elements are referred to the mean equator and mean equinox of
@@ -140,7 +140,7 @@ def planet_ephem(dd, nbody):
     >>> from datetime import datetime
     >>> from poliastro import ephem
     >>> dd = datetime(2065, 6, 24)
-    >>> ephem.planet_ephem(dd, ephem.MERCURY)
+    >>> ephem.ephem(dd, ephem.MERCURY)
     (57909082.92756851, 0.20564509902750358, 0.12228075058282453, 0.85709018507404022, 0.51256360806673706, 2.4713634244634277)
 
     """
