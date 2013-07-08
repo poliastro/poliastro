@@ -2,6 +2,8 @@
 
 """
 
+import warnings
+
 import numpy as np
 
 from .util import rotate
@@ -10,8 +12,7 @@ from . import _ast2body
 __all__ = ['coe2rv', 'rv2coe', 'kepler']
 
 
-def coe2rv(k, a, ecc, inc, omega, argp, nu,
-           arglat=None, truelon=None, lonper=None):
+def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-4):
     """Converts classical orbital elements to r, v IJK vectors.
 
     Parameters
@@ -30,12 +31,8 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu,
         Argument of perigee (rad).
     nu : float
         True anomaly (rad).
-    arglat : float (optional)
-        Argument of latitude (rad), default to None.
-    truelon : float (optional)
-        True longitude (rad), default to None.
-    lonper : float (optional)
-        Longitude of periapsis (rad), default to None.
+    tol : float
+        Tolerance of the algorithm to detect edge cases, default to 1e-4.
 
     Examples
     --------
@@ -49,7 +46,27 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu,
     array([ 4.90227593,  5.5331365 , -1.975709  ]))
 
     """
-    # TODO: Include special cases with extra arguments
+    if ecc < tol:
+        if abs(inc) < tol or abs(inc - np.pi) < tol:
+            warnings.warn("Circular equatorial orbit: true longitude will "
+                          "be used", RuntimeWarning)
+            truelon = omega + argp + nu
+            nu = truelon
+            omega = argp = 0.0
+        else:
+            warnings.warn("Circular inclined orbit: argument of latitude "
+                          "will be used", RuntimeWarning)
+            arglat = argp + nu
+            nu = arglat
+            argp = 0.0
+    else:
+        if abs(inc) < tol or abs(inc - np.pi) < tol:
+            warnings.warn("Elliptic equatorial orbit: longitude of periapsis "
+                          "will be used", RuntimeWarning)
+            lonper = omega + argp
+            argp = lonper
+            omega = 0.0
+
     p = a * (1 - ecc ** 2)
     r_pqw = np.array([
         p * np.cos(nu) / (1 + ecc * np.cos(nu)),
