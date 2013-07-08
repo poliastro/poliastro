@@ -9,10 +9,14 @@ from . import twobody
 __all__ = ['plot_orbit']
 
 
-def plot_orbit(ax, k, a, ecc, inc, omega, argp, nu_vals=None, *args, **kwargs):
+def plot_orbit(ax, k, a, ecc, inc, omega, argp, nu_lims=(0, 2 * np.pi), N=200,
+               *args, **kwargs):
     """Plots orbit given orbital parameters.
 
-    Rest of the arguments are passed to ax.plot3D.
+    The function always assumes direct motion: if nu_lims[1] < nu_lims[0],
+    sums one revolution to the final position.
+
+    The rest of the arguments are passed to ax.plot3D.
 
     Parameters
     ----------
@@ -30,27 +34,31 @@ def plot_orbit(ax, k, a, ecc, inc, omega, argp, nu_vals=None, *args, **kwargs):
         Longitude of ascending node (rad).
     argp : float
         Argument of perigee (rad).
-    nu_vals : array (optional)
-        Values of the true anomaly. If none given, they are calculated to
-        close the orbit.
+    nu_lims : tuple (optional)
+        Minimum and maximum values of the true anomaly. Default (0, 2 * pi)
+        (plot complete orbit).
+    N : int (optional)
+        Number of points to plot, default to 200.
 
     Notes
     -----
     Based on plotorb by Richard Rieber.
 
     """
-    # TODO: Improve for hyperbolic orbits
-    # TODO: Improve number of points when speed is slow
+    # TODO: Adaptative number of points?
+    # TODO: Fix for hyperbolic orbits
+    N = 200
     close = False
-    if nu_vals is None:
+    if nu_lims is (0, 2 * np.pi):
         close = True
-        nu_vals = np.linspace(0, 2 * np.pi, 200)
-    N = len(nu_vals)
+    else:
+        while nu_lims[1] < nu_lims[0]:
+            nu_lims = (nu_lims[0], nu_lims[1] + 2 * np.pi)
+    nu_vals = np.linspace(nu_lims[0], nu_lims[1], N)
     r_array = np.empty((N, 3))
     for ii, nu in enumerate(nu_vals):
         r, _ = twobody.coe2rv(k, a, ecc, inc, omega, argp, nu)
         r_array[ii, :] = r
-    # Close orbit
     if close:
         r_array = np.append(r_array, [r_array[0]], 0)
     return ax.plot3D(r_array[:, 0], r_array[:, 1], r_array[:, 2],
