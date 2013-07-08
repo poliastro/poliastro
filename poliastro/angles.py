@@ -52,8 +52,13 @@ def nu2M(ecc, nu):
 
     """
     e0 = nu2E(ecc, nu)
-    M = e0 - ecc * np.sin(E0)
+    M = e0 - ecc * np.sin(e0)
     return e0, M
+
+
+def nu2E(ecc, nu):
+    e0 = 2 * np.arctan(np.sqrt((1 - ecc) / (1 + ecc)) * np.tan(nu / 2))
+    return e0
 
 
 def fp_angle(ecc, nu):
