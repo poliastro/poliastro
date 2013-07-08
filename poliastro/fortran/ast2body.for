@@ -175,7 +175,7 @@
 cf2py real*8, intent(in), dimension(3) :: r, v
 cf2py real*8, intent(in) :: mu
 cf2py real*8, intent(out) :: P, A, Ecc, Incl, Omega, Argp, Nu, M
-cf2py real*8, intent(out), optional :: ArgLat, TrueLon, LonPer
+cf2py real*8, intent(out) :: ArgLat, TrueLon, LonPer
         EXTERNAL DOT, MAG
 * -----------------------------  Locals  ------------------------------
         REAL*8 c1, RDotV, hk, SME, Hbar(3), Ebar(3), Nbar(3),
