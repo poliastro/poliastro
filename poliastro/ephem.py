@@ -55,7 +55,7 @@ ephem_coeffs = {
         [0.0],
         [0.0],
         [102.937348, 1.7195269, 0.00045962, 0.000000499],
-        [100466499.0, 36000.7698231, 0.00030368, 0.000000021]
+        [100.4664990, 36000.7698231, 0.00030368, 0.000000021]
     ],
     MARS: [
         [1.523679342],
@@ -155,7 +155,7 @@ def ephem(dd, nbody):
     argp = lonper - omega
     M = meanlon - lonper
     _, nu = angles.M2nu(ecc, M)
-    return a, ecc, inc, omega, argp, normalize(nu, 0, 2 * np.pi)
+    return a, ecc, inc, omega, argp, nu
 
 
 def jd(dd):
