@@ -41,7 +41,7 @@ if __name__ == '__main__':
               "aero", "aerospace", "engineering",
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
-          requires=["numpy", "scipy", "jdcal", "angles"],
+          requires=["numpy", "scipy", "jdcal"],
           data_files=[('poliastro/octave',
                        ['poliastro/octave/uplanet_2013.m'])],
           packages=['poliastro'],

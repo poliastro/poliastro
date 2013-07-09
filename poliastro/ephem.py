@@ -5,7 +5,6 @@
 import numpy as np
 from numpy import radians
 from numpy.polynomial.polynomial import polyval
-from angles import normalize
 
 from . import angles
 from .constants import AU

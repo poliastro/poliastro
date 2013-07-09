@@ -42,7 +42,6 @@ environments:
 * Python 3.3
 * NumPy 1.7.1
 * SciPy 0.12.0
-* angles 1.1
 * jdcal 1.0 (optional, for numerical computation of bodies ephemerides)
 
 Besides, a Fortran compiler is needed to build the extensions. poliastro
