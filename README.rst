@@ -42,7 +42,6 @@ environments:
 * Python 3.3
 * NumPy 1.7.1
 * SciPy 0.12.0
-* jdcal 1.0 (optional, for numerical computation of bodies ephemerides)
 
 Besides, a Fortran compiler is needed to build the extensions. poliastro
 is usually built with gfortran.
@@ -113,7 +112,11 @@ License
 =======
 
 poliastro is released under a 2-clause BSD license, hence allowing commercial
-use of the library. Please refer to the COPYING file.
+use of the library. Please refer to the COPYING file. This includes the
+modified Fortran subroutines.
+
+The function gcal2jd was borrowed from jdcal by Prasanth Nair, available under
+this same license.
 
 TODO
 ====
