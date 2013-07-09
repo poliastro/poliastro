@@ -11,7 +11,7 @@ from poliastro.constants import AU
 class TestEphem(TestCase):
     def test_vallado55(self):
         dd = datetime(1994, 5, 20, 20)
-        a, ecc, inc, omega, argp, nu = ephem.ephem(dd, ephem.JUPITER)
+        a, ecc, inc, omega, argp, nu = ephem.mean_elements(dd, ephem.JUPITER)
         assert_almost_equal(a / AU, 5.202603, decimal=6)
         assert_almost_equal(ecc, 0.048486, decimal=6)
         assert_almost_equal(inc, radians(1.303270), decimal=4)

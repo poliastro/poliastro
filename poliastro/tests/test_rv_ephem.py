@@ -14,7 +14,7 @@ class TestRVEphem(TestCase):
         # Data from HORIZONS, the xy-plane is the ecliptic
         TU = 86400
         dd = datetime(1994, 5, 20, 20)
-        coe = ephem.ephem(dd, ephem.JUPITER)
+        coe = ephem.mean_elements(dd, ephem.JUPITER)
         r_XYZ, v_XYZ = twobody.coe2rv(k_Sun, *coe)
         r0_XYZ = np.array([-4.0686995, -3.5897288, 0.1059762]) * AU
         v0_XYZ = np.array([0.0048974, -0.0053138, -0.00008791]) * AU / TU

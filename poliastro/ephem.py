@@ -17,7 +17,7 @@ except ImportError as e:
     raise e
 
 
-__all__ = ['J2000', 'ephem', 'jd']
+__all__ = ['J2000', 'mean_elements']
 
 J2000 = jdcal.MJD_0 + jdcal.MJD_JD2000
 
