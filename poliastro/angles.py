@@ -4,33 +4,43 @@
 
 import numpy as np
 
-from ._ast2body import newtonm as M2nu
+from . import _ast2body
 
 __all__ = ['fp_angle', 'M2nu', 'nu2M']
 
-M2nu.__doc__ = """Eccentric and true anomaly from mean anomaly.
+def M2nu(ecc, M):
+    """Eccentric and true anomaly from mean anomaly.
 
-Parameters
-----------
-ecc : float
-    Eccentricity.
-M : float
-    Mean anomaly (rad).
+    Parameters
+    ----------
+    ecc : float
+        Eccentricity.
+    M : float
+        Mean anomaly (rad).
 
-Returns
--------
-e0 : float
-    Eccentric anomaly (rad).
-nu : float
-    True anomaly (rad).
+    Returns
+    -------
+    e0 : float
+        Eccentric anomaly (rad).
+    nu : float
+        True anomaly (rad).
 
-Examples
---------
->>> _, nu = M2nu(0.06, np.radians(30.0))
->>> np.degrees(nu)
-33.673284930211658
+    Examples
+    --------
+    >>> _, nu = M2nu(0.06, np.radians(30.0))
+    >>> np.degrees(nu)
+    33.673284930211658
 
-"""
+    """
+    bdc = np.broadcast(ecc, M)
+    if bdc.shape:
+        e0 = np.zeros(bdc.shape)
+        nu = np.zeros(bdc.shape)
+        for ii, (ecc_, M_) in enumerate(bdc):
+            e0[ii], nu[ii] = _ast2body.newtonm(ecc_, M_)
+    else:
+        e0, nu = _ast2body.newtonm(ecc, M)
+    return e0, nu
 
 
 def nu2M(ecc, nu):
