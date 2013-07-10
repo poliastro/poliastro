@@ -78,13 +78,13 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-4):
         np.sqrt(k / p) * (ecc + np.cos(nu)),
         0
     ])
-    r_ijk = rotate(r_pqw, 3, -argp)
-    r_ijk = rotate(r_ijk, 1, -inc)
-    r_ijk = rotate(r_ijk, 3, -omega)
+    r_ijk = rotate(r_pqw, 3, argp)
+    r_ijk = rotate(r_ijk, 1, inc)
+    r_ijk = rotate(r_ijk, 3, omega)
 
-    v_ijk = rotate(v_pqw, 3, -argp)
-    v_ijk = rotate(v_ijk, 1, -inc)
-    v_ijk = rotate(v_ijk, 3, -omega)
+    v_ijk = rotate(v_pqw, 3, argp)
+    v_ijk = rotate(v_ijk, 1, inc)
+    v_ijk = rotate(v_ijk, 3, omega)
 
     return r_ijk, v_ijk
 
