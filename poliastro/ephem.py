@@ -105,7 +105,7 @@ ephem_coeffs = {
 }
 
 
-def mean_elements(dd, nbody):
+def mean_elements(jday, nbody):
     """Returns the mean orbital elements of a planet for a given date.
 
     The orbital elements are referred to the mean equator and mean equinox of
@@ -113,8 +113,8 @@ def mean_elements(dd, nbody):
 
     Parameters
     ----------
-    dd : date
-        Date of the query.
+    jday : float
+        Julian Day.
     nbody : int
         Integer identifying the body.
 
@@ -142,7 +142,7 @@ def mean_elements(dd, nbody):
 
     """
     coeffs = ephem_coeffs[nbody]
-    tt = (jd(dd) - J2000) / 36525
+    tt = (jday - J2000) / 36525
     a = polyval(tt, coeffs[0]) * AU
     ecc = polyval(tt, coeffs[1])
     inc = radians(polyval(tt, coeffs[2]))
