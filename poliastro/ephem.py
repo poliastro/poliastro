@@ -138,8 +138,9 @@ def mean_elements(jday, nbody):
     >>> from datetime import datetime
     >>> from poliastro import ephem
     >>> dd = datetime(2065, 6, 24)
-    >>> ephem.ephem(dd, ephem.MERCURY)
-    (57909082.92756851, 0.20564509902750358, 0.12228075058282453, 0.85709018507404022, 0.51256360806673706, 2.4713634244634277)
+    >>> ephem.mean_elements(ephem.jd(dd), ephem.MERCURY)
+    array([  5.79090829e+07,   2.05645099e-01,   1.22280751e-01,
+             8.57090185e-01,   5.12563608e-01,   2.47136342e+00])
 
     TODO: Check with ASTINTER.for.
 
@@ -155,7 +156,10 @@ def mean_elements(jday, nbody):
     argp = normalize(lonper - omega)
     M = normalize(meanlon - lonper)
     _, nu = angles.M2nu(ecc, M)
-    return a, ecc, inc, normalize(omega), argp, nu
+    coe = np.column_stack((a, ecc, inc, normalize(omega), argp, nu))
+    if coe.shape[0] == 1:
+        coe = coe[0]
+    return coe
 
 
 def jd(dd):

@@ -92,3 +92,9 @@ def normalize(angle):
 
     """
     return angle % twopi
+
+
+def direct_angles(a1, a2):
+    twopi = 2 * np.pi
+    a2 = a2 - twopi * ((a2 - a1) // twopi)
+    return a1, a2

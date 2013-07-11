@@ -13,8 +13,7 @@ class TestEphem(TestCase):
         N = 10
         jday_vec = np.arange(N) + ephem.J2000
         coe = ephem.mean_elements(jday_vec, ephem.VENUS)
-        for el in coe:
-            assert el.shape == jday_vec.shape
+        assert coe.shape == jday_vec.shape + (6,)
 
     def test_vallado55(self):
         jday = ephem.jd(datetime(1994, 5, 20, 20))
