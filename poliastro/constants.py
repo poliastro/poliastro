@@ -2,6 +2,8 @@
 
 Units: km, kg, s
 
+TODO: Use AU?
+
 """
 
 k_Sun = 1.32712440018e11

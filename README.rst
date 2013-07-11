@@ -127,6 +127,7 @@ These tasks are in my checklist:
 * Expand constants module
 * Investigate astropy integration
 * Add examples
+* Add benchmarks
 
 FAQ
 ===
