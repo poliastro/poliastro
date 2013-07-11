@@ -2,8 +2,6 @@
 
 """
 
-import warnings
-
 import numpy as np
 
 from .util import transform
@@ -12,7 +10,7 @@ from . import _ast2body
 __all__ = ['coe2rv', 'rv2coe', 'kepler']
 
 
-def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-4):
+def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-5):
     """Converts classical orbital elements to r, v IJK vectors.
 
     Parameters
@@ -46,38 +44,40 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-4):
     array([ 4.90227593,  5.5331365 , -1.975709  ]))
 
     """
-    if ecc < tol:
-        if abs(inc) < tol or abs(inc - np.pi) < tol:
-            warnings.warn("Circular equatorial orbit: true longitude will "
-                          "be used", RuntimeWarning)
-            truelon = omega + argp + nu
-            nu = truelon
-            omega = argp = 0.0
-        else:
-            warnings.warn("Circular inclined orbit: argument of latitude "
-                          "will be used", RuntimeWarning)
-            arglat = argp + nu
-            nu = arglat
-            argp = 0.0
-    else:
-        if abs(inc) < tol or abs(inc - np.pi) < tol:
-            warnings.warn("Elliptic equatorial orbit: longitude of periapsis "
-                          "will be used", RuntimeWarning)
-            lonper = omega + argp
-            argp = lonper
-            omega = 0.0
+    a, ecc, inc, omega, argp, nu = np.atleast_1d(a, ecc, inc, omega, argp, nu)
+    a, ecc, inc, omega, argp, nu = np.broadcast_arrays(a, ecc, inc, omega,
+                                                       argp, nu)
 
+    # Check special cases
+    truelon = omega + argp + nu
+    arglat = argp + nu
+    lonper = omega + argp
+
+    eq = (np.abs(inc) < tol) | (np.abs(inc - np.pi) < tol)
+    ellip_eq = (ecc > tol) & eq
+    circ_eq = (ecc < tol) & eq
+    circ_inc = (ecc < tol) & ~eq
+
+    nu[circ_eq] = truelon[circ_eq]
+    omega[circ_eq] = argp[circ_eq] = 0.0
+
+    nu[circ_inc] = arglat[circ_inc]
+    argp[circ_inc] = 0.0
+
+    argp[ellip_eq] = lonper[ellip_eq]
+    omega[ellip_eq] = 0.0
+
+    # Start computing
     p = a * (1 - ecc ** 2)
-    r_pqw = np.array([
-        p * np.cos(nu) / (1 + ecc * np.cos(nu)),
-        p * np.sin(nu) / (1 + ecc * np.cos(nu)),
-        0
-    ])
-    v_pqw = np.array([
-        -np.sqrt(k / p) * np.sin(nu),
-        np.sqrt(k / p) * (ecc + np.cos(nu)),
-        0
-    ])
+    bdc = np.broadcast(a, ecc, inc, omega, argp, nu)
+    r_pqw = np.zeros((3,) + bdc.shape)
+    r_pqw[0] = p * np.cos(nu) / (1 + ecc * np.cos(nu))
+    r_pqw[1] = p * np.sin(nu) / (1 + ecc * np.cos(nu))
+
+    v_pqw = np.zeros((3,) + bdc.shape)
+    v_pqw[0] = -np.sqrt(k / p) * np.sin(nu)
+    v_pqw[1] = np.sqrt(k / p) * (ecc + np.cos(nu))
+
     r_ijk = transform(r_pqw, 3, -argp)
     r_ijk = transform(r_ijk, 1, -inc)
     r_ijk = transform(r_ijk, 3, -omega)
@@ -86,7 +86,7 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-4):
     v_ijk = transform(v_ijk, 1, -inc)
     v_ijk = transform(v_ijk, 3, -omega)
 
-    return r_ijk, v_ijk
+    return r_ijk.T, v_ijk.T
 
 
 def rv2coe(k, r, v):
@@ -118,7 +118,10 @@ def rv2coe(k, r, v):
     r = np.asanyarray(r).astype(np.float)
     v = np.asanyarray(v).astype(np.float)
     _, a, ecc, inc, omega, argp, nu, _ = _ast2body.rv2coe(r, v, k)
-    return a, ecc, inc, omega, argp, nu
+    coe = np.vstack((a, ecc, inc, omega, argp, nu))
+    if coe.shape[-1] == 1:
+        coe = coe[:, 0]
+    return coe
 
 
 def kepler(k, r0, v0, tof):

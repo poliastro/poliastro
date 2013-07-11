@@ -12,6 +12,20 @@ from poliastro.twobody import coe2rv, rv2coe, kepler
 
 
 class TestCoe2rv(TestCase):
+    def test_vectorize(self):
+        N = 50
+        k = k_Earth
+        p = 11067.790
+        ecc = 0.83285
+        a = p / (1 - ecc ** 2)
+        inc = radians(87.87)
+        omega = radians(227.89)
+        argp = radians(53.38)
+        nu = np.linspace(0, 2 * np.pi, num=N)
+        r, v = coe2rv(k, a, ecc, inc, omega, argp, nu)
+        assert r.shape, (3,) == nu.shape
+        assert v.shape, (3,) == nu.shape
+
     def test_vallado26(self):
         k = k_Earth
         p = 11067.790

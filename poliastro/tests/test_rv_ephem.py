@@ -15,7 +15,7 @@ class TestRVEphem(TestCase):
         TU = 86400
         jday = ephem.jd(datetime(1994, 5, 20, 20))
         coe = ephem.mean_elements(jday, ephem.JUPITER)
-        r_XYZ, v_XYZ = twobody.coe2rv(k_Sun, *coe)
+        r_XYZ, v_XYZ = twobody.coe2rv(k_Sun, *coe.T)
         r0_XYZ = np.array([-4.0686995, -3.5897288, 0.1059762]) * AU
         v0_XYZ = np.array([0.0048974, -0.0053138, -0.00008791]) * AU / TU
         assert_array_almost_equal(r_XYZ / AU, r0_XYZ / AU, decimal=2)
