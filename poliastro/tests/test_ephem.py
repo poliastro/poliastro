@@ -17,15 +17,14 @@ class TestEphem(TestCase):
             assert el.shape == jday_vec.shape
 
     def test_vallado55(self):
-        # FIXME: Data is wrong, get from HORIZONS
         jday = ephem.jd(datetime(1994, 5, 20, 20))
         a, ecc, inc, omega, argp, nu = ephem.mean_elements(jday, ephem.JUPITER)
-        assert_almost_equal(a / AU, 5.202603, decimal=6)
-        assert_almost_equal(ecc, 0.048486, decimal=6)
-        assert_almost_equal(inc, radians(1.303270), decimal=4)
-        assert_almost_equal(omega, radians(100.454519), decimal=2)
-        assert_almost_equal(argp, radians(-86.135316), decimal=2)
-        assert_almost_equal(nu, radians(206.95453))  # ERRATA
+        assert_almost_equal(a / AU, 5.202895, decimal=3)
+        assert_almost_equal(ecc, 0.048319, decimal=3)
+        assert_almost_equal(inc, 0.022770, decimal=4)
+        assert_almost_equal(omega, 1.753543, decimal=2)
+        assert_almost_equal(argp, 4.803144, decimal=1)
+        assert_almost_equal(nu, 3.590915, decimal=1)
 
 
 class TestJd(TestCase):

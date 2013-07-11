@@ -3,9 +3,11 @@
 """
 
 import numpy as np
-from numpy import cos, sin
+from numpy import cos, sin, pi
 
 __all__ = ['rotate']
+
+twopi = 2 * pi
 
 
 def rotate(vec, ax, angle):
@@ -52,3 +54,10 @@ def rotate(vec, ax, angle):
             cos(angle) + ax[2] ** 2 * (1 - cos(angle))]
     ])
     return np.dot(rot, vec)
+
+
+def normalize(angle):
+    """Normalize angle between 0 and 2 pi radians.
+
+    """
+    return angle % twopi

@@ -10,6 +10,7 @@ from numpy import radians
 from numpy.polynomial.polynomial import polyval
 
 from . import angles
+from .util import normalize
 from .constants import AU
 
 
@@ -145,14 +146,14 @@ def mean_elements(jday, nbody):
     tt = (jday - J2000) / 36525
     a = polyval(tt, coeffs[0]) * AU
     ecc = polyval(tt, coeffs[1])
-    inc = radians(polyval(tt, coeffs[2]))
+    inc = normalize(radians(polyval(tt, coeffs[2])))
     omega = radians(polyval(tt, coeffs[3]))
     lonper = radians(polyval(tt, coeffs[4]))
     meanlon = radians(polyval(tt, coeffs[5]))
-    argp = lonper - omega
-    M = meanlon - lonper
+    argp = normalize(lonper - omega)
+    M = normalize(meanlon - lonper)
     _, nu = angles.M2nu(ecc, M)
-    return a, ecc, inc, omega, argp, nu
+    return a, ecc, inc, normalize(omega), argp, nu
 
 
 def jd(dd):

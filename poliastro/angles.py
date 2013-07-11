@@ -5,6 +5,7 @@
 import numpy as np
 
 from . import _ast2body
+from .util import normalize
 
 __all__ = ['fp_angle', 'M2nu', 'nu2M']
 
@@ -40,7 +41,7 @@ def M2nu(ecc, M):
             e0[ii], nu[ii] = _ast2body.newtonm(ecc_, M_)
     else:
         e0, nu = _ast2body.newtonm(ecc, M)
-    return e0, nu
+    return normalize(e0), normalize(nu)
 
 
 def nu2M(ecc, nu):
