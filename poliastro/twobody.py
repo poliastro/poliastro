@@ -6,7 +6,7 @@ import warnings
 
 import numpy as np
 
-from .util import rotate
+from .util import transform
 from . import _ast2body
 
 __all__ = ['coe2rv', 'rv2coe', 'kepler']
@@ -78,13 +78,13 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-4):
         np.sqrt(k / p) * (ecc + np.cos(nu)),
         0
     ])
-    r_ijk = rotate(r_pqw, 3, argp)
-    r_ijk = rotate(r_ijk, 1, inc)
-    r_ijk = rotate(r_ijk, 3, omega)
+    r_ijk = transform(r_pqw, 3, -argp)
+    r_ijk = transform(r_ijk, 1, -inc)
+    r_ijk = transform(r_ijk, 3, -omega)
 
-    v_ijk = rotate(v_pqw, 3, argp)
-    v_ijk = rotate(v_ijk, 1, inc)
-    v_ijk = rotate(v_ijk, 3, omega)
+    v_ijk = transform(v_pqw, 3, -argp)
+    v_ijk = transform(v_ijk, 1, -inc)
+    v_ijk = transform(v_ijk, 3, -omega)
 
     return r_ijk, v_ijk
 

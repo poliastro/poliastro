@@ -13,6 +13,11 @@ twopi = 2 * pi
 def rotate(vec, ax, angle):
     """Rotates a vector around axis a right-handed positive angle.
 
+    This performs a so-called active or alibi transformation: rotates the
+    vector while the coordinate system remains unchanged. To do the opposite
+    operation (passive or alias transformation) call the function as
+    ``rotate(vec, ax, -angle)`` or use the convenience function `transform`.
+
     Parameters
     ----------
     vec : array
@@ -54,6 +59,18 @@ def rotate(vec, ax, angle):
             cos(angle) + ax[2] ** 2 * (1 - cos(angle))]
     ])
     return np.dot(rot, vec)
+
+
+def transform(vec, ax, angle):
+    """Rotates a coordinate system around axis a positive right-handed angle.
+
+    Notes
+    -----
+    This is a convenience function, equivalent to `rotate(vec, ax, -angle)`.
+    Refer to the documentation of that function for further information.
+
+    """
+    return rotate(vec, ax, -angle)
 
 
 def normalize(angle):
