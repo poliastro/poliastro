@@ -3,7 +3,7 @@ from numpy import radians
 from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal, run_module_suite
 
-from poliastro.util import rotate
+from poliastro.util import rotate, direct_angles
 
 
 class TestRotate(TestCase):
@@ -57,6 +57,14 @@ class TestRotate(TestCase):
         assert_array_almost_equal(rotate(vv, 3, angle)[0][1], v0[0], decimal=4)
         assert_array_almost_equal(rotate(v, 3, angles)[0][1], v0[0], decimal=4)
         assert_array_almost_equal(rotate(v, 3, angle)[0], v0[0], decimal=4)
+
+
+class TestDirectAngles(TestCase):
+    def test_data(self):
+        r = radians
+        assert direct_angles(0, r(-1)) == (0, r(359))
+        assert direct_angles(0, r(-361)) == (0, r(359))
+        assert direct_angles(r(360), r(-361)) == (r(360), r(719))
 
 
 if __name__ == '__main__':

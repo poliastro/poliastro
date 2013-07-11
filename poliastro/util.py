@@ -94,7 +94,10 @@ def normalize(angle):
     return angle % twopi
 
 
-def direct_angles(a1, a2):
+def direct_angles(a_i, a_f):
+    """Return angles so a_f > a_i, with a1 unchanged.
+
+    """
     twopi = 2 * np.pi
-    a2 = a2 - twopi * ((a2 - a1) // twopi)
-    return a1, a2
+    a_f = a_f - twopi * ((a_f - a_i) // twopi)
+    return a_i, a_f
