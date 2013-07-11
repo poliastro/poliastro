@@ -25,40 +25,28 @@ def rotate(vec, ax, angle):
     ax : array, int
         Axis of rotation. If 1, 2, 3 is given, then one of the coordinate axis
         is chosen.
-    angle : float
-        Angle of rotation (rad).
+    angle : array
+        Angle(s) of rotation (rad).
 
     Notes
     -----
-    Based on
-    http://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+    This function performs some unholy sorcery to work also with an array of
+    vectors and an array of angles. There be dragons!
 
     """
-    # TODO: Broadcast angle and axis too, will have to do it OVER THE THIRD DIMENSION LOL
-    #assert ax.shape == (3,)
-    #assert vec.shape[-1] == 3
     if type(ax) is int:
         ax_ = np.zeros(3)
         ax_[ax - 1] = 1
         ax = ax_
-    rot = np.zeros((3, 3))
-    rot[..., :, :] = np.array([
-        [
-            cos(angle) + ax[0] ** 2 * (1 - cos(angle)),
-            ax[0] * ax[1] * (1 - cos(angle)) - ax[2] * sin(angle),
-            ax[0] * ax[2] * (1 - cos(angle)) + ax[1] * sin(angle)
-        ],
-        [
-            ax[1] * ax[0] * (1 - cos(angle)) + ax[2] * sin(angle),
-            cos(angle) + ax[1] ** 2 * (1 - cos(angle)),
-            ax[1] * ax[2] * (1 - cos(angle)) - ax[0] * sin(angle)
-        ],
-        [
-            ax[2] * ax[0] * (1 - cos(angle)) - ax[1] * sin(angle),
-            ax[2] * ax[1] * (1 - cos(angle)) + ax[0] * sin(angle),
-            cos(angle) + ax[2] ** 2 * (1 - cos(angle))]
-    ])
-    return np.dot(rot, vec)
+    angle = np.atleast_1d(angle)
+    vec = np.atleast_2d(vec.T).T
+    angle, vec = np.broadcast_arrays(angle, vec)
+    rot = _rot_matrix(ax, angle[0])
+    qqq = np.einsum('aik,km->aim', rot, vec)
+    rot_vec = np.einsum('lhl->hl', qqq)
+    if rot_vec.shape[-1] == 1:
+        rot_vec = rot_vec[:, 0]
+    return rot_vec
 
 
 def transform(vec, ax, angle):
@@ -71,6 +59,32 @@ def transform(vec, ax, angle):
 
     """
     return rotate(vec, ax, -angle)
+
+
+def _rot_matrix(ax, ang):
+    """
+    Based on
+    http://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+
+    """
+    rot = np.zeros((3, 3) + ang.shape)
+    rot = np.array([
+        [
+            cos(ang) + ax[0] ** 2 * (1 - cos(ang)),
+            ax[0] * ax[1] * (1 - cos(ang)) - ax[2] * sin(ang),
+            ax[0] * ax[2] * (1 - cos(ang)) + ax[1] * sin(ang)
+            ],
+        [
+            ax[1] * ax[0] * (1 - cos(ang)) + ax[2] * sin(ang),
+            cos(ang) + ax[1] ** 2 * (1 - cos(ang)),
+            ax[1] * ax[2] * (1 - cos(ang)) - ax[0] * sin(ang)
+            ],
+        [
+            ax[2] * ax[0] * (1 - cos(ang)) - ax[1] * sin(ang),
+            ax[2] * ax[1] * (1 - cos(ang)) + ax[0] * sin(ang),
+            cos(ang) + ax[2] ** 2 * (1 - cos(ang))]
+    ])
+    return rot.transpose(2, 0, 1)
 
 
 def normalize(angle):
