@@ -42,8 +42,6 @@ if __name__ == '__main__':
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
           requires=["numpy", "scipy", "jdcal"],
-          data_files=[('poliastro/octave',
-                       ['poliastro/octave/uplanet_2013.m'])],
           packages=['poliastro'],
           classifiers=[
               "Development Status :: 2 - Pre-Alpha",
