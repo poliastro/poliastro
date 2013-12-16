@@ -7,7 +7,42 @@ import numpy as np
 from .util import transform
 from . import _ast2body
 
-__all__ = ['coe2rv', 'rv2coe', 'kepler']
+__all__ = ['hohmann', 'coe2rv', 'rv2coe', 'kepler']
+
+
+def hohmann(k, r_i, r_f):
+    """Performs Hohmann transfer between two circular orbits.
+
+    """
+    a_trans = (r_i + r_f) / 2
+    vi = np.sqrt(k / r_i)
+    va = np.sqrt(2 * (k / r_i - k / (2 * a_trans)))
+    dva = va - vi
+    vb = np.sqrt(2 * (k / r_f - k / (2 * a_trans)))
+    vf = np.sqrt(k / r_f)
+    dvb = vf - vb
+    t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
+    return dva, dvb, a_trans, t_trans
+
+
+def bielliptic(k, r_i, r_b, r_f):
+    """Performs bielliptic transfer between two circular orbits.
+
+    """
+    a_trans1 = (r_i + r_b) / 2
+    a_trans2 = (r_b + r_f) / 2
+    vi = np.sqrt(k / r_i)
+    va1 = np.sqrt(2 * (k / r_i - k / (2 * a_trans1)))
+    dva = va1 - vi
+    vb1 = np.sqrt(2 * (k / r_b - k / (2 * a_trans1)))
+    vb2 = np.sqrt(2 * (k / r_b - k / (2 * a_trans2)))
+    dvb = vb2 - vb1
+    vc2 = np.sqrt(2 * (k / r_f - k / (2 * a_trans2)))
+    vf = np.sqrt(k / r_f)
+    dvc = vf - vc2
+    t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
+    t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
+    return dva, dvb, dvc, a_trans1, a_trans2, t_trans1, t_trans2
 
 
 def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-5):

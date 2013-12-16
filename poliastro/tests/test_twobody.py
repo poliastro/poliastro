@@ -3,12 +3,45 @@ from numpy import radians
 from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal, run_module_suite
 
-from poliastro.constants import k_Earth, k_Sun
+from poliastro.constants import k_Earth, k_Sun, R_Earth
 
-from poliastro.twobody import coe2rv, rv2coe, kepler
+from poliastro.twobody import hohmann, bielliptic, coe2rv, rv2coe, kepler
 
 # TODO: Low precision in some results, why? Use canonical units?
 # TODO: Test for exceptions
+
+
+class TestHohmann(TestCase):
+    def test_vallado61(self):
+        alt_i = 191.34411  # km
+        alt_f = 35781.34857  # km
+        k = k_Earth
+        expected_dv = 3.935224  # km/s
+        expected_t_trans = 5.256713  # h
+        r_i = R_Earth + alt_i
+        r_f = R_Earth + alt_f
+        dva, dvb, _, t_trans = hohmann(k, r_i, r_f)
+        dv = abs(dva) + abs(dvb)
+        assert_almost_equal(dv, expected_dv, decimal=6)
+        assert_almost_equal(t_trans / 3600, expected_t_trans, decimal=6)
+
+
+class TestBielliptic(TestCase):
+    def test_vallado62(self):
+        alt_i = 191.34411  # km
+        alt_b = 503873  # km
+        alt_f = 376310.0  # km
+        k = k_Earth
+        expected_dv = 3.904057  # km/s
+        expected_t_trans = 593.919803  # h
+        r_i = R_Earth + alt_i
+        r_b = R_Earth + alt_b
+        r_f = R_Earth + alt_f
+        dva, dvb, dvc, _, _, t_trans1, t_trans2 = bielliptic(k, r_i, r_b, r_f)
+        dv = abs(dva) + abs(dvb) + abs(dvc)
+        t_trans = t_trans1 + t_trans2
+        assert_almost_equal(dv, expected_dv, decimal=6)
+        assert_almost_equal(t_trans / 3600, expected_t_trans, decimal=3)
 
 
 class TestCoe2rv(TestCase):
