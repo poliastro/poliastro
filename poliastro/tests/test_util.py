@@ -7,7 +7,14 @@ from poliastro.util import rotate, direct_angles
 
 
 class TestRotate(TestCase):
-    def test_simple(self):
+    def test_rotation_around_coordinate_axis(self):
+        vec = np.array([1, 0, 0])
+        ax = 2
+        angle = np.pi / 2
+        rot_vec = rotate(vec, ax, angle)
+        assert_array_almost_equal(rot_vec, np.array([0, 0, -1]))
+
+    def test_rotation_around_arbitrary_axis(self):
         vec = np.array([1, 0, 0])
         ax = np.array([0, 0, 1])
         angle = np.pi / 2
@@ -16,55 +23,18 @@ class TestRotate(TestCase):
 
     def test_vectorize_vec(self):
         vec = np.random.rand(3, 10)
-        ax = np.array([1, 0, 0])
+        ax = 1
         angle = np.random.rand()
         rot_vec = rotate(vec, ax, angle)
         assert rot_vec.shape == vec.shape
 
-    def test_vectorize_ang(self):
-        vec = np.random.rand(3)
-        ax = np.array([1, 0, 0])
-        angle = np.random.rand(10)
-        rot_vec = rotate(vec, ax, angle)
-        assert rot_vec.shape == vec.shape + angle.shape
-
-    def test_data(self):
-        N = 10
-        idx = 1
-        angles = radians(np.arange(N) * 10)
-        angle = angles[idx]
-        vv = np.array([
-            [1, 0, 0],
-            [0, 1, 0],
-            [0, 0, 1],
-            [-1, 0, 0],
-            [0, -1, 0],
-            [0, 0, -1],
-            [1, 1, 0],
-            [1, 0, 1],
-            [0, 1, 1],
-            [-1, 0, -1]
-            ]).T
-        v = vv[:, idx]
-        # vv[idx] rotated angles[idx]
-        v0 = np.array([-0.1736,  0.9848,  0.    ])
-        assert_array_almost_equal(rotate(vv, 3, angles)[:, 1], v0, decimal=4)
-        assert_array_almost_equal(rotate(vv, 3, angle)[:, 1], v0, decimal=4)
-        assert_array_almost_equal(rotate(v, 3, angles)[:, 1], v0, decimal=4)
-        assert_array_almost_equal(rotate(v, 3, angle), v0, decimal=4)
-
-        assert_array_almost_equal(rotate(vv, 3, angles)[0][1], v0[0], decimal=4)
-        assert_array_almost_equal(rotate(vv, 3, angle)[0][1], v0[0], decimal=4)
-        assert_array_almost_equal(rotate(v, 3, angles)[0][1], v0[0], decimal=4)
-        assert_array_almost_equal(rotate(v, 3, angle)[0], v0[0], decimal=4)
-
 
 class TestDirectAngles(TestCase):
     def test_data(self):
-        r = radians
-        assert direct_angles(0, r(-1)) == (0, r(359))
-        assert direct_angles(0, r(-361)) == (0, r(359))
-        assert direct_angles(r(360), r(-361)) == (r(360), r(719))
+        rd = radians
+        assert direct_angles(0, rd(-1)) == (0, rd(359))
+        assert direct_angles(0, rd(-361)) == (0, rd(359))
+        assert direct_angles(rd(360), rd(-361)) == (rd(360), rd(719))
 
 
 if __name__ == '__main__':
