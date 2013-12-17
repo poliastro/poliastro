@@ -19,9 +19,9 @@ class TestLambert(TestCase):
         tof = 76.0 * 60.0
         va, vb = lambert(k, r0, r, tof)
         assert_array_almost_equal(va, np.array([2.058925, 2.915956, 0.0]),
-                                  decimal=4)
+                                  decimal=3)
         assert_array_almost_equal(vb, np.array([-3.451569, 0.910301, 0.0]),
-                                  decimal=5)
+                                  decimal=3)
 
     def test_curtis52(self):
         k = k_earth.to(units.km ** 3 / units.s ** 2).value
@@ -30,9 +30,9 @@ class TestLambert(TestCase):
         tof = 3600.0
         va, vb = lambert(k, r0, r, tof)
         assert_array_almost_equal(va, np.array([-5.9925, 1.9254, 3.2456]),
-                                  decimal=4)
+                                  decimal=3)
         assert_array_almost_equal(vb, np.array([-3.3125, -4.1966, -0.38529]),
-                                  decimal=4)
+                                  decimal=3)
 
     def test_curtis53(self):
         k = k_earth.to(units.km ** 3 / units.s ** 2).value

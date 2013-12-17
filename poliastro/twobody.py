@@ -79,37 +79,32 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-5):
     array([ 4.90227593,  5.5331365 , -1.975709  ]))
 
     """
-    a, ecc, inc, omega, argp, nu = np.atleast_1d(a, ecc, inc, omega, argp, nu)
-    a, ecc, inc, omega, argp, nu = np.broadcast_arrays(a, ecc, inc, omega,
-                                                       argp, nu)
+    ## Check special cases
+    #truelon = omega + argp + nu
+    #arglat = argp + nu
+    #lonper = omega + argp
 
-    # Check special cases
-    truelon = omega + argp + nu
-    arglat = argp + nu
-    lonper = omega + argp
+    #eq = (np.abs(inc) < tol) | (np.abs(inc - np.pi) < tol)
+    #ellip_eq = (ecc > tol) & eq
+    #circ_eq = (ecc < tol) & eq
+    #circ_inc = (ecc < tol) & ~eq
 
-    eq = (np.abs(inc) < tol) | (np.abs(inc - np.pi) < tol)
-    ellip_eq = (ecc > tol) & eq
-    circ_eq = (ecc < tol) & eq
-    circ_inc = (ecc < tol) & ~eq
+    #nu[circ_eq] = truelon[circ_eq]
+    #omega[circ_eq] = argp[circ_eq] = 0.0
 
-    nu[circ_eq] = truelon[circ_eq]
-    omega[circ_eq] = argp[circ_eq] = 0.0
+    #nu[circ_inc] = arglat[circ_inc]
+    #argp[circ_inc] = 0.0
 
-    nu[circ_inc] = arglat[circ_inc]
-    argp[circ_inc] = 0.0
-
-    argp[ellip_eq] = lonper[ellip_eq]
-    omega[ellip_eq] = 0.0
+    #argp[ellip_eq] = lonper[ellip_eq]
+    #omega[ellip_eq] = 0.0
 
     # Start computing
     p = a * (1 - ecc ** 2)
-    bdc = np.broadcast(a, ecc, inc, omega, argp, nu)
-    r_pqw = np.zeros((3,) + bdc.shape)
+    r_pqw = np.zeros(3)
     r_pqw[0] = p * np.cos(nu) / (1 + ecc * np.cos(nu))
     r_pqw[1] = p * np.sin(nu) / (1 + ecc * np.cos(nu))
 
-    v_pqw = np.zeros((3,) + bdc.shape)
+    v_pqw = np.zeros(3)
     v_pqw[0] = -np.sqrt(k / p) * np.sin(nu)
     v_pqw[1] = np.sqrt(k / p) * (ecc + np.cos(nu))
 
@@ -152,7 +147,7 @@ def rv2coe(k, r, v):
     # TODO: Extend for additional arguments arglat, truelon, lonper
     r = np.asanyarray(r).astype(np.float)
     v = np.asanyarray(v).astype(np.float)
-    _, a, ecc, inc, omega, argp, nu, _ = _ast2body.rv2coe(r, v, k)
+    _, a, ecc, inc, omega, argp, nu, *_ = _ast2body.rv2coe(r, v, k)
     coe = np.vstack((a, ecc, inc, omega, argp, nu))
     if coe.shape[-1] == 1:
         coe = coe[:, 0]
