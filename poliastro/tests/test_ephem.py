@@ -4,8 +4,12 @@ import numpy as np
 from numpy import radians
 from numpy.testing import TestCase, assert_almost_equal, run_module_suite
 
+from astropy import units
+from astropy.constants import au
+
 from poliastro import ephem
-from poliastro.constants import AU
+
+AU = au.to(units.km).value
 
 
 class TestEphem(TestCase):

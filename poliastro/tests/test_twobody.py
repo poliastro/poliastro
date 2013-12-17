@@ -3,23 +3,27 @@ from numpy import radians
 from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal, run_module_suite
 
-from poliastro.constants import k_Earth, k_Sun, R_Earth
+from astropy import units
+from astropy.constants import G, M_earth, R_earth
 
 from poliastro.twobody import hohmann, bielliptic, coe2rv, rv2coe, kepler
 
 # TODO: Low precision in some results, why? Use canonical units?
 # TODO: Test for exceptions
 
+k_earth = (G * M_earth)
+
 
 class TestHohmann(TestCase):
     def test_vallado61(self):
         alt_i = 191.34411  # km
         alt_f = 35781.34857  # km
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
+        R = R_earth.to(units.km).value
         expected_dv = 3.935224  # km/s
         expected_t_trans = 5.256713  # h
-        r_i = R_Earth + alt_i
-        r_f = R_Earth + alt_f
+        r_i = R + alt_i
+        r_f = R + alt_f
         dva, dvb, _, t_trans = hohmann(k, r_i, r_f)
         dv = abs(dva) + abs(dvb)
         assert_almost_equal(dv, expected_dv, decimal=6)
@@ -31,12 +35,13 @@ class TestBielliptic(TestCase):
         alt_i = 191.34411  # km
         alt_b = 503873  # km
         alt_f = 376310.0  # km
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
+        R = R_earth.to(units.km).value
         expected_dv = 3.904057  # km/s
         expected_t_trans = 593.919803  # h
-        r_i = R_Earth + alt_i
-        r_b = R_Earth + alt_b
-        r_f = R_Earth + alt_f
+        r_i = R + alt_i
+        r_b = R + alt_b
+        r_f = R + alt_f
         dva, dvb, dvc, _, _, t_trans1, t_trans2 = bielliptic(k, r_i, r_b, r_f)
         dv = abs(dva) + abs(dvb) + abs(dvc)
         t_trans = t_trans1 + t_trans2
@@ -47,7 +52,7 @@ class TestBielliptic(TestCase):
 class TestCoe2rv(TestCase):
     def test_vectorize(self):
         N = 50
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
         p = 11067.790
         ecc = 0.83285
         a = p / (1 - ecc ** 2)
@@ -60,7 +65,7 @@ class TestCoe2rv(TestCase):
         assert v.shape, (3,) == nu.shape
 
     def test_vallado26(self):
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
         p = 11067.790
         ecc = 0.83285
         a = p / (1 - ecc ** 2)
@@ -77,7 +82,7 @@ class TestCoe2rv(TestCase):
 
 class TestRv2coe(TestCase):
     def test_vallado25(self):
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
         r = np.array([6524.384, 6862.875, 6448.296])
         v = np.array([4.901327, 5.533756, -1.976341])
         a, ecc, inc, omega, argp, nu = rv2coe(k, r, v)
@@ -92,7 +97,7 @@ class TestRv2coe(TestCase):
 
 class TestKepler(TestCase):
     def test_vallado24(self):
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
         r0 = np.array([1131.340, -2282.343, 6672.423])
         v0 = np.array([-5.64305, 4.30333, 2.42879])
         tof = 40 * 60.0

@@ -3,14 +3,17 @@ from numpy import radians
 from numpy.testing import TestCase, assert_array_almost_equal, \
     assert_almost_equal, run_module_suite
 
-from poliastro.constants import k_Earth, k_Sun
+from astropy import units
+from astropy.constants import G, M_earth, R_earth
 
 from poliastro.iod import lambert
+
+k_earth = (G * M_earth)
 
 
 class TestLambert(TestCase):
     def test_vallado75(self):
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
         r0 = np.array([15945.34, 0.0, 0.0])
         r = np.array([12214.83399, 10249.46731, 0.0])
         tof = 76.0 * 60.0
@@ -21,7 +24,7 @@ class TestLambert(TestCase):
                                   decimal=5)
 
     def test_curtis52(self):
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
         r0 = np.array([5000.0, 10000.0, 2100.0])
         r = np.array([-14600.0, 2500.0, 7000.0])
         tof = 3600.0
@@ -32,7 +35,7 @@ class TestLambert(TestCase):
                                   decimal=4)
 
     def test_curtis53(self):
-        k = k_Earth
+        k = k_earth.to(units.km ** 3 / units.s ** 2).value
         r0 = np.array([273378.0, 0.0, 0.0])
         r = np.array([145820.0, 12758.0, 0.0])
         tof = 13.5 * 3600.0

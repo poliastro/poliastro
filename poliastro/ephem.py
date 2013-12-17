@@ -11,7 +11,11 @@ from numpy.polynomial.polynomial import polyval
 
 from . import angles
 from .util import normalize
-from .constants import AU
+
+from astropy import units
+from astropy.constants import au
+
+AU = au.to(units.km).value
 
 
 __all__ = ['J2000', 'mean_elements']
