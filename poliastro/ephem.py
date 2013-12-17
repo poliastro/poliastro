@@ -1,8 +1,5 @@
 """Ephemerides.
 
-Function gcal2jd borrowed from jdcal by Prasanth Nair, available under
-the same license as poliastro (BSD). See COPYING for full text.
-
 """
 
 import numpy as np
@@ -12,6 +9,7 @@ from numpy.polynomial.polynomial import polyval
 from . import angles
 from .util import normalize
 
+from astropy import time
 from astropy import units
 from astropy.constants import au
 
@@ -20,9 +18,7 @@ AU = au.to(units.km).value
 
 __all__ = ['J2000', 'mean_elements']
 
-MJD_0 = 2400000.5
-MJD_JD2000 = 51544.5
-J2000 = MJD_0 + MJD_JD2000
+J2000 = time.Time("2000-01-01 12:00", scale='utc')
 
 MERCURY = 1
 VENUS = 2
@@ -110,7 +106,7 @@ ephem_coeffs = {
 }
 
 
-def mean_elements(jday, nbody):
+def mean_elements(dd, nbody):
     """Returns the mean orbital elements of a planet for a given date.
 
     The orbital elements are referred to the mean equator and mean equinox of
@@ -118,8 +114,8 @@ def mean_elements(jday, nbody):
 
     Parameters
     ----------
-    jday : float
-        Julian Day.
+    dd : datetime
+        Date to calculate the mean elements.
     nbody : int
         Integer identifying the body.
 
@@ -142,7 +138,7 @@ def mean_elements(jday, nbody):
     >>> from datetime import datetime
     >>> from poliastro import ephem
     >>> dd = datetime(2065, 6, 24)
-    >>> ephem.mean_elements(ephem.jd(dd), ephem.MERCURY)
+    >>> ephem.mean_elements(dd, ephem.MERCURY)
     array([  5.79090829e+07,   2.05645099e-01,   1.22280751e-01,
              8.57090185e-01,   5.12563608e-01,   2.47136342e+00])
 
@@ -150,7 +146,7 @@ def mean_elements(jday, nbody):
 
     """
     coeffs = ephem_coeffs[nbody]
-    tt = (jday - J2000) / 36525
+    tt = (time.Time(dd, scale='utc') - J2000).jd / 36525
     a = polyval(tt, coeffs[0]) * AU
     ecc = polyval(tt, coeffs[1])
     inc = normalize(radians(polyval(tt, coeffs[2])))
@@ -164,173 +160,3 @@ def mean_elements(jday, nbody):
     if coe.shape[0] == 1:
         coe = coe[0]
     return coe
-
-
-def jd(dd):
-    """Returns Julian Day given date.
-
-    Parameters
-    ----------
-    dd : date or datetime
-        Date to compute the JD (Gregorian calendar)
-
-    Examples
-    --------
-    >>> from datetime import date, datetime
-    >>> from poliastro import ephem
-    >>> dd = date(2000, 1, 1)
-    >>> ephem.jd(dd)
-    2451545.0
-    >>> ephem.jd(datetime(2065, 6, 24, 0))
-    2475460.5
-    >>> ephem.jd(datetime(1977, 4, 26, 9, 36))
-    2443259.9
-    >>> ephem.jd(datetime(1957, 10, 4, 19, 26, 24))
-    2436116.31
-
-    """
-    try:
-        tt = dd.timetz()
-        if tt.tzinfo:
-            raise NotImplementedError("Only UTC accepted")
-        frac = (3600000000 * tt.hour +
-                60000000 * tt.minute +
-                1000000 * tt.second +
-                tt.microsecond) / (24 * 3600 * 1000000)
-    except AttributeError:
-        # The object is a date: assume midnight
-        frac = 0.5
-    return sum(gcal2jd(dd.year, dd.month, dd.day) + (frac,))
-
-
-def gcal2jd(year, month, day):
-    """Gregorian calendar date to Julian date.
-
-    The input and output are for the proleptic Gregorian calendar,
-    i.e., no consideration of historical usage of the calendar is
-    made.
-
-    # TODO: Vectorize, merge with jd?
-
-    Parameters
-    ----------
-    year : int
-        Year as an integer.
-    month : int
-        Month as an integer.
-    day : int
-        Day as an integer.
-
-    Returns
-    -------
-    jd1, jd2: 2-element tuple of floats
-        When added together, the numbers give the Julian date for the
-        given Gregorian calendar date. The first number is always
-        MJD_0 i.e., 2451545.5. So the second is the MJD.
-
-    Examples
-    --------
-    >>> gcal2jd(2000,1,1)
-    (2400000.5, 51544.0)
-    >>> 2400000.5 + 51544.0 + 0.5
-    2451545.0
-    >>> year = [-4699, -2114, -1050, -123, -1, 0, 1, 123, 1678.0, 2000,
-    ....: 2012, 2245]
-    >>> month = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    >>> day = [1, 12, 23, 14, 25, 16, 27, 8, 9, 10, 11, 31]
-    >>> x = [gcal2jd(y, m, d) for y, m, d in zip(year, month, day)]
-    >>> for i in x: print(i)
-    (2400000.5, -2395215.0)
-    (2400000.5, -1451021.0)
-    (2400000.5, -1062364.0)
-    (2400000.5, -723762.0)
-    (2400000.5, -679162.0)
-    (2400000.5, -678774.0)
-    (2400000.5, -678368.0)
-    (2400000.5, -633797.0)
-    (2400000.5, -65812.0)
-    (2400000.5, 51827.0)
-    (2400000.5, 56242.0)
-    (2400000.5, 141393.0)
-
-    Negative months and days are valid. For example, 2000/-2/-4 =>
-    1999/+12-2/-4 => 1999/10/-4 => 1999/9/30-4 => 1999/9/26.
-
-    >>> gcal2jd(2000, -2, -4)
-    (2400000.5, 51447.0)
-    >>> gcal2jd(1999, 9, 26)
-    (2400000.5, 51447.0)
-
-    >>> gcal2jd(2000, 2, -1)
-    (2400000.5, 51573.0)
-    >>> gcal2jd(2000, 1, 30)
-    (2400000.5, 51573.0)
-
-    >>> gcal2jd(2000, 3, -1)
-    (2400000.5, 51602.0)
-    >>> gcal2jd(2000, 2, 28)
-    (2400000.5, 51602.0)
-
-    Month 0 becomes previous month.
-
-    >>> gcal2jd(2000, 0, 1)
-    (2400000.5, 51513.0)
-    >>> gcal2jd(1999, 12, 1)
-    (2400000.5, 51513.0)
-
-    Day number 0 becomes last day of previous month.
-
-    >>> gcal2jd(2000, 3, 0)
-    (2400000.5, 51603.0)
-    >>> gcal2jd(2000, 2, 29)
-    (2400000.5, 51603.0)
-
-    If `day` is greater than the number of days in `month`, then it
-    gets carried over to the next month.
-
-    >>> gcal2jd(2000,2,30)
-    (2400000.5, 51604.0)
-    >>> gcal2jd(2000,3,1)
-    (2400000.5, 51604.0)
-
-    >>> gcal2jd(2001,2,30)
-    (2400000.5, 51970.0)
-    >>> gcal2jd(2001,3,2)
-    (2400000.5, 51970.0)
-
-    Notes
-    -----
-    The returned Julian date is for mid-night of the given date. To
-    find the Julian date for any time of the day, simply add time as a
-    fraction of a day. For example Julian date for mid-day can be
-    obtained by adding 0.5 to either the first part or the second
-    part. The latter is preferable, since it will give the MJD for the
-    date and time.
-
-    BC dates should be given as -(BC - 1) where BC is the year. For
-    example 1 BC == 0, 2 BC == -1, and so on.
-
-    Negative numbers can be used for `month` and `day`. For example
-    2000, -1, 1 is the same as 1999, 11, 1.
-
-    The Julian dates are proleptic Julian dates, i.e., values are
-    returned without considering if Gregorian dates are valid for the
-    given date.
-
-    The input values are truncated to integers.
-
-    """
-    year = int(year)
-    month = int(month)
-    day = int(day)
-
-    a = np.trunc((month - 14) / 12.0)
-    jd = np.trunc((1461 * (year + 4800 + a)) / 4.0)
-    jd += np.trunc((367 * (month - 2 - 12 * a)) / 12.0)
-    x = np.trunc((year + 4900 + a) / 100.0)
-    jd -= np.trunc((3 * x) / 4.0)
-    jd += day - 2432075.5  # was 32075; add 2400000.5
-
-    jd -= 0.5  # 0 hours; above JD is for midday, switch to midnight.
-
-    return MJD_0, jd
