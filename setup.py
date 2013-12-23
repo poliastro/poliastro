@@ -25,7 +25,7 @@ def configuration(parent_package='', top_path=None):
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    setup(version='0.1.0',
+    setup(version='0.1.1',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
           author="Juan Luis Cano",
@@ -52,5 +52,5 @@ if __name__ == '__main__':
               "Topic :: Scientific/Engineering",
               "Topic :: Scientific/Engineering :: Physics"
           ],
-          long_description=open('README.rst').read(),
+          long_description=open('README').read(),
           configuration=configuration)
