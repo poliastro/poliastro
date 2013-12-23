@@ -147,7 +147,7 @@ def rv2coe(k, r, v):
     # TODO: Extend for additional arguments arglat, truelon, lonper
     r = np.asanyarray(r).astype(np.float)
     v = np.asanyarray(v).astype(np.float)
-    _, a, ecc, inc, omega, argp, nu, *_ = _ast2body.rv2coe(r, v, k)
+    _, a, ecc, inc, omega, argp, nu, _, _, _ = _ast2body.rv2coe(r, v, k)
     coe = np.vstack((a, ecc, inc, omega, argp, nu))
     if coe.shape[-1] == 1:
         coe = coe[:, 0]
