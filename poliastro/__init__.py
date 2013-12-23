@@ -16,6 +16,7 @@ from . import iod
 from . import twobody
 from .logging import logger
 
-from numpy.testing import Tester
-test = Tester().test
-bench = Tester().bench
+def test():
+    import os.path
+    import pytest
+    pytest.main(os.path.dirname(os.path.abspath(__file__)))

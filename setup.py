@@ -41,7 +41,7 @@ if __name__ == '__main__':
               "aero", "aerospace", "engineering",
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
-          requires=["numpy", "scipy", "jdcal"],
+          requires=["numpy", "astropy", "pytest"],
           packages=['poliastro'],
           classifiers=[
               "Development Status :: 2 - Pre-Alpha",
