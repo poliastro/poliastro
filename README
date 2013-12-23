@@ -8,7 +8,7 @@ Overview
 :Name: poliastro
 :Website: https://github.com/Pybonacci/poliastro
 :Author: Juan Luis Cano <juanlu001@gmail.com>
-:Version: 0.1.1
+:Version: 0.1.2
 
 These are some Python wrappers to Fortran and MATLAB subroutines useful in
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's

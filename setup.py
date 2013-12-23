@@ -25,7 +25,7 @@ def configuration(parent_package='', top_path=None):
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    setup(version='0.1.1',
+    setup(version='0.1.2',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
           author="Juan Luis Cano",
