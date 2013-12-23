@@ -56,5 +56,5 @@ if __name__ == '__main__':
               "Topic :: Scientific/Engineering :: Physics",
               "Topic :: Scientific/Engineering :: Astronomy",
           ],
-          long_description=open('README.rst').read(),
+          long_description=open('README').read(),
           configuration=configuration)
