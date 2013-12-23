@@ -1,1 +1,1 @@
-recursive-include poliastro/fortran *.cmn
+recursive-include poliastro/src *.cmn

@@ -2,10 +2,6 @@
 
 from os.path import join
 
-try:
-    import setuptools
-except ImportError:
-    pass
 from numpy.distutils.core import setup
 
 def configuration(parent_package='', top_path=None):
@@ -13,15 +9,15 @@ def configuration(parent_package='', top_path=None):
     config = Configuration("poliastro", parent_package, top_path)
 
     config.add_library('ast2body',
-                       sources=[join('poliastro', 'fortran', '*.for')])
+                       sources=[join('poliastro', 'src', '*.for')])
     config.add_library('astiod',
-                       sources=[join('poliastro', 'fortran', '*.for')])
+                       sources=[join('poliastro', 'src', '*.for')])
 
     config.add_extension('_ast2body',
-                         sources=['poliastro/ast2body.pyf'],
+                         sources=[join('poliastro', 'src', 'ast2body.pyf')],
                          libraries=['ast2body'])
     config.add_extension('_astiod',
-                         sources=['poliastro/astiod.pyf'],
+                         sources=[join('poliastro', 'src', 'astiod.pyf')],
                          libraries=['astiod'])
 
     config.add_data_dir(('tests', 'poliastro/tests'))
