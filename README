@@ -6,7 +6,7 @@ Overview
 ========
 
 :Name: poliastro
-:Website: https://github.com/Pybonacci/poliastro
+:Website: https://pybonacci.github.io/poliastro
 :Author: Juan Luis Cano <juanlu001@gmail.com>
 :Version: 0.2.0-dev
 
@@ -38,24 +38,14 @@ suitable to use with different gravitational parameters.
 Requirements
 ============
 
-poliastro requires NumPy and SciPy and is usually tested in these
-environments:
-
-* Linux 64-bit
-* Python 3.3
-* NumPy 1.7.1
-* SciPy 0.12.0
+poliastro requires NumPy and Astropy and is usually tested on Linux
+on Python 2.7 and Python 3.3 (single codebase).
 
 Besides, a Fortran compiler is needed to build the extensions. poliastro
 is usually built with gfortran.
 
 There is no reason it shouldn't work under Windows or Mac OS X with
 properly configured tools (not tested).
-
-Python 2 compatibility might be accomplished with little syntax changes using
-`3to2`_.
-
-.. _3to2: https://pypi.python.org/pypi/3to2
 
 Installation
 ============
