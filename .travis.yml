@@ -7,4 +7,4 @@ before_install:
   - pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel --use-mirrors numpy astropy pytest
 script:
   - python setup.py install
-  - py.test -t tests
+  - py.test tests/
