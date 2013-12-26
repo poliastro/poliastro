@@ -1,1 +1,1 @@
-recursive-include poliastro/src *.cmn
+recursive-include poliastro/src *.cmn *.pyf
