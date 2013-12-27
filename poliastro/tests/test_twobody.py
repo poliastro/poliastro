@@ -1,97 +1,66 @@
-import numpy as np
-from numpy import radians
-from numpy.testing import TestCase, assert_array_almost_equal, \
-    assert_almost_equal, run_module_suite
+import pytest
+from astropy import units as u
+from astropy import time
 
-from astropy import units
-from astropy.constants import G, M_earth, R_earth
-
-from poliastro.twobody import hohmann, bielliptic, coe2rv, rv2coe, kepler
-
-# TODO: Low precision in some results, why? Use canonical units?
-# TODO: Test for exceptions
-
-k_earth = (G * M_earth)
+from poliastro.bodies import Sun
+from poliastro import twobody
 
 
-class TestHohmann(TestCase):
-    def test_vallado61(self):
-        alt_i = 191.34411  # km
-        alt_f = 35781.34857  # km
-        k = k_earth.to(units.km ** 3 / units.s ** 2).value
-        R = R_earth.to(units.km).value
-        expected_dv = 3.935224  # km/s
-        expected_t_trans = 5.256713  # h
-        r_i = R + alt_i
-        r_f = R + alt_f
-        dva, dvb, _, t_trans = hohmann(k, r_i, r_f)
-        dv = abs(dva) + abs(dvb)
-        assert_almost_equal(dv, expected_dv, decimal=2)
-        assert_almost_equal(t_trans / 3600, expected_t_trans, decimal=2)
+def test_state_raises_valueerror_if_meaningless_state():
+    _ = 1.0
+    with pytest.raises(ValueError) as excinfo:
+        ss = twobody.State(Sun, (_,))
+    assert ("ValueError: Incorrect number of parameters"
+            in excinfo.exconly())
 
 
-class TestBielliptic(TestCase):
-    def test_vallado62(self):
-        alt_i = 191.34411  # km
-        alt_b = 503873  # km
-        alt_f = 376310.0  # km
-        k = k_earth.to(units.km ** 3 / units.s ** 2).value
-        R = R_earth.to(units.km).value
-        expected_dv = 3.904057  # km/s
-        expected_t_trans = 593.919803  # h
-        r_i = R + alt_i
-        r_b = R + alt_b
-        r_f = R + alt_f
-        dva, dvb, dvc, _, _, t_trans1, t_trans2 = bielliptic(k, r_i, r_b, r_f)
-        dv = abs(dva) + abs(dvb) + abs(dvc)
-        t_trans = t_trans1 + t_trans2
-        assert_almost_equal(dv, expected_dv, decimal=2)
-        assert_almost_equal(t_trans / 3600, expected_t_trans, decimal=0)
+def test_state_has_attractor_given_in_constructor():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = twobody.State(Sun, (_d, _, _a, _a, _a, _a))
+    assert ss.attractor == Sun
 
 
-class TestCoe2rv(TestCase):
-    def test_vallado26(self):
-        k = k_earth.to(units.km ** 3 / units.s ** 2).value
-        p = 11067.790
-        ecc = 0.83285
-        a = p / (1 - ecc ** 2)
-        inc = radians(87.87)
-        omega = radians(227.89)
-        argp = radians(53.38)
-        nu = radians(92.335)
-        r, v = coe2rv(k, a, ecc, inc, omega, argp, nu)
-        assert_array_almost_equal(r, np.array([6525.344, 6861.535, 6449.125]),
-                                  decimal=1)
-        assert_array_almost_equal(v, np.array([4.902276, 5.533124, -1.975709]),
-                                  decimal=3)
+def test_default_time_for_new_state():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
+    expected_epoch = time.Time("J2000", scale='utc')
+    ss = twobody.State(_body, (_d, _, _a, _a, _a, _a))
+    assert ss.epoch == expected_epoch
 
 
-class TestRv2coe(TestCase):
-    def test_vallado25(self):
-        k = k_earth.to(units.km ** 3 / units.s ** 2).value
-        r = np.array([6524.384, 6862.875, 6448.296])
-        v = np.array([4.901327, 5.533756, -1.976341])
-        a, ecc, inc, omega, argp, nu = rv2coe(k, r, v)
-        p = a * (1 - ecc ** 2)
-        assert_almost_equal(p, 11067.79, decimal=0)
-        assert_almost_equal(ecc, 0.832853, decimal=4)
-        assert_almost_equal(inc, radians(87.870), decimal=4)
-        assert_almost_equal(omega, radians(227.89), decimal=3)
-        assert_almost_equal(argp, radians(53.38), decimal=3)
-        assert_almost_equal(nu, radians(92.335), decimal=5)
+def test_state_has_elements_given_in_constructor():
+    # Mars data from HORIZONS at J2000
+    a = 1.523679 * u.AU
+    ecc = 0.093315
+    inc = 1.85 * u.deg
+    raan = 49.562 * u.deg
+    argp = 286.537 * u.deg
+    nu = 23.33 * u.deg
+    ss = twobody.State(Sun, (a, ecc, inc, raan, argp, nu))
+    assert ss.elements == (a, ecc, inc, raan, argp, nu)
 
 
-class TestKepler(TestCase):
-    def test_vallado24(self):
-        k = k_earth.to(units.km ** 3 / units.s ** 2).value
-        r0 = np.array([1131.340, -2282.343, 6672.423])
-        v0 = np.array([-5.64305, 4.30333, 2.42879])
-        tof = 40 * 60.0
-        r, v = kepler(k, r0, v0, tof)
-        assert_array_almost_equal(r, np.array([-4219.7527, 4363.0292, -3958.7666]),
-                                  decimal=0)
-        assert_array_almost_equal(v, np.array([3.689866, -1.916735, -6.112511]))
+def test_state_raises_unitserror_if_elements_units_are_wrong():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    wrong_angle = 1.0 * u.AU
+    with pytest.raises(u.UnitsError) as excinfo:
+        ss = twobody.State(Sun, (_d, _, _a, _a, _a, wrong_angle))
+    assert ("astropy.units.core.UnitsError: Units must be consistent"
+            in excinfo.exconly())
 
 
-if __name__ == '__main__':
-    run_module_suite()
+def test_state_raises_valueerror_if_elements_units_are_wrong():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    wrong_angle = 1.0
+    with pytest.raises(ValueError) as excinfo:
+        ss = twobody.State(Sun, (_d, _, _a, _a, _a, wrong_angle))
+    assert ("Elements must have units (use astropy.units)"
+            in excinfo.exconly())

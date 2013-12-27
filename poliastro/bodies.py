@@ -41,4 +41,4 @@ class Body(object):
 
 
 Sun = Body(k=G * M_sun, name="Sun", symbol=u"☉")
-Earth = Body(k = G * M_earth, name="Earth", symbol=u"♁")
+Earth = Body(k=G * M_earth, name="Earth", symbol=u"♁")
