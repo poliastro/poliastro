@@ -1,3 +1,4 @@
+# coding: utf-8
 """Bodies of the Solar System.
 
 Contains some predefined bodies of the Solar System:
@@ -37,7 +38,7 @@ class Body(object):
         self.symbol = symbol
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.symbol)
+        return u"{} ({})".format(self.name, self.symbol)
 
 
 Sun = Body(k=G * M_sun, name="Sun", symbol=u"\u2609")
