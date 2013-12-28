@@ -1,3 +1,4 @@
+# coding: utf-8
 import pytest
 
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
@@ -65,7 +66,7 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         ss = twobody.State(Sun, (_d, _, _a, _a, _a, wrong_angle))
-    assert ("astropy.units.core.UnitsError: Units must be consistent"
+    assert ("UnitsError: Units must be consistent"
             in excinfo.exconly())
 
 
@@ -90,7 +91,7 @@ def test_state_raises_unitserror_if_rv_units_are_wrong():
     wrong_v = [0.0, 1.0e-6, 0.0] * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         ss = twobody.State(Sun, (_d, wrong_v))
-    assert ("astropy.units.core.UnitsError: Units must be consistent"
+    assert ("UnitsError: Units must be consistent"
             in excinfo.exconly())
 
 

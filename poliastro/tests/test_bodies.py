@@ -1,3 +1,4 @@
+# coding: utf-8
 import pytest
 from astropy import units as u
 
@@ -31,5 +32,7 @@ def test_body_printing_has_name_and_symbol():
     symbol = u"\u26b4"
     k = 1.41e10 * u.m ** 3 / u.s ** 2
     pallas2 = bodies.Body(k, name, symbol)
-    assert name in str(pallas2)
-    assert symbol in str(pallas2)
+    # NOTE: str(pallas2) fails in Python 2, not willing to provide a fix; see
+    # http://docs.python.org/3/howto/pyporting.html#str-unicode
+    assert name in pallas2.__str__()
+    assert symbol in pallas2.__str__()
