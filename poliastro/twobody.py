@@ -52,15 +52,12 @@ class State(object):
         #ss_coe.p, ss_coe.ecc, ...
         a, ecc, inc, raan, argp, nu = elements
         p = a * (1 - ecc ** 2)
-        # HACK: No easy way to build vector quantities, see
-        # http://mail.scipy.org/pipermail/astropy/2013-December/002991.html
-        r_pqw = [p.to(u.km).value * np.cos(nu) / (1 + ecc * np.cos(nu)),
-                 p.to(u.km).value * np.sin(nu) / (1 + ecc * np.cos(nu)),
-                 0] * u.km
-        sqrtkp = np.sqrt(attractor.k / p).to(u.km / u.s)
-        v_pqw = [-sqrtkp.value * np.sin(nu),
-                 sqrtkp.value * (ecc + np.cos(nu)),
-                 0] * u.km / u.s
+        r_pqw = [np.cos(nu) / (1 + ecc * np.cos(nu)),
+                 np.sin(nu) / (1 + ecc * np.cos(nu)),
+                 0] * p
+        v_pqw = [-np.sin(nu),
+                 (ecc + np.cos(nu)),
+                 0] * np.sqrt(attractor.k / p).to(u.km / u.s)
         r_ijk = transform(r_pqw, -argp, 'z')
         r_ijk = transform(r_ijk, -inc, 'x')
         r_ijk = transform(r_ijk, -raan, 'z')
