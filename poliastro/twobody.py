@@ -4,9 +4,10 @@
 """
 
 import numpy as np
+from numpy.linalg import norm
 
-from astropy import units as u
 from astropy import time
+from astropy import units as u
 
 from poliastro.util import transform
 
@@ -73,33 +74,31 @@ class State(object):
 
         """
         # TODO: See coe2rv
-        #import pdb; pdb.set_trace()
         # HACK: Neither np.dot nor np.cross won't preserve Quantity,
         # see astropy #1930
-        def dot(a, b):
-            return np.sum(a * b)
+
+        # Initial data
         r, v = rv
         k = attractor.k
-        r_mag = np.sqrt(dot(r, r))
-        v2 = dot(v, v)
-        h = np.cross(r, v) * u.km ** 2 / u.s
-        n = np.cross([0, 0, 1], h) * h.unit
-        n_mag = np.sqrt(dot(n, n))
-        e = (((v2 - k / r_mag) * r - dot(r, v) * v) / k).decompose()
-        ecc = np.sqrt(dot(e, e))
-        p = dot(h, h) / k
+
+        # Shape parameters
+        h = np.cross(r.to(u.km), v.to(u.km / u.s)) * u.km ** 2 / u.s
+        n = np.cross([0, 0, 1], h) / norm(h)
+        e = ((((v.dot(v) - k / (norm(r) * r.unit)) * r - r.dot(v) * v) / k)
+             .decompose().value)
+        ecc = norm(e)
+        p = h.dot(h) / k
         a = p / (1 - ecc ** 2)  # Might produce np.inf
-        inc = np.arccos(dot(h, [0, 0, 1]) / np.sqrt(dot(h, h))).to(u.deg)
-        raan = np.arccos(dot(n, [1, 0, 0]) / np.sqrt(dot(n, n))).to(u.deg)
-        # TODO: Use of arctan2 to automatically resolve quadrants
-        if dot(n, [0, 1, 0]) < 0:
-            raan = 360 * u.deg - raan
-        argp = np.arccos(dot(n, e) / (ecc * n_mag)).to(u.deg)
-        if dot(e, [0, 0, 1]) < 0:
-            argp = 360 * u.deg - argp
-        nu = np.arccos(dot(e, r) / (ecc * r_mag)).to(u.deg)
-        if dot(r, v) < 0:
-            nu = 360 * u.deg - nu
+
+        # Angular parameters
+        inc = np.arccos(h[2] / (norm(h) * h.unit)).to(u.deg)
+        raan = (np.arctan2(n[1], n[0])
+                % (2 * np.pi) * u.rad).to(u.deg)
+        argp = (np.arctan2(h.value.dot(np.cross(n, e)) / norm(h), e.dot(n))
+                % (2 * np.pi) * u.rad).to(u.deg)
+        nu = (np.arctan2(h.value.dot(np.cross(e, r)) / norm(h), r.value.dot(e))
+              % (2 * np.pi) * u.rad).to(u.deg)
+
         return cls(attractor, (a, ecc, inc, raan, argp, nu))
 
     @property

@@ -117,11 +117,11 @@ def test_convert_from_coe_to_rv():
     attractor = Earth
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
-    a, ecc, inc, omega, argp, nu = twobody.State(Earth, (r, v)).elements
+    a, ecc, inc, raan, argp, nu = twobody.State(Earth, (r, v)).elements
     p = a * (1 - ecc ** 2)
     assert_almost_equal(p, 11067.79 * u.km)
     assert_almost_equal(ecc, 0.832853, decimal=3)
     assert_almost_equal(inc, 87.870 * u.deg, decimal=2)
-    assert_almost_equal(omega, 227.89 * u.deg, decimal=2)
+    assert_almost_equal(raan, 227.89 * u.deg, decimal=2)
     assert_almost_equal(argp, 53.38 * u.deg, decimal=2)
     assert_almost_equal(nu, 92.335 * u.deg, decimal=1)

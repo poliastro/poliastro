@@ -13,10 +13,5 @@ python module _ast2body ! in
             real*8, intent(in) :: ecc, m
             real*8, intent(out) :: e0, nu
         end subroutine newtonm
-        subroutine rv2coe(r,v,mu,p,a,ecc,incl,omega,argp,nu,m,arglat,truelon,lonper) ! in :_ast2body:ast2body.for
-            real*8 dimension(3),intent(in) :: r, v
-            real*8, intent(in) :: mu
-            real*8 intent(out) :: p, a, ecc, incl, omega, argp, nu, m, arglat, truelon, lonper
-        end subroutine rv2coe
     end interface 
 end python module _ast2body
