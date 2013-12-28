@@ -28,7 +28,7 @@ def test_body_constructor_raises_valueerror_if_k_units_not_correct():
 
 def test_body_printing_has_name_and_symbol():
     name = "2 Pallas"
-    symbol = u"⚴"
+    symbol = u"\u26b4"
     k = 1.41e10 * u.m ** 3 / u.s ** 2
     pallas2 = bodies.Body(k, name, symbol)
     assert name in str(pallas2)

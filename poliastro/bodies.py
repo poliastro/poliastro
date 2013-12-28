@@ -40,5 +40,5 @@ class Body(object):
         return "{} ({})".format(self.name, self.symbol)
 
 
-Sun = Body(k=G * M_sun, name="Sun", symbol=u"☉")
-Earth = Body(k=G * M_earth, name="Earth", symbol=u"♁")
+Sun = Body(k=G * M_sun, name="Sun", symbol=u"\u2609")
+Earth = Body(k=G * M_earth, name="Earth", symbol=u"\u2641")

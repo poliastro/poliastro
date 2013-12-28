@@ -1,41 +1,33 @@
 import numpy as np
-from numpy import radians
-from numpy.testing import TestCase, assert_array_almost_equal, \
-    assert_almost_equal, run_module_suite
+from numpy.testing import assert_array_almost_equal
 
-from poliastro.util import rotate, direct_angles
+from astropy import units as u
 
-
-class TestRotate(TestCase):
-    def test_rotation_around_coordinate_axis(self):
-        vec = np.array([1, 0, 0])
-        ax = 2
-        angle = np.pi / 2
-        rot_vec = rotate(vec, ax, angle)
-        assert_array_almost_equal(rot_vec, np.array([0, 0, -1]))
-
-    def test_rotation_around_arbitrary_axis(self):
-        vec = np.array([1, 0, 0])
-        ax = np.array([0, 0, 1])
-        angle = np.pi / 2
-        rot_vec = rotate(vec, ax, angle)
-        assert_array_almost_equal(rot_vec, np.array([0, 1, 0]))
-
-    def test_vectorize_vec(self):
-        vec = np.random.rand(3, 10)
-        ax = 1
-        angle = np.random.rand()
-        rot_vec = rotate(vec, ax, angle)
-        assert rot_vec.shape == vec.shape
+from poliastro import util
 
 
-class TestDirectAngles(TestCase):
-    def test_data(self):
-        rd = radians
-        assert direct_angles(0, rd(-1)) == (0, rd(359))
-        assert direct_angles(0, rd(-361)) == (0, rd(359))
-        assert direct_angles(rd(360), rd(-361)) == (rd(360), rd(719))
+def test_rotate_unitless_vector():
+    vector = [1, 0, 0]
+    angle = 90 * u.deg
+    axis = 'z'
+    expected_vector = [0, 1, 0]
+    result = util.rotate(vector, angle, axis)
+    assert_array_almost_equal(result, expected_vector)
 
 
-if __name__ == '__main__':
-    run_module_suite()
+def test_rotate_vector_with_units():
+    vector = [1, 0, 0] * u.m
+    angle = 90 * u.deg
+    axis = 'y'
+    expected_vector = [0, 0, -1] * u.m
+    result = util.rotate(vector, angle, axis)
+    assert_array_almost_equal(result, expected_vector)
+
+
+def test_transform_unitless_vector():
+    vector = [0, 1, 0]
+    angle = 45 * u.deg
+    axis = 'z'
+    expected_vector = [np.sqrt(2) / 2, np.sqrt(2) / 2, 0]
+    result = util.transform(vector, angle, axis)
+    assert_array_almost_equal(result, expected_vector)
