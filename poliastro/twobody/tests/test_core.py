@@ -48,17 +48,6 @@ def test_state_has_elements_given_in_constructor():
     assert ss.elements == (a, ecc, inc, raan, argp, nu)
 
 
-def test_state_raises_valueerror_if_elements_units_are_missing():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    wrong_angle = 1.0
-    with pytest.raises(ValueError) as excinfo:
-        ss = core.State(Sun, (_d, _, _a, _a, _a, wrong_angle))
-    assert ("Elements must have units (use astropy.units)"
-            in excinfo.exconly())
-
-
 def test_state_raises_unitserror_if_elements_units_are_wrong():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5  # Unused dimensionless value
@@ -75,15 +64,6 @@ def test_state_has_rv_given_in_constructor():
     v = [0.0, 1.0e-6, 0.0] * u.AU / u.s
     ss = core.State(Sun, (r, v))
     assert ss.rv == (r, v)
-
-
-def test_state_raises_valueerror_if_rv_units_are_missing():
-    _d = [1.0, 0.0, 0.0] * u.AU
-    wrong_v = [0.0, 1.0e-6, 0.0]
-    with pytest.raises(ValueError) as excinfo:
-        ss = core.State(Sun, (_d, wrong_v))
-    assert ("ValueError: r and v vectors must have units (use astropy.units)"
-            in excinfo.exconly())
 
 
 def test_state_raises_unitserror_if_rv_units_are_wrong():

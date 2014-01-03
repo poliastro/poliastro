@@ -9,7 +9,7 @@ from numpy.linalg import norm
 from astropy import time
 from astropy import units as u
 
-from poliastro.util import transform
+from poliastro.util import transform, check_units
 
 J2000 = time.Time("J2000", scale='utc')
 
@@ -36,9 +36,12 @@ class State(object):
         self.attractor = attractor
         self.epoch = epoch
         if len(values) == 6:
-            _check_elements_units(values)
+            u._ = u.dimensionless_unscaled
+            if not check_units(values, (u.m, u._, u.rad, u.rad, u.rad, u.rad)):
+                raise u.UnitsError("Units must be consistent")
         elif len(values) == 2:
-            _check_rv_units(values)
+            if not check_units(values, (u.m, u.m / u.s)):
+                raise u.UnitsError("Units must be consistent")
         else:
             raise ValueError("Incorrect number of parameters")
         self._values = values
@@ -120,32 +123,3 @@ class State(object):
             return self._values
         else:
             return self.coe2rv(self.attractor, self.elements).rv
-
-
-def _check_elements_units(elements):
-    """Check if orbital elements have consistent units.
-
-    """
-    ELEMENTS_UNITS = (u.m, u.dimensionless_unscaled, u.rad,
-                      u.rad, u.rad, u.rad)
-    for ii, unit in enumerate(ELEMENTS_UNITS):
-        try:
-            if elements[ii].si.unit != unit:
-                raise u.UnitsError("Units must be consistent")
-        except AttributeError:
-            if ii != 1:
-                raise ValueError("Elements must have units "
-                                 "(use astropy.units)")
-
-
-def _check_rv_units(rv):
-    """Check if r and v vectors have consistent units.
-
-    """
-    r, v = rv
-    try:
-        if r.si.unit != u.m or v.si.unit != u.m / u.s:
-            raise u.UnitsError("Units must be consistent")
-    except AttributeError:
-        raise ValueError("r and v vectors must have units "
-                         "(use astropy.units)")
