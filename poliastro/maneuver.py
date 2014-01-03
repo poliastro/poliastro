@@ -64,5 +64,34 @@ def hohmann(k, r_i, r_f):
     v_i = np.sqrt(k / r_i)
     dv_a = v_i * (np.sqrt(2 * R / (1 + R)) - 1)
     dv_b = v_i * (1 - np.sqrt(2 / (1 + R))) / np.sqrt(R)
-    t_trans = np.pi * np.sqrt((r_i * (1 + R)) ** 3 / (8 * k))
+    # TODO: Refactor: half-period
+    t_trans = np.pi * np.sqrt((r_i * (1 + R) / 2) ** 3 / k)
     return dv_a, dv_b, t_trans
+
+
+def bielliptic(k, r_i, r_b, r_f):
+    """Compute a bi-elliptic transfer between two circular orbits.
+
+    Parameters
+    ----------
+    k : Quantity
+        Standard gravitational parameter.
+    r_i : Quantity
+        Initial radius.
+    r_b : Quantity
+        Intermediate radius.
+    r_f : Quantity
+        Final radius.
+
+    """
+    R = r_f / r_i
+    Rs = r_b / r_i
+    v_i = np.sqrt(k / r_i)
+    # TODO: Duplicate, see above
+    dv_a = v_i * (np.sqrt(2 * Rs / (1 + Rs)) - 1)
+    dv_b = v_i * np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) -
+                                    np.sqrt(1 / (1 + Rs)))
+    dv_c = v_i * (np.sqrt(2 * Rs / (R + Rs)) - 1) / np.sqrt(R)
+    t_trans1 = np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)
+    t_trans2 = np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)
+    return dv_a, dv_b, dv_c, t_trans1, t_trans2
