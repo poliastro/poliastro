@@ -50,22 +50,18 @@ properly configured tools (not tested).
 Installation
 ============
 
+To install poliastro just use pip::
+
+  $ pip install poliastro
+
 To install poliastro from source, just type::
 
   $ python setup.py install
 
-This might require superuser privileges. To install in a local directory::
-
-  $ python setup.py install --user
-
-Installations through PyPI are also supported::
-
-  $ pip install poliastro --user
-
 It is recommended that you **never ever use sudo** with distutils, pip,
 setuptools and friends in Linux because you might seriously break your
-system [1_][2_][3_][4_]. Apart from `per user directories`_, other options
-are using `virtualenv`_  or `local installations`_.
+system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
+or `local installations`_.
 
 .. _1: http://wiki.python.org/moin/CheeseShopTutorial#Distutils_Installation
 .. _2: http://stackoverflow.com/questions/4314376/how-can-i-install-a-python-egg-file/4314446#comment4690673_4314446
@@ -87,8 +83,21 @@ If installed correctly, this should work::
   OK
   $ 
 
+Contributing
+============
+
+Code writing
+------------
+
+Code contributions are welcome! Just send a pull request and we'll discuss it.
+In the `wiki`_ you can find some documents explaining the overall design of
+poliastro, and in the `issue tracker`_ you may find pending tasks waiting for
+someone to complete them.
+
+.. _`wiki`: https://github.com/Pybonacci/poliastro/wiki
+
 Bug reporting
-=============
+-------------
 
 I am one of those that writes bug-free code every single time, but if you
 think you've found one please refer to the `issue tracker`_ on GitHub.
@@ -107,20 +116,6 @@ License
 poliastro is released under a 2-clause BSD license, hence allowing commercial
 use of the library. Please refer to the COPYING file. This includes the
 modified Fortran subroutines.
-
-The function gcal2jd was borrowed from jdcal by Prasanth Nair, available under
-this same license.
-
-TODO
-====
-
-These tasks are in my checklist:
-
-* Test in Windows
-* Expand constants module
-* Investigate astropy integration
-* Add examples
-* Add benchmarks
 
 FAQ
 ===
