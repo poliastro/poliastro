@@ -63,22 +63,11 @@ class State(object):
         if not check_units(elements, (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
+        k = attractor.k
         a, ecc, inc, raan, argp, nu = elements
-        p = a * (1 - ecc ** 2)
-        r_pqw = [np.cos(nu) / (1 + ecc * np.cos(nu)),
-                 np.sin(nu) / (1 + ecc * np.cos(nu)),
-                 0] * p
-        v_pqw = [-np.sin(nu),
-                 (ecc + np.cos(nu)),
-                 0] * np.sqrt(attractor.k / p).to(u.km / u.s)
-        r_ijk = transform(r_pqw, -argp, 'z')
-        r_ijk = transform(r_ijk, -inc, 'x')
-        r_ijk = transform(r_ijk, -raan, 'z')
-        v_ijk = transform(v_pqw, -argp, 'z')
-        v_ijk = transform(v_ijk, -inc, 'x')
-        v_ijk = transform(v_ijk, -raan, 'z')
+        r, v = coe2rv(k, a, ecc, inc, raan, argp, nu)
 
-        ss = cls(attractor, r_ijk, v_ijk, epoch)
+        ss = cls(attractor, r, v, epoch)
         ss._elements = elements
         return ss
 
@@ -90,7 +79,7 @@ class State(object):
         if self._elements:
             return self._elements
         else:
-            self._elements = rv2coe(self.attractor, self.r, self.v)
+            self._elements = rv2coe(self.attractor.k, self.r, self.v)
             return self._elements
 
     def rv(self):
@@ -110,23 +99,61 @@ class State(object):
                                  self.epoch + time_of_flight)
 
 
-def coe2rv(attractor, elements):
+def coe2rv(k, a, ecc, inc, raan, argp, nu):
     """Converts from orbital elements to vectors.
 
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter (km^3 / s^2).
+    a : float
+        Semi-major axis (km).
+    ecc : float
+        Eccentricity.
+    inc : float
+        Inclination (rad).
+    omega : float
+        Longitude of ascending node (rad).
+    argp : float
+        Argument of perigee (rad).
+    nu : float
+        True anomaly (rad).
+
     """
-    # TODO: Invert this logic, the low-level function should not
-    # depend on `State` but the contrary
-    ss = State.from_elements(attractor, elements)
-    return ss.r, ss.v
+    p = a * (1 - ecc ** 2)
+    r_pqw = [np.cos(nu) / (1 + ecc * np.cos(nu)),
+             np.sin(nu) / (1 + ecc * np.cos(nu)),
+             0] * p
+    v_pqw = [-np.sin(nu),
+             (ecc + np.cos(nu)),
+             0] * np.sqrt(k / p).to(u.km / u.s)
+
+    r_ijk = transform(r_pqw, -argp, 'z')
+    r_ijk = transform(r_ijk, -inc, 'x')
+    r_ijk = transform(r_ijk, -raan, 'z')
+    v_ijk = transform(v_pqw, -argp, 'z')
+    v_ijk = transform(v_ijk, -inc, 'x')
+    v_ijk = transform(v_ijk, -raan, 'z')
+
+    return r_ijk, v_ijk
 
 
-def rv2coe(attractor, r, v):
+def rv2coe(k, r, v):
     """Converts from vectors to orbital elements.
+
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter (km^3 / s^2).
+    r : array
+        Position vector (km).
+    v : array
+        Velocity vector (km / s).
 
     """
     r = r.to(u.km)
     v = v.to(u.km / u.s)
-    k = attractor.k.to(u.km ** 3 / u.s ** 2)
+    k = k.to(u.km ** 3 / u.s ** 2)
 
     h = np.cross(r, v) * u.km ** 2 / u.s
     n = np.cross([0, 0, 1], h) / norm(h)
