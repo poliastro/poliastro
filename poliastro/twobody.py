@@ -63,7 +63,7 @@ class State(object):
         if not check_units(elements, (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        k = attractor.k
+        k = attractor.k.to(u.km ** 3 / u.s ** 2)
         a, ecc, inc, raan, argp, nu = elements
         r, v = coe2rv(k, a, ecc, inc, raan, argp, nu)
 
@@ -79,7 +79,14 @@ class State(object):
         if self._elements:
             return self._elements
         else:
-            self._elements = rv2coe(self.attractor.k, self.r, self.v)
+            k = self.attractor.k.to(u.km ** 3 / u.s ** 2).value
+            r = self.r.to(u.km).value
+            v = self.v.to(u.km / u.s).value
+            a, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
+            self._elements = (a * u.km, ecc * u.one, (inc * u.rad).to(u.deg),
+                              (raan * u.rad).to(u.deg),
+                              (argp * u.rad).to(u.deg),
+                              (nu * u.rad).to(u.deg))
             return self._elements
 
     def rv(self):
@@ -121,12 +128,12 @@ def coe2rv(k, a, ecc, inc, raan, argp, nu):
 
     """
     p = a * (1 - ecc ** 2)
-    r_pqw = [np.cos(nu) / (1 + ecc * np.cos(nu)),
-             np.sin(nu) / (1 + ecc * np.cos(nu)),
-             0] * p
-    v_pqw = [-np.sin(nu),
-             (ecc + np.cos(nu)),
-             0] * np.sqrt(k / p).to(u.km / u.s)
+    r_pqw = np.array([np.cos(nu) / (1 + ecc * np.cos(nu)),
+                      np.sin(nu) / (1 + ecc * np.cos(nu)),
+                      0]) * p
+    v_pqw = np.array([-np.sin(nu),
+                      (ecc + np.cos(nu)),
+                      0]) * np.sqrt(k / p)
 
     r_ijk = transform(r_pqw, -argp, 'z')
     r_ijk = transform(r_ijk, -inc, 'x')
@@ -151,26 +158,18 @@ def rv2coe(k, r, v):
         Velocity vector (km / s).
 
     """
-    r = r.to(u.km)
-    v = v.to(u.km / u.s)
-    k = k.to(u.km ** 3 / u.s ** 2)
-
-    h = np.cross(r, v) * u.km ** 2 / u.s
+    h = np.cross(r, v)
     n = np.cross([0, 0, 1], h) / norm(h)
-    e = ((((v.dot(v) - k / (norm(r) * r.unit)) * r - r.dot(v) * v) / k)
-         .decompose().value)
-    ecc = norm(e) * u.one
+    e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
+    ecc = norm(e)
     p = h.dot(h) / k
     # TODO: Cannot define a parabola with its semi-major axis
     a = p / (1 - ecc ** 2)
 
-    inc = np.arccos(h[2] / (norm(h) * h.unit)).to(u.deg)
-    raan = (np.arctan2(n[1], n[0])
-            % (2 * np.pi) * u.rad).to(u.deg)
-    argp = (np.arctan2(h.value.dot(np.cross(n, e)) / norm(h), e.dot(n))
-            % (2 * np.pi) * u.rad).to(u.deg)
-    nu = (np.arctan2(h.value.dot(np.cross(e, r)) / norm(h), r.value.dot(e))
-          % (2 * np.pi) * u.rad).to(u.deg)
+    inc = np.arccos(h[2] / norm(h))
+    raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
+    argp = np.arctan2(h.dot(np.cross(n, e)) / norm(h), e.dot(n)) % (2 * np.pi)
+    nu = np.arctan2(h.dot(np.cross(e, r)) / norm(h), r.dot(e)) % (2 * np.pi)
 
     return a, ecc, inc, raan, argp, nu
 

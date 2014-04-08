@@ -20,7 +20,7 @@ def test_state_raises_valueerror_if_meaningless_state():
 
 def test_state_has_attractor_given_in_constructor():
     _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5  # Unused dimensionless value
+    _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     ss = State.from_elements(Sun, (_d, _, _a, _a, _a, _a))
     assert ss.attractor == Sun
@@ -28,7 +28,7 @@ def test_state_has_attractor_given_in_constructor():
 
 def test_default_time_for_new_state():
     _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5  # Unused dimensionless value
+    _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     expected_epoch = time.Time("J2000", scale='utc')
@@ -39,7 +39,7 @@ def test_default_time_for_new_state():
 def test_state_has_elements_given_in_constructor():
     # Mars data from HORIZONS at J2000
     a = 1.523679 * u.AU
-    ecc = 0.093315
+    ecc = 0.093315 * u.one
     inc = 1.85 * u.deg
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
@@ -50,7 +50,7 @@ def test_state_has_elements_given_in_constructor():
 
 def test_state_raises_unitserror_if_elements_units_are_wrong():
     _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5  # Unused dimensionless value
+    _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
@@ -79,7 +79,7 @@ def test_convert_from_rv_to_coe():
     # Data from Vallado, example 2.6
     attractor = Earth
     p = 11067.790 * u.km
-    ecc = 0.83285
+    ecc = 0.83285 * u.one
     a = p / (1 - ecc ** 2)
     inc = 87.87 * u.deg
     raan = 227.89 * u.deg
@@ -116,6 +116,6 @@ def test_propagate():
     ss1 = ss0.propagate(tof)
     r, v = ss1.r, ss1.v
     assert_array_almost_equal(r.value, [-4219.7527, 4363.0292, -3958.7666],
-                                decimal=-1)
+                              decimal=-1)
     assert_array_almost_equal(v.value, [3.689866, -1.916735, -6.112511],
                               decimal=2)
