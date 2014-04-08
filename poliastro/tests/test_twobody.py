@@ -7,7 +7,7 @@ from astropy import units as u
 from astropy import time
 
 from poliastro.bodies import Sun, Earth
-from poliastro.twobody.core import State
+from poliastro.twobody import State
 
 
 def test_state_raises_valueerror_if_meaningless_state():
@@ -45,7 +45,7 @@ def test_state_has_elements_given_in_constructor():
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
     ss = State.from_elements(Sun, (a, ecc, inc, raan, argp, nu))
-    assert ss.elements() == (a, ecc, inc, raan, argp, nu)
+    assert ss.elements == (a, ecc, inc, raan, argp, nu)
 
 
 def test_state_raises_unitserror_if_elements_units_are_wrong():
@@ -85,11 +85,11 @@ def test_convert_from_rv_to_coe():
     raan = 227.89 * u.deg
     argp = 53.38 * u.deg
     nu = 92.335 * u.deg
-    expected_r = [6525.344, 6861.535, 6449.125] * u.km
-    expected_v = [4.902276, 5.533124, -1.975709] * u.km / u.s
+    expected_r = [6525.344, 6861.535, 6449.125]  # km
+    expected_v = [4.902276, 5.533124, -1.975709]  # km / s
     r, v = State.from_elements(Earth, (a, ecc, inc, raan, argp, nu)).rv()
-    assert_array_almost_equal(r, expected_r, decimal=1)
-    assert_array_almost_equal(v, expected_v, decimal=3)
+    assert_array_almost_equal(r.value, expected_r, decimal=1)
+    assert_array_almost_equal(v.value, expected_v, decimal=3)
 
 
 def test_convert_from_coe_to_rv():
@@ -97,11 +97,25 @@ def test_convert_from_coe_to_rv():
     attractor = Earth
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
-    a, ecc, inc, raan, argp, nu = State.from_vectors(Earth, r, v).elements()
+    a, ecc, inc, raan, argp, nu = State.from_vectors(Earth, r, v).elements
     p = a * (1 - ecc ** 2)
-    assert_almost_equal(p, 11067.79 * u.km, decimal=-1)
-    assert_almost_equal(ecc, 0.832853, decimal=3)
-    assert_almost_equal(inc, 87.870 * u.deg, decimal=2)
-    assert_almost_equal(raan, 227.89 * u.deg, decimal=2)
-    assert_almost_equal(argp, 53.38 * u.deg, decimal=2)
-    assert_almost_equal(nu, 92.335 * u.deg, decimal=1)
+    assert_almost_equal(p.value, 11067.79, decimal=-1)
+    assert_almost_equal(ecc.value, 0.832853, decimal=3)
+    assert_almost_equal(inc.value, 87.870, decimal=2)
+    assert_almost_equal(raan.value, 227.89, decimal=1)
+    assert_almost_equal(argp.value, 53.38, decimal=1)
+    assert_almost_equal(nu.value, 92.335, decimal=1)
+
+
+def test_propagate():
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = State.from_vectors(Earth, r0, v0)
+    tof = 40 * u.min
+    ss1 = ss0.propagate(tof)
+    r, v = ss1.r, ss1.v
+    assert_array_almost_equal(r.value, [-4219.7527, 4363.0292, -3958.7666],
+                                decimal=-1)
+    assert_array_almost_equal(v.value, [3.689866, -1.916735, -6.112511],
+                              decimal=2)

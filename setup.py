@@ -38,7 +38,7 @@ if __name__ == '__main__':
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
           requires=["numpy", "astropy", "pytest"],
-          packages=['poliastro', 'poliastro.twobody'],
+          packages=['poliastro'],
           classifiers=[
               "Development Status :: 2 - Pre-Alpha",
               "Intended Audience :: Education",
