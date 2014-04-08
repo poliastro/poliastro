@@ -7,6 +7,7 @@ import numpy as np
 
 from astropy.coordinates import angles
 from astropy import units as u
+u.one = u.dimensionless_unscaled  # astropy #1980
 
 __all__ = ['rotate', 'transform']
 
@@ -68,7 +69,5 @@ def check_units(quantities, units):
     """Check if list of quantities is consistent with given list of units.
 
     """
-    # NOTE: I prefer it this way, see astropy #1941
-    u._ = u.dimensionless_unscaled
-    return all(unit.is_equivalent((quant * u._).unit)
+    return all(unit.is_equivalent((quant * u.one).unit)
                for unit, quant in zip(units, quantities))

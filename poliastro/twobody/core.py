@@ -8,6 +8,7 @@ from numpy.linalg import norm
 
 from astropy import time
 from astropy import units as u
+u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.util import transform, check_units
 
@@ -18,42 +19,48 @@ class State(object):
     """Class to represent a position of a body wrt to an attractor.
 
     """
-    def __init__(self, attractor, values, epoch=J2000):
+    def __init__(self, attractor, r, v, epoch):
         """Constructor.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
-        values : tuple
-            Values to define the state, either orbital elements
-            or r, v vectors.
-        epoch : Time, optional
-            Epoch, default to J2000
+        r, v : array
+            Position and velocity vectors.
+        epoch : Time
+            Epoch.
 
         """
-        # TODO: Cannot define a parabola with its semi-major axis
         self.attractor = attractor
         self.epoch = epoch
-        if len(values) == 6:
-            u._ = u.dimensionless_unscaled
-            if not check_units(values, (u.m, u._, u.rad, u.rad, u.rad, u.rad)):
-                raise u.UnitsError("Units must be consistent")
-        elif len(values) == 2:
-            if not check_units(values, (u.m, u.m / u.s)):
-                raise u.UnitsError("Units must be consistent")
-        else:
-            raise ValueError("Incorrect number of parameters")
-        self._values = values
+        self.r = r
+        self.v = v
+        self.epoch = epoch
+        self._elements = None
 
     @classmethod
-    def coe2rv(cls, attractor, elements):
-        """Return `State` object using r and v from elements.
+    def from_vectors(cls, attractor, r, v, epoch=J2000):
+        """Return `State` object from position and velocity vectors.
+
+        """
+        if not check_units((r, v), (u.m, u.m / u.s)):
+            raise u.UnitsError("Units must be consistent")
+
+        return cls(attractor, r, v, epoch)
+
+    @classmethod
+    def from_elements(cls, attractor, elements, epoch=J2000):
+        """Return `State` object from orbital elements.
 
         """
         # TODO: Desirable?
-        #ss_coe = cls(attractor, elements)
         #ss_coe.p, ss_coe.ecc, ...
+        if len(elements) != 6:
+            raise ValueError("Incorrect number of parameters")
+        if not check_units(elements, (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
+            raise u.UnitsError("Units must be consistent")
+
         a, ecc, inc, raan, argp, nu = elements
         p = a * (1 - ecc ** 2)
         r_pqw = [np.cos(nu) / (1 + ecc * np.cos(nu)),
@@ -69,57 +76,58 @@ class State(object):
         v_ijk = transform(v_ijk, -inc, 'x')
         v_ijk = transform(v_ijk, -raan, 'z')
 
-        return cls(attractor, (r_ijk, v_ijk))
+        ss = cls(attractor, r_ijk, v_ijk, epoch)
+        ss._elements = elements
+        return ss
 
-    @classmethod
-    def rv2coe(cls, attractor, rv):
-        """Returns `State` object using elements from r and v.
-
-        """
-        # TODO: See coe2rv
-        # HACK: Neither np.dot nor np.cross won't preserve Quantity,
-        # see astropy #1930
-
-        # Initial data
-        r, v = rv
-        k = attractor.k
-
-        # Shape parameters
-        h = np.cross(r.to(u.km), v.to(u.km / u.s)) * u.km ** 2 / u.s
-        n = np.cross([0, 0, 1], h) / norm(h)
-        e = ((((v.dot(v) - k / (norm(r) * r.unit)) * r - r.dot(v) * v) / k)
-             .decompose().value)
-        ecc = norm(e)
-        p = h.dot(h) / k
-        a = p / (1 - ecc ** 2)  # Might produce np.inf
-
-        # Angular parameters
-        inc = np.arccos(h[2] / (norm(h) * h.unit)).to(u.deg)
-        raan = (np.arctan2(n[1], n[0])
-                % (2 * np.pi) * u.rad).to(u.deg)
-        argp = (np.arctan2(h.value.dot(np.cross(n, e)) / norm(h), e.dot(n))
-                % (2 * np.pi) * u.rad).to(u.deg)
-        nu = (np.arctan2(h.value.dot(np.cross(e, r)) / norm(h), r.value.dot(e))
-              % (2 * np.pi) * u.rad).to(u.deg)
-
-        return cls(attractor, (a, ecc, inc, raan, argp, nu))
-
-    @property
     def elements(self):
         """Classical orbital elements.
 
         """
-        if len(self._values) == 6:
-            return self._values
+        if self._elements:
+            return self._elements
         else:
-            return self.rv2coe(self.attractor, self.rv).elements
+            self._elements = rv2coe(self.attractor, self.r, self.v)
+            return self._elements
 
-    @property
     def rv(self):
         """Position and velocity vectors.
 
         """
-        if len(self._values) == 2:
-            return self._values
-        else:
-            return self.coe2rv(self.attractor, self.elements).rv
+        return self.r, self.v
+
+
+def coe2rv(attractor, elements):
+    """Converts from orbital elements to vectors.
+
+    """
+    ss = State.from_elements(attractor, elements)
+    return ss.r, ss.v
+
+
+def rv2coe(attractor, r, v):
+    """Converts from vectors to orbital elements.
+
+    """
+    r = r.to(u.km)
+    v = v.to(u.km / u.s)
+    k = attractor.k.to(u.km ** 3 / u.s ** 2)
+
+    h = np.cross(r, v) * u.km ** 2 / u.s
+    n = np.cross([0, 0, 1], h) / norm(h)
+    e = ((((v.dot(v) - k / (norm(r) * r.unit)) * r - r.dot(v) * v) / k)
+         .decompose().value)
+    ecc = norm(e)
+    p = h.dot(h) / k
+    # TODO: Cannot define a parabola with its semi-major axis
+    a = p / (1 - ecc ** 2)
+
+    inc = np.arccos(h[2] / (norm(h) * h.unit)).to(u.deg)
+    raan = (np.arctan2(n[1], n[0])
+            % (2 * np.pi) * u.rad).to(u.deg)
+    argp = (np.arctan2(h.value.dot(np.cross(n, e)) / norm(h), e.dot(n))
+            % (2 * np.pi) * u.rad).to(u.deg)
+    nu = (np.arctan2(h.value.dot(np.cross(e, r)) / norm(h), r.value.dot(e))
+          % (2 * np.pi) * u.rad).to(u.deg)
+
+    return a, ecc, inc, raan, argp, nu
