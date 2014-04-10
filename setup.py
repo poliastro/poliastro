@@ -20,7 +20,7 @@ def configuration(parent_package='', top_path=None):
                          sources=[join('poliastro', 'src', 'astiod.pyf')],
                          libraries=['astiod'])
 
-    config.add_data_dir(('tests', 'tests'))
+    config.add_data_dir(('tests', 'poliastro/tests'))
 
     return config
 

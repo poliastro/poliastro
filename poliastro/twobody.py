@@ -1,52 +1,112 @@
-"""Two-body dynamics.
+# coding: utf-8
+"""Two body problem.
 
 """
 
 import numpy as np
+from numpy.linalg import norm
 
-from .util import transform
+from astropy import time
+from astropy import units as u
+u.one = u.dimensionless_unscaled  # astropy #1980
+
+from poliastro.util import transform, check_units
+
 from . import _ast2body
 
-__all__ = ['hohmann', 'coe2rv', 'rv2coe', 'kepler']
+J2000 = time.Time("J2000", scale='utc')
 
 
-def hohmann(k, r_i, r_f):
-    """Performs Hohmann transfer between two circular orbits.
-
-    """
-    a_trans = (r_i + r_f) / 2
-    vi = np.sqrt(k / r_i)
-    va = np.sqrt(2 * (k / r_i - k / (2 * a_trans)))
-    dva = va - vi
-    vb = np.sqrt(2 * (k / r_f - k / (2 * a_trans)))
-    vf = np.sqrt(k / r_f)
-    dvb = vf - vb
-    t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
-    return dva, dvb, a_trans, t_trans
-
-
-def bielliptic(k, r_i, r_b, r_f):
-    """Performs bielliptic transfer between two circular orbits.
+class State(object):
+    """Class to represent the position of a body wrt to an attractor.
 
     """
-    a_trans1 = (r_i + r_b) / 2
-    a_trans2 = (r_b + r_f) / 2
-    vi = np.sqrt(k / r_i)
-    va1 = np.sqrt(2 * (k / r_i - k / (2 * a_trans1)))
-    dva = va1 - vi
-    vb1 = np.sqrt(2 * (k / r_b - k / (2 * a_trans1)))
-    vb2 = np.sqrt(2 * (k / r_b - k / (2 * a_trans2)))
-    dvb = vb2 - vb1
-    vc2 = np.sqrt(2 * (k / r_f - k / (2 * a_trans2)))
-    vf = np.sqrt(k / r_f)
-    dvc = vf - vc2
-    t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
-    t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
-    return dva, dvb, dvc, a_trans1, a_trans2, t_trans1, t_trans2
+    def __init__(self, attractor, r, v, epoch):
+        """Constructor.
+
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        r, v : array
+            Position and velocity vectors.
+        epoch : Time
+            Epoch.
+
+        """
+        self.attractor = attractor
+        self.epoch = epoch
+        self.r = r
+        self.v = v
+        self._elements = None
+
+    @classmethod
+    def from_vectors(cls, attractor, r, v, epoch=J2000):
+        """Return `State` object from position and velocity vectors.
+
+        """
+        if not check_units((r, v), (u.m, u.m / u.s)):
+            raise u.UnitsError("Units must be consistent")
+
+        return cls(attractor, r, v, epoch)
+
+    @classmethod
+    def from_elements(cls, attractor, elements, epoch=J2000):
+        """Return `State` object from orbital elements.
+
+        """
+        # TODO: Desirable?
+        #ss_coe.p, ss_coe.ecc, ...
+        if len(elements) != 6:
+            raise ValueError("Incorrect number of parameters")
+        if not check_units(elements, (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
+            raise u.UnitsError("Units must be consistent")
+
+        k = attractor.k.to(u.km ** 3 / u.s ** 2)
+        a, ecc, inc, raan, argp, nu = elements
+        r, v = coe2rv(k, a, ecc, inc, raan, argp, nu)
+
+        ss = cls(attractor, r, v, epoch)
+        ss._elements = elements
+        return ss
+
+    @property
+    def elements(self):
+        """Classical orbital elements.
+
+        """
+        if self._elements:
+            return self._elements
+        else:
+            k = self.attractor.k.to(u.km ** 3 / u.s ** 2).value
+            r = self.r.to(u.km).value
+            v = self.v.to(u.km / u.s).value
+            a, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
+            self._elements = (a * u.km, ecc * u.one, (inc * u.rad).to(u.deg),
+                              (raan * u.rad).to(u.deg),
+                              (argp * u.rad).to(u.deg),
+                              (nu * u.rad).to(u.deg))
+            return self._elements
+
+    def rv(self):
+        """Position and velocity vectors.
+
+        """
+        return self.r, self.v
+
+    def propagate(self, time_of_flight):
+        """Propagate this `State` some `time` and return the result.
+
+        """
+        r, v = kepler(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                      self.r.to(u.km).value, self.v.to(u.km / u.s).value,
+                      time_of_flight.to(u.s).value)
+        return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
+                                 self.epoch + time_of_flight)
 
 
-def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-5):
-    """Converts classical orbital elements to r, v IJK vectors.
+def coe2rv(k, a, ecc, inc, raan, argp, nu):
+    """Converts from orbital elements to vectors.
 
     Parameters
     ----------
@@ -64,65 +124,28 @@ def coe2rv(k, a, ecc, inc, omega, argp, nu, tol=1e-5):
         Argument of perigee (rad).
     nu : float
         True anomaly (rad).
-    tol : float
-        Tolerance of the algorithm to detect edge cases, default to 1e-4.
-
-    Examples
-    --------
-    From Vallado 2007, ex. 2-6
-    >>> p = 11067.790
-    >>> ecc = 0.83285
-    >>> a = p / (1 - ecc ** 2)
-    >>> coe2rv(3.986e5, a, 0.83285, np.radians(87.87),
-    ... np.radians(227.89), np.radians(53.38), np.radians(92.335))
-    (array([ 6525.36812099,  6861.5318349 ,  6449.11861416]),
-    array([ 4.90227593,  5.5331365 , -1.975709  ]))
 
     """
-    ## Check special cases
-    #truelon = omega + argp + nu
-    #arglat = argp + nu
-    #lonper = omega + argp
-
-    #eq = (np.abs(inc) < tol) | (np.abs(inc - np.pi) < tol)
-    #ellip_eq = (ecc > tol) & eq
-    #circ_eq = (ecc < tol) & eq
-    #circ_inc = (ecc < tol) & ~eq
-
-    #nu[circ_eq] = truelon[circ_eq]
-    #omega[circ_eq] = argp[circ_eq] = 0.0
-
-    #nu[circ_inc] = arglat[circ_inc]
-    #argp[circ_inc] = 0.0
-
-    #argp[ellip_eq] = lonper[ellip_eq]
-    #omega[ellip_eq] = 0.0
-
-    # Start computing
     p = a * (1 - ecc ** 2)
-    r_pqw = np.zeros(3)
-    r_pqw[0] = p * np.cos(nu) / (1 + ecc * np.cos(nu))
-    r_pqw[1] = p * np.sin(nu) / (1 + ecc * np.cos(nu))
+    r_pqw = np.array([np.cos(nu) / (1 + ecc * np.cos(nu)),
+                      np.sin(nu) / (1 + ecc * np.cos(nu)),
+                      0]) * p
+    v_pqw = np.array([-np.sin(nu),
+                      (ecc + np.cos(nu)),
+                      0]) * np.sqrt(k / p)
 
-    v_pqw = np.zeros(3)
-    v_pqw[0] = -np.sqrt(k / p) * np.sin(nu)
-    v_pqw[1] = np.sqrt(k / p) * (ecc + np.cos(nu))
+    r_ijk = transform(r_pqw, -argp, 'z')
+    r_ijk = transform(r_ijk, -inc, 'x')
+    r_ijk = transform(r_ijk, -raan, 'z')
+    v_ijk = transform(v_pqw, -argp, 'z')
+    v_ijk = transform(v_ijk, -inc, 'x')
+    v_ijk = transform(v_ijk, -raan, 'z')
 
-    r_ijk = transform(r_pqw, 3, -argp)
-    r_ijk = transform(r_ijk, 1, -inc)
-    r_ijk = transform(r_ijk, 3, -omega)
-
-    v_ijk = transform(v_pqw, 3, -argp)
-    v_ijk = transform(v_ijk, 1, -inc)
-    v_ijk = transform(v_ijk, 3, -omega)
-
-    return r_ijk.T, v_ijk.T
+    return r_ijk, v_ijk
 
 
 def rv2coe(k, r, v):
-    """Converts r, v to classical orbital elements.
-
-    This is a wrapper around rv2coe from ast2body.for.
+    """Converts from vectors to orbital elements.
 
     Parameters
     ----------
@@ -133,25 +156,21 @@ def rv2coe(k, r, v):
     v : array
         Velocity vector (km / s).
 
-    Examples
-    --------
-    Vallado 2001, example 2-5
-    >>> r = [6524.834, 6862.875, 6448.296]
-    >>> v = [4.901327, 5.533756, -1.976341]
-    >>> k = 3.986e5
-    >>> rv2coe(k, r, v)
-    (36127.55012131963, 0.83285427644495158, 1.5336055626394494,
-    3.9775750028016947, 0.93174413995595795, 1.6115511711293014)
-
     """
-    # TODO: Extend for additional arguments arglat, truelon, lonper
-    r = np.asanyarray(r).astype(np.float)
-    v = np.asanyarray(v).astype(np.float)
-    _, a, ecc, inc, omega, argp, nu, _, _, _, _ = _ast2body.rv2coe(r, v, k)
-    coe = np.vstack((a, ecc, inc, omega, argp, nu))
-    if coe.shape[-1] == 1:
-        coe = coe[:, 0]
-    return coe
+    h = np.cross(r, v)
+    n = np.cross([0, 0, 1], h) / norm(h)
+    e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
+    ecc = norm(e)
+    p = h.dot(h) / k
+    # TODO: Cannot define a parabola with its semi-major axis
+    a = p / (1 - ecc ** 2)
+
+    inc = np.arccos(h[2] / norm(h))
+    raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
+    argp = np.arctan2(h.dot(np.cross(n, e)) / norm(h), e.dot(n)) % (2 * np.pi)
+    nu = np.arctan2(h.dot(np.cross(e, r)) / norm(h), r.dot(e)) % (2 * np.pi)
+
+    return a, ecc, inc, raan, argp, nu
 
 
 def kepler(k, r0, v0, tof):
@@ -176,8 +195,8 @@ def kepler(k, r0, v0, tof):
         If the status of the subroutine is not 'ok'.
 
     """
-    r0 = np.asanyarray(r0).astype(np.float)
-    v0 = np.asanyarray(v0).astype(np.float)
+    r0 = np.asarray(r0).astype(np.float)
+    v0 = np.asarray(v0).astype(np.float)
     tof = float(tof)
     assert r0.shape == (3,)
     assert v0.shape == (3,)

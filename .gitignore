@@ -9,6 +9,7 @@ build/*
 *.egg-info/*
 
 poliastro/_*.so
-poliastro/_*.c
+poliastro/src/_*.so
+poliastro/src/_*.c
 
 __pycache__/
