@@ -38,7 +38,6 @@ class State(object):
         self.epoch = epoch
         self.r = r
         self.v = v
-        self.epoch = epoch
         self._elements = None
 
     @classmethod
