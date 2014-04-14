@@ -8,7 +8,7 @@ import numpy as np
 from astropy import units as u
 u.one = u.dimensionless_unscaled  # astropy #1980
 
-from poliastro.util import transform, check_units
+from poliastro.util import check_units
 
 
 class Maneuver(object):
@@ -25,19 +25,35 @@ class Maneuver(object):
 
         """
         self.delta_times, self.delta_velocities = zip(*vals)
-        if not check_units(self.delta_times, (u.s,)) or not check_units(self.delta_velocities, (u.m / u.s,)):
+        u_times = check_units(self.delta_times, (u.s,))
+        u_dvs = check_units(self.delta_velocities, (u.m / u.s,))
+        if not u_times or not u_dvs:
             raise u.UnitsError("Units must be consistent")
 
     def total_time(self):
         """Total time of the maneuver.
 
         """
-        # HACK: This won't work
-        #total_time = sum(self.delta_times)
-        total_time = 0.0 * u.s
-        for dt in self.delta_times:
-            total_time += dt
+        total_time = sum(self.delta_times, 0 * u.s)
         return total_time
+
+    def total_cost(self):
+        """Total cost of the maneuver.
+
+        """
+        dvs = [np.sqrt(dv.dot(dv)) for dv in self.delta_velocities]
+        return sum(dvs, 0 * u.km / u.s)
+
+    @classmethod
+    def hohmann(cls, ss_i, r_f):
+        """Compute a Hohmann transfer between two circular orbits.
+
+        """
+        # TODO: Check if circular?
+        r_i = ss_i.a.to(u.km)
+        k = ss_i.attractor.k.to(u.km ** 3 / u.s ** 2)
+        dv_a, dv_b, t_trans = hohmann(k, r_i, r_f)
+        return cls((0 * u.s, dv_a), (t_trans, dv_b))
 
     @property
     def tof(self):
@@ -52,16 +68,16 @@ def hohmann(k, r_i, r_f):
 
     Parameters
     ----------
-    k : Quantity
+    k : float
         Standard gravitational parameter.
-    r_i, r_f : Quantity
+    r_i, r_f : float
         Initial and final radiuses.
 
     Returns
     -------
-    dv_a, dv_b : Quantity
+    dv_a, dv_b : float
         Initial and final impulses.
-    t_trans : Quantity
+    t_trans : float
         Time of transfer.
 
     """
