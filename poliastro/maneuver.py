@@ -6,13 +6,16 @@
 import numpy as np
 
 from astropy import units as u
+u.one = u.dimensionless_unscaled  # astropy #1980
+
+from poliastro.util import transform, check_units
 
 
 class Maneuver(object):
     """Class to represent a Maneuver.
 
     """
-    def __init__(self, vals):
+    def __init__(self, *vals):
         """Constructor.
 
         Parameters
@@ -22,6 +25,8 @@ class Maneuver(object):
 
         """
         self.delta_times, self.delta_velocities = zip(*vals)
+        if not check_units(self.delta_times, (u.s,)) or not check_units(self.delta_velocities, (u.m / u.s,)):
+            raise u.UnitsError("Units must be consistent")
 
     def total_time(self):
         """Total time of the maneuver.

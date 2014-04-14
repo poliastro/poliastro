@@ -13,12 +13,33 @@ from poliastro import maneuver
 
 # Object oriented API
 
+def test_maneuver_has_separated_dvs_and_times():
+    dt1 = 1 * u.s
+    dt2 = 2 * u.s
+    dt3 = 3 * u.s
+    dv1 = [1, 0, 0] * u.km / u.s
+    dv2 = [2, 0, 0] * u.km / u.s
+    dv3 = [3, 0, 0] * u.km / u.s
+    man = maneuver.Maneuver((dt1, dv1), (dt2, dv2), (dt3, dv3))
+    assert man.delta_times == (dt1, dt2, dt3)
+    assert man.delta_velocities == (dv1, dv2, dv3)
+
+
+def test_maneuver_raises_error_if_units_are_wrong():
+    wrong_dt = 1.0
+    _v = np.zeros(3) * u.km / u.s  # Unused velocity
+    with pytest.raises(u.UnitsError) as excinfo:
+        man = maneuver.Maneuver([wrong_dt, _v])
+    assert ("UnitsError: Units must be consistent"
+            in excinfo.exconly())
+
+
 def test_maneuver_total_time():
     dt1 = 10.0 * u.s
     dt2 = 100.0 * u.s
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     expected_total_time = 110.0 * u.s
-    man = maneuver.Maneuver([(dt1, _v), (dt2, _v)])
+    man = maneuver.Maneuver((dt1, _v), (dt2, _v))
     assert_almost_equal(man.total_time(), expected_total_time)
     assert_array_almost_equal(man.tof, expected_total_time)
 

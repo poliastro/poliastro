@@ -10,8 +10,8 @@ Overview
 :Author: Juan Luis Cano <juanlu001@gmail.com>
 :Version: 0.2.0-dev
 
-.. image:: http://img.shields.io/travis-ci/Pybonacci/poliastro.png
-    :target: https://travis-ci.org/Pybonacci/poliastro
+.. image:: https://travis-ci.org/Pybonacci/poliastro.svg?branch=master
+   :target: https://travis-ci.org/Pybonacci/poliastro
 
 These are some Python wrappers to Fortran and MATLAB subroutines useful in
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
