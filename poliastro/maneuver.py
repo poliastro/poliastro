@@ -37,15 +37,15 @@ class Maneuver(object):
         except TypeError:
             raise ValueError("Delta-V must be three dimensions vectors")
 
-    def total_time(self):
-        """Total time of the maneuver.
+    def get_total_time(self):
+        """Returns total time of the maneuver.
 
         """
         total_time = sum(self.delta_times, 0 * u.s)
         return total_time
 
-    def total_cost(self):
-        """Total cost of the maneuver.
+    def get_total_cost(self):
+        """Returns otal cost of the maneuver.
 
         """
         dvs = [np.sqrt(dv.dot(dv)) for dv in self.delta_velocities]
@@ -64,13 +64,6 @@ class Maneuver(object):
         dv_vec_a = dv_a * v_i.value / norm(v_i.value)
         dv_vec_b = dv_b * v_i.value / norm(v_i.value)
         return cls((0 * u.s, dv_vec_a), (t_trans, dv_vec_b))
-
-    @property
-    def tof(self):
-        """Total time of the maneuver.
-
-        """
-        return self.total_time()
 
 
 def hohmann(k, r_i, r_f):

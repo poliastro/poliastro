@@ -51,8 +51,7 @@ def test_maneuver_total_time():
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     expected_total_time = 110.0 * u.s
     man = Maneuver((dt1, _v), (dt2, _v))
-    assert_almost_equal(man.total_time(), expected_total_time)
-    assert_array_almost_equal(man.tof, expected_total_time)
+    assert_almost_equal(man.get_total_time(), expected_total_time)
 
 
 def test_hohmann_maneuver():
@@ -63,9 +62,10 @@ def test_hohmann_maneuver():
     expected_dv = 3.935224 * u.km / u.s
     expected_t_trans = 5.256713 * u.h
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
-    assert_almost_equal(man.total_cost().to(u.km / u.s), expected_dv,
+    assert_almost_equal(man.get_total_cost().to(u.km / u.s), expected_dv,
                         decimal=3)
-    assert_almost_equal(man.total_time().to(u.h), expected_t_trans, decimal=3)
+    assert_almost_equal(man.get_total_time().to(u.h), expected_t_trans,
+                        decimal=3)
 
 
 # Procedural API
