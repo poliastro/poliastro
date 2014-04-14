@@ -41,7 +41,7 @@ def test_maneuver_raises_error_if_dvs_are_not_vectors():
     wrong_dv = 1 * u.km / u.s
     with pytest.raises(ValueError) as excinfo:
         man = Maneuver((dt, wrong_dv))
-    assert ("ValueError: delta-V must be a three dimensions vector"
+    assert ("ValueError: Delta-V must be three dimensions vectors"
             in excinfo.exconly())
 
 

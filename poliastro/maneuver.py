@@ -4,6 +4,7 @@
 """
 
 import numpy as np
+from numpy.linalg import norm
 
 from astropy import units as u
 u.one = u.dimensionless_unscaled  # astropy #1980
@@ -29,6 +30,12 @@ class Maneuver(object):
         u_dvs = check_units(self.delta_velocities, (u.m / u.s,))
         if not u_times or not u_dvs:
             raise u.UnitsError("Units must be consistent")
+        try:
+            arr_dvs = [len(dv) == 3 for dv in self.delta_velocities]
+            if not all(arr_dvs):
+                raise TypeError
+        except TypeError:
+            raise ValueError("Delta-V must be three dimensions vectors")
 
     def total_time(self):
         """Total time of the maneuver.
@@ -51,9 +58,12 @@ class Maneuver(object):
         """
         # TODO: Check if circular?
         r_i = ss_i.a.to(u.km)
+        v_i = ss_i.v.to(u.km / u.s)
         k = ss_i.attractor.k.to(u.km ** 3 / u.s ** 2)
         dv_a, dv_b, t_trans = hohmann(k, r_i, r_f)
-        return cls((0 * u.s, dv_a), (t_trans, dv_b))
+        dv_vec_a = dv_a * v_i.value / norm(v_i.value)
+        dv_vec_b = dv_b * v_i.value / norm(v_i.value)
+        return cls((0 * u.s, dv_vec_a), (t_trans, dv_vec_b))
 
     @property
     def tof(self):
