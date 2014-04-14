@@ -55,8 +55,6 @@ class State(object):
         """Return `State` object from orbital elements.
 
         """
-        # TODO: Desirable?
-        #ss_coe.p, ss_coe.ecc, ...
         if len(elements) != 6:
             raise ValueError("Incorrect number of parameters")
         if not check_units(elements, (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
@@ -68,6 +66,22 @@ class State(object):
 
         ss = cls(attractor, r, v, epoch)
         ss._elements = elements
+        return ss
+
+    @classmethod
+    def circular(cls, attractor, alt,
+                 inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000):
+        """Return `State` corresponding to a circular orbit.
+
+        """
+        if not check_units((alt, inc, raan, arglat),
+                           (u.m, u.rad, u.rad, u.rad)):
+            raise u.UnitsError("Units must be consistent")
+        a = attractor.R + alt
+        ecc = 0 * u.one
+        argp = 0 * u.deg
+        ss = cls.from_elements(attractor, (a, ecc, inc, raan, argp, arglat),
+                               epoch)
         return ss
 
     @property
@@ -87,6 +101,54 @@ class State(object):
                               (argp * u.rad).to(u.deg),
                               (nu * u.rad).to(u.deg))
             return self._elements
+
+    @property
+    def a(self):
+        """Semimajor axis.
+
+        """
+        a = self.elements[0]
+        return a
+
+    @property
+    def ecc(self):
+        """Eccentricity.
+
+        """
+        ecc = self.elements[1]
+        return ecc
+
+    @property
+    def inc(self):
+        """Inclination.
+
+        """
+        inc = self.elements[2]
+        return inc
+
+    @property
+    def raan(self):
+        """Right ascension of the ascending node.
+
+        """
+        raan = self.elements[3]
+        return raan
+
+    @property
+    def argp(self):
+        """Argument of the perigee.
+
+        """
+        argp = self.elements[4]
+        return argp
+
+    @property
+    def nu(self):
+        """True anomaly.
+
+        """
+        nu = self.elements[5]
+        return nu
 
     def rv(self):
         """Position and velocity vectors.

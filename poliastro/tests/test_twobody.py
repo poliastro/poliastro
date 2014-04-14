@@ -48,6 +48,22 @@ def test_state_has_elements_given_in_constructor():
     assert ss.elements == (a, ecc, inc, raan, argp, nu)
 
 
+def test_state_has_individual_elements():
+    a = 1.523679 * u.AU
+    ecc = 0.093315 * u.one
+    inc = 1.85 * u.deg
+    raan = 49.562 * u.deg
+    argp = 286.537 * u.deg
+    nu = 23.33 * u.deg
+    ss = State.from_elements(Sun, (a, ecc, inc, raan, argp, nu))
+    assert ss.a == a
+    assert ss.ecc == ecc
+    assert ss.inc == inc
+    assert ss.raan == raan
+    assert ss.argp == argp
+    assert ss.nu == nu
+
+
 def test_state_raises_unitserror_if_elements_units_are_wrong():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -73,6 +89,14 @@ def test_state_raises_unitserror_if_rv_units_are_wrong():
         ss = State.from_vectors(Sun, _d, wrong_v)
     assert ("UnitsError: Units must be consistent"
             in excinfo.exconly())
+
+
+def test_circular_has_proper_semimajor_axis():
+    alt = 500 * u.km
+    attractor = Earth
+    expected_a = Earth.R + alt
+    ss = State.circular(attractor, alt)
+    assert ss.a == expected_a
 
 
 def test_convert_from_rv_to_coe():
