@@ -13,6 +13,9 @@ Overview
 .. image:: https://travis-ci.org/Pybonacci/poliastro.svg?branch=master
    :target: https://travis-ci.org/Pybonacci/poliastro
 
+.. image:: https://coveralls.io/repos/Pybonacci/poliastro/badge.png
+   :target: https://coveralls.io/r/Pybonacci/poliastro
+
 These are some Python wrappers to Fortran subroutines useful in
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
 problem, conversion between position and velocity vectors and classical
