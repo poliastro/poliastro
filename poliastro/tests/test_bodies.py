@@ -11,19 +11,11 @@ def test_body_has_k_given_in_constructor():
     assert earth.k == k
 
 
-def test_body_constructor_raises_valueerror_if_k_is_not_quantity():
-    k = 4902.8
-    with pytest.raises(ValueError) as excinfo:
-        moon = bodies.Body(k)
-    assert ("ValueError: k must have units (use astropy.units)"
-            in excinfo.exconly())
-
-
 def test_body_constructor_raises_valueerror_if_k_units_not_correct():
-    k = 4902.8 * u.kg
-    with pytest.raises(ValueError) as excinfo:
-        moon = bodies.Body(k)
-    assert ("k units not consistent (expected u.m ** 3 / u.s ** 2)"
+    wrong_k = 4902.8 * u.kg
+    with pytest.raises(u.UnitsError) as excinfo:
+        moon = bodies.Body(wrong_k)
+    assert ("UnitsError: Units must be consistent"
             in excinfo.exconly())
 
 

@@ -13,6 +13,8 @@ and a way to define new bodies (`Body` class).
 from astropy.constants import G, M_sun, M_earth, R_earth
 from astropy import units as u
 
+from poliastro.util import check_units
+
 
 class Body(object):
     """Class to represent a body of the Solar System.
@@ -27,12 +29,9 @@ class Body(object):
             Standard gravitational parameter
 
         """
-        try:
-            if k.si.unit != u.m ** 3 / u.s ** 2:
-                raise ValueError("k units not consistent "
-                                 "(expected u.m ** 3 / u.s ** 2)")
-        except AttributeError:
-            raise ValueError("k must have units (use astropy.units)")
+        if not check_units((k,), (u.m ** 3 / u.s ** 2,)):
+            raise u.UnitsError("Units must be consistent")
+
         self.k = k
         self.name = name
         self.symbol = symbol
@@ -42,5 +41,7 @@ class Body(object):
         return u"{} ({})".format(self.name, self.symbol)
 
 
-Sun = Body(k=G * M_sun, name="Sun", symbol=u"\u2609")
-Earth = Body(k=G * M_earth, name="Earth", symbol=u"\u2641", R=R_earth)
+Sun = Body(k=(G * M_sun).to(u.km ** 3 / u.s ** 2),
+           name="Sun", symbol=u"\u2609")
+Earth = Body(k=(G * M_earth).to(u.km ** 3 / u.s ** 2),
+             name="Earth", symbol=u"\u2641", R=R_earth)

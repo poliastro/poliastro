@@ -56,9 +56,9 @@ class Maneuver(object):
 
         """
         # TODO: Check if circular?
-        r_i = ss_i.a.to(u.km)
-        v_i = ss_i.v.to(u.km / u.s)
-        k = ss_i.attractor.k.to(u.km ** 3 / u.s ** 2)
+        r_i = ss_i.a
+        v_i = ss_i.v
+        k = ss_i.attractor.k
         R = r_f / r_i
         dv_a = (np.sqrt(2 * R / (1 + R)) - 1) * v_i
         dv_b = (1 - np.sqrt(2 / (1 + R))) / np.sqrt(R) * v_i
@@ -70,9 +70,9 @@ class Maneuver(object):
         """Compute a bielliptic transfer between two circular orbits.
 
         """
-        r_i = ss_i.a.to(u.km)
-        v_i = ss_i.v.to(u.km / u.s)
-        k = ss_i.attractor.k.to(u.km ** 3 / u.s ** 2)
+        r_i = ss_i.a
+        v_i = ss_i.v
+        k = ss_i.attractor.k
         R = r_f / r_i
         Rs = r_b / r_i
         dv_a = (np.sqrt(2 * Rs / (1 + Rs)) - 1) * v_i
