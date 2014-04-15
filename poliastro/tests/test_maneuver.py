@@ -68,23 +68,16 @@ def test_hohmann_maneuver():
                         decimal=3)
 
 
-# Procedural API
-
-
-def test_bielliptic_example():
+def test_bielliptic_maneuver():
     # Data from Vallado, example 6.2
     alt_i = 191.34411 * u.km
     alt_b = 503873.0 * u.km
     alt_f = 376310.0 * u.km
-    k = Earth.k.to(u.km ** 3 / u.s ** 2)
-    R = R_earth.to(u.km)
+    ss_i = State.circular(Earth, alt_i)
     expected_dv = 3.904057 * u.km / u.s
     expected_t_trans = 593.919803 * u.h
-    r_i = R + alt_i
-    r_b = R + alt_b
-    r_f = R + alt_f
-    dva, dvb, dvc, t_trans1, t_trans2 = maneuver.bielliptic(k, r_i, r_b, r_f)
-    dv = abs(dva) + abs(dvb) + abs(dvc)
-    t_trans = t_trans1 + t_trans2
-    assert_almost_equal(dv, expected_dv, decimal=3)
-    assert_almost_equal(t_trans.to(u.h), expected_t_trans, decimal=1)
+    man = Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_f)
+    assert_almost_equal(man.get_total_cost().to(u.km / u.s), expected_dv,
+                        decimal=3)
+    assert_almost_equal(man.get_total_time().to(u.h), expected_t_trans,
+                        decimal=1)
