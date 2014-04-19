@@ -99,6 +99,12 @@ def test_circular_has_proper_semimajor_axis():
     assert ss.a == expected_a
 
 
+def test_geosync_has_proper_period():
+    expected_period = 1436  # min
+    ss = State.circular(Earth, alt=42164 * u.km - Earth.R)
+    assert_almost_equal(ss.period.to(u.min).value, expected_period, decimal=0)
+
+
 def test_convert_from_rv_to_coe():
     # Data from Vallado, example 2.6
     attractor = Earth
@@ -121,10 +127,11 @@ def test_convert_from_coe_to_rv():
     attractor = Earth
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
-    a, ecc, inc, raan, argp, nu = State.from_vectors(Earth, r, v).elements
-    p = a * (1 - ecc ** 2)
-    assert_almost_equal(p.value, 11067.79, decimal=-1)
-    assert_almost_equal(ecc.value, 0.832853, decimal=3)
+    ss = State.from_vectors(Earth, r, v)
+    a, ecc, inc, raan, argp, nu = ss.elements
+    p = ss.p
+    assert_almost_equal(p.value, 11067.79, decimal=0)
+    assert_almost_equal(ecc.value, 0.832853, decimal=4)
     assert_almost_equal(inc.value, 87.870, decimal=2)
     assert_almost_equal(raan.value, 227.89, decimal=1)
     assert_almost_equal(argp.value, 53.38, decimal=2)

@@ -111,6 +111,14 @@ class State(object):
         return a
 
     @property
+    def p(self):
+        """Semilatus rectum.
+
+        """
+        p = self.a * (1 - self.ecc ** 2)
+        return p
+
+    @property
     def ecc(self):
         """Eccentricity.
 
@@ -149,6 +157,14 @@ class State(object):
         """
         nu = self.elements[5]
         return nu
+
+    @property
+    def period(self):
+        """Period of the orbit.
+
+        """
+        period = 2 * np.pi * np.sqrt(self.a ** 3 / self.attractor.k)
+        return period
 
     def rv(self):
         """Position and velocity vectors.
