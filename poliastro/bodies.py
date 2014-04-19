@@ -10,7 +10,7 @@ and a way to define new bodies (`Body` class).
 
 """
 
-from astropy.constants import G, M_sun, M_earth, R_earth
+from astropy.constants import R_earth
 from astropy import units as u
 
 from poliastro.util import check_units
@@ -41,7 +41,7 @@ class Body(object):
         return u"{} ({})".format(self.name, self.symbol)
 
 
-Sun = Body(k=(G * M_sun).to(u.km ** 3 / u.s ** 2),
+Sun = Body(k=132712440018 * u.km ** 3 / u.s ** 2,
            name="Sun", symbol=u"\u2609")
-Earth = Body(k=(G * M_earth).to(u.km ** 3 / u.s ** 2),
+Earth = Body(k=398600 * u.km ** 3 / u.s ** 2,
              name="Earth", symbol=u"\u2641", R=R_earth)

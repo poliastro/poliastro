@@ -113,7 +113,7 @@ def test_convert_from_rv_to_coe():
     expected_v = [4.902276, 5.533124, -1.975709]  # km / s
     r, v = State.from_elements(Earth, (a, ecc, inc, raan, argp, nu)).rv()
     assert_array_almost_equal(r.value, expected_r, decimal=1)
-    assert_array_almost_equal(v.value, expected_v, decimal=3)
+    assert_array_almost_equal(v.value, expected_v, decimal=5)
 
 
 def test_convert_from_coe_to_rv():
@@ -127,8 +127,8 @@ def test_convert_from_coe_to_rv():
     assert_almost_equal(ecc.value, 0.832853, decimal=3)
     assert_almost_equal(inc.value, 87.870, decimal=2)
     assert_almost_equal(raan.value, 227.89, decimal=1)
-    assert_almost_equal(argp.value, 53.38, decimal=1)
-    assert_almost_equal(nu.value, 92.335, decimal=1)
+    assert_almost_equal(argp.value, 53.38, decimal=2)
+    assert_almost_equal(nu.value, 92.335, decimal=2)
 
 
 def test_propagate():
@@ -140,6 +140,6 @@ def test_propagate():
     ss1 = ss0.propagate(tof)
     r, v = ss1.r, ss1.v
     assert_array_almost_equal(r.value, [-4219.7527, 4363.0292, -3958.7666],
-                              decimal=-1)
+                              decimal=1)
     assert_array_almost_equal(v.value, [3.689866, -1.916735, -6.112511],
-                              decimal=2)
+                              decimal=4)
