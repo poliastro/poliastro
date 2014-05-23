@@ -6,8 +6,8 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq gfortran
   - pip install --upgrade pip setuptools
-  - pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel --use-mirrors numpy astropy pytest
-  - pip install pytest-cov
+  - pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel --use-mirrors numpy astropy matplotlib
+  - pip install pytest
   - pip install coveralls
 script:
   - python setup.py install

@@ -50,7 +50,7 @@ suitable to use with different gravitational parameters.
 Requirements
 ============
 
-poliastro requires NumPy and Astropy and is usually tested on Linux
+poliastro requires NumPy, Astropy and matplotlib and is usually tested on Linux
 on Python 2.7 and Python 3.3 (single codebase).
 
 Besides, a Fortran compiler is needed to build the extensions. poliastro
@@ -87,7 +87,7 @@ or `local installations`_.
 Testing
 =======
 
-If installed correctly, this should work::
+If installed correctly, the tests can be run using py.test::
 
   $ python -c "import poliastro; poliastro.test()"
   Running unit tests for poliastro
@@ -119,7 +119,7 @@ think you've found one please refer to the `issue tracker`_ on GitHub.
 Citing
 ======
 
-If you use scikit-aero on your project, please
+If you use poliastro on your project, please
 `drop me a line <mailto:juanlu001@gmail.com>`_.
 
 License
@@ -148,5 +148,5 @@ What's up with the name?
 ------------------------
 
 poliastro comes from Polimi, which is the shortened name of the Politecnico di
-Milano, the Italian university where I've been studying while writing this
-software. It's my tiny tribute to a place I've come to love. *Grazie mille!*
+Milano, the Italian university where I was studying while writing this
+software. It's my tiny tribute to a place I came to love. *Grazie mille!*
