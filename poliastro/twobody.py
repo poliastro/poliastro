@@ -247,7 +247,7 @@ class State(object):
 
         """
         if not ax:
-            _, ax = plt.subplots()
+            _, ax = plt.subplots(figsize=(6, 6))
 
         lines = []
         nu_vals = np.linspace(0, 2 * np.pi, num) + self.nu.to(u.rad).value
@@ -275,6 +275,12 @@ class State(object):
         ax.set_aspect(1)
 
         return lines
+
+    def plot(self):
+        """Shortcut to `plot2D`.
+
+        """
+        return self.plot2D()
 
 
 def rv_pqw(k, p, ecc, nu):

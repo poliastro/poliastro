@@ -21,6 +21,12 @@ Orbital Mechanics, such as orbit propagation, solution of the Lambert's
 problem, conversion between position and velocity vectors and classical
 orbital elements and orbit plotting.
 
+    from poliastro.examples import molniya
+    
+    molniya.plot()
+
+.. image:: https://raw.github.com/Pybonacci/poliastro/master/examples/molniya.png
+
 Fortran subroutines
 -------------------
 
