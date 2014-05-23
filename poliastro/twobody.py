@@ -4,6 +4,7 @@
 TODO
 ----
 * Include other element sets and non-elliptic orbits.
+* Improve consistency of units.
 
 """
 
@@ -197,8 +198,16 @@ class State(object):
         """Period of the orbit.
 
         """
-        period = 2 * np.pi * np.sqrt(self.a ** 3 / self.attractor.k)
+        period = 2 * np.pi * u.rad / self.n
         return period
+
+    @property
+    def n(self):
+        """Mean motion.
+
+        """
+        n = np.sqrt(self.attractor.k / self.a ** 3) * u.rad
+        return n
 
     def rv(self):
         """Position and velocity vectors.
