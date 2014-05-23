@@ -50,6 +50,14 @@ class Body(object):
     def __str__(self):
         return u"{} ({})".format(self.name, self.symbol)
 
+    def _repr_latex_(self):
+        """Creates a LaTeX representation.
+
+        Used by the IPython notebook.
+
+        """
+        return self.__str__()
+
 
 Sun = Body(k=132712440018 * u.km ** 3 / u.s ** 2,
            name="Sun", symbol=u"\u2609")

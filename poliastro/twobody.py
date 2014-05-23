@@ -50,6 +50,20 @@ class State(object):
         self.v = v
         self._elements = None
 
+    def _repr_latex_(self):
+        """Creates a LaTeX representation.
+
+        Used by the IPython notebook.
+
+        """
+        elem_names = [r"a", r"e", r"i", r"\Omega", r"\omega", r"\nu"]
+        elem_values = [elem._repr_latex_().strip("$")
+                       for elem in self.elements]
+        pairs = zip(elem_names, elem_values)
+        res = r"\\".join(["{0} & = {1}".format(name, value)
+                         for name, value in pairs])
+        return r"$\begin{{align}}{}\end{{align}}$".format(res)
+
     @classmethod
     def from_vectors(cls, attractor, r, v, epoch=J2000):
         """Return `State` object from position and velocity vectors.
