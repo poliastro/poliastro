@@ -10,19 +10,11 @@ from poliastro.bodies import Sun, Earth
 from poliastro.twobody import State
 
 
-def test_state_raises_valueerror_if_meaningless_state():
-    _ = 1.0
-    with pytest.raises(ValueError) as excinfo:
-        ss = State.from_elements(Sun, (_,))
-    assert ("ValueError: Incorrect number of parameters"
-            in excinfo.exconly())
-
-
 def test_state_has_attractor_given_in_constructor():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_elements(Sun, (_d, _, _a, _a, _a, _a))
+    ss = State.from_elements(Sun, _d, _, _a, _a, _a, _a)
     assert ss.attractor == Sun
 
 
@@ -32,7 +24,7 @@ def test_default_time_for_new_state():
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     expected_epoch = time.Time("J2000", scale='utc')
-    ss = State.from_elements(_body, (_d, _, _a, _a, _a, _a))
+    ss = State.from_elements(_body, _d, _, _a, _a, _a, _a)
     assert ss.epoch == expected_epoch
 
 
@@ -44,7 +36,7 @@ def test_state_has_elements_given_in_constructor():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_elements(Sun, (a, ecc, inc, raan, argp, nu))
+    ss = State.from_elements(Sun, a, ecc, inc, raan, argp, nu)
     assert ss.elements == (a, ecc, inc, raan, argp, nu)
 
 
@@ -55,7 +47,7 @@ def test_state_has_individual_elements():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_elements(Sun, (a, ecc, inc, raan, argp, nu))
+    ss = State.from_elements(Sun, a, ecc, inc, raan, argp, nu)
     assert ss.a == a
     assert ss.ecc == ecc
     assert ss.inc == inc
@@ -70,7 +62,7 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
     _a = 1.0 * u.deg  # Unused angle
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
-        ss = State.from_elements(Sun, (_d, _, _a, _a, _a, wrong_angle))
+        ss = State.from_elements(Sun, _d, _, _a, _a, _a, wrong_angle)
     assert ("UnitsError: Units must be consistent"
             in excinfo.exconly())
 
@@ -117,7 +109,7 @@ def test_convert_from_rv_to_coe():
     nu = 92.335 * u.deg
     expected_r = [6525.344, 6861.535, 6449.125]  # km
     expected_v = [4.902276, 5.533124, -1.975709]  # km / s
-    r, v = State.from_elements(Earth, (a, ecc, inc, raan, argp, nu)).rv()
+    r, v = State.from_elements(Earth, a, ecc, inc, raan, argp, nu).rv()
     assert_array_almost_equal(r.value, expected_r, decimal=1)
     assert_array_almost_equal(v.value, expected_v, decimal=5)
 

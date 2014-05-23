@@ -1,6 +1,10 @@
 # coding: utf-8
 """Two body problem.
 
+TODO
+----
+* Include other element sets and non-elliptic orbits.
+
 """
 
 import numpy as np
@@ -22,7 +26,8 @@ class State(object):
 
     """
     def __init__(self, attractor, r, v, epoch):
-        """Constructor.
+        """Constructor. To create a `State` object better use `from_vectors`
+        and `from_elements` methods.
 
         Parameters
         ----------
@@ -44,6 +49,17 @@ class State(object):
     def from_vectors(cls, attractor, r, v, epoch=J2000):
         """Return `State` object from position and velocity vectors.
 
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        r : Quantity
+            Position vector wrt attractor center.
+        v : Quantity
+            Velocity vector.
+        epoch : Time
+            Epoch, default to J2000.
+
         """
         if not check_units((r, v), (u.m, u.m / u.s)):
             raise u.UnitsError("Units must be consistent")
@@ -51,21 +67,39 @@ class State(object):
         return cls(attractor, r, v, epoch)
 
     @classmethod
-    def from_elements(cls, attractor, elements, epoch=J2000):
+    def from_elements(cls, attractor, a, ecc, inc, raan, argp, nu,
+                      epoch=J2000):
         """Return `State` object from orbital elements.
 
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        a : Quantity
+            Semimajor axis.
+        ecc : Quantity
+            Eccentricity.
+        inc : Quantity
+            Inclination
+        raan : Quantity
+            Right ascension of the ascending node.
+        argp : Quantity
+            Argument of the pericenter.
+        nu : Quantity
+            True anomaly.
+        epoch : Time
+            Epoch, default to J2000.
+
         """
-        if len(elements) != 6:
-            raise ValueError("Incorrect number of parameters")
-        if not check_units(elements, (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
+        if not check_units((a, ecc, inc, raan, argp, nu),
+                           (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        a, ecc, inc, raan, argp, nu = elements
         r, v = coe2rv(k, a, ecc, inc, raan, argp, nu)
 
         ss = cls(attractor, r, v, epoch)
-        ss._elements = elements
+        ss._elements = a, ecc, inc, raan, argp, nu
         return ss
 
     @classmethod
@@ -80,7 +114,7 @@ class State(object):
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
-        ss = cls.from_elements(attractor, (a, ecc, inc, raan, argp, arglat),
+        ss = cls.from_elements(attractor, a, ecc, inc, raan, argp, arglat,
                                epoch)
         return ss
 
@@ -240,7 +274,6 @@ def rv2coe(k, r, v):
     e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
     ecc = norm(e)
     p = h.dot(h) / k
-    # TODO: Cannot define a parabola with its semi-major axis
     a = p / (1 - ecc ** 2)
 
     inc = np.arccos(h[2] / norm(h))
