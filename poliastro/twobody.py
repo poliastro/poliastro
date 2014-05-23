@@ -17,6 +17,10 @@ u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.util import transform, check_units
 
+# For plotting
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
 from . import _ast2body
 
 J2000 = time.Time("J2000", scale='utc')
@@ -227,6 +231,51 @@ class State(object):
                       time_of_flight.to(u.s).value)
         return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
                                  self.epoch + time_of_flight)
+
+    def plot2D(self, ax=None, num=100, osculating=True):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        ax : Axes, optional
+            Matplotlib axes where plotting should be performed. If not given,
+            new ones will be created.
+        num : int, optional
+            Number of points, default to 100.
+        osculating : bool, optional
+            Whether to plot the osculating orbit, default to yes.
+
+        """
+        if not ax:
+            _, ax = plt.subplots()
+
+        lines = []
+        nu_vals = np.linspace(0, 2 * np.pi, num) + self.nu.to(u.rad).value
+        r_pqw, _ = rv_pqw(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                          self.p.to(u.km).value, self.ecc.value, nu_vals)
+
+        # Current position
+        l, = ax.plot(r_pqw[0, 0], r_pqw[0, 1], 'o')
+        lines.append(l)
+
+        # Attractor
+        attractor = mpl.patches.Circle((0, 0),
+                                       self.attractor.R.to(u.km).value,
+                                       lw=0, color='#204a87')  # Earth
+        ax.add_patch(attractor)
+
+        if osculating:
+            l, = ax.plot(r_pqw[:, 0], r_pqw[:, 1], '--', color=l.get_color())
+            lines.append(l)
+
+        # Appearance
+        ax.set_title(self.epoch.iso)
+        ax.set_xlabel("$x$ (km)")
+        ax.set_ylabel("$y$ (km)")
+        ax.set_aspect(1)
+
+        return lines
+
 
 def rv_pqw(k, p, ecc, nu):
     """Returns r and v vectors in perifocal frame.
