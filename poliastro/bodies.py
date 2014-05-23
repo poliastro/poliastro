@@ -8,6 +8,10 @@ Contains some predefined bodies of the Solar System:
 
 and a way to define new bodies (`Body` class).
 
+TODO
+----
+* Add more parameters (e.g. J2)
+
 """
 
 from astropy.constants import R_earth
@@ -20,16 +24,22 @@ class Body(object):
     """Class to represent a body of the Solar System.
 
     """
-    def __init__(self, k, name=None, symbol=None, R=None):
+    def __init__(self, k, name=None, symbol=None, R=0 * u.km):
         """Constructor.
 
         Parameters
         ----------
         k : Quantity
             Standard gravitational parameter
+        name : str, optional
+            Name of the body, default to None.
+        symbol : str, optional
+            Symbol for the body, default to None.
+        R : Quantity, optional
+            Radius of the body, default to 0 km.
 
         """
-        if not check_units((k,), (u.m ** 3 / u.s ** 2,)):
+        if not check_units((k, R), (u.m ** 3 / u.s ** 2, u.m)):
             raise u.UnitsError("Units must be consistent")
 
         self.k = k
