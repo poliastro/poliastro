@@ -58,7 +58,7 @@ class State(object):
             Position vector wrt attractor center.
         v : Quantity
             Velocity vector.
-        epoch : Time
+        epoch : Time, optional
             Epoch, default to J2000.
 
         """
@@ -88,7 +88,7 @@ class State(object):
             Argument of the pericenter.
         nu : Quantity
             True anomaly.
-        epoch : Time
+        epoch : Time, optional
             Epoch, default to J2000.
 
         """
