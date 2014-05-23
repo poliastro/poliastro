@@ -28,6 +28,7 @@ orbital elements and orbit plotting.
     molniya.plot()
 
 .. image:: https://github.com/Pybonacci/poliastro/raw/master/examples/molniya.png
+   :align: center
 
 Fortran subroutines
 -------------------
