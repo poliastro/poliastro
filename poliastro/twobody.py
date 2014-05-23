@@ -97,9 +97,12 @@ class State(object):
             raise u.UnitsError("Units must be consistent")
 
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        r, v = coe2rv(k, a, ecc, inc, raan, argp, nu)
+        r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
+                      a.to(u.km).value, ecc.value, inc.to(u.rad).value,
+                      raan.to(u.rad).value, argp.to(u.rad).value,
+                      nu.to(u.rad).value)
 
-        ss = cls(attractor, r, v, epoch)
+        ss = cls(attractor, r * u.km, v * u.km / u.s, epoch)
         ss._elements = a, ecc, inc, raan, argp, nu
         return ss
 
@@ -225,6 +228,14 @@ class State(object):
         return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
                                  self.epoch + time_of_flight)
 
+def rv_pqw(k, p, ecc, nu):
+    """Returns r and v vectors in perifocal frame.
+
+    """
+    r_pqw = (np.array([np.cos(nu), np.sin(nu), 0 * nu]) * p / (1 + ecc * np.cos(nu))).T
+    v_pqw = (np.array([-np.sin(nu), (ecc + np.cos(nu)), 0]) * np.sqrt(k / p)).T
+    return r_pqw, v_pqw
+
 
 def coe2rv(k, a, ecc, inc, raan, argp, nu):
     """Converts from orbital elements to vectors.
@@ -248,19 +259,14 @@ def coe2rv(k, a, ecc, inc, raan, argp, nu):
 
     """
     p = a * (1 - ecc ** 2)
-    r_pqw = np.array([np.cos(nu) / (1 + ecc * np.cos(nu)),
-                      np.sin(nu) / (1 + ecc * np.cos(nu)),
-                      0]) * p
-    v_pqw = np.array([-np.sin(nu),
-                      (ecc + np.cos(nu)),
-                      0]) * np.sqrt(k / p)
+    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
 
-    r_ijk = transform(r_pqw, -argp, 'z')
-    r_ijk = transform(r_ijk, -inc, 'x')
-    r_ijk = transform(r_ijk, -raan, 'z')
-    v_ijk = transform(v_pqw, -argp, 'z')
-    v_ijk = transform(v_ijk, -inc, 'x')
-    v_ijk = transform(v_ijk, -raan, 'z')
+    r_ijk = transform(r_pqw, -argp, 'z', u.rad)
+    r_ijk = transform(r_ijk, -inc, 'x', u.rad)
+    r_ijk = transform(r_ijk, -raan, 'z', u.rad)
+    v_ijk = transform(v_pqw, -argp, 'z', u.rad)
+    v_ijk = transform(v_ijk, -inc, 'x', u.rad)
+    v_ijk = transform(v_ijk, -raan, 'z', u.rad)
 
     return r_ijk, v_ijk
 
