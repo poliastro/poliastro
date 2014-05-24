@@ -4,10 +4,14 @@ Getting started
 Requirements
 ------------
 
-poliastro requires NumPy, Astropy and matplotlib and is usually tested on Linux
-on Python 2.7 and Python 3.3 (single codebase).
+poliastro requires the following Python packages:
 
-Besides, a Fortran compiler is needed to build the extensions. poliastro
+* NumPy
+* Astropy (for physical units handling and geometrical transforms)
+* matplotlib (for plotting)
+
+It is usually tested on Linux on Python 2.7 and Python 3.3 (single codebase).
+A Fortran compiler is needed to build the extensions: poliastro
 is usually built with gfortran.
 
 There is no reason it shouldn't work under Windows or Mac OS X with
@@ -18,16 +22,20 @@ Installation
 
 To install poliastro just use pip::
 
-  $ pip install poliastro
+  $ pip install numpy astropy matplotlib poliastro
 
-To install poliastro from source, just type::
+To install poliastro from source, just clone the source::
 
+  $ clone https://github.com/Pybonacci/poliastro.git
+  $ cd poliastro/
   $ python setup.py install
 
-It is recommended that you **never ever use sudo** with distutils, pip,
-setuptools and friends in Linux because you might seriously break your
-system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
-or `local installations`_.
+.. note::
+
+    It is recommended that you **never ever use sudo** with distutils, pip,
+    setuptools and friends in Linux because you might seriously break your
+    system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
+    or `local installations`_.
 
 .. _1: http://wiki.python.org/moin/CheeseShopTutorial#Distutils_Installation
 .. _2: http://stackoverflow.com/questions/4314376/how-can-i-install-a-python-egg-file/4314446#comment4690673_4314446
@@ -49,3 +57,6 @@ If installed correctly, the tests can be run using py.test::
   OK
   $ 
 
+If for some reason any test fails, please report it in the `issue tracker`_.
+
+.. _`issue tracker`: https://github.com/Pybonacci/poliastro/issues

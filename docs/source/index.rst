@@ -6,26 +6,48 @@ poliastro - Astrodynamics in Python
    :figwidth: 300
    :alt: Molniya orbit
 
-   Plot of a Molniya orbit around the Earth
+   Plot of a `Molniya orbit`_ around the Earth
    (\\(a = 26600\\,\\mathrm{km}, e = 0.75,
    i = 63.4 \\mathrm{{}^{\\circ}} \\)).
 
-poliastro is a collection of Python wrappers to Fortran subroutines useful in
-Orbital Mechanics, such as:
+poliastro is an open source collection of Python subroutines useful in
+Astrodynamics and Orbital Mechanics. It tries to provide a simple and
+intuitive API and handles physical quantities with units (thanks to
+:code:`astropy.units`). Some of its features are:
 
 * Orbit propagation
 * Conversion between position and velocity vectors and classical orbital
   elements
 * Hohmann and bielliptic maneuvers computation
-* Orbit plotting
+* Trajectory plotting
 
 And more to come!
+
+The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
+contributions and feedback are more than welcome.
+
+.. _`source code`: https://github.com/Pybonacci/poliastro
+.. _`issue tracker`: https://github.com/Pybonacci/poliastro/issues
+.. _`wiki`: https://github.com/Pybonacci/poliastro/wiki/
+
+poliastro works on both Python 2 and 3 and is released under a 2-clause
+BSD license, hence allowing commercial use of the library.
 
 .. code-block:: python
 
     from poliastro.examples import molniya
     
     molniya.plot()
+
+poliastro relies on some Fortran subroutines written by David A. Vallado for
+his book "Fundamentals of Astrodynamics and Applications" and available on
+the Internet as the `companion software of the book`__.
+The author explicitly gave permission to redistribute these subroutines
+in this project under the current license.
+
+.. __: http://celestrak.com/software/vallado-sw.asp
+
+.. _`Molniya orbit`: http://en.wikipedia.org/wiki/Molniya_orbit
 
 Contents
 --------
@@ -34,5 +56,7 @@ Contents
    :maxdepth: 2
 
    getting_started
+   user_guide
+   changelog
    api
 
