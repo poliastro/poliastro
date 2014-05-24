@@ -6,6 +6,7 @@ MANIFEST
 
 dist/*
 build/*
+docs/build/*
 *.egg-info/*
 
 poliastro/.coverage
