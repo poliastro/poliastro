@@ -190,6 +190,22 @@ class State(object):
         return p
 
     @property
+    def r_p(self):
+        """Radius of pericenter.
+
+        """
+        r_p = self.a * (1 - self.ecc)
+        return r_p
+
+    @property
+    def r_a(self):
+        """Radius of apocenter.
+
+        """
+        r_a = self.a * (1 + self.ecc)
+        return r_a
+
+    @property
     def ecc(self):
         """Eccentricity.
 
