@@ -15,40 +15,37 @@ class Maneuver(object):
     """Class to represent a Maneuver.
 
     """
-    def __init__(self, *vals):
+    def __init__(self, *impulses):
         """Constructor.
 
         Parameters
         ----------
-        vals : list
+        impulses : list
             List of pairs (delta_time, delta_velocity)
 
+        Notes
+        -----
+        TODO: Fix docstring, \*args convention
+
         """
-        self.delta_times, self.delta_velocities = zip(*vals)
-        u_times = check_units(self.delta_times, (u.s,))
-        u_dvs = check_units(self.delta_velocities, (u.m / u.s,))
+        self.impulses = impulses
+        self._dts, self._dvs = zip(*impulses)
+        u_times = check_units(self._dts, (u.s,))
+        u_dvs = check_units(self._dvs, (u.m / u.s,))
         if not u_times or not u_dvs:
             raise u.UnitsError("Units must be consistent")
         try:
-            arr_dvs = [len(dv) == 3 for dv in self.delta_velocities]
-            if not all(arr_dvs):
+            if not all(len(dv) == 3 for dv in self._dvs):
                 raise TypeError
         except TypeError:
             raise ValueError("Delta-V must be three dimensions vectors")
 
-    def get_total_time(self):
-        """Returns total time of the maneuver.
+    @classmethod
+    def impulse(cls, dv):
+        """Single impulse at current time.
 
         """
-        total_time = sum(self.delta_times, 0 * u.s)
-        return total_time
-
-    def get_total_cost(self):
-        """Returns otal cost of the maneuver.
-
-        """
-        dvs = [np.sqrt(dv.dot(dv)) for dv in self.delta_velocities]
-        return sum(dvs, 0 * u.km / u.s)
+        return cls((0 * u.s, dv))
 
     @classmethod
     def hohmann(cls, ss_i, r_f):
@@ -82,3 +79,17 @@ class Maneuver(object):
         t_trans1 = np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)
         t_trans2 = np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)
         return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
+
+    def get_total_time(self):
+        """Returns total time of the maneuver.
+
+        """
+        total_time = sum(self._dts, 0 * u.s)
+        return total_time
+
+    def get_total_cost(self):
+        """Returns otal cost of the maneuver.
+
+        """
+        dvs = [np.sqrt(dv.dot(dv)) for dv in self._dvs]
+        return sum(dvs, 0 * u.km / u.s)

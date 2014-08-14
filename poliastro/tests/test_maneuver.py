@@ -15,18 +15,6 @@ from poliastro.maneuver import Maneuver
 
 # Object oriented API
 
-def test_maneuver_has_separated_dvs_and_times():
-    dt1 = 1 * u.s
-    dt2 = 2 * u.s
-    dt3 = 3 * u.s
-    dv1 = [1, 0, 0] * u.km / u.s
-    dv2 = [2, 0, 0] * u.km / u.s
-    dv3 = [3, 0, 0] * u.km / u.s
-    man = Maneuver((dt1, dv1), (dt2, dv2), (dt3, dv3))
-    assert man.delta_times == (dt1, dt2, dt3)
-    assert man.delta_velocities == (dv1, dv2, dv3)
-
-
 def test_maneuver_raises_error_if_units_are_wrong():
     wrong_dt = 1.0
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
