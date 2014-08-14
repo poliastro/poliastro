@@ -1,34 +1,30 @@
 API Reference
 =============
 
-poliastro.bodies module
------------------------
+poliastro.twobody module
+------------------------
 
-.. automodule:: poliastro.bodies
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. automodule:: poliastro.twobody
+
+    .. autoclass:: State()
+       :members:
 
 poliastro.maneuver module
 -------------------------
 
 .. automodule:: poliastro.maneuver
     :members:
-    :undoc-members:
-    :show-inheritance:
+    :special-members: __init__
 
-poliastro.twobody module
-------------------------
+poliastro.bodies module
+-----------------------
 
-.. automodule:: poliastro.twobody
-    
-    .. autoclass:: State()
-       :members: from_vectors, from_elements
+.. automodule:: poliastro.bodies
+    :members:
+    :special-members: __init__
 
 poliastro.util module
 ---------------------
 
 .. automodule:: poliastro.util
     :members:
-    :undoc-members:
-    :show-inheritance:

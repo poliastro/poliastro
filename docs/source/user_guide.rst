@@ -56,11 +56,15 @@ And that's it! Notice a couple of things:
    :alt: Plot of the orbit
 
 If we're working on interactive mode (for example, using the wonderful IPython
-notebook) we can immediately plot the current state typing :code:`ss.plot()`:
-this plot is made in the so called *perifocal frame*, which means we're
-visualizing the plane of the orbit itself, the \\(x\\) axis points to the
-pericenter and the \\(y\\) axis is turned \\(90 \\mathrm{^\\circ}\\) in the
-direction of the orbit. The dotted line represents the *osculating orbit*:
+notebook) we can immediately plot the current state typing :code:`ss.plot()` in
+the so called *perifocal frame* which means:
+
+* we're visualizing the plane of the orbit itself,
+* the \\(x\\) axis points to the pericenter, and
+* the \\(y\\) axis is turned \\(90 \\mathrm{^\\circ}\\) in the
+  direction of the orbit.
+
+The dotted line represents the *osculating orbit*:
 the instantaneous Keplerian orbit at that point. This is relevant in the
 context of perturbations, when the object shall deviate from its Keplerian
 orbit.
@@ -71,7 +75,7 @@ From classical orbital elements
 We can also define a :py:class:`~poliastro.twobody.State` using a set of
 six parameters called orbital elements. Although there are several of
 this element sets, each one with its advantages and drawbacks, right now
-poliastro just support the *classical orbital elements*:
+poliastro supports the *classical orbital elements*:
 
 * Semimajor axis \\(a\\).
 * Eccentricity \\(e\\).
@@ -79,3 +83,10 @@ poliastro just support the *classical orbital elements*:
 * Right ascension of the ascending node \\(\\Omega\\).
 * Argument of pericenter \\(\\omega\\).
 * True anomaly \\(\\nu\\).
+
+Changing the orbit: :code:`Maneuver` objects
+--------------------------------------------
+
+poliastro helps us to define several in-plane and general out-of-plane
+maneuvers with the :py:class:`~poliastro.maneuver.Maneuver` inside the
+:py:mod:`poliastro.maneuver` module.

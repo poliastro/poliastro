@@ -36,6 +36,9 @@ extensions = [
     'sphinx.ext.mathjax',
 ]
 
+# Custom configuration
+autodoc_member_order = 'bysource'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -50,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'poliastro'
-copyright = u'2014, Juan Luis Cano Rodríguez'
+copyright = u'2013-2014, Juan Luis Cano Rodríguez'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
