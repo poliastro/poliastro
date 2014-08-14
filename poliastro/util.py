@@ -37,11 +37,11 @@ def rotate(vector, angle, axis='z', unit=None):
     -----
     This is just a convenience function around
     `astropy.coordinates.angles.rotation_matrix`.
-    This performs a so-called active or alibi transformation: rotates the
+    This performs a so-called *active* or *alibi* transformation: rotates the
     vector while the coordinate system remains unchanged. To do the opposite
-    operation (passive or alias transformation) call the function as
-    ``rotate(vec, ax, -angle)`` or use the convenience function `transform`,
-    see `[1]_`.
+    operation (*passive* or *alias* transformation) call the function as
+    ``rotate(vec, ax, -angle, unit)`` or use the convenience function
+    :py:func:`transform`, see [1].
 
     References
     ----------
@@ -58,8 +58,8 @@ def transform(vector, angle, axis='z', unit=None):
     Notes
     -----
     This is a convenience function, equivalent to
-    `rotate(vec, -angle, axis, unit)`.
-    Refer to the documentation of that function for further information.
+    ``rotate(vec, -angle, axis, unit)``.
+    Refer to the documentation of :py:func:`rotate` for further information.
 
     """
     return rotate(vector, -angle, axis, unit)

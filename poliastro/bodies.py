@@ -6,11 +6,9 @@ Contains some predefined bodies of the Solar System:
 * Sun (☉)
 * Earth (♁)
 
-and a way to define new bodies (`Body` class).
+and a way to define new bodies (:py:class:`~Body` class).
 
-TODO
-----
-* Add more parameters (e.g. J2)
+TODO: Add more parameters (e.g. J2)
 
 """
 

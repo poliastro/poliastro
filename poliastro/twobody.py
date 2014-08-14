@@ -129,6 +129,21 @@ class State(object):
                  inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000):
         """Return `State` corresponding to a circular orbit.
 
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        alt : Quantity
+            Altitude over surface.
+        inc : Quantity, optional
+            Inclination, default to 0 deg (equatorial orbit).
+        raan : Quantity, optional
+            Right ascension of the ascending node, default to 0 deg.
+        arglat : Quantity, optional
+            Argument of latitude, default to 0 deg.
+        epoch: Time, optional
+            Epoch, default to J2000.
+
         """
         if not check_units((alt, inc, raan, arglat),
                            (u.m, u.rad, u.rad, u.rad)):
@@ -258,6 +273,12 @@ class State(object):
             Number of points, default to 100.
         osculating : bool, optional
             Whether to plot the osculating orbit, default to yes.
+
+        Notes
+        -----
+        TODO: I still miss a way to plot several orbits in one plot. Probably
+        it's time to create some plotting.py module, with a OrbitPlotter where
+        I can hold things like the plane.
 
         """
         if not ax:
