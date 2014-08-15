@@ -71,3 +71,10 @@ def check_units(quantities, units):
     """
     return all(unit.is_equivalent((quant * u.one).unit)
                for unit, quant in zip(units, quantities))
+
+
+def norm(vec):
+    """Norm of a Quantity vector that respects units.
+
+    """
+    return np.sqrt(vec.dot(vec))

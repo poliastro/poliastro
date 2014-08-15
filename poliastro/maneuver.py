@@ -9,6 +9,7 @@ from astropy import units as u
 u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.util import check_units
+from poliastro.util import norm
 
 
 class Maneuver(object):
@@ -91,5 +92,5 @@ class Maneuver(object):
         """Returns otal cost of the maneuver.
 
         """
-        dvs = [np.sqrt(dv.dot(dv)) for dv in self._dvs]
+        dvs = [norm(dv) for dv in self._dvs]
         return sum(dvs, 0 * u.km / u.s)
