@@ -19,9 +19,7 @@ from poliastro.twobody.conversion import coe2rv, rv2coe
 
 from poliastro.plotting import OrbitPlotter
 
-from poliastro.util import check_units
-
-from . import _ast2body
+from poliastro.util import check_units, norm
 
 J2000 = time.Time("J2000", scale='utc')
 
@@ -261,11 +259,49 @@ class State(object):
         n = np.sqrt(self.attractor.k / self.a ** 3) * u.rad
         return n
 
+    @property
+    def h(self):
+        """Specific angular momentum.
+
+        """
+        return norm(self.h_vec)
+
+    @property
+    def e_vec(self):
+        """Eccentricity vector.
+
+        """
+        r, v = self.rv()
+        k = self.attractor.k
+        e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
+        return e_vec
+
+    @property
+    def h_vec(self):
+        """Specific angular momentum vector.
+
+        """
+        h_vec = np.cross(self.r.to(u.km).value,
+                         self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        return h_vec
+
     def rv(self):
         """Position and velocity vectors.
 
         """
         return self.r, self.v
+
+    def pqw(self):
+        """Perifocal frame (PQW) vectors.
+
+        """
+        if self.ecc > 1e-8:
+            p_vec = self.e_vec / self.ecc
+        else:
+            p_vec = self.r / norm(self.r)
+        w_vec = self.h_vec / self.h
+        q_vec = np.cross(w_vec, p_vec) * u.one
+        return p_vec, q_vec, w_vec
 
     def propagate(self, time_of_flight):
         """Propagate this `State` some `time` and return the result.
