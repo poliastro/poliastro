@@ -9,9 +9,10 @@ build/*
 docs/build/*
 *.egg-info/*
 
+examples/.ipynb_checkpoints/*
+
 poliastro/.coverage
-poliastro/_*.so
-poliastro/src/_*.so
+poliastro/twobody/_*.so
 poliastro/src/_*.c
 
 __pycache__/

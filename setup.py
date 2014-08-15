@@ -13,10 +13,10 @@ def configuration(parent_package='', top_path=None):
     config.add_library('astiod',
                        sources=[join('poliastro', 'src', '*.for')])
 
-    config.add_extension('_ast2body',
+    config.add_extension('twobody._ast2body',
                          sources=[join('poliastro', 'src', 'ast2body.pyf')],
                          libraries=['ast2body'])
-    config.add_extension('_astiod',
+    config.add_extension('twobody._astiod',
                          sources=[join('poliastro', 'src', 'astiod.pyf')],
                          libraries=['astiod'])
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
           requires=["numpy", "astropy", "pytest"],
-          packages=['poliastro'],
+          packages=['poliastro', 'poliastro.twobody'],
           classifiers=[
               "Development Status :: 2 - Pre-Alpha",
               "Intended Audience :: Education",
