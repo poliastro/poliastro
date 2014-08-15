@@ -280,15 +280,8 @@ class State(object):
     def plot2D(self, ax=None, num=100, osculating=True):
         """Plots state and osculating orbit in their plane.
 
-        Parameters
-        ----------
-        ax : Axes, optional
-            Matplotlib axes where plotting should be performed. If not given,
-            new ones will be created.
-        num : int, optional
-            Number of points, default to 100.
-        osculating : bool, optional
-            Whether to plot the osculating orbit, default to yes.
+        This is a convenience function using
+        :py:class:`poliastro.plotting.OrbitPlotter`.
 
         """
         op = OrbitPlotter(num)

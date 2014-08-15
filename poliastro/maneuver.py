@@ -89,7 +89,7 @@ class Maneuver(object):
         return total_time
 
     def get_total_cost(self):
-        """Returns otal cost of the maneuver.
+        """Returns total cost of the maneuver.
 
         """
         dvs = [norm(dv) for dv in self._dvs]

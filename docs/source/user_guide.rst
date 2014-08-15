@@ -84,9 +84,70 @@ poliastro supports the *classical orbital elements*:
 * Argument of pericenter \\(\\omega\\).
 * True anomaly \\(\\nu\\).
 
+In this case, we'd use the method
+:py:meth:`~poliastro.twobody.State.from_elements`:
+
+.. code-block:: python
+
+    # Data for Mars at J2000 from JPL HORIZONS
+    a = 1.523679 * u.AU
+    ecc = 0.093315 * u.one
+    inc = 1.85 * u.deg
+    raan = 49.562 * u.deg
+    argp = 286.537 * u.deg
+    nu = 23.33 * u.deg
+    
+    ss = State.from_elements(Sun, a, ecc, inc, raan, argp, nu)
+
+Notice that whether we create a ``State`` from \\(r\\) and \\(v\\) or from
+elements we can access many mathematical properties individually::
+
+    >>> ss.period.to(u.day)
+    <Quantity 686.9713888628166 d>
+    >>> ss.v
+    <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
+
+To see a complete list of properties, check out the
+:py:class:`poliastro.twobody.State` class on the API reference.
+
 Changing the orbit: :code:`Maneuver` objects
 --------------------------------------------
 
 poliastro helps us to define several in-plane and general out-of-plane
-maneuvers with the :py:class:`~poliastro.maneuver.Maneuver` inside the
+maneuvers with the :py:class:`~poliastro.maneuver.Maneuver` class inside the
 :py:mod:`poliastro.maneuver` module.
+
+Each ``Maneuver`` consists on a list of impulses \\(\\Delta v_i\\)
+(changes in velocity) each one applied at a certain instant \\(t_i\\). The
+simplest maneuver is a single change of velocity without delay: you can
+recreate it either using the :py:meth:`~poliastro.maneuver.Maneuver.impulse`
+method or instantiating it directly.
+
+.. code-block:: python
+
+    dv = [5, 0, 0] * u.m / u.s
+    
+    man = Maneuver.impulse(dv)
+    man = Maneuver((0 * u.s, dv))  # Equivalent
+
+There are other useful methods you can use to compute common in-plane
+maneuvers, notably :py:meth:`~poliastro.maneuver.Maneuver.hohmann` and
+:py:meth:`~poliastro.maneuver.Maneuver.bielliptic` for Hohmann and
+bielliptic transfers respectively. Both of these return the corresponding
+``Maneuver`` object, which in turn you can use to calculate the total cost
+in terms of velocity change (\\(\\sum \|\\Delta v_i|\\)) and the transfer
+time::
+
+    >>> ss_i = State.circular(Earth, alt=700 * u.km)
+    >>> hoh = Maneuver.hohmann(ss_i, 36000 * u.km)
+    >>> hoh.get_total_cost()
+    <Quantity 3.6173981270031357 km / s>
+    >>> hoh.get_total_time()
+    <Quantity 15729.741535747102 s>
+
+You can also retrieve the individual vectorial impulses::
+
+    >>> hoh.impulses[0]
+    (<Quantity 0 s>, <Quantity [ 0.        , 2.19739818, 0.        ] km / s>)
+    >>> tuple(_.decompose([u.km, u.s]) for _ in hoh.impulses[1])
+    (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)

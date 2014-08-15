@@ -43,7 +43,7 @@ class OrbitPlotter(object):
                           state.p.to(u.km).value, state.ecc.value, nu_vals)
 
         # Current position
-        l, = ax.plot(r_pqw[0, 0], r_pqw[0, 1], 'o')
+        l, = ax.plot(r_pqw[0, 0], r_pqw[0, 1], 'o', mew=0)
         lines.append(l)
 
         # Attractor
