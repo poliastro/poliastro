@@ -5,12 +5,21 @@ New in poliastro 0.2
 --------------------
 
 * **Totally refactored code** to provide a more pythonic API (see `PR #14`_
-  and `wiki`_ for further information).
-* Mandatory use of **physical units** through :code:`astropy.units`.
+  and `wiki`_ for further information) heavily inspired by `Plyades`_ by
+  Helge Eichhorn.
+
+  * Mandatory use of **physical units** through :code:`astropy.units`.
+  * Object-oriented approach: :py:class:`~poliastro.twobody.State` and
+    :py:class:`~poliastro.maneuver.Maneuver` classes.
+  * Vector quantities: results not only have magnitude now, but also direction
+    (see for example maneuvers).
+
 * Easy plotting of orbits in two dimensions using matplotlib.
+* Module :code:`example` with sample data to start testing the library.
 
 .. _`PR #14`: https://github.com/Pybonacci/poliastro/pull/14
 .. _wiki: https://github.com/Pybonacci/poliastro/wiki
+.. _Plyades: https://github.com/helgee/Plyades
 
 These features were removed temporarily not to block the release and will
 see the light again in poliastro 0.3:
