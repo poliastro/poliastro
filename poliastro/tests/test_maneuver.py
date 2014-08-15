@@ -42,6 +42,12 @@ def test_maneuver_total_time():
     assert_almost_equal(man.get_total_time(), expected_total_time)
 
 
+def test_maneuver_impulse():
+    dv = [1, 0, 0] * u.m / u.s
+    man = Maneuver.impulse(dv)
+    assert man.impulses[0] == (0 * u.s, dv)
+
+
 def test_hohmann_maneuver():
     # Data from Vallado, example 6.1
     alt_i = 191.34411 * u.km

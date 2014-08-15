@@ -97,6 +97,17 @@ def test_geosync_has_proper_period():
     assert_almost_equal(ss.period.to(u.min).value, expected_period, decimal=0)
 
 
+def test_perigee_and_apogee():
+    expected_r_a = 500 * u.km
+    expected_r_p = 300 * u.km
+    a = (expected_r_a + expected_r_p) / 2
+    ecc = expected_r_a / a - 1
+    _a = 1.0 * u.deg  # Unused angle
+    ss = State.from_elements(Earth, a, ecc, _a, _a, _a, _a)
+    assert_almost_equal(ss.r_a, expected_r_a)
+    assert_almost_equal(ss.r_p, expected_r_p)
+
+
 def test_convert_from_rv_to_coe():
     # Data from Vallado, example 2.6
     attractor = Earth
