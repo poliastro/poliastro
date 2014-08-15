@@ -339,8 +339,8 @@ class State(object):
         :py:class:`poliastro.plotting.OrbitPlotter`.
 
         """
-        op = OrbitPlotter(num)
-        return op.plot(self, ax, osculating)
+        op = OrbitPlotter(ax, num)
+        return op.plot(self, osculating)
 
     def plot(self):
         """Shortcut to `plot2D`.
