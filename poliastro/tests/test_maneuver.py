@@ -50,6 +50,7 @@ def test_hohmann_maneuver():
     expected_dv = 3.935224 * u.km / u.s
     expected_t_trans = 5.256713 * u.h
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
+    assert_almost_equal(ss_i.apply_maneuver(man).ecc, 0)
     assert_almost_equal(man.get_total_cost().to(u.km / u.s), expected_dv,
                         decimal=5)
     assert_almost_equal(man.get_total_time().to(u.h), expected_t_trans,
@@ -65,6 +66,7 @@ def test_bielliptic_maneuver():
     expected_dv = 3.904057 * u.km / u.s
     expected_t_trans = 593.919803 * u.h
     man = Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_f)
+    assert_almost_equal(ss_i.apply_maneuver(man).ecc, 0)
     assert_almost_equal(man.get_total_cost().to(u.km / u.s), expected_dv,
                         decimal=5)
     assert_almost_equal(man.get_total_time().to(u.h), expected_t_trans,

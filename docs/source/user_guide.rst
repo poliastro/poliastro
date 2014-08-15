@@ -159,5 +159,7 @@ To actually retrieve the resulting ``State`` after performing a maneuver, use
 the method :py:meth:`apply_maneuver`::
 
     >>> ss_f = ss_i.apply_maneuver(hoh)
+    >>> ss_f.rv()
+    (<Quantity [ -3.60000000e+04, -7.05890200e-11, -0.00000000e+00] km>, <Quantity [ -8.97717523e-16, -3.32749489e+00, -0.00000000e+00] km / s>)
 
-.. warning:: There is a bug here.
+.. note:: TODO: Better provide a plot here.
