@@ -277,6 +277,25 @@ class State(object):
         return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
                                  self.epoch + time_of_flight)
 
+    def apply_maneuver(self, maneuver):
+        """Returns resulting State after applying maneuver to self.
+
+        Parameters
+        ----------
+        maneuver : Maneuver
+            Maneuver to apply.
+
+        """
+        ss_new = self  # Initialize
+        attractor = self.attractor
+        for delta_t, delta_v in maneuver.impulses:
+            if not delta_t == 0 * u.s:
+                ss_new = ss_new.propagate(time_of_flight=delta_t)
+            r, v = ss_new.rv()
+            vnew = v + delta_v
+            ss_new = ss_new.from_vectors(attractor, r, vnew)
+        return ss_new
+
     def plot2D(self, ax=None, num=100, osculating=True):
         """Plots state and osculating orbit in their plane.
 

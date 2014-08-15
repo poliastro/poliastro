@@ -132,8 +132,8 @@ method or instantiating it directly.
 
 There are other useful methods you can use to compute common in-plane
 maneuvers, notably :py:meth:`~poliastro.maneuver.Maneuver.hohmann` and
-:py:meth:`~poliastro.maneuver.Maneuver.bielliptic` for Hohmann and
-bielliptic transfers respectively. Both of these return the corresponding
+:py:meth:`~poliastro.maneuver.Maneuver.bielliptic` for `Hohmann`_ and
+`bielliptic`_ transfers respectively. Both of these return the corresponding
 ``Maneuver`` object, which in turn you can use to calculate the total cost
 in terms of velocity change (\\(\\sum \|\\Delta v_i|\\)) and the transfer
 time::
@@ -151,3 +151,13 @@ You can also retrieve the individual vectorial impulses::
     (<Quantity 0 s>, <Quantity [ 0.        , 2.19739818, 0.        ] km / s>)
     >>> tuple(_.decompose([u.km, u.s]) for _ in hoh.impulses[1])
     (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
+
+.. _Hohmann: http://en.wikipedia.org/wiki/Hohmann_transfer_orbit
+.. _bielliptic: http://en.wikipedia.org/wiki/Bi-elliptic_transfer
+
+To actually retrieve the resulting ``State`` after performing a maneuver, use
+the method :py:meth:`apply_maneuver`::
+
+    >>> ss_f = ss_i.apply_maneuver(hoh)
+
+.. warning:: There is a bug here.
