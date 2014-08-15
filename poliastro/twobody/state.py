@@ -9,17 +9,17 @@ TODO
 """
 
 import numpy as np
-from numpy.linalg import norm
 
 from astropy import time
 from astropy import units as u
 u.one = u.dimensionless_unscaled  # astropy #1980
 
-from poliastro.util import transform, check_units
+from poliastro.twobody.propagation import kepler
+from poliastro.twobody.conversion import coe2rv, rv2coe
 
-# For plotting
-import matplotlib.pyplot as plt
-import matplotlib as mpl
+from poliastro.plotting import OrbitPlotter
+
+from poliastro.util import check_units
 
 from . import _ast2body
 
@@ -290,150 +290,12 @@ class State(object):
         osculating : bool, optional
             Whether to plot the osculating orbit, default to yes.
 
-        Notes
-        -----
-        TODO: I still miss a way to plot several orbits in one plot. Probably
-        it's time to create some plotting.py module, with a OrbitPlotter where
-        I can hold things like the plane.
-
         """
-        if not ax:
-            _, ax = plt.subplots(figsize=(6, 6))
-
-        lines = []
-        nu_vals = np.linspace(0, 2 * np.pi, num) + self.nu.to(u.rad).value
-        r_pqw, _ = rv_pqw(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                          self.p.to(u.km).value, self.ecc.value, nu_vals)
-
-        # Current position
-        l, = ax.plot(r_pqw[0, 0], r_pqw[0, 1], 'o')
-        lines.append(l)
-
-        # Attractor
-        attractor = mpl.patches.Circle((0, 0),
-                                       self.attractor.R.to(u.km).value,
-                                       lw=0, color='#204a87')  # Earth
-        ax.add_patch(attractor)
-
-        if osculating:
-            l, = ax.plot(r_pqw[:, 0], r_pqw[:, 1], '--', color=l.get_color())
-            lines.append(l)
-
-        # Appearance
-        ax.set_title(self.epoch.iso)
-        ax.set_xlabel("$x$ (km)")
-        ax.set_ylabel("$y$ (km)")
-        ax.set_aspect(1)
-
-        return lines
+        op = OrbitPlotter(num)
+        return op.plot(self, ax, osculating)
 
     def plot(self):
         """Shortcut to `plot2D`.
 
         """
         return self.plot2D()
-
-
-def rv_pqw(k, p, ecc, nu):
-    """Returns r and v vectors in perifocal frame.
-
-    """
-    r_pqw = (np.array([np.cos(nu), np.sin(nu), 0 * nu]) * p / (1 + ecc * np.cos(nu))).T
-    v_pqw = (np.array([-np.sin(nu), (ecc + np.cos(nu)), 0]) * np.sqrt(k / p)).T
-    return r_pqw, v_pqw
-
-
-def coe2rv(k, a, ecc, inc, raan, argp, nu):
-    """Converts from orbital elements to vectors.
-
-    Parameters
-    ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
-    a : float
-        Semi-major axis (km).
-    ecc : float
-        Eccentricity.
-    inc : float
-        Inclination (rad).
-    omega : float
-        Longitude of ascending node (rad).
-    argp : float
-        Argument of perigee (rad).
-    nu : float
-        True anomaly (rad).
-
-    """
-    p = a * (1 - ecc ** 2)
-    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
-
-    r_ijk = transform(r_pqw, -argp, 'z', u.rad)
-    r_ijk = transform(r_ijk, -inc, 'x', u.rad)
-    r_ijk = transform(r_ijk, -raan, 'z', u.rad)
-    v_ijk = transform(v_pqw, -argp, 'z', u.rad)
-    v_ijk = transform(v_ijk, -inc, 'x', u.rad)
-    v_ijk = transform(v_ijk, -raan, 'z', u.rad)
-
-    return r_ijk, v_ijk
-
-
-def rv2coe(k, r, v):
-    """Converts from vectors to orbital elements.
-
-    Parameters
-    ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
-    r : array
-        Position vector (km).
-    v : array
-        Velocity vector (km / s).
-
-    """
-    h = np.cross(r, v)
-    n = np.cross([0, 0, 1], h) / norm(h)
-    e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
-    ecc = norm(e)
-    p = h.dot(h) / k
-    a = p / (1 - ecc ** 2)
-
-    inc = np.arccos(h[2] / norm(h))
-    raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
-    argp = np.arctan2(h.dot(np.cross(n, e)) / norm(h), e.dot(n)) % (2 * np.pi)
-    nu = np.arctan2(h.dot(np.cross(e, r)) / norm(h), r.dot(e)) % (2 * np.pi)
-
-    return a, ecc, inc, raan, argp, nu
-
-
-def kepler(k, r0, v0, tof):
-    """Propagates orbit.
-
-    This is a wrapper around kepler from ast2body.for.
-
-    Parameters
-    ----------
-    k : float
-        Gravitational constant of main attractor (km^3 / s^2).
-    r0 : array
-        Initial position (km).
-    v0 : array
-        Initial velocity (km).
-    tof : float
-        Time of flight (s).
-
-    Raises
-    ------
-    RuntimeError
-        If the status of the subroutine is not 'ok'.
-
-    """
-    r0 = np.asarray(r0).astype(np.float)
-    v0 = np.asarray(v0).astype(np.float)
-    tof = float(tof)
-    assert r0.shape == (3,)
-    assert v0.shape == (3,)
-    r, v, error = _ast2body.kepler(r0, v0, tof, k)
-    error = error.strip().decode('ascii')
-    if error != 'ok':
-        raise RuntimeError("There was an error: {}".format(error))
-    return r, v
