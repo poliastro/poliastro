@@ -13,7 +13,18 @@ from poliastro.util import norm
 
 
 class Maneuver(object):
-    """Class to represent a Maneuver.
+    r"""Class to represent a Maneuver.
+
+    Each ``Maneuver`` consists on a list of impulses \\(\\Delta v_i\\)
+    (changes in velocity) each one applied at a certain instant \\(t_i\\).
+    You can access them directly indexing the ``Maneuver`` object itself.
+
+    >>> man = Maneuver((0 * u.s, [1, 0, 0] * u.km / u.s),
+    ... (10 * u.s, [1, 0, 0] * u.km / u.s))
+    >>> man[0]
+    (<Quantity 0 s>, <Quantity [1,0,0] km / s>)
+    >>> man.impulses[1]
+    (<Quantity 10 s>, <Quantity [1,0,0] km / s>)
 
     """
     def __init__(self, *impulses):
@@ -40,6 +51,9 @@ class Maneuver(object):
                 raise TypeError
         except TypeError:
             raise ValueError("Delta-V must be three dimensions vectors")
+
+    def __getitem__(self, key):
+        return self.impulses[key]
 
     @classmethod
     def impulse(cls, dv):

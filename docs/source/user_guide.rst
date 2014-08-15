@@ -12,7 +12,7 @@ information to define an orbit:
 * The position and velocity vectors or the orbital elements.
 * The time at which the orbit is defined.
 
-First of all, we'll have to import the relevant code:
+First of all, we have to import the relevant modules and classes:
 
 .. code-block:: python
 
@@ -74,7 +74,7 @@ From classical orbital elements
 
 We can also define a :py:class:`~poliastro.twobody.State` using a set of
 six parameters called orbital elements. Although there are several of
-this element sets, each one with its advantages and drawbacks, right now
+these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
 
 * Semimajor axis \\(a\\).
@@ -113,7 +113,7 @@ To see a complete list of properties, check out the
 Changing the orbit: :code:`Maneuver` objects
 --------------------------------------------
 
-poliastro helps us to define several in-plane and general out-of-plane
+poliastro helps us define several in-plane and general out-of-plane
 maneuvers with the :py:class:`~poliastro.maneuver.Maneuver` class inside the
 :py:mod:`poliastro.maneuver` module.
 
@@ -133,7 +133,7 @@ method or instantiating it directly.
 There are other useful methods you can use to compute common in-plane
 maneuvers, notably :py:meth:`~poliastro.maneuver.Maneuver.hohmann` and
 :py:meth:`~poliastro.maneuver.Maneuver.bielliptic` for `Hohmann`_ and
-`bielliptic`_ transfers respectively. Both of these return the corresponding
+`bielliptic`_ transfers respectively. Both return the corresponding
 ``Maneuver`` object, which in turn you can use to calculate the total cost
 in terms of velocity change (\\(\\sum \|\\Delta v_i|\\)) and the transfer
 time::
@@ -149,7 +149,9 @@ You can also retrieve the individual vectorial impulses::
 
     >>> hoh.impulses[0]
     (<Quantity 0 s>, <Quantity [ 0.        , 2.19739818, 0.        ] km / s>)
-    >>> tuple(_.decompose([u.km, u.s]) for _ in hoh.impulses[1])
+    >>> hoh[0]  # Equivalent
+    (<Quantity 0 s>, <Quantity [ 0.        , 2.19739818, 0.        ] km / s>)
+    >>> tuple(_.decompose([u.km, u.s]) for _ in hoh[1])
     (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 
 .. _Hohmann: http://en.wikipedia.org/wiki/Hohmann_transfer_orbit
