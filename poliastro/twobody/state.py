@@ -315,21 +315,31 @@ class State(object):
         return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
                                  self.epoch + time_of_flight)
 
-    def apply_maneuver(self, maneuver):
+    def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting State after applying maneuver to self.
+
+        Optionally return intermediate states (default to False).
 
         Parameters
         ----------
         maneuver : Maneuver
             Maneuver to apply.
+        intermediate : bool, optional
+            Return intermediate states, default to False.
 
         """
         ss_new = self  # Initialize
+        states = []
         attractor = self.attractor
         for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
                 ss_new = ss_new.propagate(time_of_flight=delta_t)
             r, v = ss_new.rv()
             vnew = v + delta_v
-            ss_new = ss_new.from_vectors(attractor, r, vnew)
-        return ss_new
+            ss_new = ss_new.from_vectors(attractor, r, vnew, ss_new.epoch)
+            states.append(ss_new)
+        if intermediate:
+            res = states
+        else:
+            res = ss_new
+        return res
