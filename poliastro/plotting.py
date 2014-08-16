@@ -11,8 +11,6 @@ import matplotlib.pyplot as plt
 from astropy import units as u
 u.one = u.dimensionless_unscaled  # astropy #1980
 
-from poliastro.twobody.conversion import rv_pqw
-
 
 class OrbitPlotter(object):
     """OrbitPlotter class.
@@ -41,21 +39,20 @@ class OrbitPlotter(object):
 
         # Generate points of the osculating orbit
         nu_vals = (np.linspace(0, 2 * np.pi, self.num_points) +
-                   state.nu.to(u.rad).value)
-        r_pqw, _ = rv_pqw(state.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                          state.p.to(u.km).value, state.ecc.value, nu_vals)
+                   state.nu.to(u.rad).value) * u.rad
+        r_pqw, _ = state.rv_pqw(nu_vals)
 
         # Express on inertial frame
         e_vec, p_vec, h_vec = state.pqw()
         p_vec = np.cross(h_vec, e_vec) * u.one
         rr = (r_pqw[:, 0, None].dot(e_vec[None, :]) +
-              r_pqw[:, 1, None].dot(p_vec[None, :])) * u.km
+              r_pqw[:, 1, None].dot(p_vec[None, :]))
 
         # Project on OrbitPlotter frame
-        x_vec, y_vec, z_vec = self._frame
-        rr_proj = rr - rr.dot(z_vec)[:, None] * z_vec
-        x = rr_proj.dot(x_vec)
-        y = rr_proj.dot(y_vec)
+        # x_vec, y_vec, z_vec = self._frame
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
 
         # Plot current position
         l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
