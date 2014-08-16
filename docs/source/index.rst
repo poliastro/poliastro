@@ -36,8 +36,9 @@ BSD license, hence allowing commercial use of the library.
 .. code-block:: python
 
     from poliastro.examples import molniya
+    from poliastro.plotting import plot
     
-    molniya.plot()
+    plot(molniya)
 
 poliastro relies on some Fortran subroutines written by David A. Vallado for
 his book "Fundamentals of Astrodynamics and Applications" and available on

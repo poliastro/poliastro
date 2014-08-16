@@ -179,6 +179,25 @@ have :py:class:`~poliastro.plotting.OrbitPlotter` objects in the
 
 These objects hold the perifocal plane of the first ``State`` we plot in
 them, projecting any further trajectories on this plane. This allows to
-easily visualize in two dimensions.
+easily visualize in two dimensions:
 
-.. note:: TODO: Better provide a plot here.
+.. code-block:: python
+
+    from poliastro.plotting import OrbitPlotter
+    
+    op = OrbitPlotter()
+    ss_a, ss_f = ss_i.apply_maneuver(hoh, intermediate=True)
+    op.plot(ss_i)
+    op.plot(ss_a)
+    op.plot(ss_f)
+
+Which produces this beautiful plot:
+
+.. figure:: _static/hohmann.png
+   :align: center
+   :alt: Hohmann transfer
+   
+   Plot of a Hohmann transfer.
+
+And that's it for the basics of poliastro! Feel free to send my your
+suggestions of improvement, both for the code and the docs.
