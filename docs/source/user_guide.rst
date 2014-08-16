@@ -56,8 +56,12 @@ And that's it! Notice a couple of things:
    :alt: Plot of the orbit
 
 If we're working on interactive mode (for example, using the wonderful IPython
-notebook) we can immediately plot the current state typing :code:`ss.plot()` in
-the so called *perifocal frame* which means:
+notebook) we can immediately plot the current state::
+
+    >>> from poliastro.plotting import plot
+    >>> plot(ss)
+
+This plot is made in the so called *perifocal frame*, which means:
 
 * we're visualizing the plane of the orbit itself,
 * the \\(x\\) axis points to the pericenter, and
@@ -163,5 +167,18 @@ the method :py:meth:`apply_maneuver`::
     >>> ss_f = ss_i.apply_maneuver(hoh)
     >>> ss_f.rv()
     (<Quantity [ -3.60000000e+04, -7.05890200e-11, -0.00000000e+00] km>, <Quantity [ -8.97717523e-16, -3.32749489e+00, -0.00000000e+00] km / s>)
+
+More advanced plotting: :code:`OrbitPlotter` objects
+----------------------------------------------------
+
+We previously saw the :py:func:`poliastro.plotting.plot` function to easily
+plot orbits. Now we'd like to plot several orbits in one graph (for example,
+the maneuver me computed in the previous section). For this purpose, we
+have :py:class:`~poliastro.plotting.OrbitPlotter` objects in the
+:py:mod:`~poliastro.plotting` module.
+
+These objects hold the perifocal plane of the first ``State`` we plot in
+them, projecting any further trajectories on this plane. This allows to
+easily visualize in two dimensions.
 
 .. note:: TODO: Better provide a plot here.

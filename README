@@ -24,8 +24,9 @@ orbital elements and orbit plotting.
 .. code-block:: python
 
     from poliastro.examples import molniya
+    from poliastro.plotting import plot
     
-    molniya.plot()
+    plot(molniya)
 
 .. image:: https://github.com/Pybonacci/poliastro/raw/master/examples/molniya.png
    :align: center

@@ -23,6 +23,13 @@ poliastro.bodies module
     :members:
     :special-members: __init__
 
+poliastro.plotting module
+-------------------------
+
+.. automodule:: poliastro.plotting
+    :members:
+    :special-members: __init__
+
 poliastro.util module
 ---------------------
 

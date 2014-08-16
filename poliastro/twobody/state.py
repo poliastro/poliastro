@@ -17,8 +17,6 @@ u.one = u.dimensionless_unscaled  # astropy #1980
 from poliastro.twobody.propagation import kepler
 from poliastro.twobody.conversion import coe2rv, rv2coe, rv_pqw
 
-from poliastro.plotting import OrbitPlotter
-
 from poliastro.util import check_units, norm
 
 J2000 = time.Time("J2000", scale='utc')
@@ -291,21 +289,6 @@ class State(object):
         """
         return self.r, self.v
 
-    def rv_pqw(self, nu_values=None):
-        """Position and velocity vectors in perifocal frame.
-
-        Optionally an array-like of values for the true anomaly can be given,
-        useful to compute the osculating orbit.
-
-        """
-        if nu_values is None:
-            nu_values = self.nu
-        r_pqw, v_pqw =  rv_pqw(self.attractor.k.decompose([u.km, u.s]).value,
-                               self.p.to(u.km).value,
-                               self.ecc.value,
-                               nu_values.to(u.rad).value)
-        return r_pqw * u.km, v_pqw * u.km / u.s
-
     def pqw(self):
         """Perifocal frame (PQW) vectors.
 
@@ -346,19 +329,3 @@ class State(object):
             vnew = v + delta_v
             ss_new = ss_new.from_vectors(attractor, r, vnew)
         return ss_new
-
-    def plot2D(self, ax=None, num=100, osculating=True):
-        """Plots state and osculating orbit in their plane.
-
-        This is a convenience function using
-        :py:class:`poliastro.plotting.OrbitPlotter`.
-
-        """
-        op = OrbitPlotter(ax, num)
-        return op.plot(self, osculating)
-
-    def plot(self):
-        """Shortcut to `plot2D`.
-
-        """
-        return self.plot2D()
