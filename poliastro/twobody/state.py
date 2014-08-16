@@ -293,10 +293,14 @@ class State(object):
         """Perifocal frame (PQW) vectors.
 
         """
-        if self.ecc > 1e-8:
-            p_vec = self.e_vec / self.ecc
+        if self.ecc < 1e-8:
+            if abs(self.inc.to(u.rad).value) > 1e-8:
+                n = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
+                p_vec = self.n / norm(self.n)  # Circular inclined
+            else:
+                p_vec = [1, 0, 0] * u.one  # Circular equatorial
         else:
-            p_vec = self.r / norm(self.r)
+            p_vec = self.e_vec / self.ecc
         w_vec = self.h_vec / self.h
         q_vec = np.cross(w_vec, p_vec) * u.one
         return p_vec, q_vec, w_vec
@@ -322,7 +326,7 @@ class State(object):
         """
         ss_new = self  # Initialize
         attractor = self.attractor
-        for delta_t, delta_v in maneuver.impulses:
+        for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
                 ss_new = ss_new.propagate(time_of_flight=delta_t)
             r, v = ss_new.rv()

@@ -56,7 +56,7 @@ def coe2rv(k, a, ecc, inc, raan, argp, nu):
     return r_ijk, v_ijk
 
 
-def rv2coe(k, r, v):
+def rv2coe(k, r, v, tol=1e-8):
     """Converts from vectors to orbital elements.
 
     Parameters
@@ -67,6 +67,8 @@ def rv2coe(k, r, v):
         Position vector (km).
     v : array
         Velocity vector (km / s).
+    tol : float, optional
+        Tolerance for eccentricity and inclination checks, default to 1e-8.
 
     """
     h = np.cross(r, v)
@@ -75,10 +77,27 @@ def rv2coe(k, r, v):
     ecc = norm(e)
     p = h.dot(h) / k
     a = p / (1 - ecc ** 2)
-
     inc = np.arccos(h[2] / norm(h))
-    raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
-    argp = np.arctan2(h.dot(np.cross(n, e)) / norm(h), e.dot(n)) % (2 * np.pi)
-    nu = np.arctan2(h.dot(np.cross(e, r)) / norm(h), r.dot(e)) % (2 * np.pi)
+
+    circular = ecc < tol
+    equatorial = abs(inc) < tol
+
+    if equatorial and not circular:
+        raan = 0
+        argp = np.arctan2(e[1], e[0]) % (2 * np.pi)  # Longitude of periapsis
+        nu = np.arctan2(h.dot(np.cross(e, r)) / norm(h), r.dot(e)) % (2 * np.pi)
+    elif not equatorial and circular:
+        raan = np.arctan2(n[1], n[0]) % (2 * np.pi)  # Not equatorial
+        argp = 0
+        # Argument of latitude
+        nu = np.arctan2(r.dot(np.cross(h, n)) / norm(h), r.dot(n)) % (2 * np.pi)
+    elif equatorial and circular:
+        raan = 0
+        argp = 0
+        nu = np.arctan2(r[1], r[0]) % (2 * np.pi)  # True longitude
+    else:
+        raan = np.arctan2(n[1], n[0]) % (2 * np.pi)  # Not equatorial
+        argp = np.arctan2(e.dot(np.cross(h, n)) / norm(h), e.dot(n)) % (2 * np.pi)
+        nu = np.arctan2(r.dot(np.cross(h, e)) / norm(h), r.dot(e)) % (2 * np.pi)
 
     return a, ecc, inc, raan, argp, nu
