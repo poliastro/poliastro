@@ -30,7 +30,7 @@ To install poliastro from source, just clone the source::
   $ cd poliastro/
   $ python setup.py install
 
-.. note::
+.. warning::
 
     It is recommended that you **never ever use sudo** with distutils, pip,
     setuptools and friends in Linux because you might seriously break your

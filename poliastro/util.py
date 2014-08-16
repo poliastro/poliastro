@@ -9,8 +9,6 @@ from astropy.coordinates import angles
 from astropy import units as u
 u.one = u.dimensionless_unscaled  # astropy #1980
 
-__all__ = ['rotate', 'transform']
-
 
 def rotate(vector, angle, axis='z', unit=None):
     """Rotates a vector around axis a right-handed positive angle.

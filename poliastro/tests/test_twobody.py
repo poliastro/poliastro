@@ -141,6 +141,49 @@ def test_convert_from_coe_to_rv():
     assert_almost_equal(nu.value, 92.335, decimal=2)
 
 
+def test_apply_zero_maneuver_returns_equal_state():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = State.from_elements(Sun, _d, _, _a, _a, _a, _a)
+    dt = 0 * u.s
+    dv = [0, 0, 0] * u.km / u.s
+    ss_new = ss.apply_maneuver([(dt, dv)])
+    assert_almost_equal(ss_new.r.to(u.km), ss.r.to(u.km))
+    assert_almost_equal(ss_new.v.to(u.km / u.s), ss.v.to(u.km / u.s))
+
+
+def test_apply_maneuver_changes_epoch():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = State.from_elements(Sun, _d, _, _a, _a, _a, _a)
+    dt = 1 * u.h
+    dv = [0, 0, 0] * u.km / u.s
+    ss_new = ss.apply_maneuver([(dt, dv)])
+    assert ss_new.epoch == ss.epoch + dt
+
+
+def test_perifocal_points_to_perigee():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = State.from_elements(Sun, _d, _, _a, _a, _a, _a)
+    p, _, _ = ss.pqw()
+    assert_almost_equal(p, ss.e_vec / ss.ecc)
+
+
+def test_pqw_for_circular_equatorial_orbit():
+    ss = State.circular(Earth, 600 * u.km)
+    expected_p = [1, 0, 0] * u.one
+    expected_q = [0, 1, 0] * u.one
+    expected_w = [0, 0, 1] * u.one
+    p, q, w = ss.pqw()
+    assert_almost_equal(p, expected_p)
+    assert_almost_equal(q, expected_q)
+    assert_almost_equal(w, expected_w)
+
+
 def test_propagate():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km

@@ -15,7 +15,7 @@ from astropy import units as u
 u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.twobody.propagation import kepler
-from poliastro.twobody.conversion import coe2rv, rv2coe, rv_pqw
+from poliastro.twobody.conversion import coe2rv, rv2coe
 
 from poliastro.util import check_units, norm
 
@@ -295,8 +295,8 @@ class State(object):
         """
         if self.ecc < 1e-8:
             if abs(self.inc.to(u.rad).value) > 1e-8:
-                n = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
-                p_vec = self.n / norm(self.n)  # Circular inclined
+                node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
+                p_vec = node / norm(node)  # Circular inclined
             else:
                 p_vec = [1, 0, 0] * u.one  # Circular equatorial
         else:

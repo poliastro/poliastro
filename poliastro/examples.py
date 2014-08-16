@@ -1,4 +1,7 @@
 # coding: utf-8
+"""Example data.
+
+"""
 
 from astropy import time
 from astropy import units as u
