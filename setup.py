@@ -25,7 +25,7 @@ def configuration(parent_package='', top_path=None):
     return config
 
 if __name__ == '__main__':
-    setup(version='0.2.0-dev',
+    setup(version='0.3.0-dev',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
           author="Juan Luis Cano",
@@ -40,7 +40,7 @@ if __name__ == '__main__':
           requires=["numpy", "astropy", "pytest"],
           packages=['poliastro', 'poliastro.twobody'],
           classifiers=[
-              "Development Status :: 2 - Pre-Alpha",
+              "Development Status :: 3 - Pre-Alpha",
               "Intended Audience :: Education",
               "Intended Audience :: Science/Research",
               "License :: OSI Approved :: BSD License",
