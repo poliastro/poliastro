@@ -2,7 +2,6 @@
 import pytest
 
 import astropy.units as u
-u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro import plotting
 from poliastro.plotting import OrbitPlotter

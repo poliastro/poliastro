@@ -6,7 +6,6 @@
 import numpy as np
 
 from astropy import units as u
-u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.util import check_units
 from poliastro.util import norm

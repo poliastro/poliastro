@@ -9,7 +9,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from astropy import units as u
-u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.twobody.conversion import rv_pqw
 from poliastro.util import norm

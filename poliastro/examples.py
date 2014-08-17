@@ -5,7 +5,6 @@
 
 from astropy import time
 from astropy import units as u
-u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.bodies import Earth
 from poliastro.twobody import State

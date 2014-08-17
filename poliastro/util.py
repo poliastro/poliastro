@@ -7,7 +7,6 @@ import numpy as np
 
 from astropy.coordinates import angles
 from astropy import units as u
-u.one = u.dimensionless_unscaled  # astropy #1980
 
 
 def rotate(vector, angle, axis='z', unit=None):

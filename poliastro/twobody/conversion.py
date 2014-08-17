@@ -7,7 +7,6 @@ import numpy as np
 from numpy import cos, sin, sqrt
 
 from astropy import units as u
-u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.util import transform, norm
 

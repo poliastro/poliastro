@@ -12,7 +12,6 @@ import numpy as np
 
 from astropy import time
 from astropy import units as u
-u.one = u.dimensionless_unscaled  # astropy #1980
 
 from poliastro.twobody.propagation import kepler
 from poliastro.twobody.conversion import coe2rv, rv2coe
