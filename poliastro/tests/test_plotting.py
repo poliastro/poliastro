@@ -1,0 +1,24 @@
+# coding: utf-8
+import pytest
+
+import astropy.units as u
+u.one = u.dimensionless_unscaled  # astropy #1980
+
+from poliastro import plotting
+from poliastro.plotting import OrbitPlotter
+
+
+def test_OrbitPlotter_has_axes():
+    ax = "Unused axes"
+    op = OrbitPlotter(ax)
+    assert op.ax is ax
+
+
+def test_set_frame_raises_error_if_frame_exists():
+    op = OrbitPlotter()
+    p = [1, 0, 0] * u.one
+    q = [0, 1, 0] * u.one
+    w = [0, 0, 1] * u.one
+    op.set_frame(p, q, w)
+    with pytest.raises(NotImplementedError):
+        op.set_frame(p, q, w)
