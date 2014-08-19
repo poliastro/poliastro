@@ -87,8 +87,20 @@ class OrbitPlotter(object):
         lines = []
 
         # Generate points of the osculating orbit
-        nu_vals = (np.linspace(0, 2 * np.pi, self.num_points) +
-                   state.nu.to(u.rad).value) * u.rad
+        if state.ecc >= 1.0:
+            # Select a sensible limiting value for non-closed orbits.
+            # This corresponds to r = 3p.
+            max_nu = np.arccos(-(1 - 1 / 3.) / state.ecc)
+        else:
+            max_nu = np.pi * u.rad
+        nu_vals = np.linspace(-max_nu, max_nu, self.num_points)
+
+        # Insert state true anomaly into array
+        idx = np.searchsorted(nu_vals, state.nu.to(u.rad))
+        nu_vals = np.insert(nu_vals.to(u.rad).value, idx,
+                            state.nu.to(u.rad).value) * u.rad
+
+        # Compute PQW coordinates
         r_pqw, _ = rv_pqw(state.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                           state.p.to(u.km).value,
                           state.ecc.value,
@@ -108,7 +120,7 @@ class OrbitPlotter(object):
         y = rr_proj.dot(self._frame[1])
 
         # Plot current position
-        l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
+        l, = self.ax.plot(x[idx].to(u.km).value, y[idx].to(u.km).value,
                           'o', mew=0)
         lines.append(l)
 
