@@ -1,31 +1,23 @@
 #!/usr/bin/env python
 
 from os.path import join
+import glob
 
-from numpy.distutils.core import setup
+import setuptools
 
-def configuration(parent_package='', top_path=None):
-    from numpy.distutils.misc_util import Configuration
-    config = Configuration("poliastro", parent_package, top_path)
+from numpy.distutils.core import setup, Extension
 
-    config.add_library('ast2body',
-                       sources=[join('poliastro', 'src', '*.for')])
-    config.add_library('astiod',
-                       sources=[join('poliastro', 'src', '*.for')])
-
-    config.add_extension('twobody._ast2body',
-                         sources=[join('poliastro', 'src', 'ast2body.pyf')],
-                         libraries=['ast2body'])
-    config.add_extension('twobody._astiod',
-                         sources=[join('poliastro', 'src', 'astiod.pyf')],
-                         libraries=['astiod'])
-
-    config.add_data_dir(('tests', 'poliastro/tests'))
-
-    return config
+ast2body = Extension(name="_ast2body",
+                     sources=[join('poliastro', 'src', 'ast2body.pyf')] +
+                              glob.glob(join('poliastro', 'src', '*.for')))
+astiod = Extension(name="_astiod",
+                   sources=[join('poliastro', 'src', 'astiod.pyf')] +
+                            glob.glob(join('poliastro', 'src', '*.for')))
+ext_modules = [ast2body, astiod]
 
 if __name__ == '__main__':
-    setup(version='0.3.0-dev',
+    setup(name="poliastro",
+          version='0.3.0-dev',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
           author="Juan Luis Cano",
@@ -37,7 +29,7 @@ if __name__ == '__main__':
               "aero", "aerospace", "engineering",
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
-          requires=["numpy", "astropy", "pytest"],
+          requires=["numpy", "numba", "astropy", "pytest"],
           packages=['poliastro', 'poliastro.twobody'],
           classifiers=[
               "Development Status :: 3 - Pre-Alpha",
@@ -53,4 +45,5 @@ if __name__ == '__main__':
               "Topic :: Scientific/Engineering :: Astronomy",
           ],
           long_description=open('README').read(),
-          configuration=configuration)
+          package_data={"poliastro": ['tests/*.py']},
+          ext_modules=ext_modules)

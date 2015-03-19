@@ -1,4 +1,4 @@
-sphinxcontrib-napoleon
 numpy
+numba
 astropy
 matplotlib

@@ -1,6 +1,11 @@
+poliastro.nja
+.idea
+
 MANIFEST
 
 *.pyc
+*.so
+*.png
 
 .tox
 
@@ -12,7 +17,6 @@ docs/build/*
 examples/.ipynb_checkpoints/*
 
 poliastro/.coverage
-poliastro/twobody/_*.so
 poliastro/src/_*.c
 
 __pycache__/
