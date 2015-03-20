@@ -10,11 +10,11 @@ Overview
 :Author: Juan Luis Cano <juanlu001@gmail.com>
 :Version: 0.3.0-dev
 
-.. image:: https://travis-ci.org/Pybonacci/poliastro.svg?branch=master
+.. image:: https://travis-ci.org/Pybonacci/poliastro.svg?branch=idea-numba
    :target: https://travis-ci.org/Pybonacci/poliastro
 
-.. image:: https://coveralls.io/repos/Pybonacci/poliastro/badge.png
-   :target: https://coveralls.io/r/Pybonacci/poliastro
+.. image:: https://coveralls.io/repos/Pybonacci/poliastro/badge.svg?branch=idea-numba
+   :target: https://coveralls.io/r/Pybonacci/poliastro?branch=idea-numba
 
 These are some Python wrappers to Fortran subroutines useful in
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
