@@ -12,8 +12,8 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy numba astropy matplotlib pytest pip \
-      coverage requests pyyaml
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy numba astropy matplotlib pytest pip
+    coverage requests pyyaml
   - source activate test-environment
   - pip install coveralls
   - python setup.py install
