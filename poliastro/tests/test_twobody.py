@@ -104,8 +104,10 @@ def test_perigee_and_apogee():
     ecc = expected_r_a / a - 1
     _a = 1.0 * u.deg  # Unused angle
     ss = State.from_elements(Earth, a, ecc, _a, _a, _a, _a)
-    assert_almost_equal(ss.r_a, expected_r_a)
-    assert_almost_equal(ss.r_p, expected_r_p)
+    assert_almost_equal(ss.r_a.to(u.km).value,
+                        expected_r_a.to(u.km).value)
+    assert_almost_equal(ss.r_p.to(u.km).value,
+                        expected_r_p.to(u.km).value)
 
 
 def test_convert_from_rv_to_coe():
@@ -149,8 +151,10 @@ def test_apply_zero_maneuver_returns_equal_state():
     dt = 0 * u.s
     dv = [0, 0, 0] * u.km / u.s
     ss_new = ss.apply_maneuver([(dt, dv)])
-    assert_almost_equal(ss_new.r.to(u.km), ss.r.to(u.km))
-    assert_almost_equal(ss_new.v.to(u.km / u.s), ss.v.to(u.km / u.s))
+    assert_almost_equal(ss_new.r.to(u.km).value,
+                        ss.r.to(u.km).value)
+    assert_almost_equal(ss_new.v.to(u.km / u.s).value,
+                        ss.v.to(u.km / u.s).value)
 
 
 def test_apply_maneuver_changes_epoch():
