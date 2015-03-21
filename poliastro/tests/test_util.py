@@ -22,7 +22,7 @@ def test_rotate_vector_with_units():
     axis = 'y'
     expected_vector = [0, 0, -1] * u.m
     result = util.rotate(vector, angle, axis)
-    assert_array_almost_equal(result, expected_vector)
+    assert_array_almost_equal(result.value, expected_vector.value)
 
 
 def test_transform_unitless_vector():
