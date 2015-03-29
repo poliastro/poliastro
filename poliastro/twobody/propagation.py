@@ -4,14 +4,14 @@
 """
 
 import numpy as np
+import numba
 
-from . import _ast2body
+from poliastro.math import dot
+from poliastro.stumpff import c2, c3
 
 
-def kepler(k, r0, v0, tof):
-    """Propagates orbit.
-
-    This is a wrapper around kepler from ast2body.for.
+def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
+    """Propagates Keplerian orbit.
 
     Parameters
     ----------
@@ -23,20 +23,84 @@ def kepler(k, r0, v0, tof):
         Initial velocity (km).
     tof : float
         Time of flight (s).
+    numiter : int, optional
+        Maximum number of iterations, default to 35.
+    rtol : float, optional
+        Maximum relative error permitted, default to 1e-10.
 
     Raises
     ------
     RuntimeError
-        If the status of the subroutine is not 'ok'.
+        If the algorithm didn't converge.
+
+    Notes
+    -----
+    This algorithm is based on Vallado implementation, and does basic Newton
+    iteration on the Kepler equation written using universal variables. Battin
+    claims his algorithm uses the same amount of memory but is between 40 %
+    and 85 % faster.
 
     """
-    r0 = np.asarray(r0).astype(np.float)
-    v0 = np.asarray(v0).astype(np.float)
-    tof = float(tof)
-    assert r0.shape == (3,)
-    assert v0.shape == (3,)
-    r, v, error = _ast2body.kepler(r0, v0, tof, k)
-    error = error.strip().decode('ascii')
-    if error != 'ok':
-        raise RuntimeError("There was an error: {}".format(error))
+    # Compute Lagrange coefficients
+    try:
+        f, g, fdot, gdot = _kepler(k, r0, v0, tof, numiter, rtol)
+    except RuntimeError:
+        raise RuntimeError("Convergence could not be achieved under "
+                           "%d iterations" % numiter)
+
+    assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
+
+    # Return position and velocity vectors
+    r = f * r0 + g * v0
+    v = fdot * r0 + gdot * v0
+
     return r, v
+
+
+@numba.njit
+def _kepler(k, r0, v0, tof, numiter, rtol):
+    # Cache some results
+    dot_r0v0 = dot(r0, v0)
+    norm_r0 = dot(r0, r0) ** .5
+    sqrt_mu = k**.5
+    alpha = -dot(v0, v0) / k + 2 / norm_r0
+
+    # First guess
+    if alpha > 0:
+        # Elliptic orbit
+        xi_new = sqrt_mu * tof * alpha
+    elif alpha < 0:
+        # Hyperbolic orbit
+        xi_new = (np.sign(tof) * (-1 / alpha)**.5 *
+                  np.log((-2 * k * alpha * tof) / (dot_r0v0 + np.sign(tof) *
+                                                   np.sqrt(-k / alpha) * (1 - norm_r0 * alpha))))
+    else:
+        # Parabolic orbit
+        # (Conservative initial guess)
+        xi_new = sqrt_mu * tof / norm_r0
+
+    # Newton-Raphson iteration on the Kepler equation
+    count = 0
+    while count < numiter:
+        xi = xi_new
+        psi = xi * xi * alpha
+        c2_psi = c2(psi)
+        c3_psi = c3(psi)
+        norm_r = xi * xi * c2_psi + dot_r0v0 / sqrt_mu * xi * (1 - psi * c3_psi) + norm_r0 * (1 - psi * c2_psi)
+        xi_new = xi + (sqrt_mu * tof - xi * xi * xi * c3_psi - dot_r0v0 / sqrt_mu * xi * xi * c2_psi -
+                       norm_r0 * xi * (1 - psi * c3_psi)) / norm_r
+        if abs((xi_new - xi) / xi_new) < rtol:
+            break
+        else:
+            count += 1
+    else:
+        raise RuntimeError
+
+    # Compute Lagrange coefficients
+    f = 1 - xi**2 / norm_r0 * c2_psi
+    g = tof - xi**3 / sqrt_mu * c3_psi
+
+    gdot = 1 - xi**2 / norm_r * c2_psi
+    fdot = sqrt_mu / (norm_r * norm_r0) * xi * (psi * c3_psi - 1)
+
+    return f, g, fdot, gdot

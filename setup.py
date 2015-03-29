@@ -7,13 +7,11 @@ import setuptools
 
 from numpy.distutils.core import setup, Extension
 
-ast2body = Extension(name="poliastro.twobody._ast2body",
-                     sources=[join('poliastro', 'src', 'ast2body.pyf')] +
-                              glob.glob(join('poliastro', 'src', '*.for')))
+
 astiod = Extension(name="poliastro.twobody._astiod",
                    sources=[join('poliastro', 'src', 'astiod.pyf')] +
                             glob.glob(join('poliastro', 'src', '*.for')))
-ext_modules = [ast2body, astiod]
+ext_modules = [astiod]
 
 if __name__ == '__main__':
     setup(name="poliastro",
