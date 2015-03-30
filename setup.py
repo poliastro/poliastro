@@ -1,23 +1,12 @@
 #!/usr/bin/env python
 
-from os.path import join
-import glob
+from setuptools import setup
 
-import setuptools
-
-from numpy.distutils.core import setup, Extension
-
-
-astiod = Extension(name="poliastro.twobody._astiod",
-                   sources=[join('poliastro', 'src', 'astiod.pyf')] +
-                            glob.glob(join('poliastro', 'src', '*.for')))
-ext_modules = [astiod]
 
 if __name__ == '__main__':
     setup(name="poliastro",
           version='0.3.0-dev',
-          description="poliastro - Utilities and Python wrappers for "
-                      "Orbital Mechanics",
+          description="poliastro - Python package for Orbital Mechanics",
           author="Juan Luis Cano",
           author_email="juanlu001@gmail.com",
           url="http://pybonacci.github.io/poliastro/",
@@ -43,5 +32,4 @@ if __name__ == '__main__':
               "Topic :: Scientific/Engineering :: Astronomy",
           ],
           long_description=open('README').read(),
-          package_data={"poliastro": ['tests/*.py']},
-          ext_modules=ext_modules)
+          package_data={"poliastro": ['tests/*.py']})

@@ -16,7 +16,7 @@ Overview
 .. image:: https://coveralls.io/repos/Pybonacci/poliastro/badge.svg?branch=master
    :target: https://coveralls.io/r/Pybonacci/poliastro?branch=master
 
-These are some Python wrappers to Fortran subroutines useful in
+poliastro is a pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
 problem, conversion between position and velocity vectors and classical
 orbital elements and orbit plotting.
@@ -31,34 +31,14 @@ orbital elements and orbit plotting.
 .. image:: https://github.com/Pybonacci/poliastro/raw/master/examples/molniya.png
    :align: center
 
-Fortran subroutines
--------------------
-
-The core of poliastro is possible thanks to several Fortran subroutines,
-written by David A. Vallado for his book "Fundamentals of Astrodynamics and
-Applications" and available on the Internet as the `companion software of
-the book`__.
-
-.. __: http://celestrak.com/software/vallado-sw.asp
-
-The author explicitly gave permission to redistribute these subroutines
-in this project under the current license.
-
-Some of them were slightly modified due to errors in the build process,
-the handling of relative errors in comparisons and to make them more
-suitable to use with different gravitational parameters.
-
 Requirements
 ============
 
-poliastro requires NumPy, Astropy and matplotlib and is usually tested on Linux
-on Python 2.7 and Python 3.3 (single codebase).
+poliastro requires recent versions of NumPy, Astropy and numba to work.
+Besides, matplotlib is needed for plotting the orbits.
 
-Besides, a Fortran compiler is needed to build the extensions. poliastro
-is usually built with gfortran.
-
-There is no reason it shouldn't work under Windows or Mac OS X with
-properly configured tools (not tested).
+poliastro is usually tested on Linux on Python 2.7, 3.3 and 3.4 (single
+codebase).
 
 Installation
 ============
@@ -70,6 +50,10 @@ To install poliastro just use pip::
 To install poliastro from source, just type::
 
   $ python setup.py install
+
+Development installations are also supported thanks to setuptools::
+
+  $ python setup.py develop
 
 It is recommended that you **never ever use sudo** with distutils, pip,
 setuptools and friends in Linux because you might seriously break your
@@ -133,17 +117,12 @@ modified Fortran subroutines.
 FAQ
 ===
 
-Does it work on Windows?
-------------------------
+Does it work on Windows and OS X too?
+-------------------------------------
 
-I had some problems to find a free Fortran compiler for Windows 64-bit
-(but I am `not alone`__).
-
-.. __: http://spyder-ide.blogspot.it/2012/08/scientific-python-distribution-for.html
-
-Have you considered `choosing another operative system`__?
-
-.. __: http://www.ubuntu.com/
+poliastro is a pure Python package with no compiled extensions, so
+there is no reason it shouldn't work under Windows or Mac OS X with
+properly installed dependencies (not tested).
 
 What's up with the name?
 ------------------------
