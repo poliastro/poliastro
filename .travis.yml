@@ -17,7 +17,6 @@ before_install:
     coverage requests pyyaml
   - source activate test-environment
   - pip install coveralls pytest-cov
-  - python setup.py install
 script:
   - py.test --cov poliastro -vv
 after_success:
