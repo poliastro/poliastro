@@ -3,18 +3,14 @@
 """
 
 import numpy as np
-from numpy.linalg import norm
+import numba
 
-from poliastro import twobody
-from .twobody import _astiod
-
-__all__ = ['lambert', 'target']
+from poliastro.math import dot
+from poliastro.stumpff import c2, c3
 
 
-def lambert(k, r0, rf, tof, short=True):
+def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     """Solves the Lambert problem.
-
-    This is a wrapper around lambertuniv from astiod.for.
 
     Parameters
     ----------
@@ -32,82 +28,77 @@ def lambert(k, r0, rf, tof, short=True):
     Raises
     ------
     RuntimeError
-        If the status of the subroutine is not 'ok'.
+        If it was not possible to compute the orbit.
 
     Note
     ----
-    Multiple revolutions not supported.
+    This uses the universal variable approach found in Battin, Mueller & White
+    with the bisection iteration suggested by Vallado. Multiple revolutions
+    not supported.
 
     """
-    r0 = np.asanyarray(r0).astype(np.float)
-    rf = np.asanyarray(rf).astype(np.float)
-    tof = float(tof)
-    assert r0.shape == (3,)
-    assert rf.shape == (3,)
-    assert type(short) is bool
+    try:
+        f, g, fdot, gdot = _lambert(k, r0, r, tof, short, numiter, rtol)
+    except RuntimeError as e:
+        raise e
+
+    v0 = (r - f * r0) / g
+    v = (gdot * r - r0) / g
+
+    return v0, v
+
+
+@numba.njit
+def _lambert(k, r0, r, tof, short, numiter, rtol):
     if short:
-        dm = "SHORT"
+        t_m = +1
     else:
-        dm = "LONG"
-    va, vb, error = _astiod.lambertuniv(r0, rf, dm, 'N', tof, k)
-    error = error.strip().decode('ascii')
-    if error != 'ok':
-        raise RuntimeError("There was an error: {}".format(error))
-    return va, vb
+        t_m = -1
 
+    norm_r0 = dot(r0, r0)**.5
+    norm_r = dot(r, r)**.5
+    cos_dnu = dot(r0, r) / (norm_r0 * norm_r)
 
-def target(k, r0, v0, r0_tg, v0_tg, tof):
-    """Solves the targetting problem.
+    A = t_m * (norm_r * norm_r0 * (1 + cos_dnu))**.5
 
-    Given the departure position and the initial position of the target body,
-    finds the trajectory between the departure and the final position of
-    the target.
+    if A == 0.0:
+        raise RuntimeError
 
-    Parameters
-    ----------
-    k : float
-        Gravitational constant of main attractor (km^3 / s^2).
-    r0 : array
-        Departure position (km).
-    v0 : array
-        Velocity at departure position (km / s).
-    r0_tg : array
-        Position of target at departure (km).
-    v0_tg : array
-        Velocity of target at departure (km / s).
-    tof : array
-        Time of flight (s).
+    psi = 0.0
+    psi_low = -4 * np.pi
+    psi_up = 4 * np.pi
 
-    Returns
-    -------
-    rf : array
-        Final position of target (km).
-    vf : array
-        Velocity of target at final position (km / s).
-    va : array
-        Departure velocity (km / s).
-    vb : array
-        Arrival velocity (km / s).
-    dva : array
-        Change of velocity at departure (km / s).
-    dvb : array
-        Change of velocity at arrival (km / s).
+    count = 0
+    while count < numiter:
+        y = norm_r0 + norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
+        if A > 0.0 and y < 0.0:
+            # Readjust xi_low until y > 0.0
+            # Translated directly from Vallado
+            while y < 0.0:
+                psi_low = psi
+                psi = 0.8 * (1.0 / c3(psi)) * (1.0 - (norm_r0 + norm_r) * np.sqrt(c2(psi)) / A)
+                y = norm_r0 + norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
 
-    """
-    rf, vf = twobody.kepler(k, r0_tg, v0_tg, tof)
-    va_short, vb_short = lambert(k, r0, rf, tof, True)
-    va_long, vb_long = lambert(k, r0, rf, tof, False)
-    dva_short = va_short - v0
-    dvb_short = vf - vb_short
-    dv_short = norm(dva_short) + norm(dvb_short)
-    dva_long = va_long - v0
-    dvb_long = vf - vb_long
-    dv_long = norm(dva_long) + norm(dvb_long)
-    if dv_short < dv_long:
-        va, vb = va_short, vb_short
-        dva, dvb = dva_short, dvb_short
+        xi = np.sqrt(y / c2(psi))
+        tof_new = (xi**3 * c3(psi) + A * np.sqrt(y)) / np.sqrt(k)
+
+        # Convergence check
+        if np.abs((tof_new - tof) / tof) < rtol:
+            break
+        else:
+            count += 1
+            # Bisection check
+            if tof_new <= tof:
+                psi_low = psi
+            else:
+                psi_up = psi
+            psi = (psi_up + psi_low) / 2
     else:
-        va, vb = va_long, vb_long
-        dva, dvb = dva_long, dvb_long
+        raise RuntimeError
 
-    return rf, vf, va, vb, dva, dvb
+    f = 1 - y / norm_r0
+    g = A * np.sqrt(y / k)
+
+    gdot = 1 - y / norm_r
+
+    return f, g, (f * gdot - 1) / g, gdot
