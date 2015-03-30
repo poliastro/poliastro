@@ -19,7 +19,7 @@ before_install:
   - pip install coveralls
   - python setup.py install
 script:
-  - cd poliastro; py.test -rx
-  - cd poliastro; coverage run --source poliastro -m py.test
+  - py.test -rx
+  - coverage run --source poliastro -m py.test
 after_success:
   coveralls
