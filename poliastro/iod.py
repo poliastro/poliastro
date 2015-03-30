@@ -6,7 +6,7 @@ import numpy as np
 from numpy.linalg import norm
 
 from poliastro import twobody
-from . import _astiod
+from .twobody import _astiod
 
 __all__ = ['lambert', 'target']
 
