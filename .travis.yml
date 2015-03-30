@@ -16,7 +16,7 @@ before_install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy numba astropy matplotlib pytest pip
     coverage requests pyyaml
   - source activate test-environment
-  - pip install coveralls
+  - pip install coveralls pytest-cov
   - python setup.py install
 script:
   - py.test --cov poliastro -vv
