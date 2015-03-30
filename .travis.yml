@@ -6,6 +6,7 @@ python:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq gfortran
+install:
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
@@ -16,10 +17,8 @@ before_install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy numba astropy matplotlib pytest pip
     coverage requests pyyaml
   - source activate test-environment
-  - pip install coveralls
-  - python setup.py install
+  - pip install coveralls pytest-cov
 script:
-  - cd poliastro; py.test -rx
-  - cd poliastro; coverage run --source poliastro -m py.test
+  - py.test --cov poliastro -vv
 after_success:
   coveralls
