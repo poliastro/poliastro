@@ -27,11 +27,14 @@ install:
   - "conda config --set always_yes yes --set changeps1 no"
   - "conda update -q conda"
   - "conda info -a"
-  - "conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy numba astropy matplotlib pytest"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION%"
   - "activate test-environment"
 
   # Check that we have the expected version of Python
   - "python --version"
+
+  # Install dependencies
+  - "conda install -q numpy numba astropy matplotlib pytest"
   
 build: off
 
