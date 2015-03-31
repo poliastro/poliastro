@@ -6,7 +6,7 @@ version: 0.3.dev{build}
 
 branches:
   only:
-  - appveyor
+  - master
 
 environment:
   global:
