@@ -36,5 +36,4 @@ install:
 build: off
 
 test_script:
-  - "cd %APPVEYOR_BUILD_FOLDER%/poliastro/tests"
-    "py.test poliastro"
+  - "py.test poliastro"
