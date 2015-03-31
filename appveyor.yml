@@ -1,0 +1,42 @@
+# AppVeyor.com is a Continuous Integration service to build and run tests under
+# Windows
+# File shamelessly inspired by Astropy
+
+version: 0.3.dev{build}
+
+branches:
+  only:
+  - appveyor
+
+environment:
+  global:
+    PYTHON: "C:\\conda"
+    MINICONDA_VERSION: "3.5.5"
+
+  matrix:
+    - PYTHON_VERSION: 2.7
+    - PYTHON_VERSION: 3.3
+    - PYTHON_VERSION: 3.4
+
+install:
+  # Install miniconda using a powershell script.
+  - "powershell .ci/appveyor/install-miniconda.ps1"
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+
+  # Install the build and runtime dependencies of the project.
+  - "conda config --set always_yes yes --set changeps1 no"
+  - "conda update -q conda"
+  - "conda info -a"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION%"
+  - "activate test-environment"
+
+  # Check that we have the expected version of Python
+  - "python --version"
+
+  # Install dependencies
+  - "conda install -q numpy numba astropy matplotlib pytest"
+  
+build: off
+
+test_script:
+  - "py.test poliastro"
