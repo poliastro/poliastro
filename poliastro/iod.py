@@ -5,7 +5,7 @@
 import numpy as np
 import numba
 
-from poliastro.math import dot
+from poliastro.util import dot
 from poliastro.stumpff import c2, c3
 
 
