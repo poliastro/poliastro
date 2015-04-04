@@ -4,6 +4,7 @@
 """
 
 import numpy as np
+import numba
 
 from astropy.coordinates import angles
 from astropy import units as u
@@ -75,3 +76,14 @@ def norm(vec):
 
     """
     return np.sqrt(vec.dot(vec))
+
+
+@numba.njit('f8(f8[:], f8[:])')
+def dot(u, v):
+    """Returns the dot product of two vectors.
+
+    """
+    dp = 0.0
+    for ii in range(u.shape[0]):
+        dp += u[ii] * v[ii]
+    return dp
