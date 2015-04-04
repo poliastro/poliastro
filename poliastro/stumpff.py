@@ -16,12 +16,12 @@ def c2(psi):
         res = (np.cosh(np.sqrt(-psi)) - 1) / (-psi)
     else:
         res = 1.0 / 2.0
-        delta = (-psi) / gamma(2 + 2)
+        delta = (-psi) / gamma(2 + 2 + 1)
         k = 1
         while res + delta != res:
             res = res + delta
             k += 1
-            delta = (-psi) ** k / gamma(2 * k + 2)
+            delta = (-psi) ** k / gamma(2 * k + 2 + 1)
 
     return res
 
@@ -35,11 +35,11 @@ def c3(psi):
         res = (np.sinh(np.sqrt(-psi)) - np.sqrt(-psi)) / (-psi * np.sqrt(-psi))
     else:
         res = 1.0 / 6.0
-        delta = (-psi) / gamma(2 + 3)
+        delta = (-psi) / gamma(2 + 3 + 1)
         k = 1
         while res + delta != res:
             res = res + delta
             k += 1
-            delta = (-psi) ** k / gamma(2 * k + 3)
+            delta = (-psi) ** k / gamma(2 * k + 3 + 1)
 
     return res

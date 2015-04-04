@@ -40,7 +40,6 @@ def test_curtis52():
                               decimal=4)
 
 
-@pytest.mark.xfail
 def test_curtis53():
     k = Earth.k
     r0 = [273378.0, 0.0, 0.0] * u.km
@@ -52,18 +51,4 @@ def test_curtis53():
     # ERRATA: j component is positive
     assert_array_almost_equal(va,
                               ([-2.4356, 0.26741, 0.0] * u.km / u.s).value,
-                              decimal=3)  # Now fails with 3 figures
-
-
-def test_curtis53_low_prec():
-    k = Earth.k
-    r0 = [273378.0, 0.0, 0.0] * u.km
-    r = [145820.0, 12758.0, 0.0] * u.km
-    tof = 13.5 * u.h
-    va, vb = lambert(k.to(u.km ** 3 / u.s ** 2).value,
-                     r0.value, r.value,
-                     tof.to(u.s).value)
-    # ERRATA: j component is positive
-    assert_array_almost_equal(va,
-                              ([-2.4356, 0.26741, 0.0] * u.km / u.s).value,
-                              decimal=2)  # Only 2 figures of precision
+                              decimal=3)
