@@ -37,10 +37,7 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     not supported.
 
     """
-    try:
-        f, g, fdot, gdot = _lambert(k, r0, r, tof, short, numiter, rtol)
-    except RuntimeError as e:
-        raise e
+    f, g, fdot, gdot = _lambert(k, r0, r, tof, short, numiter, rtol)
 
     v0 = (r - f * r0) / g
     v = (gdot * r - r0) / g
@@ -62,7 +59,7 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
     A = t_m * (norm_r * norm_r0 * (1 + cos_dnu))**.5
 
     if A == 0.0:
-        raise RuntimeError
+        raise RuntimeError("Cannot compute orbit, phase angle is 180 degrees")
 
     psi = 0.0
     psi_low = -4 * np.pi
@@ -94,7 +91,7 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
                 psi_up = psi
             psi = (psi_up + psi_low) / 2
     else:
-        raise RuntimeError
+        raise RuntimeError("Maximum number of iterations reached")
 
     f = 1 - y / norm_r0
     g = A * np.sqrt(y / k)

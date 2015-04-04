@@ -42,11 +42,7 @@ def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
 
     """
     # Compute Lagrange coefficients
-    try:
-        f, g, fdot, gdot = _kepler(k, r0, v0, tof, numiter, rtol)
-    except RuntimeError:
-        raise RuntimeError("Convergence could not be achieved under "
-                           "%d iterations" % numiter)
+    f, g, fdot, gdot = _kepler(k, r0, v0, tof, numiter, rtol)
 
     assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
 
@@ -94,7 +90,7 @@ def _kepler(k, r0, v0, tof, numiter, rtol):
         else:
             count += 1
     else:
-        raise RuntimeError
+        raise RuntimeError("Maximum number of iterations reached")
 
     # Compute Lagrange coefficients
     f = 1 - xi**2 / norm_r0 * c2_psi

@@ -17,8 +17,8 @@ requirements:
   run:
     - python
     - numpy
-    - numba
-    - astropy
+    - numba >=0.18
+    - astropy >=1.0
     - matplotlib
 
 test:
