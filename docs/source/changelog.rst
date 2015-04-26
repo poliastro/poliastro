@@ -1,6 +1,17 @@
 What's new
 ==========
 
+New in poliastro 0.2.1
+----------------------
+
+This is a bugfix release, no new features were introduced since 0.2.0.
+
+* Fixed `#35`_ (failing tests with recent astropy versions), thanks to
+  Sam Dupree for the bug report.
+* Updated for recent Sphinx versions.
+
+.. _`#35`: https://github.com/Pybonacci/poliastro/issues/35
+
 New in poliastro 0.2
 --------------------
 

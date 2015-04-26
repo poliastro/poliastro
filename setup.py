@@ -25,7 +25,7 @@ def configuration(parent_package='', top_path=None):
     return config
 
 if __name__ == '__main__':
-    setup(version='0.2.0',
+    setup(version='0.2.1',
           description="poliastro - Utilities and Python wrappers for "
                       "Orbital Mechanics",
           author="Juan Luis Cano",
