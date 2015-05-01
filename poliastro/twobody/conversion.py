@@ -20,15 +20,15 @@ def rv_pqw(k, p, ecc, nu):
     return r_pqw, v_pqw
 
 
-def coe2rv(k, a, ecc, inc, raan, argp, nu):
+def coe2rv(k, p, ecc, inc, raan, argp, nu):
     """Converts from orbital elements to vectors.
 
     Parameters
     ----------
     k : float
         Standard gravitational parameter (km^3 / s^2).
-    a : float
-        Semi-major axis (km).
+    p : float
+        Semi-latus rectum or parameter (km).
     ecc : float
         Eccentricity.
     inc : float
@@ -41,7 +41,6 @@ def coe2rv(k, a, ecc, inc, raan, argp, nu):
         True anomaly (rad).
 
     """
-    p = a * (1 - ecc ** 2)
     r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
 
     r_ijk = transform(r_pqw, -argp, 'z', u.rad)
