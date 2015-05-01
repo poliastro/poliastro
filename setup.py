@@ -9,8 +9,8 @@ if __name__ == '__main__':
           description="poliastro - Python package for Orbital Mechanics",
           author="Juan Luis Cano",
           author_email="juanlu001@gmail.com",
-          url="http://pybonacci.github.io/poliastro/",
-          download_url="https://github.com/Pybonacci/poliastro",
+          url="http://poliastro.github.io/",
+          download_url="https://github.com/poliastro/poliastro",
           license="BSD",
           keywords=[
               "aero", "aerospace", "engineering",

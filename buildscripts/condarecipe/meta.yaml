@@ -4,7 +4,7 @@ package:
 
 source:
   path: ../..
-  #git_url: https://github.com/Pybonacci/poliastro
+  #git_url: https://github.com/poliastro/poliastro
   #git_tag: master
 
 build:
@@ -30,6 +30,6 @@ test:
     - pytest
 
 about:
-  home: https://pybonacci.github.io/poliastro
+  home: https://poliastro.github.io/
   license: Simplified BSD License
   summary: "Python package for Orbital Mechanics"

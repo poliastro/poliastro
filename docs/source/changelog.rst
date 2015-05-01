@@ -10,7 +10,7 @@ This is a bugfix release, no new features were introduced since 0.2.0.
   Sam Dupree for the bug report.
 * Updated for recent Sphinx versions.
 
-.. _`#35`: https://github.com/Pybonacci/poliastro/issues/35
+.. _`#35`: https://github.com/poliastro/poliastro/issues/35
 
 New in poliastro 0.2
 --------------------
