@@ -110,10 +110,14 @@ class State(object):
             raise u.UnitsError("Units must be consistent")
 
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
-                      a.to(u.km).value, ecc.value, inc.to(u.rad).value,
-                      raan.to(u.rad).value, argp.to(u.rad).value,
-                      nu.to(u.rad).value)
+        try:
+            p = a * (1 - ecc ** 2)
+            r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
+                          p.to(u.km).value, ecc.value, inc.to(u.rad).value,
+                          raan.to(u.rad).value, argp.to(u.rad).value,
+                          nu.to(u.rad).value)
+        except ZeroDivisionError:
+            raise ValueError("For parabolic orbits use State.parabolic instead")
 
         ss = cls(attractor, r * u.km, v * u.km / u.s, epoch)
         ss._elements = a, ecc, inc, raan, argp, nu
@@ -148,6 +152,40 @@ class State(object):
         argp = 0 * u.deg
         ss = cls.from_elements(attractor, a, ecc, inc, raan, argp, arglat,
                                epoch)
+        return ss
+
+    @classmethod
+    def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000):
+        """Return `State` corresponding to parabolic orbit.
+
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        p : Quantity
+            Semi-latus rectum or parameter.
+        inc : Quantity, optional
+            Inclination, default to 0 deg (equatorial orbit).
+        raan : Quantity, optional
+            Right ascension of the ascending node, default to 0 deg.
+        arglat : Quantity, optional
+            Argument of latitude, default to 0 deg.
+        epoch: Time, optional
+            Epoch, default to J2000.
+
+        """
+        if not check_units((p, inc, raan, argp, nu),
+                           (u.m, u.rad, u.rad, u.rad, u.rad)):
+            raise u.UnitsError("Units must be consistent")
+
+        k = attractor.k.to(u.km ** 3 / u.s ** 2)
+        ecc = 1.0 * u.one
+        r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
+                      p.to(u.km).value, ecc.value, inc.to(u.rad).value,
+                      raan.to(u.rad).value, argp.to(u.rad).value,
+                      nu.to(u.rad).value)
+
+        ss = cls(attractor, r * u.km, v * u.km / u.s, epoch)
         return ss
 
     @property

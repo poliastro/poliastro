@@ -1,6 +1,7 @@
 # coding: utf-8
 import pytest
 
+import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 
 from astropy import units as u
@@ -95,6 +96,38 @@ def test_geosync_has_proper_period():
     expected_period = 1436  # min
     ss = State.circular(Earth, alt=42164 * u.km - Earth.R)
     assert_almost_equal(ss.period.to(u.min).value, expected_period, decimal=0)
+
+
+def test_parabolic_elements_fail_early():
+    attractor = Earth
+    ecc = 1.0 * u.one
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    with pytest.raises(ValueError) as excinfo:
+        ss = State.from_elements(attractor, _d, ecc, _a, _a, _a, _a)
+    assert ("ValueError: For parabolic orbits use State.parabolic instead"
+            in excinfo.exconly())
+
+
+def test_parabolic_has_proper_eccentricity():
+    attractor = Earth
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    expected_ecc = 1.0 * u.one
+    ss = State.parabolic(attractor, _d, _a, _a, _a, _a)
+    assert_almost_equal(ss.ecc, 1.0 * u.one)
+
+
+def test_parabolic_has_zero_energy():
+    attractor = Earth
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = State.parabolic(attractor, _d, _a, _a, _a, _a)
+    E = ss.v.dot(ss.v) / 2 - attractor.k / np.sqrt(ss.r.dot(ss.r))
+    assert_almost_equal(E.value, 0.0)
 
 
 def test_perigee_and_apogee():
