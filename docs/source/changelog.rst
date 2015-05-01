@@ -17,8 +17,8 @@ New in poliastro 0.2
 * Easy plotting of orbits in two dimensions using matplotlib.
 * Module :code:`example` with sample data to start testing the library.
 
-.. _`PR #14`: https://github.com/Pybonacci/poliastro/pull/14
-.. _wiki: https://github.com/Pybonacci/poliastro/wiki
+.. _`PR #14`: https://github.com/poliastro/poliastro/pull/14
+.. _wiki: https://github.com/poliastro/poliastro/wiki
 .. _Plyades: https://github.com/helgee/Plyades
 
 These features were removed temporarily not to block the release and will
@@ -30,4 +30,4 @@ see the light again in poliastro 0.3:
 * Lambert problem solving.
 * Perturbation analysis.
 
-.. _`issue #4`: https://github.com/Pybonacci/poliastro/issues/4
+.. _`issue #4`: https://github.com/poliastro/poliastro/issues/4

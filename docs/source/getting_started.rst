@@ -26,7 +26,7 @@ To install poliastro just use pip::
 
 To install poliastro from source, just clone the source::
 
-  $ clone https://github.com/Pybonacci/poliastro.git
+  $ clone https://github.com/poliastro/poliastro.git
   $ cd poliastro/
   $ python setup.py install
 
@@ -59,4 +59,4 @@ If installed correctly, the tests can be run using py.test::
 
 If for some reason any test fails, please report it in the `issue tracker`_.
 
-.. _`issue tracker`: https://github.com/Pybonacci/poliastro/issues
+.. _`issue tracker`: https://github.com/poliastro/poliastro/issues

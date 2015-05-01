@@ -26,9 +26,9 @@ And more to come!
 The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
 contributions and feedback are more than welcome.
 
-.. _`source code`: https://github.com/Pybonacci/poliastro
-.. _`issue tracker`: https://github.com/Pybonacci/poliastro/issues
-.. _`wiki`: https://github.com/Pybonacci/poliastro/wiki/
+.. _`source code`: https://github.com/poliastro/poliastro
+.. _`issue tracker`: https://github.com/poliastro/poliastro/issues
+.. _`wiki`: https://github.com/poliastro/poliastro/wiki/
 
 poliastro works on both Python 2 and 3 and is released under a 2-clause
 BSD license, hence allowing commercial use of the library.
