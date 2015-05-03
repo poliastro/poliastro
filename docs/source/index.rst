@@ -30,8 +30,8 @@ contributions and feedback are more than welcome.
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 .. _`wiki`: https://github.com/poliastro/poliastro/wiki/
 
-poliastro works on both Python 2 and 3 and is released under a 2-clause
-BSD license, hence allowing commercial use of the library.
+poliastro works on both Python 2 and 3 and is released under
+the MIT license, hence allowing commercial use of the library.
 
 .. code-block:: python
 
@@ -40,11 +40,11 @@ BSD license, hence allowing commercial use of the library.
     
     plot(molniya)
 
-poliastro relies on some Fortran subroutines written by David A. Vallado for
+older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for
 his book "Fundamentals of Astrodynamics and Applications" and available on
 the Internet as the `companion software of the book`__.
 The author explicitly gave permission to redistribute these subroutines
-in this project under the current license.
+in this project under a permissive license.
 
 .. __: http://celestrak.com/software/vallado-sw.asp
 

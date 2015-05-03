@@ -19,13 +19,13 @@ Overview
 .. image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
    :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
 
-.. image:: https://img.shields.io/badge/license-BSD-blue.svg
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING
 
-poliastro is a pure Python package dedicated to problems arising in Astrodynamics and
+poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
 problem, conversion between position and velocity vectors and classical
-orbital elements and orbit plotting.
+orbital elements and orbit plotting. It is released under the MIT license.
 
 .. code-block:: python
 
@@ -116,9 +116,8 @@ If you use poliastro on your project, please
 License
 =======
 
-poliastro is released under a 2-clause BSD license, hence allowing commercial
-use of the library. Please refer to the COPYING file. This includes the
-modified Fortran subroutines.
+poliastro is released under the MIT license, hence allowing commercial
+use of the library. Please refer to the COPYING file.
 
 FAQ
 ===

@@ -11,7 +11,7 @@ if __name__ == '__main__':
           author_email="juanlu001@gmail.com",
           url="http://poliastro.github.io/",
           download_url="https://github.com/poliastro/poliastro",
-          license="BSD",
+          license="MIT",
           keywords=[
               "aero", "aerospace", "engineering",
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
@@ -22,7 +22,7 @@ if __name__ == '__main__':
               "Development Status :: 3 - Pre-Alpha",
               "Intended Audience :: Education",
               "Intended Audience :: Science/Research",
-              "License :: OSI Approved :: BSD License",
+              "License :: OSI Approved :: MIT License",
               "Operating System :: OS Independent",
               "Programming Language :: Python",
               "Programming Language :: Python :: 3",
