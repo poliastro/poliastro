@@ -7,13 +7,6 @@ poliastro
 Utilities and Python wrappers for Orbital Mechanics
 
 """
-
-from __future__ import absolute_import
+from poliastro.testing import test
 
 __version__ = '0.3.0-dev'
-
-
-def test():
-    import os.path
-    import pytest
-    pytest.main(os.path.dirname(os.path.abspath(__file__)))

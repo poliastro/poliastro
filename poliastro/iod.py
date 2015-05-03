@@ -3,9 +3,9 @@
 """
 
 import numpy as np
-import numba
 
 from poliastro.util import dot
+from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
 
@@ -45,7 +45,7 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     return v0, v
 
 
-@numba.njit
+@jit
 def _lambert(k, r0, r, tof, short, numiter, rtol):
     if short:
         t_m = +1
