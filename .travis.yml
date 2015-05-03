@@ -19,6 +19,7 @@ install:
   - conda install numpy "numba>=0.18" "astropy>=1.0" matplotlib pytest pip coverage requests pyyaml
   - pip install coveralls pytest-cov
 script:
-  - py.test --cov poliastro -vv
+  - py.test -vv
+  - python -c "import poliastro; poliastro.test(coverage=True)"
 after_success:
   coveralls
