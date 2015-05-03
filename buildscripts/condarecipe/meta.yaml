@@ -31,5 +31,5 @@ test:
 
 about:
   home: https://poliastro.github.io/
-  license: Simplified BSD License
+  license: MIT License
   summary: "Python package for Orbital Mechanics"
