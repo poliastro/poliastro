@@ -16,8 +16,8 @@ Overview
 .. image:: https://coveralls.io/repos/poliastro/poliastro/badge.svg?branch=master
    :target: https://coveralls.io/r/poliastro/poliastro?branch=master
 
-.. image:: https://ci.appveyor.com/api/projects/status/b83ogpd70yynohgt/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
+.. image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
+   :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
 
 .. image:: https://img.shields.io/badge/license-BSD-blue.svg
    :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING
