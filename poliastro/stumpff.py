@@ -3,11 +3,12 @@
 
 """
 import numpy as np
-import numba
 from math import gamma
 
+from poliastro.jit import jit
 
-@numba.jit('f8(f8)', nopython=True)
+
+@jit('f8(f8)', nopython=True)
 def c2(psi):
     eps = 1.0
     if psi > eps:
@@ -26,7 +27,7 @@ def c2(psi):
     return res
 
 
-@numba.jit('f8(f8)', nopython=True)
+@jit('f8(f8)', nopython=True)
 def c3(psi):
     eps = 1.0
     if psi > eps:

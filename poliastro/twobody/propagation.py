@@ -4,8 +4,8 @@
 """
 
 import numpy as np
-import numba
 
+from poliastro.jit import jit
 from poliastro.util import dot
 from poliastro.stumpff import c2, c3
 
@@ -53,7 +53,7 @@ def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
     return r, v
 
 
-@numba.njit
+@jit
 def _kepler(k, r0, v0, tof, numiter, rtol):
     # Cache some results
     dot_r0v0 = dot(r0, v0)

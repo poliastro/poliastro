@@ -4,10 +4,11 @@
 """
 
 import numpy as np
-import numba
 
 from astropy.coordinates import angles
 from astropy import units as u
+
+from poliastro.jit import jit
 
 
 def rotate(vector, angle, axis='z', unit=None):
@@ -78,7 +79,7 @@ def norm(vec):
     return np.sqrt(vec.dot(vec))
 
 
-@numba.njit('f8(f8[:], f8[:])')
+@jit('f8(f8[:], f8[:])')
 def dot(u, v):
     """Returns the dot product of two vectors.
 
