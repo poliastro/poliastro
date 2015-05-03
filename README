@@ -1,9 +1,10 @@
-=========
-poliastro
-=========
+.. poliastro
 
-Overview
-========
+.. image:: http://poliastro.github.io/_images/logo_text.svg
+   :target: http://poliastro.github.io/
+   :alt: poliastro logo
+   :width: 675px
+   :align: center
 
 :Name: poliastro
 :Website: https://poliastro.github.io/
