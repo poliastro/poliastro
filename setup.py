@@ -16,7 +16,12 @@ if __name__ == '__main__':
               "aero", "aerospace", "engineering",
               "astrodynamics", "orbits", "kepler", "orbital mechanics"
           ],
-          requires=["numpy", "numba", "astropy", "pytest"],
+          requires=["numpy",
+                    "numba",
+                    "astropy",
+                    "matplotlib",
+                    "jplephem",
+                    "pytest"],
           packages=['poliastro', 'poliastro.twobody'],
           classifiers=[
               "Development Status :: 3 - Pre-Alpha",
