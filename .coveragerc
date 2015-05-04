@@ -1,3 +1,4 @@
 [run]
 omit =
+    poliastro/__init__.py
     poliastro/tests/*.py
