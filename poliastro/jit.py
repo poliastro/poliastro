@@ -23,6 +23,12 @@ def ijit(first=None, *args, **kwargs):
 
 
 def select_jit():
+    """Selects appropriate JIT function.
+
+    Returns numba.njit (nopython JIT) if available, else returns an identity
+    decorator.
+
+    """
     try:
         import numba
         jit = numba.njit

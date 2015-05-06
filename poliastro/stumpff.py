@@ -8,7 +8,7 @@ from math import gamma
 from poliastro.jit import jit
 
 
-@jit('f8(f8)', nopython=True)
+@jit('f8(f8)')
 def c2(psi):
     eps = 1.0
     if psi > eps:
@@ -27,7 +27,7 @@ def c2(psi):
     return res
 
 
-@jit('f8(f8)', nopython=True)
+@jit('f8(f8)')
 def c3(psi):
     eps = 1.0
     if psi > eps:

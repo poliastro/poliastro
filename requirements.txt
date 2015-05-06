@@ -1,5 +1,0 @@
-numpy
-numba
-astropy
-matplotlib
-pytest
