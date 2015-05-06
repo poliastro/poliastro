@@ -1,8 +1,8 @@
 """Initial orbit determination.
 
 """
-
 import numpy as np
+from astropy import units as u
 
 from poliastro.util import dot
 from poliastro.jit import jit
@@ -37,12 +37,16 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     not supported.
 
     """
-    f, g, fdot, gdot = _lambert(k, r0, r, tof, short, numiter, rtol)
+    k_ = k.to(u.km ** 3 / u.s ** 2).value
+    r0_ = r0.to(u.km).value
+    r_ = r.to(u.km).value
+    tof_ = tof.to(u.s).value
+    f, g, fdot, gdot = _lambert(k_, r0_, r_, tof_, short, numiter, rtol)
 
-    v0 = (r - f * r0) / g
-    v = (gdot * r - r0) / g
+    v0 = (r_ - f * r0_) / g
+    v = (gdot * r_ - r0_) / g
 
-    return v0, v
+    return v0 * u.km / u.s, v * u.km / u.s
 
 
 @jit
