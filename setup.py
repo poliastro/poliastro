@@ -23,6 +23,11 @@ if __name__ == '__main__':
                     "jplephem",
                     "pytest"],
           packages=['poliastro', 'poliastro.twobody'],
+          entry_points={
+              'console_scripts': [
+                  'poliastro = poliastro.cli:main'
+              ]
+          },
           classifiers=[
               "Development Status :: 3 - Pre-Alpha",
               "Intended Audience :: Education",

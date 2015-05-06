@@ -1,33 +1,15 @@
 # coding: utf-8
 """Planetary ephemerides.
 
-Ideas
------
-* Don't download any data by default
-* Provide a CLI utility to download data, and raise exception if none available
-
-Example::
-
-    $ poliastro ephem  # Downloads default
-    $ poliastro ephem --name de421  # Downloads specific kernel
-
-* The kernels are downloaded to ~/.poliastro, using os.path.expanduser
-* Create a way to assign module-level kernel
-* Python modules are singletons http://stackoverflow.com/q/6255050
-* Use it for planet_ephem, or provide an extra argument
-* Use entry points for provide a function
-
 """
 from astropy import units as u
 import glob
 import warnings
+warnings.formatwarning = lambda msg, *_: str(msg) + '\n'
 
 from jplephem.spk import SPK
 
 
-# TODO: Convert to enum, introduce requirement for Python 2
-# https://caremad.io/2013/07/setup-vs-requirement/
-# https://pip.pypa.io/en/latest/user_guide.html#requirements-files
 MERCURY = 1
 VENUS = 2
 EARTH = 3
@@ -53,11 +35,13 @@ def select_kernel():
     elif kernel_files:
         kernel = SPK.open(kernel_files[0])
     else:
-        warnings.warn("No SPICE kernels found under ~/.poliastro. Please "
-                      "download them manually or using "
-                      "`poliastro ephem --name KERNEL_NAME` to provide a "
-                      "default kernel, else pass a custom one as an argument "
-                      "to `planet_ephem`.")
+        warnings.warn("""No SPICE kernels found under ~/.poliastro. \
+Please download them manually or using
+
+  poliastro download-spk [-d NAME]
+
+to provide a default kernel, else pass a custom one as \
+an argument to `planet_ephem`.""")
         kernel = None
 
     return kernel
