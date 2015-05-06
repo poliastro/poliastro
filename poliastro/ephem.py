@@ -2,14 +2,29 @@
 """Planetary ephemerides.
 
 """
-from astropy import units as u
+import os
 import glob
 import warnings
 warnings.formatwarning = lambda msg, *_: str(msg) + '\n'
 
+from astropy import units as u
+
 from jplephem.spk import SPK
 
+try:
+    from urllib.request import urlretrieve
+    from urllib.error import HTTPError
+except ImportError:  # Python 2
+    from urllib import urlretrieve
+    from urllib2 import HTTPError
 
+SPK_TOP_URL = "http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/"
+SPK_OLD_URL = "http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/a_old_versions/"
+
+SPK_LOCAL_DIR = os.path.expanduser("~/.poliastro")
+
+
+# Planets
 MERCURY = 1
 VENUS = 2
 EARTH = 3
@@ -29,7 +44,7 @@ def select_kernel():
     else None.
 
     """
-    kernel_files = glob.glob("*.bsp")
+    kernel_files = glob.glob(os.path.join(SPK_LOCAL_DIR, "*.bsp"))
     if "de421.bsp" in kernel_files:
         kernel = SPK.open("de421.bsp")
     elif kernel_files:
@@ -47,6 +62,42 @@ an argument to `planet_ephem`.""")
     return kernel
 
 default_kernel = select_kernel()
+
+
+def download_kernel(name):
+    """Downloads SPICE kernel by name.
+
+    The function will try the top SPK path first, and then the old versions
+    path in case the .bsp file is not found.
+
+    """
+    destination_file = os.path.join(SPK_LOCAL_DIR, name + ".bsp")
+    if os.path.isfile(destination_file):
+        # Don't download file again
+        print("File %s.bsp already exists under %s" % (name, SPK_LOCAL_DIR))
+        return
+
+    # Create .poliastro directory if not existing
+    # Simple solution, no race condition checking, see
+    # http://stackoverflow.com/a/273227
+    if not os.path.isdir(SPK_LOCAL_DIR):
+        os.makedirs(SPK_LOCAL_DIR)
+
+    # Actually download file
+    for url_dir in SPK_TOP_URL, SPK_OLD_URL:
+        try:
+            bsp_url = url_dir + name + ".bsp"
+            print("Downloading %s.bsp from %s, please wait..." % (name, url_dir))
+            urlretrieve(bsp_url, destination_file)
+        except HTTPError as e:
+            print(e.msg)
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError("File %s.bsp not found under top nor old versions "
+                           "directories, please consider downloading it "
+                           "manually" % name)
 
 
 def planet_ephem(body, epoch, kernel=default_kernel):

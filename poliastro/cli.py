@@ -5,6 +5,7 @@
 import argparse
 
 import poliastro
+from poliastro import ephem
 
 
 def main():
@@ -20,10 +21,10 @@ def main():
         "download-spk",
         help="Downloads .bsp SPICE kernel files")
     download_parser.add_argument(
-        "-d", "--download-spk",
+        "-n", "--name",
         dest="name", default="de430",
         help="Name of a .bsp SPICE kernel file to download")
-    download_parser.set_defaults(func=download_spk)
+    download_parser.set_defaults(func=download_kernel)
 
     args = parser.parse_args()
     try:
@@ -32,5 +33,8 @@ def main():
         parser.print_help()
 
 
-def download_spk(args):
-    print(args.name)
+def download_kernel(args):
+    """Downloads SPICE kernel file.
+
+    """
+    ephem.download_kernel(args.name)
