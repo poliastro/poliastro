@@ -43,6 +43,8 @@ def select_kernel():
     Returns DE421 if available in data directory, else the first kernel found,
     else None.
 
+    .. versionadded:: 0.3.0
+
     """
     kernel_files = glob.glob(os.path.join(SPK_LOCAL_DIR, "*.bsp"))
     if "de421.bsp" in kernel_files:
@@ -69,6 +71,8 @@ def download_kernel(name):
 
     The function will try the top SPK path first, and then the old versions
     path in case the .bsp file is not found.
+
+    .. versionadded:: 0.3.0
 
     """
     destination_file = os.path.join(SPK_LOCAL_DIR, name + ".bsp")
@@ -105,12 +109,17 @@ def planet_ephem(body, epoch, kernel=default_kernel):
 
     The vectors are computed with respect to the Solar System barycenter.
 
+    .. versionadded:: 0.3.0
+
     Parameters
     ----------
     body : int
         Planetary body.
-    epoch : astropy.Time
-        Computation time.
+    epoch : astropy.time.Time
+        Computation time. Can be scalar or vector.
+    kernel : jplephem.spk.SPK, optional
+        jplephem SPK kernel to make the computation, if not given a default
+        one will be used.
 
     Returns
     -------

@@ -6,29 +6,39 @@ Requirements
 
 poliastro requires the following Python packages:
 
-* NumPy
-* Astropy (for physical units handling and geometrical transforms)
-* matplotlib (for plotting)
+* NumPy, for basic numerical routines
+* Astropy, for physical units and time handling
+* numba (optional), for accelerating the code
+* jplephem, for the planetary ephemerides using SPICE kernels
+* matplotlib, for the orbit plotting
 
-It is usually tested on Linux on Python 2.7 and Python 3.3 (single codebase).
-A Fortran compiler is needed to build the extensions: poliastro
-is usually built with gfortran.
-
-There is no reason it shouldn't work under Windows or Mac OS X with
-properly configured tools (not tested).
+poliastro is usually tested on Linux and Windows on Python 2.7, 3.3 and 3.4
+(single codebase). It should work on OS X too with no changes (not tested).
 
 Installation
 ------------
 
-To install poliastro just use pip::
+The easiest and fastest way to get the package up and running is to
+install poliastro using `conda <http://conda.io>`_::
 
-  $ pip install numpy astropy matplotlib poliastro
+  $ conda create -n poliastro34 python=3.4 -q
+  $ conda install poliastro -c poliastro
 
-To install poliastro from source, just clone the source::
+You can also `install poliastro from PyPI`_ using pip, given that you already
+have all the requirements::
 
-  $ clone https://github.com/poliastro/poliastro.git
-  $ cd poliastro/
+  $ pip install poliastro
+
+You can also `download poliastro source from GitHub`_ and type::
+
   $ python setup.py install
+
+Development installations are also supported thanks to setuptools::
+
+  $ python setup.py develop
+
+.. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
+.. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
 
 .. warning::
 

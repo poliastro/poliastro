@@ -12,6 +12,8 @@ from poliastro.stumpff import c2, c3
 def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     """Solves the Lambert problem.
 
+    .. versionadded:: 0.3.0
+
     Parameters
     ----------
     k : float

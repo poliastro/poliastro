@@ -199,5 +199,12 @@ Which produces this beautiful plot:
    
    Plot of a Hohmann transfer.
 
-And that's it for the basics of poliastro! Feel free to send my your
-suggestions of improvement, both for the code and the docs.
+Where are the planets? Computing ephemerides
+--------------------------------------------
+
+WIP
+
+Traveling through space: solving the Lambert problem
+----------------------------------------------------
+
+WIP

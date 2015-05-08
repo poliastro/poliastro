@@ -1,6 +1,38 @@
 What's new
 ==========
 
+New in poliastro 0.3.0
+----------------------
+
+This is a new major release, focused on switching to a pure Python codebase.
+Lambert problem solving and ephemerides computation came back, and a couple
+of bugs were fixed.
+
+New features:
+
+* **Pure Python codebase**: Forget about Fortran linking problems and
+  nightmares on Windows, because now poliastro is a pure Python package.
+  A new dependency, numba, was introduced to accelerate the algorithms,
+  but poliastro will use it only if it is installed.
+* **Lambert problem solving**: WIP
+* `PR #42`_: **Planetary ephemerides computation**: WIP
+* `PR #38`_: New method ``State.parabolic`` to create parabolic orbits.
+* New conda package: visit `poliastro binstar channel`_!
+* New organization and logo.
+
+.. _`PR #42`: https://github.com/poliastro/poliastro/pull/42
+.. _`PR #38`: https://github.com/poliastro/poliastro/pull/38
+
+.. _`poliastro binstar channel`: https://binstar.org/poliastro
+
+Bugs fixed:
+
+* `Issue #19`_: Fixed plotting region for parabolic orbits.
+* `Issue #37`_: Fixed creation of parabolic orbits.
+
+.. _`Issue #19`: https://github.com/poliastro/poliastro/issues/19
+.. _`Issue #37`: https://github.com/poliastro/poliastro/issues/37
+
 New in poliastro 0.2.1
 ----------------------
 
