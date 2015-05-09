@@ -265,4 +265,43 @@ we are querying and an ``astropy.time.Time`` scalar or vector variable::
 Traveling through space: solving the Lambert problem
 ----------------------------------------------------
 
-WIP
+The determination of an orbit given two position vectors and the time of
+flight is known in celestial mechanics as **Lambert's problem**, also
+known as two point boundary value problem. This contrasts with Kepler's
+problem or propagation, which is rather an initial value problem.
+
+The module :py:mod:`poliastro.iod` allows as to solve Lambert's problem,
+provided the main attractor's gravitational constant, the two position
+vectors and the time of flight. As you can imagine, being able to compute
+the positions of the planets as we saw in the previous section is the
+perfect complement to this feature!
+
+For instance, this is a simplified version of the example
+`Going to Mars with Python using poliastro`_, where the orbit of the
+Mars Science Laboratory mission (rover Curiosity) is determined::
+
+    >>> from astropy import time
+    >>> date_launch = time.Time('2011-11-26 15:02', scale='utc')
+    >>> date_arrival = time.Time('2012-08-06 05:17', scale='utc')
+    >>> tof = date_arrival - date_launch
+    >>> from poliastro import ephem
+    >>> r0, _ = ephem.planet_ephem(ephem.EARTH, date_launch)
+    >>> r, _ = ephem.planet_ephem(ephem.MARS, date_arrival)
+    >>> from poliastro import iod
+    >>> from poliastro.bodies import Sun
+    >>> v0, v = iod.lambert(Sun.k, r0, r, tof)
+    >>> v0
+    <Quantity [-29.29150998, 14.53326521,  5.41691336] km / s>
+    >>> v
+    <Quantity [ 17.6154992 ,-10.99830723, -4.20796062] km / s>
+
+
+.. figure:: _static/msl.png
+   :align: center
+   :alt: MSL orbit
+
+   Mars Science Laboratory orbit.
+
+.. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
+
+*Per Python ad astra* ;)

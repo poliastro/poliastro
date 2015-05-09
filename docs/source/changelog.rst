@@ -14,7 +14,8 @@ New features:
   nightmares on Windows, because now poliastro is a pure Python package.
   A new dependency, numba, was introduced to accelerate the algorithms,
   but poliastro will use it only if it is installed.
-* **Lambert problem solving**: WIP
+* **Lambert problem solving**: New module :py:mod:`~poliastro.iod` to
+  determine an orbit given two position vectors and the time of flight.
 * `PR #42`_: **Planetary ephemerides computation**: New module
   :py:mod:`~poliastro.ephem` with functions to deal with SPK files and
   compute position and velocity vectors of the planets.
