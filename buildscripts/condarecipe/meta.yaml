@@ -19,7 +19,9 @@ requirements:
     - numpy
     - numba >=0.18
     - astropy >=1.0
+    - jplephem
     - matplotlib
+    - pytest
 
 test:
   imports:
