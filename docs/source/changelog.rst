@@ -15,7 +15,9 @@ New features:
   A new dependency, numba, was introduced to accelerate the algorithms,
   but poliastro will use it only if it is installed.
 * **Lambert problem solving**: WIP
-* `PR #42`_: **Planetary ephemerides computation**: WIP
+* `PR #42`_: **Planetary ephemerides computation**: New module
+  :py:mod:`~poliastro.ephem` with functions to deal with SPK files and
+  compute position and velocity vectors of the planets.
 * `PR #38`_: New method :py:meth:`~poliastro.twobody.State.parabolic` to create parabolic orbits.
 * New conda package: visit `poliastro binstar channel`_!
 * New organization and logo.

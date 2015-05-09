@@ -202,7 +202,65 @@ Which produces this beautiful plot:
 Where are the planets? Computing ephemerides
 --------------------------------------------
 
-WIP
+.. versionadded:: 0.3.0
+
+Thanks to the awesome jplephem package, poliastro can now read Satellite
+Planet Kernel (SPK) files, part of NASA's SPICE toolkit. This means that
+we can query the position and velocity of the planets of the Solar System.
+
+The first time we import :py:mod:`poliastro.ephem` we will get a warning
+indicating that no SPK files are present::
+
+    >>> import poliastro.ephem
+    No SPICE kernels found under ~/.poliastro. Please download them manually or using
+
+      poliastro download-spk [-d NAME]
+
+    to provide a default kernel, else pass a custom one as an argument to `planet_ephem`.
+
+This is because poliastro does not download any data when installed: SPK files
+weight several MiB and that would slow the download process. Instead, we are
+requested to download them from NASA website or use the builtin command-line
+utility::
+
+    $ poliastro download-spk --name de421
+    No SPICE kernels found under ~/.poliastro. Please download them manually or using
+
+      poliastro download-spk [-d NAME]
+
+    to provide a default kernel, else pass a custom one as an argument to `planet_ephem`.
+    Downloading de421.bsp from http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/, please wait...
+    Not Found
+    Downloading de421.bsp from http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/a_old_versions/, please wait...
+
+If no ``--name`` argument is provided, de430 will be downloaded.
+Alternatively, we can use :py:func:`poliastro.ephem.download_kernel` from a
+Python session::
+
+    >>> from poliastro import ephem
+    >>> ephem.download_kernel("de421")
+    File de421.bsp already exists under /home/juanlu/.poliastro
+    >>>
+
+In this case, the ``name`` argument is required.
+
+Once we have downloaded an SPK file we can already compute the position and
+velocity vectors of the planets with the
+:py:func:`poliastro.ephem.planet_ephem` function. All we need is the body
+we are querying and an ``astropy.time.Time`` scalar or vector variable::
+
+    >>> from astropy import time
+    >>> epoch = time.Time("2015-05-09 10:43")
+    >>> from poliastro import ephem
+    >>> r, v = ephem.planet_ephem(ephem.EARTH, epoch)
+    >>> r
+    <Quantity [ -9.99802065e+07, -1.03447226e+08, -4.48696791e+07] km>
+    >>> v
+    <Quantity [ 1880007.6848216 ,-1579126.15900176, -684591.24441181] km / s>
+
+.. note:: The position and velocity vectors are given with respect to the
+    Solar System Barycenter in the **International Standard Reference Frame**,
+    which has the Equator as the fundamental plane.
 
 Traveling through space: solving the Lambert problem
 ----------------------------------------------------
