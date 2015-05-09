@@ -2,11 +2,12 @@
 # Windows
 # File shamelessly inspired by Astropy
 
-version: 0.3.dev{build}
+version: 0.3.0rc1-{build}
 
 branches:
   only:
   - master
+  - 0.3.x
 
 environment:
   global:

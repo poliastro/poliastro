@@ -29,7 +29,7 @@ if __name__ == '__main__':
               ]
           },
           classifiers=[
-              "Development Status :: 3 - Pre-Alpha",
+              "Development Status :: 3 - Alpha",
               "Intended Audience :: Education",
               "Intended Audience :: Science/Research",
               "License :: OSI Approved :: MIT License",

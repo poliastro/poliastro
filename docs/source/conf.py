@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'poliastro'
-copyright = u'2013-2014, Juan Luis Cano Rodríguez'
+copyright = u'2013-2015, Juan Luis Cano Rodríguez'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
