@@ -64,6 +64,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   about
    getting_started
    user_guide
    changelog
