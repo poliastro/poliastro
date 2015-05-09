@@ -1,6 +1,6 @@
 .. poliastro
 
-.. image:: http://poliastro.github.io/_images/logo_text.svg
+.. image:: http://poliastro.github.io/_static/logo_text.png
    :target: http://poliastro.github.io/
    :alt: poliastro logo
    :width: 675px
@@ -9,19 +9,19 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
-:Version: 0.3.0.dev0
+:Version: 0.3.0rc1
 
-.. image:: https://travis-ci.org/poliastro/poliastro.svg?branch=master
+.. image:: https://travis-ci.org/poliastro/poliastro.svg?branch=0.3.x
    :target: https://travis-ci.org/poliastro/poliastro
 
-.. image:: https://coveralls.io/repos/poliastro/poliastro/badge.svg?branch=master
-   :target: https://coveralls.io/r/poliastro/poliastro?branch=master
+.. image:: https://coveralls.io/repos/poliastro/poliastro/badge.svg?branch=0.3.x
+   :target: https://coveralls.io/r/poliastro/poliastro?branch=0.3.x
 
-.. image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
+.. image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/0.3.x?svg=true
+   :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/0.3.x
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING
+   :target: https://raw.githubusercontent.com/poliastro/poliastro/0.3.x/COPYING
 
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
@@ -35,7 +35,7 @@ orbital elements and orbit plotting. It is released under the MIT license.
     
     plot(molniya)
 
-.. image:: https://github.com/poliastro/poliastro/raw/master/examples/molniya.png
+.. image:: https://github.com/poliastro/poliastro/raw/0.3.x/examples/molniya.png
    :align: center
 
 Requirements
