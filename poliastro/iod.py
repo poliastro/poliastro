@@ -12,18 +12,24 @@ from poliastro.stumpff import c2, c3
 def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     """Solves the Lambert problem.
 
+    .. versionadded:: 0.3.0
+
     Parameters
     ----------
-    k : float
+    k : Quantity
         Gravitational constant of main attractor (km^3 / s^2).
-    r0 : array
+    r0 : Quantity
         Initial position (km).
-    r : array
+    r : Quantity
         Final position (km).
-    tof : float
+    tof : Quantity
         Time of flight (s).
-    short : boolean
+    short : boolean, optional
         Find out the short path, default to True. If False, find long path.
+    numiter : int, optional
+        Maximum number of iterations, default to 35.
+    rtol : float, optional
+        Relative tolerance of the algorithm, default to 1e-8.
 
     Raises
     ------

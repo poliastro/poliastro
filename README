@@ -41,26 +41,40 @@ orbital elements and orbit plotting. It is released under the MIT license.
 Requirements
 ============
 
-poliastro requires recent versions of NumPy, Astropy and numba to work.
-Besides, matplotlib is needed for plotting the orbits.
+poliastro requires the following Python packages:
 
-poliastro is usually tested on Linux on Python 2.7, 3.3 and 3.4 (single
-codebase).
+* NumPy, for basic numerical routines
+* Astropy, for physical units and time handling
+* numba (optional), for accelerating the code
+* jplephem, for the planetary ephemerides using SPICE kernels
+* matplotlib, for the orbit plotting
+
+poliastro is usually tested on Linux and Windows on Python 2.7, 3.3 and 3.4
+(single codebase). It should work on OS X too with no changes (not tested).
 
 Installation
 ============
 
-To install poliastro just use pip::
+The easiest and fastest way to get the package up and running is to
+install poliastro using `conda <http://conda.io>`_::
+
+  $ conda install poliastro --channel poliastro
+
+You can also `install poliastro from PyPI`_ using pip, given that you already
+have all the requirements::
 
   $ pip install poliastro
 
-To install poliastro from source, just type::
+You can also `download poliastro source from GitHub`_ and type::
 
   $ python setup.py install
 
 Development installations are also supported thanks to setuptools::
 
   $ python setup.py develop
+
+.. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
+.. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
 
 It is recommended that you **never ever use sudo** with distutils, pip,
 setuptools and friends in Linux because you might seriously break your
@@ -126,9 +140,10 @@ FAQ
 Does it work on Windows and OS X too?
 -------------------------------------
 
-poliastro is a pure Python package with no compiled extensions, so
-there is no reason it shouldn't work under Windows or Mac OS X with
-properly installed dependencies (not tested).
+poliastro is tested on Windows (see above). It is a pure Python package with
+no compiled extensions, so it should work under Windows or Mac OS X with
+properly installed dependencies. Please file a bug on the
+`issue tracker`_ otherwise.
 
 What's up with the name?
 ------------------------

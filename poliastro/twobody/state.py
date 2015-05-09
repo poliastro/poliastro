@@ -165,11 +165,13 @@ class State(object):
         p : Quantity
             Semi-latus rectum or parameter.
         inc : Quantity, optional
-            Inclination, default to 0 deg (equatorial orbit).
-        raan : Quantity, optional
-            Right ascension of the ascending node, default to 0 deg.
-        arglat : Quantity, optional
-            Argument of latitude, default to 0 deg.
+            Inclination.
+        raan : Quantity
+            Right ascension of the ascending node.
+        argp : Quantity
+            Argument of the pericenter.
+        nu : Quantity
+            True anomaly.
         epoch: Time, optional
             Epoch, default to J2000.
 

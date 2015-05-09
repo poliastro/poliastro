@@ -199,5 +199,109 @@ Which produces this beautiful plot:
    
    Plot of a Hohmann transfer.
 
-And that's it for the basics of poliastro! Feel free to send my your
-suggestions of improvement, both for the code and the docs.
+Where are the planets? Computing ephemerides
+--------------------------------------------
+
+.. versionadded:: 0.3.0
+
+Thanks to the awesome jplephem package, poliastro can now read Satellite
+Planet Kernel (SPK) files, part of NASA's SPICE toolkit. This means that
+we can query the position and velocity of the planets of the Solar System.
+
+The first time we import :py:mod:`poliastro.ephem` we will get a warning
+indicating that no SPK files are present::
+
+    >>> import poliastro.ephem
+    No SPICE kernels found under ~/.poliastro. Please download them manually or using
+
+      poliastro download-spk [-d NAME]
+
+    to provide a default kernel, else pass a custom one as an argument to `planet_ephem`.
+
+This is because poliastro does not download any data when installed: SPK files
+weight several MiB and that would slow the download process. Instead, we are
+requested to download them from NASA website or use the builtin command-line
+utility::
+
+    $ poliastro download-spk --name de421
+    No SPICE kernels found under ~/.poliastro. Please download them manually or using
+
+      poliastro download-spk [-d NAME]
+
+    to provide a default kernel, else pass a custom one as an argument to `planet_ephem`.
+    Downloading de421.bsp from http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/, please wait...
+    Not Found
+    Downloading de421.bsp from http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/a_old_versions/, please wait...
+
+If no ``--name`` argument is provided, de430 will be downloaded.
+Alternatively, we can use :py:func:`poliastro.ephem.download_kernel` from a
+Python session::
+
+    >>> from poliastro import ephem
+    >>> ephem.download_kernel("de421")
+    File de421.bsp already exists under /home/juanlu/.poliastro
+    >>>
+
+In this case, the ``name`` argument is required.
+
+Once we have downloaded an SPK file we can already compute the position and
+velocity vectors of the planets with the
+:py:func:`poliastro.ephem.planet_ephem` function. All we need is the body
+we are querying and an ``astropy.time.Time`` scalar or vector variable::
+
+    >>> from astropy import time
+    >>> epoch = time.Time("2015-05-09 10:43")
+    >>> from poliastro import ephem
+    >>> r, v = ephem.planet_ephem(ephem.EARTH, epoch)
+    >>> r
+    <Quantity [ -9.99802065e+07, -1.03447226e+08, -4.48696791e+07] km>
+    >>> v
+    <Quantity [ 1880007.6848216 ,-1579126.15900176, -684591.24441181] km / s>
+
+.. note:: The position and velocity vectors are given with respect to the
+    Solar System Barycenter in the **International Standard Reference Frame**,
+    which has the Equator as the fundamental plane.
+
+Traveling through space: solving the Lambert problem
+----------------------------------------------------
+
+The determination of an orbit given two position vectors and the time of
+flight is known in celestial mechanics as **Lambert's problem**, also
+known as two point boundary value problem. This contrasts with Kepler's
+problem or propagation, which is rather an initial value problem.
+
+The module :py:mod:`poliastro.iod` allows as to solve Lambert's problem,
+provided the main attractor's gravitational constant, the two position
+vectors and the time of flight. As you can imagine, being able to compute
+the positions of the planets as we saw in the previous section is the
+perfect complement to this feature!
+
+For instance, this is a simplified version of the example
+`Going to Mars with Python using poliastro`_, where the orbit of the
+Mars Science Laboratory mission (rover Curiosity) is determined::
+
+    >>> from astropy import time
+    >>> date_launch = time.Time('2011-11-26 15:02', scale='utc')
+    >>> date_arrival = time.Time('2012-08-06 05:17', scale='utc')
+    >>> tof = date_arrival - date_launch
+    >>> from poliastro import ephem
+    >>> r0, _ = ephem.planet_ephem(ephem.EARTH, date_launch)
+    >>> r, _ = ephem.planet_ephem(ephem.MARS, date_arrival)
+    >>> from poliastro import iod
+    >>> from poliastro.bodies import Sun
+    >>> v0, v = iod.lambert(Sun.k, r0, r, tof)
+    >>> v0
+    <Quantity [-29.29150998, 14.53326521,  5.41691336] km / s>
+    >>> v
+    <Quantity [ 17.6154992 ,-10.99830723, -4.20796062] km / s>
+
+
+.. figure:: _static/msl.png
+   :align: center
+   :alt: MSL orbit
+
+   Mars Science Laboratory orbit.
+
+.. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
+
+*Per Python ad astra* ;)

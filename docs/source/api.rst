@@ -30,6 +30,18 @@ poliastro.plotting module
     :members:
     :special-members: __init__
 
+poliastro.iod module
+--------------------
+
+.. automodule:: poliastro.iod
+    :members:
+
+poliastro.ephem module
+----------------------
+
+.. automodule:: poliastro.ephem
+    :members:
+
 poliastro.util module
 ---------------------
 
