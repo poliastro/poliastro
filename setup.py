@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# coding: utf-8
 
 from setuptools import setup
 
@@ -41,5 +41,5 @@ if __name__ == '__main__':
               "Topic :: Scientific/Engineering :: Physics",
               "Topic :: Scientific/Engineering :: Astronomy",
           ],
-          long_description=open('README').read(),
+          long_description=open('README', encoding='utf-8').read(),
           package_data={"poliastro": ['tests/*.py']})
