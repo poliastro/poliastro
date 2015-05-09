@@ -16,7 +16,7 @@ New features:
   but poliastro will use it only if it is installed.
 * **Lambert problem solving**: WIP
 * `PR #42`_: **Planetary ephemerides computation**: WIP
-* `PR #38`_: New method ``State.parabolic`` to create parabolic orbits.
+* `PR #38`_: New method :py:meth:`~poliastro.twobody.State.parabolic` to create parabolic orbits.
 * New conda package: visit `poliastro binstar channel`_!
 * New organization and logo.
 
