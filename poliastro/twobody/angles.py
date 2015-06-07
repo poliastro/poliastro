@@ -7,8 +7,6 @@ import numpy as np
 
 from scipy import optimize
 
-__all__ = ['fp_angle', 'M2nu', 'nu2M']
-
 
 def _kepler_equation(E, M, ecc):
     return E - ecc * np.sin(E) - M
@@ -20,6 +18,8 @@ def _kepler_equation_prime(E, M, ecc):
 
 def nu_to_E(nu, ecc):
     """Eccentric anomaly from true anomaly.
+
+    .. versionadded:: 0.4.0
 
     Parameters
     ----------
@@ -41,6 +41,8 @@ def nu_to_E(nu, ecc):
 def E_to_nu(E, ecc):
     """True anomaly from eccentric anomaly.
 
+    .. versionadded:: 0.4.0
+
     Parameters
     ----------
     E : float
@@ -60,6 +62,8 @@ def E_to_nu(E, ecc):
 
 def M_to_E(M, ecc):
     """Eccentric anomaly from true anomaly.
+
+    .. versionadded:: 0.4.0
 
     Parameters
     ----------
@@ -82,6 +86,8 @@ def M_to_E(M, ecc):
 def E_to_M(E, ecc):
     """Mean anomaly from eccentric anomaly.
 
+    .. versionadded:: 0.4.0
+
     Parameters
     ----------
     E : float
@@ -101,6 +107,8 @@ def E_to_M(E, ecc):
 
 def M_to_nu(M, ecc):
     """True anomaly from mean anomaly.
+
+    .. versionadded:: 0.4.0
 
     Parameters
     ----------
@@ -129,6 +137,8 @@ def M_to_nu(M, ecc):
 def nu_to_M(nu, ecc):
     """Mean anomaly from true anomaly.
 
+    .. versionadded:: 0.4.0
+
     Parameters
     ----------
     nu : float
@@ -150,6 +160,8 @@ def nu_to_M(nu, ecc):
 def fp_angle(nu, ecc):
     """Flight path angle.
 
+    .. versionadded:: 0.4.0
+
     Parameters
     ----------
     nu : float
@@ -157,7 +169,9 @@ def fp_angle(nu, ecc):
     ecc : float
         Eccentricity.
 
-    From Vallado 2007, pp. 113.
+    Notes
+    -----
+    Algorithm taken from Vallado 2007, pp. 113.
 
     """
     return np.arctan2(ecc * np.sin(nu), 1 + ecc * np.cos(nu))
