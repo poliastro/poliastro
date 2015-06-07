@@ -1,13 +1,19 @@
 API Reference
 =============
 
-poliastro.twobody module
-------------------------
+poliastro.twobody package
+-------------------------
 
 .. automodule:: poliastro.twobody
 
     .. autoclass:: State()
        :members:
+
+poliastro.twobody.angles module
+-------------------------------
+
+.. automodule:: poliastro.twobody.angles
+   :members:
 
 poliastro.maneuver module
 -------------------------

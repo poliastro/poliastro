@@ -35,7 +35,7 @@ install:
   - "python --version"
 
   # Install dependencies
-  - "conda install -q numpy numba>=0.18 astropy>=1.0 matplotlib pytest"
+  - "conda install -q numpy numba>=0.18 astropy>=1.0 matplotlib pytest scipy"
   
 build: off
 
