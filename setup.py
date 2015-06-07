@@ -1,5 +1,7 @@
 # coding: utf-8
 
+# http://stackoverflow.com/a/10975371/554319
+import io
 from setuptools import setup
 
 
@@ -35,11 +37,15 @@ if __name__ == '__main__':
               "License :: OSI Approved :: MIT License",
               "Operating System :: OS Independent",
               "Programming Language :: Python",
+              "Programming Language :: Python :: 2",
+              "Programming Language :: Python :: 2.7",
               "Programming Language :: Python :: 3",
+              "Programming Language :: Python :: 3.3",
+              "Programming Language :: Python :: 3.4",
               "Programming Language :: Python :: Implementation :: CPython",
               "Topic :: Scientific/Engineering",
               "Topic :: Scientific/Engineering :: Physics",
               "Topic :: Scientific/Engineering :: Astronomy",
           ],
-          long_description=open('README', encoding='utf-8').read(),
+          long_description=io.open('README', encoding='utf-8').read(),
           package_data={"poliastro": ['tests/*.py']})
