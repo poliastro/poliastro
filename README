@@ -20,7 +20,7 @@
 .. image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
    :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
 
-.. image:: https://badge.waffle.io/poliastro/poliastro.png?label=ready&title=Ready 
+.. image:: https://badge.waffle.io/poliastro/poliastro.png?label=Ready
    :target: https://waffle.io/poliastro/poliastro 
    :alt: 'Stories in Ready'
 
