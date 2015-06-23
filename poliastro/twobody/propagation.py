@@ -85,7 +85,7 @@ def _kepler(k, r0, v0, tof, numiter, rtol):
         norm_r = xi * xi * c2_psi + dot_r0v0 / sqrt_mu * xi * (1 - psi * c3_psi) + norm_r0 * (1 - psi * c2_psi)
         xi_new = xi + (sqrt_mu * tof - xi * xi * xi * c3_psi - dot_r0v0 / sqrt_mu * xi * xi * c2_psi -
                        norm_r0 * xi * (1 - psi * c3_psi)) / norm_r
-        if abs((xi_new - xi) / xi_new) < rtol:
+        if abs(np.divide(xi_new - xi, xi_new)) < rtol or abs(xi_new - xi) < rtol:
             break
         else:
             count += 1
