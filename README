@@ -20,6 +20,10 @@
 .. image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
    :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
 
+.. image:: https://badge.waffle.io/poliastro/poliastro.png?label=ready&title=Ready 
+   :target: https://waffle.io/poliastro/poliastro 
+   :alt: 'Stories in Ready'
+
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING
 
