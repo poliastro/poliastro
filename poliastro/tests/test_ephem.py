@@ -1,4 +1,6 @@
 # coding: utf-8
+import numpy as np
+
 from astropy import time
 from astropy import units as u
 
@@ -12,8 +14,8 @@ class FakeKernel(object):
 
 class FakeSegment(object):
     def compute_and_differentiate(self, jd1, jd2=None):
-        r = [1, 1, 1] * u.km
-        v = [1, 1, 1] * u.km / u.day
+        r = np.array([1, 1, 1])
+        v = np.array([1, 1, 1])
         return r, v
 
 
