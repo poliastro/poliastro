@@ -14,7 +14,7 @@ class FakeSegment(object):
     def compute_and_differentiate(self, jd1, jd2=None):
         r = [1, 1, 1] * u.km
         v = [1, 1, 1] * u.km / u.day
-        return
+        return r, v
 
 
 def test_proper_velocity_units():
