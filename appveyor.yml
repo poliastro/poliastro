@@ -22,7 +22,7 @@ environment:
 
 install:
   # Install miniconda using a powershell script.
-  - "choco install miniconda"
+  - "choco install -y miniconda"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # Install the build and runtime dependencies of the project.
