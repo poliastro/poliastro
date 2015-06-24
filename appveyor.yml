@@ -12,7 +12,7 @@ branches:
 
 environment:
   global:
-    - MINICONDA: "C:\\tools\\Miniconda"
+    MINICONDA: "C:\\tools\\Miniconda"
 
   matrix:
     - PYTHON_VERSION: 2.7
