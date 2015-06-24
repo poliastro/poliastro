@@ -12,7 +12,6 @@ branches:
 
 environment:
   global:
-    PYTHON: "C:\\Miniconda"
     MINICONDA_VERSION: "3.5.5"
 
   matrix:
@@ -22,10 +21,11 @@ environment:
 
 install:
   # Install miniconda using a powershell script.
-  - "choco install -y miniconda"
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "choco install -y miniconda -notSilent"
 
   # Install the build and runtime dependencies of the project.
+  - "echo %PATH%"
+  - "dir %ProgramData%\chocolatey"
   - "conda config --set always_yes yes --set changeps1 no"
   - "conda update -q conda"
   - "conda info -a"
