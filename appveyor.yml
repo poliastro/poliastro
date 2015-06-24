@@ -36,6 +36,7 @@ install:
 
   # Install dependencies
   - "conda install -q numpy numba>=0.18 astropy>=1.0 matplotlib pytest"
+  - "conda install jplephem -c poliastro"
   
 build: off
 

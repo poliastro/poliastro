@@ -17,6 +17,7 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
   - conda install numpy "numba>=0.18" "astropy>=1.0" matplotlib pytest pip coverage requests pyyaml
+  - conda install jplephem -c poliastro
   - pip install coveralls pytest-cov
 script:
   - py.test -vv
