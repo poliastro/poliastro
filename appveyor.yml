@@ -11,6 +11,9 @@ branches:
   - "choco-appveyor#46"
 
 environment:
+  global:
+    - MINICONDA: "C:\\tools\\Miniconda"
+
   matrix:
     - PYTHON_VERSION: 2.7
     - PYTHON_VERSION: 3.3
@@ -19,11 +22,9 @@ environment:
 install:
   # Install miniconda using a powershell script.
   - "choco install -y miniconda"
-  - "SET PATH=%ProgramData%\\chocolatey\\bin\\Miniconda;%ProgramData%\\chocolatey\\bin\\Miniconda\\Scripts;%PATH%"
+  - "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
 
   # Install the build and runtime dependencies of the project.
-  - "dir %ProgramData%\\chocolatey\\bin"
-  - "dir %ProgramData%\\chocolatey\\bin\\Miniconda"
   - "conda config --set always_yes yes --set changeps1 no"
   - "conda update -q conda"
   - "conda info -a"
