@@ -8,10 +8,11 @@ branches:
   only:
   - master
   - 0.3.x
+  - "choco-appveyor#46"
 
 environment:
   global:
-    PYTHON: "C:\\conda"
+    PYTHON: "C:\\Miniconda"
     MINICONDA_VERSION: "3.5.5"
 
   matrix:
@@ -21,7 +22,7 @@ environment:
 
 install:
   # Install miniconda using a powershell script.
-  - "powershell .ci/appveyor/install-miniconda.ps1"
+  - "choco install miniconda"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # Install the build and runtime dependencies of the project.
