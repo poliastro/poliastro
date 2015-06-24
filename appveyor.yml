@@ -21,7 +21,7 @@ environment:
 
 install:
   # Install miniconda using a powershell script.
-  - "choco install -y miniconda -notSilent"
+  - "choco install -y miniconda"
 
   # Install the build and runtime dependencies of the project.
   - "echo %PATH%"
