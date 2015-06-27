@@ -4,7 +4,7 @@ import pytest
 import astropy.units as u
 
 import matplotlib
-matplotlib.use("Agg", warn=False) # use Agg backend for these tests
+matplotlib.use("Agg", warn=False)  # use Agg backend for these tests
 
 from poliastro import plotting
 from poliastro.plotting import OrbitPlotter

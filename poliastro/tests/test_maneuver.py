@@ -2,18 +2,14 @@
 import pytest
 
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_almost_equal
+from numpy.testing import assert_almost_equal
 
 from astropy import units as u
-from astropy.constants import R_earth
 
 from poliastro.bodies import Earth
 from poliastro.twobody import State
-from poliastro import maneuver
 from poliastro.maneuver import Maneuver
 
-
-# Object oriented API
 
 def test_maneuver_raises_error_if_units_are_wrong():
     wrong_dt = 1.0
