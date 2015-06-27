@@ -48,6 +48,12 @@ poliastro.ephem module
 .. automodule:: poliastro.ephem
     :members:
 
+poliastro.stumpff module
+------------------------
+
+.. automodule:: poliastro.stumpff
+    :members:
+
 poliastro.util module
 ---------------------
 

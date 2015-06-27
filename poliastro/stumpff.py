@@ -10,6 +10,15 @@ from poliastro.jit import jit
 
 @jit('f8(f8)')
 def c2(psi):
+    r"""Second Stumpff function.
+
+    For positive arguments:
+
+    .. math::
+
+        c_2(\psi) = \frac{1 - \cos{\sqrt{\psi}}}{\psi}
+
+    """
     eps = 1.0
     if psi > eps:
         res = (1 - np.cos(np.sqrt(psi))) / psi
@@ -29,6 +38,15 @@ def c2(psi):
 
 @jit('f8(f8)')
 def c3(psi):
+    r"""Third Stumpff function.
+
+    For positive arguments:
+
+    .. math::
+
+        c_3(\psi) = \frac{\sqrt{\psi} - \sin{\sqrt{\psi}}}{\sqrt{\psi^3}}
+
+    """
     eps = 1.0
     if psi > eps:
         res = (np.sqrt(psi) - np.sin(np.sqrt(psi))) / (psi * np.sqrt(psi))
