@@ -24,6 +24,6 @@ install:
   - pip install coveralls pytest-cov
 script:
   - py.test -vv
-  - NUMBA_DISABLE_JIT=1 py.test
+  - NUMBA_DISABLE_JIT=1 py.test --cov poliastro
 after_success:
   coveralls
