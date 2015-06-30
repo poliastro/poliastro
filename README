@@ -9,7 +9,7 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
-:Version: 0.3.0
+:Version: 0.3.1
 
 .. image:: https://travis-ci.org/poliastro/poliastro.svg?branch=0.3.x
    :target: https://travis-ci.org/poliastro/poliastro
