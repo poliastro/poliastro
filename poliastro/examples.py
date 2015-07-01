@@ -15,6 +15,6 @@ iss = State.from_vectors(Earth,
                          [7.37289205, 2.08223573, 4.39999794e-1] * u.km / u.s,
                          time.Time("2013-03-18 12:00", scale='utc'))
 
-molniya = State.from_elements(Earth,
-                              26600 * u.km, 0.75 * u.one, 63.4 * u.deg,
-                              0 * u.deg, 270 * u.deg, 80 * u.deg)
+molniya = State.from_classical(Earth,
+                               26600 * u.km, 0.75 * u.one, 63.4 * u.deg,
+                               0 * u.deg, 270 * u.deg, 80 * u.deg)

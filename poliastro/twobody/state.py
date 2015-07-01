@@ -25,42 +25,23 @@ class State(object):
     """Class to represent the position of a body wrt to an attractor.
 
     """
-    def __init__(self, attractor, r, v, epoch):
+    def __init__(self, attractor, epoch):
         """Constructor. To create a `State` object better use `from_vectors`
-        and `from_elements` methods.
+        and `from_classical` methods.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
-        r, v : array
-            Position and velocity vectors.
         epoch : Time
             Epoch.
 
         """
         self.attractor = attractor
         self.epoch = epoch
-        self.r = r
-        self.v = v
-        self._elements = None
 
-    def _repr_latex_(self):
-        """Creates a LaTeX representation.
-
-        Used by the IPython notebook.
-
-        """
-        elem_names = [r"a", r"e", r"i", r"\Omega", r"\omega", r"\nu"]
-        elem_values = [elem._repr_latex_().strip("$")
-                       for elem in self.elements]
-        pairs = zip(elem_names, elem_values)
-        res = r"\\".join(["{0} & = {1}".format(name, value)
-                         for name, value in pairs])
-        return r"$\begin{{align}}{}\end{{align}}$".format(res)
-
-    @classmethod
-    def from_vectors(cls, attractor, r, v, epoch=J2000):
+    @staticmethod
+    def from_vectors(attractor, r, v, epoch=J2000):
         """Return `State` object from position and velocity vectors.
 
         Parameters
@@ -78,11 +59,11 @@ class State(object):
         if not check_units((r, v), (u.m, u.m / u.s)):
             raise u.UnitsError("Units must be consistent")
 
-        return cls(attractor, r, v, epoch)
+        return _RVState(attractor, r, v, epoch)
 
-    @classmethod
-    def from_elements(cls, attractor, a, ecc, inc, raan, argp, nu,
-                      epoch=J2000):
+    @staticmethod
+    def from_classical(attractor, a, ecc, inc, raan, argp, nu,
+                       epoch=J2000):
         """Return `State` object from orbital elements.
 
         Parameters
@@ -109,18 +90,11 @@ class State(object):
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        try:
-            p = a * (1 - ecc ** 2)
-            r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
-                          p.to(u.km).value, ecc.value, inc.to(u.rad).value,
-                          raan.to(u.rad).value, argp.to(u.rad).value,
-                          nu.to(u.rad).value)
-        except ZeroDivisionError:
-            raise ValueError("For parabolic orbits use State.parabolic instead")
+        if ecc == 1.0 * u.one:
+            raise ValueError("For parabolic orbits use "
+                             "State.parabolic instead")
 
-        ss = cls(attractor, r * u.km, v * u.km / u.s, epoch)
-        ss._elements = a, ecc, inc, raan, argp, nu
+        ss = _ClassicalState(attractor, a, ecc, inc, raan, argp, nu, epoch)
         return ss
 
     @classmethod
@@ -150,8 +124,8 @@ class State(object):
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
-        ss = cls.from_elements(attractor, a, ecc, inc, raan, argp, arglat,
-                               epoch)
+        ss = cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat,
+                                epoch)
         return ss
 
     @classmethod
@@ -187,127 +161,87 @@ class State(object):
                       raan.to(u.rad).value, argp.to(u.rad).value,
                       nu.to(u.rad).value)
 
-        ss = cls(attractor, r * u.km, v * u.km / u.s, epoch)
+        ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
         return ss
 
     @property
-    def elements(self):
-        """Classical orbital elements.
+    def r(self):
+        """Position vector. """
+        return self.to_vectors().r
 
-        """
-        if self._elements:
-            return self._elements
-        else:
-            k = self.attractor.k.to(u.km ** 3 / u.s ** 2).value
-            r = self.r.to(u.km).value
-            v = self.v.to(u.km / u.s).value
-            a, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
-            self._elements = (a * u.km, ecc * u.one, (inc * u.rad).to(u.deg),
-                              (raan * u.rad).to(u.deg),
-                              (argp * u.rad).to(u.deg),
-                              (nu * u.rad).to(u.deg))
-            return self._elements
+    @property
+    def v(self):
+        """Velocity vector. """
+        return self.to_vectors().v
+
+    @property
+    def coe(self):
+        """Classical orbital elements. """
+        return self.a, self.ecc, self.inc, self.raan, self.argp, self.nu
 
     @property
     def a(self):
-        """Semimajor axis.
-
-        """
-        a = self.elements[0]
-        return a
+        """Semimajor axis. """
+        return self.to_classical().a
 
     @property
     def p(self):
-        """Semilatus rectum.
-
-        """
-        p = self.a * (1 - self.ecc ** 2)
-        return p
+        """Semilatus rectum. """
+        return self.a * (1 - self.ecc ** 2)
 
     @property
     def r_p(self):
-        """Radius of pericenter.
-
-        """
-        r_p = self.a * (1 - self.ecc)
-        return r_p
+        """Radius of pericenter. """
+        return self.a * (1 - self.ecc)
 
     @property
     def r_a(self):
-        """Radius of apocenter.
-
-        """
-        r_a = self.a * (1 + self.ecc)
-        return r_a
+        """Radius of apocenter. """
+        return self.a * (1 + self.ecc)
 
     @property
     def ecc(self):
-        """Eccentricity.
-
-        """
-        ecc = self.elements[1]
-        return ecc
+        """Eccentricity. """
+        return self.to_classical().ecc
 
     @property
     def inc(self):
-        """Inclination.
-
-        """
-        inc = self.elements[2]
-        return inc
+        """Inclination. """
+        return self.to_classical().inc
 
     @property
     def raan(self):
-        """Right ascension of the ascending node.
-
-        """
-        raan = self.elements[3]
-        return raan
+        """Right ascension of the ascending node. """
+        return self.to_classical().raan
 
     @property
     def argp(self):
-        """Argument of the perigee.
-
-        """
-        argp = self.elements[4]
-        return argp
+        """Argument of the perigee. """
+        return self.to_classical().argp
 
     @property
     def nu(self):
-        """True anomaly.
-
-        """
-        nu = self.elements[5]
-        return nu
+        """True anomaly. """
+        return self.to_classical().nu
 
     @property
     def period(self):
-        """Period of the orbit.
-
-        """
-        period = 2 * np.pi * u.rad / self.n
-        return period
+        """Period of the orbit. """
+        return 2 * np.pi * u.rad / self.n
 
     @property
     def n(self):
-        """Mean motion.
-
-        """
-        n = np.sqrt(self.attractor.k / self.a ** 3) * u.rad
-        return n
+        """Mean motion. """
+        return np.sqrt(self.attractor.k / self.a ** 3) * u.rad
 
     @property
     def h(self):
-        """Specific angular momentum.
-
-        """
+        """Specific angular momentum. """
         return norm(self.h_vec)
 
     @property
     def e_vec(self):
-        """Eccentricity vector.
-
-        """
+        """Eccentricity vector. """
         r, v = self.rv()
         k = self.attractor.k
         e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
@@ -315,23 +249,17 @@ class State(object):
 
     @property
     def h_vec(self):
-        """Specific angular momentum vector.
-
-        """
+        """Specific angular momentum vector. """
         h_vec = np.cross(self.r.to(u.km).value,
                          self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
     def rv(self):
-        """Position and velocity vectors.
-
-        """
+        """Position and velocity vectors. """
         return self.r, self.v
 
     def pqw(self):
-        """Perifocal frame (PQW) vectors.
-
-        """
+        """Perifocal frame (PQW) vectors. """
         if self.ecc < 1e-8:
             if abs(self.inc.to(u.rad).value) > 1e-8:
                 node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
@@ -382,3 +310,102 @@ class State(object):
         else:
             res = ss_new
         return res
+
+
+class _RVState(State):
+    def __init__(self, attractor, r, v, epoch):
+        super(_RVState, self).__init__(attractor, epoch)
+        self._r = r
+        self._v = v
+
+    @property
+    def r(self):
+        return self._r
+
+    @property
+    def v(self):
+        return self._v
+
+    def to_vectors(self):
+        return self
+
+    def to_classical(self):
+        (a, ecc, inc, raan, argp, nu
+         ) = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                    self.r.to(u.km).value,
+                    self.v.to(u.km / u.s).value)
+        return super(_RVState, self).from_classical(self.attractor,
+                                                    a * u.km,
+                                                    ecc * u.one,
+                                                    inc * u.rad,
+                                                    raan * u.rad,
+                                                    argp * u.rad,
+                                                    nu * u.rad,
+                                                    self.epoch)
+
+
+class _ClassicalState(State):
+    def __init__(self, attractor, a, ecc, inc, raan, argp, nu,
+                 epoch):
+        super(_ClassicalState, self).__init__(attractor, epoch)
+        self._a = a
+        self._ecc = ecc
+        self._inc = inc
+        self._raan = raan
+        self._argp = argp
+        self._nu = nu
+
+    @property
+    def a(self):
+        return self._a
+
+    @property
+    def ecc(self):
+        return self._ecc
+
+    @property
+    def inc(self):
+        return self._inc
+
+    @property
+    def raan(self):
+        return self._raan
+
+    @property
+    def argp(self):
+        return self._argp
+
+    @property
+    def nu(self):
+        return self._nu
+
+    def _repr_latex_(self):
+        """Creates a LaTeX representation.
+
+        Used by the IPython notebook.
+
+        """
+        elem_names = [r"a", r"e", r"i", r"\Omega", r"\omega", r"\nu"]
+        elem_values = [elem._repr_latex_().strip("$")
+                       for elem in self.elements]
+        pairs = zip(elem_names, elem_values)
+        res = r"\\".join(["{0} & = {1}".format(name, value)
+                         for name, value in pairs])
+        return r"$\begin{{align}}{}\end{{align}}$".format(res)
+
+    def to_vectors(self):
+        r, v = coe2rv(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                      self.p.to(u.km).value,
+                      self.ecc.value,
+                      self.inc.to(u.rad).value,
+                      self.raan.to(u.rad).value,
+                      self.argp.to(u.rad).value,
+                      self.nu.to(u.rad).value)
+
+        return super(_ClassicalState, self).from_vectors(self.attractor,
+                                                         r * u.km,
+                                                         v * u.km / u.s,
+                                                         self.epoch)
+
+    def to_classical(self):
+        return self
