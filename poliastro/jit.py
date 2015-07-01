@@ -33,9 +33,10 @@ def select_jit():
         import numba
         jit = numba.njit
     except ImportError:
-        warnings.warn("Could not import numba package. All poliastro functions "
-                      "will work properly but the CPU intensive algorithms will "
-                      "be slow. Consider installing numba to boost performance")
+        warnings.warn("Could not import numba package. All poliastro "
+                      "functions will work properly but the CPU intensive "
+                      "algorithms will be slow. Consider installing numba to "
+                      "boost performance")
         jit = ijit
 
     return jit

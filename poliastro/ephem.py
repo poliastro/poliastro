@@ -18,8 +18,9 @@ except ImportError:  # Python 2
     from urllib import urlretrieve
     from urllib2 import HTTPError
 
-SPK_TOP_URL = "http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/"
-SPK_OLD_URL = "http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/a_old_versions/"
+NAIF_BASE_URL = "http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/"
+SPK_TOP_URL = NAIF_BASE_URL + "planets/"
+SPK_OLD_URL = NAIF_BASE_URL + "planets/a_old_versions/"
 
 SPK_LOCAL_DIR = os.path.expanduser("~/.poliastro")
 
@@ -91,7 +92,8 @@ def download_kernel(name):
     for url_dir in SPK_TOP_URL, SPK_OLD_URL:
         try:
             bsp_url = url_dir + name + ".bsp"
-            print("Downloading %s.bsp from %s, please wait..." % (name, url_dir))
+            print("Downloading %s.bsp from %s, please wait..." %
+                  (name, url_dir))
             urlretrieve(bsp_url, destination_file)
         except HTTPError as e:
             print(e.msg)
