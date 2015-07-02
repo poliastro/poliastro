@@ -70,8 +70,8 @@ class State(object):
         ----------
         attractor : Body
             Main attractor.
-        a : Quantity
-            Semimajor axis.
+        p : Quantity
+            Semilatus rectum.
         ecc : Quantity
             Eccentricity.
         inc : Quantity
@@ -89,10 +89,6 @@ class State(object):
         if not check_units((p, ecc, inc, raan, argp, nu),
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
-
-        if ecc == 1.0 * u.one:
-            raise ValueError("For parabolic orbits use "
-                             "State.parabolic instead")
 
         ss = _ClassicalState(attractor, p, ecc, inc, raan, argp, nu, epoch)
         return ss
@@ -137,7 +133,7 @@ class State(object):
         attractor : Body
             Main attractor.
         p : Quantity
-            Semi-latus rectum or parameter.
+            Semilatus rectum or parameter.
         inc : Quantity, optional
             Inclination.
         raan : Quantity
@@ -154,14 +150,7 @@ class State(object):
                            (u.m, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        ecc = 1.0 * u.one
-        r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
-                      p.to(u.km).value, ecc.value, inc.to(u.rad).value,
-                      raan.to(u.rad).value, argp.to(u.rad).value,
-                      nu.to(u.rad).value)
-
-        ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
+        ss = cls.from_classical(attractor, p, 1.0 * u.one, inc, raan, argp, nu, epoch)
         return ss
 
     @property
