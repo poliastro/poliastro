@@ -21,7 +21,7 @@ def rv_pqw(k, p, ecc, nu):
 
 
 def coe2rv(k, p, ecc, inc, raan, argp, nu):
-    """Converts from orbital elements to vectors.
+    """Converts from classical orbital elements to vectors.
 
     Parameters
     ----------
@@ -54,7 +54,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
 
 
 def rv2coe(k, r, v, tol=1e-8):
-    """Converts from vectors to orbital elements.
+    """Converts from vectors to classical orbital elements.
 
     Parameters
     ----------
@@ -68,6 +68,7 @@ def rv2coe(k, r, v, tol=1e-8):
         Tolerance for eccentricity and inclination checks, default to 1e-8.
 
     """
+    # FIXME: rv2coe and coe2rv are not transitive
     h = np.cross(r, v)
     n = np.cross([0, 0, 1], h) / norm(h)
     e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
@@ -102,3 +103,64 @@ def rv2coe(k, r, v, tol=1e-8):
               % (2 * np.pi))
 
     return a, ecc, inc, raan, argp, nu
+
+
+def coe2mee(p, ecc, inc, raan, argp, nu):
+    """Converts from classical orbital elements to modified equinoctial
+    orbital elements.
+
+    The definition of the modified equinoctial orbital elements is taken from
+    [Walker, 1985].
+
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter (km^3 / s^2).
+    p : float
+        Semi-latus rectum or parameter (km).
+    ecc : float
+        Eccentricity.
+    inc : float
+        Inclination (rad).
+    omega : float
+        Longitude of ascending node (rad).
+    argp : float
+        Argument of perigee (rad).
+    nu : float
+        True anomaly (rad).
+
+    Notes
+    -----
+    The conversion equations are taken directly from the original paper.
+
+    """
+    lonper = raan + argp
+    f = ecc * np.cos(lonper)
+    g = ecc * np.sin(lonper)
+    # TODO: Check polar case (see [Walker, 1985])
+    h = np.tan(inc / 2) * np.cos(raan)
+    k = np.tan(inc / 2) * np.sin(raan)
+    L = lonper + nu
+    return p, f, g, h, k, L
+
+
+def mee2coe(p, f, g, h, k, L):
+    """Converts from modified equinoctial orbital elements to classical
+    orbital elements.
+
+    The definition of the modified equinoctial orbital elements is taken from
+    [Walker, 1985].
+
+    Notes
+    -----
+    The conversion is always safe because arctan2 works also for 0, 0
+    arguments.
+
+    """
+    ecc = np.sqrt(f**2 + g**2)
+    inc = 2 * np.arctan(np.sqrt(h**2 + k**2))
+    lonper = np.arctan2(g, f)
+    raan = np.arctan2(k, h) % (2 * np.pi)
+    argp = (lonper - raan) % (2 * np.pi)
+    nu = (L - lonper) % (2 * np.pi)
+    return p, ecc, inc, raan, argp, nu

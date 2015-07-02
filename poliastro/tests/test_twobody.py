@@ -10,6 +10,8 @@ from astropy import time
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import State
 
+from poliastro.twobody.conversion import coe2mee, mee2coe
+
 
 def test_state_has_attractor_given_in_constructor():
     _d = 1.0 * u.AU  # Unused distance
@@ -174,6 +176,21 @@ def test_convert_from_coe_to_rv():
     assert_almost_equal(raan.to(u.deg).value, 227.89, decimal=1)
     assert_almost_equal(argp.to(u.deg).value, 53.38, decimal=2)
     assert_almost_equal(nu.to(u.deg).value, 92.335, decimal=2)
+
+
+def test_convert_between_coe_and_mee_is_transitive():
+    p = 11067.790  # u.km
+    ecc = 0.83285  # u.one
+    inc = np.deg2rad(87.87)  # u.rad
+    raan = np.deg2rad(227.89)  # u.rad
+    argp = np.deg2rad(53.38)  # u.rad
+    nu = np.deg2rad(92.335)  # u.rad
+
+    expected_res = (p, ecc, inc, raan, argp, nu)
+
+    res = mee2coe(*coe2mee(*expected_res))
+
+    assert_array_almost_equal(res, expected_res)
 
 
 def test_apply_zero_maneuver_returns_equal_state():
