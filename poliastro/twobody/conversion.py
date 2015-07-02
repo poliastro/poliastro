@@ -68,13 +68,11 @@ def rv2coe(k, r, v, tol=1e-8):
         Tolerance for eccentricity and inclination checks, default to 1e-8.
 
     """
-    # FIXME: rv2coe and coe2rv are not transitive
     h = np.cross(r, v)
     n = np.cross([0, 0, 1], h) / norm(h)
     e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
     ecc = norm(e)
     p = h.dot(h) / k
-    a = p / (1 - ecc ** 2)
     inc = np.arccos(h[2] / norm(h))
 
     circular = ecc < tol
@@ -102,7 +100,7 @@ def rv2coe(k, r, v, tol=1e-8):
         nu = (np.arctan2(r.dot(np.cross(h, e)) / norm(h), r.dot(e))
               % (2 * np.pi))
 
-    return a, ecc, inc, raan, argp, nu
+    return p, ecc, inc, raan, argp, nu
 
 
 def coe2mee(p, ecc, inc, raan, argp, nu):

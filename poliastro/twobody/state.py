@@ -62,7 +62,7 @@ class State(object):
         return _RVState(attractor, r, v, epoch)
 
     @staticmethod
-    def from_classical(attractor, a, ecc, inc, raan, argp, nu,
+    def from_classical(attractor, p, ecc, inc, raan, argp, nu,
                        epoch=J2000):
         """Return `State` object from orbital elements.
 
@@ -86,7 +86,7 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((a, ecc, inc, raan, argp, nu),
+        if not check_units((p, ecc, inc, raan, argp, nu),
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
@@ -94,7 +94,7 @@ class State(object):
             raise ValueError("For parabolic orbits use "
                              "State.parabolic instead")
 
-        ss = _ClassicalState(attractor, a, ecc, inc, raan, argp, nu, epoch)
+        ss = _ClassicalState(attractor, p, ecc, inc, raan, argp, nu, epoch)
         return ss
 
     @classmethod
@@ -177,7 +177,7 @@ class State(object):
     @property
     def coe(self):
         """Classical orbital elements. """
-        return self.a, self.ecc, self.inc, self.raan, self.argp, self.nu
+        return self.p, self.ecc, self.inc, self.raan, self.argp, self.nu
 
     @property
     def a(self):
@@ -187,7 +187,7 @@ class State(object):
     @property
     def p(self):
         """Semilatus rectum. """
-        return self.a * (1 - self.ecc ** 2)
+        return self.to_classical().p
 
     @property
     def r_p(self):
@@ -330,12 +330,12 @@ class _RVState(State):
         return self
 
     def to_classical(self):
-        (a, ecc, inc, raan, argp, nu
+        (p, ecc, inc, raan, argp, nu
          ) = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                     self.r.to(u.km).value,
                     self.v.to(u.km / u.s).value)
         return super(_RVState, self).from_classical(self.attractor,
-                                                    a * u.km,
+                                                    p * u.km,
                                                     ecc * u.one,
                                                     inc * u.rad,
                                                     raan * u.rad,
@@ -345,10 +345,10 @@ class _RVState(State):
 
 
 class _ClassicalState(State):
-    def __init__(self, attractor, a, ecc, inc, raan, argp, nu,
+    def __init__(self, attractor, p, ecc, inc, raan, argp, nu,
                  epoch):
         super(_ClassicalState, self).__init__(attractor, epoch)
-        self._a = a
+        self._p = p
         self._ecc = ecc
         self._inc = inc
         self._raan = raan
@@ -356,8 +356,12 @@ class _ClassicalState(State):
         self._nu = nu
 
     @property
+    def p(self):
+        return self._p
+
+    @property
     def a(self):
-        return self._a
+        return self.p / (1 - self.ecc ** 2)
 
     @property
     def ecc(self):

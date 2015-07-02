@@ -10,7 +10,7 @@ from astropy import time
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import State
 
-from poliastro.twobody.conversion import coe2mee, mee2coe
+from poliastro.twobody.conversion import rv2coe, coe2rv, coe2mee, mee2coe
 
 
 def test_state_has_attractor_given_in_constructor():
@@ -35,22 +35,24 @@ def test_state_has_elements_given_in_constructor():
     # Mars data from HORIZONS at J2000
     a = 1.523679 * u.AU
     ecc = 0.093315 * u.one
+    p = a * (1 - ecc**2)
     inc = 1.85 * u.deg
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
-    assert ss.coe == (a, ecc, inc, raan, argp, nu)
+    ss = State.from_classical(Sun, p, ecc, inc, raan, argp, nu)
+    assert ss.coe == (p, ecc, inc, raan, argp, nu)
 
 
 def test_state_has_individual_elements():
     a = 1.523679 * u.AU
     ecc = 0.093315 * u.one
+    p = a * (1 - ecc**2)
     inc = 1.85 * u.deg
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
+    ss = State.from_classical(Sun, p, ecc, inc, raan, argp, nu)
     assert ss.a == a
     assert ss.ecc == ecc
     assert ss.inc == inc
@@ -137,8 +139,9 @@ def test_perigee_and_apogee():
     expected_r_p = 300 * u.km
     a = (expected_r_a + expected_r_p) / 2
     ecc = expected_r_a / a - 1
+    p = a * (1 - ecc**2)
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Earth, a, ecc, _a, _a, _a, _a)
+    ss = State.from_classical(Earth, p, ecc, _a, _a, _a, _a)
     assert_almost_equal(ss.r_a.to(u.km).value,
                         expected_r_a.to(u.km).value)
     assert_almost_equal(ss.r_p.to(u.km).value,
@@ -150,14 +153,13 @@ def test_convert_from_rv_to_coe():
     attractor = Earth
     p = 11067.790 * u.km
     ecc = 0.83285 * u.one
-    a = p / (1 - ecc ** 2)
     inc = 87.87 * u.deg
     raan = 227.89 * u.deg
     argp = 53.38 * u.deg
     nu = 92.335 * u.deg
     expected_r = [6525.344, 6861.535, 6449.125]  # km
     expected_v = [4.902276, 5.533124, -1.975709]  # km / s
-    r, v = State.from_classical(Earth, a, ecc, inc, raan, argp, nu).rv()
+    r, v = State.from_classical(Earth, p, ecc, inc, raan, argp, nu).rv()
     assert_array_almost_equal(r.value, expected_r, decimal=1)
     assert_array_almost_equal(v.value, expected_v, decimal=5)
 
@@ -176,6 +178,22 @@ def test_convert_from_coe_to_rv():
     assert_almost_equal(raan.to(u.deg).value, 227.89, decimal=1)
     assert_almost_equal(argp.to(u.deg).value, 53.38, decimal=2)
     assert_almost_equal(nu.to(u.deg).value, 92.335, decimal=2)
+
+
+def test_convert_between_coe_and_rv_is_transitive():
+    k = Earth.k.to(u.km**3 / u.s**2).value  # u.km**3 / u.s**2
+    p = 11067.790  # u.km
+    ecc = 0.83285  # u.one
+    inc = np.deg2rad(87.87)  # u.rad
+    raan = np.deg2rad(227.89)  # u.rad
+    argp = np.deg2rad(53.38)  # u.rad
+    nu = np.deg2rad(92.335)  # u.rad
+
+    expected_res = (p, ecc, inc, raan, argp, nu)
+
+    res = rv2coe(k, *coe2rv(k, *expected_res))
+
+    assert_array_almost_equal(res, expected_res)
 
 
 def test_convert_between_coe_and_mee_is_transitive():
