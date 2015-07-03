@@ -207,7 +207,7 @@ class State(object):
     @property
     def p(self):
         """Semilatus rectum. """
-        return self.to_classical().a
+        return self.to_classical().p
 
     @property
     def r_p(self):

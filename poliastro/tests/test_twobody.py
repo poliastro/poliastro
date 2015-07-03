@@ -170,8 +170,7 @@ def test_convert_from_coe_to_rv():
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
     ss = State.from_vectors(Earth, r, v)
-    a, ecc, inc, raan, argp, nu = ss.coe
-    p = ss.p
+    p, ecc, inc, raan, argp, nu = ss.coe
     assert_almost_equal(p.to(u.km).value, 11067.79, decimal=0)
     assert_almost_equal(ecc.value, 0.832853, decimal=4)
     assert_almost_equal(inc.to(u.deg).value, 87.870, decimal=2)
