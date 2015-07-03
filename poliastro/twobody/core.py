@@ -202,12 +202,12 @@ class State(object):
     @property
     def a(self):
         """Semimajor axis. """
-        return self.to_classical().a
+        return self.p / (1 - self.ecc**2)
 
     @property
     def p(self):
         """Semilatus rectum. """
-        return self.to_classical().p
+        return self.to_classical().a
 
     @property
     def r_p(self):
@@ -243,6 +243,31 @@ class State(object):
     def nu(self):
         """True anomaly. """
         return self.to_classical().nu
+
+    @property
+    def f(self):
+        """Second modified equinoctial element. """
+        return self.to_equinoctial().f
+
+    @property
+    def g(self):
+        """Third modified equinoctial element. """
+        return self.to_equinoctial().g
+
+    @property
+    def h(self):
+        """Fourth modified equinoctial element. """
+        return self.to_equinoctial().h
+
+    @property
+    def k(self):
+        """Fifth modified equinoctial element. """
+        return self.to_equinoctial().k
+
+    @property
+    def L(self):
+        """True longitude. """
+        return self.raan + self.argp + self.nu
 
     @property
     def period(self):
@@ -331,6 +356,24 @@ class State(object):
         else:
             res = ss_new
         return res
+
+    def to_rv(self):
+        """Converts to position and velocity vector representation.
+
+        """
+        raise NotImplementedError
+
+    def to_classical(self):
+        """Converts to classical orbital elements representation.
+
+        """
+        raise NotImplementedError
+
+    def to_equinoctial(self):
+        """Converts to modified equinoctial elements representation.
+
+        """
+        raise NotImplementedError
 
 
 # Imports at the bottom to avoid circular import problems

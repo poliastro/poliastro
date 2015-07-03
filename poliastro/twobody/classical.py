@@ -108,10 +108,6 @@ class _ClassicalState(State):
         return self._p
 
     @property
-    def a(self):
-        return self.p / (1 - self.ecc ** 2)
-
-    @property
     def ecc(self):
         return self._ecc
 
