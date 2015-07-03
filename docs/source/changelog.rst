@@ -1,6 +1,21 @@
 What's new
 ==========
 
+New in poliastro 0.3.1
+----------------------
+
+This is a new minor release, with some bug fixes backported from the main
+development branch.
+
+Bugs fixed:
+
+* Fixed installation problem in Python 2.
+* `Issue #49`_: Fix velocity units in ``ephem``.
+* `Issue #50`_: Fixed ``ZeroDivisionError`` when propagating with time zero.
+
+.. _`Issue #49`: https://github.com/poliastro/poliastro/issues/49
+.. _`Issue #50`: https://github.com/poliastro/poliastro/issues/50
+
 New in poliastro 0.3.0
 ----------------------
 
