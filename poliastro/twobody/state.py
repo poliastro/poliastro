@@ -3,7 +3,6 @@
 
 TODO
 ----
-* Include other element sets and non-elliptic orbits.
 * Improve consistency of units.
 
 """
@@ -14,7 +13,8 @@ from astropy import time
 from astropy import units as u
 
 from poliastro.twobody.propagation import kepler
-from poliastro.twobody.conversion import coe2rv, rv2coe
+from poliastro.twobody.conversion import (coe2rv, rv2coe,
+                                          coe2mee, mee2coe)
 
 from poliastro.util import check_units, norm
 
@@ -64,7 +64,7 @@ class State(object):
     @staticmethod
     def from_classical(attractor, p, ecc, inc, raan, argp, nu,
                        epoch=J2000):
-        """Return `State` object from orbital elements.
+        """Return `State` object from classical orbital elements.
 
         Parameters
         ----------
@@ -91,6 +91,37 @@ class State(object):
             raise u.UnitsError("Units must be consistent")
 
         ss = _ClassicalState(attractor, p, ecc, inc, raan, argp, nu, epoch)
+        return ss
+
+    @staticmethod
+    def from_equinoctial(attractor, p, f, g, h, k, L, epoch=J2000):
+        """Return `State` object from modified equinoctial elements.
+
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        p : Quantity
+            Semilatus rectum.
+        f : Quantity
+            Second modified equinoctial element.
+        g : Quantity
+            Third modified equinoctial element.
+        h : Quantity
+            Fourth modified equinoctial element.
+        k : Quantity
+            Fifth modified equinoctial element.
+        L : Quantity
+            True longitude.
+        epoch : Time, optional
+            Epoch, default to J2000.
+
+        """
+        if not check_units((p, f, g, h, k, L),
+                           (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
+            raise u.UnitsError("Units must be consistent")
+
+        ss = _ModifiedEquinoctialState(attractor, p, f, g, h, k, L, epoch)
         return ss
 
     @classmethod
@@ -226,6 +257,7 @@ class State(object):
     @property
     def h(self):
         """Specific angular momentum. """
+        # TODO: Change name?
         return norm(self.h_vec)
 
     @property
@@ -323,6 +355,7 @@ class _RVState(State):
          ) = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                     self.r.to(u.km).value,
                     self.v.to(u.km / u.s).value)
+
         return super(_RVState, self).from_classical(self.attractor,
                                                     p * u.km,
                                                     ecc * u.one,
@@ -402,3 +435,75 @@ class _ClassicalState(State):
 
     def to_classical(self):
         return self
+
+    def to_equinoctial(self):
+        p, f, g, h, k, L = coe2mee(self.p.to(u.km).value,
+                                   self.ecc.value,
+                                   self.inc.to(u.rad).value,
+                                   self.raan.to(u.rad).value,
+                                   self.argp.to(u.rad).value,
+                                   self.nu.to(u.rad).value)
+
+        return super(_ClassicalState, self).from_equinoctial(
+            self.attractor,
+            p * u.km,
+            f * u.rad,
+            g * u.rad,
+            h * u.rad,
+            k * u.rad,
+            L * u.rad,
+            self.epoch)
+
+
+class _ModifiedEquinoctialState(State):
+    def __init__(self, attractor, p, f, g, h, k, L,
+                 epoch):
+        super(_ModifiedEquinoctialState, self).__init__(attractor, epoch)
+        self._p = p
+        self._f = f
+        self._g = g
+        self._h = h
+        self._k = k
+        self._L = L
+
+    @property
+    def p(self):
+        return self._p
+
+    @property
+    def f(self):
+        return self._f
+
+    @property
+    def g(self):
+        return self._g
+
+    @property
+    def h(self):
+        # FIXME: Name clash
+        return self._h
+
+    @property
+    def k(self):
+        return self._k
+
+    @property
+    def L(self):
+        return self._L
+
+    def to_classical(self):
+        p, ecc, inc, raan, argp, nu = mee2coe(self.p.to(u.km).value,
+                                              self.f.to(u.rad).value,
+                                              self.g.to(u.rad).value,
+                                              self.h.to(u.rad).value,
+                                              self.k.to(u.rad).value,
+                                              self.L.to(u.rad).value)
+
+        return super(_ModifiedEquinoctialState, self).from_classical(
+            self.attractor,
+            p * u.km,
+            ecc * u.one,
+            inc * u.rad,
+            raan * u.rad,
+            argp * u.rad,
+            nu * u.rad)
