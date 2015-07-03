@@ -1,6 +1,48 @@
 What's new
 ==========
 
+New in poliastro 0.4.0
+----------------------
+
+.. warning:: This version is not released yet.
+
+This is a new major release, focused on improving stability and code quality.
+New angle conversion and modified equinoctial elements functions were added
+and an important backwards incompatible change was introduced related to
+classical orbital elements.
+
+New features:
+
+* **Angle conversion functions**: Finally brought back from poliastro 0.1,
+  new functions were added to convert between true \\(\\nu\\), eccentric
+  \\(E\\) and mean \\(M\\) anomaly.
+
+Backward incompatible changes:
+
+* **Creation of orbits from classical elements**: poliastro has
+  switched to the *semilatus rectum* \\(p\\) instead of the semimajor
+  axis \\(a\\) to define ``State`` objects, and the function has been renamed
+  to :py:meth:`~poliastro.twobody.State.from_classical`. Please update your
+  programs accordingly.
+* Removed specific angular momentum \\(h\\) property to avoid a name clash
+  with the fourth modified equinoctial element, use ``norm(ss.h_vec)``
+  instead.
+
+New in poliastro 0.3.1
+----------------------
+
+This is a new minor release, with some bug fixes backported from the main
+development branch.
+
+Bugs fixed:
+
+* Fixed installation problem in Python 2.
+* `Issue #49`_: Fix velocity units in ``ephem``.
+* `Issue #50`_: Fixed ``ZeroDivisionError`` when propagating with time zero.
+
+.. _`Issue #49`: https://github.com/poliastro/poliastro/issues/49
+.. _`Issue #50`: https://github.com/poliastro/poliastro/issues/50
+
 New in poliastro 0.3.0
 ----------------------
 

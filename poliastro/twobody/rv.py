@@ -1,60 +1,17 @@
 # coding: utf-8
-"""Conversion functions.
+"""Functions to define orbits from position and velocity vectors.
 
 """
-
 import numpy as np
-from numpy import cos, sin, sqrt
-
 from astropy import units as u
 
-from poliastro.util import transform, norm
+from poliastro.util import norm
 
-
-def rv_pqw(k, p, ecc, nu):
-    """Returns r and v vectors in perifocal frame.
-
-    """
-    r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
-    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T
-    return r_pqw, v_pqw
-
-
-def coe2rv(k, p, ecc, inc, raan, argp, nu):
-    """Converts from orbital elements to vectors.
-
-    Parameters
-    ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
-    p : float
-        Semi-latus rectum or parameter (km).
-    ecc : float
-        Eccentricity.
-    inc : float
-        Inclination (rad).
-    omega : float
-        Longitude of ascending node (rad).
-    argp : float
-        Argument of perigee (rad).
-    nu : float
-        True anomaly (rad).
-
-    """
-    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
-
-    r_ijk = transform(r_pqw, -argp, 'z', u.rad)
-    r_ijk = transform(r_ijk, -inc, 'x', u.rad)
-    r_ijk = transform(r_ijk, -raan, 'z', u.rad)
-    v_ijk = transform(v_pqw, -argp, 'z', u.rad)
-    v_ijk = transform(v_ijk, -inc, 'x', u.rad)
-    v_ijk = transform(v_ijk, -raan, 'z', u.rad)
-
-    return r_ijk, v_ijk
+from poliastro.twobody.core import State
 
 
 def rv2coe(k, r, v, tol=1e-8):
-    """Converts from vectors to orbital elements.
+    """Converts from vectors to classical orbital elements.
 
     Parameters
     ----------
@@ -73,7 +30,6 @@ def rv2coe(k, r, v, tol=1e-8):
     e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
     ecc = norm(e)
     p = h.dot(h) / k
-    a = p / (1 - ecc ** 2)
     inc = np.arccos(h[2] / norm(h))
 
     circular = ecc < tol
@@ -101,4 +57,37 @@ def rv2coe(k, r, v, tol=1e-8):
         nu = (np.arctan2(r.dot(np.cross(h, e)) / norm(h), r.dot(e))
               % (2 * np.pi))
 
-    return a, ecc, inc, raan, argp, nu
+    return p, ecc, inc, raan, argp, nu
+
+
+class _RVState(State):
+    def __init__(self, attractor, r, v, epoch):
+        super(_RVState, self).__init__(attractor, epoch)
+        self._r = r
+        self._v = v
+
+    @property
+    def r(self):
+        return self._r
+
+    @property
+    def v(self):
+        return self._v
+
+    def to_vectors(self):
+        return self
+
+    def to_classical(self):
+        (p, ecc, inc, raan, argp, nu
+         ) = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                    self.r.to(u.km).value,
+                    self.v.to(u.km / u.s).value)
+
+        return super(_RVState, self).from_classical(self.attractor,
+                                                    p * u.km,
+                                                    ecc * u.one,
+                                                    inc * u.rad,
+                                                    raan * u.rad,
+                                                    argp * u.rad,
+                                                    nu * u.rad,
+                                                    self.epoch)

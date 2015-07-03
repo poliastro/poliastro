@@ -3,18 +3,15 @@
 
 TODO
 ----
-* Include other element sets and non-elliptic orbits.
 * Improve consistency of units.
 
 """
-
 import numpy as np
 
 from astropy import time
 from astropy import units as u
 
 from poliastro.twobody.propagation import kepler
-from poliastro.twobody.conversion import coe2rv, rv2coe
 
 from poliastro.util import check_units, norm
 
@@ -25,42 +22,23 @@ class State(object):
     """Class to represent the position of a body wrt to an attractor.
 
     """
-    def __init__(self, attractor, r, v, epoch):
-        """Constructor. To create a `State` object better use `from_vectors`
-        and `from_elements` methods.
+    def __init__(self, attractor, epoch):
+        """Constructor. To create a `State` object use `from_vectors`
+        and `from_classical` methods.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
-        r, v : array
-            Position and velocity vectors.
         epoch : Time
             Epoch.
 
         """
         self.attractor = attractor
         self.epoch = epoch
-        self.r = r
-        self.v = v
-        self._elements = None
 
-    def _repr_latex_(self):
-        """Creates a LaTeX representation.
-
-        Used by the IPython notebook.
-
-        """
-        elem_names = [r"a", r"e", r"i", r"\Omega", r"\omega", r"\nu"]
-        elem_values = [elem._repr_latex_().strip("$")
-                       for elem in self.elements]
-        pairs = zip(elem_names, elem_values)
-        res = r"\\".join(["{0} & = {1}".format(name, value)
-                         for name, value in pairs])
-        return r"$\begin{{align}}{}\end{{align}}$".format(res)
-
-    @classmethod
-    def from_vectors(cls, attractor, r, v, epoch=J2000):
+    @staticmethod
+    def from_vectors(attractor, r, v, epoch=J2000):
         """Return `State` object from position and velocity vectors.
 
         Parameters
@@ -78,19 +56,20 @@ class State(object):
         if not check_units((r, v), (u.m, u.m / u.s)):
             raise u.UnitsError("Units must be consistent")
 
-        return cls(attractor, r, v, epoch)
+        return poliastro.twobody.rv._RVState(
+            attractor, r, v, epoch)
 
-    @classmethod
-    def from_elements(cls, attractor, a, ecc, inc, raan, argp, nu,
-                      epoch=J2000):
-        """Return `State` object from orbital elements.
+    @staticmethod
+    def from_classical(attractor, p, ecc, inc, raan, argp, nu,
+                       epoch=J2000):
+        """Return `State` object from classical orbital elements.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
-        a : Quantity
-            Semimajor axis.
+        p : Quantity
+            Semilatus rectum.
         ecc : Quantity
             Eccentricity.
         inc : Quantity
@@ -105,23 +84,43 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((a, ecc, inc, raan, argp, nu),
+        if not check_units((p, ecc, inc, raan, argp, nu),
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        try:
-            p = a * (1 - ecc ** 2)
-            r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
-                          p.to(u.km).value, ecc.value, inc.to(u.rad).value,
-                          raan.to(u.rad).value, argp.to(u.rad).value,
-                          nu.to(u.rad).value)
-        except ZeroDivisionError:
-            raise ValueError("For parabolic orbits use State.parabolic instead")
+        return poliastro.twobody.classical._ClassicalState(
+            attractor, p, ecc, inc, raan, argp, nu, epoch)
 
-        ss = cls(attractor, r * u.km, v * u.km / u.s, epoch)
-        ss._elements = a, ecc, inc, raan, argp, nu
-        return ss
+    @staticmethod
+    def from_equinoctial(attractor, p, f, g, h, k, L, epoch=J2000):
+        """Return `State` object from modified equinoctial elements.
+
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        p : Quantity
+            Semilatus rectum.
+        f : Quantity
+            Second modified equinoctial element.
+        g : Quantity
+            Third modified equinoctial element.
+        h : Quantity
+            Fourth modified equinoctial element.
+        k : Quantity
+            Fifth modified equinoctial element.
+        L : Quantity
+            True longitude.
+        epoch : Time, optional
+            Epoch, default to J2000.
+
+        """
+        if not check_units((p, f, g, h, k, L),
+                           (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
+            raise u.UnitsError("Units must be consistent")
+
+        return poliastro.twobody.equinoctial._ModifiedEquinoctialState(
+            attractor, p, f, g, h, k, L, epoch)
 
     @classmethod
     def circular(cls, attractor, alt,
@@ -150,9 +149,9 @@ class State(object):
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
-        ss = cls.from_elements(attractor, a, ecc, inc, raan, argp, arglat,
-                               epoch)
-        return ss
+
+        return cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat,
+                                  epoch)
 
     @classmethod
     def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000):
@@ -163,7 +162,7 @@ class State(object):
         attractor : Body
             Main attractor.
         p : Quantity
-            Semi-latus rectum or parameter.
+            Semilatus rectum or parameter.
         inc : Quantity, optional
             Inclination.
         raan : Quantity
@@ -180,134 +179,115 @@ class State(object):
                            (u.m, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        k = attractor.k.to(u.km ** 3 / u.s ** 2)
         ecc = 1.0 * u.one
-        r, v = coe2rv(k.to(u.km ** 3 / u.s ** 2).value,
-                      p.to(u.km).value, ecc.value, inc.to(u.rad).value,
-                      raan.to(u.rad).value, argp.to(u.rad).value,
-                      nu.to(u.rad).value)
 
-        ss = cls(attractor, r * u.km, v * u.km / u.s, epoch)
-        return ss
+        return cls.from_classical(attractor, p, ecc, inc, raan, argp, nu,
+                                  epoch)
 
     @property
-    def elements(self):
-        """Classical orbital elements.
+    def r(self):
+        """Position vector. """
+        return self.to_vectors().r
 
-        """
-        if self._elements:
-            return self._elements
-        else:
-            k = self.attractor.k.to(u.km ** 3 / u.s ** 2).value
-            r = self.r.to(u.km).value
-            v = self.v.to(u.km / u.s).value
-            a, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
-            self._elements = (a * u.km, ecc * u.one, (inc * u.rad).to(u.deg),
-                              (raan * u.rad).to(u.deg),
-                              (argp * u.rad).to(u.deg),
-                              (nu * u.rad).to(u.deg))
-            return self._elements
+    @property
+    def v(self):
+        """Velocity vector. """
+        return self.to_vectors().v
+
+    @property
+    def coe(self):
+        """Classical orbital elements. """
+        return self.p, self.ecc, self.inc, self.raan, self.argp, self.nu
 
     @property
     def a(self):
-        """Semimajor axis.
-
-        """
-        a = self.elements[0]
-        return a
+        """Semimajor axis. """
+        return self.p / (1 - self.ecc**2)
 
     @property
     def p(self):
-        """Semilatus rectum.
-
-        """
-        p = self.a * (1 - self.ecc ** 2)
-        return p
+        """Semilatus rectum. """
+        return self.to_classical().p
 
     @property
     def r_p(self):
-        """Radius of pericenter.
-
-        """
-        r_p = self.a * (1 - self.ecc)
-        return r_p
+        """Radius of pericenter. """
+        return self.a * (1 - self.ecc)
 
     @property
     def r_a(self):
-        """Radius of apocenter.
-
-        """
-        r_a = self.a * (1 + self.ecc)
-        return r_a
+        """Radius of apocenter. """
+        return self.a * (1 + self.ecc)
 
     @property
     def ecc(self):
-        """Eccentricity.
-
-        """
-        ecc = self.elements[1]
-        return ecc
+        """Eccentricity. """
+        return self.to_classical().ecc
 
     @property
     def inc(self):
-        """Inclination.
-
-        """
-        inc = self.elements[2]
-        return inc
+        """Inclination. """
+        return self.to_classical().inc
 
     @property
     def raan(self):
-        """Right ascension of the ascending node.
-
-        """
-        raan = self.elements[3]
-        return raan
+        """Right ascension of the ascending node. """
+        return self.to_classical().raan
 
     @property
     def argp(self):
-        """Argument of the perigee.
-
-        """
-        argp = self.elements[4]
-        return argp
+        """Argument of the perigee. """
+        return self.to_classical().argp
 
     @property
     def nu(self):
-        """True anomaly.
-
-        """
-        nu = self.elements[5]
-        return nu
+        """True anomaly. """
+        return self.to_classical().nu
 
     @property
-    def period(self):
-        """Period of the orbit.
-
-        """
-        period = 2 * np.pi * u.rad / self.n
-        return period
+    def f(self):
+        """Second modified equinoctial element. """
+        return self.to_equinoctial().f
 
     @property
-    def n(self):
-        """Mean motion.
-
-        """
-        n = np.sqrt(self.attractor.k / self.a ** 3) * u.rad
-        return n
+    def g(self):
+        """Third modified equinoctial element. """
+        return self.to_equinoctial().g
 
     @property
     def h(self):
-        """Specific angular momentum.
+        """Fourth modified equinoctial element. """
+        return self.to_equinoctial().h
 
-        """
-        return norm(self.h_vec)
+    @property
+    def k(self):
+        """Fifth modified equinoctial element. """
+        return self.to_equinoctial().k
+
+    @property
+    def L(self):
+        """True longitude. """
+        return self.raan + self.argp + self.nu
+
+    @property
+    def period(self):
+        """Period of the orbit. """
+        return 2 * np.pi * u.rad / self.n
+
+    @property
+    def n(self):
+        """Mean motion. """
+        return np.sqrt(self.attractor.k / self.a ** 3) * u.rad
+
+    @property
+    def energy(self):
+        """Specific energy. """
+        return (self.v.dot(self.v) / 2 -
+                self.attractor.k / np.sqrt(self.r.dot(self.r)))
 
     @property
     def e_vec(self):
-        """Eccentricity vector.
-
-        """
+        """Eccentricity vector. """
         r, v = self.rv()
         k = self.attractor.k
         e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
@@ -315,23 +295,17 @@ class State(object):
 
     @property
     def h_vec(self):
-        """Specific angular momentum vector.
-
-        """
+        """Specific angular momentum vector. """
         h_vec = np.cross(self.r.to(u.km).value,
                          self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
     def rv(self):
-        """Position and velocity vectors.
-
-        """
+        """Position and velocity vectors. """
         return self.r, self.v
 
     def pqw(self):
-        """Perifocal frame (PQW) vectors.
-
-        """
+        """Perifocal frame (PQW) vectors. """
         if self.ecc < 1e-8:
             if abs(self.inc.to(u.rad).value) > 1e-8:
                 node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
@@ -340,7 +314,7 @@ class State(object):
                 p_vec = [1, 0, 0] * u.one  # Circular equatorial
         else:
             p_vec = self.e_vec / self.ecc
-        w_vec = self.h_vec / self.h
+        w_vec = self.h_vec / norm(self.h_vec)
         q_vec = np.cross(w_vec, p_vec) * u.one
         return p_vec, q_vec, w_vec
 
@@ -382,3 +356,27 @@ class State(object):
         else:
             res = ss_new
         return res
+
+    def to_rv(self):
+        """Converts to position and velocity vector representation.
+
+        """
+        raise NotImplementedError
+
+    def to_classical(self):
+        """Converts to classical orbital elements representation.
+
+        """
+        raise NotImplementedError
+
+    def to_equinoctial(self):
+        """Converts to modified equinoctial elements representation.
+
+        """
+        raise NotImplementedError
+
+
+# Imports at the bottom to avoid circular import problems
+import poliastro.twobody.rv
+import poliastro.twobody.classical
+import poliastro.twobody.equinoctial

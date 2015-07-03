@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from astropy import units as u
 
-from poliastro.twobody.conversion import rv_pqw
+from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
 
 
