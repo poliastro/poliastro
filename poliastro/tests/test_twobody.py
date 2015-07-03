@@ -11,7 +11,9 @@ from astropy import time
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import State
 
-from poliastro.twobody.conversion import rv2coe, coe2rv, coe2mee, mee2coe
+from poliastro.twobody.rv import rv2coe
+from poliastro.twobody.classical import coe2rv, coe2mee
+from poliastro.twobody.equinoctial import mee2coe
 
 
 def test_state_has_attractor_given_in_constructor():

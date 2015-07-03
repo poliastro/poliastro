@@ -6,15 +6,12 @@ TODO
 * Improve consistency of units.
 
 """
-
 import numpy as np
 
 from astropy import time
 from astropy import units as u
 
 from poliastro.twobody.propagation import kepler
-from poliastro.twobody.conversion import (coe2rv, rv2coe,
-                                          coe2mee, mee2coe)
 
 from poliastro.util import check_units, norm
 
@@ -26,7 +23,7 @@ class State(object):
 
     """
     def __init__(self, attractor, epoch):
-        """Constructor. To create a `State` object better use `from_vectors`
+        """Constructor. To create a `State` object use `from_vectors`
         and `from_classical` methods.
 
         Parameters
@@ -59,7 +56,8 @@ class State(object):
         if not check_units((r, v), (u.m, u.m / u.s)):
             raise u.UnitsError("Units must be consistent")
 
-        return _RVState(attractor, r, v, epoch)
+        return poliastro.twobody.rv._RVState(
+            attractor, r, v, epoch)
 
     @staticmethod
     def from_classical(attractor, p, ecc, inc, raan, argp, nu,
@@ -90,8 +88,8 @@ class State(object):
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        ss = _ClassicalState(attractor, p, ecc, inc, raan, argp, nu, epoch)
-        return ss
+        return poliastro.twobody.classical._ClassicalState(
+            attractor, p, ecc, inc, raan, argp, nu, epoch)
 
     @staticmethod
     def from_equinoctial(attractor, p, f, g, h, k, L, epoch=J2000):
@@ -121,8 +119,8 @@ class State(object):
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        ss = _ModifiedEquinoctialState(attractor, p, f, g, h, k, L, epoch)
-        return ss
+        return poliastro.twobody.equinoctial._ModifiedEquinoctialState(
+            attractor, p, f, g, h, k, L, epoch)
 
     @classmethod
     def circular(cls, attractor, alt,
@@ -151,9 +149,9 @@ class State(object):
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
-        ss = cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat,
-                                epoch)
-        return ss
+
+        return cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat,
+                                  epoch)
 
     @classmethod
     def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000):
@@ -181,8 +179,10 @@ class State(object):
                            (u.m, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        ss = cls.from_classical(attractor, p, 1.0 * u.one, inc, raan, argp, nu, epoch)
-        return ss
+        ecc = 1.0 * u.one
+
+        return cls.from_classical(attractor, p, ecc, inc, raan, argp, nu,
+                                  epoch)
 
     @property
     def r(self):
@@ -333,177 +333,7 @@ class State(object):
         return res
 
 
-class _RVState(State):
-    def __init__(self, attractor, r, v, epoch):
-        super(_RVState, self).__init__(attractor, epoch)
-        self._r = r
-        self._v = v
-
-    @property
-    def r(self):
-        return self._r
-
-    @property
-    def v(self):
-        return self._v
-
-    def to_vectors(self):
-        return self
-
-    def to_classical(self):
-        (p, ecc, inc, raan, argp, nu
-         ) = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                    self.r.to(u.km).value,
-                    self.v.to(u.km / u.s).value)
-
-        return super(_RVState, self).from_classical(self.attractor,
-                                                    p * u.km,
-                                                    ecc * u.one,
-                                                    inc * u.rad,
-                                                    raan * u.rad,
-                                                    argp * u.rad,
-                                                    nu * u.rad,
-                                                    self.epoch)
-
-
-class _ClassicalState(State):
-    def __init__(self, attractor, p, ecc, inc, raan, argp, nu,
-                 epoch):
-        super(_ClassicalState, self).__init__(attractor, epoch)
-        self._p = p
-        self._ecc = ecc
-        self._inc = inc
-        self._raan = raan
-        self._argp = argp
-        self._nu = nu
-
-    @property
-    def p(self):
-        return self._p
-
-    @property
-    def a(self):
-        return self.p / (1 - self.ecc ** 2)
-
-    @property
-    def ecc(self):
-        return self._ecc
-
-    @property
-    def inc(self):
-        return self._inc
-
-    @property
-    def raan(self):
-        return self._raan
-
-    @property
-    def argp(self):
-        return self._argp
-
-    @property
-    def nu(self):
-        return self._nu
-
-    def _repr_latex_(self):
-        """Creates a LaTeX representation.
-
-        Used by the IPython notebook.
-
-        """
-        elem_names = [r"a", r"e", r"i", r"\Omega", r"\omega", r"\nu"]
-        elem_values = [elem._repr_latex_().strip("$")
-                       for elem in self.elements]
-        pairs = zip(elem_names, elem_values)
-        res = r"\\".join(["{0} & = {1}".format(name, value)
-                         for name, value in pairs])
-        return r"$\begin{{align}}{}\end{{align}}$".format(res)
-
-    def to_vectors(self):
-        r, v = coe2rv(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                      self.p.to(u.km).value,
-                      self.ecc.value,
-                      self.inc.to(u.rad).value,
-                      self.raan.to(u.rad).value,
-                      self.argp.to(u.rad).value,
-                      self.nu.to(u.rad).value)
-
-        return super(_ClassicalState, self).from_vectors(self.attractor,
-                                                         r * u.km,
-                                                         v * u.km / u.s,
-                                                         self.epoch)
-
-    def to_classical(self):
-        return self
-
-    def to_equinoctial(self):
-        p, f, g, h, k, L = coe2mee(self.p.to(u.km).value,
-                                   self.ecc.value,
-                                   self.inc.to(u.rad).value,
-                                   self.raan.to(u.rad).value,
-                                   self.argp.to(u.rad).value,
-                                   self.nu.to(u.rad).value)
-
-        return super(_ClassicalState, self).from_equinoctial(
-            self.attractor,
-            p * u.km,
-            f * u.rad,
-            g * u.rad,
-            h * u.rad,
-            k * u.rad,
-            L * u.rad,
-            self.epoch)
-
-
-class _ModifiedEquinoctialState(State):
-    def __init__(self, attractor, p, f, g, h, k, L,
-                 epoch):
-        super(_ModifiedEquinoctialState, self).__init__(attractor, epoch)
-        self._p = p
-        self._f = f
-        self._g = g
-        self._h = h
-        self._k = k
-        self._L = L
-
-    @property
-    def p(self):
-        return self._p
-
-    @property
-    def f(self):
-        return self._f
-
-    @property
-    def g(self):
-        return self._g
-
-    @property
-    def h(self):
-        # FIXME: Name clash
-        return self._h
-
-    @property
-    def k(self):
-        return self._k
-
-    @property
-    def L(self):
-        return self._L
-
-    def to_classical(self):
-        p, ecc, inc, raan, argp, nu = mee2coe(self.p.to(u.km).value,
-                                              self.f.to(u.rad).value,
-                                              self.g.to(u.rad).value,
-                                              self.h.to(u.rad).value,
-                                              self.k.to(u.rad).value,
-                                              self.L.to(u.rad).value)
-
-        return super(_ModifiedEquinoctialState, self).from_classical(
-            self.attractor,
-            p * u.km,
-            ecc * u.one,
-            inc * u.rad,
-            raan * u.rad,
-            argp * u.rad,
-            nu * u.rad)
+# Imports at the bottom to avoid circular import problems
+import poliastro.twobody.rv
+import poliastro.twobody.classical
+import poliastro.twobody.equinoctial
