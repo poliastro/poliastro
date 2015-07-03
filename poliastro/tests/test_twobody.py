@@ -131,8 +131,7 @@ def test_parabolic_has_zero_energy():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     ss = State.parabolic(attractor, _d, _a, _a, _a, _a)
-    E = ss.v.dot(ss.v) / 2 - attractor.k / np.sqrt(ss.r.dot(ss.r))
-    assert_almost_equal(E.value, 0.0)
+    assert_almost_equal(ss.energy.value, 0.0)
 
 
 def test_perigee_and_apogee():

@@ -55,7 +55,6 @@ class _ModifiedEquinoctialState(State):
 
     @property
     def h(self):
-        # FIXME: Name clash
         return self._h
 
     @property

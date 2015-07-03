@@ -255,10 +255,10 @@ class State(object):
         return np.sqrt(self.attractor.k / self.a ** 3) * u.rad
 
     @property
-    def h(self):
-        """Specific angular momentum. """
-        # TODO: Change name?
-        return norm(self.h_vec)
+    def energy(self):
+        """Specific energy. """
+        return (self.v.dot(self.v) / 2 -
+                self.attractor.k / np.sqrt(self.r.dot(self.r)))
 
     @property
     def e_vec(self):
@@ -289,7 +289,7 @@ class State(object):
                 p_vec = [1, 0, 0] * u.one  # Circular equatorial
         else:
             p_vec = self.e_vec / self.ecc
-        w_vec = self.h_vec / self.h
+        w_vec = self.h_vec / norm(self.h_vec)
         q_vec = np.cross(w_vec, p_vec) * u.one
         return p_vec, q_vec, w_vec
 

@@ -24,6 +24,9 @@ Backward incompatible changes:
   axis \\(a\\) to define ``State`` objects, and the function has been renamed
   to :py:meth:`~poliastro.twobody.State.from_classical`. Please update your
   programs accordingly.
+* Removed specific angular momentum \\(h\\) property to avoid a name clash
+  with the fourth modified equinoctial element, use ``norm(ss.h_vec)``
+  instead.
 
 New in poliastro 0.3.1
 ----------------------
