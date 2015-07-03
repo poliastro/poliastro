@@ -1,6 +1,30 @@
 What's new
 ==========
 
+New in poliastro 0.4.0
+----------------------
+
+.. warning:: This version is not released yet.
+
+This is a new major release, focused on improving stability and code quality.
+New angle conversion and modified equinoctial elements functions were added
+and an important backwards incompatible change was introduced related to
+classical orbital elements.
+
+New features:
+
+* **Angle conversion functions**: Finally brought back from poliastro 0.1,
+  new functions were added to convert between true \\(\\nu\\), eccentric
+  \\(E\\) and mean \\(M\\) anomaly.
+
+Backward incompatible changes:
+
+* **Creation of orbits from classical elements**: poliastro has
+  switched to the *semilatus rectum* \\(p\\) instead of the semimajor
+  axis \\(a\\) to define ``State`` objects, and the function has been renamed
+  to :py:meth:`~poliastro.twobody.State.from_classical`. Please update your
+  programs accordingly.
+
 New in poliastro 0.3.1
 ----------------------
 
