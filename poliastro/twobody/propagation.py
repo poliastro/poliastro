@@ -10,6 +10,40 @@ from poliastro.util import dot
 from poliastro.stumpff import c2, c3
 
 
+def func_twobody(t0, u, a, k, kwargs):
+    """Differential equation for generic twobody motion.
+
+    Parameters
+    ----------
+    u : ndarray
+        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+    t0 : float
+        Time.
+    a : function(t0, u, k, **kwargs)
+        Non Keplerian acceleration.
+    k : float
+        Standard gravitational parameter.
+    kwargs : dict
+        Dictionary of extra parameters for both the objective function and
+        the user-supplied acceleration function.
+
+    """
+    ax, ay, az = a(t0, u, k, **kwargs)
+
+    x, y, z, vx, vy, vz = u
+    r3 = (x**2 + y**2 + z**2)**1.5
+
+    du = np.array([
+        vx,
+        vy,
+        vz,
+        -k * x / r3 + ax,
+        -k * y / r3 + ay,
+        -k * z / r3 + az
+    ])
+    return du
+
+
 def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
     """Propagates Keplerian orbit.
 
