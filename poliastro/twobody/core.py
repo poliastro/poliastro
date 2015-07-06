@@ -195,11 +195,6 @@ class State(object):
         return self.to_vectors().v
 
     @property
-    def coe(self):
-        """Classical orbital elements. """
-        return self.p, self.ecc, self.inc, self.raan, self.argp, self.nu
-
-    @property
     def a(self):
         """Semimajor axis. """
         return self.p / (1 - self.ecc**2)
@@ -303,6 +298,10 @@ class State(object):
     def rv(self):
         """Position and velocity vectors. """
         return self.r, self.v
+
+    def coe(self):
+        """Classical orbital elements. """
+        return self.p, self.ecc, self.inc, self.raan, self.argp, self.nu
 
     def pqw(self):
         """Perifocal frame (PQW) vectors. """
