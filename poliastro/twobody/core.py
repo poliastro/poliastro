@@ -317,13 +317,14 @@ class State(object):
         q_vec = np.cross(w_vec, p_vec) * u.one
         return p_vec, q_vec, w_vec
 
-    def propagate(self, time_of_flight):
+    def propagate(self, time_of_flight, rtol=1e-10):
         """Propagate this `State` some `time` and return the result.
 
         """
         r, v = kepler(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                       self.r.to(u.km).value, self.v.to(u.km / u.s).value,
-                      time_of_flight.to(u.s).value)
+                      time_of_flight.to(u.s).value,
+                      rtol=rtol)
         return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
                                  self.epoch + time_of_flight)
 
