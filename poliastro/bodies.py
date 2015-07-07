@@ -11,7 +11,6 @@ and a way to define new bodies (:py:class:`~Body` class).
 TODO: Add more parameters (e.g. J2)
 
 """
-
 from astropy.constants import R_earth
 from astropy import units as u
 
@@ -60,4 +59,4 @@ class Body(object):
 Sun = Body(k=132712440018 * u.km ** 3 / u.s ** 2,
            name="Sun", symbol=u"\u2609")
 Earth = Body(k=398600 * u.km ** 3 / u.s ** 2,
-             name="Earth", symbol=u"\u2641", R=R_earth)
+             name="Earth", symbol=u"\u2641", R=R_earth.to(u.km))

@@ -19,7 +19,7 @@ def func_twobody(t0, u, a, k, kwargs):
     t0 : float
         Time.
     a : function(t0, u, k, **kwargs)
-        Non Keplerian acceleration.
+        Non Keplerian acceleration (km/s2).
     k : float
         Standard gravitational parameter.
     kwargs : dict

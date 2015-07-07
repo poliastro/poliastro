@@ -56,6 +56,8 @@ class State(object):
         if not check_units((r, v), (u.m, u.m / u.s)):
             raise u.UnitsError("Units must be consistent")
 
+        assert np.any(r.value), "Position vector must be non zero"
+
         return poliastro.twobody.rv._RVState(
             attractor, r, v, epoch)
 
