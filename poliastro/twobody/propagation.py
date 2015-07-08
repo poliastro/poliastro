@@ -4,30 +4,31 @@
 """
 import numpy as np
 
+from scipy.integrate import ode
+
 from poliastro.jit import jit
 from poliastro.util import dot
 from poliastro.stumpff import c2, c3
 
 
-def func_twobody(t0, u, a, k, kwargs):
-    """Differential equation for generic twobody motion.
+def func_twobody(t0, u, k, ad):
+    """Differential equation for the initial value two body problem.
+
+    This function follows Cowell's formulation.
 
     Parameters
     ----------
-    u : ndarray
-        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     t0 : float
         Time.
-    a : function(t0, u, k, **kwargs)
-        Non Keplerian acceleration (km/s2).
+    u : ndarray
+        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard gravitational parameter.
-    kwargs : dict
-        Dictionary of extra parameters for both the objective function and
-        the user-supplied acceleration function.
+    ad : function(t0, u, k)
+         Non Keplerian acceleration (km/s2).
 
     """
-    ax, ay, az = a(t0, u, k, **kwargs)
+    ax, ay, az = ad(t0, u, k)
 
     x, y, z, vx, vy, vz = u
     r3 = (x**2 + y**2 + z**2)**1.5
@@ -41,6 +42,61 @@ def func_twobody(t0, u, a, k, kwargs):
         -k * z / r3 + az
     ])
     return du
+
+
+def cowell(k, r0, v0, tof, ad=None, nsteps=1000, rtol=1e-10):
+    """Propagates orbit using Cowell's formulation.
+
+    Parameters
+    ----------
+    k : float
+        Gravitational constant of main attractor (km^3 / s^2).
+    r0 : array
+        Initial position (km).
+    v0 : array
+        Initial velocity (km).
+    ad : function(t0, u, k), optional
+         Non Keplerian acceleration (km/s2), default to None.
+    tof : float
+        Time of flight (s).
+    nsteps : int, optional
+        Maximum number of internal steps, default to 1000.
+    rtol : float, optional
+        Maximum relative error permitted, default to 1e-10.
+
+    Raises
+    ------
+    RuntimeError
+        If the algorithm didn't converge.
+
+    Notes
+    -----
+    This method uses a Dormand & Prince method of order 8(5,3) available
+    in the ``scipy.integrate.ode`` module.
+
+    """
+    x, y, z = r0
+    vx, vy, vz = v0
+    u0 = np.array([x, y, z, vx, vy, vz])
+
+    # Set the non Keplerian acceleration
+    if ad is None:
+        ad = lambda t0, u, k: (0, 0, 0)
+
+    # Set the integrator
+    rr = ode(func_twobody).set_integrator('dop853', rtol=rtol, nsteps=nsteps)
+    rr.set_initial_value(u0)  # Initial time equal to 0.0
+    rr.set_f_params(k, ad)  # Parameters of the integration
+
+    # Make integration step
+    rr.integrate(tof)
+
+    if rr.successful():
+        r, v = rr.y[:3], rr.y[3:]
+    else:
+        raise RuntimeError("Integration failed")
+
+    return r, v
 
 
 def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):

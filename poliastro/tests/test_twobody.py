@@ -255,7 +255,7 @@ def test_pqw_for_circular_equatorial_orbit():
     assert_almost_equal(w, expected_w)
 
 
-def test_propagate():
+def test_propagation():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
