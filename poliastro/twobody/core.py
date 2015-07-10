@@ -56,6 +56,8 @@ class State(object):
         if not check_units((r, v), (u.m, u.m / u.s)):
             raise u.UnitsError("Units must be consistent")
 
+        assert np.any(r.value), "Position vector must be non zero"
+
         return poliastro.twobody.rv._RVState(
             attractor, r, v, epoch)
 
@@ -195,11 +197,6 @@ class State(object):
         return self.to_vectors().v
 
     @property
-    def coe(self):
-        """Classical orbital elements. """
-        return self.p, self.ecc, self.inc, self.raan, self.argp, self.nu
-
-    @property
     def a(self):
         """Semimajor axis. """
         return self.p / (1 - self.ecc**2)
@@ -304,6 +301,10 @@ class State(object):
         """Position and velocity vectors. """
         return self.r, self.v
 
+    def coe(self):
+        """Classical orbital elements. """
+        return self.p, self.ecc, self.inc, self.raan, self.argp, self.nu
+
     def pqw(self):
         """Perifocal frame (PQW) vectors. """
         if self.ecc < 1e-8:
@@ -318,13 +319,14 @@ class State(object):
         q_vec = np.cross(w_vec, p_vec) * u.one
         return p_vec, q_vec, w_vec
 
-    def propagate(self, time_of_flight):
+    def propagate(self, time_of_flight, rtol=1e-10):
         """Propagate this `State` some `time` and return the result.
 
         """
         r, v = kepler(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                       self.r.to(u.km).value, self.v.to(u.km / u.s).value,
-                      time_of_flight.to(u.s).value)
+                      time_of_flight.to(u.s).value,
+                      rtol=rtol)
         return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
                                  self.epoch + time_of_flight)
 

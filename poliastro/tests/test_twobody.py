@@ -44,7 +44,7 @@ def test_state_has_elements_given_in_constructor():
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
     ss = State.from_classical(Sun, p, ecc, inc, raan, argp, nu)
-    assert ss.coe == (p, ecc, inc, raan, argp, nu)
+    assert ss.coe() == (p, ecc, inc, raan, argp, nu)
 
 
 def test_state_has_individual_elements():
@@ -170,7 +170,7 @@ def test_convert_from_coe_to_rv():
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
     ss = State.from_vectors(Earth, r, v)
-    p, ecc, inc, raan, argp, nu = ss.coe
+    p, ecc, inc, raan, argp, nu = ss.coe()
     assert_almost_equal(p.to(u.km).value, 11067.79, decimal=0)
     assert_almost_equal(ecc.value, 0.832853, decimal=4)
     assert_almost_equal(inc.to(u.deg).value, 87.870, decimal=2)
@@ -255,7 +255,7 @@ def test_pqw_for_circular_equatorial_orbit():
     assert_almost_equal(w, expected_w)
 
 
-def test_propagate():
+def test_propagation():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
