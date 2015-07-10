@@ -9,6 +9,12 @@ poliastro.twobody package
     .. autoclass:: State()
        :members:
 
+poliastro.twobody.propagation module
+------------------------------------
+
+.. automodule:: poliastro.twobody.propagation
+   :members:
+
 poliastro.twobody.angles module
 -------------------------------
 
