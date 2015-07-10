@@ -11,7 +11,7 @@ poliastro requires the following Python packages:
 * numba (optional), for accelerating the code
 * jplephem, for the planetary ephemerides using SPICE kernels
 * matplotlib, for orbit plotting
-* scipy, for root finding
+* scipy, for root finding and numerical propagation
 
 poliastro is usually tested on Linux and Windows on Python 2.7, 3.3 and 3.4
 (single codebase). It should work on OS X too with no changes (not tested).
