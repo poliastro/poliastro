@@ -38,33 +38,36 @@ PLUTO = 9
 SUN = 10
 
 
-def select_kernel():
-    """Selects appropriate kernel.
+def select_kernel(kernel_filenames):
+    """Selects appropriate kernel filename from a list.
 
-    Returns DE421 if available in data directory, else the first kernel found,
-    else None.
+    Returns DE421 if present, else the first name found, else None.
 
     .. versionadded:: 0.3.0
 
     """
-    kernel_files = glob.glob(os.path.join(SPK_LOCAL_DIR, "*.bsp"))
-    if "de421.bsp" in kernel_files:
-        kernel = SPK.open("de421.bsp")
-    elif kernel_files:
-        kernel = SPK.open(kernel_files[0])
+    if "de421.bsp" in kernel_filenames:
+        kernel = "de421.bsp"
+    elif kernel_filenames:
+        kernel = kernel_filenames[0]
     else:
-        warnings.warn("""No SPICE kernels found under ~/.poliastro. \
-Please download them manually or using
-
-  poliastro download-spk [-d NAME]
-
-to provide a default kernel, else pass a custom one as \
-an argument to `planet_ephem`.""")
         kernel = None
 
     return kernel
 
-default_kernel = select_kernel()
+kernel_fname = select_kernel(
+    glob.glob(os.path.join(SPK_LOCAL_DIR, "*.bsp")))
+
+if kernel_fname:
+    default_kernel = SPK.open(kernel_fname)
+else:
+    warnings.warn("""No SPICE kernels found under ~/.poliastro.
+Please download them manually or using
+
+  poliastro download-spk [-d NAME]
+
+to provide a default kernel, else pass a custom one as
+an argument to `planet_ephem`.""")
 
 
 def download_kernel(name):

@@ -27,3 +27,19 @@ def test_proper_velocity_units():
     r, v = ephem.planet_ephem(_body, _epoch, FakeKernel())
 
     assert v.unit == u.km / u.day
+
+
+def test_de421_is_selected_if_present():
+    kernel_filenames = ["de421.bsp"]
+    selected_kernel = ephem.select_kernel(kernel_filenames)
+    assert selected_kernel == "de421.bsp"
+
+
+def test_first_kernel_is_selected_if_de421_not_present():
+    kernel_filenames = ["1.bsp", "2.bsp"]
+    selected_kernel = ephem.select_kernel(kernel_filenames)
+    assert selected_kernel == "1.bsp"
+
+
+def test_None_is_returned_if_list_is_empty():
+    assert ephem.select_kernel([]) is None
