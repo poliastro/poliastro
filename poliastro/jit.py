@@ -22,23 +22,12 @@ def ijit(first=None, *args, **kwargs):
         return _jit
 
 
-def select_jit():
-    """Selects appropriate JIT function.
-
-    Returns numba.njit (nopython JIT) if available, else returns an identity
-    decorator.
-
-    """
-    try:
-        import numba
-        jit = numba.njit
-    except ImportError:
-        warnings.warn("Could not import numba package. All poliastro "
-                      "functions will work properly but the CPU intensive "
-                      "algorithms will be slow. Consider installing numba to "
-                      "boost performance")
-        jit = ijit
-
-    return jit
-
-jit = select_jit()
+try:
+    import numba
+    jit = numba.njit
+except ImportError:
+    warnings.warn("Could not import numba package. All poliastro "
+                  "functions will work properly but the CPU intensive "
+                  "algorithms will be slow. Consider installing numba to "
+                  "boost performance")
+    jit = ijit
