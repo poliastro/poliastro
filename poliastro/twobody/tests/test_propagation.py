@@ -12,6 +12,35 @@ from poliastro.twobody.propagation import cowell
 from poliastro.util import norm
 
 
+def test_propagation():
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = State.from_vectors(Earth, r0, v0)
+    tof = 40 * u.min
+    ss1 = ss0.propagate(tof)
+    r, v = ss1.rv()
+    assert_array_almost_equal(r.value, [-4219.7527, 4363.0292, -3958.7666],
+                              decimal=1)
+    assert_array_almost_equal(v.value, [3.689866, -1.916735, -6.112511],
+                              decimal=4)
+
+
+def test_propagation_zero_time_returns_same_state():
+    # Bug #50
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = State.from_vectors(Earth, r0, v0)
+    tof = 0 * u.s
+
+    ss1 = ss0.propagate(tof)
+
+    r, v = ss1.rv()
+
+    assert_array_almost_equal(r.value, r0.value)
+    assert_array_almost_equal(v.value, v0.value)
+
+
 def test_cowell_propagation_with_zero_acceleration_equals_kepler():
     # Data from Vallado, example 2.4
     k = Earth.k.to(u.km**3 / u.s**2).value
