@@ -26,6 +26,18 @@ def test_propagation():
                               decimal=4)
 
 
+def test_propagation_hyperbolic():
+    # Data from Curtis, example 3.5
+    r0 = [Earth.R.to(u.km).value + 300, 0, 0] * u.km
+    v0 = [0, 15, 0] * u.km / u.s
+    ss0 = State.from_vectors(Earth, r0, v0)
+    tof = 14941 * u.s
+    ss1 = ss0.propagate(tof)
+    r, v = ss1.rv()
+    assert_almost_equal(norm(r).to(u.km).value, 163180, decimal=-1)
+    assert_almost_equal(norm(v).to(u.km/u.s).value, 10.51, decimal=2)
+
+
 def test_propagation_zero_time_returns_same_state():
     # Bug #50
     r0 = [1131.340, -2282.343, 6672.423] * u.km
