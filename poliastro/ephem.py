@@ -68,6 +68,7 @@ Please download them manually or using
 
 to provide a default kernel, else pass a custom one as
 an argument to `planet_ephem`.""")
+    default_kernel = None
 
 
 def download_kernel(name):

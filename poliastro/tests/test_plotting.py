@@ -4,7 +4,7 @@ import pytest
 import astropy.units as u
 
 import matplotlib
-matplotlib.use("Agg", warn=False)  # use Agg backend for these tests
+matplotlib.use("Agg")  # use Agg backend for these tests
 import matplotlib.pyplot as plt
 
 from poliastro.examples import iss
