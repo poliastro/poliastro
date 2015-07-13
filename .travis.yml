@@ -6,9 +6,6 @@ python:
 branches:
   only:
     - master
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq gfortran
 install:
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
@@ -27,3 +24,5 @@ script:
   - NUMBA_DISABLE_JIT=1 py.test --cov poliastro
 after_success:
   coveralls
+
+sudo: false

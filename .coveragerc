@@ -2,3 +2,4 @@
 omit =
     poliastro/__init__.py
     poliastro/tests/*.py
+    poliastro/twobody/tests/*.py
