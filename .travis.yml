@@ -1,16 +1,23 @@
-language: python
-python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
+# The only current way of using OS X virtual machines in Travis CI
+# is setting up the environment for Objective-C
+# This is not a problem because Python will be installed through conda
+
+language: objective-c
+
+env:
+  matrix:
+    - python=2.7 CONDA_PY=27 CONDA-NPY=19
+    - python=3.3 CONDA_PY=33 CONDA_NPY=19
+    - python=3.4 CONDA_PY=34 CONDA_NPY=19
+
 branches:
   only:
     - master
+
 install:
-  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
@@ -19,9 +26,11 @@ install:
   - conda install numpy "numba>=0.18" "astropy>=1.0" matplotlib pytest pip coverage requests pyyaml scipy
   - conda install jplephem -c poliastro
   - pip install coveralls pytest-cov
+
 script:
   - py.test -vv
   - NUMBA_DISABLE_JIT=1 py.test --cov poliastro
+
 after_success:
   coveralls
 
