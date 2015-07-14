@@ -17,6 +17,7 @@ requirements:
   run:
     - python
     - numpy
+    - scipy
     - numba >=0.18
     - astropy >=1.0
     - jplephem
