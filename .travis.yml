@@ -28,8 +28,7 @@ script:
   - py.test -vv
   - NUMBA_DISABLE_JIT=1 py.test --cov poliastro
 
-# Uncomment after pull request
-#after_success:
-#  coveralls
+after_success:
+  coveralls
 
 sudo: false
