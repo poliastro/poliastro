@@ -20,9 +20,6 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda info -a
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
-  - source activate test-environment
   - conda install numpy "numba>=0.18" "astropy>=1.0" matplotlib pytest pip coverage requests pyyaml scipy
   - conda install jplephem -c poliastro
   - pip install coveralls pytest-cov
@@ -31,7 +28,8 @@ script:
   - py.test -vv
   - NUMBA_DISABLE_JIT=1 py.test --cov poliastro
 
-after_success:
-  coveralls
+# Uncomment after pull request
+#after_success:
+#  coveralls
 
 sudo: false
