@@ -6,9 +6,9 @@ language: objective-c
 
 env:
   matrix:
-    - python=2.7 CONDA_PY=27 CONDA-NPY=19
-    - python=3.3 CONDA_PY=33 CONDA_NPY=19
-    - python=3.4 CONDA_PY=34 CONDA_NPY=19
+    - PYTHON=2.7
+    - PYTHON=3.3
+    - PYTHON=3.4
 
 branches:
   only:
@@ -20,6 +20,8 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
+  - conda create -q -n test-environment python=$PYTHON
+  - source activate test-environment
   - conda install numpy "numba>=0.18" "astropy>=1.0" matplotlib pytest pip coverage requests pyyaml scipy
   - conda install jplephem -c poliastro
   - pip install coveralls pytest-cov
