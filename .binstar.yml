@@ -1,0 +1,14 @@
+package: poliastro
+install:
+  - conda config --set always_yes true
+  - conda config --add channels poliastro
+script:
+  - conda build buildscripts/condarecipe
+build_targets:
+  - conda
+platform: 
+  - linux-64
+engine:
+  - python=2.7 numpy=1.9
+  - python=3.3 numpy=1.9
+  - python=3.4 numpy=1.9

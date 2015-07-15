@@ -1,3 +1,2 @@
-cd $SRC_DIR/poliastro/tests
-
-py.test
+cd $SRC_DIR
+py.test poliastro
