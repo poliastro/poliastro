@@ -25,10 +25,11 @@ install:
   - conda install numpy "numba>=0.18" "astropy>=1.0" matplotlib pytest pip coverage requests pyyaml scipy
   - conda install jplephem -c poliastro
   - pip install coveralls pytest-cov
+  - pip install -e .    # Needed to use py.test properly
 
 script:
-  - py.test -vv
-  - NUMBA_DISABLE_JIT=1 py.test --cov poliastro
+  - py.test poliastro -vv
+  - NUMBA_DISABLE_JIT=1 py.test --cov poliastro poliastro/tests poliastro/twobody/tests --cov-config .coveragerc
 
 after_success:
   coveralls
