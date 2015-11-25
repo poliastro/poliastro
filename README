@@ -165,17 +165,17 @@ use of the library. Please refer to the COPYING file.
 FAQ
 ===
 
-Does it work on Windows and OS X too?
--------------------------------------
-
-poliastro is tested on Windows (see above). It is a pure Python package with
-no compiled extensions, so it should work under Windows or Mac OS X with
-properly installed dependencies. Please file a bug on the
-`issue tracker`_ otherwise.
-
 What's up with the name?
 ------------------------
 
 poliastro comes from Polimi, which is the shortened name of the Politecnico di
 Milano, the Italian university where I was studying while writing this
 software. It's my tiny tribute to a place I came to love. *Grazie mille!*
+
+What's the future of the project?
+---------------------------------
+
+Development efforts are shifting soon towards the new
+`Python Astrodynamics Project <https://github.com/python-astrodynamics/astrodynamics>`_,
+a joint effort between several developers. In the meanwhile, poliastro will
+see bug fixes and probably a new release in winter 2015/2016.
