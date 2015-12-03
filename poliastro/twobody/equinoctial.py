@@ -30,10 +30,10 @@ def mee2coe(p, f, g, h, k, L):
     return p, ecc, inc, raan, argp, nu
 
 
-class _ModifiedEquinoctialState(State):
+class ModifiedEquinoctialState(State):
     def __init__(self, attractor, p, f, g, h, k, L,
                  epoch):
-        super(_ModifiedEquinoctialState, self).__init__(attractor, epoch)
+        super(ModifiedEquinoctialState, self).__init__(attractor, epoch)
         self._p = p
         self._f = f
         self._g = g
@@ -73,7 +73,7 @@ class _ModifiedEquinoctialState(State):
                                               self.k.to(u.rad).value,
                                               self.L.to(u.rad).value)
 
-        return super(_ModifiedEquinoctialState, self).from_classical(
+        return super(ModifiedEquinoctialState, self).from_classical(
             self.attractor,
             p * u.km,
             ecc * u.one,

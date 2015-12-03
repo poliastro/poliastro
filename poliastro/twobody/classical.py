@@ -92,10 +92,10 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     return p, f, g, h, k, L
 
 
-class _ClassicalState(State):
+class ClassicalState(State):
     def __init__(self, attractor, p, ecc, inc, raan, argp, nu,
                  epoch):
-        super(_ClassicalState, self).__init__(attractor, epoch)
+        super(ClassicalState, self).__init__(attractor, epoch)
         self._p = p
         self._ecc = ecc
         self._inc = inc
@@ -134,6 +134,11 @@ class _ClassicalState(State):
 
         """
         elem_names = [r"a", r"e", r"i", r"\Omega", r"\omega", r"\nu"]
+        # noinspection PyProtectedMember
+        # Each element is an astropy Quantity:
+        # https://github.com/astropy/astropy/blob/v1.0.7/astropy/units/quantity.py#L935
+        # '_repr_index' is an internal method for IPython use:
+        # http://ipython.readthedocs.org/en/3.x/config/integrating.html#rich-display
         elem_values = [elem._repr_latex_().strip("$")
                        for elem in self.elements]
         pairs = zip(elem_names, elem_values)
@@ -150,10 +155,10 @@ class _ClassicalState(State):
                       self.argp.to(u.rad).value,
                       self.nu.to(u.rad).value)
 
-        return super(_ClassicalState, self).from_vectors(self.attractor,
-                                                         r * u.km,
-                                                         v * u.km / u.s,
-                                                         self.epoch)
+        return super(ClassicalState, self).from_vectors(self.attractor,
+                                                        r * u.km,
+                                                        v * u.km / u.s,
+                                                        self.epoch)
 
     def to_classical(self):
         return self
@@ -166,7 +171,7 @@ class _ClassicalState(State):
                                    self.argp.to(u.rad).value,
                                    self.nu.to(u.rad).value)
 
-        return super(_ClassicalState, self).from_equinoctial(
+        return super(ClassicalState, self).from_equinoctial(
             self.attractor,
             p * u.km,
             f * u.rad,
