@@ -16,7 +16,8 @@ requirements:
     - numpy
   run:
     - python
-    - numpy
+    - numpy 1.9*  # [np == 19]
+    - numpy 1.10* # [np == 110]
     - scipy
     - numba >=0.18
     - astropy >=1.0
