@@ -12,3 +12,5 @@ engine:
   - python=2.7 numpy=1.9
   - python=3.3 numpy=1.9
   - python=3.4 numpy=1.9
+  - python=3.5 numpy=1.10
+

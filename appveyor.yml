@@ -18,6 +18,7 @@ environment:
     - PYTHON_VERSION: 2.7
     - PYTHON_VERSION: 3.3
     - PYTHON_VERSION: 3.4
+    - PYTHON_VERSION: 3.5
 
 install:
   # Install miniconda using a powershell script.
