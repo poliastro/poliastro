@@ -47,8 +47,8 @@ poliastro requires the following Python packages:
 * matplotlib, for orbit plotting
 * scipy, for root finding and numerical propagation
 
-poliastro is usually tested on Linux, Windows and OS X on Python 2.7, 3.3 and 3.4
-(single codebase).
+poliastro is usually tested on Linux, Windows and OS X on Python 2.7, 3.3, 3.4
+and 3.5 (single codebase).
 
 ==============  ============  ===================
 Platform        Site          Status

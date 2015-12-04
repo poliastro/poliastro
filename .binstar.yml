@@ -1,12 +1,12 @@
 package: poliastro
-script:
-  # Force conda build to use specific versions of Python and Numpy
-  - export CONDA_PY=$(python -c "from __future__ import print_function;from sys import version_info as ver;print(str(ver.major) + str(ver.minor))")
-  - export CONDA_NPY=$(python -c "from __future__ import print_function;import numpy;npver=numpy.__version__;print(npver[:npver.rfind('.')].replace('.',''))")
 install:
   - conda config --set always_yes true
   - conda config --add channels poliastro
 script:
+  # Force conda build to use specific versions of Python and Numpy
+  - export CONDA_PY=$(python -c "from __future__ import print_function;from sys import version_info as ver;print(str(ver.major) + str(ver.minor))")
+  - export CONDA_NPY=$(python -c "from __future__ import print_function;import numpy;npver=numpy.__version__;print(npver[:npver.rfind('.')].replace('.',''))")
+  # Build once the env variables are set
   - conda build buildscripts/condarecipe
 build_targets:
   - conda
