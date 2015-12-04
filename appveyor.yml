@@ -15,13 +15,20 @@ environment:
     MINICONDA: "C:\\tools\\Miniconda"
 
   matrix:
-    - PYTHON=2.7 NUMPY=1.9
-    - PYTHON=2.7 NUMPY=1.10
-    - PYTHON=3.3 NUMPY=1.9
-    - PYTHON=3.4 NUMPY=1.9
-    - PYTHON=3.4 NUMPY=1.10
-    - PYTHON=3.5 NUMPY=1.9
-    - PYTHON=3.5 NUMPY=1.10
+    - PYTHON: 2.7
+      NUMPY: 1.9
+    - PYTHON: 2.7
+      NUMPY: 1.10
+    - PYTHON: 3.3
+      NUMPY: 1.9
+    - PYTHON: 3.4
+      NUMPY: 1.9
+    - PYTHON: 3.4
+      NUMPY: 1.10
+    - PYTHON: 3.5
+      NUMPY: 1.9
+    - PYTHON: 3.5
+      NUMPY: 1.10
 
 install:
   # Install miniconda using a powershell script.
