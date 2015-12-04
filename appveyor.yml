@@ -15,10 +15,13 @@ environment:
     MINICONDA: "C:\\tools\\Miniconda"
 
   matrix:
-    - PYTHON_VERSION: 2.7
-    - PYTHON_VERSION: 3.3
-    - PYTHON_VERSION: 3.4
-    - PYTHON_VERSION: 3.5
+    - PYTHON=2.7 NUMPY=1.9
+    - PYTHON=2.7 NUMPY=1.10
+    - PYTHON=3.3 NUMPY=1.9
+    - PYTHON=3.4 NUMPY=1.9
+    - PYTHON=3.4 NUMPY=1.10
+    - PYTHON=3.5 NUMPY=1.9
+    - PYTHON=3.5 NUMPY=1.10
 
 install:
   # Install miniconda using a powershell script.
@@ -29,14 +32,14 @@ install:
   - "conda config --set always_yes yes --set changeps1 no"
   - "conda update -q conda"
   - "conda info -a"
-  - "conda create -q -n test-environment python=%PYTHON_VERSION%"
+  - "conda create -q -n test-environment python=%PYTHON%"
   - "activate test-environment"
 
   # Check that we have the expected version of Python
   - "python --version"
 
   # Install dependencies
-  - "conda install -q numpy numba>=0.18 astropy>=1.0 matplotlib pytest scipy"
+  - "conda install -q numpy=%NUMPY% numba>=0.18 astropy>=1.0 matplotlib pytest scipy"
   - "conda install jplephem -c poliastro"
   - "pip install -e ."    # Needed to use py.test properly
   
