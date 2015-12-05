@@ -90,14 +90,14 @@ class OrbitPlotter(object):
         if state.ecc >= 1.0:
             # Select a sensible limiting value for non-closed orbits.
             # This corresponds to r = 3p.
-            max_nu = np.arccos(-(1 - 1 / 3.) / state.ecc)
+            max_nu = np.arccos(-(1 - 1 / 3.) / state.ecc).to(u.rad).value
         else:
-            max_nu = np.pi * u.rad
-        nu_vals = np.linspace(-max_nu, max_nu, self.num_points)
+            max_nu = np.pi  # rad
+        nu_vals = np.linspace(-max_nu, max_nu, self.num_points)  # rad
 
         # Insert state true anomaly into array
         idx = np.searchsorted(nu_vals, state.nu.to(u.rad))
-        nu_vals = np.insert(nu_vals.to(u.rad).value, idx,
+        nu_vals = np.insert(nu_vals, idx,
                             state.nu.to(u.rad).value) * u.rad
 
         # Compute PQW coordinates
