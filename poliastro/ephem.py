@@ -128,6 +128,6 @@ def planet_ephem(body, epoch, kernel=default_kernel):
 
     """
     r, v = kernel[0, body].compute_and_differentiate(epoch.jd1, epoch.jd2)
-    r *= u.km
-    v *= u.km / u.day
+    r = r * u.km
+    v = v * u.km / u.day
     return r, v
