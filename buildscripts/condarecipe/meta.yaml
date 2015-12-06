@@ -3,9 +3,9 @@ package:
   version: "0.4.0.dev0"
 
 source:
-  path: ../..
-  #git_url: https://github.com/poliastro/poliastro
-  #git_tag: master
+  #path: ../..
+  git_url: https://github.com/poliastro/poliastro
+  git_tag: master
 
 build:
   number: 1
@@ -13,11 +13,10 @@ build:
 requirements:
   build:
     - python
-    - numpy
+
   run:
     - python
-    - numpy 1.9*  # [np == 19]
-    - numpy 1.10* # [np == 110]
+    - numpy >=1.9
     - scipy
     - numba >=0.18
     - astropy >=1.0
