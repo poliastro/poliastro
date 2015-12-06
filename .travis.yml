@@ -12,6 +12,11 @@ env:
     - PYTHON=2.7 NUMPY=1.10
     - PYTHON=3.4 NUMPY=1.10
 
+branches:
+  only:
+    - master
+    - 0.3.x
+
 install:
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda

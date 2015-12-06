@@ -7,7 +7,7 @@ script:
   - export NUMPY=$(python -c "from __future__ import print_function;import numpy as np;print(np.__version__[:np.__version__.rfind('.')])")
   - conda create -q -n test-environment python=$PYTHON
   - source activate test-environment
-  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip coverage requests pyyaml scipy jplephem
+  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip requests pyyaml scipy jplephem
   - pip install -e .
   - py.test poliastro -vv
 platform: 
