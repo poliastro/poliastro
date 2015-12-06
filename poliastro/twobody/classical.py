@@ -139,7 +139,7 @@ class _ClassicalState(State):
         pairs = zip(elem_names, elem_values)
         res = r"\\".join(["{0} & = {1}".format(name, value)
                          for name, value in pairs])
-        return r"$\begin{{align}}{}\end{{align}}$".format(res)
+        return r"$\begin{{align}}{0}\end{{align}}$".format(res)
 
     def to_vectors(self):
         r, v = coe2rv(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,

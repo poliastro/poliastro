@@ -45,7 +45,7 @@ class Body(object):
         self.R = R
 
     def __str__(self):
-        return u"{} ({})".format(self.name, self.symbol)
+        return u"{0} ({1})".format(self.name, self.symbol)
 
     def _repr_latex_(self):
         """Creates a LaTeX representation.
