@@ -25,7 +25,7 @@ install:
   - conda create -q -n test-environment python=$PYTHON
   - source activate test-environment
   - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip coverage requests pyyaml scipy
-  - conda install jplephem -c poliastro
+  - conda install numpy=$NUMPY jplephem -c poliastro
   - pip install coveralls pytest-cov
   - pip install -e .    # Needed to use py.test properly
 

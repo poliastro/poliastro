@@ -3,13 +3,13 @@ install:
   - conda config --set always_yes true
   - conda config --add channels poliastro
 script:
-  # Force conda build to use specific versions of Python and Numpy
-  - export CONDA_PY=$(python -c "from __future__ import print_function;from sys import version_info as ver;print(str(ver.major) + str(ver.minor))")
-  - export CONDA_NPY=$(python -c "from __future__ import print_function;import numpy;npver=numpy.__version__;print(npver[:npver.rfind('.')].replace('.',''))")
-  # Build once the env variables are set
-  - conda build buildscripts/condarecipe
-build_targets:
-  - conda
+  - export PYTHON=$(python -c "from __future__ import print_function;from sys import version_info as pyver;print(str(pyver[0]) + '.' + str(pyver[1]))")
+  - export NUMPY=$(python -c "from __future__ import print_function;import numpy as np;print(np.__version__[:np.__version__.rfind('.')])")
+  - conda create -q -n test-environment python=$PYTHON
+  - source activate test-environment
+  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip coverage requests pyyaml scipy jplephem
+  - pip install -e .
+  - py.test poliastro -vv
 platform: 
   - linux-64
 engine:
