@@ -16,7 +16,7 @@ requirements:
 
   run:
     - python
-    - numpy >=1.9
+    - numpy {{NPY_VER}}*,>=1.9
     - scipy
     - numba >=0.18
     - astropy >=1.0
