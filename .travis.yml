@@ -22,11 +22,11 @@ install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels poliastro
   - conda update -q conda
   - conda create -q -n test-environment python=$PYTHON
   - source activate test-environment
-  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip coverage requests pyyaml scipy
-  - conda install numpy=$NUMPY jplephem -c poliastro
+  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip coverage requests pyyaml scipy jplephem
   - pip install coveralls pytest-cov
   - pip install -e .    # Needed to use py.test properly
 
