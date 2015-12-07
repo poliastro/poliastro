@@ -60,9 +60,9 @@ def rv2coe(k, r, v, tol=1e-8):
     return p, ecc, inc, raan, argp, nu
 
 
-class _RVState(State):
+class RVState(State):
     def __init__(self, attractor, r, v, epoch):
-        super(_RVState, self).__init__(attractor, epoch)
+        super(RVState, self).__init__(attractor, epoch)
         self._r = r
         self._v = v
 
@@ -83,11 +83,11 @@ class _RVState(State):
                     self.r.to(u.km).value,
                     self.v.to(u.km / u.s).value)
 
-        return super(_RVState, self).from_classical(self.attractor,
-                                                    p * u.km,
-                                                    ecc * u.one,
-                                                    inc * u.rad,
-                                                    raan * u.rad,
-                                                    argp * u.rad,
-                                                    nu * u.rad,
-                                                    self.epoch)
+        return super(RVState, self).from_classical(self.attractor,
+                                                   p * u.km,
+                                                   ecc * u.one,
+                                                   inc * u.rad,
+                                                   raan * u.rad,
+                                                   argp * u.rad,
+                                                   nu * u.rad,
+                                                   self.epoch)

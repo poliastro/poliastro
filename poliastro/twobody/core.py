@@ -58,7 +58,7 @@ class State(object):
 
         assert np.any(r.value), "Position vector must be non zero"
 
-        return poliastro.twobody.rv._RVState(
+        return poliastro.twobody.rv.RVState(
             attractor, r, v, epoch)
 
     @staticmethod
@@ -90,7 +90,7 @@ class State(object):
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        return poliastro.twobody.classical._ClassicalState(
+        return poliastro.twobody.classical.ClassicalState(
             attractor, p, ecc, inc, raan, argp, nu, epoch)
 
     @staticmethod
@@ -121,7 +121,7 @@ class State(object):
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
-        return poliastro.twobody.equinoctial._ModifiedEquinoctialState(
+        return poliastro.twobody.equinoctial.ModifiedEquinoctialState(
             attractor, p, f, g, h, k, L, epoch)
 
     @classmethod
