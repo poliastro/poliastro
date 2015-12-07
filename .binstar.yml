@@ -1,18 +1,24 @@
 package: poliastro
+platform: linux-64
+engine:
+  - python=2.7
+  - python=3.3
+  - python=3.4
+  - python=2.7
+  - python=3.4
+env:
+  - NUMPY=1.9
+  - NUMPY=1.10
 install:
   - conda config --set always_yes yes --set changeps1 no
   - conda config --add channels poliastro
 script:
-  - export PYTHON=$(python -c "from __future__ import print_function;from sys import version_info as pyver;print(str(pyver[0]) + '.' + str(pyver[1]))")
-  - export NUMPY=$(python -c "from __future__ import print_function;import numpy as np;print(np.__version__[:np.__version__.rfind('.')])")
   - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip requests pyyaml scipy jplephem
   - pip install -e .
   - py.test poliastro -vv
-platform: 
-  - linux-64
-engine:
-  - python=2.7 numpy=1.9
-  - python=3.3 numpy=1.9
-  - python=3.4 numpy=1.9
-  - python=2.7 numpy=1.10
-  - python=3.4 numpy=1.10
+---
+package: poliastro
+platform: linux-64
+engine: python=3.3
+env: NUMPY=1.10
+exclude: true
