@@ -13,8 +13,8 @@ poliastro requires the following Python packages:
 * matplotlib, for orbit plotting
 * scipy, for root finding and numerical propagation
 
-poliastro is usually tested on Linux and Windows on Python 2.7, 3.3 and 3.4
-(single codebase). It should work on OS X too with no changes (not tested).
+poliastro is usually tested on Linux, Windows and OS X on Python 2.7, 3.3,
+3.4 and 3.5, using NumPy 1.9 and 1.10 (single codebase).
 
 Installation
 ------------
@@ -22,8 +22,7 @@ Installation
 The easiest and fastest way to get the package up and running is to
 install poliastro using `conda <http://conda.io>`_::
 
-  $ conda create -n poliastro34 python=3.4 -q
-  $ conda install poliastro -c poliastro
+  $ conda install poliastro --channel poliastro
 
 You can also `install poliastro from PyPI`_ using pip, given that you already
 have all the requirements::

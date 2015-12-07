@@ -8,7 +8,6 @@ branches:
   only:
   - master
   - 0.3.x
-  - "choco-appveyor#46"
 
 environment:
   global:
@@ -21,9 +20,13 @@ environment:
       NUMPY: 1.9
     - PYTHON: 3.4
       NUMPY: 1.9
+    - PYTHON: 3.5
+      NUMPY: 1.9
     - PYTHON: 2.7
       NUMPY: 1.10
     - PYTHON: 3.4
+      NUMPY: 1.10
+    - PYTHON: 3.5
       NUMPY: 1.10
 
 install:
