@@ -2,8 +2,9 @@
 """Angles and anomalies.
 
 """
-
 import numpy as np
+
+from astropy import units as u
 
 from scipy import optimize
 
@@ -78,8 +79,9 @@ def M_to_E(M, ecc):
         Eccentric anomaly.
 
     """
-    E = optimize.newton(_kepler_equation, M, _kepler_equation_prime,
-                        args=(M, ecc))
+    with u.set_enabled_equivalencies(u.dimensionless_angles()):
+        E = optimize.newton(_kepler_equation, M, _kepler_equation_prime,
+                            args=(M, ecc))
     return E
 
 
@@ -101,7 +103,8 @@ def E_to_M(E, ecc):
         Mean anomaly (rad).
 
     """
-    M = _kepler_equation(E, 0.0, ecc)
+    with u.set_enabled_equivalencies(u.dimensionless_angles()):
+        M = _kepler_equation(E, 0.0 * u.rad, ecc)
     return M
 
 
