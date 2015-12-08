@@ -46,7 +46,7 @@ install:
   - "python --version"
 
   # Install testing dependencies
-  - "conda install -q pytest codecov"
+  - "pip install pytest codecov"
 
   # Install dependencies
   - "conda install -q numpy=%NUMPY% numba>=0.18 astropy>=1.0 matplotlib scipy jplephem"
