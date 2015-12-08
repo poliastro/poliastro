@@ -147,10 +147,11 @@ Citing
 If you use poliastro on your project, please
 `drop me a line <mailto:juanlu001@gmail.com>`_.
 
-You can also use this DOI to cite it in your publications:
+You can also use the DOI to cite it in your publications. This is the latest
+one:
 
-.. image:: https://zenodo.org/badge/doi/10.5281/zenodo.17462.svg
-   :target: http://dx.doi.org/10.5281/zenodo.17462
+.. image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg
+   :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
 
 And this is an example citation format::
 
