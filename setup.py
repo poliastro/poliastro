@@ -23,6 +23,7 @@ if __name__ == '__main__':
                     "astropy",
                     "matplotlib",
                     "jplephem",
+                    "scipy",
                     "pytest"],
           packages=['poliastro', 'poliastro.twobody'],
           entry_points={

@@ -1,8 +1,8 @@
 # coding: utf-8
-import pytest
-
 import numpy as np
 from numpy.testing import assert_almost_equal
+
+from astropy import units as u
 
 from poliastro.twobody import angles
 
@@ -19,10 +19,14 @@ def test_true_to_eccentric():
     ]
     for row in data:
         ecc, expected_E, nu = row
+        ecc = ecc * u.one
+        expected_E = expected_E * u.deg
+        nu = nu * u.deg
 
-        E = angles.nu_to_E(np.deg2rad(nu), ecc)
+        E = angles.nu_to_E(nu, ecc)
 
-        assert_almost_equal(np.rad2deg(E), expected_E, decimal=4)
+        assert_almost_equal(E.to(u.rad).value, expected_E.to(u.rad).value,
+                            decimal=4)
 
 
 def test_mean_to_true():
@@ -41,10 +45,14 @@ def test_mean_to_true():
     ]
     for row in data:
         ecc, M, expected_nu = row
+        ecc = ecc * u.one
+        M = M * u.deg
+        expected_nu = expected_nu * u.deg
 
-        nu = angles.M_to_nu(np.deg2rad(M), ecc)
+        nu = angles.M_to_nu(M, ecc)
 
-        assert_almost_equal(np.rad2deg(nu), expected_nu, decimal=2)
+        assert_almost_equal(nu.to(u.rad).value, expected_nu.to(u.rad).value,
+                            decimal=2)
 
 
 def test_true_to_mean():
@@ -63,16 +71,21 @@ def test_true_to_mean():
     ]
     for row in data:
         ecc, expected_M, nu = row
+        ecc = ecc * u.one
+        expected_M = expected_M * u.deg
+        nu = nu * u.deg
 
-        M = angles.nu_to_M(np.deg2rad(nu), ecc)
+        M = angles.nu_to_M(nu, ecc)
 
-        assert_almost_equal(M, np.deg2rad(expected_M), decimal=3)
+        assert_almost_equal(M.to(u.rad).value, expected_M.to(u.rad).value,
+                            decimal=3)
 
 
 def test_flight_path_angle():
     # Data from Curtis, example 2.5
-    nu = 109.5  # deg
-    ecc = 0.6
-    expected_gamma = 35.26  # deg
+    nu = 109.5 * u.deg
+    ecc = 0.6 * u.one
+    expected_gamma = 35.26 * u.deg
     gamma = angles.fp_angle(np.deg2rad(nu), ecc)
-    assert_almost_equal(gamma, np.deg2rad(expected_gamma), decimal=3)
+    assert_almost_equal(gamma.to(u.rad).value, expected_gamma.to(u.rad).value,
+                        decimal=3)
