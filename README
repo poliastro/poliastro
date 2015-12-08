@@ -17,8 +17,8 @@
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING
 
-.. image:: https://zenodo.org/badge/doi/10.5281/zenodo.17462.svg
-   :target: http://dx.doi.org/10.5281/zenodo.17462
+.. image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg
+   :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
 
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
