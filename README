@@ -11,8 +11,8 @@
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
 :Version: 0.4.0.dev0
 
-.. image:: https://coveralls.io/repos/poliastro/poliastro/badge.svg?branch=master
-   :target: https://coveralls.io/r/poliastro/poliastro?branch=master
+.. image:: https://codecov.io/github/poliastro/poliastro/coverage.svg?branch=master
+   :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING

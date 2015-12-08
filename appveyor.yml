@@ -45,11 +45,17 @@ install:
   # Check that we have the expected version of Python
   - "python --version"
 
+  # Install testing dependencies
+  - "conda install -q pytest codecov"
+
   # Install dependencies
-  - "conda install -q numpy=%NUMPY% numba>=0.18 astropy>=1.0 matplotlib pytest scipy jplephem"
+  - "conda install -q numpy=%NUMPY% numba>=0.18 astropy>=1.0 matplotlib scipy jplephem"
   - "pip install -e ."    # Needed to use py.test properly
   
 build: off
 
 test_script:
   - "py.test poliastro"
+
+build_success:
+  - "codecov"
