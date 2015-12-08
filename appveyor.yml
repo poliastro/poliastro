@@ -57,5 +57,5 @@ build: off
 test_script:
   - "py.test poliastro"
 
-build_success:
+after_test:
   - "codecov"
