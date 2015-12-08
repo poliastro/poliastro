@@ -8,11 +8,12 @@ engine:
 env:
   - NUMPY=1.9
   - NUMPY=1.10
-install:
+before_script:
   - conda config --set always_yes yes --set changeps1 no
   - conda config --add channels poliastro
+  - conda install pytest
 script:
-  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib pytest pip requests pyyaml scipy jplephem
+  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib scipy jplephem
   - pip install -e .
   - py.test poliastro -vv
 ---
