@@ -68,5 +68,6 @@ Contents
    getting_started
    user_guide
    changelog
+   references
    api
 
