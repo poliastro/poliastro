@@ -15,7 +15,25 @@ New features:
 
 * **Angle conversion functions**: Finally brought back from poliastro 0.1,
   new functions were added to convert between true \\(\\nu\\), eccentric
-  \\(E\\) and mean \\(M\\) anomaly.
+  \\(E\\) and mean \\(M\\) anomaly, see `#45`_.
+* **Equinoctial elements**: Now it's possible to convert between classical
+  and equinoctial elements, as well as from/to position and velocity vectors,
+  see `#61`_.
+* **Numerical propagation**: A new propagator using
+  SciPy Dormand & Prince 8(5,3) integrator was added, see `#64`_.
+
+.. _`#45`: https://github.com/poliastro/poliastro/pull/45
+.. _`#61`: https://github.com/poliastro/poliastro/pull/61
+.. _`#64`: https://github.com/poliastro/poliastro/pull/64
+
+Other highlights:
+
+* **MIT license**: The project has been relicensed to a more popular license.
+  poliastro remains commercial-friendly through a permissive, OSI-approved
+  license.
+* **Python 3.5 and NumPy 1.10 compatibility**. poliastro retains compatibility
+  with legacy Python (Python 2) and NumPy 1.9. *Next version will be Python 3
+  only*.
 
 Backward incompatible changes:
 
