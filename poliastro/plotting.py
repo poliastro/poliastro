@@ -9,6 +9,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from astropy import units as u
+from astropy.coordinates.angles import Angle
 
 from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
@@ -79,6 +80,7 @@ class OrbitPlotter(object):
         """Plots state and osculating orbit in their plane.
 
         """
+        # TODO: This function needs a refactoring
         if not self._frame:
             self.set_frame(*state.pqw())
 
@@ -86,19 +88,7 @@ class OrbitPlotter(object):
 
         lines = []
 
-        # Generate points of the osculating orbit
-        if state.ecc >= 1.0:
-            # Select a sensible limiting value for non-closed orbits.
-            # This corresponds to r = 3p.
-            max_nu = np.arccos(-(1 - 1 / 3.) / state.ecc).to(u.rad).value
-        else:
-            max_nu = np.pi  # rad
-        nu_vals = np.linspace(-max_nu, max_nu, self.num_points)  # rad
-
-        # Insert state true anomaly into array
-        idx = np.searchsorted(nu_vals, state.nu.to(u.rad))
-        nu_vals = np.insert(nu_vals, idx,
-                            state.nu.to(u.rad).value) * u.rad
+        nu_vals = self._generate_vals(state)
 
         # Compute PQW coordinates
         r_pqw, _ = rv_pqw(state.attractor.k.to(u.km ** 3 / u.s ** 2).value,
@@ -120,7 +110,7 @@ class OrbitPlotter(object):
         y = rr_proj.dot(self._frame[1])
 
         # Plot current position
-        l, = self.ax.plot(x[idx].to(u.km).value, y[idx].to(u.km).value,
+        l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
                           'o', mew=0)
         lines.append(l)
 
@@ -140,3 +130,20 @@ class OrbitPlotter(object):
         self.ax.set_aspect(1)
 
         return lines
+
+    def _generate_vals(self, state):
+        """Generate points of the osculating orbit.
+
+        """
+        nu_vals = Angle((np.linspace(0, 2 * np.pi, self.num_points) +
+                         state.nu.to(u.rad).value) * u.rad).wrap_at('360d')
+
+        if state.ecc >= 1:
+            # Select a sensible limiting value for non-closed orbits
+            # This corresponds to r = 3p
+            nu_limit = Angle(np.arccos(-(1 - 1 / 3.) / state.ecc))
+            nu_invalid = ((nu_vals > nu_limit) &
+                          (nu_vals < (-nu_limit).wrap_at('360d')))
+            nu_vals[nu_invalid] = np.nan
+
+        return nu_vals
