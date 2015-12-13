@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 setup(
     name="poliastro",
     version='0.5.0.dev0',
-    description="poliastro - Python package for Orbital Mechanics",
+    description="Python package for Orbital Mechanics",
     author="Juan Luis Cano",
     author_email="hello@juanlu.space",
     url="http://poliastro.github.io/",
