@@ -1,7 +1,7 @@
 poliastro - Astrodynamics in Python
 ===================================
 
-.. image:: logo/logo_text.svg
+.. image:: logo/logo.png
    :width: 675px
    :align: center
 
