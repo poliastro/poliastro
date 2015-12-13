@@ -1,18 +1,19 @@
 poliastro.nja
 .idea
+.cache
 
 MANIFEST
 
-*.pyc
+*.py[cod]
 *.so
 
-dist/*
-build/*
-docs/build/*
-*.egg-info/*
+dist
+build
+*.egg
+*.egg-info
 
-examples/.ipynb_checkpoints/*
+.ipynb_checkpoints
 
 .coverage
 
-__pycache__/
+__pycache__

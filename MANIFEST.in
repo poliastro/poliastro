@@ -1,0 +1,10 @@
+graft examples
+
+include README.rst
+include COPYING
+include AUTHORS
+
+global-include tests/test_*.py
+
+prune examples/.ipynb_checkpoints
+global-exclude *.py[cod] __pycache__ *.so *.dylib
