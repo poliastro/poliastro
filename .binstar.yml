@@ -14,8 +14,8 @@ before_script:
   - conda install pytest
 script:
   - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib scipy jplephem
-  - pip install -e .
-  - py.test poliastro -vv
+  - python setup.py install  # Tests setup.py correctness
+  - py.test -vv  # Tests against installed code
 ---
 package: poliastro
 platform: linux-64

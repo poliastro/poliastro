@@ -32,13 +32,13 @@ before_install:
 
 install:
   - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib scipy jplephem
-  - pip install -e .    # Needed to use py.test properly
+  - python setup.py install  # Tests setup.py correctness
 
 script:
-  - py.test poliastro -vv
-  - NUMBA_DISABLE_JIT=1 py.test --cov poliastro poliastro/tests poliastro/twobody/tests --cov-config .coveragerc
+  - py.test -vv  # Tests against installed code
+  #- NUMBA_DISABLE_JIT=1 py.test --cov poliastro poliastro/tests poliastro/twobody/tests --cov-config .coveragerc
 
 after_success:
-  - codecov
+  #- codecov
 
 sudo: false
