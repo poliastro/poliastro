@@ -4,8 +4,6 @@ What's new
 New in poliastro 0.4.0
 ----------------------
 
-.. warning:: This version is not released yet.
-
 This is a new major release, focused on improving stability and code quality.
 New angle conversion and modified equinoctial elements functions were added
 and an important backwards incompatible change was introduced related to
