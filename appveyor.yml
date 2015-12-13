@@ -50,12 +50,15 @@ install:
 
   # Install dependencies
   - "conda install -q numpy=%NUMPY% numba>=0.18 astropy>=1.0 matplotlib scipy jplephem"
-  - "python setup.py install"  # Tests setup.py correctness
+  - "python setup.py install"  # Test setup.py correctness
   
 build: off
 
 test_script:
-  - "py.test -vv"  # Tests against installed code
+  - "py.test -vv"  # Test against installed code
 
 after_test:
-  #- "codecov"
+  - "pip uninstall poliastro"
+  - "python setup.py develop"
+  - "NUMBA_DISABLE_JIT=1 py.test --cov"
+  - "codecov"

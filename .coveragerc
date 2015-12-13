@@ -1,5 +1,9 @@
+[paths]
+source = src
+
 [run]
+branch = True
+source = src
 omit =
-    poliastro/__init__.py
-    poliastro/tests/*.py
-    poliastro/twobody/tests/*.py
+    src/poliastro/tests/*
+    src/poliastro/twobody/tests/*
