@@ -58,8 +58,8 @@ And that's it! Notice a couple of things:
 If we're working on interactive mode (for example, using the wonderful IPython
 notebook) we can immediately plot the current state::
 
-    >>> from poliastro.plotting import plot
-    >>> plot(ss)
+    from poliastro.plotting import plot
+    plot(ss)
 
 This plot is made in the so called *perifocal frame*, which means:
 
@@ -192,9 +192,9 @@ easily visualize in two dimensions:
     
     op = OrbitPlotter()
     ss_a, ss_f = ss_i.apply_maneuver(hoh, intermediate=True)
-    op.plot(ss_i)
-    op.plot(ss_a)
-    op.plot(ss_f)
+    op.plot(ss_i, label="Initial orbit")
+    op.plot(ss_a, label="Transfer orbit")
+    op.plot(ss_f, label="Final orbit")
 
 Which produces this beautiful plot:
 

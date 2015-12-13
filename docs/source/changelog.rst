@@ -35,6 +35,14 @@ Other highlights:
   with legacy Python (Python 2) and NumPy 1.9. *Next version will be Python 3
   only*.
 
+Bugs fixed:
+
+* `Issue #62`_: Conversion between coe and rv is not transitive
+* `Issue #69`_: Incorrect plotting of certain closed orbits
+
+.. _`Issue #62`: https://github.com/poliastro/poliastro/issues/62
+.. _`Issue #69`: https://github.com/poliastro/poliastro/issues/69
+
 Backward incompatible changes:
 
 * **Creation of orbits from classical elements**: poliastro has

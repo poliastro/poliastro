@@ -76,7 +76,7 @@ class OrbitPlotter(object):
         else:
             raise NotImplementedError
 
-    def plot(self, state, osculating=True):
+    def plot(self, state, osculating=True, label=None):
         """Plots state and osculating orbit in their plane.
 
         """
@@ -124,10 +124,16 @@ class OrbitPlotter(object):
                               '--', color=l.get_color())
             lines.append(l)
 
+        if label:
+            # This will apply the label to either the point or the osculating
+            # orbit depending on the last plotted line, as they share variable
+            l.set_label(label)
+
         self.ax.set_title(state.epoch.iso)
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
+        self.ax.legend()
 
         return lines
 
