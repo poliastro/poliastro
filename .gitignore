@@ -4,15 +4,16 @@ poliastro.nja
 
 MANIFEST
 
-*.pyc
+*.py[cod]
 *.so
 
-dist/
-build/
-*.egg-info/
+dist
+build
+*.egg
+*.egg-info
 
-examples/.ipynb_checkpoints/*
+.ipynb_checkpoints
 
 .coverage
 
-__pycache__/
+__pycache__
