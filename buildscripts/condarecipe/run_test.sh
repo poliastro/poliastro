@@ -1,2 +1,2 @@
 cd $SRC_DIR
-py.test poliastro
+py.test -vv
