@@ -53,9 +53,3 @@ build: off
 
 test_script:
   - "py.test -vv"  # Test against installed code
-
-after_test:
-  - "pip uninstall poliastro -y"
-  - "python setup.py develop"
-  - "NUMBA_DISABLE_JIT=1 py.test --cov"
-  - "codecov"
