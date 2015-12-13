@@ -2,7 +2,7 @@
 
 # http://stackoverflow.com/a/10975371/554319
 import io
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 if __name__ == '__main__':
@@ -25,7 +25,8 @@ if __name__ == '__main__':
                     "jplephem",
                     "scipy",
                     "pytest"],
-          packages=['poliastro', 'poliastro.twobody'],
+          packages=find_packages('src'),
+          package_dir={'': 'src'},
           entry_points={
               'console_scripts': [
                   'poliastro = poliastro.cli:main'

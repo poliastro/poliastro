@@ -1,0 +1,1 @@
+global-include tests/test_*.py

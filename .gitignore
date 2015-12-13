@@ -1,15 +1,15 @@
 poliastro.nja
 .idea
+.cache
 
 MANIFEST
 
 *.pyc
 *.so
 
-dist/*
-build/*
-docs/build/*
-*.egg-info/*
+dist/
+build/
+*.egg-info/
 
 examples/.ipynb_checkpoints/*
 
