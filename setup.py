@@ -9,10 +9,10 @@ from setuptools import setup, find_packages
 # http://blog.ionelmc.ro/2014/05/25/python-packaging/
 setup(
     name="poliastro",
-    version='0.4.0.dev0',
+    version='0.4.0',
     description="poliastro - Python package for Orbital Mechanics",
     author="Juan Luis Cano",
-    author_email="juanlu001@gmail.com",
+    author_email="hello@juanlu.space",
     url="http://poliastro.github.io/",
     download_url="https://github.com/poliastro/poliastro",
     license="MIT",
@@ -20,13 +20,15 @@ setup(
       "aero", "aerospace", "engineering",
       "astrodynamics", "orbits", "kepler", "orbital mechanics"
     ],
-    requires=["numpy",
-            "numba",
-            "astropy",
-            "matplotlib",
-            "jplephem",
-            "scipy",
-            "pytest"],
+    requires=[
+        "numpy",
+        "numba",
+        "astropy",
+        "matplotlib",
+        "jplephem",
+        "scipy",
+        "pytest"
+    ],
     packages=find_packages('src'),
     package_dir={'': 'src'},
     entry_points={
@@ -46,6 +48,7 @@ setup(
       "Programming Language :: Python :: 3",
       "Programming Language :: Python :: 3.3",
       "Programming Language :: Python :: 3.4",
+      "Programming Language :: Python :: 3.5",
       "Programming Language :: Python :: Implementation :: CPython",
       "Topic :: Scientific/Engineering",
       "Topic :: Scientific/Engineering :: Physics",

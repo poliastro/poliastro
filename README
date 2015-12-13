@@ -9,13 +9,13 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
-:Version: 0.4.0.dev0
+:Version: 0.4.0
 
-.. image:: https://codecov.io/github/poliastro/poliastro/coverage.svg?branch=master
-   :target: https://codecov.io/github/poliastro/poliastro?branch=master
+.. image:: https://codecov.io/github/poliastro/poliastro/coverage.svg?branch=0.4.x
+   :target: https://codecov.io/github/poliastro/poliastro?branch=0.4.x
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING
+   :target: https://github.com/poliastro/poliastro/raw/0.4.x/COPYING
 
 .. image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg
    :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
@@ -32,7 +32,7 @@ orbital elements and orbit plotting. It is released under the MIT license.
     
     plot(molniya)
 
-.. image:: https://github.com/poliastro/poliastro/raw/master/examples/molniya.png
+.. image:: https://github.com/poliastro/poliastro/raw/0.4.x/examples/molniya.png
    :align: center
 
 Requirements
@@ -61,11 +61,11 @@ Windows-x64     Appveyor      |appveyor|
 .. |anaconda| image:: https://anaconda.org/poliastro/poliastro/badges/build.svg
    :target: https://anaconda.org/poliastro/poliastro/builds
 
-.. |travisci| image:: https://travis-ci.org/poliastro/poliastro.svg?branch=master
+.. |travisci| image:: https://travis-ci.org/poliastro/poliastro.svg?branch=0.4.x
    :target: https://travis-ci.org/poliastro/poliastro
 
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
+.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/0.4.x?svg=true
+   :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/0.4.x
 
 Installation
 ============
