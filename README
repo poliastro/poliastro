@@ -1,6 +1,6 @@
 .. poliastro
 
-.. image:: http://poliastro.github.io/_images/logo_text.svg
+.. image:: http://poliastro.github.io/_static/logo_text.png
    :target: http://poliastro.github.io/
    :alt: poliastro logo
    :width: 675px
@@ -9,13 +9,13 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
-:Version: 0.4.0.dev0
+:Version: 0.5.0.dev0
 
 .. image:: https://codecov.io/github/poliastro/poliastro/coverage.svg?branch=master
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://raw.githubusercontent.com/poliastro/poliastro/master/COPYING
+   :target: https://github.com/poliastro/poliastro/raw/master/COPYING
 
 .. image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg
    :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
@@ -155,7 +155,7 @@ one:
 
 And this is an example citation format::
 
- Juan Luis Cano Rodríguez et al.. (2015). poliastro: poliastro 0.3.0. Zenodo. 10.5281/zenodo.17462
+ Juan Luis Cano Rodríguez et al.. (2015). poliastro: poliastro 0.4.0. Zenodo. 10.5281/zenodo.17462
 
 License
 =======
@@ -179,4 +179,4 @@ What's the future of the project?
 Development efforts are shifting soon towards the new
 `Python Astrodynamics Project <https://github.com/python-astrodynamics/astrodynamics>`_,
 a joint effort between several developers. In the meanwhile, poliastro will
-see bug fixes and probably a new releases in 2015 and 2016.
+see bug fixes and probably new releases in 2015 and 2016.
