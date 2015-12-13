@@ -11,12 +11,8 @@ from astropy import units as u
 
 from jplephem.spk import SPK
 
-try:
-    from urllib.request import urlretrieve
-    from urllib.error import HTTPError
-except ImportError:  # Python 2
-    from urllib import urlretrieve
-    from urllib2 import HTTPError
+from urllib.request import urlretrieve
+from urllib.error import HTTPError
 
 NAIF_BASE_URL = "http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/"
 SPK_TOP_URL = NAIF_BASE_URL + "planets/"

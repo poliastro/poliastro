@@ -36,7 +36,7 @@ contributions and feedback are more than welcome.
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 .. _`wiki`: https://github.com/poliastro/poliastro/wiki/
 
-poliastro works on both Python 2 and 3 and is released under
+poliastro works on recent Python versions and is released under
 the MIT license, hence allowing commercial use of the library.
 
 .. code-block:: python
