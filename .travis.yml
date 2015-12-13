@@ -36,10 +36,9 @@ install:
 
 script:
   - py.test -vv  # Test against installed code
-  #- NUMBA_DISABLE_JIT=1 py.test --cov poliastro poliastro/tests poliastro/twobody/tests --cov-config .coveragerc
 
 after_success:
-  - pip uninstall poliastro
+  - pip uninstall poliastro -y
   - python setup.py develop
   - NUMBA_DISABLE_JIT=1 py.test --cov
   - codecov
