@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 # http://blog.ionelmc.ro/2014/05/25/python-packaging/
 setup(
     name="poliastro",
-    version='0.4.1',
+    version='0.4.2',
     description="poliastro - Python package for Orbital Mechanics",
     author="Juan Luis Cano",
     author_email="hello@juanlu.space",
