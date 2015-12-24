@@ -1,6 +1,11 @@
 What's new
 ==========
 
+New in poliastro 0.4.1
+----------------------
+
+Fixed packaging problem.
+
 New in poliastro 0.4.0
 ----------------------
 
