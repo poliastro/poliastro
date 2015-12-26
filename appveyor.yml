@@ -9,6 +9,7 @@ branches:
   #- master
   - 0.3.x
   - 0.4.x
+  - modern-packaging
 
 environment:
   global:
