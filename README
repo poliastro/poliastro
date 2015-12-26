@@ -9,7 +9,7 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
-:Version: 0.5.0.dev0
+:Version: 0.5.dev0
 
 .. image:: https://codecov.io/github/poliastro/poliastro/coverage.svg?branch=master
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
