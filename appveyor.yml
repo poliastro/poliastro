@@ -2,13 +2,14 @@
 # Windows
 # File shamelessly inspired by Astropy
 
-version: 0.5.0.dev0-{build}
+version: 0.5.dev0-{build}
 
 branches:
   only:
   #- master
   - 0.3.x
   - 0.4.x
+  - modern-packaging
 
 environment:
   global:
@@ -47,7 +48,7 @@ install:
 
   # Install dependencies
   - "conda install -q numpy=%NUMPY% numba>=0.18 astropy>=1.0 matplotlib scipy jplephem"
-  - "python setup.py install"  # Test setup.py correctness
+  - "pip install ."  # Test installation correctness
   
 build: off
 

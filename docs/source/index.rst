@@ -30,7 +30,9 @@ And more to come!
    i = 63.4 \\mathrm{{}^{\\circ}} \\)).
 
 The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
-contributions and feedback are more than welcome.
+contributions and feedback are more than welcome:
+
+https://github.com/poliastro/poliastro
 
 .. _`source code`: https://github.com/poliastro/poliastro
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues

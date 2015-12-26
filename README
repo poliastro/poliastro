@@ -9,7 +9,7 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
-:Version: 0.5.0.dev0
+:Version: 0.5.dev0
 
 .. image:: https://codecov.io/github/poliastro/poliastro/coverage.svg?branch=master
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
@@ -82,19 +82,21 @@ have all the requirements::
 
 You can also `download poliastro source from GitHub`_ and type::
 
-  $ python setup.py install
+  $ pip install .
 
-Development installations are also supported thanks to setuptools::
+Development installations are also supported::
 
-  $ python setup.py develop
+  $ pip install --no-deps -e .
 
 .. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
 .. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
 
-It is recommended that you **never ever use sudo** with distutils, pip,
-setuptools and friends in Linux because you might seriously break your
-system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
-or `local installations`_.
+.. warning::
+
+    It is recommended that you **never ever use sudo** with distutils, pip,
+    setuptools and friends in Linux because you might seriously break your
+    system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
+    or `local installations`_.
 
 .. _1: http://wiki.python.org/moin/CheeseShopTutorial#Distutils_Installation
 .. _2: http://stackoverflow.com/questions/4314376/how-can-i-install-a-python-egg-file/4314446#comment4690673_4314446
@@ -119,27 +121,14 @@ If installed correctly, the tests can be run using py.test::
 Contributing
 ============
 
-Code writing
-------------
-
 .. image:: https://badge.waffle.io/poliastro/poliastro.png?label=Ready
    :target: https://waffle.io/poliastro/poliastro
    :alt: 'Stories in Ready'
 
-Code contributions are welcome! Just send a pull request and we'll discuss it.
-In the `wiki`_ you can find some documents explaining the overall design of
-poliastro, and in the `issue tracker`_ you may find pending tasks waiting for
-someone to complete them.
+poliastro is a community project, hence all contributions are more than
+welcome! For more information, head to `CONTRIBUTING`_.
 
-.. _`wiki`: https://github.com/poliastro/poliastro/wiki
-
-Bug reporting
--------------
-
-I am one of those that writes bug-free code every single time, but if you
-think you've found one please refer to the `issue tracker`_ on GitHub.
-
-.. _`issue tracker`: https://github.com/poliastro/poliastro/issues
+.. _`CONTRIBUTING`: https://github.com/poliastro/poliastro/blob/master/CONTRIBUTING
 
 Citing
 ======

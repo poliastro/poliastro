@@ -1,6 +1,6 @@
 package:
   name: poliastro
-  version: "0.5.0.dev0"
+  version: "0.5.dev0"
 
 source:
   path: ../..

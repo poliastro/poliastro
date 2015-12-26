@@ -31,14 +31,14 @@ before_install:
 
 install:
   - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib scipy jplephem
-  - python setup.py install  # Test setup.py correctness
+  - pip install --no-deps .  # Test installation correctness
 
 script:
   - py.test -vv  # Test against installed code
 
 after_success:
   - pip uninstall poliastro -y
-  - python setup.py develop
+  - pip install --no-deps -e .
   - NUMBA_DISABLE_JIT=1 py.test --cov
   - codecov
 
