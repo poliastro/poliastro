@@ -121,27 +121,14 @@ If installed correctly, the tests can be run using py.test::
 Contributing
 ============
 
-Code writing
-------------
-
 .. image:: https://badge.waffle.io/poliastro/poliastro.png?label=Ready
    :target: https://waffle.io/poliastro/poliastro
    :alt: 'Stories in Ready'
 
-Code contributions are welcome! Just send a pull request and we'll discuss it.
-In the `wiki`_ you can find some documents explaining the overall design of
-poliastro, and in the `issue tracker`_ you may find pending tasks waiting for
-someone to complete them.
+poliastro is a community project, hence all contributions are more than
+welcome! For more information, head to `CONTRIBUTING`_.
 
-.. _`wiki`: https://github.com/poliastro/poliastro/wiki
-
-Bug reporting
--------------
-
-I am one of those that writes bug-free code every single time, but if you
-think you've found one please refer to the `issue tracker`_ on GitHub.
-
-.. _`issue tracker`: https://github.com/poliastro/poliastro/issues
+.. _`CONTRIBUTING`: https://github.com/poliastro/poliastro/blob/master/CONTRIBUTING
 
 Citing
 ======
