@@ -82,19 +82,21 @@ have all the requirements::
 
 You can also `download poliastro source from GitHub`_ and type::
 
-  $ python setup.py install
+  $ pip install .
 
-Development installations are also supported thanks to setuptools::
+Development installations are also supported::
 
-  $ python setup.py develop
+  $ pip install --no-deps -e .
 
 .. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
 .. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
 
-It is recommended that you **never ever use sudo** with distutils, pip,
-setuptools and friends in Linux because you might seriously break your
-system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
-or `local installations`_.
+.. warning::
+
+    It is recommended that you **never ever use sudo** with distutils, pip,
+    setuptools and friends in Linux because you might seriously break your
+    system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
+    or `local installations`_.
 
 .. _1: http://wiki.python.org/moin/CheeseShopTutorial#Distutils_Installation
 .. _2: http://stackoverflow.com/questions/4314376/how-can-i-install-a-python-egg-file/4314446#comment4690673_4314446

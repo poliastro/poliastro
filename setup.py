@@ -20,10 +20,10 @@ setup(
       "aero", "aerospace", "engineering",
       "astrodynamics", "orbits", "kepler", "orbital mechanics"
     ],
-    requires=[
+    install_requires=[
         "numpy",
-        "numba",
-        "astropy",
+        "numba>=0.18",
+        "astropy>=1.0",
         "matplotlib",
         "jplephem",
         "scipy",

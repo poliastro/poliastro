@@ -31,11 +31,11 @@ have all the requirements::
 
 You can also `download poliastro source from GitHub`_ and type::
 
-  $ python setup.py install
+  $ pip install .
 
 Development installations are also supported thanks to setuptools::
 
-  $ python setup.py develop
+  $ pip install -e .
 
 .. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
 .. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
