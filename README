@@ -86,7 +86,7 @@ You can also `download poliastro source from GitHub`_ and type::
 
 Development installations are also supported::
 
-  $ pip install --no-deps -e .
+  $ pip install -e .
 
 .. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
 .. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
