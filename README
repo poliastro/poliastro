@@ -121,7 +121,7 @@ If installed correctly, the tests can be run using py.test::
 Contributing
 ============
 
-.. image:: https://badge.waffle.io/poliastro/poliastro.png?label=Ready
+.. image:: https://badge.waffle.io/poliastro/poliastro.png?label=1%20-%20Ready
    :target: https://waffle.io/poliastro/poliastro
    :alt: 'Stories in Ready'
 
