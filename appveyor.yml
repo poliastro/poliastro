@@ -16,8 +16,6 @@ environment:
     MINICONDA: "C:\\tools\\Miniconda"
 
   matrix:
-    - PYTHON: 3.3
-      NUMPY: 1.9
     - PYTHON: 3.4
       NUMPY: 1.9
     - PYTHON: 3.5
@@ -47,7 +45,7 @@ install:
   - "pip install pytest codecov"
 
   # Install dependencies
-  - "conda install -q numpy=%NUMPY% numba>=0.18 astropy>=1.0 matplotlib scipy jplephem"
+  - "conda install -q numpy=%NUMPY% numba>=0.23 astropy>=1.0 matplotlib scipy jplephem"
   - "pip install ."  # Test installation correctness
   
 build: off
