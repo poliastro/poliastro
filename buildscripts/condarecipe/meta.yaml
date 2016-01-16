@@ -18,7 +18,7 @@ requirements:
     - python
     - numpy >=1.9
     - scipy
-    - numba >=0.18
+    - numba >=0.23
     - astropy >=1.0
     - jplephem
     - matplotlib

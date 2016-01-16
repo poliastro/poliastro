@@ -12,7 +12,7 @@ before_script:
   - conda config --add channels poliastro
   - conda install pytest
 script:
-  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib scipy jplephem
+  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install --no-deps .  # Test installation correctness
   - py.test -vv  # Test against installed code
 ---

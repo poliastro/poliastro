@@ -4,7 +4,6 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.util import dot
 from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
@@ -62,9 +61,9 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
     else:
         t_m = -1
 
-    norm_r0 = dot(r0, r0)**.5
-    norm_r = dot(r, r)**.5
-    cos_dnu = dot(r0, r) / (norm_r0 * norm_r)
+    norm_r0 = np.dot(r0, r0)**.5
+    norm_r = np.dot(r, r)**.5
+    cos_dnu = np.dot(r0, r) / (norm_r0 * norm_r)
 
     A = t_m * (norm_r * norm_r0 * (1 + cos_dnu))**.5
 

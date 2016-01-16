@@ -30,7 +30,7 @@ before_install:
   - pip install coverage pytest pytest-cov codecov
 
 install:
-  - conda install numpy=$NUMPY numba>=0.18 astropy>=1.0 matplotlib scipy jplephem
+  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install --no-deps .  # Test installation correctness
 
 script:

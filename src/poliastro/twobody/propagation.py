@@ -7,7 +7,6 @@ import numpy as np
 from scipy.integrate import ode
 
 from poliastro.jit import jit
-from poliastro.util import dot
 from poliastro.stumpff import c2, c3
 
 
@@ -145,10 +144,10 @@ def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
 @jit
 def _kepler(k, r0, v0, tof, numiter, rtol):
     # Cache some results
-    dot_r0v0 = dot(r0, v0)
-    norm_r0 = dot(r0, r0) ** .5
+    dot_r0v0 = np.dot(r0, v0)
+    norm_r0 = np.dot(r0, r0) ** .5
     sqrt_mu = k**.5
-    alpha = -dot(v0, v0) / k + 2 / norm_r0
+    alpha = -np.dot(v0, v0) / k + 2 / norm_r0
 
     # First guess
     if alpha > 0:
