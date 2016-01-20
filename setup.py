@@ -7,7 +7,7 @@ from setuptools import setup
 
 if __name__ == '__main__':
     setup(name="poliastro",
-          version='0.3.2',
+          version='0.3.3',
           description="poliastro - Python package for Orbital Mechanics",
           author="Juan Luis Cano",
           author_email="juanlu001@gmail.com",
