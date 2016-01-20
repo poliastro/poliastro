@@ -1,0 +1,10 @@
+name: poliastro
+channels:
+  - poliastro
+dependencies:
+  - astropy
+  - jplephem
+  - matplotlib
+  - numba
+  - numpy
+  - scipy
