@@ -1,10 +1,10 @@
 package:
   name: poliastro
-  version: "0.4.2"
+  version: "0.4.3"
 
 source:
   git_url: https://github.com/poliastro/poliastro
-  git_tag: v0.4.2
+  git_tag: v0.4.3
 
 build:
   number: 1
