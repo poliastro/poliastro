@@ -8,3 +8,4 @@ dependencies:
   - numba
   - numpy
   - scipy
+  - pytest
