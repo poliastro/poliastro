@@ -1,5 +1,5 @@
 python:
-   version: 3.5
+   version: 3.4
    setup_py_install: true
 conda:
     file: environment.yml
