@@ -27,6 +27,8 @@ setup(
         "matplotlib",
         "jplephem",
         "scipy",
+    ],
+    tests_require=[
         "pytest"
     ],
     packages=find_packages('src'),

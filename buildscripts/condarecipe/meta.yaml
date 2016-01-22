@@ -22,7 +22,6 @@ requirements:
     - astropy >=1.0
     - jplephem
     - matplotlib
-    - pytest
 
 test:
   imports:
