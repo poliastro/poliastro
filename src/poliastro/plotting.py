@@ -121,7 +121,9 @@ class OrbitPlotter(object):
         lines.append(l)
 
         # Attractor
-        radius = state.attractor.R.to(u.km).value
+        # TODO: If several orbits are plotted, the attractor is being plotted several times!
+        radius = max(state.attractor.R.to(u.km).value,
+                     state.r_p.to(u.km).value / 6)
         color = BODY_COLORS.get(state.attractor.name, "#999999")
         self.ax.add_patch(
                 mpl.patches.Circle((0, 0), radius, lw=0, color=color))
