@@ -15,6 +15,12 @@ from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
 
 
+BODY_COLORS = {
+    "Sun": "#ffcc00",
+    "Earth": "#204a87",
+}
+
+
 def plot(state, label=None):
     """Plots a ``State``.
 
@@ -115,9 +121,10 @@ class OrbitPlotter(object):
         lines.append(l)
 
         # Attractor
-        self.ax.add_patch(mpl.patches.Circle((0, 0),
-                                             state.attractor.R.to(u.km).value,
-                                             lw=0, color='#204a87'))  # Earth
+        radius = state.attractor.R.to(u.km).value
+        color = BODY_COLORS.get(state.attractor.name, "#999999")
+        self.ax.add_patch(
+                mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
         if osculating:
             l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
