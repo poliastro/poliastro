@@ -15,14 +15,14 @@ from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
 
 
-def plot(state):
+def plot(state, label=None):
     """Plots a ``State``.
 
     For more advanced tuning, use the :py:class:`OrbitPlotter` class.
 
     """
     op = OrbitPlotter()
-    return op.plot(state)
+    return op.plot(state, label=label)
 
 
 class OrbitPlotter(object):
@@ -128,12 +128,12 @@ class OrbitPlotter(object):
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
             l.set_label(label)
+            self.ax.legend()
 
         self.ax.set_title(state.epoch.iso)
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
-        self.ax.legend()
 
         return lines
 
