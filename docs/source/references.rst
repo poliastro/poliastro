@@ -21,6 +21,8 @@ source code itself. Here is the complete list in no particular order:
   Aiaa, 1999.
 * Edelbaum, Theodore N. "Propulsion requirements for controllable satellites."
   *ARS Journal* 31, no. 8 (1961): 1079-1089.
+* Walker, M. J. H., B. Ireland, and Joyce Owens. "A set modified equinoctial
+  orbit elements." *Celestial Mechanics* 36.4 (1985): 409-419.
 
 Software
 --------
