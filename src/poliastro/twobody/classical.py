@@ -93,10 +93,10 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
 
 
 class ClassicalState(State):
-    def __init__(self, attractor, p, ecc, inc, raan, argp, nu,
+    def __init__(self, attractor, a, ecc, inc, raan, argp, nu,
                  epoch):
         super(ClassicalState, self).__init__(attractor, epoch)
-        self._p = p
+        self._a = a
         self._ecc = ecc
         self._inc = inc
         self._raan = raan
@@ -104,8 +104,8 @@ class ClassicalState(State):
         self._nu = nu
 
     @property
-    def p(self):
-        return self._p
+    def a(self):
+        return self._a
 
     @property
     def ecc(self):

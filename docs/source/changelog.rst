@@ -1,6 +1,18 @@
 What's new
 ==========
 
+New in poliastro 0.5.0
+----------------------
+
+.. warning:: This version is not released yet.
+
+Backward incompatible changes:
+
+* **Creation of orbits from classical elements**: poliastro has
+  reverted the switch to the *semilatus rectum* \\(p\\) instead of the semimajor
+  axis \\(a\\) made in 0.4.0, so \\(a\\) must be used again. This change is
+  definitive.
+
 New in poliastro 0.4.2
 ----------------------
 

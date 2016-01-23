@@ -81,16 +81,12 @@ six parameters called orbital elements. Although there are several of
 these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
 
-* *Semilatus rectum* \\(p\\).
+* Semimajor axis \\(a\\).
 * Eccentricity \\(e\\).
 * Inclination \\(i\\).
 * Right ascension of the ascending node \\(\\Omega\\).
 * Argument of pericenter \\(\\omega\\).
 * True anomaly \\(\\nu\\).
-
-.. note:: poliastro uses the *semilatus rectum* instead of the semimajor
-    axis \\(a\\) to avoid singularities when working with parabolic or
-    near-parabolic orbits, where the latter takes infinite values.
 
 In this case, we'd use the method
 :py:meth:`~poliastro.twobody.State.from_classical`:
@@ -100,13 +96,12 @@ In this case, we'd use the method
     # Data for Mars at J2000 from JPL HORIZONS
     a = 1.523679 * u.AU
     ecc = 0.093315 * u.one
-    p = a * (1 - ecc**2)
     inc = 1.85 * u.deg
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
     
-    ss = State.from_classical(Sun, p, ecc, inc, raan, argp, nu)
+    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
 Notice that whether we create a ``State`` from \\(r\\) and \\(v\\) or from
 elements we can access many mathematical properties individually::

@@ -34,24 +34,22 @@ def test_state_has_elements_given_in_constructor():
     # Mars data from HORIZONS at J2000
     a = 1.523679 * u.AU
     ecc = 0.093315 * u.one
-    p = a * (1 - ecc**2)
     inc = 1.85 * u.deg
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_classical(Sun, p, ecc, inc, raan, argp, nu)
-    assert ss.coe() == (p, ecc, inc, raan, argp, nu)
+    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
+    assert ss.coe() == (a, ecc, inc, raan, argp, nu)
 
 
 def test_state_has_individual_elements():
     a = 1.523679 * u.AU
     ecc = 0.093315 * u.one
-    p = a * (1 - ecc**2)
     inc = 1.85 * u.deg
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_classical(Sun, p, ecc, inc, raan, argp, nu)
+    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
     assert ss.a == a
     assert ss.ecc == ecc
     assert ss.inc == inc
@@ -101,6 +99,18 @@ def test_geosync_has_proper_period():
     assert_almost_equal(ss.period.to(u.min).value, expected_period, decimal=0)
 
 
+def test_parabolic_elements_fail_early():
+    attractor = Earth
+    ecc = 1.0 * u.one
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    with pytest.raises(ValueError) as excinfo:
+        ss = State.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
+    assert ("ValueError: For parabolic orbits use State.parabolic instead"
+            in excinfo.exconly())
+
+
 def test_parabolic_has_proper_eccentricity():
     attractor = Earth
     _d = 1.0 * u.AU  # Unused distance
@@ -109,16 +119,6 @@ def test_parabolic_has_proper_eccentricity():
     expected_ecc = 1.0 * u.one
     ss = State.parabolic(attractor, _d, _a, _a, _a, _a)
     assert_almost_equal(ss.ecc, expected_ecc)
-
-
-def test_parabolic_has_infinite_semimajor_axis():
-    attractor = Earth
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    expected_a = np.inf * u.km
-    ss = State.parabolic(attractor, _d, _a, _a, _a, _a)
-    assert_equal(ss.a, expected_a)
 
 
 def test_parabolic_has_zero_energy():
@@ -135,9 +135,8 @@ def test_perigee_and_apogee():
     expected_r_p = 300 * u.km
     a = (expected_r_a + expected_r_p) / 2
     ecc = expected_r_a / a - 1
-    p = a * (1 - ecc**2)
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Earth, p, ecc, _a, _a, _a, _a)
+    ss = State.from_classical(Earth, a, ecc, _a, _a, _a, _a)
     assert_almost_equal(ss.r_a.to(u.km).value,
                         expected_r_a.to(u.km).value)
     assert_almost_equal(ss.r_p.to(u.km).value,
@@ -149,13 +148,14 @@ def test_convert_from_rv_to_coe():
     attractor = Earth
     p = 11067.790 * u.km
     ecc = 0.83285 * u.one
+    a = p / (1 - ecc ** 2)
     inc = 87.87 * u.deg
     raan = 227.89 * u.deg
     argp = 53.38 * u.deg
     nu = 92.335 * u.deg
     expected_r = [6525.344, 6861.535, 6449.125]  # km
     expected_v = [4.902276, 5.533124, -1.975709]  # km / s
-    r, v = State.from_classical(Earth, p, ecc, inc, raan, argp, nu).rv()
+    r, v = State.from_classical(Earth, a, ecc, inc, raan, argp, nu).rv()
     assert_array_almost_equal(r.value, expected_r, decimal=1)
     assert_array_almost_equal(v.value, expected_v, decimal=5)
 
@@ -166,7 +166,8 @@ def test_convert_from_coe_to_rv():
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
     ss = State.from_vectors(Earth, r, v)
-    p, ecc, inc, raan, argp, nu = ss.coe()
+    _, ecc, inc, raan, argp, nu = ss.coe()
+    p = ss.p
     assert_almost_equal(p.to(u.km).value, 11067.79, decimal=0)
     assert_almost_equal(ecc.value, 0.832853, decimal=4)
     assert_almost_equal(inc.to(u.deg).value, 87.870, decimal=2)
