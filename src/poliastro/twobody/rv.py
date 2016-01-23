@@ -68,23 +68,33 @@ class RVState(State):
 
     @property
     def r(self):
+        """Position vector. """
         return self._r
 
     @property
     def v(self):
+        """Velocity vector. """
         return self._v
 
     def to_vectors(self):
+        """Converts to position and velocity vector representation.
+
+        """
         return self
 
     def to_classical(self):
+        """Converts to classical orbital elements representation.
+
+        """
         (p, ecc, inc, raan, argp, nu
          ) = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                     self.r.to(u.km).value,
                     self.v.to(u.km / u.s).value)
 
+        a = p / (1 - ecc**2)
+
         return super(RVState, self).from_classical(self.attractor,
-                                                   p * u.km,
+                                                   a * u.km,
                                                    ecc * u.one,
                                                    inc * u.rad,
                                                    raan * u.rad,

@@ -62,7 +62,7 @@ class State(object):
             attractor, r, v, epoch)
 
     @staticmethod
-    def from_classical(attractor, p, ecc, inc, raan, argp, nu,
+    def from_classical(attractor, a, ecc, inc, raan, argp, nu,
                        epoch=J2000):
         """Return `State` object from classical orbital elements.
 
@@ -86,12 +86,16 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((p, ecc, inc, raan, argp, nu),
+        if not check_units((a, ecc, inc, raan, argp, nu),
                            (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
+        if ecc == 1.0 * u.one:
+            raise ValueError("For parabolic orbits use "
+                             "State.parabolic instead")
+
         return poliastro.twobody.classical.ClassicalState(
-            attractor, p, ecc, inc, raan, argp, nu, epoch)
+            attractor, a, ecc, inc, raan, argp, nu, epoch)
 
     @staticmethod
     def from_equinoctial(attractor, p, f, g, h, k, L, epoch=J2000):
@@ -181,10 +185,16 @@ class State(object):
                            (u.m, u.rad, u.rad, u.rad, u.rad)):
             raise u.UnitsError("Units must be consistent")
 
+        k = attractor.k.to(u.km ** 3 / u.s ** 2)
         ecc = 1.0 * u.one
+        r, v = poliastro.twobody.classical.coe2rv(
+                k.to(u.km ** 3 / u.s ** 2).value,
+                p.to(u.km).value, ecc.value, inc.to(u.rad).value,
+                raan.to(u.rad).value, argp.to(u.rad).value,
+                nu.to(u.rad).value)
 
-        return cls.from_classical(attractor, p, ecc, inc, raan, argp, nu,
-                                  epoch)
+        ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
+        return ss
 
     @property
     def r(self):
@@ -199,12 +209,12 @@ class State(object):
     @property
     def a(self):
         """Semimajor axis. """
-        return self.p / (1 - self.ecc**2)
+        return self.to_classical().a
 
     @property
     def p(self):
         """Semilatus rectum. """
-        return self.to_classical().p
+        return self.a * (1 - self.ecc**2)
 
     @property
     def r_p(self):
@@ -303,7 +313,7 @@ class State(object):
 
     def coe(self):
         """Classical orbital elements. """
-        return self.p, self.ecc, self.inc, self.raan, self.argp, self.nu
+        return self.a, self.ecc, self.inc, self.raan, self.argp, self.nu
 
     def pqw(self):
         """Perifocal frame (PQW) vectors. """
@@ -359,7 +369,7 @@ class State(object):
             res = ss_new
         return res
 
-    def to_rv(self):
+    def to_vectors(self):
         """Converts to position and velocity vector representation.
 
         """

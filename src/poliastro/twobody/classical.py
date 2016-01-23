@@ -93,10 +93,10 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
 
 
 class ClassicalState(State):
-    def __init__(self, attractor, p, ecc, inc, raan, argp, nu,
+    def __init__(self, attractor, a, ecc, inc, raan, argp, nu,
                  epoch):
         super(ClassicalState, self).__init__(attractor, epoch)
-        self._p = p
+        self._a = a
         self._ecc = ecc
         self._inc = inc
         self._raan = raan
@@ -104,27 +104,33 @@ class ClassicalState(State):
         self._nu = nu
 
     @property
-    def p(self):
-        return self._p
+    def a(self):
+        """Semimajor axis. """
+        return self._a
 
     @property
     def ecc(self):
+        """Eccentricity. """
         return self._ecc
 
     @property
     def inc(self):
+        """Inclination. """
         return self._inc
 
     @property
     def raan(self):
+        """Right ascension of the ascending node. """
         return self._raan
 
     @property
     def argp(self):
+        """Argument of the perigee. """
         return self._argp
 
     @property
     def nu(self):
+        """True anomaly. """
         return self._nu
 
     def _repr_latex_(self):
@@ -147,6 +153,9 @@ class ClassicalState(State):
         return r"$\begin{{align}}{0}\end{{align}}$".format(res)
 
     def to_vectors(self):
+        """Converts to position and velocity vector representation.
+
+        """
         r, v = coe2rv(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                       self.p.to(u.km).value,
                       self.ecc.value,
@@ -161,9 +170,15 @@ class ClassicalState(State):
                                                         self.epoch)
 
     def to_classical(self):
+        """Converts to classical orbital elements representation.
+
+        """
         return self
 
     def to_equinoctial(self):
+        """Converts to modified equinoctial elements representation.
+
+        """
         p, f, g, h, k, L = coe2mee(self.p.to(u.km).value,
                                    self.ecc.value,
                                    self.inc.to(u.rad).value,
