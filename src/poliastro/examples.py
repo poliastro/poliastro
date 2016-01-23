@@ -6,7 +6,7 @@
 from astropy import time
 from astropy import units as u
 
-from poliastro.bodies import Earth
+from poliastro.bodies import Sun, Earth
 from poliastro.twobody import State
 
 # Taken from Plyades (c) 2012 Helge Eichhorn (MIT License)
@@ -18,3 +18,8 @@ iss = State.from_vectors(Earth,
 molniya = State.from_classical(Earth,
                                26600 * u.km, 0.75 * u.one, 63.4 * u.deg,
                                0 * u.deg, 270 * u.deg, 80 * u.deg)
+
+churi = State.from_classical(Sun,
+                             3.46250 * u.AU, 0.64 * u.one, 7.04 * u.deg,
+                             50.1350 * u.deg, 12.8007 * u.deg, 63.89 * u.deg,
+                             time.Time("2015-11-05 12:00", scale='utc'))

@@ -15,14 +15,20 @@ from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
 
 
-def plot(state):
+BODY_COLORS = {
+    "Sun": "#ffcc00",
+    "Earth": "#204a87",
+}
+
+
+def plot(state, label=None):
     """Plots a ``State``.
 
     For more advanced tuning, use the :py:class:`OrbitPlotter` class.
 
     """
     op = OrbitPlotter()
-    return op.plot(state)
+    return op.plot(state, label=label)
 
 
 class OrbitPlotter(object):
@@ -115,9 +121,12 @@ class OrbitPlotter(object):
         lines.append(l)
 
         # Attractor
-        self.ax.add_patch(mpl.patches.Circle((0, 0),
-                                             state.attractor.R.to(u.km).value,
-                                             lw=0, color='#204a87'))  # Earth
+        # TODO: If several orbits are plotted, the attractor is being plotted several times!
+        radius = max(state.attractor.R.to(u.km).value,
+                     state.r_p.to(u.km).value / 6)
+        color = BODY_COLORS.get(state.attractor.name, "#999999")
+        self.ax.add_patch(
+                mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
         if osculating:
             l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
@@ -128,12 +137,12 @@ class OrbitPlotter(object):
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
             l.set_label(label)
+            self.ax.legend()
 
         self.ax.set_title(state.epoch.iso)
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
-        self.ax.legend()
 
         return lines
 
