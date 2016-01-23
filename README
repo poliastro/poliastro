@@ -23,7 +23,8 @@
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
 problem, conversion between position and velocity vectors and classical
-orbital elements and orbit plotting. It is released under the MIT license.
+orbital elements and orbit plotting, focusing on interplanetary applications.
+It is released under the MIT license.
 
 .. code-block:: python
 
@@ -162,10 +163,29 @@ poliastro comes from Polimi, which is the shortened name of the Politecnico di
 Milano, the Italian university where I was studying while writing this
 software. It's my tiny tribute to a place I came to love. *Grazie mille!*
 
+Can I do <insert awesome thing> with poliastro?
+-----------------------------------------------
+
+poliastro is focused on interplanetary applications. This has two consequences:
+
+* It tries to be more general than other Flight Dynamics core libraries more
+  focused on Earth satellites (see `Related software`_ for a brief list),
+  allowing the algorithms to work also for orbits around non-Earth bodies.
+* It leaves out certain features that would be too Earth-specific, such as
+  TLE reading, SGP4 propagation, groundtrack plotting and others.
+
+Keep that in mind when asking for a feature. For a software package focused on
+Earth applications please refer to the `Python Astrodynamics Project`_, a
+still in progress joint effort between several developers.
+
+.. _`Related software`: http://poliastro.readthedocs.org/en/latest/about.html#related-software
+.. _`Python Astrodynamics Project`: https://github.com/python-astrodynamics/astrodynamics
+
 What's the future of the project?
 ---------------------------------
 
-Development efforts are shifting soon towards the new
-`Python Astrodynamics Project <https://github.com/python-astrodynamics/astrodynamics>`_,
-a joint effort between several developers. In the meanwhile, poliastro will
-see bug fixes and probably new releases in 2015 and 2016.
+poliastro is actively maintained and will receive bug fixes and releases
+in 2016, maintaining its focus on interplanetary applications. Expect better
+algorithms, easier 3D plotting and optimization techniques. The best way
+to get an idea of the roadmap is to check the Kanban board at Waffle.io
+(see `Contributing`_).

@@ -6,11 +6,12 @@ poliastro - Astrodynamics in Python
    :align: center
 
 **poliastro** is an open source collection of Python subroutines useful in
-Astrodynamics and Orbital Mechanics. It tries to provide a simple and
+Astrodynamics and Orbital Mechanics, focusing on interplanetary applications.
+It provides a simple and
 intuitive API and handles physical quantities with units. Some of its
 awesome features are:
 
-* Orbit propagation (Keplerian orbits)
+* Analytical and numerical orbit propagation
 * Conversion between position and velocity vectors and classical orbital
   elements
 * Hohmann and bielliptic maneuvers computation
