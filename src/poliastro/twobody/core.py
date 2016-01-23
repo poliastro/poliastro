@@ -369,7 +369,7 @@ class State(object):
             res = ss_new
         return res
 
-    def to_rv(self):
+    def to_vectors(self):
         """Converts to position and velocity vector representation.
 
         """
