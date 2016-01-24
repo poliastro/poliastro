@@ -258,9 +258,9 @@ we are querying and an ``astropy.time.Time`` scalar or vector variable::
     >>> v
     <Quantity [ 1880007.6848216 ,-1579126.15900176, -684591.24441181] km / s>
 
-.. note:: The position and velocity vectors are given with respect to the
-    Solar System Barycenter in the **International Standard Reference Frame**,
-    which has the Equator as the fundamental plane.
+.. note:: The position and velocity vectors are usually given with respect to the
+    Solar System Barycenter in the **International Celestial Reference Frame**
+    (ICRF), which means approximately equatorial coordinates.
 
 Traveling through space: solving the Lambert problem
 ----------------------------------------------------
