@@ -156,8 +156,8 @@ class OrbitPlotter(object):
 
         if state.ecc >= 1:
             # Select a sensible limiting value for non-closed orbits
-            # This corresponds to r = 3p
-            nu_limit = Angle(np.arccos(-(1 - 1 / 3.) / state.ecc))
+            # This corresponds to r = infinity
+            nu_limit = Angle(np.arccos(-1 / state.ecc))
             nu_invalid = ((nu_vals > nu_limit) &
                           (nu_vals < (-nu_limit).wrap_at('360d')))
             nu_vals[nu_invalid] = np.nan
