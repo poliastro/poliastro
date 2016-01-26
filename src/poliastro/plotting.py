@@ -18,6 +18,7 @@ from poliastro.util import norm
 BODY_COLORS = {
     "Sun": "#ffcc00",
     "Earth": "#204a87",
+    "Jupiter": "#ba3821",
 }
 
 
