@@ -11,6 +11,15 @@ It provides a simple and
 intuitive API and handles physical quantities with units. Some of its
 awesome features are:
 
+.. figure:: _static/molniya.png
+   :align: right
+   :figwidth: 300
+   :alt: Molniya orbit
+
+   Plot of a `Molniya orbit`_ around the Earth
+   (\\(a = 26600\\,\\mathrm{km}, e = 0.75,
+   i = 63.4 \\mathrm{{}^{\\circ}} \\)).
+
 * Analytical and numerical orbit propagation
 * Conversion between position and velocity vectors and classical orbital
   elements
@@ -20,15 +29,6 @@ awesome features are:
 * Planetary ephemerides (SPICE kernels)
 
 And more to come!
-
-.. figure:: _static/molniya.png
-   :align: right
-   :figwidth: 300
-   :alt: Molniya orbit
-
-   Plot of a `Molniya orbit`_ around the Earth
-   (\\(a = 26600\\,\\mathrm{km}, e = 0.75,
-   i = 63.4 \\mathrm{{}^{\\circ}} \\)).
 
 The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
 contributions and feedback are more than welcome:
@@ -49,6 +49,9 @@ the MIT license, hence allowing commercial use of the library.
     
     plot(molniya)
 
+.. include:: success.rst
+
+----
 
 .. note::
     Older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for
