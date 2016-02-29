@@ -68,7 +68,7 @@ def _lambert_izzo(k, r1, r2, tof, short=True, numiter=35, rtol=1e-8):
 
     # Find solutions
     # TODO: Are x_list and y_list generators too?
-    x_list, y_list = _find_xy(ll, T)
+    x_list, y_list = _find_xy(ll, T, numiter, rtol)
 
     # Reconstruct
     gamma = np.sqrt(k * s / 2)
@@ -94,7 +94,7 @@ def _reconstruct(x, y, r1, r2, i_r1, i_t1, i_r2, i_t2, ll, gamma, rho, sigma):
     return v1, v2
 
 
-def _find_xy(ll, T):
+def _find_xy(ll, T, numiter=35, rtol=1e-8):
     """Computes all x, y for single and multi revolution solutions.
 
     """
@@ -116,13 +116,9 @@ def _find_xy(ll, T):
     x_0 = _initial_guess(T, ll, M_max)
 
     # Start Householder iterations from x_0 and find x, y
-    # FIXME: Using newton temporarily
-    """
     x = householder(_tof_equation, x_0, args=(T, ll, M_max),
                     fprime=_tof_equation_p, fprime2=_tof_equation_pp,
-                    fprime3=_tof_equation_ppp)"""
-    x = newton(_tof_equation, x_0, args=(T, ll, M_max),
-               fprime=_tof_equation_p, fprime2=_tof_equation_pp)
+                    fprime3=_tof_equation_ppp)
     y = _compute_y(x, ll)
 
     return (x,), (y,)
@@ -181,25 +177,25 @@ def _tof_equation(x, T, ll, M):
     return T_ - T
 
 
-def _tof_equation_p(x, T_, ll, M):
+def _tof_equation_p(x, _, ll, M):
     # TODO: What about derivatives when x approaches 1?
     y = _compute_y(x, ll)
     T = _tof_equation(x, 0.0, ll, M)
     return (3 * T * x - 2 + 2 * ll ** 3 * x / y) / (1 - x ** 2)
 
 
-def _tof_equation_pp(x, T_, ll, M):
+def _tof_equation_pp(x, _, ll, M):
     y = _compute_y(x, ll)
     T = _tof_equation(x, 0.0, ll, M)
-    dT = _tof_equation_p(x, T_, ll, M)
+    dT = _tof_equation_p(x, _, ll, M)
     return (3 * T + 5 * x * dT + 2 * (1 - ll ** 2) * ll ** 3 / y ** 3) / (1 - x ** 2)
 
 
-def _tof_equation_ppp(x, T_, ll, M):
+def _tof_equation_ppp(x, _, ll, M):
     y = _compute_y(x, ll)
     T = _tof_equation(x, 0.0, ll, M)
-    dT = _tof_equation_p(x, T_, ll, M)
-    ddT = _tof_equation_pp(x, T_, ll, M)
+    dT = _tof_equation_p(x, _, ll, M)
+    ddT = _tof_equation_pp(x, _, ll, M)
     return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
 
 
@@ -248,8 +244,9 @@ def _initial_guess(T, ll, M):
     return x_0
 
 
-def householder(func, x0, fprime, fprime2, fprime3, args=(), tol=1.48e-8, maxiter=50):
+def householder(func, x0, fprime, fprime2, fprime3, args=(), tol=1e-8, maxiter=35):
     """Householder iteration scheme.
 
     """
-    raise NotImplementedError
+    # FIXME: Use Halley's iteration for now
+    return newton(func, x0, fprime, args, tol, maxiter, fprime2)
