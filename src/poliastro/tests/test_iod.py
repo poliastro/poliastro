@@ -5,10 +5,11 @@ from numpy.testing import assert_array_almost_equal
 from astropy import units as u
 from poliastro.bodies import Earth
 
-from poliastro.iod import lambert
+from poliastro.iod import izzo, vallado
 
 
-def test_vallado75():
+@pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
+def test_vallado75(lambert):
     k = Earth.k
     r0 = [15945.34, 0.0, 0.0] * u.km
     r = [12214.83399, 10249.46731, 0.0] * u.km
@@ -26,7 +27,8 @@ def test_vallado75():
                               decimal=5)
 
 
-def test_curtis52():
+@pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
+def test_curtis52(lambert):
     k = Earth.k
     r0 = [5000.0, 10000.0, 2100.0] * u.km
     r = [-14600.0, 2500.0, 7000.0] * u.km
@@ -44,7 +46,8 @@ def test_curtis52():
                               decimal=4)
 
 
-def test_curtis53():
+@pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
+def test_curtis53(lambert):
     k = Earth.k
     r0 = [273378.0, 0.0, 0.0] * u.km
     r = [145820.0, 12758.0, 0.0] * u.km
