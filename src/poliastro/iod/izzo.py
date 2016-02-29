@@ -57,7 +57,7 @@ def _lambert_izzo(k, r1, r2, tof, short=True, numiter=35, rtol=1e-8):
     ll = np.sqrt(1 - c_norm / s)
 
     # if r1[0] * r2[1] - r1[1] * r2[0] < 0:
-    if i_h[2] < 0:
+    if i_h[2] < 0 and short:
         ll = -ll
         i_t1, i_t2 = np.cross(i_r1, i_h), np.cross(i_r2, i_h)  # Fixed from paper
     else:
