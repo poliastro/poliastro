@@ -5,8 +5,7 @@ from numpy.testing import assert_array_almost_equal
 from astropy import units as u
 from poliastro.bodies import Earth
 
-#from poliastro.iod import lambert
-from poliastro.izzo import lambert
+from poliastro.iod import lambert
 
 
 def test_vallado75():
