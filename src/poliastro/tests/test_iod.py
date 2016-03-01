@@ -8,8 +8,7 @@ from poliastro.bodies import Earth
 from poliastro.iod import izzo, vallado
 
 
-@pytest.mark.parametrize("lambert", [#vallado.lambert,
-                                     izzo.lambert])
+@pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
 def test_vallado75(lambert):
     k = Earth.k
     r0 = [15945.34, 0.0, 0.0] * u.km
@@ -28,8 +27,7 @@ def test_vallado75(lambert):
                               decimal=5)
 
 
-@pytest.mark.parametrize("lambert", [#vallado.lambert,
-                                     izzo.lambert])
+@pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
 def test_curtis52(lambert):
     k = Earth.k
     r0 = [5000.0, 10000.0, 2100.0] * u.km
@@ -48,8 +46,7 @@ def test_curtis52(lambert):
                               decimal=4)
 
 
-@pytest.mark.parametrize("lambert", [#vallado.lambert,
-                                     izzo.lambert])
+@pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
 def test_curtis53(lambert):
     k = Earth.k
     r0 = [273378.0, 0.0, 0.0] * u.km

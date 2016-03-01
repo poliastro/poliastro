@@ -51,7 +51,7 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     v0 = (r_ - f * r0_) / g
     v = (gdot * r_ - r0_) / g
 
-    return v0 * u.km / u.s, v * u.km / u.s
+    yield v0 * u.km / u.s, v * u.km / u.s
 
 
 @jit
