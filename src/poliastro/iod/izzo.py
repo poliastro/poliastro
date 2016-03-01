@@ -118,7 +118,7 @@ def _find_xy(ll, T, M, numiter, rtol):
     assert abs(ll) < 1
     assert T > 0  # Mistake on original paper
 
-    M_max = np.floor(T / pi)
+    M_max = int(np.floor(T / pi))
     T_00 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # T_xM
 
     # Refine maximum number of revolutions if necessary
