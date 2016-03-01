@@ -107,3 +107,16 @@ def test_molniya_der_one_full_revolution(lambert):
     assert_array_almost_equal(vb_r.to(u.km / u.s).value,
                               expected_vb_r.value,
                               decimal=4)
+
+
+@pytest.mark.parametrize("lambert", [izzo.lambert])
+def test_raises_exception_for_non_feasible_solution(lambert):
+    k = Earth.k
+    r0 = [22592.145603, -1599.915239, -19783.950506] * u.km
+    r = [1922.067697, 4054.157051, -8925.727465] * u.km
+    tof = 5 * u.h
+
+    with pytest.raises(ValueError) as excinfo:
+        next(lambert(k, r0, r, tof, M=1))
+    assert ("ValueError: No feasible solution, try M <= 0"
+            in excinfo.exconly())
