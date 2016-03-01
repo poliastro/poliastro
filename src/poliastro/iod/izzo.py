@@ -16,10 +16,32 @@ except ImportError:
     from scipy.special import hyp2f1
 
 
-def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
-    """Solves the Lambert problem.
+def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
+    """Solves the Lambert problem using the Izzo algorithm.
 
     .. versionadded:: 0.5.0
+
+    Parameters
+    ----------
+    k : Quantity
+        Gravitational constant of main attractor (km^3 / s^2).
+    r0 : Quantity
+        Initial position (km).
+    r : Quantity
+        Final position (km).
+    tof : Quantity
+        Time of flight (s).
+    M : int, optional
+        Number of full revolutions, default to 0.
+    numiter : int, optional
+        Maximum number of iterations, default to 35.
+    rtol : float, optional
+        Relative tolerance of the algorithm, default to 1e-8.
+
+    Yields
+    ------
+    v0, v : tuple
+        Pair of velocity solutions.
 
     """
     k_ = k.to(u.km ** 3 / u.s ** 2).value
@@ -27,16 +49,13 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     r_ = r.to(u.km).value
     tof_ = tof.to(u.s).value
 
-    v0, v = _lambert_izzo(k_, r0_, r_, tof_, short, numiter, rtol)
+    sols = _lambert_izzo(k_, r0_, r_, tof_, M, numiter, rtol)
 
-    # FIXME: Return several solutions
-    return v0 * u.km / u.s, v * u.km / u.s
+    for v0, v in sols:
+        yield v0 * u.km / u.s, v * u.km / u.s
 
 
-def _lambert_izzo(k, r1, r2, tof, short=True, numiter=35, rtol=1e-8):
-    """Solves the Lambert problem using the Izzo algorithm.
-
-    """
+def _lambert_izzo(k, r1, r2, tof, M, numiter, rtol):
     # Check preconditions
     assert tof > 0
     assert k > 0
@@ -56,29 +75,26 @@ def _lambert_izzo(k, r1, r2, tof, short=True, numiter=35, rtol=1e-8):
     # Geometry of the problem
     ll = np.sqrt(1 - c_norm / s)
 
-    # if r1[0] * r2[1] - r1[1] * r2[0] < 0:
-    if i_h[2] < 0 and short:
+    if i_h[2] < 0:
         ll = -ll
-        i_t1, i_t2 = np.cross(i_r1, i_h), np.cross(i_r2, i_h)  # Fixed from paper
-    else:
-        i_t1, i_t2 = np.cross(i_h, i_r1), np.cross(i_h, i_r2)  # Fixed from paper
+        i_h = -i_h
+
+    i_t1, i_t2 = np.cross(i_h, i_r1), np.cross(i_h, i_r2)  # Fixed from paper
 
     # Non dimensional time of flight
     T = np.sqrt(2 * k / s ** 3) * tof
 
     # Find solutions
-    # TODO: Are x_list and y_list generators too?
-    x_list, y_list = _find_xy(ll, T, numiter, rtol)
+    xy = _find_xy(ll, T, M, numiter, rtol)
 
     # Reconstruct
     gamma = np.sqrt(k * s / 2)
     rho = (r1_norm - r2_norm) / c_norm
     sigma = np.sqrt(1 - rho ** 2)
 
-    for x, y in zip(x_list, y_list):
+    for x, y in xy:
         v1, v2 = _reconstruct(x, y, r1_norm, r2_norm, i_r1, i_t1, i_r2, i_t2, ll, gamma, rho, sigma)
-        # FIXME: Return several solutions
-        return v1, v2
+        yield v1, v2
 
 
 def _reconstruct(x, y, r1, r2, i_r1, i_t1, i_r2, i_t2, ll, gamma, rho, sigma):
@@ -94,8 +110,8 @@ def _reconstruct(x, y, r1, r2, i_r1, i_t1, i_r2, i_t2, ll, gamma, rho, sigma):
     return v1, v2
 
 
-def _find_xy(ll, T, numiter=35, rtol=1e-8):
-    """Computes all x, y for single and multi revolution solutions.
+def _find_xy(ll, T, M, numiter, rtol):
+    """Computes all x, y for given number of revolutions.
 
     """
     # For abs(ll) == 1 the derivative is not continuous
@@ -103,33 +119,28 @@ def _find_xy(ll, T, numiter=35, rtol=1e-8):
     assert T > 0  # Mistake on original paper
 
     M_max = np.floor(T / pi)
-    assert M_max == 0  # FIXME: Allow multi revolution case
     T_00 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # T_xM
 
     # Refine maximum number of revolutions if necessary
     if T < T_00 + M_max * pi and M_max > 0:
         T_min = _compute_T_min(ll, M_max)
-        if T_min > T:
+        if T < T_min:
             M_max -= 1
 
+    # Check if a feasible solution exist for the given number of revolutions
+    # This departs from the original paper in that we do not compute all solutions
+    if M > M_max:
+        raise ValueError("No feasible solution, try M <= {:d}".format(M_max))
+
     # Initial guess
-    x_0 = _initial_guess(T, ll, M_max)
+    for x_0 in _initial_guess(T, ll, M):
+        # Start Householder iterations from x_0 and find x, y
+        x = householder(_tof_equation, x_0, args=(T, ll, M), tol=rtol, maxiter=numiter,
+                        fprime=_tof_equation_p, fprime2=_tof_equation_pp,
+                        fprime3=_tof_equation_ppp)
+        y = _compute_y(x, ll)
 
-    # Start Householder iterations from x_0 and find x, y
-    x = householder(_tof_equation, x_0, args=(T, ll, M_max),
-                    fprime=_tof_equation_p, fprime2=_tof_equation_pp,
-                    fprime3=_tof_equation_ppp)
-    y = _compute_y(x, ll)
-
-    return (x,), (y,)
-
-"""
-    while M_max > 0:
-        # Compute x_0l and x_0r from Equation 31 with M = M_max
-        # Start Householder iterations from x_0l and find x_r, y_r
-        # Start Householder iterations from x_0r and find x_l, y_l
-        M_max = M_max - 1
-"""  # Only one revolution
+        yield x, y
 
 
 def _compute_y(x, ll):
@@ -224,6 +235,7 @@ def _initial_guess(T, ll, M):
 
     """
     if M == 0:
+        # Single revolution
         T_0 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2) + M * pi  # Equation 19
         T_1 = 2 * (1 - ll ** 3) / 3  # Equation 21
         if T >= T_0:
@@ -234,12 +246,15 @@ def _initial_guess(T, ll, M):
             # This is the real condition, which is not exactly equivalent
             # elif T_1 < T < T_0
             x_0 = (T_0 / T) ** (np.log2(T_1 / T_0)) - 1
+
+        # Convert to tuple
+        x_0 = x_0,
     else:
+        # Multiple revolution
         x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (((M * pi + pi) / (8 * T)) ** (2 / 3) + 1)
         x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (((8 * T) / (M * pi)) ** (2 / 3) + 1)
 
-        # FIXME: Return double initial guesses too
-        x_0 = x_0r
+        x_0 = x_0l, x_0r
 
     return x_0
 
