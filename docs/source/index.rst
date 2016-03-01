@@ -39,6 +39,13 @@ https://github.com/poliastro/poliastro
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 .. _`wiki`: https://github.com/poliastro/poliastro/wiki/
 
+Release announcements and general discussion take place on our `mailing list`_.
+Feel free to join!
+
+.. _`mailing list`: https://groups.io/g/poliastro-dev
+
+https://groups.io/g/poliastro-dev
+
 poliastro works on recent Python versions and is released under
 the MIT license, hence allowing commercial use of the library.
 
