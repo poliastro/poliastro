@@ -1,15 +1,18 @@
 # The only current way of using OS X virtual machines in Travis CI
-# is setting up the environment for Objective-C
+# is setting up a generic environment
 # This is not a problem because Python will be installed through conda
 
-language: objective-c
+language: generic
+
+os:
+  - linux
+  - osx
 
 env:
-  matrix:
-    - PYTHON=3.4 NUMPY=1.9
-    - PYTHON=3.5 NUMPY=1.9
-    - PYTHON=3.4 NUMPY=1.10
-    - PYTHON=3.5 NUMPY=1.10
+  - PYTHON=3.4 NUMPY=1.9
+  - PYTHON=3.5 NUMPY=1.9
+  - PYTHON=3.4 NUMPY=1.10
+  - PYTHON=3.5 NUMPY=1.10
 
 branches:
   only:
@@ -18,27 +21,35 @@ branches:
     - 0.4.x
 
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
+  - if [[ "$(uname)" == "Darwin" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
+  - if [[ "$(uname)" == "Linux" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
+
+  # Update conda and create test environment
   - conda config --set always_yes yes --set changeps1 no
   - conda config --add channels poliastro
   - conda update -q conda
   - conda create -q -n test-environment python=$PYTHON
   - source activate test-environment
+
+  # Install project requirements
+  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install coverage pytest pytest-cov codecov
 
 install:
-  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install --no-deps .  # Test installation correctness
 
 script:
   - py.test -vv  # Test against installed code
 
 after_success:
+  # Uninstall to test coverage against sources
   - pip uninstall poliastro -y
   - pip install --no-deps -e .
+
   - NUMBA_DISABLE_JIT=1 py.test --cov
+
   - codecov
 
 sudo: false
