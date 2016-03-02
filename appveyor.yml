@@ -15,10 +15,6 @@ environment:
     - PYTHON: 3.4
       NUMPY: 1.9
     - PYTHON: 3.5
-      NUMPY: 1.9
-    - PYTHON: 3.4
-      NUMPY: 1.10
-    - PYTHON: 3.5
       NUMPY: 1.10
 
 matrix:
