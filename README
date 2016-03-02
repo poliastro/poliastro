@@ -11,18 +11,22 @@
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
 :Version: 0.5.dev0
 
-|travisci|
+.. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square
+   :target: https://travis-ci.org/poliastro/poliastro.svg?branch=master
 
-.. image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
+.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
+   :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
+
+.. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
-.. image:: https://img.shields.io/github/license/poliastro/poliastro.svg?style=flat-square
+.. |license| image:: https://img.shields.io/github/license/poliastro/poliastro.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/master/COPYING
 
-.. image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg?style=flat-square
+.. |doi| image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg?style=flat-square
    :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
 
-.. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat-square
+.. |astropy| image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat-square
    :target: http://www.astropy.org/
 
 .. |mailing| image:: https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square
@@ -65,12 +69,6 @@ Platform        Site          Status
 Linux & OS X    Travis CI     |travisci|
 Windows x64     Appveyor      |appveyor|
 ==============  ============  ===================
-
-.. |travisci| image:: https://travis-ci.org/poliastro/poliastro.svg?branch=master
-   :target: https://travis-ci.org/poliastro/poliastro
-
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/ajg5j8byv8isslso/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/poliastro/poliastro/branch/master
 
 Installation
 ============
@@ -115,6 +113,8 @@ Development installations are also supported::
 Testing
 =======
 
+|codecov|
+
 If installed correctly, the tests can be run using py.test::
 
   $ python -c "import poliastro.testing; poliastro.testing.test()"
@@ -156,8 +156,7 @@ If you use poliastro on your project, please
 You can also use the DOI to cite it in your publications. This is the latest
 one:
 
-.. image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg
-   :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
+|doi|
 
 And this is an example citation format::
 
@@ -165,6 +164,8 @@ And this is an example citation format::
 
 License
 =======
+
+|license|
 
 poliastro is released under the MIT license, hence allowing commercial
 use of the library. Please refer to the COPYING file.
