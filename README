@@ -32,6 +32,9 @@
 .. |mailing| image:: https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square
    :target: https://groups.io/g/poliastro-dev
 
+|travisci| |appveyor| |codecov|
+|license| |doi| |astropy| |mailing|
+
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
 problem, conversion between position and velocity vectors and classical
