@@ -11,7 +11,7 @@
 :Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
 :Version: 0.5.dev0
 
-|anaconda|
+|travisci|
 
 .. image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
@@ -62,13 +62,9 @@ poliastro is usually tested on Linux, Windows and OS X on Python
 ==============  ============  ===================
 Platform        Site          Status
 ==============  ============  ===================
-Linux-x64       Anaconda      |anaconda|
-OS X-x64        Travis CI     |travisci|
-Windows-x64     Appveyor      |appveyor|
+Linux & OS X    Travis CI     |travisci|
+Windows x64     Appveyor      |appveyor|
 ==============  ============  ===================
-
-.. |anaconda| image:: https://anaconda.org/poliastro/poliastro/badges/build.svg
-   :target: https://anaconda.org/poliastro/poliastro/builds
 
 .. |travisci| image:: https://travis-ci.org/poliastro/poliastro.svg?branch=master
    :target: https://travis-ci.org/poliastro/poliastro
