@@ -298,7 +298,7 @@ class State(object):
         r, v = self.rv()
         k = self.attractor.k
         e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
-        return e_vec
+        return e_vec.decompose()
 
     @property
     def h_vec(self):
