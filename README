@@ -12,7 +12,7 @@
 :Version: 0.5.dev0
 
 .. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square
-   :target: https://travis-ci.org/poliastro/poliastro.svg?branch=master
+   :target: https://travis-ci.org/poliastro/poliastro
 
 .. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square
    :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
