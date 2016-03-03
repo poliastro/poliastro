@@ -263,22 +263,29 @@ def householder(func, x0, fprime, fprime2, fprime3=None, args=(), tol=1e-8, maxi
     """Find a zero using the Householder or Halley method.
 
     """
-    if fprime3 is None:
-        p0 = 1.0 * x0
-        for ii in range(maxiter):
-            myargs = (p0,) + args
-            fder = fprime(*myargs)
-            if fder == 0:
-                raise RuntimeError("derivative was zero")
-            fval = func(*myargs)
-            fder2 = fprime2(*myargs)
+    # Multiply by 1.0 to convert to floating point
+    # We don't use float(x0) so it still works if x0 is complex
+    p0 = 1.0 * x0
+    fder3 = 0
+    for ii in range(maxiter):
+        myargs = (p0,) + args
+        fder = fprime(*myargs)
+        if fder == 0:
+            raise RuntimeError("derivative was zero")
+        fval = func(*myargs)
+        fder2 = fprime2(*myargs)
+        if fprime3 is not None:
+            fder3 = fprime3(*myargs)
+        if fder3 == 0:
+            # Halley step (cubic)
             p = p0 - 2 * fval * fder / (2 * fder ** 2 - fval * fder2)
-            if abs(p - p0) < tol:
-                return p
-            p0 = p
+        else:
+            # Householder step (quartic)
+            p = p0 - fval * ((fder ** 2 - fval * fder2 / 2) /
+                             (fder * (fder ** 2 - fval * fder2) + fder3 * fval ** 2 / 6))
+        if abs(p - p0) < tol:
+            return p
+        p0 = p
 
-        msg = "Failed to converge after %d iterations, value is %.16f" % (maxiter, p)
-        raise RuntimeError(msg)
-    else:
-        # FIXME: Use Halley's iteration for now
-        return householder(func, x0, fprime, fprime2, None, args, tol, maxiter)
+    msg = "Failed to converge after %d iterations, value is %.16f" % (maxiter, p)
+    raise RuntimeError(msg)
