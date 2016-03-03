@@ -259,9 +259,26 @@ def _initial_guess(T, ll, M):
     return x_0
 
 
-def householder(func, x0, fprime, fprime2, fprime3, args=(), tol=1e-8, maxiter=35):
-    """Householder iteration scheme.
+def householder(func, x0, fprime, fprime2, fprime3=None, args=(), tol=1e-8, maxiter=35):
+    """Find a zero using the Householder or Halley method.
 
     """
-    # FIXME: Use Halley's iteration for now
-    return newton(func, x0, fprime, args, tol, maxiter, fprime2)
+    if fprime3 is None:
+        p0 = 1.0 * x0
+        for ii in range(maxiter):
+            myargs = (p0,) + args
+            fder = fprime(*myargs)
+            if fder == 0:
+                raise RuntimeError("derivative was zero")
+            fval = func(*myargs)
+            fder2 = fprime2(*myargs)
+            p = p0 - 2 * fval * fder / (2 * fder ** 2 - fval * fder2)
+            if abs(p - p0) < tol:
+                return p
+            p0 = p
+
+        msg = "Failed to converge after %d iterations, value is %.16f" % (maxiter, p)
+        raise RuntimeError(msg)
+    else:
+        # FIXME: Use Halley's iteration for now
+        return householder(func, x0, fprime, fprime2, None, args, tol, maxiter)
