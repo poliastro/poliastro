@@ -123,7 +123,7 @@ def _find_xy(ll, T, M, numiter, rtol):
 
     # Refine maximum number of revolutions if necessary
     if T < T_00 + M_max * pi and M_max > 0:
-        T_min = _compute_T_min(ll, M_max)
+        _, T_min = _compute_T_min(ll, M_max)
         if T < T_min:
             M_max -= 1
 
