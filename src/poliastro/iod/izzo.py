@@ -135,9 +135,9 @@ def _find_xy(ll, T, M, numiter, rtol):
     # Initial guess
     for x_0 in _initial_guess(T, ll, M):
         # Start Householder iterations from x_0 and find x, y
-        x = householder(_tof_equation, x_0, T, args=(ll, M), tol=rtol, maxiter=numiter,
-                        fprime=_tof_equation_p, fprime2=_tof_equation_pp,
-                        fprime3=_tof_equation_ppp)
+        x = _householder(_tof_equation, x_0, T, args=(ll, M), tol=rtol, maxiter=numiter,
+                         fprime=_tof_equation_p, fprime2=_tof_equation_pp,
+                         fprime3=_tof_equation_ppp)
         y = _compute_y(x, ll)
 
         yield x, y
@@ -253,30 +253,26 @@ def _initial_guess(T, ll, M):
     return x_0
 
 
-def householder(func, x0, T0, fprime, fprime2, fprime3=None, args=(), tol=1e-8, maxiter=35):
-    """Find a zero using the Householder or Halley method.
+def _householder(func, p0, T0, fprime, fprime2, fprime3, args=(), tol=1e-8, maxiter=10):
+    """Find a zero of time of flight equation using the Householder method.
+
+    Note
+    ----
+    This function is private because it assumes a calling convention specific to
+    this module and is not really reusable.
 
     """
-    # Multiply by 1.0 to convert to floating point
-    # We don't use float(x0) so it still works if x0 is complex
-    p0 = 1.0 * x0
-    fder3 = 0
     for ii in range(maxiter):
         fval = func(p0, T0, *args)
         T = fval + T0
         fder = fprime(p0, T, *args)
-        if fder == 0:
-            raise RuntimeError("Derivative was zero")
         fder2 = fprime2(p0, T, fder, *args)
-        if fprime3 is not None:
-            fder3 = fprime3(p0, T, fder, fder2, *args)
-        if fder3 == 0:
-            # Halley step (cubic)
-            p = p0 - 2 * fval * fder / (2 * fder ** 2 - fval * fder2)
-        else:
-            # Householder step (quartic)
-            p = p0 - fval * ((fder ** 2 - fval * fder2 / 2) /
-                             (fder * (fder ** 2 - fval * fder2) + fder3 * fval ** 2 / 6))
+        fder3 = fprime3(p0, T, fder, fder2, *args)
+
+        # Householder step (quartic)
+        p = p0 - fval * ((fder ** 2 - fval * fder2 / 2) /
+                         (fder * (fder ** 2 - fval * fder2) + fder3 * fval ** 2 / 6))
+
         if abs(p - p0) < tol:
             return p
         p0 = p
