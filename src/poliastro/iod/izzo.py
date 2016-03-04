@@ -216,9 +216,9 @@ def _compute_T_min(ll, M):
             T_min = 0.0
         else:
             # Set x_0 > 0 to avoid problems at ll = -1
-            x_T_min = householder(_tof_equation_p, 0.1, 0.0,
-                                  _tof_equation_pp, _tof_equation_ppp,
-                                  args=(ll, M))
+            x_T_min = _halley(_tof_equation_p, 0.1, _tof_equation(0.1, 0.0, ll, M),
+                              _tof_equation_pp, _tof_equation_ppp,
+                              args=(ll, M))
             T_min = _tof_equation(x_T_min, 0.0, ll, M)
 
     return x_T_min, T_min
@@ -251,6 +251,33 @@ def _initial_guess(T, ll, M):
         x_0 = x_0l, x_0r
 
     return x_0
+
+
+def _halley(fprime, p0, T0, fprime2, fprime3, args=(), tol=1e-8, maxiter=10):
+    """Find a minimum of time of flight equation using the Halley method.
+
+    Note
+    ----
+    This function is private because it assumes a calling convention specific to
+    this module and is not really reusable.
+
+    """
+    for ii in range(maxiter):
+        fder = fprime(p0, T0, *args)
+        fder2 = fprime2(p0, T0, fder, *args)
+        if fder2 == 0:
+            raise RuntimeError("Derivative was zero")
+        fder3 = fprime3(p0, T0, fder, fder2, *args)
+
+        # Halley step (cubic)
+        p = p0 - 2 * fder * fder2 / (2 * fder2 ** 2 - fder * fder3)
+
+        if abs(p - p0) < tol:
+            return p
+        p0 = p
+
+    msg = "Failed to converge after %d iterations, value is %.16f" % (maxiter, p)
+    raise RuntimeError(msg)
 
 
 def _householder(func, p0, T0, fprime, fprime2, fprime3, args=(), tol=1e-8, maxiter=10):
