@@ -51,6 +51,22 @@ It is released under the MIT license.
 .. image:: https://github.com/poliastro/poliastro/raw/master/examples/molniya.png
    :align: center
 
+Examples
+========
+
+.. |mybinder| image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
+   :target: http://mybinder.org/repo/poliastro/poliastro
+
+|mybinder|
+
+In the examples directory you can find several Jupyter notebooks with specific
+applications of poliastro. You can launch a cloud Jupyter server using `binder`_ to edit
+the notebooks without installing anything. Try it out!
+
+http://mybinder.org/repo/poliastro/poliastro
+
+.. _binder: http://mybinder.org/
+
 Requirements
 ============
 

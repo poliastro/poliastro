@@ -39,6 +39,13 @@ https://github.com/poliastro/poliastro
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 .. _`wiki`: https://github.com/poliastro/poliastro/wiki/
 
+You can browse the gallery of examples using `binder`_, a cloud Jupyter notebook server:
+
+image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
+   :target: http://mybinder.org/repo/poliastro/poliastro
+
+.. _binder: http://mybinder.org/
+
 Release announcements and general discussion take place on our `mailing list`_.
 Feel free to join!
 
