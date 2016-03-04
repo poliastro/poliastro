@@ -41,7 +41,7 @@ https://github.com/poliastro/poliastro
 
 You can browse the gallery of examples using `binder`_, a cloud Jupyter notebook server:
 
-image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
+.. image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
    :target: http://mybinder.org/repo/poliastro/poliastro
 
 .. _binder: http://mybinder.org/
