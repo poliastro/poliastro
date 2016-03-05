@@ -20,6 +20,9 @@
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
+.. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
+   :target: http://poliastro.readthedocs.org/en/latest/?badge=latest
+
 .. |license| image:: https://img.shields.io/github/license/poliastro/poliastro.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/master/COPYING
 
@@ -33,7 +36,8 @@
    :target: https://groups.io/g/poliastro-dev
 
 |travisci| |appveyor| |codecov|
-|license| |doi| |astropy| |mailing|
+
+|docs| |license| |doi| |astropy| |mailing|
 
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
@@ -50,6 +54,18 @@ It is released under the MIT license.
 
 .. image:: https://github.com/poliastro/poliastro/raw/master/examples/molniya.png
    :align: center
+
+Documentation
+=============
+
+|docs|
+
+Complete documentation, including a user guide and an API reference, can be read on
+the wonderful `Read the Docs`_.
+
+http://poliastro.readthedocs.org/en/latest/
+
+.. _`Read the Docs`: http://readthedocs.org/
 
 Examples
 ========
