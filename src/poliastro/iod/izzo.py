@@ -5,9 +5,7 @@ import numpy as np
 from numpy import pi
 from astropy import units as u
 
-from scipy.optimize import newton  # Halley iteration
-
-# from poliastro.jit import jit
+from poliastro.jit import jit
 from poliastro.util import norm
 
 try:
@@ -93,11 +91,15 @@ def _lambert_izzo(k, r1, r2, tof, M, numiter, rtol):
     sigma = np.sqrt(1 - rho ** 2)
 
     for x, y in xy:
-        v1, v2 = _reconstruct(x, y, r1_norm, r2_norm, i_r1, i_t1, i_r2, i_t2, ll, gamma, rho, sigma)
+        V_r1, V_r2, V_t1, V_t2 = _reconstruct(x, y, r1_norm, r2_norm, ll,
+                                              gamma, rho, sigma)
+        v1 = V_r1 * i_r1 + V_t1 * i_t1
+        v2 = V_r2 * i_r2 + V_t2 * i_t2
         yield v1, v2
 
 
-def _reconstruct(x, y, r1, r2, i_r1, i_t1, i_r2, i_t2, ll, gamma, rho, sigma):
+@jit
+def _reconstruct(x, y, r1, r2, ll, gamma, rho, sigma):
     """Reconstruct solution velocity vectors.
 
     """
@@ -105,9 +107,7 @@ def _reconstruct(x, y, r1, r2, i_r1, i_t1, i_r2, i_t2, ll, gamma, rho, sigma):
     V_r2 = -gamma * ((ll * y - x) + rho * (ll * y + x)) / r2
     V_t1 = gamma * sigma * (y + ll * x) / r1
     V_t2 = gamma * sigma * (y + ll * x) / r2
-    v1 = V_r1 * i_r1 + V_t1 * i_t1
-    v2 = V_r2 * i_r2 + V_t2 * i_t2
-    return v1, v2
+    return [V_r1, V_r2, V_t1, V_t2]
 
 
 def _find_xy(ll, T, M, numiter, rtol):
@@ -143,6 +143,7 @@ def _find_xy(ll, T, M, numiter, rtol):
         yield x, y
 
 
+@jit('f8(f8, f8)')
 def _compute_y(x, ll):
     """Computes y.
 
@@ -150,6 +151,7 @@ def _compute_y(x, ll):
     return np.sqrt(1 - ll ** 2 * (1 - x ** 2))
 
 
+@jit('f8(f8, f8, f8)')
 def _compute_psi(x, y, ll):
     """Computes psi.
 
@@ -186,15 +188,18 @@ def _tof_equation(x, y, T0, ll, M):
     return T_ - T0
 
 
+@jit('f8(f8, f8, f8, f8)')
 def _tof_equation_p(x, y, T, ll):
     # TODO: What about derivatives when x approaches 1?
     return (3 * T * x - 2 + 2 * ll ** 3 * x / y) / (1 - x ** 2)
 
 
+@jit('f8(f8, f8, f8, f8, f8)')
 def _tof_equation_pp(x, y, T, dT, ll):
     return (3 * T + 5 * x * dT + 2 * (1 - ll ** 2) * ll ** 3 / y ** 3) / (1 - x ** 2)
 
 
+@jit('f8(f8, f8, f8, f8, f8, f8)')
 def _tof_equation_ppp(x, y, _, dT, ddT, ll):
     return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
 
@@ -221,6 +226,7 @@ def _compute_T_min(ll, M):
     return x_T_min, T_min
 
 
+@jit
 def _initial_guess(T, ll, M):
     """Initial guess.
 
@@ -238,16 +244,13 @@ def _initial_guess(T, ll, M):
             # elif T_1 < T < T_0
             x_0 = (T_0 / T) ** (np.log2(T_1 / T_0)) - 1
 
-        # Convert to tuple
-        x_0 = x_0,
+        return [x_0]
     else:
         # Multiple revolution
         x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (((M * pi + pi) / (8 * T)) ** (2 / 3) + 1)
         x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (((8 * T) / (M * pi)) ** (2 / 3) + 1)
 
-        x_0 = x_0l, x_0r
-
-    return x_0
+        return [x_0l, x_0r]
 
 
 def _halley(fprime, p0, T0, ll, fprime2, fprime3, tol=1e-8, maxiter=10):
