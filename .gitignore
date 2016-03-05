@@ -12,8 +12,9 @@ build
 *.egg
 *.egg-info
 
-.ipynb_checkpoints
+.ipynb_checkpoints/
+.benchmarks/
 
 .coverage
 
-__pycache__
+__pycache__/
