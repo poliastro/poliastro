@@ -208,7 +208,7 @@ def _compute_T_min(ll, M):
     """
     if ll == 1:
         x_T_min = 0.0
-        T_min = _tof_equation(x_T_min, 0.0, ll, M)
+        T_min = _tof_equation(x_T_min, _compute_y(x_T_min, ll), 0.0, ll, M)
     else:
         if M == 0:
             x_T_min = np.inf
@@ -249,6 +249,7 @@ def _initial_guess(T, ll, M):
         return [x_0l, x_0r]
 
 
+@jit('f8(f8, f8, f8, f8, i4)')
 def _halley(p0, T0, ll, tol=1e-8, maxiter=10):
     """Find a minimum of time of flight equation using the Halley method.
 
@@ -273,8 +274,7 @@ def _halley(p0, T0, ll, tol=1e-8, maxiter=10):
             return p
         p0 = p
 
-    msg = "Failed to converge after %d iterations, value is %.16f" % (maxiter, p)
-    raise RuntimeError(msg)
+    raise RuntimeError("Failed to converge")
 
 
 def _householder(p0, T0, ll, M, tol=1e-8, maxiter=10):
@@ -302,5 +302,4 @@ def _householder(p0, T0, ll, M, tol=1e-8, maxiter=10):
             return p
         p0 = p
 
-    msg = "Failed to converge after %d iterations, value is %.16f" % (maxiter, p)
-    raise RuntimeError(msg)
+    raise RuntimeError("Failed to converge")
