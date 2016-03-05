@@ -123,7 +123,7 @@ def _find_xy(ll, T, M, numiter, rtol):
 
     # Refine maximum number of revolutions if necessary
     if T < T_00 + M_max * pi and M_max > 0:
-        _, T_min = _compute_T_min(ll, M_max)
+        _, T_min = _compute_T_min(ll, M_max, numiter, rtol)
         if T < T_min:
             M_max -= 1
 
@@ -202,7 +202,7 @@ def _tof_equation_p3(x, y, _, dT, ddT, ll):
     return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
 
 
-def _compute_T_min(ll, M):
+def _compute_T_min(ll, M, numiter, rtol):
     """Compute minimum T.
 
     """
@@ -217,7 +217,8 @@ def _compute_T_min(ll, M):
             # Set x_i > 0 to avoid problems at ll = -1
             x_i = 0.1
             y = _compute_y(x_i, ll)
-            x_T_min = _halley(0.1, _tof_equation(x_i, y, 0.0, ll, M), ll)
+            T_i = _tof_equation(x_i, y, 0.0, ll, M)
+            x_T_min = _halley(0.1, T_i, ll, rtol, numiter)
             T_min = _tof_equation(x_T_min, y, 0.0, ll, M)
 
     return x_T_min, T_min
@@ -250,7 +251,7 @@ def _initial_guess(T, ll, M):
 
 
 @jit('f8(f8, f8, f8, f8, i4)')
-def _halley(p0, T0, ll, tol=1e-8, maxiter=10):
+def _halley(p0, T0, ll, tol, maxiter):
     """Find a minimum of time of flight equation using the Halley method.
 
     Note
@@ -277,7 +278,7 @@ def _halley(p0, T0, ll, tol=1e-8, maxiter=10):
     raise RuntimeError("Failed to converge")
 
 
-def _householder(p0, T0, ll, M, tol=1e-8, maxiter=10):
+def _householder(p0, T0, ll, M, tol, maxiter):
     """Find a zero of time of flight equation using the Householder method.
 
     Note
