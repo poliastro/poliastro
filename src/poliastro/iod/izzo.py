@@ -150,14 +150,13 @@ def _compute_y(x, ll):
     return np.sqrt(1 - ll ** 2 * (1 - x ** 2))
 
 
-def _compute_psi(x, ll):
+def _compute_psi(x, y, ll):
     """Computes psi.
 
     "The auxiliary angle psi is computed using Eq.(17) by the appropriate
     inverse function"
 
     """
-    y = _compute_y(x, ll)
     if -1 <= x < 1:
         # Elliptic motion
         # Use arc cosine to avoid numerical errors
@@ -171,36 +170,32 @@ def _compute_psi(x, ll):
         return 0.0
 
 
-def _tof_equation(x, T0, ll, M):
+def _tof_equation(x, y, T0, ll, M):
     """Time of flight equation.
 
     """
-    y = _compute_y(x, ll)
     if M == 0 and np.sqrt(0.6) < x < np.sqrt(1.4):
         eta = y - ll * x
         S_1 = (1 - ll - x * eta) * .5
         Q = 4 / 3 * hyp2f1(3, 1, 5 / 2, S_1)
         T_ = (eta ** 3 * Q + 4 * ll * eta) * .5
     else:
-        psi = _compute_psi(x, ll)
+        psi = _compute_psi(x, y, ll)
         T_ = ((psi + M * pi) / np.sqrt(np.abs(1 - x ** 2)) - x + ll * y) / (1 - x ** 2)
 
     return T_ - T0
 
 
-def _tof_equation_p(x, T, ll):
+def _tof_equation_p(x, y, T, ll):
     # TODO: What about derivatives when x approaches 1?
-    y = _compute_y(x, ll)
     return (3 * T * x - 2 + 2 * ll ** 3 * x / y) / (1 - x ** 2)
 
 
-def _tof_equation_pp(x, T, dT, ll):
-    y = _compute_y(x, ll)
+def _tof_equation_pp(x, y, T, dT, ll):
     return (3 * T + 5 * x * dT + 2 * (1 - ll ** 2) * ll ** 3 / y ** 3) / (1 - x ** 2)
 
 
-def _tof_equation_ppp(x, T, dT, ddT, ll):
-    y = _compute_y(x, ll)
+def _tof_equation_ppp(x, y, _, dT, ddT, ll):
     return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
 
 
@@ -216,10 +211,12 @@ def _compute_T_min(ll, M):
             x_T_min = np.inf
             T_min = 0.0
         else:
-            # Set x_0 > 0 to avoid problems at ll = -1
-            x_T_min = _halley(_tof_equation_p, 0.1, _tof_equation(0.1, 0.0, ll, M), ll,
+            # Set x_i > 0 to avoid problems at ll = -1
+            x_i = 0.1
+            y = _compute_y(x_i, ll)
+            x_T_min = _halley(_tof_equation_p, 0.1, _tof_equation(x_i, y, 0.0, ll, M), ll,
                               _tof_equation_pp, _tof_equation_ppp)
-            T_min = _tof_equation(x_T_min, 0.0, ll, M)
+            T_min = _tof_equation(x_T_min, y, 0.0, ll, M)
 
     return x_T_min, T_min
 
@@ -263,11 +260,12 @@ def _halley(fprime, p0, T0, ll, fprime2, fprime3, tol=1e-8, maxiter=10):
 
     """
     for ii in range(maxiter):
-        fder = fprime(p0, T0, ll)
-        fder2 = fprime2(p0, T0, fder, ll)
+        y = _compute_y(p0, ll)
+        fder = fprime(p0, y, T0, ll)
+        fder2 = fprime2(p0, y, T0, fder, ll)
         if fder2 == 0:
             raise RuntimeError("Derivative was zero")
-        fder3 = fprime3(p0, T0, fder, fder2, ll)
+        fder3 = fprime3(p0, y, T0, fder, fder2, ll)
 
         # Halley step (cubic)
         p = p0 - 2 * fder * fder2 / (2 * fder2 ** 2 - fder * fder3)
@@ -290,11 +288,12 @@ def _householder(func, p0, T0, ll, M, fprime, fprime2, fprime3, tol=1e-8, maxite
 
     """
     for ii in range(maxiter):
-        fval = func(p0, T0, ll, M)
+        y = _compute_y(p0, ll)
+        fval = func(p0, y, T0, ll, M)
         T = fval + T0
-        fder = fprime(p0, T, ll)
-        fder2 = fprime2(p0, T, fder, ll)
-        fder3 = fprime3(p0, T, fder, fder2, ll)
+        fder = fprime(p0, y, T, ll)
+        fder2 = fprime2(p0, y, T, fder, ll)
+        fder3 = fprime3(p0, y, T, fder, fder2, ll)
 
         # Householder step (quartic)
         p = p0 - fval * ((fder ** 2 - fval * fder2 / 2) /
