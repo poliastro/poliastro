@@ -2,6 +2,7 @@ name: poliastro
 channels:
   - poliastro
 dependencies:
+  - poliastro
   - astropy
   - jplephem
   - matplotlib
