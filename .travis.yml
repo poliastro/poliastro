@@ -26,19 +26,19 @@ before_install:
   - conda update -q conda
   - conda create -q -n test-environment python=$PYTHON
   - source activate test-environment
-  - pip install coverage pytest pytest-cov codecov
+  - pip install coverage pytest pytest-cov pytest-benchmark codecov
 
 install:
   - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install --no-deps .  # Test installation correctness
 
 script:
-  - py.test -vv  # Test against installed code
+  - py.test -vv --benchmark-skip  # Test against installed code
 
 after_success:
   - pip uninstall poliastro -y
   - pip install --no-deps -e .
-  - NUMBA_DISABLE_JIT=1 py.test --cov
+  - NUMBA_DISABLE_JIT=1 py.test --cov --benchmark-skip
   - codecov
 
 sudo: false
