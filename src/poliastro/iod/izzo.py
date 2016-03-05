@@ -135,9 +135,9 @@ def _find_xy(ll, T, M, numiter, rtol):
     # Initial guess
     for x_0 in _initial_guess(T, ll, M):
         # Start Householder iterations from x_0 and find x, y
-        x = _householder(_tof_equation, x_0, T, args=(ll, M), tol=rtol, maxiter=numiter,
-                         fprime=_tof_equation_p, fprime2=_tof_equation_pp,
-                         fprime3=_tof_equation_ppp)
+        x = _householder(_tof_equation, x_0, T, ll, M,
+                         _tof_equation_p, _tof_equation_pp, _tof_equation_ppp,
+                         rtol, numiter)
         y = _compute_y(x, ll)
 
         yield x, y
@@ -187,18 +187,19 @@ def _tof_equation(x, T0, ll, M):
 
     return T_ - T0
 
-def _tof_equation_p(x, T, ll, M):
+
+def _tof_equation_p(x, T, ll):
     # TODO: What about derivatives when x approaches 1?
     y = _compute_y(x, ll)
     return (3 * T * x - 2 + 2 * ll ** 3 * x / y) / (1 - x ** 2)
 
 
-def _tof_equation_pp(x, T, dT, ll, M):
+def _tof_equation_pp(x, T, dT, ll):
     y = _compute_y(x, ll)
     return (3 * T + 5 * x * dT + 2 * (1 - ll ** 2) * ll ** 3 / y ** 3) / (1 - x ** 2)
 
 
-def _tof_equation_ppp(x, T, dT, ddT, ll, M):
+def _tof_equation_ppp(x, T, dT, ddT, ll):
     y = _compute_y(x, ll)
     return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
 
@@ -216,9 +217,8 @@ def _compute_T_min(ll, M):
             T_min = 0.0
         else:
             # Set x_0 > 0 to avoid problems at ll = -1
-            x_T_min = _halley(_tof_equation_p, 0.1, _tof_equation(0.1, 0.0, ll, M),
-                              _tof_equation_pp, _tof_equation_ppp,
-                              args=(ll, M))
+            x_T_min = _halley(_tof_equation_p, 0.1, _tof_equation(0.1, 0.0, ll, M), ll,
+                              _tof_equation_pp, _tof_equation_ppp)
             T_min = _tof_equation(x_T_min, 0.0, ll, M)
 
     return x_T_min, T_min
@@ -253,7 +253,7 @@ def _initial_guess(T, ll, M):
     return x_0
 
 
-def _halley(fprime, p0, T0, fprime2, fprime3, args=(), tol=1e-8, maxiter=10):
+def _halley(fprime, p0, T0, ll, fprime2, fprime3, tol=1e-8, maxiter=10):
     """Find a minimum of time of flight equation using the Halley method.
 
     Note
@@ -263,11 +263,11 @@ def _halley(fprime, p0, T0, fprime2, fprime3, args=(), tol=1e-8, maxiter=10):
 
     """
     for ii in range(maxiter):
-        fder = fprime(p0, T0, *args)
-        fder2 = fprime2(p0, T0, fder, *args)
+        fder = fprime(p0, T0, ll)
+        fder2 = fprime2(p0, T0, fder, ll)
         if fder2 == 0:
             raise RuntimeError("Derivative was zero")
-        fder3 = fprime3(p0, T0, fder, fder2, *args)
+        fder3 = fprime3(p0, T0, fder, fder2, ll)
 
         # Halley step (cubic)
         p = p0 - 2 * fder * fder2 / (2 * fder2 ** 2 - fder * fder3)
@@ -280,7 +280,7 @@ def _halley(fprime, p0, T0, fprime2, fprime3, args=(), tol=1e-8, maxiter=10):
     raise RuntimeError(msg)
 
 
-def _householder(func, p0, T0, fprime, fprime2, fprime3, args=(), tol=1e-8, maxiter=10):
+def _householder(func, p0, T0, ll, M, fprime, fprime2, fprime3, tol=1e-8, maxiter=10):
     """Find a zero of time of flight equation using the Householder method.
 
     Note
@@ -290,11 +290,11 @@ def _householder(func, p0, T0, fprime, fprime2, fprime3, args=(), tol=1e-8, maxi
 
     """
     for ii in range(maxiter):
-        fval = func(p0, T0, *args)
+        fval = func(p0, T0, ll, M)
         T = fval + T0
-        fder = fprime(p0, T, *args)
-        fder2 = fprime2(p0, T, fder, *args)
-        fder3 = fprime3(p0, T, fder, fder2, *args)
+        fder = fprime(p0, T, ll)
+        fder2 = fprime2(p0, T, fder, ll)
+        fder3 = fprime3(p0, T, fder, fder2, ll)
 
         # Householder step (quartic)
         p = p0 - fval * ((fder ** 2 - fval * fder2 / 2) /
