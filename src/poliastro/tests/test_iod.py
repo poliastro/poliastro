@@ -123,7 +123,7 @@ def test_raises_exception_for_non_feasible_solution(lambert):
 
 
 def test_computing_T_min_works():
-    try:
-        next(izzo._find_xy(-0.9, 37.734608668435975, 0, 3, 1e-3))
-    except TypeError:
-        pytest.fail("Incorrect argument unpacking")
+    #try:
+    next(izzo._find_xy(-0.9, 37.734608668435975, 0, 3, 1e-3))
+    #except TypeError:
+    #pytest.fail("Incorrect argument unpacking")
