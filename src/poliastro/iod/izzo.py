@@ -223,7 +223,6 @@ def _compute_T_min(ll, M):
     return x_T_min, T_min
 
 
-@jit
 def _initial_guess(T, ll, M):
     """Initial guess.
 
