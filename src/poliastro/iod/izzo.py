@@ -200,6 +200,7 @@ def _tof_equation_p3(x, y, _, dT, ddT, ll):
     return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
 
 
+@jit
 def _compute_T_min(ll, M, numiter, rtol):
     """Compute minimum T.
 
@@ -222,6 +223,7 @@ def _compute_T_min(ll, M, numiter, rtol):
     return [x_T_min, T_min]
 
 
+@jit
 def _initial_guess(T, ll, M):
     """Initial guess.
 
