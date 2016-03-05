@@ -8,10 +8,7 @@ from astropy import units as u
 from poliastro.jit import jit
 from poliastro.util import norm
 
-try:
-    from hyper.hyper import hyp2f1
-except ImportError:
-    from scipy.special import hyp2f1
+from hyper.hyper import hyp2f1
 
 
 def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
@@ -170,6 +167,7 @@ def _compute_psi(x, y, ll):
         return 0.0
 
 
+@jit('f8(f8, f8, f8, f8, i4)')
 def _tof_equation(x, y, T0, ll, M):
     """Time of flight equation.
 
@@ -221,7 +219,7 @@ def _compute_T_min(ll, M, numiter, rtol):
             x_T_min = _halley(0.1, T_i, ll, rtol, numiter)
             T_min = _tof_equation(x_T_min, y, 0.0, ll, M)
 
-    return x_T_min, T_min
+    return [x_T_min, T_min]
 
 
 def _initial_guess(T, ll, M):
@@ -278,6 +276,7 @@ def _halley(p0, T0, ll, tol, maxiter):
     raise RuntimeError("Failed to converge")
 
 
+@jit('f8(f8, f8, f8, i4, f8, i4)')
 def _householder(p0, T0, ll, M, tol, maxiter):
     """Find a zero of time of flight equation using the Householder method.
 
