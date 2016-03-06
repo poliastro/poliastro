@@ -8,4 +8,4 @@ Utilities and Python wrappers for Orbital Mechanics
 
 """
 
-__version__ = '0.5.dev0'
+__version__ = '0.5.0'

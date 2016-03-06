@@ -4,8 +4,6 @@ What's new
 New in poliastro 0.5.0
 ----------------------
 
-.. warning:: This version is not released yet.
-
 This is a new major release, focused on expanding the initial orbit
 determination capabilities and solving some infrastructure challenges.
 
