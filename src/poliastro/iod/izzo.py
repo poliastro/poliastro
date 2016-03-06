@@ -7,8 +7,7 @@ from astropy import units as u
 
 from poliastro.jit import jit
 from poliastro.util import norm
-
-from pycephes.hyper import hyp2f1
+from poliastro.hyper import hyp2f1b as hyp2f1
 
 
 def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):

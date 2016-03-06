@@ -38,7 +38,7 @@ install:
   - "pip install pytest codecov pytest-benchmark"
 
   # Install dependencies
-  - "conda install -q numpy=%NUMPY% numba>=0.23 astropy>=1.0 matplotlib scipy jplephem pycephes"
+  - "conda install -q numpy=%NUMPY% numba>=0.23 astropy>=1.0 matplotlib scipy jplephem"
   - "pip install ."  # Test installation correctness
   
 build: off
