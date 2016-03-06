@@ -27,6 +27,7 @@ setup(
         "matplotlib",
         "jplephem",
         "scipy",
+        "pycephes",
     ],
     tests_require=[
         "pytest"
