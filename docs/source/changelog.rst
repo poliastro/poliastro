@@ -31,7 +31,7 @@ Bugs fixed:
 
 * `Issue #110`_: Bug when plotting State with non canonical units
 
-.. _`#110`: https://github.com/poliastro/poliastro/issues/110
+.. _`Issue #110`: https://github.com/poliastro/poliastro/issues/110
 
 Backward incompatible changes:
 
