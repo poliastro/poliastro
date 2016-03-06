@@ -23,7 +23,7 @@
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
    :target: http://poliastro.readthedocs.org/en/latest/?badge=latest
 
-.. |license| image:: https://img.shields.io/github/license/poliastro/poliastro.svg?style=flat-square
+.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/master/COPYING
 
 .. |doi| image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg?style=flat-square
