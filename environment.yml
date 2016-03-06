@@ -9,3 +9,4 @@ dependencies:
   - numba
   - numpy
   - scipy
+  - pycephes

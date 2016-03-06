@@ -33,7 +33,7 @@ before_install:
   - source activate test-environment
 
   # Install project requirements
-  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
+  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem pycephes
   - pip install coverage pytest pytest-cov codecov pytest-benchmark
 
 install:
