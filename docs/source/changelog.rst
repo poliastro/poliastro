@@ -6,8 +6,42 @@ New in poliastro 0.5.0
 
 .. warning:: This version is not released yet.
 
+This is a new major release, focused on expanding the initial orbit
+determination capabilities and solving some infrastructure challenges.
+
+New features:
+
+* **Izzo's algorithm for the Lambert problem**: Thanks to this algorithm
+  multirevolution solutions are also returned. The old algorithm is kept
+  on a separate module.
+
+Other highlights:
+
+* **Documentation on Read the Docs**: You can now browse previous releases
+  of the package and easily switch between released and development versions.
+* **Mailing list**: poliastro now has a mailing list hosted on groups.io.
+  Come and join!
+* **Clarified scope**: poliastro will now be focused on interplanetary
+  applications, leaving other features to the new `python-astrodynamics`_
+  project.
+
+.. _`python-astrodynamics`: http://python-astrodynamics.org/
+
+Bugs fixed:
+
+* `Issue #110`_: Bug when plotting State with non canonical units
+
+.. _`#110`: https://github.com/poliastro/poliastro/issues/110
+
 Backward incompatible changes:
 
+* **Drop Legacy Python**: poliastro 0.5.x and later will support only
+  Python 3.x. We recommend our potential users to create dedicated virtual
+  environments using conda or virtualenv or to contact the developers to fund
+  Python 2 support.
+* **Change ``lambert`` function API**: The functions for solving Lambert's
+  problem are now _generators_, even in the single revolution case.
+  Check out the User Guide for specific examples.
 * **Creation of orbits from classical elements**: poliastro has
   reverted the switch to the *semilatus rectum* \\(p\\) instead of the semimajor
   axis \\(a\\) made in 0.4.0, so \\(a\\) must be used again. This change is

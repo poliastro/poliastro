@@ -34,20 +34,20 @@ before_install:
 
   # Install project requirements
   - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
-  - pip install coverage pytest pytest-cov codecov
+  - pip install coverage pytest pytest-cov codecov pytest-benchmark
 
 install:
   - pip install --no-deps .  # Test installation correctness
 
 script:
-  - py.test -vv  # Test against installed code
+  - py.test -vv --benchmark-skip  # Test against installed code
 
 after_success:
   # Uninstall to test coverage against sources
   - pip uninstall poliastro -y
   - pip install --no-deps -e .
 
-  - NUMBA_DISABLE_JIT=1 py.test --cov
+  - NUMBA_DISABLE_JIT=1 py.test --cov --benchmark-skip
 
   - codecov
 

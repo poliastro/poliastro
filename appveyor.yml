@@ -35,7 +35,7 @@ install:
   - "python --version"
 
   # Install testing dependencies
-  - "pip install pytest codecov"
+  - "pip install pytest codecov pytest-benchmark"
 
   # Install dependencies
   - "conda install -q numpy=%NUMPY% numba>=0.23 astropy>=1.0 matplotlib scipy jplephem"
@@ -44,4 +44,4 @@ install:
 build: off
 
 test_script:
-  - "py.test -vv"  # Test against installed code
+  - "py.test -vv --benchmark-skip"  # Test against installed code
