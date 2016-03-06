@@ -178,7 +178,9 @@ def _tof_equation(x, y, T0, ll, M):
         T_ = (eta ** 3 * Q + 4 * ll * eta) * .5
     else:
         psi = _compute_psi(x, y, ll)
-        T_ = ((psi + M * pi) / np.sqrt(np.abs(1 - x ** 2)) - x + ll * y) / (1 - x ** 2)
+        T_ = np.divide(np.divide(psi + M * pi,
+                                 np.sqrt(np.abs(1 - x ** 2))) - x + ll * y,
+                       (1 - x ** 2))
 
     return T_ - T0
 
