@@ -7,7 +7,7 @@ from astropy import units as u
 
 from poliastro.jit import jit
 from poliastro.util import norm
-from poliastro.hyper import hyp2f1b as hyp2f1
+from poliastro.hyper import hyp2f1b
 
 
 def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
@@ -174,7 +174,7 @@ def _tof_equation(x, y, T0, ll, M):
     if M == 0 and np.sqrt(0.6) < x < np.sqrt(1.4):
         eta = y - ll * x
         S_1 = (1 - ll - x * eta) * .5
-        Q = 4 / 3 * hyp2f1(3, 1, 5 / 2, S_1)
+        Q = 4 / 3 * hyp2f1b(S_1)
         T_ = (eta ** 3 * Q + 4 * ll * eta) * .5
     else:
         psi = _compute_psi(x, y, ll)
