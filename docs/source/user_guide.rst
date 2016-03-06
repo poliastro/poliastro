@@ -289,7 +289,7 @@ Mars Science Laboratory mission (rover Curiosity) is determined::
     >>> r, _ = ephem.planet_ephem(ephem.MARS, date_arrival)
     >>> from poliastro import iod
     >>> from poliastro.bodies import Sun
-    >>> v0, v = next(iod.lambert(Sun.k, r0, r, tof))
+    >>> (v0, v), = iod.lambert(Sun.k, r0, r, tof)
     >>> v0
     <Quantity [-29.29150998, 14.53326521,  5.41691336] km / s>
     >>> v

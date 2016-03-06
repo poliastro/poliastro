@@ -40,8 +40,8 @@ Backward incompatible changes:
   environments using conda or virtualenv or to contact the developers to fund
   Python 2 support.
 * **Change ``lambert`` function API**: The functions for solving Lambert's
-  problem are now _generators_, and therefore each solution must be retrieved
-  using ``next()``. Check out the User Guide and the examples gallery.
+  problem are now _generators_, even in the single revolution case.
+  Check out the User Guide for specific examples.
 * **Creation of orbits from classical elements**: poliastro has
   reverted the switch to the *semilatus rectum* \\(p\\) instead of the semimajor
   axis \\(a\\) made in 0.4.0, so \\(a\\) must be used again. This change is
