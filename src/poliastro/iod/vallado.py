@@ -46,10 +46,8 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     r0_ = r0.to(u.km).value
     r_ = r.to(u.km).value
     tof_ = tof.to(u.s).value
-    f, g, fdot, gdot = _lambert(k_, r0_, r_, tof_, short, numiter, rtol)
 
-    v0 = (r_ - f * r0_) / g
-    v = (gdot * r_ - r0_) / g
+    v0, v = _lambert(k_, r0_, r_, tof_, short, numiter, rtol)
 
     yield v0 * u.km / u.s, v * u.km / u.s
 
@@ -108,4 +106,7 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
 
     gdot = 1 - y / norm_r
 
-    return f, g, (f * gdot - 1) / g, gdot
+    v0 = (r - f * r0) / g
+    v = (gdot * r - r0) / g
+
+    return v0, v
