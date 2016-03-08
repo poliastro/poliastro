@@ -43,13 +43,13 @@ def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
     r_ = r.to(u.km).value
     tof_ = tof.to(u.s).value
 
-    sols = _lambert_izzo(k_, r0_, r_, tof_, M, numiter, rtol)
+    sols = _lambert(k_, r0_, r_, tof_, M, numiter, rtol)
 
     for v0, v in sols:
         yield v0 * u.km / u.s, v * u.km / u.s
 
 
-def _lambert_izzo(k, r1, r2, tof, M, numiter, rtol):
+def _lambert(k, r1, r2, tof, M, numiter, rtol):
     # Check preconditions
     assert tof > 0
     assert k > 0
