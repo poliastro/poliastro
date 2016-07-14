@@ -111,7 +111,7 @@ Installation
 The easiest and fastest way to get the package up and running is to
 install poliastro using `conda <http://conda.io>`_::
 
-  $ conda install poliastro --channel poliastro
+  $ conda install poliastro --channel conda-forge
 
 You can also `install poliastro from PyPI`_ using pip, given that you already
 have all the requirements::

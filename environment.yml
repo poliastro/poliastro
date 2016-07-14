@@ -1,6 +1,6 @@
 name: poliastro
 channels:
-  - poliastro
+  - conda-forge
 dependencies:
   - python=3.4
   - poliastro
