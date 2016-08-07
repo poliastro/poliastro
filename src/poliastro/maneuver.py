@@ -7,7 +7,6 @@ import numpy as np
 
 from astropy import units as u
 
-from poliastro.util import check_units
 from poliastro.util import norm
 
 
@@ -40,16 +39,21 @@ class Maneuver(object):
 
         """
         self.impulses = impulses
-        self._dts, self._dvs = zip(*impulses)
-        u_times = check_units(self._dts, (u.s,))
-        u_dvs = check_units(self._dvs, (u.m / u.s,))
-        if not u_times or not u_dvs:
-            raise u.UnitsError("Units must be consistent")
+        # HACK: Change API or validation code
+        _dts, _dvs = zip(*impulses)
+        self._dts, self._dvs = self._initialize(
+            [(_dt * u.one).value for _dt in _dts] * (_dts[0] * u.one).unit,
+            [(_dv * u.one).value for _dv in _dvs] * (_dvs[0] * u.one).unit,
+        )
         try:
             if not all(len(dv) == 3 for dv in self._dvs):
                 raise TypeError
         except TypeError:
             raise ValueError("Delta-V must be three dimensions vectors")
+
+    @u.quantity_input(dts=u.s, dvs=u.m / u.s)
+    def _initialize(self, dts, dvs):
+        return dts, dvs
 
     def __getitem__(self, key):
         return self.impulses[key]

@@ -16,7 +16,7 @@ def test_maneuver_raises_error_if_units_are_wrong():
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     with pytest.raises(u.UnitsError) as excinfo:
         man = Maneuver([wrong_dt, _v])
-    assert ("UnitsError: Units must be consistent"
+    assert ("UnitsError: Argument 'dts' to function '_initialize' must be in units convertible to 's'."
             in excinfo.exconly())
 
 
