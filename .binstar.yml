@@ -3,14 +3,11 @@ platform: linux-64
 engine:
   - python=3.4
   - python=3.5
-env:
-  - NUMPY=1.9
-  - NUMPY=1.10
 before_script:
   - conda config --set always_yes yes --set changeps1 no
   - conda config --add channels poliastro
   - conda install pytest
 script:
-  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
+  - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install --no-deps .  # Test installation correctness
   - py.test -vv  # Test against installed code

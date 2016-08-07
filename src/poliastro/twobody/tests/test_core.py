@@ -65,7 +65,7 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         ss = State.from_classical(Sun, _d, _, _a, _a, _a, wrong_angle)
-    assert ("UnitsError: Units must be consistent"
+    assert ("UnitsError: Argument 'nu' to function 'from_classical' must be in units convertible to 'rad'."
             in excinfo.exconly())
 
 
@@ -81,7 +81,7 @@ def test_state_raises_unitserror_if_rv_units_are_wrong():
     wrong_v = [0.0, 1.0e-6, 0.0] * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         ss = State.from_vectors(Sun, _d, wrong_v)
-    assert ("UnitsError: Units must be consistent"
+    assert ("UnitsError: Argument 'v' to function 'from_vectors' must be in units convertible to 'm / s'."
             in excinfo.exconly())
 
 

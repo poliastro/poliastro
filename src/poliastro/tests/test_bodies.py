@@ -17,7 +17,7 @@ def test_body_constructor_raises_valueerror_if_k_units_not_correct():
     wrong_k = 4902.8 * u.kg
     with pytest.raises(u.UnitsError) as excinfo:
         moon = bodies.Body(wrong_k)
-    assert ("UnitsError: Units must be consistent"
+    assert ("UnitsError: Argument 'k' to function '__init__' must be in units convertible to 'm3 / s2'."
             in excinfo.exconly())
 
 

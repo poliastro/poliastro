@@ -9,9 +9,8 @@ os:
   - osx
 
 env:
-  - PYTHON=3.4 NUMPY=1.9
-  - PYTHON=3.4 NUMPY=1.10
-  - PYTHON=3.5 NUMPY=1.10
+  - PYTHON=3.4
+  - PYTHON=3.5
 
 branches:
   only:
@@ -33,7 +32,7 @@ before_install:
   - source activate test-environment
 
   # Install project requirements
-  - conda install numpy=$NUMPY numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
+  - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install coverage pytest pytest-cov codecov pytest-benchmark
 
 install:

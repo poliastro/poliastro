@@ -61,14 +61,6 @@ def transform(vector, angle, axis='z', unit=None):
     return rotate(vector, -angle, axis, unit)
 
 
-def check_units(quantities, units):
-    """Check if list of quantities is consistent with given list of units.
-
-    """
-    return all(unit.is_equivalent((quant * u.one).unit)
-               for unit, quant in zip(units, quantities))
-
-
 def norm(vec):
     """Norm of a Quantity vector that respects units.
 

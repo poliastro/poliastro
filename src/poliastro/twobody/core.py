@@ -13,7 +13,7 @@ from astropy import units as u
 
 from poliastro.twobody.propagation import kepler
 
-from poliastro.util import check_units, norm
+from poliastro.util import norm
 
 J2000 = time.Time("J2000", scale='utc')
 
@@ -38,6 +38,7 @@ class State(object):
         self.epoch = epoch
 
     @staticmethod
+    @u.quantity_input(r=u.m, v=u.m / u.s)
     def from_vectors(attractor, r, v, epoch=J2000):
         """Return `State` object from position and velocity vectors.
 
@@ -53,15 +54,13 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((r, v), (u.m, u.m / u.s)):
-            raise u.UnitsError("Units must be consistent")
-
         assert np.any(r.value), "Position vector must be non zero"
 
         return poliastro.twobody.rv.RVState(
             attractor, r, v, epoch)
 
     @staticmethod
+    @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def from_classical(attractor, a, ecc, inc, raan, argp, nu,
                        epoch=J2000):
         """Return `State` object from classical orbital elements.
@@ -86,10 +85,6 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((a, ecc, inc, raan, argp, nu),
-                           (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
-            raise u.UnitsError("Units must be consistent")
-
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use "
                              "State.parabolic instead")
@@ -98,6 +93,7 @@ class State(object):
             attractor, a, ecc, inc, raan, argp, nu, epoch)
 
     @staticmethod
+    @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
     def from_equinoctial(attractor, p, f, g, h, k, L, epoch=J2000):
         """Return `State` object from modified equinoctial elements.
 
@@ -121,14 +117,11 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((p, f, g, h, k, L),
-                           (u.m, u.one, u.rad, u.rad, u.rad, u.rad)):
-            raise u.UnitsError("Units must be consistent")
-
         return poliastro.twobody.equinoctial.ModifiedEquinoctialState(
             attractor, p, f, g, h, k, L, epoch)
 
     @classmethod
+    @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
     def circular(cls, attractor, alt,
                  inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000):
         """Return `State` corresponding to a circular orbit.
@@ -149,9 +142,6 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((alt, inc, raan, arglat),
-                           (u.m, u.rad, u.rad, u.rad)):
-            raise u.UnitsError("Units must be consistent")
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
@@ -160,6 +150,7 @@ class State(object):
                                   epoch)
 
     @classmethod
+    @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000):
         """Return `State` corresponding to parabolic orbit.
 
@@ -181,10 +172,6 @@ class State(object):
             Epoch, default to J2000.
 
         """
-        if not check_units((p, inc, raan, argp, nu),
-                           (u.m, u.rad, u.rad, u.rad, u.rad)):
-            raise u.UnitsError("Units must be consistent")
-
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
         ecc = 1.0 * u.one
         r, v = poliastro.twobody.classical.coe2rv(
@@ -306,6 +293,12 @@ class State(object):
         h_vec = np.cross(self.r.to(u.km).value,
                          self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
+
+    @property
+    def arglat(self):
+        """Argument of latitude. """
+        arglat = self.argp + self.nu
+        return arglat
 
     def rv(self):
         """Position and velocity vectors. """

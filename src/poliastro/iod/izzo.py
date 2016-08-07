@@ -137,7 +137,7 @@ def _find_xy(ll, T, M, numiter, rtol):
         yield x, y
 
 
-@jit('f8(f8, f8)')
+@jit
 def _compute_y(x, ll):
     """Computes y.
 
@@ -145,7 +145,7 @@ def _compute_y(x, ll):
     return np.sqrt(1 - ll ** 2 * (1 - x ** 2))
 
 
-@jit('f8(f8, f8, f8)')
+@jit
 def _compute_psi(x, y, ll):
     """Computes psi.
 
@@ -166,7 +166,7 @@ def _compute_psi(x, y, ll):
         return 0.0
 
 
-@jit('f8(f8, f8, f8, f8, i4)')
+@jit
 def _tof_equation(x, y, T0, ll, M):
     """Time of flight equation.
 
@@ -185,18 +185,18 @@ def _tof_equation(x, y, T0, ll, M):
     return T_ - T0
 
 
-@jit('f8(f8, f8, f8, f8)')
+@jit
 def _tof_equation_p(x, y, T, ll):
     # TODO: What about derivatives when x approaches 1?
     return (3 * T * x - 2 + 2 * ll ** 3 * x / y) / (1 - x ** 2)
 
 
-@jit('f8(f8, f8, f8, f8, f8)')
+@jit
 def _tof_equation_p2(x, y, T, dT, ll):
     return (3 * T + 5 * x * dT + 2 * (1 - ll ** 2) * ll ** 3 / y ** 3) / (1 - x ** 2)
 
 
-@jit('f8(f8, f8, f8, f8, f8, f8)')
+@jit
 def _tof_equation_p3(x, y, _, dT, ddT, ll):
     return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
 
@@ -251,7 +251,7 @@ def _initial_guess(T, ll, M):
         return [x_0l, x_0r]
 
 
-@jit('f8(f8, f8, f8, f8, i4)')
+@jit
 def _halley(p0, T0, ll, tol, maxiter):
     """Find a minimum of time of flight equation using the Halley method.
 
@@ -279,7 +279,7 @@ def _halley(p0, T0, ll, tol, maxiter):
     raise RuntimeError("Failed to converge")
 
 
-@jit('f8(f8, f8, f8, i4, f8, i4)')
+@jit
 def _householder(p0, T0, ll, M, tol, maxiter):
     """Find a zero of time of flight equation using the Householder method.
 

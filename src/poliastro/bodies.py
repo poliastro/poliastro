@@ -14,13 +14,12 @@ TODO: Add more parameters (e.g. J2)
 from astropy.constants import R_earth
 from astropy import units as u
 
-from poliastro.util import check_units
-
 
 class Body(object):
     """Class to represent a body of the Solar System.
 
     """
+    @u.quantity_input(k=u.m ** 3 / u.s ** 2, R=u.m)
     def __init__(self, k, name=None, symbol=None, R=0 * u.km):
         """Constructor.
 
@@ -36,9 +35,6 @@ class Body(object):
             Radius of the body, default to 0 km.
 
         """
-        if not check_units((k, R), (u.m ** 3 / u.s ** 2, u.m)):
-            raise u.UnitsError("Units must be consistent")
-
         self.k = k
         self.name = name
         self.symbol = symbol

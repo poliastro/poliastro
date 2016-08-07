@@ -22,8 +22,8 @@ setup(
     ],
     install_requires=[
         "numpy",
-        "numba>=0.23",
-        "astropy>=1.0",
+        "numba>=0.25",
+        "astropy>=1.2",
         "matplotlib",
         "jplephem",
         "scipy",
