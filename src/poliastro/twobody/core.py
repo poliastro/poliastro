@@ -307,6 +307,12 @@ class State(object):
                          self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
+    @property
+    def arglat(self):
+        """Argument of latitude. """
+        arglat = self.argp + self.nu
+        return arglat
+
     def rv(self):
         """Position and velocity vectors. """
         return self.r, self.v
