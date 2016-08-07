@@ -8,7 +8,7 @@ from math import gamma
 from poliastro.jit import jit
 
 
-@jit('f8(f8)')
+@jit
 def c2(psi):
     r"""Second Stumpff function.
 
@@ -36,7 +36,7 @@ def c2(psi):
     return res
 
 
-@jit('f8(f8)')
+@jit
 def c3(psi):
     r"""Third Stumpff function.
 

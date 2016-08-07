@@ -6,7 +6,7 @@ import numpy as np
 from poliastro.jit import jit
 
 
-@jit('f8(f8)')
+@jit
 def hyp2f1b(x):
     """Hypergeometric function 2F1(3, 1, 5/2, x), see [Battin].
 
