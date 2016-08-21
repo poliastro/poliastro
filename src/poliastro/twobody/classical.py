@@ -8,7 +8,10 @@ from astropy import units as u
 
 from poliastro.util import transform
 
-from poliastro.twobody.core import State
+from poliastro.twobody.base import BaseState
+
+import poliastro.twobody.rv
+import poliastro.twobody.equinoctial
 
 
 def rv_pqw(k, p, ecc, nu):
@@ -92,7 +95,7 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     return p, f, g, h, k, L
 
 
-class ClassicalState(State):
+class ClassicalState(BaseState):
     def __init__(self, attractor, a, ecc, inc, raan, argp, nu,
                  epoch):
         super(ClassicalState, self).__init__(attractor, epoch)
@@ -164,7 +167,7 @@ class ClassicalState(State):
                       self.argp.to(u.rad).value,
                       self.nu.to(u.rad).value)
 
-        return super(ClassicalState, self).from_vectors(self.attractor,
+        return poliastro.twobody.rv.RVState(self.attractor,
                                                         r * u.km,
                                                         v * u.km / u.s,
                                                         self.epoch)
@@ -186,7 +189,7 @@ class ClassicalState(State):
                                    self.argp.to(u.rad).value,
                                    self.nu.to(u.rad).value)
 
-        return super(ClassicalState, self).from_equinoctial(
+        return poliastro.twobody.equinoctial.ModifiedEquinoctialState(
             self.attractor,
             p * u.km,
             f * u.rad,
