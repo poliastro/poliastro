@@ -52,7 +52,7 @@ class Orbit(object):
         attractor = self.state.attractor
         for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
-                orbit_new = self.propagate(time_of_flight=delta_t)
+                orbit_new = orbit_new.propagate(time_of_flight=delta_t)
             r, v = orbit_new.state.rv()
             vnew = v + delta_v
             ss_new = StateFactory.from_vectors(attractor, r, vnew)
