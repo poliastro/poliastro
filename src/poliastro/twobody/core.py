@@ -8,14 +8,11 @@ TODO
 """
 import numpy as np
 
-from astropy import time
 from astropy import units as u
 
 import poliastro.twobody.rv
 import poliastro.twobody.classical
 import poliastro.twobody.equinoctial
-
-J2000 = time.Time("J2000", scale='utc')
 
 
 class StateFactory(object):
@@ -24,7 +21,7 @@ class StateFactory(object):
     """
     @staticmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
-    def from_vectors(attractor, r, v, epoch=J2000):
+    def from_vectors(attractor, r, v):
         """Return `State` object from position and velocity vectors.
 
         Parameters
@@ -35,19 +32,16 @@ class StateFactory(object):
             Position vector wrt attractor center.
         v : Quantity
             Velocity vector.
-        epoch : Time, optional
-            Epoch, default to J2000.
 
         """
         assert np.any(r.value), "Position vector must be non zero"
 
         return poliastro.twobody.rv.RVState(
-            attractor, r, v, epoch)
+            attractor, r, v)
 
     @staticmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
-    def from_classical(attractor, a, ecc, inc, raan, argp, nu,
-                       epoch=J2000):
+    def from_classical(attractor, a, ecc, inc, raan, argp, nu):
         """Return `State` object from classical orbital elements.
 
         Parameters
@@ -66,8 +60,6 @@ class StateFactory(object):
             Argument of the pericenter.
         nu : Quantity
             True anomaly.
-        epoch : Time, optional
-            Epoch, default to J2000.
 
         """
         if ecc == 1.0 * u.one:
@@ -75,11 +67,11 @@ class StateFactory(object):
                              "State.parabolic instead")
 
         return poliastro.twobody.classical.ClassicalState(
-            attractor, a, ecc, inc, raan, argp, nu, epoch)
+            attractor, a, ecc, inc, raan, argp, nu)
 
     @staticmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
-    def from_equinoctial(attractor, p, f, g, h, k, L, epoch=J2000):
+    def from_equinoctial(attractor, p, f, g, h, k, L):
         """Return `State` object from modified equinoctial elements.
 
         Parameters
@@ -98,17 +90,15 @@ class StateFactory(object):
             Fifth modified equinoctial element.
         L : Quantity
             True longitude.
-        epoch : Time, optional
-            Epoch, default to J2000.
 
         """
         return poliastro.twobody.equinoctial.ModifiedEquinoctialState(
-            attractor, p, f, g, h, k, L, epoch)
+            attractor, p, f, g, h, k, L)
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
     def circular(cls, attractor, alt,
-                 inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000):
+                 inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg):
         """Return `State` corresponding to a circular orbit.
 
         Parameters
@@ -123,20 +113,17 @@ class StateFactory(object):
             Right ascension of the ascending node, default to 0 deg.
         arglat : Quantity, optional
             Argument of latitude, default to 0 deg.
-        epoch: Time, optional
-            Epoch, default to J2000.
 
         """
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
 
-        return cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat,
-                                  epoch)
+        return cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat)
 
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
-    def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000):
+    def parabolic(cls, attractor, p, inc, raan, argp, nu):
         """Return `State` corresponding to parabolic orbit.
 
         Parameters
@@ -153,8 +140,6 @@ class StateFactory(object):
             Argument of the pericenter.
         nu : Quantity
             True anomaly.
-        epoch: Time, optional
-            Epoch, default to J2000.
 
         """
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
@@ -165,5 +150,5 @@ class StateFactory(object):
                 raan.to(u.rad).value, argp.to(u.rad).value,
                 nu.to(u.rad).value)
 
-        ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
+        ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s)
         return ss

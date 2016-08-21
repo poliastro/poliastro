@@ -64,8 +64,8 @@ def rv2coe(k, r, v, tol=1e-8):
 
 
 class RVState(BaseState):
-    def __init__(self, attractor, r, v, epoch):
-        super(RVState, self).__init__(attractor, epoch)
+    def __init__(self, attractor, r, v):
+        super(RVState, self).__init__(attractor)
         self._r = r
         self._v = v
 
@@ -102,5 +102,4 @@ class RVState(BaseState):
                                                    inc * u.rad,
                                                    raan * u.rad,
                                                    argp * u.rad,
-                                                   nu * u.rad,
-                                                   self.epoch)
+                                                   nu * u.rad)

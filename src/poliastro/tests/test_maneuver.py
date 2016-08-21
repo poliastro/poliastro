@@ -8,6 +8,7 @@ from astropy import units as u
 
 from poliastro.bodies import Earth
 from poliastro.twobody import State
+from poliastro.twobody.orbit import Orbit
 from poliastro.maneuver import Maneuver
 
 
@@ -50,10 +51,11 @@ def test_hohmann_maneuver():
     alt_i = 191.34411 * u.km
     alt_f = 35781.34857 * u.km
     ss_i = State.circular(Earth, alt_i)
+    or_i = Orbit(ss_i)
     expected_dv = 3.935224 * u.km / u.s
     expected_t_trans = 5.256713 * u.h
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
-    assert_almost_equal(ss_i.apply_maneuver(man).ecc, 0)
+    assert_almost_equal(or_i.apply_maneuver(man).state.ecc, 0)
     assert_almost_equal(man.get_total_cost().to(u.km / u.s).value,
                         expected_dv.value,
                         decimal=5)
@@ -68,10 +70,11 @@ def test_bielliptic_maneuver():
     alt_b = 503873.0 * u.km
     alt_f = 376310.0 * u.km
     ss_i = State.circular(Earth, alt_i)
+    or_i = Orbit(ss_i)
     expected_dv = 3.904057 * u.km / u.s
     expected_t_trans = 593.919803 * u.h
     man = Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_f)
-    assert_almost_equal(ss_i.apply_maneuver(man).ecc, 0)
+    assert_almost_equal(or_i.apply_maneuver(man).state.ecc, 0)
     assert_almost_equal(man.get_total_cost().to(u.km / u.s).value,
                         expected_dv.value,
                         decimal=5)

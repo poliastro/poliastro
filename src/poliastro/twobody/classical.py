@@ -96,9 +96,8 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
 
 
 class ClassicalState(BaseState):
-    def __init__(self, attractor, a, ecc, inc, raan, argp, nu,
-                 epoch):
-        super(ClassicalState, self).__init__(attractor, epoch)
+    def __init__(self, attractor, a, ecc, inc, raan, argp, nu):
+        super(ClassicalState, self).__init__(attractor)
         self._a = a
         self._ecc = ecc
         self._inc = inc
@@ -169,8 +168,7 @@ class ClassicalState(BaseState):
 
         return poliastro.twobody.rv.RVState(self.attractor,
                                                         r * u.km,
-                                                        v * u.km / u.s,
-                                                        self.epoch)
+                                                        v * u.km / u.s)
 
     def to_classical(self):
         """Converts to classical orbital elements representation.
@@ -196,5 +194,4 @@ class ClassicalState(BaseState):
             g * u.rad,
             h * u.rad,
             k * u.rad,
-            L * u.rad,
-            self.epoch)
+            L * u.rad)

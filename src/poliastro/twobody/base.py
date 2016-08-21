@@ -3,13 +3,11 @@ import numpy as np
 
 from astropy import units as u
 
-from poliastro.twobody.propagation import kepler
-
 from poliastro.util import norm
 
 
 class BaseState(object):
-    def __init__(self, attractor, epoch):
+    def __init__(self, attractor):
         """Constructor. To create a `State` object use `from_vectors`
         and `from_classical` methods.
 
@@ -17,12 +15,9 @@ class BaseState(object):
         ----------
         attractor : Body
             Main attractor.
-        epoch : Time
-            Epoch.
 
         """
         self.attractor = attractor
-        self.epoch = epoch
 
     @property
     def r(self):
@@ -162,46 +157,6 @@ class BaseState(object):
         w_vec = self.h_vec / norm(self.h_vec)
         q_vec = np.cross(w_vec, p_vec) * u.one
         return p_vec, q_vec, w_vec
-
-    def propagate(self, time_of_flight, rtol=1e-10):
-        """Propagate this `State` some `time` and return the result.
-
-        """
-        r, v = kepler(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                      self.r.to(u.km).value, self.v.to(u.km / u.s).value,
-                      time_of_flight.to(u.s).value,
-                      rtol=rtol)
-        return self.from_vectors(self.attractor, r * u.km, v * u.km / u.s,
-                                 self.epoch + time_of_flight)
-
-    def apply_maneuver(self, maneuver, intermediate=False):
-        """Returns resulting State after applying maneuver to self.
-
-        Optionally return intermediate states (default to False).
-
-        Parameters
-        ----------
-        maneuver : Maneuver
-            Maneuver to apply.
-        intermediate : bool, optional
-            Return intermediate states, default to False.
-
-        """
-        ss_new = self  # Initialize
-        states = []
-        attractor = self.attractor
-        for delta_t, delta_v in maneuver:
-            if not delta_t == 0 * u.s:
-                ss_new = ss_new.propagate(time_of_flight=delta_t)
-            r, v = ss_new.rv()
-            vnew = v + delta_v
-            ss_new = ss_new.from_vectors(attractor, r, vnew, ss_new.epoch)
-            states.append(ss_new)
-        if intermediate:
-            res = states
-        else:
-            res = ss_new
-        return res
 
     def to_vectors(self):
         """Converts to position and velocity vector representation.
