@@ -8,10 +8,10 @@ from astropy import units as u
 
 from poliastro.util import transform
 
-from poliastro.twobody.base import BaseState
-
 import poliastro.twobody.rv
 import poliastro.twobody.equinoctial
+
+from ._base import BaseState
 
 
 def rv_pqw(k, p, ecc, nu):
@@ -96,8 +96,14 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
 
 
 class ClassicalState(BaseState):
+    """State defined by its classical orbital elements.
+
+    """
+    @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def __init__(self, attractor, a, ecc, inc, raan, argp, nu):
         super(ClassicalState, self).__init__(attractor)
+        if ecc == 1.0:
+            raise ValueError("For parabolic orbits use Orbit.parabolic instead")
         self._a = a
         self._ecc = ecc
         self._inc = inc

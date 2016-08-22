@@ -5,10 +5,7 @@ from astropy import units as u
 from astropy import time
 
 from poliastro.bodies import Sun, Earth
-from poliastro.twobody import State
-from poliastro.twobody.orbit import Orbit
-
-from poliastro.util import norm
+from poliastro.twobody import Orbit
 
 
 def test_default_time_for_new_state():
@@ -17,77 +14,60 @@ def test_default_time_for_new_state():
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     expected_epoch = time.Time("J2000", scale='utc')
-    ss = State.from_classical(_body, _d, _, _a, _a, _a, _a)
-    orbit = Orbit(ss)
-    assert orbit.epoch == expected_epoch
+    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
+    assert ss.epoch == expected_epoch
 
 
 def test_apply_maneuver_changes_epoch():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
     dt = 1 * u.h
     dv = [0, 0, 0] * u.km / u.s
-    orbit = Orbit(ss)
-    orbit_new = orbit.apply_maneuver([(dt, dv)])
-    assert orbit_new.epoch == orbit.epoch + dt
+    orbit_new = ss.apply_maneuver([(dt, dv)])
+    assert orbit_new.epoch == ss.epoch + dt
 
 
-def test_propagation():
-    # Data from Vallado, example 2.4
-    r0 = [1131.340, -2282.343, 6672.423] * u.km
-    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-    ss0 = State.from_vectors(Earth, r0, v0)
-    tof = 40 * u.min
-    or0 = Orbit(ss0)
-    or1 = or0.propagate(tof)
-    r, v = or1.state.rv()
-    assert_array_almost_equal(r.value, [-4219.7527, 4363.0292, -3958.7666],
-                              decimal=1)
-    assert_array_almost_equal(v.value, [3.689866, -1.916735, -6.112511],
-                              decimal=4)
+def test_circular_has_proper_semimajor_axis():
+    alt = 500 * u.km
+    attractor = Earth
+    expected_a = Earth.R + alt
+    ss = Orbit.circular(attractor, alt)
+    assert ss.state.a == expected_a
 
 
-def test_propagation_hyperbolic():
-    # Data from Curtis, example 3.5
-    r0 = [Earth.R.to(u.km).value + 300, 0, 0] * u.km
-    v0 = [0, 15, 0] * u.km / u.s
-    ss0 = State.from_vectors(Earth, r0, v0)
-    tof = 14941 * u.s
-    or0 = Orbit(ss0)
-    or1 = or0.propagate(tof)
-    r, v = or1.state.rv()
-    assert_almost_equal(norm(r).to(u.km).value, 163180, decimal=-1)
-    assert_almost_equal(norm(v).to(u.km/u.s).value, 10.51, decimal=2)
+def test_geosync_has_proper_period():
+    expected_period = 1436  # min
+    ss = Orbit.circular(Earth, alt=42164 * u.km - Earth.R)
+    assert_almost_equal(ss.state.period.to(u.min).value, expected_period, decimal=0)
 
 
-def test_propagation_zero_time_returns_same_state():
-    # Bug #50
-    r0 = [1131.340, -2282.343, 6672.423] * u.km
-    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-    ss0 = State.from_vectors(Earth, r0, v0)
-    tof = 0 * u.s
-    or0 = Orbit(ss0)
-
-    or1 = or0.propagate(tof)
-
-    r, v = or1.state.rv()
-
-    assert_array_almost_equal(r.value, r0.value)
-    assert_array_almost_equal(v.value, v0.value)
-
-
-def test_apply_zero_maneuver_returns_equal_state():
+def test_parabolic_has_proper_eccentricity():
+    attractor = Earth
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Sun, _d, _, _a, _a, _a, _a)
-    dt = 0 * u.s
-    dv = [0, 0, 0] * u.km / u.s
-    orbit = Orbit(ss)
-    orbit_new = orbit.apply_maneuver([(dt, dv)])
-    assert_almost_equal(orbit_new.state.r.to(u.km).value,
-                        ss.r.to(u.km).value)
-    assert_almost_equal(orbit_new.state.v.to(u.km / u.s).value,
-                        ss.v.to(u.km / u.s).value)
+    expected_ecc = 1.0 * u.one
+    ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
+    assert_almost_equal(ss.state.ecc, expected_ecc)
+
+
+def test_parabolic_has_zero_energy():
+    attractor = Earth
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
+    assert_almost_equal(ss.state.energy.value, 0.0)
+
+
+def test_pqw_for_circular_equatorial_orbit():
+    ss = Orbit.circular(Earth, 600 * u.km)
+    expected_p = [1, 0, 0] * u.one
+    expected_q = [0, 1, 0] * u.one
+    expected_w = [0, 0, 1] * u.one
+    p, q, w = ss.state.pqw()
+    assert_almost_equal(p, expected_p)
+    assert_almost_equal(q, expected_q)
+    assert_almost_equal(w, expected_w)

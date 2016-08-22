@@ -8,8 +8,7 @@ from poliastro.util import norm
 
 class BaseState(object):
     def __init__(self, attractor):
-        """Constructor. To create a `State` object use `from_vectors`
-        and `from_classical` methods.
+        """Constructor.
 
         Parameters
         ----------

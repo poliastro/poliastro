@@ -5,10 +5,10 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.twobody.base import BaseState
-
 import poliastro.twobody.rv
 import poliastro.twobody.classical
+
+from ._base import BaseState
 
 
 def mee2coe(p, f, g, h, k, L):

@@ -7,10 +7,10 @@ from astropy import units as u
 
 from poliastro.util import norm
 
-from poliastro.twobody.base import BaseState
-
 import poliastro.twobody.classical
 import poliastro.twobody.equinoctial
+
+from ._base import BaseState
 
 
 def rv2coe(k, r, v, tol=1e-8):
@@ -64,6 +64,10 @@ def rv2coe(k, r, v, tol=1e-8):
 
 
 class RVState(BaseState):
+    """State defined by its position and velocity vectors.
+
+    """
+    @u.quantity_input(r=u.m, v=u.m / u.s)
     def __init__(self, attractor, r, v):
         super(RVState, self).__init__(attractor)
         self._r = r
