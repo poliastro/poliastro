@@ -127,7 +127,7 @@ def M_to_nu(M, ecc):
 
     Examples
     --------
-    >>> nu = M2nu(np.radians(30.0), 0.06)
+    >>> nu = M_to_nu(np.radians(30.0), 0.06)
     >>> np.rad2deg(nu)
     33.673284930211658
 
