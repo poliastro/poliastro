@@ -24,7 +24,9 @@ class Orbit(object):
         """Constructor.
 
         """
+        #: Position and velocity or classical elements
         self.state = state
+        #: Epoch of the orbit
         self.epoch = epoch
 
     @classmethod
