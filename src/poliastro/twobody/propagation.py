@@ -147,12 +147,12 @@ def propagate(orbit, time_of_flight, *, method=kepler, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
 
     """
-    r, v = method(orbit.state.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                  orbit.state.r.to(u.km).value, orbit.state.v.to(u.km / u.s).value,
+    r, v = method(orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                  orbit.r.to(u.km).value, orbit.v.to(u.km / u.s).value,
                   time_of_flight.to(u.s).value,
                   rtol=rtol,
                   **kwargs)
-    return orbit.from_vectors(orbit.state.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight)
+    return orbit.from_vectors(orbit.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight)
 
 
 @jit

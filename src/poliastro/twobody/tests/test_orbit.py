@@ -34,13 +34,13 @@ def test_circular_has_proper_semimajor_axis():
     attractor = Earth
     expected_a = Earth.R + alt
     ss = Orbit.circular(attractor, alt)
-    assert ss.state.a == expected_a
+    assert ss.a == expected_a
 
 
 def test_geosync_has_proper_period():
     expected_period = 1436  # min
     ss = Orbit.circular(Earth, alt=42164 * u.km - Earth.R)
-    assert_almost_equal(ss.state.period.to(u.min).value, expected_period, decimal=0)
+    assert_almost_equal(ss.period.to(u.min).value, expected_period, decimal=0)
 
 
 def test_parabolic_has_proper_eccentricity():
@@ -50,7 +50,7 @@ def test_parabolic_has_proper_eccentricity():
     _a = 1.0 * u.deg  # Unused angle
     expected_ecc = 1.0 * u.one
     ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
-    assert_almost_equal(ss.state.ecc, expected_ecc)
+    assert_almost_equal(ss.ecc, expected_ecc)
 
 
 def test_parabolic_has_zero_energy():
@@ -59,7 +59,7 @@ def test_parabolic_has_zero_energy():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
-    assert_almost_equal(ss.state.energy.value, 0.0)
+    assert_almost_equal(ss.energy.value, 0.0)
 
 
 def test_pqw_for_circular_equatorial_orbit():
@@ -67,7 +67,7 @@ def test_pqw_for_circular_equatorial_orbit():
     expected_p = [1, 0, 0] * u.one
     expected_q = [0, 1, 0] * u.one
     expected_w = [0, 0, 1] * u.one
-    p, q, w = ss.state.pqw()
+    p, q, w = ss.pqw()
     assert_almost_equal(p, expected_p)
     assert_almost_equal(q, expected_q)
     assert_almost_equal(w, expected_w)

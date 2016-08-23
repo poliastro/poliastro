@@ -197,11 +197,11 @@ class Orbit(object):
         """
         orbit_new = self  # Initialize
         states = []
-        attractor = self.state.attractor
+        attractor = self.attractor
         for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
                 orbit_new = orbit_new.propagate(time_of_flight=delta_t)
-            r, v = orbit_new.state.rv()
+            r, v = orbit_new.rv()
             vnew = v + delta_v
             orbit_new = self.from_vectors(attractor, r, vnew, orbit_new.epoch)
             states.append(orbit_new)
@@ -210,3 +210,130 @@ class Orbit(object):
         else:
             res = orbit_new
         return res
+
+    def rv(self):
+        """Position and velocity vectors. """
+        return self.state.rv()
+
+    def coe(self):
+        """Classical orbital elements. """
+        return self.state.coe()
+
+    def pqw(self):
+        """Perifocal frame (PQW) vectors. """
+        return self.state.pqw()
+
+    @property
+    def attractor(self):
+        """Main attractor body. """
+        return self.state.attractor
+
+    @property
+    def r(self):
+        """Position vector. """
+        return self.state.r
+
+    @property
+    def v(self):
+        """Velocity vector. """
+        return self.state.v
+
+    @property
+    def a(self):
+        """Semimajor axis. """
+        return self.state.a
+
+    @property
+    def p(self):
+        """Semilatus rectum. """
+        return self.state.p
+
+    @property
+    def r_p(self):
+        """Radius of pericenter. """
+        return self.state.r_p
+
+    @property
+    def r_a(self):
+        """Radius of apocenter. """
+        return self.state.r_a
+
+    @property
+    def ecc(self):
+        """Eccentricity. """
+        return self.state.ecc
+
+    @property
+    def inc(self):
+        """Inclination. """
+        return self.state.inc
+
+    @property
+    def raan(self):
+        """Right ascension of the ascending node. """
+        return self.state.raan
+
+    @property
+    def argp(self):
+        """Argument of the perigee. """
+        return self.state.argp
+
+    @property
+    def nu(self):
+        """True anomaly. """
+        return self.state.nu
+
+    @property
+    def f(self):
+        """Second modified equinoctial element. """
+        return self.state.f
+
+    @property
+    def g(self):
+        """Third modified equinoctial element. """
+        return self.state.g
+
+    @property
+    def h(self):
+        """Fourth modified equinoctial element. """
+        return self.state.h
+
+    @property
+    def k(self):
+        """Fifth modified equinoctial element. """
+        return self.state.k
+
+    @property
+    def L(self):
+        """True longitude. """
+        return self.state.L
+
+    @property
+    def period(self):
+        """Period of the orbit. """
+        return self.state.period
+
+    @property
+    def n(self):
+        """Mean motion. """
+        return self.state.n
+
+    @property
+    def energy(self):
+        """Specific energy. """
+        return self.state.energy
+
+    @property
+    def e_vec(self):
+        """Eccentricity vector. """
+        return self.state.e_vec
+
+    @property
+    def h_vec(self):
+        """Specific angular momentum vector. """
+        return self.state.h_vec
+
+    @property
+    def arglat(self):
+        """Argument of latitude. """
+        return self.state.arglat

@@ -114,10 +114,7 @@ elements we can access many mathematical properties individually using the
     <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
 
 To see a complete list of properties, check out the
-:py:class:`poliastro.twobody.State` class on the API reference.
-
-.. TODO: The reference above is broken, and actually how do I get
-  a complete reference of properties?
+:py:class:`poliastro.twobody.Orbit` class on the API reference.
 
 Changing the orbit: :py:class:`~poliastro.maneuver.Maneuver` objects
 --------------------------------------------------------------------

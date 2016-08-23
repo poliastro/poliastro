@@ -18,7 +18,7 @@ def test_propagation():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 40 * u.min
     ss1 = ss0.propagate(tof)
-    r, v = ss1.state.rv()
+    r, v = ss1.rv()
     assert_array_almost_equal(r.value, [-4219.7527, 4363.0292, -3958.7666],
                               decimal=1)
     assert_array_almost_equal(v.value, [3.689866, -1.916735, -6.112511],
@@ -32,7 +32,7 @@ def test_propagation_hyperbolic():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 14941 * u.s
     ss1 = ss0.propagate(tof)
-    r, v = ss1.state.rv()
+    r, v = ss1.rv()
     assert_almost_equal(norm(r).to(u.km).value, 163180, decimal=-1)
     assert_almost_equal(norm(v).to(u.km/u.s).value, 10.51, decimal=2)
 
@@ -46,7 +46,7 @@ def test_propagation_zero_time_returns_same_state():
 
     ss1 = ss0.propagate(tof)
 
-    r, v = ss1.state.rv()
+    r, v = ss1.rv()
 
     assert_array_almost_equal(r.value, r0.value)
     assert_array_almost_equal(v.value, v0.value)
@@ -60,10 +60,10 @@ def test_apply_zero_maneuver_returns_equal_state():
     dt = 0 * u.s
     dv = [0, 0, 0] * u.km / u.s
     orbit_new = ss.apply_maneuver([(dt, dv)])
-    assert_almost_equal(orbit_new.state.r.to(u.km).value,
-                        ss.state.r.to(u.km).value)
-    assert_almost_equal(orbit_new.state.v.to(u.km / u.s).value,
-                        ss.state.v.to(u.km / u.s).value)
+    assert_almost_equal(orbit_new.r.to(u.km).value,
+                        ss.r.to(u.km).value)
+    assert_almost_equal(orbit_new.v.to(u.km / u.s).value,
+                        ss.v.to(u.km / u.s).value)
 
 
 def test_cowell_propagation_with_zero_acceleration_equals_kepler():
@@ -93,10 +93,10 @@ def test_cowell_propagation_circle_to_circle():
         return accel * v / norm_v
 
     ss = Orbit.circular(Earth, 500 * u.km)
-    tof = 20 * ss.state.period
+    tof = 20 * ss.period
 
-    r0, v0 = ss.state.rv()
-    k = ss.state.attractor.k
+    r0, v0 = ss.rv()
+    k = ss.attractor.k
 
     r, v = cowell(k.to(u.km**3 / u.s**2).value,
                   r0.to(u.km).value,
@@ -108,10 +108,10 @@ def test_cowell_propagation_circle_to_circle():
                        r * u.km,
                        v * u.km / u.s)
 
-    da_a0 = (ss_final.state.a - ss.state.a) / ss.state.a
-    dv_v0 = abs(norm(ss_final.state.v) - norm(ss.state.v)) / norm(ss.state.v)
+    da_a0 = (ss_final.a - ss.a) / ss.a
+    dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
     assert_almost_equal(da_a0.value, 2 * dv_v0.value, decimal=4)
 
-    dv = abs(norm(ss_final.state.v) - norm(ss.state.v))
+    dv = abs(norm(ss_final.v) - norm(ss.v))
     accel_dt = accel * u.km / u.s**2 * tof
     assert_almost_equal(dv.value, accel_dt.value, decimal=4)
