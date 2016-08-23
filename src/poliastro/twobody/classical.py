@@ -141,25 +141,6 @@ class ClassicalState(BaseState):
         """True anomaly. """
         return self._nu
 
-    def _repr_latex_(self):
-        """Creates a LaTeX representation.
-
-        Used by the IPython notebook.
-
-        """
-        elem_names = [r"a", r"e", r"i", r"\Omega", r"\omega", r"\nu"]
-        # noinspection PyProtectedMember
-        # Each element is an astropy Quantity:
-        # https://github.com/astropy/astropy/blob/v1.0.7/astropy/units/quantity.py#L935
-        # '_repr_index' is an internal method for IPython use:
-        # http://ipython.readthedocs.org/en/3.x/config/integrating.html#rich-display
-        elem_values = [elem._repr_latex_().strip("$")
-                       for elem in self.elements]
-        pairs = zip(elem_names, elem_values)
-        res = r"\\".join(["{0} & = {1}".format(name, value)
-                         for name, value in pairs])
-        return r"$\begin{{align}}{0}\end{{align}}$".format(res)
-
     def to_vectors(self):
         """Converts to position and velocity vector representation.
 
