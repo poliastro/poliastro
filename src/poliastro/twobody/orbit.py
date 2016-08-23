@@ -5,7 +5,7 @@ from astropy import units as u
 
 from astropy import time
 
-from poliastro.twobody.propagation import kepler
+from poliastro.twobody.propagation import propagate
 
 import poliastro.twobody.rv
 import poliastro.twobody.classical
@@ -15,19 +15,8 @@ import poliastro.twobody.equinoctial
 J2000 = time.Time("J2000", scale='utc')
 
 
-def propagate(orbit, time_of_flight, rtol=1e-10):
-    """Propagate this `State` some `time` and return the result.
-
-    """
-    r, v = kepler(orbit.state.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                  orbit.state.r.to(u.km).value, orbit.state.v.to(u.km / u.s).value,
-                  time_of_flight.to(u.s).value,
-                  rtol=rtol)
-    return Orbit.from_vectors(orbit.state.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight)
-
-
 class Orbit(object):
-    """Class to represent the position of a body with respect to an attractor
+    """Position and velocity of a body with respect to an attractor
     at a given time (epoch).
 
     """
@@ -189,7 +178,7 @@ class Orbit(object):
         """Propagate this `State` some `time` and return the result.
 
         """
-        return propagate(self, time_of_flight, rtol)
+        return propagate(self, time_of_flight, rtol=rtol)
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting State after applying maneuver to self.

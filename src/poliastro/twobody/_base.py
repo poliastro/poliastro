@@ -7,6 +7,9 @@ from poliastro.util import norm
 
 
 class BaseState(object):
+    """Base State class, meant to be subclassed.
+
+    """
     def __init__(self, attractor):
         """Constructor.
 
