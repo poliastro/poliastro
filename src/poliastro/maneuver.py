@@ -2,7 +2,6 @@
 """Orbital maneuvers.
 
 """
-
 import numpy as np
 
 from astropy import units as u
@@ -66,11 +65,12 @@ class Maneuver(object):
         return cls((0 * u.s, dv))
 
     @classmethod
-    def hohmann(cls, ss_i, r_f):
+    def hohmann(cls, orbit_i, r_f):
         """Compute a Hohmann transfer between two circular orbits.
 
         """
         # TODO: Check if circular?
+        ss_i = orbit_i.state
         r_i = ss_i.a
         v_i = ss_i.v
         k = ss_i.attractor.k
@@ -81,10 +81,11 @@ class Maneuver(object):
         return cls((0 * u.s, dv_a), (t_trans, dv_b))
 
     @classmethod
-    def bielliptic(cls, ss_i, r_b, r_f):
+    def bielliptic(cls, orbit_i, r_b, r_f):
         """Compute a bielliptic transfer between two circular orbits.
 
         """
+        ss_i = orbit_i.state
         r_i = ss_i.a
         v_i = ss_i.v
         k = ss_i.attractor.k

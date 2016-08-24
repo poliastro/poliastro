@@ -8,8 +8,6 @@ Contains some predefined bodies of the Solar System:
 
 and a way to define new bodies (:py:class:`~Body` class).
 
-TODO: Add more parameters (e.g. J2)
-
 """
 from astropy.constants import R_earth
 from astropy import units as u

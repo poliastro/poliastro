@@ -1,33 +1,23 @@
 # coding: utf-8
 import pytest
 
-import numpy as np
-from numpy.testing import (assert_equal, assert_almost_equal,
+from numpy.testing import (assert_almost_equal,
                            assert_array_almost_equal)
 
 from astropy import units as u
-from astropy import time
 
 from poliastro.bodies import Sun, Earth
-from poliastro.twobody import State
+
+from poliastro.twobody.rv import RVState
+from poliastro.twobody.classical import ClassicalState
 
 
 def test_state_has_attractor_given_in_constructor():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    ss = ClassicalState(Sun, _d, _, _a, _a, _a, _a)
     assert ss.attractor == Sun
-
-
-def test_default_time_for_new_state():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
-    expected_epoch = time.Time("J2000", scale='utc')
-    ss = State.from_classical(_body, _d, _, _a, _a, _a, _a)
-    assert ss.epoch == expected_epoch
 
 
 def test_state_has_elements_given_in_constructor():
@@ -38,7 +28,7 @@ def test_state_has_elements_given_in_constructor():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
+    ss = ClassicalState(Sun, a, ecc, inc, raan, argp, nu)
     assert ss.coe() == (a, ecc, inc, raan, argp, nu)
 
 
@@ -49,7 +39,7 @@ def test_state_has_individual_elements():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
+    ss = ClassicalState(Sun, a, ecc, inc, raan, argp, nu)
     assert ss.a == a
     assert ss.ecc == ecc
     assert ss.inc == inc
@@ -64,15 +54,15 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
     _a = 1.0 * u.deg  # Unused angle
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
-        ss = State.from_classical(Sun, _d, _, _a, _a, _a, wrong_angle)
-    assert ("UnitsError: Argument 'nu' to function 'from_classical' must be in units convertible to 'rad'."
+        ss = ClassicalState(Sun, _d, _, _a, _a, _a, wrong_angle)
+    assert ("UnitsError: Argument 'nu' to function '__init__' must be in units convertible to 'rad'."
             in excinfo.exconly())
 
 
 def test_state_has_rv_given_in_constructor():
     r = [1.0, 0.0, 0.0] * u.AU
     v = [0.0, 1.0e-6, 0.0] * u.AU / u.s
-    ss = State.from_vectors(Sun, r, v)
+    ss = RVState(Sun, r, v)
     assert ss.rv() == (r, v)
 
 
@@ -80,23 +70,9 @@ def test_state_raises_unitserror_if_rv_units_are_wrong():
     _d = [1.0, 0.0, 0.0] * u.AU
     wrong_v = [0.0, 1.0e-6, 0.0] * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
-        ss = State.from_vectors(Sun, _d, wrong_v)
-    assert ("UnitsError: Argument 'v' to function 'from_vectors' must be in units convertible to 'm / s'."
+        ss = RVState(Sun, _d, wrong_v)
+    assert ("UnitsError: Argument 'v' to function '__init__' must be in units convertible to 'm / s'."
             in excinfo.exconly())
-
-
-def test_circular_has_proper_semimajor_axis():
-    alt = 500 * u.km
-    attractor = Earth
-    expected_a = Earth.R + alt
-    ss = State.circular(attractor, alt)
-    assert ss.a == expected_a
-
-
-def test_geosync_has_proper_period():
-    expected_period = 1436  # min
-    ss = State.circular(Earth, alt=42164 * u.km - Earth.R)
-    assert_almost_equal(ss.period.to(u.min).value, expected_period, decimal=0)
 
 
 def test_parabolic_elements_fail_early():
@@ -106,28 +82,9 @@ def test_parabolic_elements_fail_early():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     with pytest.raises(ValueError) as excinfo:
-        ss = State.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
-    assert ("ValueError: For parabolic orbits use State.parabolic instead"
+        ss = ClassicalState(attractor, _d, ecc, _a, _a, _a, _a)
+    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead"
             in excinfo.exconly())
-
-
-def test_parabolic_has_proper_eccentricity():
-    attractor = Earth
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    expected_ecc = 1.0 * u.one
-    ss = State.parabolic(attractor, _d, _a, _a, _a, _a)
-    assert_almost_equal(ss.ecc, expected_ecc)
-
-
-def test_parabolic_has_zero_energy():
-    attractor = Earth
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    ss = State.parabolic(attractor, _d, _a, _a, _a, _a)
-    assert_almost_equal(ss.energy.value, 0.0)
 
 
 def test_perigee_and_apogee():
@@ -136,7 +93,7 @@ def test_perigee_and_apogee():
     a = (expected_r_a + expected_r_p) / 2
     ecc = expected_r_a / a - 1
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Earth, a, ecc, _a, _a, _a, _a)
+    ss = ClassicalState(Earth, a, ecc, _a, _a, _a, _a)
     assert_almost_equal(ss.r_a.to(u.km).value,
                         expected_r_a.to(u.km).value)
     assert_almost_equal(ss.r_p.to(u.km).value,
@@ -155,7 +112,7 @@ def test_convert_from_rv_to_coe():
     nu = 92.335 * u.deg
     expected_r = [6525.344, 6861.535, 6449.125]  # km
     expected_v = [4.902276, 5.533124, -1.975709]  # km / s
-    r, v = State.from_classical(Earth, a, ecc, inc, raan, argp, nu).rv()
+    r, v = ClassicalState(Earth, a, ecc, inc, raan, argp, nu).rv()
     assert_array_almost_equal(r.value, expected_r, decimal=1)
     assert_array_almost_equal(v.value, expected_v, decimal=5)
 
@@ -165,7 +122,7 @@ def test_convert_from_coe_to_rv():
     attractor = Earth
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
-    ss = State.from_vectors(Earth, r, v)
+    ss = RVState(Earth, r, v)
     _, ecc, inc, raan, argp, nu = ss.coe()
     p = ss.p
     assert_almost_equal(p.to(u.km).value, 11067.79, decimal=0)
@@ -176,55 +133,19 @@ def test_convert_from_coe_to_rv():
     assert_almost_equal(nu.to(u.deg).value, 92.335, decimal=2)
 
 
-def test_apply_zero_maneuver_returns_equal_state():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Sun, _d, _, _a, _a, _a, _a)
-    dt = 0 * u.s
-    dv = [0, 0, 0] * u.km / u.s
-    ss_new = ss.apply_maneuver([(dt, dv)])
-    assert_almost_equal(ss_new.r.to(u.km).value,
-                        ss.r.to(u.km).value)
-    assert_almost_equal(ss_new.v.to(u.km / u.s).value,
-                        ss.v.to(u.km / u.s).value)
-
-
-def test_apply_maneuver_changes_epoch():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Sun, _d, _, _a, _a, _a, _a)
-    dt = 1 * u.h
-    dv = [0, 0, 0] * u.km / u.s
-    ss_new = ss.apply_maneuver([(dt, dv)])
-    assert ss_new.epoch == ss.epoch + dt
-
-
 def test_perifocal_points_to_perigee():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    ss = State.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    ss = ClassicalState(Sun, _d, _, _a, _a, _a, _a)
     p, _, _ = ss.pqw()
     assert_almost_equal(p, ss.e_vec / ss.ecc)
-
-
-def test_pqw_for_circular_equatorial_orbit():
-    ss = State.circular(Earth, 600 * u.km)
-    expected_p = [1, 0, 0] * u.one
-    expected_q = [0, 1, 0] * u.one
-    expected_w = [0, 0, 1] * u.one
-    p, q, w = ss.pqw()
-    assert_almost_equal(p, expected_p)
-    assert_almost_equal(q, expected_q)
-    assert_almost_equal(w, expected_w)
 
 
 def test_pqw_returns_dimensionless():
     r_0 = ([1, 0, 0] * u.au).to(u.km)
     v_0 = ([0, 6, 0] * u.au / u.year).to(u.km / u.day)
-    ss = State.from_vectors(Sun, r_0, v_0)
+    ss = RVState(Sun, r_0, v_0)
 
     p, q, w = ss.pqw()
 

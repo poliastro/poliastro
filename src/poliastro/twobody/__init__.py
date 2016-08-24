@@ -1,3 +1,3 @@
 # coding: utf-8
 
-from poliastro.twobody.core import State
+from poliastro.twobody.orbit import Orbit

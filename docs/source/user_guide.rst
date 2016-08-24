@@ -1,10 +1,10 @@
 User guide
 ==========
 
-Defining the orbit: :code:`State` objects
------------------------------------------
+Defining the orbit: :py:class:`~poliastro.twobody.Orbit` objects
+----------------------------------------------------------------
 
-The core of poliastro are the :py:class:`~poliastro.twobody.State` objects
+The core of poliastro are the :py:class:`~poliastro.twobody.Orbit` objects
 inside the :py:mod:`poliastro.twobody` module. They store all the required
 information to define an orbit:
 
@@ -20,15 +20,15 @@ First of all, we have to import the relevant modules and classes:
     from astropy import units as u
     
     from poliastro.bodies import Earth, Sun
-    from poliastro.twobody import State
+    from poliastro.twobody import Orbit
 
 From position and velocity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are several methods available to create
-:py:class:`~poliastro.twobody.State` objects. For example, if we have the
+:py:class:`~poliastro.twobody.Orbit` objects. For example, if we have the
 position and velocity vectors we can use
-:py:meth:`~poliastro.twobody.State.from_vectors`:
+:py:meth:`~poliastro.twobody.Orbit.from_vectors`:
 
 .. code-block:: python
 
@@ -36,11 +36,11 @@ position and velocity vectors we can use
     r = [-6045, -3490, 2500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     
-    ss = State.from_vectors(Earth, r, v)
+    ss = Orbit.from_vectors(Earth, r, v)
 
 And that's it! Notice a couple of things:
 
-* Defining vectorial physical quantities using Astropy units is terribly easy.
+* Defining vectorial physical quantities using Astropy units is very easy.
   The list is automatically converted to a :code:`Quantity`, which is actually
   a subclass of NumPy arrays.
 * If no time is specified, then a default value is assigned::
@@ -76,7 +76,7 @@ orbit.
 From classical orbital elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can also define a :py:class:`~poliastro.twobody.State` using a set of
+We can also define a :py:class:`~poliastro.twobody.Orbit` using a set of
 six parameters called orbital elements. Although there are several of
 these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
@@ -89,7 +89,7 @@ poliastro supports the *classical orbital elements*:
 * True anomaly \\(\\nu\\).
 
 In this case, we'd use the method
-:py:meth:`~poliastro.twobody.State.from_classical`:
+:py:meth:`~poliastro.twobody.Orbit.from_classical`:
 
 .. code-block:: python
 
@@ -101,21 +101,23 @@ In this case, we'd use the method
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
     
-    ss = State.from_classical(Sun, a, ecc, inc, raan, argp, nu)
+    ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
-Notice that whether we create a ``State`` from \\(r\\) and \\(v\\) or from
-elements we can access many mathematical properties individually::
+Notice that whether we create a ``Orbit`` from \\(r\\) and \\(v\\) or from
+elements we can access many mathematical properties individually using the
+:py:attr:`~poliastro.twobody.Orbit.state` property of
+:py:class:`~poliastro.twobody.Orbit` objects::
 
-    >>> ss.period.to(u.day)
+    >>> ss.state.period.to(u.day)
     <Quantity 686.9713888628166 d>
-    >>> ss.v
+    >>> ss.state.v
     <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
 
 To see a complete list of properties, check out the
-:py:class:`poliastro.twobody.State` class on the API reference.
+:py:class:`poliastro.twobody.Orbit` class on the API reference.
 
-Changing the orbit: :code:`Maneuver` objects
---------------------------------------------
+Changing the orbit: :py:class:`~poliastro.maneuver.Maneuver` objects
+--------------------------------------------------------------------
 
 poliastro helps us define several in-plane and general out-of-plane
 maneuvers with the :py:class:`~poliastro.maneuver.Maneuver` class inside the
@@ -142,7 +144,7 @@ maneuvers, notably :py:meth:`~poliastro.maneuver.Maneuver.hohmann` and
 in terms of velocity change (\\(\\sum \|\\Delta v_i|\\)) and the transfer
 time::
 
-    >>> ss_i = State.circular(Earth, alt=700 * u.km)
+    >>> ss_i = Orbit.circular(Earth, alt=700 * u.km)
     >>> hoh = Maneuver.hohmann(ss_i, 36000 * u.km)
     >>> hoh.get_total_cost()
     <Quantity 3.6173981270031357 km / s>
@@ -161,15 +163,15 @@ You can also retrieve the individual vectorial impulses::
 .. _Hohmann: http://en.wikipedia.org/wiki/Hohmann_transfer_orbit
 .. _bielliptic: http://en.wikipedia.org/wiki/Bi-elliptic_transfer
 
-To actually retrieve the resulting ``State`` after performing a maneuver, use
-the method :py:meth:`apply_maneuver`::
+To actually retrieve the resulting ``Orbit`` after performing a maneuver, use
+the method :py:meth:`~poliastro.twobody.Orbit.apply_maneuver`::
 
     >>> ss_f = ss_i.apply_maneuver(hoh)
     >>> ss_f.rv()
     (<Quantity [ -3.60000000e+04, -7.05890200e-11, -0.00000000e+00] km>, <Quantity [ -8.97717523e-16, -3.32749489e+00, -0.00000000e+00] km / s>)
 
-More advanced plotting: :code:`OrbitPlotter` objects
-----------------------------------------------------
+More advanced plotting: :py:class:`~poliastro.plotting.OrbitPlotter` objects
+----------------------------------------------------------------------------
 
 We previously saw the :py:func:`poliastro.plotting.plot` function to easily
 plot orbits. Now we'd like to plot several orbits in one graph (for example,
@@ -177,7 +179,7 @@ the maneuver me computed in the previous section). For this purpose, we
 have :py:class:`~poliastro.plotting.OrbitPlotter` objects in the
 :py:mod:`~poliastro.plotting` module.
 
-These objects hold the perifocal plane of the first ``State`` we plot in
+These objects hold the perifocal plane of the first ``Orbit`` we plot in
 them, projecting any further trajectories on this plane. This allows to
 easily visualize in two dimensions:
 

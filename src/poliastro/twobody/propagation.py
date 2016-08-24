@@ -6,6 +6,8 @@ import numpy as np
 
 from scipy.integrate import ode
 
+from astropy import units as u
+
 from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
@@ -139,6 +141,18 @@ def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
     v = fdot * r0 + gdot * v0
 
     return r, v
+
+
+def propagate(orbit, time_of_flight, *, method=kepler, rtol=1e-10, **kwargs):
+    """Propagate an orbit some time and return the result.
+
+    """
+    r, v = method(orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                  orbit.r.to(u.km).value, orbit.v.to(u.km / u.s).value,
+                  time_of_flight.to(u.s).value,
+                  rtol=rtol,
+                  **kwargs)
+    return orbit.from_vectors(orbit.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight)
 
 
 @jit

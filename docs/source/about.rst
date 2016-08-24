@@ -38,10 +38,9 @@ These are some things that I would love to implement in poliastro to expand
 its capabilities:
 
 * 3D plotting of orbits
-* Propagation of near-Earth satellites
-* TLE reading
-* Groundtrack plotting
 * Continuous thrust maneuvers
+* Tisserand graphs
+* Porkchop plots
 
 Related software
 ----------------

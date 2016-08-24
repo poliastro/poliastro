@@ -1,12 +1,11 @@
 # coding: utf-8
-import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
+import numpy as np
 
 from astropy import units as u
 
-from poliastro.bodies import Earth
-from poliastro.twobody import State
-
+from poliastro.bodies import Sun, Earth
+from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 
 from poliastro.util import norm
@@ -16,7 +15,7 @@ def test_propagation():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-    ss0 = State.from_vectors(Earth, r0, v0)
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 40 * u.min
     ss1 = ss0.propagate(tof)
     r, v = ss1.rv()
@@ -30,7 +29,7 @@ def test_propagation_hyperbolic():
     # Data from Curtis, example 3.5
     r0 = [Earth.R.to(u.km).value + 300, 0, 0] * u.km
     v0 = [0, 15, 0] * u.km / u.s
-    ss0 = State.from_vectors(Earth, r0, v0)
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 14941 * u.s
     ss1 = ss0.propagate(tof)
     r, v = ss1.rv()
@@ -42,7 +41,7 @@ def test_propagation_zero_time_returns_same_state():
     # Bug #50
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-    ss0 = State.from_vectors(Earth, r0, v0)
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 0 * u.s
 
     ss1 = ss0.propagate(tof)
@@ -51,6 +50,20 @@ def test_propagation_zero_time_returns_same_state():
 
     assert_array_almost_equal(r.value, r0.value)
     assert_array_almost_equal(v.value, v0.value)
+
+
+def test_apply_zero_maneuver_returns_equal_state():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    dt = 0 * u.s
+    dv = [0, 0, 0] * u.km / u.s
+    orbit_new = ss.apply_maneuver([(dt, dv)])
+    assert_almost_equal(orbit_new.r.to(u.km).value,
+                        ss.r.to(u.km).value)
+    assert_almost_equal(orbit_new.v.to(u.km / u.s).value,
+                        ss.v.to(u.km / u.s).value)
 
 
 def test_cowell_propagation_with_zero_acceleration_equals_kepler():
@@ -79,7 +92,7 @@ def test_cowell_propagation_circle_to_circle():
         norm_v = (v[0]**2 + v[1]**2 + v[2]**2)**.5
         return accel * v / norm_v
 
-    ss = State.circular(Earth, 500 * u.km)
+    ss = Orbit.circular(Earth, 500 * u.km)
     tof = 20 * ss.period
 
     r0, v0 = ss.rv()
@@ -91,10 +104,9 @@ def test_cowell_propagation_circle_to_circle():
                   tof.to(u.s).value,
                   constant_accel)
 
-    ss_final = State.from_vectors(Earth,
-                                  r * u.km,
-                                  v * u.km / u.s,
-                                  ss.epoch + tof)
+    ss_final = Orbit.from_vectors(Earth,
+                       r * u.km,
+                       v * u.km / u.s)
 
     da_a0 = (ss_final.a - ss.a) / ss.a
     dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)

@@ -1,10 +1,25 @@
 What's new
 ==========
 
-New in poliastro 0.5.0
+New in poliastro 0.6.0
 ----------------------
 
 .. warning:: This version is not released yet.
+
+This major release was focused on refactoring some internal core
+parts and improving the plotting functionality.
+
+Highlights:
+
+* **Introduced ``Orbit`` objects** to replace ``State`` ones. The latter
+  has been simplified, reducing some functionality, now their API
+  has been moved to the former. See the User Guide and the examples for
+  updated explanations. See `#135`_.
+
+.. _`#135`: https://github.com/poliastro/poliastro/pull/135
+
+New in poliastro 0.5.0
+----------------------
 
 This is a new major release, focused on expanding the initial orbit
 determination capabilities and solving some infrastructure challenges.

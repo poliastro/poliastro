@@ -5,7 +5,10 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.twobody.core import State
+import poliastro.twobody.rv
+import poliastro.twobody.classical
+
+from ._base import BaseState
 
 
 def mee2coe(p, f, g, h, k, L):
@@ -30,10 +33,9 @@ def mee2coe(p, f, g, h, k, L):
     return p, ecc, inc, raan, argp, nu
 
 
-class ModifiedEquinoctialState(State):
-    def __init__(self, attractor, p, f, g, h, k, L,
-                 epoch):
-        super(ModifiedEquinoctialState, self).__init__(attractor, epoch)
+class ModifiedEquinoctialState(BaseState):
+    def __init__(self, attractor, p, f, g, h, k, L):
+        super(ModifiedEquinoctialState, self).__init__(attractor)
         self._p = p
         self._f = f
         self._g = g
@@ -75,7 +77,7 @@ class ModifiedEquinoctialState(State):
 
         a = p / (1 - ecc**2)
 
-        return super(ModifiedEquinoctialState, self).from_classical(
+        return poliastro.twobody.classical.ClassicalState(
             self.attractor,
             a * u.km,
             ecc * u.one,

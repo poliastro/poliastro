@@ -6,7 +6,7 @@ poliastro.twobody package
 
 .. automodule:: poliastro.twobody
 
-    .. autoclass:: State()
+    .. autoclass:: Orbit
        :members:
 
 poliastro.twobody.propagation module

@@ -83,29 +83,29 @@ class OrbitPlotter(object):
         else:
             raise NotImplementedError
 
-    def plot(self, state, osculating=True, label=None):
+    def plot(self, orbit, osculating=True, label=None):
         """Plots state and osculating orbit in their plane.
 
         """
         # TODO: This function needs a refactoring
         if not self._frame:
-            self.set_frame(*state.pqw())
+            self.set_frame(*orbit.pqw())
 
-        self._states.append(state)
+        self._states.append(orbit)
 
         lines = []
 
-        nu_vals = self._generate_vals(state)
+        nu_vals = self._generate_vals(orbit.state)
 
         # Compute PQW coordinates
-        r_pqw, _ = rv_pqw(state.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                          state.p.to(u.km).value,
-                          state.ecc.value,
+        r_pqw, _ = rv_pqw(orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                          orbit.p.to(u.km).value,
+                          orbit.ecc.value,
                           nu_vals.value)
         r_pqw = r_pqw * u.km
 
         # Express on inertial frame
-        e_vec, p_vec, h_vec = state.pqw()
+        e_vec, p_vec, h_vec = orbit.pqw()
         p_vec = np.cross(h_vec, e_vec) * u.one
         rr = (r_pqw[:, 0, None].dot(e_vec[None, :]) +
               r_pqw[:, 1, None].dot(p_vec[None, :]))
@@ -123,9 +123,9 @@ class OrbitPlotter(object):
 
         # Attractor
         # TODO: If several orbits are plotted, the attractor is being plotted several times!
-        radius = max(state.attractor.R.to(u.km).value,
-                     state.r_p.to(u.km).value / 6)
-        color = BODY_COLORS.get(state.attractor.name, "#999999")
+        radius = max(orbit.attractor.R.to(u.km).value,
+                     orbit.r_p.to(u.km).value / 6)
+        color = BODY_COLORS.get(orbit.attractor.name, "#999999")
         self.ax.add_patch(
                 mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
@@ -140,7 +140,7 @@ class OrbitPlotter(object):
             l.set_label(label)
             self.ax.legend()
 
-        self.ax.set_title(state.epoch.iso)
+        self.ax.set_title(orbit.epoch.iso)
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
