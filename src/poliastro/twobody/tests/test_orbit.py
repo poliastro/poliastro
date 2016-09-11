@@ -1,4 +1,6 @@
 # coding: utf-8
+import pytest
+
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
 
 from astropy import units as u
@@ -16,6 +18,18 @@ def test_default_time_for_new_state():
     expected_epoch = time.Time("J2000", scale='utc')
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     assert ss.epoch == expected_epoch
+
+
+def test_bad_inclination_raises_exception():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    bad_inc = 200 * u.deg
+    _body = Sun  # Unused body
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_classical(Sun, _d, _, bad_inc, _a, _a, _a)
+    assert ("ValueError: Inclination must be between 0 and 180 degrees"
+            in excinfo.exconly())
 
 
 def test_apply_maneuver_changes_epoch():

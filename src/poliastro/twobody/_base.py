@@ -144,7 +144,10 @@ class BaseState(object):
 
     def coe(self):
         """Classical orbital elements. """
-        return self.a, self.ecc, self.inc, self.raan, self.argp, self.nu
+        return (
+            self.a, self.ecc,
+            self.inc.to(u.deg), self.raan.to(u.deg), self.argp.to(u.deg), self.nu.to(u.deg)
+        )
 
     def pqw(self):
         """Perifocal frame (PQW) vectors. """

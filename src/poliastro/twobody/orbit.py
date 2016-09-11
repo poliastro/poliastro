@@ -80,6 +80,8 @@ class Orbit(object):
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use "
                              "State.parabolic instead")
+        elif not 0 * u.deg <= inc <= 180 * u.deg:
+            raise ValueError("Inclination must be between 0 and 180 degrees")
 
         ss = poliastro.twobody.classical.ClassicalState(
             attractor, a, ecc, inc, raan, argp, nu)
