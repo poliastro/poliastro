@@ -142,6 +142,13 @@ def test_perifocal_points_to_perigee():
     assert_almost_equal(p, ss.e_vec / ss.ecc)
 
 
+def test_arglat_within_range():
+    r = [3539.08827417, 5310.19903462, 3066.31301457] * u.km
+    v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
+    ss = RVState(Earth, r, v)
+    assert 0 * u.deg <= ss.arglat <= 360 * u.deg
+
+
 def test_pqw_returns_dimensionless():
     r_0 = ([1, 0, 0] * u.au).to(u.km)
     v_0 = ([0, 6, 0] * u.au / u.year).to(u.km / u.day)

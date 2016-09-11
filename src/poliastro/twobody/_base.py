@@ -135,7 +135,7 @@ class BaseState(object):
     @property
     def arglat(self):
         """Argument of latitude. """
-        arglat = self.argp + self.nu
+        arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
 
     def rv(self):
