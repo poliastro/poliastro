@@ -12,7 +12,7 @@ from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
 
-def func_twobody(t0, u, k, ad):
+def func_twobody(t0, u_, k, ad):
     """Differential equation for the initial value two body problem.
 
     This function follows Cowell's formulation.
@@ -21,7 +21,7 @@ def func_twobody(t0, u, k, ad):
     ----------
     t0 : float
         Time.
-    u : ndarray
+    u_ : ndarray
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard gravitational parameter.
@@ -29,9 +29,9 @@ def func_twobody(t0, u, k, ad):
          Non Keplerian acceleration (km/s2).
 
     """
-    ax, ay, az = ad(t0, u, k)
+    ax, ay, az = ad(t0, u_, k)
 
-    x, y, z, vx, vy, vz = u
+    x, y, z, vx, vy, vz = u_
     r3 = (x**2 + y**2 + z**2)**1.5
 
     du = np.array([
@@ -84,7 +84,7 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
 
     # Set the non Keplerian acceleration
     if ad is None:
-        ad = lambda t0, u, k: (0, 0, 0)
+        ad = lambda t0, u_, k_: (0, 0, 0)
 
     # Set the integrator
     rr = ode(func_twobody).set_integrator('dop853', rtol=rtol, nsteps=nsteps)

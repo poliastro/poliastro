@@ -20,6 +20,38 @@ def test_default_time_for_new_state():
     assert ss.epoch == expected_epoch
 
 
+def test_state_raises_unitserror_if_elements_units_are_wrong():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    wrong_angle = 1.0 * u.AU
+    with pytest.raises(u.UnitsError) as excinfo:
+        ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, wrong_angle)
+    assert ("UnitsError: Argument 'nu' to function 'from_classical' must be in units convertible to 'rad'."
+            in excinfo.exconly())
+
+
+def test_state_raises_unitserror_if_rv_units_are_wrong():
+    _d = [1.0, 0.0, 0.0] * u.AU
+    wrong_v = [0.0, 1.0e-6, 0.0] * u.AU
+    with pytest.raises(u.UnitsError) as excinfo:
+        ss = Orbit.from_vectors(Sun, _d, wrong_v)
+    assert ("UnitsError: Argument 'v' to function 'from_vectors' must be in units convertible to 'm / s'."
+            in excinfo.exconly())
+
+
+def test_parabolic_elements_fail_early():
+    attractor = Earth
+    ecc = 1.0 * u.one
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
+    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead"
+            in excinfo.exconly())
+
+
 def test_bad_inclination_raises_exception():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
