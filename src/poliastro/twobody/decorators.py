@@ -20,6 +20,6 @@ def state_from_vector(func):
         r, v = u_[:3], u_[3:]
         ss = RVState(Body(k * u.km3s2), r * u.km, v * u.kms)
 
-        return func(t, ss, r, v, *args, **kwargs)
+        return func(t, ss, *args, **kwargs)
 
     return wrapper
