@@ -17,7 +17,7 @@ class Body(object):
     """Class to represent a body of the Solar System.
 
     """
-    @u.quantity_input(k=u.m ** 3 / u.s ** 2, R=u.m)
+    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
     def __init__(self, k, name=None, symbol=None, R=0 * u.km):
         """Constructor.
 
