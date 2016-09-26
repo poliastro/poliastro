@@ -12,7 +12,7 @@ from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
 
-def func_twobody(t0, u, k, ad):
+def func_twobody(t0, u_, k, ad):
     """Differential equation for the initial value two body problem.
 
     This function follows Cowell's formulation.
@@ -21,7 +21,7 @@ def func_twobody(t0, u, k, ad):
     ----------
     t0 : float
         Time.
-    u : ndarray
+    u_ : ndarray
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard gravitational parameter.
@@ -29,9 +29,9 @@ def func_twobody(t0, u, k, ad):
          Non Keplerian acceleration (km/s2).
 
     """
-    ax, ay, az = ad(t0, u, k)
+    ax, ay, az = ad(t0, u_, k)
 
-    x, y, z, vx, vy, vz = u
+    x, y, z, vx, vy, vz = u_
     r3 = (x**2 + y**2 + z**2)**1.5
 
     du = np.array([
@@ -45,7 +45,7 @@ def func_twobody(t0, u, k, ad):
     return du
 
 
-def cowell(k, r0, v0, tof, ad=None, nsteps=1000, rtol=1e-10):
+def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -60,10 +60,12 @@ def cowell(k, r0, v0, tof, ad=None, nsteps=1000, rtol=1e-10):
          Non Keplerian acceleration (km/s2), default to None.
     tof : float
         Time of flight (s).
-    nsteps : int, optional
-        Maximum number of internal steps, default to 1000.
     rtol : float, optional
         Maximum relative error permitted, default to 1e-10.
+    nsteps : int, optional
+        Maximum number of internal steps, default to 1000.
+    callback : callable, optional
+        Function called at each internal integrator step.
 
     Raises
     ------
@@ -82,12 +84,14 @@ def cowell(k, r0, v0, tof, ad=None, nsteps=1000, rtol=1e-10):
 
     # Set the non Keplerian acceleration
     if ad is None:
-        ad = lambda t0, u, k: (0, 0, 0)
+        ad = lambda t0, u_, k_: (0, 0, 0)
 
     # Set the integrator
     rr = ode(func_twobody).set_integrator('dop853', rtol=rtol, nsteps=nsteps)
     rr.set_initial_value(u0)  # Initial time equal to 0.0
     rr.set_f_params(k, ad)  # Parameters of the integration
+    if callback:
+        rr.set_solout(callback)
 
     # Make integration step
     rr.integrate(tof)
@@ -100,7 +104,7 @@ def cowell(k, r0, v0, tof, ad=None, nsteps=1000, rtol=1e-10):
     return r, v
 
 
-def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
+def kepler(k, r0, v0, tof, rtol=1e-10, *, numiter=35):
     """Propagates Keplerian orbit.
 
     Parameters
@@ -113,10 +117,10 @@ def kepler(k, r0, v0, tof, numiter=35, rtol=1e-10):
         Initial velocity (km).
     tof : float
         Time of flight (s).
-    numiter : int, optional
-        Maximum number of iterations, default to 35.
     rtol : float, optional
         Maximum relative error permitted, default to 1e-10.
+    numiter : int, optional
+        Maximum number of iterations, default to 35.
 
     Raises
     ------

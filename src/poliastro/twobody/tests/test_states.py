@@ -48,43 +48,11 @@ def test_state_has_individual_elements():
     assert ss.nu == nu
 
 
-def test_state_raises_unitserror_if_elements_units_are_wrong():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    wrong_angle = 1.0 * u.AU
-    with pytest.raises(u.UnitsError) as excinfo:
-        ss = ClassicalState(Sun, _d, _, _a, _a, _a, wrong_angle)
-    assert ("UnitsError: Argument 'nu' to function '__init__' must be in units convertible to 'rad'."
-            in excinfo.exconly())
-
-
 def test_state_has_rv_given_in_constructor():
     r = [1.0, 0.0, 0.0] * u.AU
     v = [0.0, 1.0e-6, 0.0] * u.AU / u.s
     ss = RVState(Sun, r, v)
     assert ss.rv() == (r, v)
-
-
-def test_state_raises_unitserror_if_rv_units_are_wrong():
-    _d = [1.0, 0.0, 0.0] * u.AU
-    wrong_v = [0.0, 1.0e-6, 0.0] * u.AU
-    with pytest.raises(u.UnitsError) as excinfo:
-        ss = RVState(Sun, _d, wrong_v)
-    assert ("UnitsError: Argument 'v' to function '__init__' must be in units convertible to 'm / s'."
-            in excinfo.exconly())
-
-
-def test_parabolic_elements_fail_early():
-    attractor = Earth
-    ecc = 1.0 * u.one
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    with pytest.raises(ValueError) as excinfo:
-        ss = ClassicalState(attractor, _d, ecc, _a, _a, _a, _a)
-    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead"
-            in excinfo.exconly())
 
 
 def test_perigee_and_apogee():
@@ -140,6 +108,13 @@ def test_perifocal_points_to_perigee():
     ss = ClassicalState(Sun, _d, _, _a, _a, _a, _a)
     p, _, _ = ss.pqw()
     assert_almost_equal(p, ss.e_vec / ss.ecc)
+
+
+def test_arglat_within_range():
+    r = [3539.08827417, 5310.19903462, 3066.31301457] * u.km
+    v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
+    ss = RVState(Earth, r, v)
+    assert 0 * u.deg <= ss.arglat <= 360 * u.deg
 
 
 def test_pqw_returns_dimensionless():
