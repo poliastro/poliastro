@@ -13,11 +13,13 @@ def test_body_has_k_given_in_constructor():
     assert earth.k == k
 
 
-def test_body_constructor_raises_valueerror_if_k_units_not_correct():
+def test_body_from_parameters_raises_valueerror_if_k_units_not_correct():
     wrong_k = 4902.8 * u.kg
+    _name = _symbol = ""
+    _R = 0
     with pytest.raises(u.UnitsError) as excinfo:
-        moon = bodies.Body(wrong_k)
-    assert ("UnitsError: Argument 'k' to function '__init__' must be in units convertible to 'm3 / s2'."
+        moon = bodies.Body.from_parameters(wrong_k, _name, _symbol, _R)
+    assert ("UnitsError: Argument 'k' to function 'from_parameters' must be in units convertible to 'km3 / s2'."
             in excinfo.exconly())
 
 
