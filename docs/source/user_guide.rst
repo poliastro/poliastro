@@ -73,6 +73,15 @@ the instantaneous Keplerian orbit at that point. This is relevant in the
 context of perturbations, when the object shall deviate from its Keplerian
 orbit.
 
+.. warning::
+
+  Be aware that, outside the Jupyter notebook (i.e. a normal Python interpreter
+  or program) you might need to call :code:`plt.show()` after the plotting
+  commands or :code:`plt.ion()` before them or they won't show. Check out the
+  `Matplotlib FAQ`_ for more information.
+
+.. _`Matplotlib FAQ`: http://matplotlib.org/faq/usage_faq.html#non-interactive-example
+
 From classical orbital elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
