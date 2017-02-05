@@ -5,7 +5,7 @@ engine:
   - python=3.6
 before_script:
   - conda config --set always_yes yes --set changeps1 no
-  - conda config --add channels poliastro
+  - conda config --add channels conda-forge
   - conda install pytest
 script:
   - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem

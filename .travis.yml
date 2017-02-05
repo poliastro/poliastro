@@ -26,7 +26,7 @@ before_install:
 
   # Update conda and create test environment
   - conda config --set always_yes yes --set changeps1 no
-  - conda config --add channels poliastro
+  - conda config --add channels conda-forge
   - conda update -q conda
   - conda create -q -n test-environment python=$PYTHON
   - source activate test-environment
