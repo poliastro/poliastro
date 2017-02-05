@@ -237,7 +237,7 @@ What's the future of the project?
 ---------------------------------
 
 poliastro is actively maintained and will receive bug fixes and releases
-in 2016, maintaining its focus on interplanetary applications. Expect better
+in 2017, maintaining its focus on interplanetary applications. Expect better
 algorithms, easier 3D plotting and optimization techniques. The best way
 to get an idea of the roadmap is to check the Kanban board at Waffle.io
 (see `Contributing`_).
