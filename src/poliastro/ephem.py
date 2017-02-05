@@ -5,7 +5,7 @@
 import os
 import glob
 import warnings
-warnings.formatwarning = lambda msg, *_: str(msg) + '\n'
+warnings.formatwarning = lambda msg, *_, **__: str(msg) + '\n'
 
 from astropy import units as u
 

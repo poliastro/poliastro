@@ -29,5 +29,5 @@ except ImportError:
     warnings.warn("Could not import numba package. All poliastro "
                   "functions will work properly but the CPU intensive "
                   "algorithms will be slow. Consider installing numba to "
-                  "boost performance")
+                  "boost performance.")
     jit = ijit
