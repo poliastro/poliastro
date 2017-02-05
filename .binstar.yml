@@ -10,4 +10,4 @@ before_script:
 script:
   - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
   - pip install --no-deps .  # Test installation correctness
-  - py.test -vv  # Test against installed code
+  - pytest -vv  # Test against installed code

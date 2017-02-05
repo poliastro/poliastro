@@ -43,4 +43,4 @@ install:
 build: off
 
 test_script:
-  - "py.test -vv --benchmark-skip"  # Test against installed code
+  - "pytest -vv --benchmark-skip"  # Test against installed code

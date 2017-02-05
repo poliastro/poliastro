@@ -39,14 +39,14 @@ install:
   - pip install --no-deps .  # Test installation correctness
 
 script:
-  - py.test -vv --benchmark-skip  # Test against installed code
+  - pytest -vv --benchmark-skip  # Test against installed code
 
 after_success:
   # Uninstall to test coverage against sources
   - pip uninstall poliastro -y
   - pip install --no-deps -e .
 
-  - NUMBA_DISABLE_JIT=1 py.test --cov --benchmark-skip
+  - NUMBA_DISABLE_JIT=1 pytest --cov --benchmark-skip
 
   - codecov
 

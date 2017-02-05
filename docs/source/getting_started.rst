@@ -60,7 +60,7 @@ Development installations are also supported thanks to setuptools::
 Testing
 -------
 
-If installed correctly, the tests can be run using py.test::
+If installed correctly, the tests can be run using pytest::
 
   $ python -c "import poliastro.testing; poliastro.testing.test()"
   Running unit tests for poliastro
