@@ -9,11 +9,12 @@ branches:
     - master
     - 0.3.x
     - 0.4.x
+    - 0.5.x
 
 environment:
   matrix:
-    - PYTHON: 3.4
     - PYTHON: 3.5
+    - PYTHON: 3.6
 
 matrix:
   fast_finish: true

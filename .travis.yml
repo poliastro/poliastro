@@ -9,8 +9,8 @@ os:
   - osx
 
 env:
-  - PYTHON=3.4
   - PYTHON=3.5
+  - PYTHON=3.6
 
 branches:
   only:

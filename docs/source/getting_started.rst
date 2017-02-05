@@ -15,7 +15,7 @@ poliastro requires the following Python packages:
 * pytest, for running the tests from the package
 
 poliastro is usually tested on Linux, Windows and OS X on Python
-3.4 and 3.5, using latest NumPy (single codebase).
+3.5 and 3.6 against latest NumPy.
 
 Installation
 ------------
