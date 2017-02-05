@@ -7,6 +7,13 @@ import numpy as np
 from astropy.coordinates import matrix_utilities
 
 
+def circular_velocity(k, a):
+    """Compute circular velocity for a given body (k) and semimajor axis (a).
+
+    """
+    return np.sqrt(k / a)
+
+
 def rotate(vector, angle, axis='z', unit=None):
     """Rotates a vector around axis a right-handed positive angle.
 
