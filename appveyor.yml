@@ -9,11 +9,12 @@ branches:
     - master
     - 0.3.x
     - 0.4.x
+    - 0.5.x
 
 environment:
   matrix:
-    - PYTHON: 3.4
     - PYTHON: 3.5
+    - PYTHON: 3.6
 
 matrix:
   fast_finish: true
@@ -23,7 +24,7 @@ install:
 
   # Install the build and runtime dependencies of the project.
   - "conda config --set always_yes yes --set changeps1 no"
-  - "conda config --add channels poliastro"
+  - "conda config --add channels conda-forge"
   - "conda update -q conda"
   - "conda info -a"
   - "conda create -q -n test-environment python=%PYTHON%"
@@ -42,4 +43,4 @@ install:
 build: off
 
 test_script:
-  - "py.test -vv --benchmark-skip"  # Test against installed code
+  - "pytest -vv --benchmark-skip"  # Test against installed code

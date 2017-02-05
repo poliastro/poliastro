@@ -4,8 +4,7 @@
 """
 import numpy as np
 
-from astropy.coordinates import angles
-from astropy import units as u
+from astropy.coordinates import matrix_utilities
 
 
 def rotate(vector, angle, axis='z', unit=None):
@@ -44,7 +43,7 @@ def rotate(vector, angle, axis='z', unit=None):
     .. [1] http://en.wikipedia.org/wiki/Rotation_matrix#Ambiguities
 
     """
-    rot = np.asarray(angles.rotation_matrix(-angle, axis, unit))
+    rot = np.asarray(matrix_utilities.rotation_matrix(-angle, axis, unit))
     return np.dot(rot, vector)
 
 

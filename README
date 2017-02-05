@@ -96,7 +96,7 @@ poliastro requires the following Python packages:
 * SciPy, for root finding and numerical propagation
 
 poliastro is usually tested on Linux, Windows and OS X on Python
-3.4 and 3.5, using latest NumPy (single codebase).
+3.5 and 3.6 against latest NumPy.
 
 ==============  ============  ===================
 Platform        Site          Status
@@ -150,7 +150,7 @@ Testing
 
 |codecov|
 
-If installed correctly, the tests can be run using py.test::
+If installed correctly, the tests can be run using pytest::
 
   $ python -c "import poliastro.testing; poliastro.testing.test()"
   Running unit tests for poliastro
@@ -237,7 +237,7 @@ What's the future of the project?
 ---------------------------------
 
 poliastro is actively maintained and will receive bug fixes and releases
-in 2016, maintaining its focus on interplanetary applications. Expect better
+in 2017, maintaining its focus on interplanetary applications. Expect better
 algorithms, easier 3D plotting and optimization techniques. The best way
 to get an idea of the roadmap is to check the Kanban board at Waffle.io
 (see `Contributing`_).

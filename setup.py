@@ -20,6 +20,7 @@ setup(
       "aero", "aerospace", "engineering",
       "astrodynamics", "orbits", "kepler", "orbital mechanics"
     ],
+    python_requires=">=3.5",
     install_requires=[
         "numpy",
         "numba>=0.25",
