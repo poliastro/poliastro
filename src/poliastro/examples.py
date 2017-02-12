@@ -23,6 +23,16 @@ molniya = Orbit.from_classical(
     0 * u.deg, 270 * u.deg, 80 * u.deg
 )
 
+# Taken from Soyuz User's Manual, issue 2 revision 0
+_r_a = Earth.R + 35950 * u.km
+_r_p = Earth.R + 250 * u.km
+_a = (_r_a + _r_p) / 2
+soyuz_gto = Orbit.from_classical(
+    Earth,
+    _a, _r_a / _a - 1, 6 * u.deg,
+    188.5 * u.deg, 178 * u.deg, 0 * u.deg
+)
+
 churi = Orbit.from_classical(
     Sun,
     3.46250 * u.AU, 0.64 * u.one, 7.04 * u.deg,
