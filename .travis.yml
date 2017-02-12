@@ -18,6 +18,7 @@ branches:
     - 0.3.x
     - 0.4.x
     - 0.5.x
+    - 0.6.x
 
 before_install:
   - if [[ "$(uname)" == "Darwin" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
