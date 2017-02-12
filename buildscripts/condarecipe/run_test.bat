@@ -1,4 +1,0 @@
-CD %SRC_DIR%
-pytest poliastro
-IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
-
