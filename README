@@ -20,6 +20,9 @@
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
+.. |codeclimate| image:: https://img.shields.io/codeclimate/github/poliastro/poliastro.svg
+   :target: https://lima.codeclimate.com/github/poliastro/poliastro
+
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
    :target: http://poliastro.readthedocs.org/en/latest/?badge=latest
 
@@ -35,7 +38,7 @@
 .. |mailing| image:: https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square
    :target: https://groups.io/g/poliastro-dev
 
-|travisci| |appveyor| |codecov|
+|travisci| |appveyor| |codecov| |codeclimate|
 
 |docs| |license| |doi| |astropy| |mailing|
 
