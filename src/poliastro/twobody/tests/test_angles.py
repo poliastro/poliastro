@@ -1,8 +1,8 @@
 # coding: utf-8
 import numpy as np
-from numpy.testing import assert_almost_equal
 
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.twobody import angles
 
@@ -25,8 +25,7 @@ def test_true_to_eccentric():
 
         E = angles.nu_to_E(nu, ecc)
 
-        assert_almost_equal(E.to(u.rad).value, expected_E.to(u.rad).value,
-                            decimal=4)
+        assert_quantity_allclose(E, expected_E, rtol=1e-6)
 
 
 def test_mean_to_true():
@@ -51,8 +50,7 @@ def test_mean_to_true():
 
         nu = angles.M_to_nu(M, ecc)
 
-        assert_almost_equal(nu.to(u.rad).value, expected_nu.to(u.rad).value,
-                            decimal=2)
+        assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
 
 
 def test_true_to_mean():
@@ -77,8 +75,7 @@ def test_true_to_mean():
 
         M = angles.nu_to_M(nu, ecc)
 
-        assert_almost_equal(M.to(u.rad).value, expected_M.to(u.rad).value,
-                            decimal=3)
+        assert_quantity_allclose(M, expected_M, rtol=1e-4)
 
 
 def test_flight_path_angle():
@@ -86,6 +83,7 @@ def test_flight_path_angle():
     nu = 109.5 * u.deg
     ecc = 0.6 * u.one
     expected_gamma = 35.26 * u.deg
+
     gamma = angles.fp_angle(np.deg2rad(nu), ecc)
-    assert_almost_equal(gamma.to(u.rad).value, expected_gamma.to(u.rad).value,
-                        decimal=3)
+
+    assert_quantity_allclose(gamma, expected_gamma, rtol=1e-3)

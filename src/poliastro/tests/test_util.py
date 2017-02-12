@@ -1,6 +1,6 @@
 # coding: utf-8
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_allclose
 
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
@@ -25,7 +25,7 @@ def test_rotate_unitless_vector():
     axis = 'z'
     expected_vector = [0, 1, 0]
     result = util.rotate(vector, angle, axis)
-    assert_array_almost_equal(result, expected_vector)
+    assert_allclose(result, expected_vector, atol=1e-16)
 
 
 def test_rotate_vector_with_units():
@@ -34,7 +34,7 @@ def test_rotate_vector_with_units():
     axis = 'y'
     expected_vector = [0, 0, -1] * u.m
     result = util.rotate(vector, angle, axis)
-    assert_array_almost_equal(result.value, expected_vector.value)
+    assert_quantity_allclose(result, expected_vector, atol=1e-16 * u.m)
 
 
 def test_transform_unitless_vector():
@@ -43,4 +43,4 @@ def test_transform_unitless_vector():
     axis = 'z'
     expected_vector = [np.sqrt(2) / 2, np.sqrt(2) / 2, 0]
     result = util.transform(vector, angle, axis)
-    assert_array_almost_equal(result, expected_vector)
+    assert_allclose(result, expected_vector)

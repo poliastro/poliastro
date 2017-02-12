@@ -1,6 +1,6 @@
 # coding: utf-8
 from numpy import cos, sin, cosh, sinh
-from numpy.testing import assert_almost_equal, assert_equal
+from numpy.testing import assert_allclose, assert_equal
 
 from poliastro.stumpff import c2, c3
 
@@ -10,8 +10,8 @@ def test_stumpff_functions_near_zero():
     expected_c2 = (1 - cos(psi**.5)) / psi
     expected_c3 = (psi**.5 - sin(psi**.5)) / psi**1.5
 
-    assert_almost_equal(c2(psi), expected_c2)
-    assert_almost_equal(c3(psi), expected_c3)
+    assert_allclose(c2(psi), expected_c2)
+    assert_allclose(c3(psi), expected_c3)
 
 
 def test_stumpff_functions_above_zero():

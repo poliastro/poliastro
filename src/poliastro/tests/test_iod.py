@@ -1,8 +1,10 @@
 # coding: utf-8
 import pytest
 
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_allclose
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
+
 from poliastro.bodies import Earth
 
 from poliastro.iod import izzo, vallado
@@ -19,12 +21,8 @@ def test_vallado75(lambert):
     expected_vb = [-3.451569, 0.910301, 0.0] * u.km / u.s
 
     va, vb = next(lambert(k, r0, r, tof))
-    assert_array_almost_equal(va.to(u.km / u.s).value,
-                              expected_va.value,
-                              decimal=4)
-    assert_array_almost_equal(vb.to(u.km / u.s).value,
-                              expected_vb.value,
-                              decimal=5)
+    assert_quantity_allclose(va, expected_va, rtol=1e-5)
+    assert_quantity_allclose(vb, expected_vb, rtol=1e-4)
 
 
 @pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
@@ -38,12 +36,8 @@ def test_curtis52(lambert):
     expected_vb = [-3.3125, -4.1966, -0.38529] * u.km / u.s
 
     va, vb = next(lambert(k, r0, r, tof))
-    assert_array_almost_equal(va.to(u.km / u.s).value,
-                              expected_va.value,
-                              decimal=4)
-    assert_array_almost_equal(vb.to(u.km / u.s).value,
-                              expected_vb.value,
-                              decimal=4)
+    assert_quantity_allclose(va, expected_va, rtol=1e-4)
+    assert_quantity_allclose(vb, expected_vb, rtol=1e-4)
 
 
 @pytest.mark.parametrize("lambert", [vallado.lambert, izzo.lambert])
@@ -57,9 +51,7 @@ def test_curtis53(lambert):
     expected_va = [-2.4356, 0.26741, 0.0] * u.km / u.s
 
     va, vb = next(lambert(k, r0, r, tof))
-    assert_array_almost_equal(va.to(u.km / u.s).value,
-                              expected_va.value,
-                              decimal=3)
+    assert_quantity_allclose(va, expected_va, rtol=1e-4)
 
 
 @pytest.mark.parametrize("lambert", [izzo.lambert])
@@ -73,12 +65,8 @@ def test_molniya_der_zero_full_revolution(lambert):
     expected_vb = [-3.79246619, -1.77707641, 6.856814395] * u.km / u.s
 
     va, vb = next(lambert(k, r0, r, tof, M=0))
-    assert_array_almost_equal(va.to(u.km / u.s).value,
-                              expected_va.value,
-                              decimal=3)
-    assert_array_almost_equal(vb.to(u.km / u.s).value,
-                              expected_vb.value,
-                              decimal=4)
+    assert_quantity_allclose(va, expected_va, rtol=1e-6)
+    assert_quantity_allclose(vb, expected_vb, rtol=1e-6)
 
 
 @pytest.mark.parametrize("lambert", [izzo.lambert])
@@ -95,18 +83,11 @@ def test_molniya_der_one_full_revolution(lambert):
     expected_vb_r = [-5.53841370, 0.01822220, 5.49641054] * u.km / u.s
 
     (va_l, vb_l), (va_r, vb_r) = lambert(k, r0, r, tof, M=1)
-    assert_array_almost_equal(va_l.to(u.km / u.s).value,
-                              expected_va_l.value,
-                              decimal=3)
-    assert_array_almost_equal(vb_l.to(u.km / u.s).value,
-                              expected_vb_l.value,
-                              decimal=4)
-    assert_array_almost_equal(va_r.to(u.km / u.s).value,
-                              expected_va_r.value,
-                              decimal=3)
-    assert_array_almost_equal(vb_r.to(u.km / u.s).value,
-                              expected_vb_r.value,
-                              decimal=4)
+
+    assert_quantity_allclose(va_l, expected_va_l, rtol=1e-5)
+    assert_quantity_allclose(vb_l, expected_vb_l, rtol=1e-5)
+    assert_quantity_allclose(va_r, expected_va_r, rtol=1e-5)
+    assert_quantity_allclose(vb_r, expected_vb_r, rtol=1e-4)
 
 
 @pytest.mark.parametrize("lambert", [izzo.lambert])

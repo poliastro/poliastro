@@ -2,9 +2,10 @@
 import pytest
 
 import numpy as np
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_allclose
 
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
@@ -35,8 +36,7 @@ def test_maneuver_total_time():
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     expected_total_time = 110.0 * u.s
     man = Maneuver((dt1, _v), (dt2, _v))
-    assert_almost_equal(man.get_total_time().to(u.s).value,
-                        expected_total_time.value)
+    assert_quantity_allclose(man.get_total_time(), expected_total_time)
 
 
 def test_maneuver_impulse():
@@ -52,14 +52,12 @@ def test_hohmann_maneuver():
     ss_i = Orbit.circular(Earth, alt_i)
     expected_dv = 3.935224 * u.km / u.s
     expected_t_trans = 5.256713 * u.h
+
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
-    assert_almost_equal(ss_i.apply_maneuver(man).ecc, 0)
-    assert_almost_equal(man.get_total_cost().to(u.km / u.s).value,
-                        expected_dv.value,
-                        decimal=5)
-    assert_almost_equal(man.get_total_time().to(u.h).value,
-                        expected_t_trans.value,
-                        decimal=5)
+
+    assert_quantity_allclose(ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-15 * u.one)
+    assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-6)
+    assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-6)
 
 
 def test_bielliptic_maneuver():
@@ -70,11 +68,9 @@ def test_bielliptic_maneuver():
     ss_i = Orbit.circular(Earth, alt_i)
     expected_dv = 3.904057 * u.km / u.s
     expected_t_trans = 593.919803 * u.h
+
     man = Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_f)
-    assert_almost_equal(ss_i.apply_maneuver(man).ecc, 0)
-    assert_almost_equal(man.get_total_cost().to(u.km / u.s).value,
-                        expected_dv.value,
-                        decimal=5)
-    assert_almost_equal(man.get_total_time().to(u.h).value,
-                        expected_t_trans.value,
-                        decimal=2)
+
+    assert_allclose(ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-12 * u.one)
+    assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-6)
+    assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-6)
