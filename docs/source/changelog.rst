@@ -4,19 +4,22 @@ What's new
 New in poliastro 0.6.0
 ----------------------
 
-.. warning:: This version is not released yet.
-
 This major release was focused on refactoring some internal core
-parts and improving the plotting functionality.
+parts and improving the propagation functionality.
 
 Highlights:
 
+* **Support Python 3.6**. See `#144`_.
 * **Introduced ``Orbit`` objects** to replace ``State`` ones. The latter
   has been simplified, reducing some functionality, now their API
   has been moved to the former. See the User Guide and the examples for
   updated explanations. See `#135`_.
+* **Allow propagation functions to receive a callback**. This paves the
+  way for better plotting and storage of results. See `#140`_.
 
 .. _`#135`: https://github.com/poliastro/poliastro/pull/135
+.. _`#140`: https://github.com/poliastro/poliastro/pull/140
+.. _`#144`: https://github.com/poliastro/poliastro/pull/144
 
 New in poliastro 0.5.0
 ----------------------
