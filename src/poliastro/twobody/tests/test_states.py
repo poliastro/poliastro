@@ -1,10 +1,10 @@
 # coding: utf-8
 import pytest
 
-from numpy.testing import (assert_almost_equal,
-                           assert_array_almost_equal)
+from numpy.testing import assert_allclose
 
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Sun, Earth
 
@@ -62,9 +62,9 @@ def test_perigee_and_apogee():
     ecc = expected_r_a / a - 1
     _a = 1.0 * u.deg  # Unused angle
     ss = ClassicalState(Earth, a, ecc, _a, _a, _a, _a)
-    assert_almost_equal(ss.r_a.to(u.km).value,
+    assert_allclose(ss.r_a.to(u.km).value,
                         expected_r_a.to(u.km).value)
-    assert_almost_equal(ss.r_p.to(u.km).value,
+    assert_allclose(ss.r_p.to(u.km).value,
                         expected_r_p.to(u.km).value)
 
 
@@ -78,11 +78,13 @@ def test_convert_from_rv_to_coe():
     raan = 227.89 * u.deg
     argp = 53.38 * u.deg
     nu = 92.335 * u.deg
-    expected_r = [6525.344, 6861.535, 6449.125]  # km
-    expected_v = [4.902276, 5.533124, -1.975709]  # km / s
+    expected_r = [6525.344, 6861.535, 6449.125] * u.km
+    expected_v = [4.902276, 5.533124, -1.975709] * u.km / u.s
+
     r, v = ClassicalState(Earth, a, ecc, inc, raan, argp, nu).rv()
-    assert_array_almost_equal(r.value, expected_r, decimal=1)
-    assert_array_almost_equal(v.value, expected_v, decimal=5)
+
+    assert_quantity_allclose(r, expected_r, rtol=1e-5)
+    assert_quantity_allclose(v, expected_v, rtol=1e-5)
 
 
 def test_convert_from_coe_to_rv():
@@ -90,15 +92,25 @@ def test_convert_from_coe_to_rv():
     attractor = Earth
     r = [6524.384, 6862.875, 6448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
-    ss = RVState(Earth, r, v)
+
+    expected_p = 11067.79 * u.km
+    expected_ecc = 0.832853 * u.one
+    expected_inc = 87.870 * u.deg
+    expected_raan = 227.89 * u.deg
+    expected_argp = 53.38 * u.deg
+    expected_nu = 92.335 * u.deg
+
+    ss = RVState(attractor, r, v)
+
     _, ecc, inc, raan, argp, nu = ss.coe()
     p = ss.p
-    assert_almost_equal(p.to(u.km).value, 11067.79, decimal=0)
-    assert_almost_equal(ecc.value, 0.832853, decimal=4)
-    assert_almost_equal(inc.to(u.deg).value, 87.870, decimal=2)
-    assert_almost_equal(raan.to(u.deg).value, 227.89, decimal=1)
-    assert_almost_equal(argp.to(u.deg).value, 53.38, decimal=2)
-    assert_almost_equal(nu.to(u.deg).value, 92.335, decimal=2)
+
+    assert_quantity_allclose(p, expected_p, rtol=1e-4)
+    assert_quantity_allclose(ecc, expected_ecc, rtol=1e-4)
+    assert_quantity_allclose(inc, expected_inc, rtol=1e-4)
+    assert_quantity_allclose(raan, expected_raan, rtol=1e-4)
+    assert_quantity_allclose(argp, expected_argp, rtol=1e-4)
+    assert_quantity_allclose(nu, expected_nu, rtol=1e-6)
 
 
 def test_perifocal_points_to_perigee():
@@ -107,7 +119,7 @@ def test_perifocal_points_to_perigee():
     _a = 1.0 * u.deg  # Unused angle
     ss = ClassicalState(Sun, _d, _, _a, _a, _a, _a)
     p, _, _ = ss.pqw()
-    assert_almost_equal(p, ss.e_vec / ss.ecc)
+    assert_allclose(p, ss.e_vec / ss.ecc)
 
 
 def test_arglat_within_range():

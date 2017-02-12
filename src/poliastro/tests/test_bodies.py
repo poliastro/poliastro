@@ -1,8 +1,8 @@
 # coding: utf-8
 import pytest
-from numpy.testing import assert_almost_equal
 
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro import bodies
 
@@ -35,5 +35,4 @@ def test_body_printing_has_name_and_symbol():
 def test_earth_has_k_given_in_literature():
     expected_k = 3.986e14 * u.m ** 3 / u.s ** 2
     k = bodies.Earth.k
-    assert_almost_equal(k.decompose([u.km, u.s]).value,
-                        expected_k.decompose([u.km, u.s]).value, decimal=1)
+    assert_quantity_allclose(k.decompose([u.km, u.s]), expected_k)

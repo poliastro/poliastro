@@ -1,8 +1,9 @@
 # coding: utf-8
-from numpy.testing import assert_almost_equal, assert_array_almost_equal
+from numpy.testing import assert_allclose
 import numpy as np
 
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
@@ -15,26 +16,33 @@ def test_propagation():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    expected_r = [-4219.7527, 4363.0292, -3958.7666] * u.km
+    expected_v = [3.689866, -1.916735, -6.112511] * u.km / u.s
+
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 40 * u.min
     ss1 = ss0.propagate(tof)
+
     r, v = ss1.rv()
-    assert_array_almost_equal(r.value, [-4219.7527, 4363.0292, -3958.7666],
-                              decimal=1)
-    assert_array_almost_equal(v.value, [3.689866, -1.916735, -6.112511],
-                              decimal=4)
+
+    assert_quantity_allclose(r, expected_r, rtol=1e-5)
+    assert_quantity_allclose(v, expected_v, rtol=1e-4)
 
 
 def test_propagation_hyperbolic():
     # Data from Curtis, example 3.5
     r0 = [Earth.R.to(u.km).value + 300, 0, 0] * u.km
     v0 = [0, 15, 0] * u.km / u.s
+    expected_r_norm = 163180 * u.km
+    expected_v_norm = 10.51 * u.km / u.s
+
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 14941 * u.s
     ss1 = ss0.propagate(tof)
     r, v = ss1.rv()
-    assert_almost_equal(norm(r).to(u.km).value, 163180, decimal=-1)
-    assert_almost_equal(norm(v).to(u.km/u.s).value, 10.51, decimal=2)
+
+    assert_quantity_allclose(norm(r), expected_r_norm, rtol=1e-4)
+    assert_quantity_allclose(norm(v), expected_v_norm, rtol=1e-3)
 
 
 def test_propagation_zero_time_returns_same_state():
@@ -48,8 +56,8 @@ def test_propagation_zero_time_returns_same_state():
 
     r, v = ss1.rv()
 
-    assert_array_almost_equal(r.value, r0.value)
-    assert_array_almost_equal(v.value, v0.value)
+    assert_allclose(r.value, r0.value)
+    assert_allclose(v.value, v0.value)
 
 
 def test_apply_zero_maneuver_returns_equal_state():
@@ -60,9 +68,9 @@ def test_apply_zero_maneuver_returns_equal_state():
     dt = 0 * u.s
     dv = [0, 0, 0] * u.km / u.s
     orbit_new = ss.apply_maneuver([(dt, dv)])
-    assert_almost_equal(orbit_new.r.to(u.km).value,
+    assert_allclose(orbit_new.r.to(u.km).value,
                         ss.r.to(u.km).value)
-    assert_almost_equal(orbit_new.v.to(u.km / u.s).value,
+    assert_allclose(orbit_new.v.to(u.km / u.s).value,
                         ss.v.to(u.km / u.s).value)
 
 
@@ -101,8 +109,8 @@ def test_cowell_propagation_with_zero_acceleration_equals_kepler():
 
     r, v = cowell(k, r0, v0, tof, ad=None)
 
-    assert_array_almost_equal(r, expected_r, decimal=1)
-    assert_array_almost_equal(v, expected_v, decimal=4)
+    assert_allclose(r, expected_r, rtol=1e-5)
+    assert_allclose(v, expected_v, rtol=1e-4)
 
 
 def test_cowell_propagation_circle_to_circle():
@@ -132,8 +140,8 @@ def test_cowell_propagation_circle_to_circle():
 
     da_a0 = (ss_final.a - ss.a) / ss.a
     dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
-    assert_almost_equal(da_a0.value, 2 * dv_v0.value, decimal=4)
+    assert_quantity_allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 
     dv = abs(norm(ss_final.v) - norm(ss.v))
     accel_dt = accel * u.km / u.s**2 * tof
-    assert_almost_equal(dv.value, accel_dt.value, decimal=4)
+    assert_quantity_allclose(dv, accel_dt, rtol=1e-2)

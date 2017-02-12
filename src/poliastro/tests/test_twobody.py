@@ -1,6 +1,6 @@
 # coding: utf-8
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_allclose
 
 from astropy import units as u
 
@@ -24,7 +24,7 @@ def test_convert_between_coe_and_rv_is_transitive():
 
     res = rv2coe(k, *coe2rv(k, *expected_res))
 
-    assert_array_almost_equal(res, expected_res)
+    assert_allclose(res, expected_res)
 
 
 def test_convert_between_coe_and_mee_is_transitive():
@@ -39,4 +39,4 @@ def test_convert_between_coe_and_mee_is_transitive():
 
     res = mee2coe(*coe2mee(*expected_res))
 
-    assert_array_almost_equal(res, expected_res)
+    assert_allclose(res, expected_res)
