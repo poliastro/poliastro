@@ -20,7 +20,7 @@
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
-.. |codeclimate| image:: https://img.shields.io/codeclimate/github/poliastro/poliastro.svg
+.. |codeclimate| image:: https://img.shields.io/codeclimate/github/poliastro/poliastro.svg?style=flat-square
    :target: https://lima.codeclimate.com/github/poliastro/poliastro
 
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
