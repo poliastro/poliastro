@@ -5,7 +5,6 @@
 import os
 import glob
 import warnings
-warnings.formatwarning = lambda msg, *_, **__: str(msg) + '\n'
 
 from astropy import units as u
 
@@ -51,20 +50,24 @@ def select_kernel(kernel_filenames):
 
     return kernel
 
-kernel_fname = select_kernel(
-    glob.glob(os.path.join(SPK_LOCAL_DIR, "*.bsp")))
 
-if kernel_fname:
-    default_kernel = SPK.open(kernel_fname)
-else:
-    warnings.warn("""No SPICE kernels found under ~/.poliastro.
-Please download them manually or using
+def get_default_kernel():
+    kernel_fname = select_kernel(
+        glob.glob(os.path.join(SPK_LOCAL_DIR, "*.bsp")))
 
-  poliastro download-spk [-d NAME]
+    if kernel_fname:
+        default_kernel = SPK.open(kernel_fname)
+    else:
+        warnings.warn("""No SPICE kernels found under ~/.poliastro.
+    Please download them manually or using
 
-to provide a default kernel, else pass a custom one as
-an argument to `planet_ephem`.""")
-    default_kernel = None
+      poliastro download-spk [-d NAME]
+
+    to provide a default kernel, else pass a custom one as
+    an argument to `planet_ephem`.""")
+        default_kernel = None
+
+    return default_kernel
 
 
 def download_kernel(name):
@@ -106,7 +109,7 @@ def download_kernel(name):
                            "manually" % name)
 
 
-def planet_ephem(body, epoch, kernel=default_kernel):
+def planet_ephem(body, epoch, kernel=get_default_kernel()):
     """Position and velocity vectors of a given planet at a certain time.
 
     The vectors are computed with respect to the Solar System barycenter.
@@ -129,6 +132,9 @@ def planet_ephem(body, epoch, kernel=default_kernel):
         Position and velocity vectors.
 
     """
+    if kernel is None:
+        kernel = get_default_kernel()
+
     r, v = kernel[0, body].compute_and_differentiate(epoch.jd1, epoch.jd2)
     r = r * u.km
     v = v * u.km / u.day
