@@ -13,7 +13,7 @@ from jplephem.spk import SPK
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
 
-NAIF_BASE_URL = "http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/"
+NAIF_BASE_URL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/"
 SPK_TOP_URL = NAIF_BASE_URL + "planets/"
 SPK_OLD_URL = NAIF_BASE_URL + "planets/a_old_versions/"
 
@@ -59,12 +59,12 @@ def get_default_kernel():
         default_kernel = SPK.open(kernel_fname)
     else:
         warnings.warn("""No SPICE kernels found under ~/.poliastro.
-    Please download them manually or using
+Please download them manually or using
 
-      poliastro download-spk [-d NAME]
+  poliastro download-spk [-d NAME]
 
-    to provide a default kernel, else pass a custom one as
-    an argument to `planet_ephem`.""")
+to provide a default kernel, else pass a custom one as
+an argument to `planet_ephem`.""")
         default_kernel = None
 
     return default_kernel
