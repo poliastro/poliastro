@@ -10,8 +10,8 @@ Bugs fixed:
 
 .. _`Issue #128`: https://github.com/poliastro/poliastro/issues/128
 
-New in poliastro 0.6.0
-----------------------
+poliastro 0.6.0 - 2017-02-12
+----------------------------
 
 This major release was focused on refactoring some internal core
 parts and improving the propagation functionality.
@@ -30,8 +30,8 @@ Highlights:
 .. _`#140`: https://github.com/poliastro/poliastro/pull/140
 .. _`#144`: https://github.com/poliastro/poliastro/pull/144
 
-New in poliastro 0.5.0
-----------------------
+poliastro 0.5.0 - 2016-03-06
+----------------------------
 
 This is a new major release, focused on expanding the initial orbit
 determination capabilities and solving some infrastructure challenges.
@@ -74,13 +74,13 @@ Backward incompatible changes:
   axis \\(a\\) made in 0.4.0, so \\(a\\) must be used again. This change is
   definitive.
 
-New in poliastro 0.4.2
-----------------------
+poliastro 0.4.2 - 2015-12-24
+----------------------------
 
 Fixed packaging problems.
 
-New in poliastro 0.4.0
-----------------------
+poliastro 0.4.0 - 2015-12-13
+----------------------------
 
 This is a new major release, focused on improving stability and code quality.
 New angle conversion and modified equinoctial elements functions were added
@@ -130,8 +130,8 @@ Backward incompatible changes:
   with the fourth modified equinoctial element, use ``norm(ss.h_vec)``
   instead.
 
-New in poliastro 0.3.1
-----------------------
+poliastro 0.3.1 - 2015-06-30
+----------------------------
 
 This is a new minor release, with some bug fixes backported from the main
 development branch.
@@ -145,8 +145,8 @@ Bugs fixed:
 .. _`Issue #49`: https://github.com/poliastro/poliastro/issues/49
 .. _`Issue #50`: https://github.com/poliastro/poliastro/issues/50
 
-New in poliastro 0.3.0
-----------------------
+poliastro 0.3.0 - 2015-05-09
+----------------------------
 
 This is a new major release, focused on switching to a pure Python codebase.
 Lambert problem solving and ephemerides computation came back, and a couple
@@ -180,8 +180,8 @@ Bugs fixed:
 .. _`Issue #19`: https://github.com/poliastro/poliastro/issues/19
 .. _`Issue #37`: https://github.com/poliastro/poliastro/issues/37
 
-New in poliastro 0.2.1
-----------------------
+poliastro 0.2.1 - 2015-04-26
+----------------------------
 
 This is a bugfix release, no new features were introduced since 0.2.0.
 
@@ -191,8 +191,8 @@ This is a bugfix release, no new features were introduced since 0.2.0.
 
 .. _`#35`: https://github.com/poliastro/poliastro/issues/35
 
-New in poliastro 0.2
---------------------
+poliastro 0.2 - 2014-08-16
+--------------------------
 
 * **Totally refactored code** to provide a more pythonic API (see `PR #14`_
   and `wiki`_ for further information) heavily inspired by `Plyades`_ by
