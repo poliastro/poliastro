@@ -1,6 +1,15 @@
 What's new
 ==========
 
+Unreleased
+----------
+
+Bugs fixed:
+
+* `Issue #128`_: Missing ephemerides if no files on import time
+
+.. _`Issue #128`: https://github.com/poliastro/poliastro/issues/128
+
 New in poliastro 0.6.0
 ----------------------
 
