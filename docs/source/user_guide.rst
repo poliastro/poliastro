@@ -184,7 +184,7 @@ More advanced plotting: :py:class:`~poliastro.plotting.OrbitPlotter` objects
 
 We previously saw the :py:func:`poliastro.plotting.plot` function to easily
 plot orbits. Now we'd like to plot several orbits in one graph (for example,
-the maneuver me computed in the previous section). For this purpose, we
+the maneuver we computed in the previous section). For this purpose, we
 have :py:class:`~poliastro.plotting.OrbitPlotter` objects in the
 :py:mod:`~poliastro.plotting` module.
 
