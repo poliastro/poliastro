@@ -6,9 +6,12 @@
    :width: 675px
    :align: center
 
+.. |orcid| image:: https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg
+   :target: http://orcid.org/0000-0002-2187-161X
+
 :Name: poliastro
 :Website: https://poliastro.github.io/
-:Author: Juan Luis Cano Rodríguez <juanlu001@gmail.com>
+:Author: Juan Luis Cano Rodríguez |orcid|
 :Version: 0.7.dev0
 
 .. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square
