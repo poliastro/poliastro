@@ -1,0 +1,51 @@
+﻿#This file contains data to create some of the most important or polular bodies in Poliastro.
+#
+#Sources for the data at the end
+#
+#Variables given:
+#name, Symbol, k[km**3 / s**2], R[km] , Gravity parent, semi-mayor axis [au], eccentricity [no unit], inclination[deg], mean longitude[deg], longitude of perihelion[deg], longitude of ascending node[deg]
+#
+#
+#       Stars or parentless Bodies:
+#
+Sun , ☉      , 132712440041, 695700 , None, None
+#
+#
+#       Planets of the Solar System 
+#
+Mercury, ☿      , 22031.78 , 2439.7 , Sun,  0.38709927, 0.20563593,  7.00497902, 252.25032350,  77.45779628,  48.33076593            
+Venus  , ♀       , 324858.6 , 6051.8 , Sun,  0.72333566, 0.00677672,  3.39467605, 181.97909950, 131.60246718,  76.67984255
+Earth  , ♁      , 398600.44, 6378.14, Sun,  1.00000261, 0.01671123,  0.0       , 100.46457166, 102.93768193,   0.0       
+Mars   , ♂       , 42828.38 , 3389.5 , Sun,  1.52371034, 0.09339410,  1.84969142,  -4.55343205, -23.94362959,  49.55953891
+Jupiter, ♃      , 126712765, 69911  , Sun,  5.20288700, 0.04838624,  1.30439695,  34.39644051,  14.72847983, 100.47390909
+Saturn , ♄      , 37940585 , 58232  , Sun,  9.53667594, 0.05386179,  2.48599187,  49.95424423,  92.59887831, 113.66242448
+Uranus , ♅      , 5794548  , 25362  , Sun, 19.18916464, 0.04725744,  0.77263783, 313.23810451, 170.95427630,  74.01692503
+Neptune, ♆      , 6836527  , 24622  , Sun, 30.06992276, 0.00859048,  1.77004347, -55.12002969,  44.96476227, 131.78422574
+#
+#
+#       Main Dwarf Planets of The Solar System
+#
+Ceres   , ⚳        , 62.6284, 469.7  , Sun, 2.767880825, 0.07568276, 10.59240162, 156.09905092, 153.21764754, 80.309858181
+Pluto   , ♇       , 977.0  , 1151   , Sun, 39.48211675, 0.24882730, 17.14001206, 238.92903833, 224.06891629, 110.30393684
+Haumea  , Haumea   , 267.4  , 650    , Sun, 43.35314387, 0.18902058, 28.20054911, 552.43678897, 361.01562590, 121.91984800
+Makemake, Makemake , 250    , 715    , Sun, 45.74849619, 0.15410206, 28.99050040, 515.85644548, 375.86020481,  79.54747618	 	
+Eris    , Eris     , 1240.79, 1200   , Sun, 67.64830340, 0.44217872, 44.19798212, 380.94222610, 187.30235624,  35.88062556	
+#
+# Moons and Satellites
+#
+Moon    , ☾       , 4902.8, 1737.1, Earth, 0.002569555, 0.0554    , 5.16       , 578.50      , 443.23      , 125.08
+#
+#
+# Aproximate keplerian elements of planets and Pluto at J2000 from JPL: http://ssd.jpl.nasa.gov/?planet_pos as of 11-March-2017 
+# NOTE: Orbit assigned to Earth comes from Earth-Moon Barycenter.
+# Mean radius of planets and Pluto from JPL: http://ssd.jpl.nasa.gov/?planet_phys_par as of 11-March-2017
+# Value used for au (astronomical unit) from JPL: http://ssd.jpl.nasa.gov/?faq#B05 as of 11-March-2017
+# K parameter for planets, Pluto, Sun and Moon from DE431, pg 49: https://ilrs.cddis.eosdis.nasa.gov/docs/2014/196C.pdf
+# Orbital parameters for Ceres, Haumea, Makemake and Eris from JPL small bodies database: http://ssd.jpl.nasa.gov/sbdb.cgi 
+# K parameter and mean radius of Ceres from JPL small bodies database: http://ssd.jpl.nasa.gov/sbdb.cgi
+# K parameter and radius of Eris from Michael E. Brown and Emily L. Schaller at Science: http://hubblesite.org/pubinfo/pdf/2007/24/pdf.pdf
+# K parameter and radius of Haumea from D. Ragozzine and M. E. Brown at the Astronomical Journal: https://doi.org/10.1088/0004-6256/137/6/4766
+# Estimation of K and radius of Makemake from M.E. Brown: https://arxiv.org/pdf/1304.1041v1.pdf
+# Note that the mass of Makemake remains unknown as of 11-March-2017 and any value of K between 158 and 363 km3/s2 is possible.
+# Moon Orbital parameters at J2000 from JPL satellite database: http://ssd.jpl.nasa.gov/?sat_elem
+#
