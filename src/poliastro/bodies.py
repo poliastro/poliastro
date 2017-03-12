@@ -9,15 +9,22 @@ Contains some predefined bodies of the Solar System:
 and a way to define new bodies (:py:class:`~Body` class).
 
 """
-from astropy.constants import R_earth
-from astropy import units as u
 
+from astropy import units as u
+import warnings
+from poliastro.twobody import Orbit
+from poliastro.twobody.angles import M_to_nu
+import os.path
+
+au = 149597870.700 * u.km
+body_dict = {}
 
 class Body(object):
     """Class to represent a body of the Solar System.
 
     """
-    def __init__(self, k, name=None, symbol=None, R=0 * u.km):
+    def __init__(self, k, name=None, symbol=None, R=0 * u.km,
+                 parent=None, orbit = None):
         """Constructor.
 
         Parameters
@@ -30,17 +37,24 @@ class Body(object):
             Symbol for the body.
         R : Quantity
             Radius of the body.
+        parent : Body
+            Gravitational center (ej: Sun for the Earth)
+        orbit: Orbit
+            orbit object of the body
 
         """
         self.k = k
         self.name = name
         self.symbol = symbol
         self.R = R
+        self.parent = parent
+        self.orbit = orbit
+        self.soi = None
 
     @classmethod
     @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
-    def from_parameters(cls, k, name, symbol, R):
-        return cls(k, name, symbol, R)
+    def from_parameters(cls, k, name, symbol, R, parent, orbit):
+        return cls(k, name, symbol, R, parent, orbit)
 
     def __str__(self):
         return u"{0} ({1})".format(self.name, self.symbol)
@@ -52,81 +66,75 @@ class Body(object):
 
         """
         return self.__str__()
+    def calculate_soi(self):
+        '''Calculate the radius of the sphere of influence.
+        The body must have a parent body and an orbit defined'''
+        if self.parent == None:
+            warnings.warn('Unable to calculate SOI without valid parent body')
+        elif self.orbit == None:
+            warnings.warn('Unable to calculate SOI without valid orbit assigned')
+        else:
+            self.soi= self.orbit.a * (self.k / self.parent.k) ** (2/5)
 
+data_path = os.path.join(os.path.dirname(__file__), "bodies_data.txt")
+with open(data_path, 'r', encoding='utf-8') as raw_data :
+    for line in raw_data:
+        line = line.replace('\ufeff','')
+        line = line.replace('\n','')
+        if line[0] == '#':
+            continue
+        line = line.replace(' ','')
+        body_data = line.split(sep = ',')
+        name, symbol, k, R = body_data[:4]
+        k = float(k) * u.km**3 / u.s**2
+        R = float(R) * u.km
+        
+        if body_data[4] == 'None':
+            parent = None
+        else:
+            parent_name = body_data[4]
+            if parent_name in body_dict:
+                parent = body_dict[parent_name]
+            else:
+                message = 'loading bodies warning: '
+                message += 'object not found during body loading:'
+                message += parent_name +'. Parent reverted to None for ' + name
+                warnings.warn(message)
+                parent = None
+        if body_data[5] == 'None':
+            orbit = None
+        elif parent == None:
+            orbit = None
+            warnings.warn('Unable to create orbit without valid parent body')
+        else:
+            a, ecc, inc, L, long_peri, raan = body_data[5:11]
+            a = float(a) * au
+            ecc = float(ecc) * u.one
+            inc = (float(inc) * u.deg).to(u.rad)
+            L = (float(L) * u.deg).to(u.rad)
+            long_peri = (float(long_peri) * u.deg).to(u.rad)
+            raan = (float(raan) * u.deg).to(u.rad)
+            argp = long_peri - raan
+            M = L - long_peri
+            nu = M_to_nu(M, ecc)
+            orbit = Orbit.from_classical(parent, a, ecc, inc, raan, argp, nu)
+        body_dict[name] = Body.from_parameters(k, name, symbol, R, parent, orbit)
+    
 
-Sun = Body.from_parameters(k=132712440018 * u.km ** 3 / u.s ** 2,
-           name="Sun", symbol=u"\u2609", R=695700 * u.km)
+for body_name in body_dict:
+    body = body_dict[body_name]
+    if body.parent != None and body.orbit != None:
+        body.calculate_soi()
 
-Earth = Body.from_parameters(k=398600.44 * u.km ** 3 / u.s ** 2,
-             name="Earth", symbol=u"\u2641", R=R_earth.to(u.km))
-Earth.a = 149598023 * u.km #Semi-mayor axis
-Earth.e = 0.0167086 * u.dimensionless_unscaled #Eccentricity
-
-Moon = Body.from_parameters(k=4902.8 * u.km ** 3 / u.s ** 2,
-             name="Moon", symbol=u"\u263E", R=1737.1 * u.km)
-Moon.a = 384399 * u.km #Semi-mayor axis
-Moon.e = 0.0549 * u.dimensionless_unscaled #Eccentricity
-
-Mercury = Body.from_parameters(k=22032.09 * u.km ** 3 / u.s ** 2,
-             name="Mercury", symbol=u"\u263F", R=2439.7 * u.km)
-Mercury.a = 57909050 * u.km #Semi-mayor axis
-Mercury.e = 0.205630 * u.dimensionless_unscaled #Eccentricity
-
-Venus = Body.from_parameters(k=324858 * u.km ** 3 / u.s ** 2,
-             name="Venus", symbol=u"\u2640", R=6051.8 * u.km)
-Venus.a = 108208000 * u.km #Semi-mayor axis
-Venus.e = 0.006772 * u.dimensionless_unscaled #Eccentricity
-
-Mars = Body.from_parameters(k=42828.4 * u.km ** 3 / u.s ** 2,
-             name="Mars", symbol=u"\u2642", R=3389.5 * u.km)
-Mars.a = 227.9392 * u.Gm #Semi-mayor axis
-Mars.e = 0.0934 * u.dimensionless_unscaled #Eccentricity
-
-Jupiter = Body.from_parameters(k=126712764 * u.km ** 3 / u.s ** 2,
-             name="Jupiter", symbol=u"\u2643", R=69911 * u.km)
-Jupiter.a = 778.299 * u.Gm #Semi-mayor axis
-Jupiter.e = 0.048498 * u.dimensionless_unscaled #Eccentricity
-
-Saturn = Body.from_parameters(k=37940585 * u.km ** 3 / u.s ** 2,
-             name="Saturn", symbol=u"\u2644", R=58232 * u.km)
-Saturn.a = 1429.395 * u.Gm #Semi-mayor axis
-Saturn.e = 0.05555 * u.dimensionless_unscaled #Eccentricity
-
-Uranus = Body.from_parameters(k=5794548 * u.km ** 3 / u.s ** 2,
-             name="Uranus", symbol=u"\u2645", R=25362 * u.km)
-Uranus.a = 2875.04 * u.Gm #Semi-mayor axis
-Uranus.e = 0.04638 * u.dimensionless_unscaled #Eccentricity
-
-Neptune = Body.from_parameters(k=6836535 * u.km ** 3 / u.s ** 2,
-             name="Neptune", symbol=u"\u2646", R=24622 * u.km)
-Neptune.a = 4504.45 * u.Gm #Semi-mayor axis
-Neptune.e = 0.009456 * u.dimensionless_unscaled #Eccentricity
-
-Pluto = Body.from_parameters(k=977 * u.km ** 3 / u.s ** 2,
-             name="Pluto", symbol=u"\u2647", R=1187 * u.km)
-Pluto.a = 5906.38 * u.Gm #Semi-mayor axis
-Pluto.e = 0.2488 * u.dimensionless_unscaled #Eccentricity
-
-planet_list = [
-        Mercury,
-        Venus,
-        Earth,
-        Mars,
-        Jupiter,
-        Saturn,
-        Uranus,
-        Neptune,
-        Pluto] #Kinda? Just so it doesn't feel alone
-
-for planet in planet_list:
-    planet.r_soi = planet.a * (planet.k / Sun.k) ** (2/5)   
-
-Moon.r_soi = Moon.a * (Moon.k / Earth.k) ** (2/5)     
-
+Sun = body_dict['Sun']
+Earth = body_dict['Earth']
+Jupiter = body_dict['Jupiter']
 
 #Checking the numers:
 if __name__ == '__main__':
-    for planet in planet_list:
-        print(planet.name.rjust(8), round(float(planet.r_soi / planet.R)))
+    for body_name in body_dict:
+        body = body_dict[body_name]
+        if body.soi != None:
+            print(body.name.rjust(8), round(float(body.soi / body.R)))
     #Values should be close to the described at:
     #https://en.wikipedia.org/wiki/Sphere_of_influence_(astrodynamics)

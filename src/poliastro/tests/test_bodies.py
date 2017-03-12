@@ -17,8 +17,11 @@ def test_body_from_parameters_raises_valueerror_if_k_units_not_correct():
     wrong_k = 4902.8 * u.kg
     _name = _symbol = ""
     _R = 0
+    _parent = None
+    _orbit = None
     with pytest.raises(u.UnitsError) as excinfo:
-        moon = bodies.Body.from_parameters(wrong_k, _name, _symbol, _R)
+        moon = bodies.Body.from_parameters(wrong_k, _name, _symbol,
+                                           _R, _parent, _orbit)
     assert ("UnitsError: Argument 'k' to function 'from_parameters' must be in units convertible to 'km3 / s2'."
             in excinfo.exconly())
 
@@ -33,6 +36,6 @@ def test_body_printing_has_name_and_symbol():
 
 
 def test_earth_has_k_given_in_literature():
-    expected_k = 3.986e14 * u.m ** 3 / u.s ** 2
+    expected_k = 398600.44 * u.km ** 3 / u.s ** 2
     k = bodies.Earth.k
     assert_quantity_allclose(k.decompose([u.km, u.s]), expected_k)
