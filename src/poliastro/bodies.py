@@ -76,65 +76,58 @@ class Body(object):
         else:
             self.soi= self.orbit.a * (self.k / self.parent.k) ** (2/5)
 
-data_path = os.path.join(os.path.dirname(__file__), "bodies_data.txt")
-with open(data_path, 'r', encoding='utf-8') as raw_data :
-    for line in raw_data:
-        line = line.replace('\ufeff','')
-        line = line.replace('\n','')
-        if line[0] == '#':
+_data_path = os.path.join(os.path.dirname(__file__), "bodies_data.txt")
+with open(_data_path, 'r', encoding='utf-8') as _raw_data :
+    for _line in _raw_data:
+        _line = _line.replace('\ufeff','')
+        _line = _line.replace('\n','')
+        if _line[0] == '#':
             continue
-        line = line.replace(' ','')
-        body_data = line.split(sep = ',')
-        name, symbol, k, R = body_data[:4]
-        k = float(k) * u.km**3 / u.s**2
-        R = float(R) * u.km
+        _line = _line.replace(' ','')
+        _body_data = _line.split(sep = ',')
+        _name, _symbol, _k, _R = _body_data[:4]
+        _k = float(_k) * u.km**3 / u.s**2
+        _R = float(_R) * u.km
         
-        if body_data[4] == 'None':
-            parent = None
+        if _body_data[4] == 'None':
+            _parent = None
         else:
-            parent_name = body_data[4]
-            if parent_name in body_dict:
-                parent = body_dict[parent_name]
+            _parent_name = _body_data[4]
+            if _parent_name in body_dict:
+                _parent = body_dict[_parent_name]
             else:
-                message = 'loading bodies warning: '
-                message += 'object not found during body loading:'
-                message += parent_name +'. Parent reverted to None for ' + name
-                warnings.warn(message)
-                parent = None
-        if body_data[5] == 'None':
-            orbit = None
-        elif parent == None:
-            orbit = None
+                _message = 'loading bodies warning: '
+                _message += 'object not found during body loading:'
+                _message += _parent_name +'. Parent reverted to None for ' + _name
+                warnings.warn(_message)
+                _parent = None
+        if _body_data[5] == 'None':
+            _orbit = None
+        elif _parent == None:
+            _orbit = None
             warnings.warn('Unable to create orbit without valid parent body')
         else:
-            a, ecc, inc, L, long_peri, raan = body_data[5:11]
-            a = float(a) * au
-            ecc = float(ecc) * u.one
-            inc = (float(inc) * u.deg).to(u.rad)
-            L = (float(L) * u.deg).to(u.rad)
-            long_peri = (float(long_peri) * u.deg).to(u.rad)
-            raan = (float(raan) * u.deg).to(u.rad)
-            argp = long_peri - raan
-            M = L - long_peri
-            nu = M_to_nu(M, ecc)
-            orbit = Orbit.from_classical(parent, a, ecc, inc, raan, argp, nu)
-        body_dict[name] = Body.from_parameters(k, name, symbol, R, parent, orbit)
+            _a, _ecc, _inc, _L, _long_peri, _raan = _body_data[5:11]
+            _a = float(_a) * au
+            _ecc = float(_ecc) * u.one
+            _inc = (float(_inc) * u.deg).to(u.rad)
+            _L = (float(_L) * u.deg).to(u.rad)
+            _long_peri = (float(_long_peri) * u.deg).to(u.rad)
+            _raan = (float(_raan) * u.deg).to(u.rad)
+            _argp = _long_peri - _raan
+            _M = _L - _long_peri
+            _nu = M_to_nu(_M, _ecc)
+            _orbit = Orbit.from_classical(_parent, _a, _ecc, _inc, _raan, _argp, _nu)
+        body_dict[_name] = Body.from_parameters(_k, _name, _symbol, _R, _parent, _orbit)
     
 
-for body_name in body_dict:
-    body = body_dict[body_name]
-    if body.parent != None and body.orbit != None:
-        body.calculate_soi()
+for _body_name in body_dict:
+    _body = body_dict[_body_name]
+    if _body.parent != None and _body.orbit != None:
+        _body.calculate_soi()
 
 Sun = body_dict['Sun']
 Earth = body_dict['Earth']
 Jupiter = body_dict['Jupiter']
 
-#Checking the numers:
-if __name__ == '__main__':
-    for body_name in body_dict:
-        body = body_dict[body_name]
-        if body.soi != None:
-            print(body.name.rjust(8), round(float(body.soi / body.R)))
-    #Values should be close to the described at:
-    #https://en.wikipedia.org/wiki/Sphere_of_influence_(astrodynamics)
+
