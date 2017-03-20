@@ -27,4 +27,4 @@ def get_body_ephem(body, epoch):
 
     """
     r, v = get_body_barycentric_posvel(body, epoch)
-    return r.xyz, v.xyz.to(u.km / u.day)
+    return r.xyz.to(u.km), v.xyz.to(u.km / u.day)

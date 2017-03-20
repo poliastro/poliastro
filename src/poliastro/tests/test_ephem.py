@@ -12,4 +12,5 @@ def test_proper_velocity_units():
 
     r, v = ephem.get_body_ephem(_body, _epoch)
 
+    assert r.unit == u.km
     assert v.unit == u.km / u.day
