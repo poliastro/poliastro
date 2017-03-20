@@ -34,11 +34,7 @@ setup(
     ],
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    entry_points={
-      'console_scripts': [
-          'poliastro = poliastro.cli:main'
-      ]
-    },
+    entry_points={},
     classifiers=[
       "Development Status :: 4 - Beta",
       "Intended Audience :: Education",
