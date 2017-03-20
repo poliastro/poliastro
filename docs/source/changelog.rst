@@ -4,11 +4,23 @@ What's new
 Unreleased
 ----------
 
+Highlights:
+
+* **Bodies now have a parent**. It is now possible to specify the attractor
+  of a body.
+* **Use Astropy for body ephemerides**. Instead of downloading the SPK
+  files ourselves, now we use Astropy builtin capabilities. This also
+  allows the user to select a builtin ephemerides that does not require
+  external downloads. See `#131` for details.
+
 Bugs fixed:
 
 * `Issue #128`_: Missing ephemerides if no files on import time
+* Slightly incorrect ephemerides results due to improper time scale, see
+  `#131`_.
 
 .. _`Issue #128`: https://github.com/poliastro/poliastro/issues/128
+.. _`#131`: https://github.com/poliastro/poliastro/issues/131
 
 poliastro 0.6.0 - 2017-02-12
 ----------------------------
