@@ -6,23 +6,6 @@ from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
 
 
-# Stars
-SUN = "sun"
-
-# Planets
-MERCURY = "mercury"
-VENUS = "venus"
-EARTH = "earth"
-MARS = "mars"
-JUPITER = "jupiter"
-SATURN = "saturn"
-URANUS = "uranus"
-NEPTUNE = "neptune"
-
-# Other bodies
-PLUTO = "pluto"
-
-
 def get_body_ephem(body, epoch):
     """Position and velocity vectors of a given body at a certain time.
 
@@ -32,8 +15,8 @@ def get_body_ephem(body, epoch):
 
     Parameters
     ----------
-    body : Body, str or int
-        Planetary body. Can be a Body object, an string or an integer.
+    body : str
+        Name of the body.
     epoch : astropy.time.Time
         Computation time. Can be scalar or vector.
 
@@ -43,10 +26,5 @@ def get_body_ephem(body, epoch):
         Position and velocity vectors.
 
     """
-    try:
-        body_str = body.name
-    except AttributeError:  # The body is not a `Body` object, assume str
-        body_str = body
-
-    r, v = get_body_barycentric_posvel(body_str, epoch)
+    r, v = get_body_barycentric_posvel(body, epoch)
     return r.xyz, v.xyz.to(u.km / u.day)
