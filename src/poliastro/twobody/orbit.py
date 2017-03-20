@@ -1,10 +1,13 @@
 # coding: utf-8
+from datetime import datetime
+
 import numpy as np
 
 from astropy import units as u
 
 from astropy import time
 
+from poliastro.ephem import get_body_ephem
 from poliastro.twobody.propagation import propagate
 
 import poliastro.twobody.rv
@@ -32,7 +35,7 @@ class Orbit(object):
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
     def from_vectors(cls, attractor, r, v, epoch=J2000):
-        """Return `State` object from position and velocity vectors.
+        """Return `Orbit` from position and velocity vectors.
 
         Parameters
         ----------
@@ -55,7 +58,7 @@ class Orbit(object):
     @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def from_classical(cls, attractor, a, ecc, inc, raan, argp, nu, epoch=J2000):
-        """Return `State` object from classical orbital elements.
+        """Return `Orbit` from classical orbital elements.
 
         Parameters
         ----------
@@ -89,7 +92,7 @@ class Orbit(object):
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
     def from_equinoctial(cls, attractor, p, f, g, h, k, L, epoch=J2000):
-        """Return `State` object from modified equinoctial elements.
+        """Return `Orbit` from modified equinoctial elements.
 
         Parameters
         ----------
@@ -116,10 +119,21 @@ class Orbit(object):
         return cls(ss, epoch)
 
     @classmethod
+    def from_body_ephem(cls, body, epoch=None):
+        """Return osculating `Orbit` of a body at a given time.
+
+        """
+        if not epoch:
+            epoch = time.Time.now()
+
+        r, v = get_body_ephem(body.name, epoch)
+        return cls.from_vectors(body.parent, r, v, epoch)
+
+    @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
     def circular(cls, attractor, alt,
                  inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000):
-        """Return `State` corresponding to a circular orbit.
+        """Return circular `Orbit`.
 
         Parameters
         ----------
@@ -146,7 +160,7 @@ class Orbit(object):
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000):
-        """Return `State` corresponding to parabolic orbit.
+        """Return parabolic `Orbit`.
 
         Parameters
         ----------
@@ -178,13 +192,13 @@ class Orbit(object):
         return ss
 
     def propagate(self, time_of_flight, rtol=1e-10):
-        """Propagate this `State` some `time` and return the result.
+        """Propagate this `Orbit` some `time` and return the result.
 
         """
         return propagate(self, time_of_flight, rtol=rtol)
 
     def apply_maneuver(self, maneuver, intermediate=False):
-        """Returns resulting State after applying maneuver to self.
+        """Returns resulting `Orbit` after applying maneuver to self.
 
         Optionally return intermediate states (default to False).
 

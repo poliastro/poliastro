@@ -77,6 +77,13 @@ def test_apply_maneuver_changes_epoch():
     assert orbit_new.epoch == ss.epoch + dt
 
 
+def test_orbit_from_ephem_with_no_epoch_is_today():
+    # This is not that obvious http://stackoverflow.com/q/6407362/554319
+    body = Earth
+    ss = Orbit.from_body_ephem(body)
+    assert (time.Time.now() - ss.epoch).sec < 1
+
+
 def test_circular_has_proper_semimajor_axis():
     alt = 500 * u.km
     attractor = Earth
