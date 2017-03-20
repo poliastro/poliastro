@@ -1,10 +1,13 @@
 # coding: utf-8
+from datetime import datetime
+
 import numpy as np
 
 from astropy import units as u
 
 from astropy import time
 
+from poliastro.ephem import get_body_ephem
 from poliastro.twobody.propagation import propagate
 
 import poliastro.twobody.rv
@@ -114,6 +117,17 @@ class Orbit(object):
         ss = poliastro.twobody.equinoctial.ModifiedEquinoctialState(
             attractor, p, f, g, h, k, L)
         return cls(ss, epoch)
+
+    @classmethod
+    def from_body_ephem(cls, body, epoch=None):
+        """Return osculating `Orbit` of a body at a given time.
+
+        """
+        if not epoch:
+            epoch = time.Time.now()
+
+        r, v = get_body_ephem(body.name, epoch)
+        return cls.from_vectors(body.parent, r, v, epoch)
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
