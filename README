@@ -41,9 +41,12 @@
 .. |mailing| image:: https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square
    :target: https://groups.io/g/poliastro-dev
 
+.. |chat| image:: https://img.shields.io/badge/riot.im-poliastro-48B9AE.svg?style=flat-square
+   :target: https://riot.im/app/#/room/#poliastro:matrix.org
+
 |travisci| |appveyor| |codecov| |codeclimate|
 
-|docs| |license| |doi| |astropy| |mailing|
+|docs| |license| |doi| |astropy| |mailing| |chat|
 
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
@@ -179,7 +182,7 @@ welcome! For more information, head to `CONTRIBUTING`_.
 Support
 =======
 
-|mailing|
+|mailing| |chat|
 
 Release announcements and general discussion take place on our `mailing list`_.
 Feel free to join!
@@ -187,6 +190,12 @@ Feel free to join!
 .. _`mailing list`: https://groups.io/g/poliastro-dev
 
 https://groups.io/g/poliastro-dev
+
+You can also join the `chat room`_ on Riot (or #poliastro on Freenode IRC):
+
+.. _`chat room: https://riot.im/app/#/room/#poliastro:matrix.org
+
+https://riot.im/app/#/room/#poliastro:matrix.org
 
 Citing
 ======
