@@ -97,12 +97,6 @@ poliastro.hyper module
 .. automodule:: poliastro.hyper
     :members:
 
-poliastro.jit module
----------------------
-
-.. automodule:: poliastro.jit
-    :members:
-
 poliastro.maneuver module
 -------------------------
 
@@ -121,12 +115,6 @@ poliastro.stumpff module
 ------------------------
 
 .. automodule:: poliastro.stumpff
-    :members:
-
-poliastro.testing module
--------------------------
-
-.. automodule:: poliastro.testing
     :members:
 
 poliastro.util module
