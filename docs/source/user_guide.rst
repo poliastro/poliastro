@@ -1,10 +1,10 @@
 User guide
 ==========
 
-Defining the orbit: :py:class:`~poliastro.twobody.Orbit` objects
+Defining the orbit: :py:class:`~poliastro.twobody.orbit.Orbit` objects
 ----------------------------------------------------------------
 
-The core of poliastro are the :py:class:`~poliastro.twobody.Orbit` objects
+The core of poliastro are the :py:class:`~poliastro.twobody.orbit.Orbit` objects
 inside the :py:mod:`poliastro.twobody` module. They store all the required
 information to define an orbit:
 
@@ -26,9 +26,9 @@ From position and velocity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are several methods available to create
-:py:class:`~poliastro.twobody.Orbit` objects. For example, if we have the
+:py:class:`~poliastro.twobody.orbit.Orbit` objects. For example, if we have the
 position and velocity vectors we can use
-:py:meth:`~poliastro.twobody.Orbit.from_vectors`:
+:py:meth:`~poliastro.twobody.orbit.Orbit.from_vectors`:
 
 .. code-block:: python
 
@@ -85,7 +85,7 @@ orbit.
 From classical orbital elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can also define a :py:class:`~poliastro.twobody.Orbit` using a set of
+We can also define a :py:class:`~poliastro.twobody.orbit.Orbit` using a set of
 six parameters called orbital elements. Although there are several of
 these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
@@ -98,7 +98,7 @@ poliastro supports the *classical orbital elements*:
 * True anomaly \\(\\nu\\).
 
 In this case, we'd use the method
-:py:meth:`~poliastro.twobody.Orbit.from_classical`:
+:py:meth:`~poliastro.twobody.orbit.Orbit.from_classical`:
 
 .. code-block:: python
 
@@ -114,8 +114,8 @@ In this case, we'd use the method
 
 Notice that whether we create a ``Orbit`` from \\(r\\) and \\(v\\) or from
 elements we can access many mathematical properties individually using the
-:py:attr:`~poliastro.twobody.Orbit.state` property of
-:py:class:`~poliastro.twobody.Orbit` objects::
+:py:attr:`~poliastro.twobody.orbit.Orbit.state` property of
+:py:class:`~poliastro.twobody.orbit.Orbit` objects::
 
     >>> ss.state.period.to(u.day)
     <Quantity 686.9713888628166 d>
@@ -123,7 +123,7 @@ elements we can access many mathematical properties individually using the
     <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
 
 To see a complete list of properties, check out the
-:py:class:`poliastro.twobody.Orbit` class on the API reference.
+:py:class:`poliastro.twobody.orbit.Orbit` class on the API reference.
 
 Changing the orbit: :py:class:`~poliastro.maneuver.Maneuver` objects
 --------------------------------------------------------------------
@@ -173,7 +173,7 @@ You can also retrieve the individual vectorial impulses::
 .. _bielliptic: http://en.wikipedia.org/wiki/Bi-elliptic_transfer
 
 To actually retrieve the resulting ``Orbit`` after performing a maneuver, use
-the method :py:meth:`~poliastro.twobody.Orbit.apply_maneuver`::
+the method :py:meth:`~poliastro.twobody.orbit.Orbit.apply_maneuver`::
 
     >>> ss_f = ss_i.apply_maneuver(hoh)
     >>> ss_f.rv()
@@ -258,7 +258,7 @@ flight is known in celestial mechanics as **Lambert's problem**, also
 known as two point boundary value problem. This contrasts with Kepler's
 problem or propagation, which is rather an initial value problem.
 
-The module :py:mod:`poliastro.iod` allows as to solve Lambert's problem,
+The package :py:obj:`poliastro.iod` allows as to solve Lambert's problem,
 provided the main attractor's gravitational constant, the two position
 vectors and the time of flight. As you can imagine, being able to compute
 the positions of the planets as we saw in the previous section is the
