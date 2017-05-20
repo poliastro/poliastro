@@ -39,7 +39,7 @@ help us fixing bugs in poliastro and check out the `"easy" tag`_. Those
 should be easier to fix than the others and require less knowledge about the
 library.
 
-.. _`easy tag`: https://github.com/poliastro/poliastro/issues?q=is%3Aissue+is%3Aopen+label%3Aeasy
+.. _`"easy" tag`: https://github.com/poliastro/poliastro/issues?q=is%3Aissue+is%3Aopen+label%3Aeasy
 
 If you are hesitant on what IDE or editor to use, just choose one that
 you find comfortable and stick to it while you are learning. People have
