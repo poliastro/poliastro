@@ -2,7 +2,7 @@ User guide
 ==========
 
 Defining the orbit: :py:class:`~poliastro.twobody.orbit.Orbit` objects
-----------------------------------------------------------------
+-----------------------------------------------------------------------
 
 The core of poliastro are the :py:class:`~poliastro.twobody.orbit.Orbit` objects
 inside the :py:mod:`poliastro.twobody` module. They store all the required
