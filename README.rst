@@ -174,7 +174,7 @@ Contributing
 poliastro is a community project, hence all contributions are more than
 welcome! For more information, head to `CONTRIBUTING.rst`_.
 
-.. _`CONTRIBUTING`: https://github.com/poliastro/poliastro/blob/master/CONTRIBUTING.rst
+.. _`CONTRIBUTING.rst`: https://github.com/poliastro/poliastro/blob/master/CONTRIBUTING.rst
 
 Support
 =======
