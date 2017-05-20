@@ -18,7 +18,7 @@ def mee2coe(p, f, g, h, k, L):
     The definition of the modified equinoctial orbital elements is taken from
     [Walker, 1985].
 
-    Notes
+    Note
     -----
     The conversion is always safe because arctan2 works also for 0, 0
     arguments.

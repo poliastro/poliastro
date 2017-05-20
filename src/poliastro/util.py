@@ -35,7 +35,7 @@ def rotate(vector, angle, axis='z', unit=None):
         If `angle` does not have associated units, they are in this
         unit.  If neither are provided, it is assumed to be degrees.
 
-    Notes
+    Note
     -----
     This is just a convenience function around
     `astropy.coordinates.angles.rotation_matrix`.
@@ -57,7 +57,7 @@ def rotate(vector, angle, axis='z', unit=None):
 def transform(vector, angle, axis='z', unit=None):
     """Rotates a coordinate system around axis a positive right-handed angle.
 
-    Notes
+    Note
     -----
     This is a convenience function, equivalent to
     ``rotate(vec, -angle, axis, unit)``.

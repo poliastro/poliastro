@@ -80,7 +80,7 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     nu : float
         True anomaly (rad).
 
-    Notes
+    Note
     -----
     The conversion equations are taken directly from the original paper.
 
