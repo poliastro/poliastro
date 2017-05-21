@@ -1,5 +1,5 @@
 API Reference
-#############
+=============
 
 poliastro.twobody package
 -------------------------
