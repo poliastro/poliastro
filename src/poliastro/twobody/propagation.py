@@ -72,7 +72,7 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     RuntimeError
         If the algorithm didn't converge.
 
-    Notes
+    Note
     -----
     This method uses a Dormand & Prince method of order 8(5,3) available
     in the ``scipy.integrate.ode`` module.
@@ -127,7 +127,7 @@ def kepler(k, r0, v0, tof, rtol=1e-10, *, numiter=35):
     RuntimeError
         If the algorithm didn't converge.
 
-    Notes
+    Note
     -----
     This algorithm is based on Vallado implementation, and does basic Newton
     iteration on the Kepler equation written using universal variables. Battin

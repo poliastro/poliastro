@@ -172,7 +172,7 @@ def fp_angle(nu, ecc):
     ecc : float
         Eccentricity.
 
-    Notes
+    Note
     -----
     Algorithm taken from Vallado 2007, pp. 113.
 
