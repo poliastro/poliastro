@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import numpy as np
 from scipy.optimize import brentq
 
@@ -62,10 +64,8 @@ def lagrange_points(m1,r1_,m2,r2_,n_):
         # these suppose a problem, since I need to know the plane in which the
         # two main bodies (m1,m2) are orbiting --> n_ clarifies that, as is the
         # normal vector to that plane
-        x4 = 0.5
-        x5 = 0.5
-        y4 = + np.sqrt(3.)/2.
-        y5 = - np.sqrt(3.)/2.
+        x45 = 0.5
+        y45 = np.sqrt(3.)/2.
     else:
         raise ValueError("m = %.5f must be < 0.5, m1 and m2 are too similar or are interchanged" %m)
 
@@ -73,8 +73,7 @@ def lagrange_points(m1,r1_,m2,r2_,n_):
     L1 = r1 + ux*r12*x1
     L2 = r1 + ux*r12*x2
     L3 = r1 + ux*r12*x3
-    L4 = r1 + ux*r12*x4 + uy*r12*y4
-    L5 = r1 + ux*r12*x5 + uy*r12*y5
+    L4 = r1 + ux*r12*x45 + uy*r12*y45
+    L5 = r1 + ux*r12*x45 - uy*r12*y45
 
     return L1,L2,L3,L4,L5
-#end function
