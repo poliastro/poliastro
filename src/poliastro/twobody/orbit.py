@@ -64,8 +64,8 @@ class Orbit(object):
         ----------
         attractor : Body
             Main attractor.
-        p : Quantity
-            Semilatus rectum.
+        a : Quantity
+            Semi-major axis.
         ecc : Quantity
             Eccentricity.
         inc : Quantity
