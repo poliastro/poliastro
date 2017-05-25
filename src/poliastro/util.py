@@ -43,7 +43,7 @@ def rotate(vector, angle, axis='z', unit=None):
     vector while the coordinate system remains unchanged. To do the opposite
     operation (*passive* or *alias* transformation) call the function as
     ``rotate(vec, ax, -angle, unit)`` or use the convenience function
-    :py:func:`transform`, see [1].
+    :py:func:`transform`, see [1]_.
 
     References
     ----------
