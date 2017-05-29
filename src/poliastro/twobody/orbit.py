@@ -41,11 +41,11 @@ class Orbit(object):
         ----------
         attractor : Body
             Main attractor.
-        r : Quantity
+        r : ~astropy.units.Quantity
             Position vector wrt attractor center.
-        v : Quantity
+        v : ~astropy.units.Quantity
             Velocity vector.
-        epoch : Time, optional
+        epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
 
         """
@@ -64,19 +64,19 @@ class Orbit(object):
         ----------
         attractor : Body
             Main attractor.
-        a : Quantity
+        a : ~astropy.units.Quantity
             Semi-major axis.
-        ecc : Quantity
+        ecc : ~astropy.units.Quantity
             Eccentricity.
-        inc : Quantity
+        inc : ~astropy.units.Quantity
             Inclination
-        raan : Quantity
+        raan : ~astropy.units.Quantity
             Right ascension of the ascending node.
-        argp : Quantity
+        argp : ~astropy.units.Quantity
             Argument of the pericenter.
-        nu : Quantity
+        nu : ~astropy.units.Quantity
             True anomaly.
-        epoch : Time, optional
+        epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
 
         """
@@ -98,19 +98,19 @@ class Orbit(object):
         ----------
         attractor : Body
             Main attractor.
-        p : Quantity
+        p : ~astropy.units.Quantity
             Semilatus rectum.
-        f : Quantity
+        f : ~astropy.units.Quantity
             Second modified equinoctial element.
-        g : Quantity
+        g : ~astropy.units.Quantity
             Third modified equinoctial element.
-        h : Quantity
+        h : ~astropy.units.Quantity
             Fourth modified equinoctial element.
-        k : Quantity
+        k : ~astropy.units.Quantity
             Fifth modified equinoctial element.
-        L : Quantity
+        L : ~astropy.units.Quantity
             True longitude.
-        epoch : Time, optional
+        epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
 
         """
@@ -139,15 +139,15 @@ class Orbit(object):
         ----------
         attractor : Body
             Main attractor.
-        alt : Quantity
+        alt : ~astropy.units.Quantity
             Altitude over surface.
-        inc : Quantity, optional
+        inc : ~astropy.units.Quantity, optional
             Inclination, default to 0 deg (equatorial orbit).
-        raan : Quantity, optional
+        raan : ~astropy.units.Quantity, optional
             Right ascension of the ascending node, default to 0 deg.
-        arglat : Quantity, optional
+        arglat : ~astropy.units.Quantity, optional
             Argument of latitude, default to 0 deg.
-        epoch: Time, optional
+        epoch: ~astropy.time.Time, optional
             Epoch, default to J2000.
 
         """
@@ -166,17 +166,17 @@ class Orbit(object):
         ----------
         attractor : Body
             Main attractor.
-        p : Quantity
+        p : ~astropy.units.Quantity
             Semilatus rectum or parameter.
-        inc : Quantity, optional
+        inc : ~astropy.units.Quantity, optional
             Inclination.
-        raan : Quantity
+        raan : ~astropy.units.Quantity
             Right ascension of the ascending node.
-        argp : Quantity
+        argp : ~astropy.units.Quantity
             Argument of the pericenter.
-        nu : Quantity
+        nu : ~astropy.units.Quantity
             True anomaly.
-        epoch: Time, optional
+        epoch: ~astropy.time.Time, optional
             Epoch, default to J2000.
 
         """

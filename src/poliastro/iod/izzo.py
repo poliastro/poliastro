@@ -17,13 +17,13 @@ def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
 
     Parameters
     ----------
-    k : Quantity
+    k : ~astropy.units.Quantity
         Gravitational constant of main attractor (km^3 / s^2).
-    r0 : Quantity
+    r0 : ~astropy.units.Quantity
         Initial position (km).
-    r : Quantity
+    r : ~astropy.units.Quantity
         Final position (km).
-    tof : Quantity
+    tof : ~astropy.units.Quantity
         Time of flight (s).
     M : int, optional
         Number of full revolutions, default to 0.

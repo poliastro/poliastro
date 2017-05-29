@@ -18,7 +18,7 @@ def rotate(vector, angle, axis='z', unit=None):
     """Rotates a vector around axis a right-handed positive angle.
 
     This is just a convenience function around
-    `astropy.coordinates.angles.rotation_matrix`.
+    :py:func:`astropy.coordinates.matrix_utilities.rotation_matrix`.
 
     Parameters
     ----------
@@ -31,14 +31,14 @@ def rotate(vector, angle, axis='z', unit=None):
         about. If 'x','y', or 'z', the rotation sense is
         counterclockwise looking down the + axis (e.g. positive
         rotations obey left-hand-rule).
-    unit : UnitBase, optional
+    unit : ~astropy.units.UnitBase, optional
         If `angle` does not have associated units, they are in this
         unit.  If neither are provided, it is assumed to be degrees.
 
     Note
     -----
     This is just a convenience function around
-    `astropy.coordinates.angles.rotation_matrix`.
+    :py:func:`astropy.coordinates.matrix_utilities.rotation_matrix`.
     This performs a so-called *active* or *alibi* transformation: rotates the
     vector while the coordinate system remains unchanged. To do the opposite
     operation (*passive* or *alias* transformation) call the function as

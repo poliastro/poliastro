@@ -24,13 +24,13 @@ class Body(object):
         ----------
         parent : Body
             Central body.
-        k : Quantity
+        k : ~astropy.units.Quantity
             Standard gravitational parameter.
         name : str
             Name of the body.
         symbol : str, optional
             Symbol for the body.
-        R : Quantity, optional
+        R : ~astropy.units.Quantity, optional
             Radius of the body.
 
         """

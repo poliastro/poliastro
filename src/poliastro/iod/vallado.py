@@ -15,13 +15,13 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
 
     Parameters
     ----------
-    k : Quantity
+    k : ~astropy.units.Quantity
         Gravitational constant of main attractor (km^3 / s^2).
-    r0 : Quantity
+    r0 : ~astropy.units.Quantity
         Initial position (km).
-    r : Quantity
+    r : ~astropy.units.Quantity
         Final position (km).
-    tof : Quantity
+    tof : ~astropy.units.Quantity
         Time of flight (s).
     short : boolean, optional
         Find out the short path, default to True. If False, find long path.
