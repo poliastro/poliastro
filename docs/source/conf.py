@@ -110,8 +110,8 @@ pygments_style = 'sphinx'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.4', None),
     'astropy': ('http://docs.astropy.org/en/stable/', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-    'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('http://matplotlib.org', None)
 }
 
