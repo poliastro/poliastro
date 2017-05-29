@@ -34,6 +34,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
+    'sphinx.ext.intersphinx',
 ]
 
 # Custom configuration
@@ -105,6 +106,14 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+#Intersphinx configuration
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3.4', None),
+    'astropy': ('http://docs.astropy.org/en/stable/', None),
+    'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+    'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
+    'matplotlib': ('http://matplotlib.org', None)
+}
 
 # -- Options for HTML output ----------------------------------------------
 
