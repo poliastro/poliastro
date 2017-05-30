@@ -17,12 +17,12 @@ def get_body_ephem(body, epoch):
     ----------
     body : str
         Name of the body.
-    epoch : astropy.time.Time
+    epoch : ~astropy.time.Time
         Computation time. Can be scalar or vector.
 
     Returns
     -------
-    r, v : Quantity
+    r, v : ~astropy.units.Quantity
         Position and velocity vectors.
 
     """

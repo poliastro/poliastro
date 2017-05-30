@@ -21,7 +21,7 @@ def func_twobody(t0, u_, k, ad):
     ----------
     t0 : float
         Time.
-    u_ : ndarray
+    u_ : ~numpy.ndarray
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard gravitational parameter.
@@ -75,7 +75,7 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     Note
     -----
     This method uses a Dormand & Prince method of order 8(5,3) available
-    in the ``scipy.integrate.ode`` module.
+    in the :py:class:`scipy.integrate.ode` module.
 
     """
     x, y, z = r0
