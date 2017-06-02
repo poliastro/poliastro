@@ -11,3 +11,4 @@ dependencies:
   - numpy
   - scipy
   - nbsphinx
+  - IPython
