@@ -35,7 +35,7 @@ before_install:
 
   # Install project requirements
   - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
-  - pip install coverage pytest pytest-cov codecov pytest-benchmark sphinx sphinx_rtd_theme
+  - pip install coverage pytest pytest-cov codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx pandoc IPython ipykernel 
 
 install:
   - pip install --no-deps .  # Test installation correctness
