@@ -35,10 +35,10 @@ install:
   - "python --version"
 
   # Install testing dependencies
-  - "pip install pytest codecov pytest-benchmark sphinx sphinx_rtd_theme"
+  - "pip install pytest codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx IPython ipykernel"
 
   # Install dependencies
-  - "conda install -q numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem"
+  - "conda install -q numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem pandoc"
   - "pip install ."  # Test installation correctness
   
 build: off

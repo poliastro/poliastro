@@ -90,4 +90,5 @@ Contents
    changelog
    references
    api
+   jupyter
 

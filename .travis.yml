@@ -34,8 +34,8 @@ before_install:
   - source activate test-environment
 
   # Install project requirements
-  - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem
-  - pip install coverage pytest pytest-cov codecov pytest-benchmark sphinx sphinx_rtd_theme
+  - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem pandoc
+  - pip install coverage pytest pytest-cov codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx IPython ipykernel 
 
 install:
   - pip install --no-deps .  # Test installation correctness
