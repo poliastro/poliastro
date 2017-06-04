@@ -12,3 +12,4 @@ dependencies:
   - scipy
   - nbsphinx
   - IPython
+  - ipykernel
