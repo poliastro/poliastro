@@ -92,11 +92,11 @@ def get_spk_id_from_name(name):
         complete_string = ''
         for string in data[1].stripped_strings:
             complete_string += string + ' '
-        regex = re.compile('Classification: ([\S\s]+) SPK-ID: (\d+)')
+        regex = re.compile(r'Classification: ([\S\s]+) SPK-ID: (\d+)')
         return regex.match(complete_string).group(2)
     else:
-        warnings.warn('Object could not be found. You can visit: ',
-                SBDB_URL + "?sstr=" + name, " for more information.")
+        warnings.warn('Object could not be found. You can visit: '
+                      + SBDB_URL + '?sstr=' + name + ' for more information.')
 
 def get_orbit_from_name(name):
     '''Return `~poliastro.twobody.orbit.Orbit` given a name.
@@ -115,4 +115,6 @@ def get_orbit_from_name(name):
         NEA orbit.
 
     '''
-    return get_orbit_from_spk_id(get_spk_id_from_name(name))
+    spk_id = get_spk_id_from_name(name)
+    if spk_id is not None:
+        return get_orbit_from_spk_id(spk_id)
