@@ -4,6 +4,8 @@ All new functions coded as part of SOCIS 2017 proposal
 
 '''
 import re
+import warnings
+
 from bs4 import BeautifulSoup
 import requests
 
@@ -101,7 +103,7 @@ def get_spk_id_from_name(name):
             print(body.string)
         print('\nPlease select one of them')
     else:
-        print('Object could not be found. You can visit: ',
+        warnings.warn('Object could not be found. You can visit: ',
                 SBDB_URL + "?sstr=" + name, " for more information.")
 
 def get_orbit_from_name(name):
