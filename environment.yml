@@ -13,3 +13,5 @@ dependencies:
   - nbsphinx
   - IPython
   - ipykernel
+  - bs4
+  - requests
