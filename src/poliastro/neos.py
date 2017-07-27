@@ -94,14 +94,6 @@ def get_spk_id_from_name(name):
             complete_string += string + ' '
         regex = re.compile('Classification: ([\S\s]+) SPK-ID: (\d+)')
         return regex.match(complete_string).group(2)
-    # If there is a 'center' sibling, it is a page with a list of possible objects
-    elif page_identifier.find_next_sibling('center') is not None:
-        object_list = page_identifier.find_next_sibling('center').table.find_all('td')
-        print('The following ', len(object_list), ' objects match your search string:\n')
-        for body in object_list:
-            #body.a['href']
-            print(body.string)
-        print('\nPlease select one of them')
     else:
         warnings.warn('Object could not be found. You can visit: ',
                 SBDB_URL + "?sstr=" + name, " for more information.")
