@@ -40,24 +40,24 @@ def get_orbit_from_spk_id(spk_id, epoch=None):
 
     response = requests.get(NEOWS_URL + spk_id, params=payload)
     response.raise_for_status()
-    if response.status_code == 200:
-        orbital_data = response.json()['orbital_data']
 
-        attractor = Sun
-        a = float(orbital_data['semi_major_axis']) * u.AU
-        ecc = float(orbital_data['eccentricity']) * u.one
-        inc = float(orbital_data['inclination']) * u.deg
-        anl = float(orbital_data['ascending_node_longitude']) * u.deg
-        parg = float(orbital_data['perihelion_argument']) * u.deg
-        M = float(orbital_data['mean_anomaly']) * u.deg
-        nu = M_to_nu(M.to(u.rad), ecc)
+    orbital_data = response.json()['orbital_data']
 
-        if epoch is None:
-            return Orbit.from_classical(attractor, a, ecc, inc,
-                                        anl, parg, nu)
-        else:
-            return Orbit.from_classical(attractor, a, ecc, inc,
-                                        anl, parg, nu, epoch)
+    attractor = Sun
+    a = float(orbital_data['semi_major_axis']) * u.AU
+    ecc = float(orbital_data['eccentricity']) * u.one
+    inc = float(orbital_data['inclination']) * u.deg
+    anl = float(orbital_data['ascending_node_longitude']) * u.deg
+    parg = float(orbital_data['perihelion_argument']) * u.deg
+    M = float(orbital_data['mean_anomaly']) * u.deg
+    nu = M_to_nu(M.to(u.rad), ecc)
+
+    if epoch is None:
+        return Orbit.from_classical(attractor, a, ecc, inc,
+                                    anl, parg, nu)
+    else:
+        return Orbit.from_classical(attractor, a, ecc, inc,
+                                    anl, parg, nu, epoch)
 
 def get_spk_id_from_name(name):
     '''Return SPK-ID number given a small-body name.
