@@ -13,6 +13,10 @@ from poliastro.twobody.orbit import Orbit
 from poliastro.bodies import Sun
 from poliastro.twobody.angles import M_to_nu
 
+#Base URLs
+NEOWS_URL = 'https://api.nasa.gov/neo/rest/v1/neo/'
+SBDB_URL = 'https://ssd.jpl.nasa.gov/sbdb.cgi'
+
 def get_orbit_from_spk_id(spk_id, epoch=None):
     """Return `~poliastro.twobody.orbit.Orbit` given a SPK-ID.
 
@@ -30,10 +34,9 @@ def get_orbit_from_spk_id(spk_id, epoch=None):
         NEA orbit..
 
     """
-    url = 'https://api.nasa.gov/neo/rest/v1/neo/'
     payload = {'api_key' : 'DEMO_KEY'}
 
-    response = requests.get(url + spk_id, params=payload)
+    response = requests.get(NEOWS_URL + spk_id, params=payload)
     response.raise_for_status()
     if response.status_code == 200:
         orbital_data = response.json()['orbital_data']
@@ -71,12 +74,9 @@ def get_spk_id_from_name(name):
         SPK-ID number.
 
     '''
-    url = 'https://ssd.jpl.nasa.gov/sbdb.cgi'
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) \
-        AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     payload = {'sstr' : name, 'orb' : '0', 'log' : '0', 'old' : '0', 'cov' : '0', 'cad' : '0'}
-    
-    response = requests.get(url, params=payload, headers=headers)
+
+    response = requests.get(SBDB_URL, params=payload)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -102,7 +102,7 @@ def get_spk_id_from_name(name):
         print('\nPlease select one of them')
     else:
         print('Object could not be found. You can visit: ',
-                url + "?sstr=" + name, " for more information.")
+                SBDB_URL + "?sstr=" + name, " for more information.")
 
 def get_orbit_from_name(name):
     '''Return `~poliastro.twobody.orbit.Orbit` given a name.
