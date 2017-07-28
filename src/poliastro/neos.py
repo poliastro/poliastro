@@ -98,12 +98,17 @@ def spk_id_from_name(name):
     elif page_identifier.find_next_sibling('center') is not None:
         object_list = page_identifier.find_next_sibling('center').table.find_all('td')
         bodies = ''
-        for body in object_list:
-            bodies += body.string + '\n'
-        raise Exception('Several bodies found:\n' + bodies)
+        if len(object_list) > 3:
+            for body in object_list[:3]:
+                bodies += body.string + '\n'
+            bodies += '...'
+        else:
+            for body in object_list:
+                bodies += body.string + '\n'
+        raise ValueError(str(len(object_list)) + ' different bodies found:\n' + bodies)
     else:
-        warnings.warn('Object could not be found. You can visit: '
-                      + SBDB_URL + '?sstr=' + name + ' for more information.')
+        raise ValueError('Object could not be found. You can visit: '
+                         + SBDB_URL + '?sstr=' + name + ' for more information.')
 
 def orbit_from_name(name):
     '''Return `~poliastro.twobody.orbit.Orbit` given a name.
