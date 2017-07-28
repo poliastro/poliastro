@@ -47,17 +47,17 @@ def orbit_from_spk_id(spk_id, epoch=None):
     a = float(orbital_data['semi_major_axis']) * u.AU
     ecc = float(orbital_data['eccentricity']) * u.one
     inc = float(orbital_data['inclination']) * u.deg
-    anl = float(orbital_data['ascending_node_longitude']) * u.deg
-    parg = float(orbital_data['perihelion_argument']) * u.deg
+    raan = float(orbital_data['ascending_node_longitude']) * u.deg
+    argp = float(orbital_data['perihelion_argument']) * u.deg
     M = float(orbital_data['mean_anomaly']) * u.deg
     nu = M_to_nu(M.to(u.rad), ecc)
 
     if epoch is None:
         return Orbit.from_classical(attractor, a, ecc, inc,
-                                    anl, parg, nu)
+                                    raan, argp, nu)
     else:
         return Orbit.from_classical(attractor, a, ecc, inc,
-                                    anl, parg, nu, epoch)
+                                    raan, argp, nu, epoch)
 
 def spk_id_from_name(name):
     '''Return SPK-ID number given a small-body name.
