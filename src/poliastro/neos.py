@@ -19,7 +19,7 @@ from poliastro.twobody.angles import M_to_nu
 NEOWS_URL = 'https://api.nasa.gov/neo/rest/v1/neo/'
 SBDB_URL = 'https://ssd.jpl.nasa.gov/sbdb.cgi'
 
-def get_orbit_from_spk_id(spk_id, epoch=None):
+def orbit_from_spk_id(spk_id, epoch=None):
     """Return `~poliastro.twobody.orbit.Orbit` given a SPK-ID.
 
     Retrieve info from NASA NeoWS API, and therefore
@@ -59,7 +59,7 @@ def get_orbit_from_spk_id(spk_id, epoch=None):
         return Orbit.from_classical(attractor, a, ecc, inc,
                                     anl, parg, nu, epoch)
 
-def get_spk_id_from_name(name):
+def spk_id_from_name(name):
     '''Return SPK-ID number given a small-body name.
     
     Retrieve and parse HTML from JPL Small Body Database
@@ -105,7 +105,7 @@ def get_spk_id_from_name(name):
         warnings.warn('Object could not be found. You can visit: '
                       + SBDB_URL + '?sstr=' + name + ' for more information.')
 
-def get_orbit_from_name(name):
+def orbit_from_name(name):
     '''Return `~poliastro.twobody.orbit.Orbit` given a name.
 
     Retrieve info from NASA NeoWS API, and therefore
@@ -122,6 +122,6 @@ def get_orbit_from_name(name):
         NEA orbit.
 
     '''
-    spk_id = get_spk_id_from_name(name)
+    spk_id = spk_id_from_name(name)
     if spk_id is not None:
-        return get_orbit_from_spk_id(spk_id)
+        return orbit_from_spk_id(spk_id)
