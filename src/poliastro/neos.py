@@ -20,7 +20,7 @@ NEOWS_URL = 'https://api.nasa.gov/neo/rest/v1/neo/'
 SBDB_URL = 'https://ssd.jpl.nasa.gov/sbdb.cgi'
 
 def orbit_from_spk_id(spk_id, epoch=None):
-    """Return `~poliastro.twobody.orbit.Orbit` given a SPK-ID.
+    """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a SPK-ID.
 
     Retrieve info from NASA NeoWS API, and therefore
     it only works with NEAs (Near Earth Asteroids)
@@ -33,7 +33,7 @@ def orbit_from_spk_id(spk_id, epoch=None):
     Returns
     -------
     orbit : ~poliastro.twobody.orbit.Orbit
-        NEA orbit..
+        NEA orbit.
 
     """
     payload = {'api_key' : 'DEMO_KEY'}
@@ -111,7 +111,7 @@ def spk_id_from_name(name):
                          + SBDB_URL + '?sstr=' + name + ' for more information.')
 
 def orbit_from_name(name):
-    '''Return `~poliastro.twobody.orbit.Orbit` given a name.
+    '''Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
 
     Retrieve info from NASA NeoWS API, and therefore
     it only works with NEAs (Near Earth Asteroids)
