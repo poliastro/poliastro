@@ -38,7 +38,7 @@ install:
   - "pip install pytest codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx IPython ipykernel"
 
   # Install dependencies
-  - "conda install -q numpy scipy numba"
+  - "conda install -q numpy scipy pandoc"
   - "pip install ."  # Test installation correctness
   
 build: off
