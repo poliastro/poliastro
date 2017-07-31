@@ -39,7 +39,6 @@ setup(
     python_requires=">=3.5",
     install_requires=[
         "numpy",
-        "numba>=0.25",
         "astropy>=1.2,!=2.0.0",
         "matplotlib",
         "jplephem",
@@ -51,6 +50,9 @@ setup(
         "coverage",
         "pytest-cov",
     ],
+    extras_require={
+        'fast': ["numba>=0.25"],
+    },
     packages=find_packages('src'),
     package_dir={'': 'src'},
     entry_points={},

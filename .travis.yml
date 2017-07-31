@@ -14,6 +14,7 @@ matrix:
       before_install:
         - brew update
         - brew tap derekkwok/python
+        - brew uninstall python
         - brew install python35
         - virtualenv env -p python3.5
         - source env/bin/activate
@@ -36,7 +37,7 @@ branches:
 install:
   - pip install numpy  # Required
   - pip install .  # Test installation correctness
-  - pip install sphinx sphinx_rtd_theme nbsphinx  # Install documentation dependencies
+  - pip install sphinx sphinx_rtd_theme nbsphinx ipython  # Install documentation dependencies
 
 script:
   - python setup.py test -vv  # Test against installed code
