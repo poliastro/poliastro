@@ -1,6 +1,6 @@
 .. poliastro
 
-.. image:: http://poliastro.github.io/_static/logo_text.png
+.. image:: http://poliastro.github.io/images/logo_text.png
    :target: http://poliastro.github.io/
    :alt: poliastro logo
    :width: 675px
