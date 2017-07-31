@@ -1,4 +1,4 @@
-poliastro.nja
+*.nja
 .idea
 .cache
 
@@ -18,3 +18,4 @@ build
 .coverage
 
 __pycache__/
+.eggs/

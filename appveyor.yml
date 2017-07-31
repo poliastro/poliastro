@@ -14,35 +14,26 @@ branches:
 
 environment:
   matrix:
-    - PYTHON: 3.5
-    - PYTHON: 3.6
+    - PYTHON: 35
+    - PYTHON: 36
 
 matrix:
   fast_finish: true
 
 install:
-  - "set PATH=C:\\Miniconda3-x64;C:\\Miniconda3-x64\\Scripts;%PATH%"
-
-  # Install the build and runtime dependencies of the project.
-  - "conda config --set always_yes yes --set changeps1 no"
-  - "conda config --add channels conda-forge"
-  - "conda update -q conda"
-  - "conda info -a"
-  - "conda create -q -n test-environment python=%PYTHON%"
-  - "activate test-environment"
+  - "set PYTHON_BIN=C:\\Python%PYTHON%-x64\\python.exe"
+  - "set PIP_BIN=C:\\Python%PYTHON%-x64\\Scripts\\pip.exe"
+  - "set SPHINX_BIN=C:\\Python%PYTHON%-x64\\Scripts\\sphinx-build.exe"
 
   # Check that we have the expected version of Python
-  - "python --version"
-
-  # Install testing dependencies
-  - "pip install pytest codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx IPython ipykernel"
+  - "%PYTHON_BIN% --version"
 
   # Install dependencies
-  - "conda install -q numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem pandoc"
-  - "pip install ."  # Test installation correctness
+  - "%PIP_BIN% install numpy"  # Required
+  - "%PIP_BIN% install ."  # Test installation correctness
   
 build: off
 
 test_script:
-  - "pytest -vv --benchmark-skip"  # Test against installed code
-  - "sphinx-build -vW -b html docs/source _HTMLTest" # Test docs build
+  - "%PYTHON_BIN% setup.py test -vv"  # Test against installed code
+  - "%SPHINX_BIN% -vW -b html docs/source _HTMLTest" # Test docs build

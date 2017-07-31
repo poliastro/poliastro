@@ -1,16 +1,29 @@
-# The only current way of using OS X virtual machines in Travis CI
-# is setting up a generic environment
-# This is not a problem because Python will be installed through conda
+# OS X trick inspired by
+# https://github.com/travis-ci/travis-ci/issues/2312#issuecomment-289140791
 
-language: generic
+language: python
 
-os:
-  - linux
-  - osx
-
-env:
-  - PYTHON=3.5
-  - PYTHON=3.6
+matrix:
+  include:
+    - os: linux
+      python: 3.5
+    - os: linux
+      python: 3.6
+    - os: osx
+      language: generic
+      before_install:
+        - brew update
+        - brew tap derekkwok/python
+        - brew install python35
+        - virtualenv env -p python3.5
+        - source env/bin/activate
+    - os: osx
+      language: generic
+      before_install:
+        - brew update
+        - brew install python3
+        - virtualenv env -p python3
+        - source env/bin/activate
 
 branches:
   only:
@@ -20,36 +33,22 @@ branches:
     - 0.5.x
     - 0.6.x
 
-before_install:
-  - if [[ "$(uname)" == "Darwin" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
-  - if [[ "$(uname)" == "Linux" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-
-  # Update conda and create test environment
-  - conda config --set always_yes yes --set changeps1 no
-  - conda config --add channels conda-forge
-  - conda update -q conda
-  - conda create -q -n test-environment python=$PYTHON
-  - source activate test-environment
-
-  # Install project requirements
-  - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem pandoc
-  - pip install coverage pytest pytest-cov codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx IPython ipykernel 
-
 install:
-  - pip install --no-deps .  # Test installation correctness
+  - pip install numpy  # Required
+  - pip install .  # Test installation correctness
+  - pip install sphinx sphinx_rtd_theme nbsphinx  # Install documentation dependencies
 
 script:
-  - pytest -vv --benchmark-skip  # Test against installed code
+  - python setup.py test -vv  # Test against installed code
   - sphinx-build -vW -b html docs/source _HTMLTest #Test docs build
+
 after_success:
   # Uninstall to test coverage against sources
   - pip uninstall poliastro -y
-  - pip install --no-deps -e .
+  - pip install -e .
 
-  - NUMBA_DISABLE_JIT=1 pytest --cov --benchmark-skip
+  - NUMBA_DISABLE_JIT=1 python setup.py test --cov
 
-  - codecov
+  - codecov  # Publish coverage
 
 sudo: false
