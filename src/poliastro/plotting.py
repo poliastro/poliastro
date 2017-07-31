@@ -42,7 +42,7 @@ class OrbitPlotter(object):
     :py:meth:`set_frame` to set the frame before plotting.
 
     """
-    def __init__(self, ax=None, num_points=100):
+    def __init__(self, ax=None, num_points=100, bgcolor=(1,1,1), linewidth=1.5, markersize=6, audivision=6):
         """Constructor.
 
         Parameters
@@ -52,11 +52,29 @@ class OrbitPlotter(object):
         num_points : int, optional
             Number of points to use in plots, default to 100.
 
+        bgcolor : tuple or string, optional
+            Background color of the plot, default to (1,1,1)
+
+        linewidth : int, optional
+            Width of the dashed lines showing the orbit path, default to 1.5
+
+        markersize : int, optional
+            Size of the point representing individual orbit bodies, default to 6
+
+        audivision : int, optional
+            The plotting function sets the size of the orbited body to the largest of the following, the first being the size of it in kilometers, and the second being based on the orbit values passed to the plot function:
+                * orbit.attractor.R.to(u.km).value
+                * orbit.r_p.to(u.km).value / self.audivision
+            If the sun is too large, setting audivision to a larger value can make it smaller, and if it is too small, setting it to a smaller value can make it larger. This, of course, depends on the second value (which this effects) being larger than the first, causing it to be selected as the size of the sun. The default value for audivision is 6.
         """
         self.ax = ax
         if not self.ax:
             _, self.ax = plt.subplots(figsize=(6, 6))
+        self.ax.set_facecolor(bgcolor)
+        self.linewidth=linewidth
+        self.markersize=markersize
         self.num_points = num_points
+        self.audivision=audivision
         self._frame = None
         self._states = []
 
@@ -118,20 +136,20 @@ class OrbitPlotter(object):
 
         # Plot current position
         l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
-                          'o', mew=0)
+                          'o', mew=0, markersize=self.markersize)
         lines.append(l)
 
         # Attractor
         # TODO: If several orbits are plotted, the attractor is being plotted several times!
         radius = max(orbit.attractor.R.to(u.km).value,
-                     orbit.r_p.to(u.km).value / 6)
+                     orbit.r_p.to(u.km).value / self.audivision)
         color = BODY_COLORS.get(orbit.attractor.name, "#999999")
         self.ax.add_patch(
                 mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
         if osculating:
             l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
-                              '--', color=l.get_color())
+                              '--', color=l.get_color(),linewidth=self.linewidth)
             lines.append(l)
 
         if label:
