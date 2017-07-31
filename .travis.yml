@@ -25,6 +25,7 @@ before_install:
   - if [[ "$(uname)" == "Linux" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
+  - export MPLBACKEND="agg"
 
   # Update conda and create test environment
   - conda config --set always_yes yes --set changeps1 no
@@ -33,23 +34,27 @@ before_install:
   - conda create -q -n test-environment python=$PYTHON
   - source activate test-environment
 
-  # Install project requirements
-  - conda install numpy numba>=0.23 astropy>=1.0 matplotlib scipy jplephem pandoc
-  - pip install coverage pytest pytest-cov codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx IPython ipykernel 
+  # Install problematic dependencies
+  - conda install pandoc
 
 install:
-  - pip install --no-deps .  # Test installation correctness
+  - pip install numpy  # Required
+  - pip install .  # Test installation correctness
+  - pip install sphinx sphinx_rtd_theme nbsphinx ipython  # Install documentation dependencies
 
 script:
-  - pytest -vv --benchmark-skip  # Test against installed code
+  - python setup.py test -vv  # Test against installed code
   - sphinx-build -vW -b html docs/source _HTMLTest #Test docs build
+
 after_success:
   # Uninstall to test coverage against sources
   - pip uninstall poliastro -y
-  - pip install --no-deps -e .
+  - pip install -e .
 
-  - NUMBA_DISABLE_JIT=1 pytest --cov --benchmark-skip
+  - NUMBA_DISABLE_JIT=1 python setup.py test --cov
 
+  # Publish coverage
+  - pip install codecov
   - codecov
 
 sudo: false

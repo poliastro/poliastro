@@ -2,14 +2,30 @@
 # coding: utf-8
 
 # http://stackoverflow.com/a/10975371/554319
+import os
 import io
+import sys
 from setuptools import setup, find_packages
+from setuptools.command.test import test
+
+
+# https://packaging.python.org/guides/single-sourcing-package-version/
+version = {}
+with open(os.path.join("src", "poliastro", "__init__.py")) as fp:
+    exec(fp.read(), version)
+
+
+# https://docs.pytest.org/en/latest/goodpractices.html#manual-integration
+class PyTest(test):
+    def run_tests(self):
+        import pytest
+        sys.exit(pytest.main([]))
 
 
 # http://blog.ionelmc.ro/2014/05/25/python-packaging/
 setup(
     name="poliastro",
-    version='0.7.dev0',
+    version=version['__version__'],
     description="Python package for Orbital Mechanics",
     author="Juan Luis Cano",
     author_email="hello@juanlu.space",
@@ -23,17 +39,20 @@ setup(
     python_requires=">=3.5",
     install_requires=[
         "numpy",
-        "numba>=0.25",
-        "astropy>=1.2",
+        "astropy>=1.2,!=2.0.0",
         "matplotlib",
         "jplephem",
         "scipy",
-        "bs4",
-        "requests"
+        "beautifulsoup4",
+        "requests",
     ],
     tests_require=[
-        "pytest"
+        "coverage",
+        "pytest-cov",
     ],
+    extras_require={
+        'fast': ["numba>=0.25"],
+    },
     packages=find_packages('src'),
     package_dir={'': 'src'},
     entry_points={},
@@ -56,4 +75,5 @@ setup(
     package_data={"poliastro": ['tests/*.py']},
     include_package_data=True,
     zip_safe=False,
+    cmdclass={'test': PyTest},
 )
