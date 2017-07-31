@@ -4,7 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.6
-  - astropy
+  - astropy!=2.0.0
   - jplephem
   - matplotlib
   - numba
