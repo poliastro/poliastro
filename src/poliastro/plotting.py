@@ -70,7 +70,7 @@ class OrbitPlotter(object):
         self.ax = ax
         if not self.ax:
             _, self.ax = plt.subplots(figsize=(6, 6))
-        self.ax.set_facecolor(bgcolor)
+        self.ax.set_axis_bgcolor(bgcolor)
         self.linewidth=linewidth
         self.markersize=markersize
         self.num_points = num_points
