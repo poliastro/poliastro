@@ -56,8 +56,8 @@ def test_hohmann_maneuver():
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
 
     assert_quantity_allclose(ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-14 * u.one)
-    assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-6)
-    assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-6)
+    assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
+    assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-5)
 
 
 def test_bielliptic_maneuver():
