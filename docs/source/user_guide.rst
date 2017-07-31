@@ -292,4 +292,43 @@ Mars Science Laboratory mission (rover Curiosity) is determined::
 
 .. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
 
+Working with NEOs
+-----------------
+`NEOs (Near Earth Objects)`_ are asteroids and comets whose orbits are near to earth (obvious, isn't it?).
+More correctly, their perihelion (closest approach to the Sun) is less than 1.3 astronomical units (≈ 200 * 10\ :sup:`6` km).
+Currently, they are being an important subject of study for scientists around the world, due to their status as the relatively
+unchanged remains from the solar system formation process.
+
+Because of that, a new module, related to NEOs, has been added (and hopefully
+will be regularly updated) to ``poliastro``, as part of `SOCIS 2017 project`_.
+
+For the moment, it is possible to search NEOs by name (also using wildcards),
+and get their orbits straight from NASA APIs, using :py:func:`~poliastro.neos.orbit_from_name`.
+For example, we can get `Apophis asteroid (99942 Apophis)`_ orbit with one command, and plot it:
+
+.. code-block:: python
+
+    from poliastro import neos
+    from poliastro.bodies import Sun, Earth
+    from poliastro.twobody.orbit import Orbit
+    from poliastro.plotting import OrbitPlotter
+    
+    op = OrbitPlotter()
+
+    apophis_orbit = neos.orbit_from_name('apophis') #Also '99942' or '99942 apophis' could be used
+    earth_orbit =  Orbit.from_body_ephem(Earth)
+
+    op.plot(earth_orbit, label='Earth')
+    op.plot(apophis_orbit, label='Apophis')
+
+.. figure:: _static/apophis.png
+   :align: center
+   :alt: Apophis asteroid orbit
+   
+   Apophis asteroid orbit compared to Earth orbit.
+
+.. _`SOCIS 2017 project`: https://github.com/poliastro/poliastro/wiki/SOCIS-2017
+.. _`NEOs (Near Earth Objects)`: https://en.wikipedia.org/wiki/Near-Earth_object
+.. _`Apophis asteroid (99942 Apophis)`: https://en.wikipedia.org/wiki/99942_Apophis
+
 *Per Python ad astra* ;)

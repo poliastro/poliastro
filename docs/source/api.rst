@@ -104,6 +104,12 @@ poliastro.maneuver module
     :members:
     :special-members: __init__
 
+poliastro.neos module
+---------------------
+
+.. automodule:: poliastro.neos
+    :members:
+
 poliastro.plotting module
 -------------------------
 
