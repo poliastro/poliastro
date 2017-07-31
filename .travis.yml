@@ -1,30 +1,16 @@
-# OS X trick inspired by
-# https://github.com/travis-ci/travis-ci/issues/2312#issuecomment-289140791
+# The only current way of using OS X virtual machines in Travis CI
+# is setting up a generic environment
+# This is not a problem because Python will be installed through conda
 
-language: python
+language: generic
 
-matrix:
-  include:
-    - os: linux
-      python: 3.5
-    - os: linux
-      python: 3.6
-    - os: osx
-      language: generic
-      before_install:
-        - brew update
-        - brew tap derekkwok/python
-        - brew uninstall python
-        - brew install python35
-        - virtualenv env -p python3.5
-        - source env/bin/activate
-    - os: osx
-      language: generic
-      before_install:
-        - brew update
-        - brew install python3
-        - virtualenv env -p python3
-        - source env/bin/activate
+os:
+  - linux
+  - osx
+
+env:
+  - PYTHON=3.5
+  - PYTHON=3.6
 
 branches:
   only:
@@ -33,6 +19,22 @@ branches:
     - 0.4.x
     - 0.5.x
     - 0.6.x
+
+before_install:
+  - if [[ "$(uname)" == "Darwin" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
+  - if [[ "$(uname)" == "Linux" ]]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+
+  # Update conda and create test environment
+  - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels conda-forge
+  - conda update -q conda
+  - conda create -q -n test-environment python=$PYTHON
+  - source activate test-environment
+
+  # Install problematic dependencies
+  - conda install pandoc
 
 install:
   - pip install numpy  # Required
@@ -50,6 +52,8 @@ after_success:
 
   - NUMBA_DISABLE_JIT=1 python setup.py test --cov
 
-  - codecov  # Publish coverage
+  # Publish coverage
+  - pip install codecov
+  - codecov
 
 sudo: false
