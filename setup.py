@@ -28,6 +28,8 @@ setup(
         "matplotlib",
         "jplephem",
         "scipy",
+        "bs4",
+        "requests"
     ],
     tests_require=[
         "pytest"
