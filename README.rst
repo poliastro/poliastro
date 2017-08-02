@@ -142,7 +142,7 @@ Development installations are also supported::
     system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
     or `local installations`_.
 
-     in order to run the file from bash, you will need to create a new file and add ".py" at the end. Call your file in bash by doing '''python3.5 file_name.py''' if you made any changes in the poliastro repository, you will need to commit and push so your code can be updated.
+     in order to run the file from bash, you will need to create a new file and add ".py" at the end. Call your file in bash by doing python3.5 file_name.py. Also if you made any changes in the poliastro repository, you will need to commit and push so your code can be updated.
 .. _1: http://wiki.python.org/moin/CheeseShopTutorial#Distutils_Installation
 .. _2: http://stackoverflow.com/questions/4314376/how-can-i-install-a-python-egg-file/4314446#comment4690673_4314446
 .. _3: http://workaround.org/easy-install-debian
