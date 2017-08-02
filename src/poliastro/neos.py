@@ -4,7 +4,6 @@ All new functions coded as part of SOCIS 2017 proposal
 
 '''
 import re
-import warnings
 
 from bs4 import BeautifulSoup
 import requests
