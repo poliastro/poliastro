@@ -62,7 +62,7 @@ def E_to_nu(E, ecc):
 
 
 def M_to_E(M, ecc):
-    """Eccentric anomaly from true anomaly.
+    """Eccentric anomaly from mean anomaly.
 
     .. versionadded:: 0.4.0
 
