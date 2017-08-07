@@ -73,10 +73,10 @@ class Body(object):
 
 
 Sun = Body.from_parameters(
-    None, k=132712440018 * u.km ** 3 / u.s ** 2,
+    None, k=132712440040.9446 * u.km ** 3 / u.s ** 2,
     name="Sun", symbol=u"\u2609", R=695700 * u.km)
 Earth = Body.from_parameters(
-    Sun, k=398600 * u.km ** 3 / u.s ** 2,
+    Sun, k=398600.436296 * u.km ** 3 / u.s ** 2,
     name="Earth", symbol=u"\u2641", R=R_earth.to(u.km))
 Moon = Body.from_parameters(
     Earth, k=4902.800013 * u.km ** 3 / u.s ** 2,
