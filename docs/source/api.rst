@@ -110,6 +110,12 @@ poliastro.neos module
 .. automodule:: poliastro.neos
     :members:
 
+poliastro.neos_dastcom5 module
+------------------------------
+
+.. automodule:: poliastro.neos_dastcom5
+    :members:
+
 poliastro.plotting module
 -------------------------
 
