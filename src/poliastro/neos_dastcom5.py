@@ -3,7 +3,6 @@
 import os
 import re
 import zipfile
-from ftplib import FTP, Error
 import urllib.request
 
 import numpy as np
