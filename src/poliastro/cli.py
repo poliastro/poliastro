@@ -5,8 +5,7 @@
 import argparse
 
 import poliastro
-from poliastro import ephem
-
+from poliastro.neos.neos_dastcom5 import download_DASTCOM5
 
 def main():
     parser = argparse.ArgumentParser(
@@ -18,23 +17,17 @@ def main():
     subparsers = parser.add_subparsers(help='Available commands')
 
     download_parser = subparsers.add_parser(
-        "download-spk",
-        help="Downloads .bsp SPICE kernel files")
+        "download-dastcom5",
+        help="Downloads DASTCOM5 database")
     download_parser.add_argument(
-        "-n", "--name",
-        dest="name", default="de430",
-        help="Name of a .bsp SPICE kernel file to download")
-    download_parser.set_defaults(func=download_kernel)
+        "-p", "--path", help="Download path")
 
     args = parser.parse_args()
     try:
-        args.func(args)
+        if args.path:
+            download_DASTCOM5(args.path)
+        else:
+            download_DASTCOM5()
     except AttributeError:
         parser.print_help()
 
-
-def download_kernel(args):
-    """Downloads SPICE kernel file.
-
-    """
-    ephem.download_kernel(args.name)
