@@ -5,6 +5,15 @@ Contains some predefined bodies of the Solar System:
 
 * Sun (☉)
 * Earth (♁)
+* Moon (☾)
+* Mercury (☿)
+* Venus (♀)
+* Mars (♂)
+* Jupiter (♃)
+* Saturn (♄)
+* Uranus (⛢)
+* Neptune (♆)
+* Pluto (♇)
 
 and a way to define new bodies (:py:class:`~Body` class).
 
@@ -63,3 +72,36 @@ Sun = Body.from_parameters(
 Earth = Body.from_parameters(
     Sun, k=398600 * u.km ** 3 / u.s ** 2,
     name="Earth", symbol=u"\u2641", R=R_earth.to(u.km))
+
+'''
+* Equatorial radius, obtained from [NASA Planetary Fact Sheets](https://nssdc.gsfc.nasa.gov/planetary/planetfact.html)
+* Mass paremeter, obtained from [JPL Development Ephemeris 424](ftp://ssd.jpl.nasa.gov/pub/eph/planets/ioms/de424.iom.pdf)
+* Symbols, following this [guideline](https://solarsystem.nasa.gov/galleries/solar-system-symbols)
+'''
+Moon = Body.from_parameters(
+    Earth, k=4902.800013 * u.km ** 3 / u.s ** 2,
+    name="Moon", symbol=u"\u263E", R=1738.1 * u.km)
+Mercury = Body.from_parameters(
+    Sun, k=22031.855 * u.km ** 3 / u.s ** 2,
+    name="Mercury", symbol=u"\u263F", R=2439.7 * u.km)
+Venus = Body.from_parameters(
+    Sun, k=324858.592 * u.km ** 3 / u.s ** 2,
+    name="Venus", symbol=u"\u2640", R=6051.8 * u.km)
+Mars = Body.from_parameters(
+    Sun, k=42828.375214 * u.km ** 3 / u.s ** 2,
+    name="Mars", symbol=u"\u2642", R=3396.2 * u.km)
+Jupiter = Body.from_parameters(
+    Sun, k=126712764.8 * u.km ** 3 / u.s ** 2,
+    name="Jupiter", symbol=u"\u2643", R=71492 * u.km)
+Saturn = Body.from_parameters(
+    Sun, k=37940585.2 * u.km ** 3 / u.s ** 2,
+    name="Saturn", symbol=u"\u2644", R=60268 * u.km)
+Uranus = Body.from_parameters(
+    Sun, k=5794548.6 * u.km ** 3 / u.s ** 2,
+    name="Uranus", symbol=u"\u26E2", R=25559 * u.km)
+Neptune = Body.from_parameters(
+    Sun, k=6836527.10058 * u.km ** 3 / u.s ** 2,
+    name="Neptune", symbol=u"\u2646", R=24764 * u.km)
+Pluto = Body.from_parameters(
+    Sun, k=977 * u.km ** 3 / u.s ** 2,
+    name="Pluto", symbol=u"\u2647", R=1187 * u.km)
