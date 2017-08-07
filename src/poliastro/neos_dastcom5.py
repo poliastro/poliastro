@@ -341,21 +341,16 @@ def orbit_from_name_DASTCOM5(name):
 
     for record in records:
         body_data = read_record(record)
-        # TODO: QUITAR try
-        try:
-            a = body_data['A'].item() * u.au
-            ecc = body_data['EC'].item() * u.one
-            inc = body_data['IN'].item() * u.deg
-            raan = body_data['OM'].item() * u.deg
-            argp = body_data['W'].item() * u.deg
-            M = body_data['MA'].item() * u.deg
-            nu = M_to_nu(M, ecc)
-            epoch = Time(body_data['EPOCH'].item(), format='jd')
+        a = body_data['A'].item() * u.au
+        ecc = body_data['EC'].item() * u.one
+        inc = body_data['IN'].item() * u.deg
+        raan = body_data['OM'].item() * u.deg
+        argp = body_data['W'].item() * u.deg
+        M = body_data['MA'].item() * u.deg
+        nu = M_to_nu(M, ecc)
+        epoch = Time(body_data['EPOCH'].item(), format='jd')
 
-            orbits.append(Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch))
-        except:
-            print(body_data) #TODO: poner una buena excepción
-            continue
+        orbits.append(Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch))
     return orbits
 
 def record_from_name(name, dirpath=DBS_LOCAL_PATH):
