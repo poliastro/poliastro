@@ -19,10 +19,13 @@ and a way to define new bodies (:py:class:`~Body` class).
 
 Data references are the following:
 
-* Equatorial radius, obtained from [NASA Planetary Fact Sheets](https://nssdc.gsfc.nasa.gov/planetary/planetfact.html)
-* Mass paremeter, obtained from [JPL Development Ephemeris 424](ftp://ssd.jpl.nasa.gov/pub/eph/planets/ioms/de424.iom.pdf)
-* Symbols, following this [guideline](https://solarsystem.nasa.gov/galleries/solar-system-symbols)
+* Equatorial radius, obtained from `NASA Planetary Fact Sheets`_.
+* Mass paremeter, obtained from `JPL Development Ephemeris 424`_.
+* Symbols, following this `guideline`_.
 
+.. _`NASA Planetary Fact Sheets`: https://nssdc.gsfc.nasa.gov/planetary/planetfact.html
+.. _`JPL Development Ephemeris 424`: ftp://ssd.jpl.nasa.gov/pub/eph/planets/ioms/de424.iom.pdf
+.. _`guideline`: https://solarsystem.nasa.gov/galleries/solar-system-symbols
 """
 from astropy.constants import R_earth
 from astropy import units as u
