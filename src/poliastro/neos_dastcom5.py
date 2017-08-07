@@ -279,8 +279,7 @@ POLIASTRO_LOCAL_PATH = os.path.join(os.path.expanduser('~'), '.poliastro')
 DBS_LOCAL_PATH = os.path.join(POLIASTRO_LOCAL_PATH, 'dastcom5', 'dat')
 AST_DB_PATH = os.path.join(DBS_LOCAL_PATH, 'dast5_le.dat')
 COM_DB_PATH = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
-# TODO: AÑADIR RUTAS AST Y COM
-# FTP_BASE_URL = 'ssd.jpl.nasa.gov'
+
 FTP_DB_URL = 'ftp://ssd.jpl.nasa.gov/pub/ssd/'
 
 def asteroid_db_from_path(filepath=AST_DB_PATH):
@@ -359,13 +358,6 @@ def orbit_from_name_DASTCOM5(name):
             continue
     return orbits
 
-# MI.DB
-# def record_from_name(name):
-#     df_index = pd.read_csv('MI.DB', sep=';', names=['DB Number', 'Name', 'SPK-ID', 'Alt design'], dtype=str)
-#     df_index[['SPK-ID',  'Alt design']] = df_index[['SPK-ID',  'Alt design']].apply(lambda x: x.str.replace(r'^(,)', '').str.split(','))
-#     return int(df_index[df_index['NAME'] == name]['DB Number'])
-
-# dastcom.idx
 def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     '''Search `dastcom.idx` and return logical records that match a given string.
 
@@ -389,12 +381,10 @@ def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     records = []
     regex = re.compile(r'\s*(\d+)')
     with open(idx_path, 'r') as inF:
-    #     for line in inF:
-    #         if re.search(r"\b" + name.casefold() + r"\b", line.casefold()):
-    #             records.append(int(line[:6].lstrip()))
-    # return records
-        lines = [int(l[:6].lstrip()) for l in inF if re.search(r"\b" + name.casefold() + r"\b", l.casefold())]
-    return lines
+        for line in inF:
+            if re.search(r"\b" + name.casefold() + r"\b", line.casefold()):
+                records.append(int(line[:6].lstrip()))
+    return records
 
 def read_headers(dirpath=DBS_LOCAL_PATH):
     '''Read `DASTCOM5` headers and return asteroid and comet headers.
@@ -501,6 +491,7 @@ def download_DASTCOM5(path=POLIASTRO_LOCAL_PATH):
     ----------
     path : path-like object
         DASTCOM5 dir.
+
     '''
 
     dastcom5_dir = os.path.join(path, 'dastcom5')
@@ -514,21 +505,6 @@ def download_DASTCOM5(path=POLIASTRO_LOCAL_PATH):
 
         urllib.request.urlretrieve(FTP_DB_URL + 'dastcom5.zip',
                                    dastcom5_zip_path, _show_download_progress)
-        # with FTP(FTP_BASE_URL) as ftp, open(dastcom5_zip_path, 'wb') as f:
-        #     ftp.login()
-        #     ftp.cwd('pub/ssd')
-        #     filesize = ftp.size('dastcom5.zip')
-        #     print('Total file size: ' + int(filesize/(1024*1024)) + ' MB.')
-        #     print('Downloaded:')
-        #     written = 0
-        #     response = ftp.retrbinary('RETR ' 'dastcom5.zip',
-        #                               lambda x: print(f.write(x),  end='\r', flush=True))
-
-        #     if response.startswith('226 Transfer complete'):
-        #         with ZipFile(dastcom5_zip_path) as zip:
-        #             zip.extractall(path)
-        #     else:
-        #         raise Error
     with zipfile.ZipFile(dastcom5_zip_path) as zip:
         zip.extractall(path)
 
