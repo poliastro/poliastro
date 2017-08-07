@@ -17,6 +17,12 @@ Contains some predefined bodies of the Solar System:
 
 and a way to define new bodies (:py:class:`~Body` class).
 
+Data references are the following:
+
+* Equatorial radius, obtained from [NASA Planetary Fact Sheets](https://nssdc.gsfc.nasa.gov/planetary/planetfact.html)
+* Mass paremeter, obtained from [JPL Development Ephemeris 424](ftp://ssd.jpl.nasa.gov/pub/eph/planets/ioms/de424.iom.pdf)
+* Symbols, following this [guideline](https://solarsystem.nasa.gov/galleries/solar-system-symbols)
+
 """
 from astropy.constants import R_earth
 from astropy import units as u
@@ -72,12 +78,6 @@ Sun = Body.from_parameters(
 Earth = Body.from_parameters(
     Sun, k=398600 * u.km ** 3 / u.s ** 2,
     name="Earth", symbol=u"\u2641", R=R_earth.to(u.km))
-
-'''
-* Equatorial radius, obtained from [NASA Planetary Fact Sheets](https://nssdc.gsfc.nasa.gov/planetary/planetfact.html)
-* Mass paremeter, obtained from [JPL Development Ephemeris 424](ftp://ssd.jpl.nasa.gov/pub/eph/planets/ioms/de424.iom.pdf)
-* Symbols, following this [guideline](https://solarsystem.nasa.gov/galleries/solar-system-symbols)
-'''
 Moon = Body.from_parameters(
     Earth, k=4902.800013 * u.km ** 3 / u.s ** 2,
     name="Moon", symbol=u"\u263E", R=1738.1 * u.km)
