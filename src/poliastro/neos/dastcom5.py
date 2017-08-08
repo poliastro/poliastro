@@ -319,7 +319,7 @@ def comet_db_from_path(filepath=COM_DB_PATH):
 
     """
     with open(filepath, "rb") as f:
-        f.seek(835, os.SEEK_SET)
+        f.seek(976, os.SEEK_SET)
         data = np.fromfile(f, dtype=COM_DTYPE)
     return data
 
@@ -548,6 +548,6 @@ def entire_db_from_path(path=DBS_LOCAL_PATH):
                                              + list(com_database.dtype.names[-4:-3])
                                              + list(com_database.dtype.names[-2:])])
     com_database.rename(columns={'COMNAM': 'NAME', 'NO': 'NUMBER', 'CALEPO': 'CALEPOCH'}, inplace=True)
-    df = pd.DataFrame.append(ast_database, com_database)
+    df = ast_database.append(com_database, ignore_index=True)
     df[['NAME', 'DESIG', 'IREF']] = df[['NAME', 'DESIG', 'IREF']].apply(lambda x: x.str.strip().str.decode('utf-8'))
     return df
