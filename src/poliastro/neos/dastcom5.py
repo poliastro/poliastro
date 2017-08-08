@@ -336,26 +336,45 @@ def orbit_from_name(name):
 
     Returns
     -------
-    orbit : ~poliastro.twobody.orbit.Orbit
-        NEO orbit.
+    orbit : list of ~poliastro.twobody.orbit.Orbit
+        NEO orbits.
 
     """
     records = record_from_name(name)
     orbits = []
-
     for record in records:
-        body_data = read_record(record)
-        a = body_data['A'].item() * u.au
-        ecc = body_data['EC'].item() * u.one
-        inc = body_data['IN'].item() * u.deg
-        raan = body_data['OM'].item() * u.deg
-        argp = body_data['W'].item() * u.deg
-        m = body_data['MA'].item() * u.deg
-        nu = M_to_nu(m, ecc)
-        epoch = Time(body_data['EPOCH'].item(), format='jd')
-
-        orbits.append(Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch))
+        orbits.append(orbit_from_record(record))
     return orbits
+
+
+def orbit_from_record(record):
+    """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a record.
+
+        Retrieve info from JPL DASTCOM5 database
+
+        Parameters
+        ----------
+        record : int
+            Object record.
+
+        Returns
+        -------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            NEO orbit.
+
+        """
+    body_data = read_record(record)
+    a = body_data['A'].item() * u.au
+    ecc = body_data['EC'].item() * u.one
+    inc = body_data['IN'].item() * u.deg
+    raan = body_data['OM'].item() * u.deg
+    argp = body_data['W'].item() * u.deg
+    m = body_data['MA'].item() * u.deg
+    nu = M_to_nu(m, ecc)
+    epoch = Time(body_data['EPOCH'].item(), format='jd')
+
+    orbit = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch)
+    return orbit
 
 
 def record_from_name(name, dirpath=DBS_LOCAL_PATH):
@@ -451,7 +470,7 @@ def read_record(record, dirpath=DBS_LOCAL_PATH):
     Parameters
     ----------
     record : int
-        Body name.
+        Body record.
     dirpath : path-like object
         dastcom.idx dir.
 
