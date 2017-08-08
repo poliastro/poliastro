@@ -99,13 +99,9 @@ def spk_id_from_name(name):
     elif page_identifier.find_next_sibling('center') is not None:
         object_list = page_identifier.find_next_sibling('center').table.find_all('td')
         bodies = ''
-        if len(object_list) > 3:
-            for body in object_list[:3]:
-                bodies += body.string + '\n'
-            bodies += '...'
-        else:
-            for body in object_list:
-                bodies += body.string + '\n'
+        obj_num = min(len(object_list), 3)
+        for body in object_list[:obj_num]:
+            bodies += body.string + '\n'
         raise ValueError(str(len(object_list)) + ' different bodies found:\n' + bodies)
     else:
         raise ValueError('Object could not be found. You can visit: '
