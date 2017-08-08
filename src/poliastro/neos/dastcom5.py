@@ -548,4 +548,6 @@ def entire_db_from_path(path=DBS_LOCAL_PATH):
                                              + list(com_database.dtype.names[-4:-3])
                                              + list(com_database.dtype.names[-2:])])
     com_database.rename(columns={'COMNAM': 'NAME', 'NO': 'NUMBER', 'CALEPO': 'CALEPOCH'}, inplace=True)
-    return pd.DataFrame.append(ast_database, com_database)
+    df = pd.DataFrame.append(ast_database, com_database)
+    df[['NAME', 'DESIG', 'IREF']] = df[['NAME', 'DESIG', 'IREF']].apply(lambda x: x.str.strip().str.decode('utf-8'))
+    return df
