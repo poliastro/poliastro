@@ -4,10 +4,11 @@ import requests
 
 import astropy.units as u
 from poliastro.twobody.angles import nu_to_M
-from poliastro import neos
+from poliastro.neos import neows
 
-@mock.patch('poliastro.neos.requests.Response')
-@mock.patch('poliastro.neos.requests.get')
+
+@mock.patch('poliastro.neos.neows.requests.Response')
+@mock.patch('poliastro.neos.neows.requests.get')
 def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
     mock_orbital_data = {
         'orbital_data': {
@@ -22,7 +23,7 @@ def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
 
     mock_response.json.return_value = mock_orbital_data
     mock_get.return_value = mock_response
-    ss = neos.orbit_from_spk_id('')
+    ss = neows.orbit_from_spk_id('')
 
     assert ss.ecc == mock_orbital_data['orbital_data']['eccentricity'] * u.one
     assert ss.a == mock_orbital_data['orbital_data']['semi_major_axis'] * u.AU
@@ -31,36 +32,40 @@ def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
     assert ss.argp == mock_orbital_data['orbital_data']['perihelion_argument'] * u.deg
     assert nu_to_M(ss.nu, ss.ecc) == mock_orbital_data['orbital_data']['mean_anomaly'] * u.deg
 
-@mock.patch('poliastro.neos.requests.get')
+
+@mock.patch('poliastro.neos.neows.requests.get')
 def test_orbit_from_spk_id_raises_when_error(mock_get):
     resp = requests.Response()
 
     resp.status_code = 404
     mock_get.return_value = resp   
     with pytest.raises(requests.HTTPError):
-        ss = neos.orbit_from_spk_id('')
+        ss = neows.orbit_from_spk_id('')
 
-@mock.patch('poliastro.neos.requests.get')
+
+@mock.patch('poliastro.neos.neows.requests.get')
 def test_spk_id_from_name_raises_when_error(mock_get):
     resp = requests.Response()
 
     resp.status_code = 404
     mock_get.return_value = resp
     with pytest.raises(requests.HTTPError):
-        ss = neos.spk_id_from_name('')
+        ss = neows.spk_id_from_name('')
 
-@mock.patch('poliastro.neos.requests.Response')
-@mock.patch('poliastro.neos.requests.get')
+
+@mock.patch('poliastro.neos.neows.requests.Response')
+@mock.patch('poliastro.neos.neows.requests.get')
 def test_spk_id_from_name_parses_body(mock_get, mock_response):
     with open('src/poliastro/tests/table.html', 'r') as demo_html:
         html = demo_html.read().replace('\n', '')
     
     mock_response.text = html
     mock_get.return_value = mock_response
-    assert '2000433' == neos.spk_id_from_name('')
+    assert '2000433' == neows.spk_id_from_name('')
 
-@mock.patch('poliastro.neos.requests.Response')
-@mock.patch('poliastro.neos.requests.get')
+
+@mock.patch('poliastro.neos.neows.requests.Response')
+@mock.patch('poliastro.neos.neows.requests.get')
 def test_spk_id_from_name_parses_object_list_and_raises(mock_get, mock_response):
     with open('src/poliastro/tests/center.html', 'r') as demo_html:
         html = demo_html.read().replace('\n', '')
@@ -68,16 +73,17 @@ def test_spk_id_from_name_parses_object_list_and_raises(mock_get, mock_response)
     mock_response.text = html
     mock_get.return_value = mock_response
     with pytest.raises(ValueError) as e_msg:
-        neos.spk_id_from_name('')
+        neows.spk_id_from_name('')
         assert 'different bodies found' in str(e_msg)
 
-@mock.patch('poliastro.neos.requests.Response')
-@mock.patch('poliastro.neos.requests.get')
+
+@mock.patch('poliastro.neos.neows.requests.Response')
+@mock.patch('poliastro.neos.neows.requests.get')
 def test_spk_id_from_name_raises_when_not_found(mock_get, mock_response):
     with open('src/poliastro/tests/none.html', 'r') as demo_html:
         html = demo_html.read().replace('\n', '')
     mock_response.text = html
     mock_get.return_value = mock_response
     with pytest.raises(ValueError) as e_msg:
-        neos.spk_id_from_name('')
+        neows.spk_id_from_name('')
         assert 'Object could not be found' in str(e_msg)
