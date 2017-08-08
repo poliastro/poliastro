@@ -5,7 +5,8 @@
 import argparse
 
 import poliastro
-from poliastro.neos.neos_dastcom5 import download_DASTCOM5
+from poliastro.neos.dastcom5 import download_dastcom5
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -25,9 +26,9 @@ def main():
     args = parser.parse_args()
     try:
         if args.path:
-            download_DASTCOM5(args.path)
+            download_dastcom5(args.path)
         else:
-            download_DASTCOM5()
+            download_dastcom5()
     except AttributeError:
         parser.print_help()
 

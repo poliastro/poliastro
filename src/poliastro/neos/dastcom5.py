@@ -283,6 +283,7 @@ COM_DB_PATH = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
 
 FTP_DB_URL = 'ftp://ssd.jpl.nasa.gov/pub/ssd/'
 
+
 def asteroid_db_from_path(filepath=AST_DB_PATH):
     """Return complete DASTCOM5 asteroid database.
 
@@ -302,6 +303,7 @@ def asteroid_db_from_path(filepath=AST_DB_PATH):
         data = np.fromfile(f, dtype=AST_DTYPE)
     return data
 
+
 def comet_db_from_path(filepath=COM_DB_PATH):
     """Return complete DASTCOM5 comet database.
 
@@ -320,6 +322,7 @@ def comet_db_from_path(filepath=COM_DB_PATH):
         f.seek(835, os.SEEK_SET)
         data = np.fromfile(f, dtype=COM_DTYPE)
     return data
+
 
 def orbit_from_name(name):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
@@ -347,12 +350,13 @@ def orbit_from_name(name):
         inc = body_data['IN'].item() * u.deg
         raan = body_data['OM'].item() * u.deg
         argp = body_data['W'].item() * u.deg
-        M = body_data['MA'].item() * u.deg
-        nu = M_to_nu(M, ecc)
+        m = body_data['MA'].item() * u.deg
+        nu = M_to_nu(m, ecc)
         epoch = Time(body_data['EPOCH'].item(), format='jd')
 
         orbits.append(Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch))
     return orbits
+
 
 def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     """Search `dastcom.idx` and return logical records that match a given string.
@@ -375,12 +379,12 @@ def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     """
     idx_path = os.path.join(dirpath, 'dastcom.idx')
     records = []
-    regex = re.compile(r'\s*(\d+)')
     with open(idx_path, 'r') as inF:
         for line in inF:
             if re.search(r"\b" + name.casefold() + r"\b", line.casefold()):
                 records.append(int(line[:6].lstrip()))
     return records
+
 
 def read_headers(dirpath=DBS_LOCAL_PATH):
     """Read `DASTCOM5` headers and return asteroid and comet headers.
@@ -438,6 +442,7 @@ def read_headers(dirpath=DBS_LOCAL_PATH):
 
     return ast_header, com_header
 
+
 def read_record(record, dirpath=DBS_LOCAL_PATH):
     """Read `DASTCOM5` record and return body data.
 
@@ -478,7 +483,8 @@ def read_record(record, dirpath=DBS_LOCAL_PATH):
             body_data = np.fromfile(f, dtype=COM_DTYPE, count=1)
     return body_data
 
-def download_DASTCOM5(path=POLIASTRO_LOCAL_PATH):
+
+def download_dastcom5(path=POLIASTRO_LOCAL_PATH):
     """Downloads DASTCOM5 database to specified path.
 
     The function downloads and unzip DASTCOM5 file in a given path.
@@ -501,13 +507,15 @@ def download_DASTCOM5(path=POLIASTRO_LOCAL_PATH):
 
         urllib.request.urlretrieve(FTP_DB_URL + 'dastcom5.zip',
                                    dastcom5_zip_path, _show_download_progress)
-    with zipfile.ZipFile(dastcom5_zip_path) as zip:
-        zip.extractall(path)
+    with zipfile.ZipFile(dastcom5_zip_path) as myzip:
+        myzip.extractall(path)
+
 
 def _show_download_progress(transferred, block, totalsize):
     trans_mb = transferred*block/(1024*1024)
     total_mb = totalsize/(1024*1024)
     print('%.2f MB / %.2f MB' % (trans_mb, total_mb), end='\r', flush=True)
+
 
 def entire_db_from_path(path=DBS_LOCAL_PATH):
     """Return complete DASTCOM5 database.
@@ -534,8 +542,7 @@ def entire_db_from_path(path=DBS_LOCAL_PATH):
 
     ast_database = pd.DataFrame(ast_database[list(ast_database.dtype.names[:17])
                                              + list(ast_database.dtype.names[-4:-3])
-                                             + list(ast_database.dtype.names[-2:])
-                                            ])
+                                             + list(ast_database.dtype.names[-2:])])
     ast_database.rename(columns={'ASTNAM': 'NAME', 'NO': 'NUMBER', 'CALEPO': 'CALEPOCH'}, inplace=True)
     com_database = pd.DataFrame(com_database[list(com_database.dtype.names[:17])
                                              + list(com_database.dtype.names[-4:-3])
