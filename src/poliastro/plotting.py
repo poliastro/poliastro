@@ -59,6 +59,7 @@ class OrbitPlotter(object):
         self.num_points = num_points
         self._frame = None
         self._states = []
+        self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame if not existing.
@@ -83,6 +84,25 @@ class OrbitPlotter(object):
         else:
             raise NotImplementedError
 
+    def set_attractor(self, orbit):
+        """Sets plotting attractor.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            orbit with attractor to plot.
+
+        """
+        radius = max(orbit.attractor.R.to(u.km).value,
+                     orbit.r_p.to(u.km).value / 6)
+        color = BODY_COLORS.get(orbit.attractor.name, "#999999")
+        self._attractor_radius = radius
+
+        for attractor in self.ax.findobj(match=mpl.patches.Circle):
+            attractor.remove()
+
+        self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
+
     def plot(self, orbit, osculating=True, label=None):
         """Plots state and osculating orbit in their plane.
 
@@ -90,6 +110,14 @@ class OrbitPlotter(object):
         # TODO: This function needs a refactoring
         if not self._frame:
             self.set_frame(*orbit.pqw())
+
+        # if new attractor radius is smaller, plot it
+        new_radius = max(orbit.attractor.R.to(u.km).value,
+                         orbit.r_p.to(u.km).value / 6)
+        if not self._attractor_radius:
+            self.set_attractor(orbit)
+        elif new_radius < self._attractor_radius:
+            self.set_attractor(orbit)
 
         self._states.append(orbit)
 
@@ -120,14 +148,6 @@ class OrbitPlotter(object):
         l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
                           'o', mew=0)
         lines.append(l)
-
-        # Attractor
-        # TODO: If several orbits are plotted, the attractor is being plotted several times!
-        radius = max(orbit.attractor.R.to(u.km).value,
-                     orbit.r_p.to(u.km).value / 6)
-        color = BODY_COLORS.get(orbit.attractor.name, "#999999")
-        self.ax.add_patch(
-                mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
         if osculating:
             l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
