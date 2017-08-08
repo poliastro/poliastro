@@ -1,6 +1,6 @@
-'''NEOs orbit from DASTCOM5 database.
+"""NEOs orbit from DASTCOM5 database.
 
-'''
+"""
 import os
 import re
 import zipfile
@@ -284,7 +284,7 @@ COM_DB_PATH = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
 FTP_DB_URL = 'ftp://ssd.jpl.nasa.gov/pub/ssd/'
 
 def asteroid_db_from_path(filepath=AST_DB_PATH):
-    '''Return complete DASTCOM5 asteroid database.
+    """Return complete DASTCOM5 asteroid database.
 
     Parameters
     ----------
@@ -296,14 +296,14 @@ def asteroid_db_from_path(filepath=AST_DB_PATH):
     database : numpy.ndarray
         Database with custom dtype.
 
-    '''
+    """
     with open(filepath, "rb") as f:
         f.seek(835, os.SEEK_SET)
         data = np.fromfile(f, dtype=AST_DTYPE)
     return data
 
 def comet_db_from_path(filepath=COM_DB_PATH):
-    '''Return complete DASTCOM5 comet database.
+    """Return complete DASTCOM5 comet database.
 
     Parameters
     ----------
@@ -315,14 +315,14 @@ def comet_db_from_path(filepath=COM_DB_PATH):
     database : numpy.ndarray
         Database with custom dtype.
 
-    '''
+    """
     with open(filepath, "rb") as f:
         f.seek(835, os.SEEK_SET)
         data = np.fromfile(f, dtype=COM_DTYPE)
     return data
 
 def orbit_from_name(name):
-    '''Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
+    """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
 
     Retrieve info from JPL DASTCOM5 database
 
@@ -336,7 +336,7 @@ def orbit_from_name(name):
     orbit : ~poliastro.twobody.orbit.Orbit
         NEO orbit.
 
-    '''
+    """
     records = record_from_name(name)
     orbits = []
 
@@ -355,7 +355,7 @@ def orbit_from_name(name):
     return orbits
 
 def record_from_name(name, dirpath=DBS_LOCAL_PATH):
-    '''Search `dastcom.idx` and return logical records that match a given string.
+    """Search `dastcom.idx` and return logical records that match a given string.
 
     (Body name, SPK-ID, or alternative designations
          can be used).
@@ -372,7 +372,7 @@ def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     records : list (int)
         DASTCOM5 database logical records matching str.
 
-    '''
+    """
     idx_path = os.path.join(dirpath, 'dastcom.idx')
     records = []
     regex = re.compile(r'\s*(\d+)')
@@ -383,7 +383,7 @@ def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     return records
 
 def read_headers(dirpath=DBS_LOCAL_PATH):
-    '''Read `DASTCOM5` headers and return asteroid and comet headers.
+    """Read `DASTCOM5` headers and return asteroid and comet headers.
 
     Headers are two numpy arrays with custom dtype.
 
@@ -397,7 +397,7 @@ def read_headers(dirpath=DBS_LOCAL_PATH):
     ast_header, com_header : tuple (numpy.ndarray)
         DASTCOM5 headers.
 
-    '''
+    """
 
     ast_path = os.path.join(dirpath, 'dast5_le.dat')
     ast_dtype = np.dtype([
@@ -439,7 +439,7 @@ def read_headers(dirpath=DBS_LOCAL_PATH):
     return ast_header, com_header
 
 def read_record(record, dirpath=DBS_LOCAL_PATH):
-    '''Read `DASTCOM5` record and return body data.
+    """Read `DASTCOM5` record and return body data.
 
     Body data consists of numpy array with custom dtype.
 
@@ -455,7 +455,7 @@ def read_record(record, dirpath=DBS_LOCAL_PATH):
     body_data : numpy.ndarray
         Body information.
 
-    '''
+    """
     ast_header, com_header = read_headers()
     ast_path = os.path.join(dirpath, 'dast5_le.dat')
     com_path = os.path.join(dirpath, 'dcom5_le.dat')
@@ -479,7 +479,7 @@ def read_record(record, dirpath=DBS_LOCAL_PATH):
     return body_data
 
 def download_DASTCOM5(path=POLIASTRO_LOCAL_PATH):
-    '''Downloads DASTCOM5 database to specified path.
+    """Downloads DASTCOM5 database to specified path.
 
     The function downloads and unzip DASTCOM5 file in a given path.
 
@@ -488,7 +488,7 @@ def download_DASTCOM5(path=POLIASTRO_LOCAL_PATH):
     path : path-like object
         DASTCOM5 dir.
 
-    '''
+    """
 
     dastcom5_dir = os.path.join(path, 'dastcom5')
     dastcom5_zip_path = os.path.join(path, 'dastcom5.zip')
@@ -510,7 +510,7 @@ def _show_download_progress(transferred, block, totalsize):
     print('%.2f MB / %.2f MB' % (trans_mb, total_mb), end='\r', flush=True)
 
 def entire_db_from_path(path=DBS_LOCAL_PATH):
-    '''Return complete DASTCOM5 database.
+    """Return complete DASTCOM5 database.
 
     Functions merge asteroid and comet database, only with fields
     related to orbital data, discarding the rest.
@@ -525,7 +525,7 @@ def entire_db_from_path(path=DBS_LOCAL_PATH):
     database : numpy.ndarray
         Database with custom dtype.
 
-    '''
+    """
     ast_path = os.path.join(path, 'dast5_le.dat')
     com_path = os.path.join(path, 'dcom5_le.dat')
 

@@ -1,6 +1,6 @@
-'''NEOs orbit from NEOWS and JPL SBDB
+"""NEOs orbit from NEOWS and JPL SBDB
 
-'''
+"""
 import re
 
 from bs4 import BeautifulSoup
@@ -57,8 +57,8 @@ def orbit_from_spk_id(spk_id, epoch=None):
                                     raan, argp, nu, epoch)
 
 def spk_id_from_name(name):
-    '''Return SPK-ID number given a small-body name.
-    
+    """Return SPK-ID number given a small-body name.
+
     Retrieve and parse HTML from JPL Small Body Database
     to get SPK-ID.
 
@@ -72,7 +72,7 @@ def spk_id_from_name(name):
     spk_id : str
         SPK-ID number.
 
-    '''
+    """
     payload = {'sstr' : name, 'orb' : '0', 'log' : '0', 'old' : '0', 'cov' : '0', 'cad' : '0'}
 
     response = requests.get(SBDB_URL, params=payload)
@@ -108,7 +108,7 @@ def spk_id_from_name(name):
                          + SBDB_URL + '?sstr=' + name + ' for more information.')
 
 def orbit_from_name(name):
-    '''Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
+    """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
 
     Retrieve info from NASA NeoWS API, and therefore
     it only works with NEAs (Near Earth Asteroids)
@@ -123,7 +123,7 @@ def orbit_from_name(name):
     orbit : ~poliastro.twobody.orbit.Orbit
         NEA orbit.
 
-    '''
+    """
     spk_id = spk_id_from_name(name)
     if spk_id is not None:
         return orbit_from_spk_id(spk_id)
