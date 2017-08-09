@@ -45,6 +45,7 @@ setup(
         "scipy",
         "beautifulsoup4",
         "requests",
+        "pandas"
     ],
     tests_require=[
         "coverage",
