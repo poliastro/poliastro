@@ -45,6 +45,7 @@ setup(
         "scipy",
         "beautifulsoup4",
         "requests",
+        "pandas"
     ],
     tests_require=[
         "coverage",
@@ -55,7 +56,11 @@ setup(
     },
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    entry_points={},
+    entry_points={
+              'console_scripts': [
+                  'poliastro = poliastro.cli:main'
+              ]
+    },
     classifiers=[
       "Development Status :: 4 - Beta",
       "Intended Audience :: Education",
