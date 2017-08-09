@@ -284,13 +284,8 @@ COM_DB_PATH = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
 FTP_DB_URL = 'ftp://ssd.jpl.nasa.gov/pub/ssd/'
 
 
-def asteroid_db_from_path(filepath=AST_DB_PATH):
+def asteroid_db_from_path():
     """Return complete DASTCOM5 asteroid database.
-
-    Parameters
-    ----------
-    filepath : path-like object
-        dast5_le.dat file path.
 
     Returns
     -------
@@ -298,19 +293,14 @@ def asteroid_db_from_path(filepath=AST_DB_PATH):
         Database with custom dtype.
 
     """
-    with open(filepath, "rb") as f:
+    with open(AST_DB_PATH, "rb") as f:
         f.seek(835, os.SEEK_SET)
         data = np.fromfile(f, dtype=AST_DTYPE)
     return data
 
 
-def comet_db_from_path(filepath=COM_DB_PATH):
+def comet_db_from_path():
     """Return complete DASTCOM5 comet database.
-
-    Parameters
-    ----------
-    filepath : path-like object
-        dcom5_le.dat file path.
 
     Returns
     -------
@@ -318,7 +308,7 @@ def comet_db_from_path(filepath=COM_DB_PATH):
         Database with custom dtype.
 
     """
-    with open(filepath, "rb") as f:
+    with open(COM_DB_PATH, "rb") as f:
         f.seek(976, os.SEEK_SET)
         data = np.fromfile(f, dtype=COM_DTYPE)
     return data
@@ -377,7 +367,7 @@ def orbit_from_record(record):
     return orbit
 
 
-def record_from_name(name, dirpath=DBS_LOCAL_PATH):
+def record_from_name(name):
     """Search `dastcom.idx` and return logical records that match a given string.
 
     (Body name, SPK-ID, or alternative designations
@@ -387,8 +377,6 @@ def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     ----------
     name : str
         Body name.
-    dirpath : path-like object
-        dastcom.idx dir.
 
     Returns
     -------
@@ -396,7 +384,7 @@ def record_from_name(name, dirpath=DBS_LOCAL_PATH):
         DASTCOM5 database logical records matching str.
 
     """
-    idx_path = os.path.join(dirpath, 'dastcom.idx')
+    idx_path = os.path.join(DBS_LOCAL_PATH, 'dastcom.idx')
     records = []
     with open(idx_path, 'r') as inF:
         for line in inF:
@@ -405,15 +393,10 @@ def record_from_name(name, dirpath=DBS_LOCAL_PATH):
     return records
 
 
-def read_headers(dirpath=DBS_LOCAL_PATH):
+def read_headers():
     """Read `DASTCOM5` headers and return asteroid and comet headers.
 
     Headers are two numpy arrays with custom dtype.
-
-    Parameters
-    ----------
-    dirpath : path-like object
-        DASTCOM5 .dat files dir.
 
     Returns
     -------
@@ -422,7 +405,7 @@ def read_headers(dirpath=DBS_LOCAL_PATH):
 
     """
 
-    ast_path = os.path.join(dirpath, 'dast5_le.dat')
+    ast_path = os.path.join(DBS_LOCAL_PATH, 'dast5_le.dat')
     ast_dtype = np.dtype([
         ("IBIAS1", np.int32),
         ("BEGINP1", "|S8"),
@@ -441,7 +424,7 @@ def read_headers(dirpath=DBS_LOCAL_PATH):
     with open(ast_path, 'rb') as f:
         ast_header = np.fromfile(f, dtype=ast_dtype, count=1)
 
-    com_path = os.path.join(dirpath, 'dcom5_le.dat')
+    com_path = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
     com_dtype = np.dtype([
         ("IBIAS2", np.int32),
         ("BEGINP1", "|S8"),
@@ -462,7 +445,7 @@ def read_headers(dirpath=DBS_LOCAL_PATH):
     return ast_header, com_header
 
 
-def read_record(record, dirpath=DBS_LOCAL_PATH):
+def read_record(record):
     """Read `DASTCOM5` record and return body data.
 
     Body data consists of numpy array with custom dtype.
@@ -481,8 +464,8 @@ def read_record(record, dirpath=DBS_LOCAL_PATH):
 
     """
     ast_header, com_header = read_headers()
-    ast_path = os.path.join(dirpath, 'dast5_le.dat')
-    com_path = os.path.join(dirpath, 'dcom5_le.dat')
+    ast_path = os.path.join(DBS_LOCAL_PATH, 'dast5_le.dat')
+    com_path = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
     # ENDPT1 indicates end of numbered asteroids records
     if record <= int(ast_header['ENDPT2'][0].item()):
         # ENDPT2 indicates end of unnumbered asteroids records
@@ -503,31 +486,26 @@ def read_record(record, dirpath=DBS_LOCAL_PATH):
     return body_data
 
 
-def download_dastcom5(path=POLIASTRO_LOCAL_PATH):
+def download_dastcom5():
     """Downloads DASTCOM5 database to specified path.
 
     The function downloads and unzip DASTCOM5 file in a given path.
 
-    Parameters
-    ----------
-    path : path-like object
-        DASTCOM5 dir.
-
     """
 
-    dastcom5_dir = os.path.join(path, 'dastcom5')
-    dastcom5_zip_path = os.path.join(path, 'dastcom5.zip')
+    dastcom5_dir = os.path.join(POLIASTRO_LOCAL_PATH, 'dastcom5')
+    dastcom5_zip_path = os.path.join(POLIASTRO_LOCAL_PATH, 'dastcom5.zip')
 
     if os.path.isdir(dastcom5_dir):
         raise FileExistsError('dastcom5 is already created in ' + os.path.abspath(dastcom5_dir))
     if not zipfile.is_zipfile(dastcom5_zip_path):
-        if not os.path.isdir(path):
-            os.makedirs(path)
+        if not os.path.isdir(POLIASTRO_LOCAL_PATH):
+            os.makedirs(POLIASTRO_LOCAL_PATH)
 
         urllib.request.urlretrieve(FTP_DB_URL + 'dastcom5.zip',
                                    dastcom5_zip_path, _show_download_progress)
     with zipfile.ZipFile(dastcom5_zip_path) as myzip:
-        myzip.extractall(path)
+        myzip.extractall(POLIASTRO_LOCAL_PATH)
 
 
 def _show_download_progress(transferred, block, totalsize):
@@ -536,16 +514,11 @@ def _show_download_progress(transferred, block, totalsize):
     print('%.2f MB / %.2f MB' % (trans_mb, total_mb), end='\r', flush=True)
 
 
-def entire_db_from_path(path=DBS_LOCAL_PATH):
+def entire_db_from_path():
     """Return complete DASTCOM5 database.
 
     Functions merge asteroid and comet database, only with fields
     related to orbital data, discarding the rest.
-
-    Parameters
-    ----------
-    path : path-like object
-        DASTCOM5 /dat folder path.
 
     Returns
     -------
@@ -553,11 +526,8 @@ def entire_db_from_path(path=DBS_LOCAL_PATH):
         Database with custom dtype.
 
     """
-    ast_path = os.path.join(path, 'dast5_le.dat')
-    com_path = os.path.join(path, 'dcom5_le.dat')
-
-    ast_database = asteroid_db_from_path(ast_path)
-    com_database = comet_db_from_path(com_path)
+    ast_database = asteroid_db_from_path()
+    com_database = comet_db_from_path()
 
     ast_database = pd.DataFrame(ast_database[list(ast_database.dtype.names[:17])
                                              + list(ast_database.dtype.names[-4:-3])
