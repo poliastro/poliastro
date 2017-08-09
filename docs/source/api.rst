@@ -66,6 +66,24 @@ poliastro.iod.vallado module
 .. automodule:: poliastro.iod.vallado
    :members:
 
+poliastro.neos package
+----------------------
+
+.. automodule:: poliastro.neos
+    :members:
+
+poliastro.neos.dastcom5 module
+******************************
+
+.. automodule:: poliastro.neos.dastcom5
+    :members:
+
+poliastro.neos.neows module
+***************************
+
+.. automodule:: poliastro.neos.neows
+    :members:
+
 poliastro.bodies module
 -----------------------
 
@@ -103,18 +121,6 @@ poliastro.maneuver module
 .. automodule:: poliastro.maneuver
     :members:
     :special-members: __init__
-
-poliastro.neos module
----------------------
-
-.. automodule:: poliastro.neos
-    :members:
-
-poliastro.neos_dastcom5 module
-------------------------------
-
-.. automodule:: poliastro.neos_dastcom5
-    :members:
 
 poliastro.plotting module
 -------------------------
