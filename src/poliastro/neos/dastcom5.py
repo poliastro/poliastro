@@ -317,7 +317,7 @@ def comet_db():
 def orbit_from_name(name):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
 
-    Retrieve info from JPL DASTCOM5 database
+    Retrieve info from JPL DASTCOM5 database.
 
     Parameters
     ----------
@@ -326,7 +326,7 @@ def orbit_from_name(name):
 
     Returns
     -------
-    orbit : list of ~poliastro.twobody.orbit.Orbit
+    orbit : list (~poliastro.twobody.orbit.Orbit)
         NEO orbits.
 
     """
@@ -340,7 +340,7 @@ def orbit_from_name(name):
 def orbit_from_record(record):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a record.
 
-        Retrieve info from JPL DASTCOM5 database
+        Retrieve info from JPL DASTCOM5 database.
 
         Parameters
         ----------
@@ -370,8 +370,7 @@ def orbit_from_record(record):
 def record_from_name(name):
     """Search `dastcom.idx` and return logical records that match a given string.
 
-    (Body name, SPK-ID, or alternative designations
-         can be used).
+    Body name, SPK-ID, or alternative designations can be used.
 
     Parameters
     ----------
@@ -487,8 +486,7 @@ def read_record(record):
 def download_dastcom5():
     """Downloads DASTCOM5 database.
 
-    The function downloads and unzip DASTCOM5 file in default
-    poliastro path (~/.poliastro).
+    Downloads and unzip DASTCOM5 file in default poliastro path (~/.poliastro).
 
     """
 
@@ -516,7 +514,7 @@ def _show_download_progress(transferred, block, totalsize):
 def entire_db():
     """Return complete DASTCOM5 database.
 
-    Functions merge asteroid and comet database, only with fields
+    Merge asteroid and comet databases, only with fields
     related to orbital data, discarding the rest.
 
     Returns
