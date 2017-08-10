@@ -2,12 +2,7 @@ from unittest import mock
 import pytest
 import os
 
-import astropy.units as u
-from astropy.time import Time
 import numpy as np
-from poliastro.twobody.orbit import Orbit
-from poliastro.twobody.angles import M_to_nu
-from poliastro.bodies import Sun
 from poliastro.examples import iss
 from poliastro.neos import dastcom5
 
