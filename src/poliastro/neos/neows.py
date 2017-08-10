@@ -21,7 +21,7 @@ def orbit_from_spk_id(spk_id, epoch=None):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a SPK-ID.
 
     Retrieve info from NASA NeoWS API, and therefore
-    it only works with NEAs (Near Earth Asteroids)
+    it only works with NEAs (Near Earth Asteroids).
 
     Parameters
     ----------
@@ -112,7 +112,7 @@ def orbit_from_name(name):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
 
     Retrieve info from NASA NeoWS API, and therefore
-    it only works with NEAs (Near Earth Asteroids)
+    it only works with NEAs (Near Earth Asteroids).
 
     Parameters
     ----------
