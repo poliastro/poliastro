@@ -4,7 +4,18 @@
 Contains some predefined bodies of the Solar System:
 
 * Sun (☉)
+* Mercury (☿)
+* Venus (♀)
 * Earth (♁)
+* Mars (♂)
+* Jupiter (♃)
+* Saturn (♄)
+* Uranus (⛢)
+* Neptune (♆)
+* Pluto (♇)
+
+* Moon (🌕)
+* Ceres (⚳)
 
 and a way to define new bodies (:py:class:`~Body` class).
 
@@ -60,6 +71,40 @@ class Body(object):
 Sun = Body.from_parameters(
     None, k=132712440018 * u.km ** 3 / u.s ** 2,
     name="Sun", symbol=u"\u2609", R=695700 * u.km)
+Mercury = Body.from_parameters(
+    Sun, k=22032 * u.km ** 3 / u.s ** 2,
+    name="Mercury", symbol=u"\u263F", R=2439.7 * u.km)
+Venus = Body.from_parameters(
+    Sun, k=324859 * u.km ** 3 / u.s ** 2,
+    name="Venus", symbol=u"\u2640", R=6051.8 * u.km)
 Earth = Body.from_parameters(
     Sun, k=398600 * u.km ** 3 / u.s ** 2,
     name="Earth", symbol=u"\u2641", R=R_earth.to(u.km))
+Mars = Body.from_parameters(
+    Sun, k=42828 * u.km ** 3 / u.s ** 2,
+    name="Mars", symbol=u"\u2642", R=3389.5 * u.km)
+Jupiter = Body.from_parameters(
+    Sun, k=126686534 * u.km ** 3 / u.s ** 2,
+    name="Jupiter", symbol=u"\u2643", R=69911 * u.km)
+Saturn = Body.from_parameters(
+    Sun, k=3793939 * u.km ** 3 / u.s ** 2,
+    name="Saturn", symbol=u"\u2644", R=58232 * u.km)
+Uranus = Body.from_parameters(
+    Sun, k=5793939 * u.km ** 3 / u.s ** 2,
+    name="Uranus", symbol=u"\u26E2", R=25362 * u.km)
+Neptune = Body.from_parameters(
+    Sun, k=6836529 * u.km ** 3 / u.s ** 2,
+    name="Neptune", symbol=u"\u2646", R=24622 * u.km)
+Pluto = Body.from_parameters(
+    Sun, k=871 * u.km ** 3 / u.s ** 2,
+    name="Pluto", symbol=u"\u2647", R=1187 * u.km)
+
+# Non-planetary bodies
+
+Moon = Body.from_parameters(
+    Earth, k=4904 * u.km ** 3 / u.s ** 2,
+    name="Moon", symbol=u"\u1F315", R=1737.4 * u.km) # Used a white circle as symbol
+Ceres = Body.from_parameters(
+    Sun, k=62.63 * u.km ** 3 / u.s ** 2,
+    name="Ceres", symbol=u"\u26B3", R=473 * u.km)
+
