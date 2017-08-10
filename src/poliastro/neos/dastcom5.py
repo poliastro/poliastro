@@ -284,7 +284,7 @@ COM_DB_PATH = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
 FTP_DB_URL = 'ftp://ssd.jpl.nasa.gov/pub/ssd/'
 
 
-def asteroid_db_from_path():
+def asteroid_db():
     """Return complete DASTCOM5 asteroid database.
 
     Returns
@@ -299,7 +299,7 @@ def asteroid_db_from_path():
     return data
 
 
-def comet_db_from_path():
+def comet_db():
     """Return complete DASTCOM5 comet database.
 
     Returns
@@ -454,8 +454,6 @@ def read_record(record):
     ----------
     record : int
         Body record.
-    dirpath : path-like object
-        dastcom.idx dir.
 
     Returns
     -------
@@ -487,9 +485,10 @@ def read_record(record):
 
 
 def download_dastcom5():
-    """Downloads DASTCOM5 database to specified path.
+    """Downloads DASTCOM5 database.
 
-    The function downloads and unzip DASTCOM5 file in a given path.
+    The function downloads and unzip DASTCOM5 file in default
+    poliastro path (~/.poliastro).
 
     """
 
@@ -514,7 +513,7 @@ def _show_download_progress(transferred, block, totalsize):
     print('%.2f MB / %.2f MB' % (trans_mb, total_mb), end='\r', flush=True)
 
 
-def entire_db_from_path():
+def entire_db():
     """Return complete DASTCOM5 database.
 
     Functions merge asteroid and comet database, only with fields
@@ -526,8 +525,8 @@ def entire_db_from_path():
         Database with custom dtype.
 
     """
-    ast_database = asteroid_db_from_path()
-    com_database = comet_db_from_path()
+    ast_database = asteroid_db()
+    com_database = comet_db()
 
     ast_database = pd.DataFrame(ast_database[list(ast_database.dtype.names[:17])
                                              + list(ast_database.dtype.names[-4:-3])
