@@ -22,6 +22,7 @@ Data references can be found in :py:mod:`~poliastro.constants`
 from astropy import units as u
 from poliastro import constants
 
+
 class Body(object):
     """Class to represent a body of the Solar System.
 
