@@ -17,19 +17,10 @@ Contains some predefined bodies of the Solar System:
 
 and a way to define new bodies (:py:class:`~Body` class).
 
-Data references are the following:
-
-* Equatorial radius, obtained from `NASA Planetary Fact Sheets`_.
-* Mass paremeter, obtained from `JPL Development Ephemeris 424`_.
-* Symbols, following this `guideline`_.
-
-.. _`NASA Planetary Fact Sheets`: https://nssdc.gsfc.nasa.gov/planetary/planetfact.html
-.. _`JPL Development Ephemeris 424`: ftp://ssd.jpl.nasa.gov/pub/eph/planets/ioms/de424.iom.pdf
-.. _`guideline`: https://solarsystem.nasa.gov/galleries/solar-system-symbols
+Data references can be found in :py:mod:`~poliastro.constants`
 """
-from astropy.constants import R_earth
 from astropy import units as u
-
+from poliastro import constants
 
 class Body(object):
     """Class to represent a body of the Solar System.
@@ -76,35 +67,35 @@ class Body(object):
 
 
 Sun = Body.from_parameters(
-    None, k=132712440040.9446 * u.km ** 3 / u.s ** 2,
-    name="Sun", symbol=u"\u2609", R=695700 * u.km)
+    None, k=constants.GM_sun.value,
+    name="Sun", symbol=u"\u2609", R=constants.R_sun.value)
 Earth = Body.from_parameters(
-    Sun, k=398600.436296 * u.km ** 3 / u.s ** 2,
-    name="Earth", symbol=u"\u2641", R=R_earth.to(u.km))
+    Sun, k=constants.GM_earth.value,
+    name="Earth", symbol=u"\u2641", R=constants.R_earth.value)
 Moon = Body.from_parameters(
-    Earth, k=4902.800013 * u.km ** 3 / u.s ** 2,
-    name="Moon", symbol=u"\u263E", R=1738.1 * u.km)
+    Earth, k=constants.GM_moon.value,
+    name="Moon", symbol=u"\u263E", R=constants.R_moon.value)
 Mercury = Body.from_parameters(
-    Sun, k=22031.855 * u.km ** 3 / u.s ** 2,
-    name="Mercury", symbol=u"\u263F", R=2439.7 * u.km)
+    Sun, k=constants.GM_mercury.value,
+    name="Mercury", symbol=u"\u263F", R=constants.R_mercury.value)
 Venus = Body.from_parameters(
-    Sun, k=324858.592 * u.km ** 3 / u.s ** 2,
-    name="Venus", symbol=u"\u2640", R=6051.8 * u.km)
+    Sun, k=constants.GM_venus.value,
+    name="Venus", symbol=u"\u2640", R=constants.R_venus.value)
 Mars = Body.from_parameters(
-    Sun, k=42828.375214 * u.km ** 3 / u.s ** 2,
-    name="Mars", symbol=u"\u2642", R=3396.2 * u.km)
+    Sun, k=constants.GM_mars.value,
+    name="Mars", symbol=u"\u2642", R=constants.R_mars.value)
 Jupiter = Body.from_parameters(
-    Sun, k=126712764.8 * u.km ** 3 / u.s ** 2,
-    name="Jupiter", symbol=u"\u2643", R=71492 * u.km)
+    Sun, k=constants.GM_jupiter.value,
+    name="Jupiter", symbol=u"\u2643", R=constants.R_jupiter.value)
 Saturn = Body.from_parameters(
-    Sun, k=37940585.2 * u.km ** 3 / u.s ** 2,
-    name="Saturn", symbol=u"\u2644", R=60268 * u.km)
+    Sun, k=constants.GM_saturn.value,
+    name="Saturn", symbol=u"\u2644", R=constants.R_saturn.value)
 Uranus = Body.from_parameters(
-    Sun, k=5794548.6 * u.km ** 3 / u.s ** 2,
-    name="Uranus", symbol=u"\u26E2", R=25559 * u.km)
+    Sun, k=constants.GM_uranus.value,
+    name="Uranus", symbol=u"\u26E2", R=constants.R_uranus.value)
 Neptune = Body.from_parameters(
-    Sun, k=6836527.10058 * u.km ** 3 / u.s ** 2,
-    name="Neptune", symbol=u"\u2646", R=24764 * u.km)
+    Sun, k=constants.GM_neptune.value,
+    name="Neptune", symbol=u"\u2646", R=constants.R_neptune.value)
 Pluto = Body.from_parameters(
-    Sun, k=977 * u.km ** 3 / u.s ** 2,
-    name="Pluto", symbol=u"\u2647", R=1187 * u.km)
+    Sun, k=constants.GM_pluto.value,
+    name="Pluto", symbol=u"\u2647", R=constants.R_pluto.value)
