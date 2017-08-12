@@ -33,6 +33,6 @@ def test_body_printing_has_name_and_symbol():
 
 
 def test_earth_has_k_given_in_literature():
-    expected_k = 3.986e14 * u.m ** 3 / u.s ** 2
+    expected_k = 3.986004418e14 * u.m ** 3 / u.s ** 2
     k = bodies.Earth.k
     assert_quantity_allclose(k.decompose([u.km, u.s]), expected_k)
