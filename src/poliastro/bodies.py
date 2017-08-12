@@ -67,35 +67,35 @@ class Body(object):
 
 
 Sun = Body.from_parameters(
-    None, k=constants.GM_sun.value,
-    name="Sun", symbol=u"\u2609", R=constants.R_sun.value)
+    None, k=constants.GM_sun,
+    name="Sun", symbol=u"\u2609", R=constants.R_sun)
 Earth = Body.from_parameters(
-    Sun, k=constants.GM_earth.value,
-    name="Earth", symbol=u"\u2641", R=constants.R_earth.value)
+    Sun, k=constants.GM_earth,
+    name="Earth", symbol=u"\u2641", R=constants.R_earth)
 Moon = Body.from_parameters(
-    Earth, k=constants.GM_moon.value,
-    name="Moon", symbol=u"\u263E", R=constants.R_moon.value)
+    Earth, k=constants.GM_moon,
+    name="Moon", symbol=u"\u263E", R=constants.R_moon)
 Mercury = Body.from_parameters(
-    Sun, k=constants.GM_mercury.value,
-    name="Mercury", symbol=u"\u263F", R=constants.R_mercury.value)
+    Sun, k=constants.GM_mercury,
+    name="Mercury", symbol=u"\u263F", R=constants.R_mercury)
 Venus = Body.from_parameters(
-    Sun, k=constants.GM_venus.value,
-    name="Venus", symbol=u"\u2640", R=constants.R_venus.value)
+    Sun, k=constants.GM_venus,
+    name="Venus", symbol=u"\u2640", R=constants.R_venus)
 Mars = Body.from_parameters(
-    Sun, k=constants.GM_mars.value,
-    name="Mars", symbol=u"\u2642", R=constants.R_mars.value)
+    Sun, k=constants.GM_mars,
+    name="Mars", symbol=u"\u2642", R=constants.R_mars)
 Jupiter = Body.from_parameters(
-    Sun, k=constants.GM_jupiter.value,
-    name="Jupiter", symbol=u"\u2643", R=constants.R_jupiter.value)
+    Sun, k=constants.GM_jupiter,
+    name="Jupiter", symbol=u"\u2643", R=constants.R_jupiter)
 Saturn = Body.from_parameters(
-    Sun, k=constants.GM_saturn.value,
-    name="Saturn", symbol=u"\u2644", R=constants.R_saturn.value)
+    Sun, k=constants.GM_saturn,
+    name="Saturn", symbol=u"\u2644", R=constants.R_saturn)
 Uranus = Body.from_parameters(
-    Sun, k=constants.GM_uranus.value,
-    name="Uranus", symbol=u"\u26E2", R=constants.R_uranus.value)
+    Sun, k=constants.GM_uranus,
+    name="Uranus", symbol=u"\u26E2", R=constants.R_uranus)
 Neptune = Body.from_parameters(
-    Sun, k=constants.GM_neptune.value,
-    name="Neptune", symbol=u"\u2646", R=constants.R_neptune.value)
+    Sun, k=constants.GM_neptune,
+    name="Neptune", symbol=u"\u2646", R=constants.R_neptune)
 Pluto = Body.from_parameters(
-    Sun, k=constants.GM_pluto.value,
-    name="Pluto", symbol=u"\u2647", R=constants.R_pluto.value)
+    Sun, k=constants.GM_pluto,
+    name="Pluto", symbol=u"\u2647", R=constants.R_pluto)
