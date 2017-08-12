@@ -75,9 +75,9 @@ class Maneuver(object):
         v_i = ss_i.v
         k = ss_i.attractor.k
         R = r_f / r_i
-        dv_a = (np.sqrt(2 * R / (1 + R)) - 1) * v_i
-        dv_b = -(1 - np.sqrt(2 / (1 + R))) / np.sqrt(R) * v_i
-        t_trans = np.pi * np.sqrt((r_i * (1 + R) / 2) ** 3 / k)
+        dv_a = ((np.sqrt(2 * R / (1 + R)) - 1) * v_i).decompose()
+        dv_b = (-(1 - np.sqrt(2 / (1 + R))) / np.sqrt(R) * v_i).decompose()
+        t_trans = (np.pi * np.sqrt((r_i * (1 + R) / 2) ** 3 / k)).decompose()
         return cls((0 * u.s, dv_a), (t_trans, dv_b))
 
     @classmethod
@@ -91,12 +91,12 @@ class Maneuver(object):
         k = ss_i.attractor.k
         R = r_f / r_i
         Rs = r_b / r_i
-        dv_a = (np.sqrt(2 * Rs / (1 + Rs)) - 1) * v_i
-        dv_b = -np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) -
-                                   np.sqrt(1 / (1 + Rs))) * v_i
-        dv_c = -(np.sqrt(2 * Rs / (R + Rs)) - 1) / np.sqrt(R) * v_i
-        t_trans1 = np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)
-        t_trans2 = np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)
+        dv_a = ((np.sqrt(2 * Rs / (1 + Rs)) - 1) * v_i).decompose()
+        dv_b = (-np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) -
+                                   np.sqrt(1 / (1 + Rs))) * v_i).decompose()
+        dv_c = (-(np.sqrt(2 * Rs / (R + Rs)) - 1) / np.sqrt(R) * v_i).decompose()
+        t_trans1 = (np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)).decompose()
+        t_trans2 = (np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)).decompose()
         return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
 
     def get_total_time(self):
