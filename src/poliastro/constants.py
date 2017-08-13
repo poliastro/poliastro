@@ -1,21 +1,24 @@
-"""Astronomical and physics constants in SI units.
+"""Astronomical and physics constants.
 
-This module complements constants defined in `astropy.constants`
+This module complements constants defined in `astropy.constants`,
+with gravitational paremeters and radii.
+
+Note that `GM_jupiter` and `GM_neptune` are both referred to the whole planetary system gravitational parameter.
 
 Unless otherwise specified, gravitational and mass parameters were obtained from:
-
-* Archinal, B. A. et al. “Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009.”
-  Celestial Mechanics and Dynamical Astronomy 109.2 (2010): 101–135. Crossref. Web. `DOI: 10.1007/s10569-010-9320-4`_
-
-and radii were obtained from:
 
 * Luzum, Brian et al. “The IAU 2009 System of Astronomical Constants: The Report of the IAU Working Group on Numerical
   Standards for Fundamental Astronomy.” Celestial Mechanics and Dynamical Astronomy 110.4 (2011): 293–304.
   Crossref. Web. `DOI: 10.1007/s10569-011-9352-4`_
 
+and radii were obtained from:
 
-.. _`DOI: 10.1007/s10569-010-9320-4`: http://dx.doi.org/10.1007/s10569-010-9320-4
+* Archinal, B. A. et al. “Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009.”
+  Celestial Mechanics and Dynamical Astronomy 109.2 (2010): 101–135. Crossref. Web. `DOI: 10.1007/s10569-010-9320-4`_
+
 .. _`DOI: 10.1007/s10569-011-9352-4`: http://dx.doi.org/10.1007/s10569-011-9352-4
+.. _`DOI: 10.1007/s10569-010-9320-4`: http://dx.doi.org/10.1007/s10569-010-9320-4
+
 
 """
 
@@ -25,10 +28,10 @@ from astropy.constants import Constant
 G = Constant('G', 'Constant of gravitation', 6.67428e-11, 'm3 / (kg * s2)', 6.7e-15,
              'IAU 2009 system of astronomical constants', system='si')
 
-GM_sun = Constant('GM_sun', 'Heliocentric gravitational constant', 1.32712442099e20, 'm3 / (s2)', 1.0e10,
+GM_sun = Constant('GM_sun', 'Heliocentric gravitational constant', 1.32712442099e20, 'm3 / (s2)', 0.0000000001e20,
                   'IAU 2009 system of astronomical constants', system='si')
 
-GM_earth = Constant('GM_earth', 'Geocentric gravitational constant', 3.986004418e14, 'm3 / (s2)', 8.0e5,
+GM_earth = Constant('GM_earth', 'Geocentric gravitational constant', 3.986004418e14, 'm3 / (s2)', 0.000000008e14,
                     'IAU 2009 system of astronomical constants', system='si')
 
 # Anderson, John D. et al. “The Mass, Gravity Field, and Ephemeris of Mercury.” Icarus 71.3 (1987): 337–349.
@@ -73,7 +76,7 @@ GM_pluto = Constant('GM_pluto', 'Pluto gravitational constant', 870.3, 'km3 / (s
 
 # Lemoine, Frank G. et al. “High-Degree Gravity Models from GRAIL Primary Mission Data.”
 # Journal of Geophysical Research: Planets 118.8 (2013): 1676–1698. Crossref. Web. DOI: 10.1002/jgre.20118
-GM_moon = Constant('GM_moon', 'Moon gravitational constant', 4902.79981, 'km3 / (s2)', 7.74e-06,
+GM_moon = Constant('GM_moon', 'Moon gravitational constant', 4902.79981, 'km3 / (s2)', 0.00000774,
                    'Journal of Geophysical Research: Planets 118.8 (2013)')
 
 
