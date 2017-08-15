@@ -17,10 +17,17 @@ with open(os.path.join("src", "poliastro", "__init__.py")) as fp:
 
 # https://docs.pytest.org/en/latest/goodpractices.html#manual-integration
 class PyTest(test):
-    def run_tests(self):
-        import pytest
-        sys.exit(pytest.main([]))
+    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
 
+    def initialize_options(self):
+        test.initialize_options(self)
+        self.pytest_args = ''
+
+    def run_tests(self):
+        import shlex
+        import pytest
+
+        sys.exit(pytest.main(shlex.split(self.pytest_args)))
 
 # http://blog.ionelmc.ro/2014/05/25/python-packaging/
 setup(

@@ -51,7 +51,7 @@ after_success:
   - pip uninstall poliastro -y
   - pip install -e .
 
-  - NUMBA_DISABLE_JIT=1 python setup.py test --cov
+  - NUMBA_DISABLE_JIT=1 python setup.py test -a "--cov"
 
   # Publish coverage
   - pip install codecov
