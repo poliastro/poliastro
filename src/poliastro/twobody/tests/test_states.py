@@ -110,7 +110,7 @@ def test_convert_from_coe_to_rv():
     assert_quantity_allclose(inc, expected_inc, rtol=1e-4)
     assert_quantity_allclose(raan, expected_raan, rtol=1e-4)
     assert_quantity_allclose(argp, expected_argp, rtol=1e-4)
-    assert_quantity_allclose(nu, expected_nu, rtol=1e-6)
+    assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
 
 
 def test_perifocal_points_to_perigee():
