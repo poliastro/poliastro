@@ -67,15 +67,6 @@ the MIT license, hence allowing commercial use of the library.
 
 ----
 
-.. note::
-    Older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for
-    his book "Fundamentals of Astrodynamics and Applications" and available on
-    the Internet as the `companion software of the book`__.
-    The author explicitly gave permission to redistribute these subroutines
-    in this project under a permissive license.
-
-.. __: http://celestrak.com/software/vallado-sw.asp
-
 .. _`Molniya orbit`: http://en.wikipedia.org/wiki/Molniya_orbit
 
 Contents
@@ -92,3 +83,11 @@ Contents
    api
    jupyter
 
+.. note::
+    Older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for
+    his book "Fundamentals of Astrodynamics and Applications" and available on
+    the Internet as the `companion software of the book`__.
+    The author explicitly gave permission to redistribute these subroutines
+    in this project under a permissive license.
+
+.. __: http://celestrak.com/software/vallado-sw.asp
