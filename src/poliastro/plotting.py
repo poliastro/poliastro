@@ -2,7 +2,6 @@
 """ Plotting utilities.
 
 """
-
 import numpy as np
 
 import matplotlib as mpl
@@ -58,7 +57,7 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
-        self._states = []
+        self._states = []  # type: list
         self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
