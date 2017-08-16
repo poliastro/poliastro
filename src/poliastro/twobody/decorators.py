@@ -18,7 +18,7 @@ def state_from_vector(func):
     @wraps(func)
     def wrapper(t, u_, k, *args, **kwargs):
         r, v = u_[:3], u_[3:]
-        ss = RVState(Body(k * u.km3s2), r * u.km, v * u.kms)
+        ss = RVState(Body(None, k * u.km3s2, "_Dummy"), r * u.km, v * u.kms)
 
         return func(t, ss, *args, **kwargs)
 
