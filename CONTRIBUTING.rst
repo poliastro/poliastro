@@ -92,9 +92,10 @@ To set up a development environment:
 2. `Register to GitHub <https://github.com/>`_.
 3. `Fork poliastro <https://help.github.com/articles/fork-a-repo/>`_.
 4. `Clone your fork <https://help.github.com/articles/cloning-a-repository/>`_.
-5. Install it in development mode using :code:`pip install --editable .` (this
-   means that the installed code will change as soon as you change it in the
-   download location).
+5. Install it in development mode using
+   :code:`pip install --editable /path/to/poliastro` (this means that the
+   installed code will change as soon as you change it in the download
+   location).
 6. Make changes and commit.
 7. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
 8. `Open a pull request! <https://help.github.com/articles/creating-a-pull-request/>`_
