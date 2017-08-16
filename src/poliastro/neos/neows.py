@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import requests
 
 import astropy.units as u
+from astropy.time import Time
 
 from poliastro.twobody.orbit import Orbit
 from poliastro.bodies import Sun
@@ -17,7 +18,7 @@ NEOWS_URL = 'https://api.nasa.gov/neo/rest/v1/neo/'
 SBDB_URL = 'https://ssd.jpl.nasa.gov/sbdb.cgi'
 
 
-def orbit_from_spk_id(spk_id, epoch=None):
+def orbit_from_spk_id(spk_id):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a SPK-ID.
 
     Retrieve info from NASA NeoWS API, and therefore
@@ -51,12 +52,9 @@ def orbit_from_spk_id(spk_id, epoch=None):
     argp = float(orbital_data['perihelion_argument']) * u.deg
     m = float(orbital_data['mean_anomaly']) * u.deg
     nu = M_to_nu(m.to(u.rad), ecc)
+    epoch = Time(orbital_data['orbit_determination_date'])
 
-    if epoch is None:
-        return Orbit.from_classical(attractor, a, ecc, inc,
-                                    raan, argp, nu)
-    else:
-        return Orbit.from_classical(attractor, a, ecc, inc,
+    return Orbit.from_classical(attractor, a, ecc, inc,
                                     raan, argp, nu, epoch)
 
 
