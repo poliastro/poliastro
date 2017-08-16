@@ -151,8 +151,8 @@ class ClassicalState(BaseState):
                       self.nu.to(u.rad).value)
 
         return poliastro.twobody.rv.RVState(self.attractor,
-                                                        r * u.km,
-                                                        v * u.km / u.s)
+                                            r * u.km,
+                                            v * u.km / u.s)
 
     def to_classical(self):
         """Converts to classical orbital elements representation.

@@ -183,10 +183,10 @@ class Orbit(object):
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
         ecc = 1.0 * u.one
         r, v = poliastro.twobody.classical.coe2rv(
-                k.to(u.km ** 3 / u.s ** 2).value,
-                p.to(u.km).value, ecc.value, inc.to(u.rad).value,
-                raan.to(u.rad).value, argp.to(u.rad).value,
-                nu.to(u.rad).value)
+            k.to(u.km ** 3 / u.s ** 2).value,
+            p.to(u.km).value, ecc.value, inc.to(u.rad).value,
+            raan.to(u.rad).value, argp.to(u.rad).value,
+            nu.to(u.rad).value)
 
         ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
         return ss

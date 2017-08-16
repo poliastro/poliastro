@@ -12,6 +12,9 @@ branches:
     - 0.5.x
     - 0.6.x
 
+env:
+  - MPLBACKEND="Agg"
+
 matrix:
   include:
     - os: osx

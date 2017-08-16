@@ -3,8 +3,6 @@ import pytest
 
 import astropy.units as u
 
-import matplotlib
-matplotlib.use("Agg")  # use Agg backend for these tests
 import matplotlib.pyplot as plt
 
 from poliastro.examples import iss
@@ -12,7 +10,7 @@ from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter
 
 
-def test_OrbitPlotter_has_axes():
+def test_orbitplotter_has_axes():
     ax = "Unused axes"
     op = OrbitPlotter(ax)
     assert op.ax is ax

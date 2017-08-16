@@ -40,8 +40,8 @@ setup(
     download_url="https://github.com/poliastro/poliastro",
     license="MIT",
     keywords=[
-      "aero", "aerospace", "engineering",
-      "astrodynamics", "orbits", "kepler", "orbital mechanics"
+        "aero", "aerospace", "engineering",
+        "astrodynamics", "orbits", "kepler", "orbital mechanics"
     ],
     python_requires=">=3.5",
     install_requires=[
@@ -64,24 +64,24 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     entry_points={
-              'console_scripts': [
-                  'poliastro = poliastro.cli:main'
-              ]
+        'console_scripts': [
+            'poliastro = poliastro.cli:main'
+        ]
     },
     classifiers=[
-      "Development Status :: 4 - Beta",
-      "Intended Audience :: Education",
-      "Intended Audience :: Science/Research",
-      "License :: OSI Approved :: MIT License",
-      "Operating System :: OS Independent",
-      "Programming Language :: Python",
-      "Programming Language :: Python :: 3",
-      "Programming Language :: Python :: 3.5",
-      "Programming Language :: Python :: 3.6",
-      "Programming Language :: Python :: Implementation :: CPython",
-      "Topic :: Scientific/Engineering",
-      "Topic :: Scientific/Engineering :: Physics",
-      "Topic :: Scientific/Engineering :: Astronomy",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Physics",
+        "Topic :: Scientific/Engineering :: Astronomy",
     ],
     long_description=io.open('README.rst', encoding='utf-8').read(),
     package_data={"poliastro": ['tests/*.py']},

@@ -63,9 +63,9 @@ def test_perigee_and_apogee():
     _a = 1.0 * u.deg  # Unused angle
     ss = ClassicalState(Earth, a, ecc, _a, _a, _a, _a)
     assert_allclose(ss.r_a.to(u.km).value,
-                        expected_r_a.to(u.km).value)
+                    expected_r_a.to(u.km).value)
     assert_allclose(ss.r_p.to(u.km).value,
-                        expected_r_p.to(u.km).value)
+                    expected_r_p.to(u.km).value)
 
 
 def test_convert_from_rv_to_coe():
