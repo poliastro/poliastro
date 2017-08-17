@@ -94,7 +94,7 @@ poliastro.bodies module
 poliastro.constants module
 --------------------------
 
-.. automodule:: poliastro.bodies
+.. automodule:: poliastro.constants
     :members:
 
 poliastro.cli module
