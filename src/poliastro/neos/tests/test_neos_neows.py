@@ -39,7 +39,7 @@ def test_orbit_from_spk_id_raises_when_error(mock_get):
     resp = requests.Response()
 
     resp.status_code = 404
-    mock_get.return_value = resp   
+    mock_get.return_value = resp
     with pytest.raises(requests.HTTPError):
         ss = neows.orbit_from_spk_id('')
 
@@ -59,7 +59,7 @@ def test_spk_id_from_name_raises_when_error(mock_get):
 def test_spk_id_from_name_parses_body(mock_get, mock_response):
     with open('src/poliastro/tests/table.html', 'r') as demo_html:
         html = demo_html.read().replace('\n', '')
-    
+
     mock_response.text = html
     mock_get.return_value = mock_response
     assert '2000433' == neows.spk_id_from_name('')

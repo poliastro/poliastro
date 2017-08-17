@@ -37,7 +37,7 @@ def orbit_from_spk_id(spk_id):
         NEA orbit.
 
     """
-    payload = {'api_key' : 'DEMO_KEY'}
+    payload = {'api_key': 'DEMO_KEY'}
 
     response = requests.get(NEOWS_URL + spk_id, params=payload)
     response.raise_for_status()
@@ -55,7 +55,7 @@ def orbit_from_spk_id(spk_id):
     epoch = Time(orbital_data['orbit_determination_date'])
 
     return Orbit.from_classical(attractor, a, ecc, inc,
-                                    raan, argp, nu, epoch)
+                                raan, argp, nu, epoch)
 
 
 def spk_id_from_name(name):
@@ -102,8 +102,8 @@ def spk_id_from_name(name):
             bodies += body.string + '\n'
         raise ValueError(str(len(object_list)) + ' different bodies found:\n' + bodies)
     else:
-        raise ValueError('Object could not be found. You can visit: '
-                         + SBDB_URL + '?sstr=' + name + ' for more information.')
+        raise ValueError('Object could not be found. You can visit: ' +
+                         SBDB_URL + '?sstr=' + name + ' for more information.')
 
 
 def orbit_from_name(name):

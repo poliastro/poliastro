@@ -7,7 +7,7 @@ import pytest
 
 
 def test():
-    '''Initiate poliastro testing
-    
-    '''
+    """Initiate poliastro testing
+
+    """
     pytest.main([os.path.dirname(os.path.abspath(__file__))])

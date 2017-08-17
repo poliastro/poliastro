@@ -14,21 +14,12 @@ def main():
         description="Command line tools for the poliastro Python library.")
     parser.add_argument("--version", action='version',
                         version=poliastro.__version__)
-
-    subparsers = parser.add_subparsers(help='Available commands')
-
-    download_parser = subparsers.add_parser(
-        "download-dastcom5",
-        help="Downloads DASTCOM5 database")
-    download_parser.add_argument(
-        "-p", "--path", help="Download path")
+    parser.add_argument("--download-dastcom5", action="store_true",
+                        help="Downloads DASTCOM5 database")
 
     args = parser.parse_args()
-    try:
-        if args.path:
-            download_dastcom5(args.path)
-        else:
-            download_dastcom5()
-    except AttributeError:
-        parser.print_help()
 
+    if args.download_dastcom5:
+        download_dastcom5()
+    else:
+        parser.print_help()

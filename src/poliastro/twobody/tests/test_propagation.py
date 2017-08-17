@@ -69,9 +69,9 @@ def test_apply_zero_maneuver_returns_equal_state():
     dv = [0, 0, 0] * u.km / u.s
     orbit_new = ss.apply_maneuver([(dt, dv)])
     assert_allclose(orbit_new.r.to(u.km).value,
-                        ss.r.to(u.km).value)
+                    ss.r.to(u.km).value)
     assert_allclose(orbit_new.v.to(u.km / u.s).value,
-                        ss.v.to(u.km / u.s).value)
+                    ss.v.to(u.km / u.s).value)
 
 
 def test_cowell_propagation_callback():
@@ -134,9 +134,8 @@ def test_cowell_propagation_circle_to_circle():
                   tof.to(u.s).value,
                   ad=constant_accel)
 
-    ss_final = Orbit.from_vectors(Earth,
-                       r * u.km,
-                       v * u.km / u.s)
+    ss_final = Orbit.from_vectors(
+        Earth, r * u.km, v * u.km / u.s)
 
     da_a0 = (ss_final.a - ss.a) / ss.a
     dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)

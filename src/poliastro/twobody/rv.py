@@ -99,10 +99,11 @@ class RVState(BaseState):
 
         a = p / (1 - ecc**2)
 
-        return poliastro.twobody.classical.ClassicalState(self.attractor,
-                                                   a * u.km,
-                                                   ecc * u.one,
-                                                   inc * u.rad,
-                                                   raan * u.rad,
-                                                   argp * u.rad,
-                                                   nu * u.rad)
+        return poliastro.twobody.classical.ClassicalState(
+            self.attractor,
+            a * u.km,
+            ecc * u.one,
+            inc * u.rad,
+            raan * u.rad,
+            argp * u.rad,
+            nu * u.rad)

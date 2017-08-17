@@ -12,6 +12,9 @@ branches:
     - 0.5.x
     - 0.6.x
 
+env:
+  - MPLBACKEND="Agg"
+
 matrix:
   include:
     - os: osx
@@ -34,12 +37,17 @@ before_install:
 
 install:
   - pip install numpy  # Required
-  - pip install .  # Test installation correctness
+  - pip install pep8 mypy
   - pip install sphinx sphinx_rtd_theme nbsphinx ipython  # Install documentation dependencies
+  - pip install .  # Test installation correctness
+
+before_script:
+  - pep8 setup.py src/  # Check PEP8 compliance
+  - mypy --ignore-missing-imports --check-untyped-defs src/  # Check MyPy diagnostics
 
 script:
   - python setup.py test -vv  # Test against installed code
-  - sphinx-build -vW -b html docs/source _HTMLTest #Test docs build
+  - sphinx-build -vW -b html docs/source _HTMLTest  # Test docs build
 
 after_success:
   # Uninstall to test coverage against sources

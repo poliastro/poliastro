@@ -506,8 +506,8 @@ def download_dastcom5():
 
 
 def _show_download_progress(transferred, block, totalsize):
-    trans_mb = transferred*block/(1024*1024)
-    total_mb = totalsize/(1024*1024)
+    trans_mb = transferred * block / (1024 * 1024)
+    total_mb = totalsize / (1024 * 1024)
     print('%.2f MB / %.2f MB' % (trans_mb, total_mb), end='\r', flush=True)
 
 
@@ -526,13 +526,13 @@ def entire_db():
     ast_database = asteroid_db()
     com_database = comet_db()
 
-    ast_database = pd.DataFrame(ast_database[list(ast_database.dtype.names[:17])
-                                             + list(ast_database.dtype.names[-4:-3])
-                                             + list(ast_database.dtype.names[-2:])])
+    ast_database = pd.DataFrame(ast_database[list(ast_database.dtype.names[:17]) +
+                                             list(ast_database.dtype.names[-4:-3]) +
+                                             list(ast_database.dtype.names[-2:])])
     ast_database.rename(columns={'ASTNAM': 'NAME', 'NO': 'NUMBER', 'CALEPO': 'CALEPOCH'}, inplace=True)
-    com_database = pd.DataFrame(com_database[list(com_database.dtype.names[:17])
-                                             + list(com_database.dtype.names[-4:-3])
-                                             + list(com_database.dtype.names[-2:])])
+    com_database = pd.DataFrame(com_database[list(com_database.dtype.names[:17]) +
+                                             list(com_database.dtype.names[-4:-3]) +
+                                             list(com_database.dtype.names[-2:])])
     com_database.rename(columns={'COMNAM': 'NAME', 'NO': 'NUMBER', 'CALEPO': 'CALEPOCH'}, inplace=True)
     df = ast_database.append(com_database, ignore_index=True)
     df[['NAME', 'DESIG', 'IREF']] = df[['NAME', 'DESIG', 'IREF']].apply(lambda x: x.str.strip().str.decode('utf-8'))
