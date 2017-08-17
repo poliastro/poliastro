@@ -27,7 +27,7 @@
    :target: https://lima.codeclimate.com/github/poliastro/poliastro
 
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
-   :target: http://poliastro.readthedocs.io/en/latest/?badge=latest
+   :target: http://docs.poliastro.space/en/latest/?badge=latest
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/master/COPYING
@@ -69,7 +69,7 @@ Documentation
 Complete documentation, including a user guide and an API reference, can be read on
 the wonderful `Read the Docs`_.
 
-http://poliastro.readthedocs.io/en/latest/
+http://docs.poliastro.space/en/latest/
 
 .. _`Read the Docs`: http://readthedocs.io/
 
@@ -121,7 +121,7 @@ install poliastro using `conda <http://conda.io>`_::
 
 Please check out the `documentation for alternative installation methods`_.
 
-.. _`documentation for alternative installation methods`: http://poliastro.readthedocs.io/en/latest/getting_started.html#alternative-installation-methods
+.. _`documentation for alternative installation methods`: http://docs.poliastro.space/en/latest/getting_started.html#alternative-installation-methods
 
 Testing
 =======
@@ -216,7 +216,7 @@ Keep that in mind when asking for a feature. For a software package focused on
 Earth applications please refer to the `Python Astrodynamics Project`_, a
 still in progress joint effort between several developers.
 
-.. _`Related software`: http://poliastro.readthedocs.io/en/latest/about.html#related-software
+.. _`Related software`: http://docs.poliastro.space/en/latest/about.html#related-software
 .. _`Python Astrodynamics Project`: https://github.com/python-astrodynamics/astrodynamics
 
 What's the future of the project?

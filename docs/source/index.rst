@@ -78,10 +78,10 @@ Contents
    about
    getting_started
    user_guide
-   changelog
+   jupyter
    references
    api
-   jupyter
+   changelog
 
 .. note::
     Older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for
