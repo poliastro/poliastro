@@ -91,6 +91,12 @@ poliastro.bodies module
     :members:
     :special-members: __init__
 
+poliastro.constants module
+--------------------------
+
+.. automodule:: poliastro.constants
+    :members:
+
 poliastro.cli module
 --------------------
 
