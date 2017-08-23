@@ -57,6 +57,7 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
+        self._states = []  # type: list
         self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
@@ -116,6 +117,8 @@ class OrbitPlotter(object):
             self.set_attractor(orbit)
         elif new_radius < self._attractor_radius:
             self.set_attractor(orbit)
+
+        self._states.append(orbit)
 
         lines = []
 
