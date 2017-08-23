@@ -102,13 +102,18 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, osculating=True, label=None):
+    def plot(self, orbit, osculating=True, label=None, propagate=False):
         """Plots state and osculating orbit in their plane.
 
         """
         # TODO: This function needs a refactoring
         if not self._frame:
             self.set_frame(*orbit.pqw())
+
+        # Propagates backwards of forwards to the last added orbit epoch.
+        if propagate:
+            if self._states:
+                orbit = orbit.propagate(self._states[-1].epoch - orbit.epoch)
 
         # if new attractor radius is smaller, plot it
         new_radius = max(orbit.attractor.R.to(u.km).value,
