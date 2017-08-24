@@ -11,11 +11,11 @@ import astropy.coordinates as coordinates
 import astropy.units as u
 
 from poliastro.util import transform
+from poliastro.constants import J2000
 
 
 T = 0
 d = 0
-J2000 = time.Time('J2000', scale='tdb')
 
 Ja = 99.360714 + 4850.4046 * T
 Jb = 175.895369 + 1191.9605 * T
@@ -76,7 +76,7 @@ bodies_orientations = {
 }
 
 
-def body_centered_to_icrs(r, v, source_body, epoch=None, rotate_meridian=False):
+def body_centered_to_icrs(r, v, source_body, epoch=J2000, rotate_meridian=False):
     """Converts position and velocity body-centered frame to ICRS.
 
     Parameters
@@ -101,9 +101,6 @@ def body_centered_to_icrs(r, v, source_body, epoch=None, rotate_meridian=False):
     """
 
     # All epochs must be in TDB
-    if not epoch:
-        epoch = time.Time('J2000', scale='tdb')
-
     T = (epoch.tdb - J2000).to('day').value / 36525
     d = (epoch.tdb - J2000).to('day').value
 
@@ -127,7 +124,7 @@ def body_centered_to_icrs(r, v, source_body, epoch=None, rotate_meridian=False):
     return r_f, v_f
 
 
-def icrs_to_body_centered(r, v, target_body, epoch=None, rotate_meridian=False):
+def icrs_to_body_centered(r, v, target_body, epoch=J2000, rotate_meridian=False):
     """Converts position and velocity in ICRS to body-centered frame.
 
     Parameters
@@ -150,6 +147,7 @@ def icrs_to_body_centered(r, v, target_body, epoch=None, rotate_meridian=False):
 
     """
 
+    # All epochs must be in TDB
     T = (epoch.tdb - J2000).to('day').value / 36525
     d = (epoch.tdb - J2000).to('day').value
 
