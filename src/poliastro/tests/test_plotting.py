@@ -49,6 +49,7 @@ def test_number_of_lines_for_osculating_orbit():
     assert len(l1) == 1
     assert len(l2) == 2
 
+
 def test_orbit_propagation():
     op1 = OrbitPlotter()
     op2 = OrbitPlotter()
