@@ -57,7 +57,7 @@ def test_spk_id_from_name_raises_when_error(mock_get):
 @mock.patch('poliastro.neos.neows.requests.Response')
 @mock.patch('poliastro.neos.neows.requests.get')
 def test_spk_id_from_name_parses_body(mock_get, mock_response):
-    with open('src/poliastro/tests/table.html', 'r') as demo_html:
+    with open('src/poliastro/neos/tests/table.html', 'r') as demo_html:
         html = demo_html.read().replace('\n', '')
 
     mock_response.text = html
@@ -68,7 +68,7 @@ def test_spk_id_from_name_parses_body(mock_get, mock_response):
 @mock.patch('poliastro.neos.neows.requests.Response')
 @mock.patch('poliastro.neos.neows.requests.get')
 def test_spk_id_from_name_parses_object_list_and_raises(mock_get, mock_response):
-    with open('src/poliastro/tests/center.html', 'r') as demo_html:
+    with open('src/poliastro/neos/tests/center.html', 'r') as demo_html:
         html = demo_html.read().replace('\n', '')
 
     mock_response.text = html
@@ -81,7 +81,7 @@ def test_spk_id_from_name_parses_object_list_and_raises(mock_get, mock_response)
 @mock.patch('poliastro.neos.neows.requests.Response')
 @mock.patch('poliastro.neos.neows.requests.get')
 def test_spk_id_from_name_raises_when_not_found(mock_get, mock_response):
-    with open('src/poliastro/tests/none.html', 'r') as demo_html:
+    with open('src/poliastro/neos/tests/none.html', 'r') as demo_html:
         html = demo_html.read().replace('\n', '')
     mock_response.text = html
     mock_get.return_value = mock_response
