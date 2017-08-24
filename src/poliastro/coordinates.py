@@ -121,7 +121,7 @@ def body_centered_to_icrs(r, v, source_body, epoch=J2000, rotate_meridian=False)
 
     # icrs_coord = coordinates.ICRS(x=r_f[0], y=r_f[1], z=r_f[2], v_x=v_f[0], v_y=v_f[1],
     #                              v_z=v_f[2], representation='cartesian')
-    return r_f, v_f
+    return r_f.to(r.unit), v_f.to(v.unit)
 
 
 def icrs_to_body_centered(r, v, target_body, epoch=J2000, rotate_meridian=False):
@@ -164,4 +164,5 @@ def icrs_to_body_centered(r, v, target_body, epoch=J2000, rotate_meridian=False)
     if rotate_meridian:
         r_f = transform(r_f, bodies_orientations[target_body.name]['W'], 'z', u.deg)
         v_f = transform(v_f, bodies_orientations[target_body.name]['W'], 'z', u.deg)
-    return r_f, v_f
+
+    return r_f.to(r.unit), v_f.to(v.unit)
