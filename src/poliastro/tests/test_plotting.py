@@ -5,7 +5,7 @@ import astropy.units as u
 
 import matplotlib.pyplot as plt
 
-from poliastro.examples import iss
+from poliastro.examples import iss, molniya
 
 from poliastro.plotting import OrbitPlotter
 
@@ -48,3 +48,20 @@ def test_number_of_lines_for_osculating_orbit():
 
     assert len(l1) == 1
     assert len(l2) == 2
+
+def test_orbit_propagation():
+    op1 = OrbitPlotter()
+    op2 = OrbitPlotter()
+    ss1 = iss
+    ss2 = molniya
+
+    op1.plot(ss1)
+    op1.plot(ss2)
+
+    op2.plot(ss1)
+    op2.plot(ss2, propagate=True)
+
+    assert op1.ax.title.get_text() == ss2.epoch.iso
+    assert op2.ax.title.get_text() == ss1.epoch.iso
+    assert op1._orbits[1].epoch.tdb.iso == ss2.epoch.tdb.iso
+    assert op2._orbits[1].epoch.tdb.iso == ss1.epoch.tdb.iso
