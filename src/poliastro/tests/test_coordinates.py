@@ -5,6 +5,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from poliastro import coordinates, bodies
 from poliastro.constants import J2000
 
+
 # Note that function are tested using astropy current builtin ephemeris.
 # Horizons uses JPL ephemeris DE431, so expected values are hardcoded,
 # instead of being obtained using Horizons.
@@ -35,4 +36,3 @@ def test_icrs_to_body_centered_transformation():
 
     assert_quantity_allclose(r, expected_r)
     assert_quantity_allclose(v, expected_v)
-
