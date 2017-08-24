@@ -97,6 +97,12 @@ poliastro.constants module
 .. automodule:: poliastro.constants
     :members:
 
+poliastro.coordinates module
+----------------------------
+
+.. automodule:: poliastro.coordinates
+    :members:
+
 poliastro.cli module
 --------------------
 

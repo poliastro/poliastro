@@ -1,6 +1,6 @@
 """Functions related to coordinate systems and transformations.
 
-This module complements `~astropy.coordinates`.
+This module complements :py:mod:`astropy.coordinates`.
 
 """
 
@@ -94,10 +94,9 @@ def body_centered_to_icrs(r, v, source_body, epoch=None, rotate_meridian=False):
 
     Returns
     -------
-    r : ~astropy.units.Quantity
-        Position vector in ICRS.
-    v : ~astropy.units.Quantity
-        Velocity vector in ICRS.
+    r, v : tuple (~astropy.units.Quantity)
+        Position and velocity vectors in ICRS.
+
 
     """
 
@@ -146,10 +145,8 @@ def icrs_to_body_centered(r, v, target_body, epoch=None, rotate_meridian=False):
 
     Returns
     -------
-    r : ~astropy.units.Quantity
-        Position vector in a body-centered reference frame.
-    v : ~astropy.units.Quantity
-        Velocity vector in a body-centered reference frame.
+    r, v : tuple (~astropy.units.Quantity)
+        Position and velocity vectors in a body-centered reference frame.
 
     """
 
