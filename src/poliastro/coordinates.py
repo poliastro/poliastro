@@ -42,10 +42,10 @@ bodies_orientations = {
         "W": 176.630 + 350.89198226 * d
     },
     "Jupiter": {
-        "ra": 268.056595 - 0.006499 * T + 0.000117 * math.sin(Ja) + 0.000938 * math.sin(Jb)
-              + 0.001432 * math.sin(Jc) + 0.000030 * math.sin(Jd) + 0.002150 * math.sin(Je),
-        "dec": 64.495303 + 0.002413 * T + 0.000050 * math.cos(Ja) + 0.000404 * math.cos(Jb)
-               + 0.000617 * math.cos(Jc) - 0.000013 * math.cos(Jd) + 0.000926 * math.cos(Je),
+        "ra": 268.056595 - 0.006499 * T + 0.000117 * math.sin(Ja) + 0.000938 * math.sin(Jb) +
+        0.001432 * math.sin(Jc) + 0.000030 * math.sin(Jd) + 0.002150 * math.sin(Je),
+        "dec": 64.495303 + 0.002413 * T + 0.000050 * math.cos(Ja) + 0.000404 * math.cos(Jb) +
+        0.000617 * math.cos(Jc) - 0.000013 * math.cos(Jd) + 0.000926 * math.cos(Je),
         "W": 284.95 + 870.5366420 * d
     },
     "Saturn": {
