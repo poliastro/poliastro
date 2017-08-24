@@ -57,7 +57,7 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
-        self._states = []  # type: list
+        self._orbits = []  # type: list
         self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
@@ -112,8 +112,8 @@ class OrbitPlotter(object):
 
         # Propagates backwards of forwards to the last added orbit epoch.
         if propagate:
-            if self._states:
-                orbit = orbit.propagate(self._states[-1].epoch - orbit.epoch)
+            if self._orbits:
+                orbit = orbit.propagate(self._orbits[-1].epoch - orbit.epoch)
 
         # if new attractor radius is smaller, plot it
         new_radius = max(orbit.attractor.R.to(u.km).value,
@@ -123,7 +123,7 @@ class OrbitPlotter(object):
         elif new_radius < self._attractor_radius:
             self.set_attractor(orbit)
 
-        self._states.append(orbit)
+        self._orbits.append(orbit)
 
         lines = []
 
