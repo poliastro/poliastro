@@ -196,10 +196,12 @@ class _Jupiter(_Body):
         Jd = (114.012305 + 6070.2476 * T) * u.deg
         Je = (49.511251 + 64.3000 * T) * u.deg
 
-        ra = (268.056595 - 0.006499 * T + 0.000117 * math.sin(Ja) + 0.000938 * math.sin(Jb) +
-              0.001432 * math.sin(Jc) + 0.000030 * math.sin(Jd) + 0.002150 * math.sin(Je)) * u.deg
-        dec = (64.495303 + 0.002413 * T + 0.000050 * math.cos(Ja) + 0.000404 * math.cos(Jb) +
-               0.000617 * math.cos(Jc) - 0.000013 * math.cos(Jd) + 0.000926 * math.cos(Je)) * u.deg
+        ra = (268.056595 - 0.006499 * T + 0.000117 * math.sin(Ja.to('rad').value) +
+              0.000938 * math.sin(Jb.to('rad').value) + 0.001432 * math.sin(Jc.to('rad').value) +
+              0.000030 * math.sin(Jd.to('rad').value) + 0.002150 * math.sin(Je.to('rad').value)) * u.deg
+        dec = (64.495303 + 0.002413 * T + 0.000050 * math.cos(Ja.to('rad').value) +
+               0.000404 * math.cos(Jb.to('rad').value) + 0.000617 * math.cos(Jc.to('rad').value) -
+               0.000013 * math.cos(Jd.to('rad').value) + 0.000926 * math.cos(Je.to('rad').value)) * u.deg
         W = (284.95 + 870.5366420 * d) * u.deg
 
         return ra, dec, W
@@ -249,9 +251,9 @@ class _Neptune(_Body):
     def _rot_elements_at_epoch(T, d):
         N = (357.85 + 52.316 * T) * u.deg
 
-        ra = (299.36 + 0.70 * math.sin(N)) * u.deg
-        dec = (43.46 - 0.51 * math.cos(N)) * u.deg
-        W = (253.18 + 536.3128492 * d - 0.48 * math.sin(N)) * u.deg
+        ra = (299.36 + 0.70 * math.sin(N.to('rad').value)) * u.deg
+        dec = (43.46 - 0.51 * math.cos(N.to('rad').value)) * u.deg
+        W = (253.18 + 536.3128492 * d - 0.48 * math.sin(N.to('rad').value)) * u.deg
 
         return ra, dec, W
 
