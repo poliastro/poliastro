@@ -136,9 +136,9 @@ class _Venus(_Body):
     @d_and_t_from_epoch
     def rot_elements_at_epoch(T, d):
 
-        ra = (281.01 - 0.033 * T) * u.deg
-        dec = (61.45 - 0.005 * T) * u.deg
-        W = (329.548 + 6.1385025 * d) * u.deg
+        ra = 272.76 * u.deg
+        dec = 67.16 * u.deg
+        W = (160.20 - 1.4813688 * d) * u.deg
 
         return ra, dec, W
 
