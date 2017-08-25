@@ -37,9 +37,8 @@ before_install:
 
 install:
   - pip install numpy  # Required
-  - pip install pep8 mypy
-  - pip install sphinx sphinx_rtd_theme nbsphinx ipython  # Install documentation dependencies
   - pip install .  # Test installation correctness
+  - pip install .[dev]  # Test development dependencies
 
 before_script:
   - pep8 setup.py src/  # Check PEP8 compliance

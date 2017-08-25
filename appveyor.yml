@@ -29,13 +29,11 @@ install:
   # Check that we have the expected version of Python
   - "python --version"
 
-  # Install testing dependencies
-  - "pip install pytest codecov pytest-benchmark sphinx sphinx_rtd_theme nbsphinx IPython ipykernel"
-
   # Install dependencies
   - "conda install -q numpy scipy pandoc"
   - "pip install ."  # Test installation correctness
-  
+  - "pip install .[dev]"  # Test development dependencies
+
 build: off
 
 test_script:
