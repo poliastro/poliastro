@@ -137,6 +137,13 @@ elements we can access many mathematical properties individually using the
 To see a complete list of properties, check out the
 :py:class:`poliastro.twobody.orbit.Orbit` class on the API reference.
 
+Moving forward in time: propagation
+-----------------------------------
+
+Now that we have defined an orbit, we might be interested in computing
+how is it going to evolve in the future. In the context of orbital
+mechanics, this process is known as **propagation**.
+
 Changing the orbit: :py:class:`~poliastro.maneuver.Maneuver` objects
 --------------------------------------------------------------------
 
