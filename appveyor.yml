@@ -37,5 +37,5 @@ install:
 build: off
 
 test_script:
-  - "pytest -vv --benchmark-skip"  # Test against installed code
+  - "python setup.py test -vv"  # Test against installed code
   - "sphinx-build -vW -b html docs/source _HTMLTest" # Test docs build
