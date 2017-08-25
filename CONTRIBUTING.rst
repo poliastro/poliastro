@@ -27,6 +27,21 @@ any inconsistency or opportunity for improvement, you can edit those too.
 Besides, the `wiki`_ is open for everybody to edit, so feel free to add
 new content.
 
+To build the docs, you must first create a development environment (see
+below) and then in the ``docs/`` directory run::
+
+    $ cd docs
+    $ make html
+
+After this, the new docs will be inside ``build/html``. You can open
+them by running an HTTP server:
+
+    $ cd build/html
+    $ python -m http.server
+    Serving HTTP on 0.0.0.0 port 8000 ...
+
+And point your browser to http://0.0.0.0:8000.
+
 Code writing
 ------------
 
