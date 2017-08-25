@@ -31,17 +31,6 @@ University tasks. I removed the MATLAB (Octave) code and kept only the
 Fortran algorithms. Finally, when numba was mature enough, I implemented
 everything in pure Python and poliastro 0.3 was born.
 
-Future ideas
-------------
-
-These are some things that I would love to implement in poliastro to expand
-its capabilities:
-
-* 3D plotting of orbits
-* Continuous thrust maneuvers
-* Tisserand graphs
-* Porkchop plots
-
 Related software
 ----------------
 
@@ -79,12 +68,24 @@ served as inspiration:
 .. _orbital: http://pythonhosted.org/OrbitalPy/
 .. _orekit-python-wrapper: https://www.orekit.org/forge/projects/orekit-python-wrapper/wiki
 
-About the author
-----------------
+Future ideas
+------------
+
+These are some things that I would love to implement in poliastro to expand
+its capabilities:
+
+* 3D plotting of orbits
+* Continuous thrust maneuvers
+* Tisserand graphs
+* Porkchop plots
+
+Note of the original author
+---------------------------
 
 I am Juan Luis Cano Rodríguez (two names and two surnames, it's the Spanish
 way!), an Aerospace Engineer with a passion for Astrodynamics
-and the Open Source world. I started poliastro when I was an Erasmus student
+and the Open Source world. Before poliastro started to be a truly community
+project, I started it when I was an Erasmus student
 at Politecnico di Milano, an important technical university in Italy which
 deeply influenced my life and ambitions and gave name to the library itself.
 It is and always will be my tiny tribute to a country that will always be in
