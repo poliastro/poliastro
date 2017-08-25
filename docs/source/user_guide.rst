@@ -338,7 +338,7 @@ For example, we can get `Apophis asteroid (99942 Apophis)`_ orbit with one comma
     op.plot(earth_orbit, label='Earth')
     op.plot(apophis_orbit, label='Apophis')
 
-.. figure:: _static/apophis.png
+.. figure:: _static/neos.png
    :align: center
    :alt: Apophis asteroid orbit
    
