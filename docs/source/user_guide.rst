@@ -142,7 +142,31 @@ Moving forward in time: propagation
 
 Now that we have defined an orbit, we might be interested in computing
 how is it going to evolve in the future. In the context of orbital
-mechanics, this process is known as **propagation**.
+mechanics, this process is known as **propagation**, and can be
+performed with the ``propagate`` method of
+:py:class:`~poliastro.twobody.orbit.Orbit` objects::
+
+    >>> from poliastro.examples import iss
+    >>> iss
+    6772 x 6790 km x 51.6 deg orbit around Earth (♁)
+    >>> iss.epoch
+    <Time object: scale='utc' format='iso' value=2013-03-18 12:00:00.000>
+    >>> iss.nu.to(u.deg)
+    <Quantity 46.595804677061956 deg>
+    >>> iss.n.to(u.deg / u.min)
+    <Quantity 3.887010576192155 deg / min>
+
+Using the :py:meth:`~poliastro.twobody.orbit.Orbit.propagate` method
+we can now retrieve the position of the ISS after some time::
+
+    >>> iss_30m = iss.propagate(30 * u.min)
+    >>> iss_30m.epoch  # Notice we advanced the epoch!
+    <Time object: scale='utc' format='iso' value=2013-03-18 12:30:00.000>
+    >>> iss_30m.nu.to(u.deg)
+    <Quantity 163.1409357544868 deg>
+
+For more advanced propagation options, check out the
+:py:mod:`poliastro.twobody.propagation` module.
 
 Changing the orbit: :py:class:`~poliastro.maneuver.Maneuver` objects
 --------------------------------------------------------------------
