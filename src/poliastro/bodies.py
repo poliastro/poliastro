@@ -45,8 +45,7 @@ class _Body(object):
     def __repr__(self):
         return self.__str__()
 
-    @staticmethod
-    def rot_elements_at_epoch(epoch):
+    def rot_elements_at_epoch(self, epoch):
         """Provides rotational elements at epoch.
 
         Provides north pole of body and angle to prime meridian
@@ -62,6 +61,12 @@ class _Body(object):
             Right ascension and declination of north pole, and angle of the prime meridian.
 
         """
+        T = (epoch.tdb - constants.J2000).to('day').value / 36525
+        d = (epoch.tdb - constants.J2000).to('day').value
+        return self._rot_elements_at_epoch(T, d)
+
+    @staticmethod
+    def _rot_elements_at_epoch(T, d):
         raise NotImplementedError('Function only defined for some Solar System bodies')
 
 
@@ -116,8 +121,7 @@ class _Mercury(_Body):
     R = constants.R_mercury
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
         ra = (281.01 - 0.033 * T) * u.deg
         dec = (61.45 - 0.005 * T) * u.deg
         W = (329.548 + 6.1385025 * d) * u.deg
@@ -133,8 +137,7 @@ class _Venus(_Body):
     R = constants.R_venus
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
 
         ra = 272.76 * u.deg
         dec = 67.16 * u.deg
@@ -151,8 +154,7 @@ class _Earth(_Body):
     R = constants.R_earth
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
 
         ra = (0.00 - 0.641 * T) * u.deg
         dec = (90.00 - 0.557 * T) * u.deg
@@ -169,8 +171,7 @@ class _Mars(_Body):
     R = constants.R_mars
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
 
         ra = (317.68143 - 0.1061 * T) * u.deg
         dec = (52.88650 - 0.0609 * T) * u.deg
@@ -187,8 +188,7 @@ class _Jupiter(_Body):
     R = constants.R_jupiter
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
 
         Ja = (99.360714 + 4850.4046 * T) * u.deg
         Jb = (175.895369 + 1191.9605 * T) * u.deg
@@ -213,8 +213,7 @@ class _Saturn(_Body):
     R = constants.R_saturn
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
 
         ra = (40.589 - 0.036 * T) * u.deg
         dec = (83.537 - 0.004 * T) * u.deg
@@ -231,8 +230,7 @@ class _Uranus(_Body):
     R = constants.R_uranus
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
         ra = 257.311 * u.deg
         dec = -15.175 * u.deg
         W = (203.81 - 501.1600928 * d) * u.deg
@@ -248,8 +246,9 @@ class _Neptune(_Body):
     R = constants.R_neptune
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
+        N = (357.85 + 52.316 * T) * u.deg
+
         ra = (299.36 + 0.70 * math.sin(N)) * u.deg
         dec = (43.46 - 0.51 * math.cos(N)) * u.deg
         W = (253.18 + 536.3128492 * d - 0.48 * math.sin(N)) * u.deg
@@ -265,8 +264,7 @@ class _Pluto(_Body):
     R = constants.R_pluto
 
     @staticmethod
-    @d_and_t_from_epoch
-    def rot_elements_at_epoch(T, d):
+    def _rot_elements_at_epoch(T, d):
         ra = 312.993 * u.deg
         dec = 6.163 * u.deg
         W = (190.147 + 360.9856235 * d) * u.deg
