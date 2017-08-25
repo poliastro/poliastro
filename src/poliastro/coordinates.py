@@ -40,20 +40,19 @@ def body_centered_to_icrs(r, v, source_body, epoch=J2000, rotate_meridian=False)
 
     ra, dec, W = source_body.rot_elements_at_epoch(epoch)
     if rotate_meridian:
-        r = transform(r, -W.value, 'z', W.unit)
-        v = transform(v, -W.value, 'z', W.unit)
+        r = transform(r, -W, 'z')
+        v = transform(v, -W, 'z')
 
-    r_trans1 = transform(r, -(90 - dec.value), 'x', dec.unit)
-    r_trans2 = transform(r_trans1, -(90 + ra.value), 'z', ra.unit)
+    r_trans1 = transform(r, -(90 * u.deg - dec), 'x')
+    r_trans2 = transform(r_trans1, -(90 * u.deg + ra), 'z')
 
-    v_trans1 = transform(v, -(90 - dec.value), 'x', dec.unit)
-    v_trans2 = transform(v_trans1, -(90 + ra.value), 'z', ra.unit)
+    v_trans1 = transform(v, -(90 * u.deg - dec), 'x')
+    v_trans2 = transform(v_trans1, -(90 * u.deg + ra), 'z')
 
     icrs_frame_pos_coord, icrs_frame_vel_coord = coordinates.get_body_barycentric_posvel(source_body.name, time=epoch)
 
     r_f = icrs_frame_pos_coord.xyz + r_trans2
     v_f = icrs_frame_vel_coord.xyz + v_trans2
-
 
     return r_f.to(r.unit), v_f.to(v.unit)
 
@@ -86,15 +85,15 @@ def icrs_to_body_centered(r, v, target_body, epoch=J2000, rotate_meridian=False)
     icrs_frame_pos_coord, icrs_frame_vel_coord = coordinates.get_body_barycentric_posvel(target_body.name, time=epoch)
 
     r_trans1 = r - icrs_frame_pos_coord.xyz
-    r_trans2 = transform(r_trans1, (90 + ra.value), 'z', ra.unit)
-    r_f = transform(r_trans2, (90 - dec.value), 'x', dec.unit)
+    r_trans2 = transform(r_trans1, (90 * u.deg + ra), 'z')
+    r_f = transform(r_trans2, (90 * u.deg - dec), 'x')
 
     v_trans1 = v - icrs_frame_vel_coord.xyz
-    v_trans2 = transform(v_trans1, (90 + ra.value), 'z', ra.unit)
-    v_f = transform(v_trans2, (90 - dec.value), 'x', dec.unit)
+    v_trans2 = transform(v_trans1, (90 * u.deg + ra), 'z')
+    v_f = transform(v_trans2, (90 * u.deg - dec), 'x')
 
     if rotate_meridian:
-        r_f = transform(r_f, W.value, 'z', W.unit)
-        v_f = transform(v_f, W.value, 'z', W.unit)
+        r_f = transform(r_f, W, 'z')
+        v_f = transform(v_f, W, 'z')
 
     return r_f.to(r.unit), v_f.to(v.unit)
