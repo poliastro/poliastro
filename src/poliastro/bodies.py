@@ -110,6 +110,14 @@ class _Sun(_Body):
     symbol = u"\u2609"
     R = constants.R_sun
 
+    @staticmethod
+    def _rot_elements_at_epoch(T, d):
+        ra = 286.13 * u.deg
+        dec = 63.87 * u.deg
+        W = (84.176 + 14.1844000 * d) * u.deg
+
+        return ra, dec, W
+
 Sun = _Sun()
 
 
@@ -292,5 +300,39 @@ class _Moon(_Body):
     name = "Moon"
     symbol = u"\u263E"
     R = constants.R_moon
+
+    @staticmethod
+    def _rot_elements_at_epoch(T, d):
+        E1 = (125.045 - 0.0529921 * d) * u.deg
+        E2 = (250.089 - 0.1059842 * d) * u.deg
+        E3 = (260.008 + 13.0120009 * d) * u.deg
+        E4 = (176.625 + 13.3407154 * d) * u.deg
+        E5 = (357.529 + 0.9856003 * d) * u.deg
+        E6 = (311.589 + 26.4057084 * d) * u.deg
+        E7 = (134.963 + 13.0649930 * d) * u.deg
+        E8 = (276.617 + 0.3287146 * d) * u.deg
+        E9 = (34.226 + 1.7484877 * d) * u.deg
+        E10 = (15.134 - 0.1589763 * d) * u.deg
+        E11 = (119.743 + 0.0036096 * d) * u.deg
+        E12 = (239.961 + 0.1643573 * d) * u.deg
+        E13 = (25.053 + 12.9590088 * d) * u.deg
+
+        ra = (269.9949 + 0.0031 * T - 3.8787 * math.sin(E1.to('rad').value) - 0.1204 * math.sin(E2.to('rad').value) +
+              0.0700 * math.sin(E3.to('rad').value) - 0.0172 * math.sin(E4.to('rad').value) +
+              0.0072 * math.sin(E6.to('rad').value) - 0.0052 * math.sin(E10.to('rad').value) +
+              0.0043 * math.sin(E13.to('rad').value)) * u.deg
+        dec = (66.5392 + 0.0130 * T + 1.5419 * math.cos(E1.to('rad').value) + 0.0239 * math.cos(E2.to('rad').value) -
+               0.0278 * math.cos(E3.to('rad').value) + 0.0068 * math.cos(E4.to('rad').value) -
+               0.0029 * math.cos(E6.to('rad').value) + 0.0009 * math.cos(E7.to('rad').value) +
+               0.0008 * math.cos(E10.to('rad').value) - 0.0009 * math.cos(E13.to('rad').value)) * u.deg
+        W = (38.321 + 13.17635815 * d - 1.4e-12 * d ** 2 + 3.5610 * math.sin(E1.to('rad').value) +
+             0.1208 * math.sin(E2.to('rad').value) - 0.0642 * math.sin(E3.to('rad').value) +
+             0.0158 * math.sin(E4.to('rad').value) + 0.0252 * math.sin(E5.to('rad').value) -
+             0.0066 * math.sin(E6.to('rad').value) - 0.0047 * math.sin(E7.to('rad').value) -
+             0.0046 * math.sin(E8.to('rad').value) + 0.0028 * math.sin(E9.to('rad').value) +
+             0.0052 * math.sin(E10.to('rad').value) + 0.0040 * math.sin(E11.to('rad').value) +
+             0.0019 * math.sin(E12.to('rad').value) - 0.0044 * math.sin(E13.to('rad').value)) * u.deg
+
+        return ra, dec, W
 
 Moon = _Moon()
