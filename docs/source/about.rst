@@ -61,12 +61,23 @@ served as inspiration:
   JCC. Orekit is a well-stablished, mature open source library for
   Astrodynamics written in Java strongly supported by several space agencies.
   The Python wrapper is developed by the Swedish Space Corporation.
+* `beyond`_: A young flight dynamics library written in Python with a focus
+  on developing "a simple API for space observations". Some parts overlap
+  with poliastro, but it also introduces many interesting features, and the
+  examples look promising. Worth checking!
+* `SpiceyPy`_: This Python library wraps the SPICE Toolkit, a huge software
+  collection developed by NASA which offers advanced astrodynamics
+  functionality. Among all the wrappers available on the Internet, at the
+  time of writing this is the most advanced and well-maintained one,
+  although there are others.
 
 .. _astropy: http://www.astropy.org/
 .. _Skyfield: http://rhodesmill.org/skyfield/
 .. _Plyades: http://plyades.readthedocs.org/en/latest/
 .. _orbital: http://pythonhosted.org/OrbitalPy/
 .. _orekit-python-wrapper: https://www.orekit.org/forge/projects/orekit-python-wrapper/wiki
+.. _beyond: https://github.com/galactics/beyond/
+.. _SpiceyPy: https://github.com/andrewannex/SpiceyPy
 
 Future ideas
 ------------
