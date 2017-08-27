@@ -13,9 +13,7 @@ from poliastro.twobody.propagation import propagate
 import poliastro.twobody.rv
 import poliastro.twobody.classical
 import poliastro.twobody.equinoctial
-
-
-J2000 = time.Time("J2000", scale='utc')
+from poliastro.constants import J2000
 
 
 class Orbit(object):
