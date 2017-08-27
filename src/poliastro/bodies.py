@@ -20,22 +20,9 @@ and a way to define new bodies (:py:class:`~Body` class).
 Data references can be found in :py:mod:`~poliastro.constants`
 """
 import math
-from functools import wraps
 
 from astropy import units as u
 from poliastro import constants
-
-
-def d_and_t_from_epoch(func):
-
-    @wraps(func)
-    def wrapper(epoch):
-        T = (epoch.tdb - constants.J2000).to('day').value / 36525
-        d = (epoch.tdb - constants.J2000).to('day').value
-
-        return func(T, d)
-
-    return wrapper
 
 
 class _Body(object):
