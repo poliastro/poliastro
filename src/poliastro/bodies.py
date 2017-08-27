@@ -133,7 +133,6 @@ class _Venus(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-
         ra = 272.76 * u.deg
         dec = 67.16 * u.deg
         W = (160.20 - 1.4813688 * d) * u.deg
@@ -150,7 +149,6 @@ class _Earth(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-
         ra = (0.00 - 0.641 * T) * u.deg
         dec = (90.00 - 0.557 * T) * u.deg
         W = (190.147 + 360.9856235 * d) * u.deg
@@ -167,7 +165,6 @@ class _Mars(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-
         ra = (317.68143 - 0.1061 * T) * u.deg
         dec = (52.88650 - 0.0609 * T) * u.deg
         W = (176.630 + 350.89198226 * d) * u.deg
@@ -184,7 +181,6 @@ class _Jupiter(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-
         Ja = (99.360714 + 4850.4046 * T) * u.deg
         Jb = (175.895369 + 1191.9605 * T) * u.deg
         Jc = (300.323162 + 262.5475 * T) * u.deg
@@ -211,7 +207,6 @@ class _Saturn(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-
         ra = (40.589 - 0.036 * T) * u.deg
         dec = (83.537 - 0.004 * T) * u.deg
         W = (38.90 + 810.7939024 * d) * u.deg
