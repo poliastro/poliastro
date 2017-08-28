@@ -7,13 +7,16 @@ from astropy import units as u
 
 from astropy import time
 
+from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem
 from poliastro.twobody.propagation import propagate
 
 import poliastro.twobody.rv
 import poliastro.twobody.classical
 import poliastro.twobody.equinoctial
-from poliastro.constants import J2000
+
+
+ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
 
 
 class Orbit(object):
@@ -188,6 +191,20 @@ class Orbit(object):
 
         ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
         return ss
+
+    def __str__(self):
+        if self.a > 1e7 * u.km:
+            unit = u.au
+        else:
+            unit = u.km
+
+        return ORBIT_FORMAT.format(
+            r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
+            body=self.attractor
+        )
+
+    def __repr__(self):
+        return self.__str__()
 
     def propagate(self, time_of_flight, rtol=1e-10):
         """Propagate this `Orbit` some `time` and return the result.

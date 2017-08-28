@@ -27,7 +27,7 @@
    :target: https://lima.codeclimate.com/github/poliastro/poliastro
 
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
-   :target: http://poliastro.readthedocs.io/en/latest/?badge=latest
+   :target: http://docs.poliastro.space/en/latest/?badge=latest
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/master/COPYING
@@ -69,7 +69,7 @@ Documentation
 Complete documentation, including a user guide and an API reference, can be read on
 the wonderful `Read the Docs`_.
 
-http://poliastro.readthedocs.io/en/latest/
+http://docs.poliastro.space/en/latest/
 
 .. _`Read the Docs`: http://readthedocs.io/
 
@@ -119,37 +119,9 @@ install poliastro using `conda <http://conda.io>`_::
 
   $ conda install poliastro --channel conda-forge
 
-You can also `install poliastro from PyPI`_ using pip, given that you already
-have all the requirements::
+Please check out the `documentation for alternative installation methods`_.
 
-  $ pip install poliastro
-
-You can also `download poliastro source from GitHub`_ and type::
-
-  $ pip install .
-
-Development installations are also supported::
-
-  $ pip install -e .
-
-.. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
-.. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
-
-.. warning::
-
-    It is recommended that you **never ever use sudo** with distutils, pip,
-    setuptools and friends in Linux because you might seriously break your
-    system [1_][2_][3_][4_]. Options are `per user directories`_, `virtualenv`_
-    or `local installations`_.
-
-.. _1: http://wiki.python.org/moin/CheeseShopTutorial#Distutils_Installation
-.. _2: http://stackoverflow.com/questions/4314376/how-can-i-install-a-python-egg-file/4314446#comment4690673_4314446
-.. _3: http://workaround.org/easy-install-debian
-.. _4: http://matplotlib.1069221.n5.nabble.com/Why-is-pip-not-mentioned-in-the-Installation-Documentation-tp39779p39812.html
-
-.. _`per user directories`: http://stackoverflow.com/a/7143496/554319
-.. _`virtualenv`: http://pypi.python.org/pypi/virtualenv
-.. _`local installations`: http://stackoverflow.com/a/4325047/554319
+.. _`documentation for alternative installation methods`: http://docs.poliastro.space/en/latest/getting_started.html#alternative-installation-methods
 
 Testing
 =======
@@ -163,6 +135,14 @@ If installed correctly, the tests can be run using pytest::
   [...]
   OK
   $ 
+
+Problems
+========
+
+If the installation fails or you find something that doesn't work as expected,
+please open an issue in the `issue tracker`_.
+
+.. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 
 Contributing
 ============
@@ -236,7 +216,7 @@ Keep that in mind when asking for a feature. For a software package focused on
 Earth applications please refer to the `Python Astrodynamics Project`_, a
 still in progress joint effort between several developers.
 
-.. _`Related software`: http://poliastro.readthedocs.io/en/latest/about.html#related-software
+.. _`Related software`: http://docs.poliastro.space/en/latest/about.html#related-software
 .. _`Python Astrodynamics Project`: https://github.com/python-astrodynamics/astrodynamics
 
 What's the future of the project?

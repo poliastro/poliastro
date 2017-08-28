@@ -21,25 +21,48 @@ Installation
 ------------
 
 The easiest and fastest way to get the package up and running is to
-install poliastro using `conda <http://conda.io>`_::
+install poliastro using `conda <https://conda.io/docs/>`_::
 
   $ conda install poliastro --channel conda-forge
 
-You can also `install poliastro from PyPI`_ using pip, given that you already
-have all the requirements::
+.. note::
 
+    We encourage users to use conda and the
+    `conda-forge <https://conda-forge.org/>`_ packages for convenience,
+    especially when developing on Windows.
+
+If the installation fails for any reason, please open an issue in the
+`issue tracker`_.
+
+Alternative installation methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you don't want to use conda you can `install poliastro from PyPI`_ on Linux
+and OS X using pip::
+
+  $ pip install numpy  # Run this one first!
+  $ pip install scipy  # If this does not work, use conda
   $ pip install poliastro
 
-You can also `download poliastro source from GitHub`_ and type::
+If your platform is supported you can also install the accelerated version of
+poliastro using pip::
 
-  $ pip install .
+  $ pip install poliastro[fast]
 
-Development installations are also supported thanks to setuptools::
+However keep in mind that conda does this automatically on all platforms.
 
-  $ pip install -e .
+Finally, you can also install the latest development version of poliastro
+`directly from GitHub`_::
+
+  $ pip install https://github.com/poliastro/poliastro/archive/master.zip
+
+This is useful if there is some feature that you want to try, but we did not
+release it yet as a stable version. Although you might find some unpolished
+details, these development installations should work without problems. If
+you find any, please open an issue in the `issue tracker`_.
 
 .. _`install poliastro from PyPI`: https://pypi.python.org/pypi/poliastro/
-.. _`download poliastro source from GitHub`: http://github.com/poliastro/poliastro
+.. _`directly from GitHub`: http://github.com/poliastro/poliastro
 
 .. warning::
 

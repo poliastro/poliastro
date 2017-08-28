@@ -16,11 +16,17 @@ First of all, we have to import the relevant modules and classes:
 
 .. code-block:: python
 
+    # If using the Jupyter notebook, use %matplotlib inline
+    %matplotlib inline
+
     import numpy as np
+    import matplotlib.pyplot as plt
     from astropy import units as u
-    
-    from poliastro.bodies import Earth, Sun
+
+    from poliastro.bodies import Earth, Mars, Sun
     from poliastro.twobody import Orbit
+
+    plt.style.use("seaborn")  # Recommended
 
 From position and velocity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,14 +41,20 @@ position and velocity vectors we can use
     # Data from Curtis, example 4.3
     r = [-6045, -3490, 2500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
-    
+
     ss = Orbit.from_vectors(Earth, r, v)
 
 And that's it! Notice a couple of things:
 
 * Defining vectorial physical quantities using Astropy units is very easy.
-  The list is automatically converted to a :code:`Quantity`, which is actually
-  a subclass of NumPy arrays.
+  The list is automatically converted to a :py:mod:`astropy.units.Quantity`,
+  which is actually a subclass of NumPy arrays.
+* If we display the orbit we just created, we get a string with the radius of
+  pericenter, radius of apocenter, inclination and attractor::
+
+    >>> ss
+    7283 x 10293 km x 153.2 deg orbit around Earth (♁)
+
 * If no time is specified, then a default value is assigned::
 
     >>> ss.epoch
@@ -125,6 +137,37 @@ elements we can access many mathematical properties individually using the
 To see a complete list of properties, check out the
 :py:class:`poliastro.twobody.orbit.Orbit` class on the API reference.
 
+Moving forward in time: propagation
+-----------------------------------
+
+Now that we have defined an orbit, we might be interested in computing
+how is it going to evolve in the future. In the context of orbital
+mechanics, this process is known as **propagation**, and can be
+performed with the ``propagate`` method of
+:py:class:`~poliastro.twobody.orbit.Orbit` objects::
+
+    >>> from poliastro.examples import iss
+    >>> iss
+    6772 x 6790 km x 51.6 deg orbit around Earth (♁)
+    >>> iss.epoch
+    <Time object: scale='utc' format='iso' value=2013-03-18 12:00:00.000>
+    >>> iss.nu.to(u.deg)
+    <Quantity 46.595804677061956 deg>
+    >>> iss.n.to(u.deg / u.min)
+    <Quantity 3.887010576192155 deg / min>
+
+Using the :py:meth:`~poliastro.twobody.orbit.Orbit.propagate` method
+we can now retrieve the position of the ISS after some time::
+
+    >>> iss_30m = iss.propagate(30 * u.min)
+    >>> iss_30m.epoch  # Notice we advanced the epoch!
+    <Time object: scale='utc' format='iso' value=2013-03-18 12:30:00.000>
+    >>> iss_30m.nu.to(u.deg)
+    <Quantity 163.1409357544868 deg>
+
+For more advanced propagation options, check out the
+:py:mod:`poliastro.twobody.propagation` module.
+
 Changing the orbit: :py:class:`~poliastro.maneuver.Maneuver` objects
 --------------------------------------------------------------------
 
@@ -140,6 +183,8 @@ method or instantiating it directly.
 
 .. code-block:: python
 
+    from poliastro.maneuver import Maneuver
+
     dv = [5, 0, 0] * u.m / u.s
     
     man = Maneuver.impulse(dv)
@@ -154,6 +199,8 @@ in terms of velocity change (\\(\\sum \|\\Delta v_i|\\)) and the transfer
 time::
 
     >>> ss_i = Orbit.circular(Earth, alt=700 * u.km)
+    >>> ss_i
+    7078 x 7078 km x 0.0 deg orbit around Earth (♁)
     >>> hoh = Maneuver.hohmann(ss_i, 36000 * u.km)
     >>> hoh.get_total_cost()
     <Quantity 3.6173981270031357 km / s>
@@ -166,7 +213,7 @@ You can also retrieve the individual vectorial impulses::
     (<Quantity 0 s>, <Quantity [ 0.        , 2.19739818, 0.        ] km / s>)
     >>> hoh[0]  # Equivalent
     (<Quantity 0 s>, <Quantity [ 0.        , 2.19739818, 0.        ] km / s>)
-    >>> tuple(_.decompose([u.km, u.s]) for _ in hoh[1])
+    >>> tuple(val.decompose([u.km, u.s]) for val in hoh[1])
     (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 
 .. _Hohmann: http://en.wikipedia.org/wiki/Hohmann_transfer_orbit
@@ -176,8 +223,8 @@ To actually retrieve the resulting ``Orbit`` after performing a maneuver, use
 the method :py:meth:`~poliastro.twobody.orbit.Orbit.apply_maneuver`::
 
     >>> ss_f = ss_i.apply_maneuver(hoh)
-    >>> ss_f.rv()
-    (<Quantity [ -3.60000000e+04, -7.05890200e-11, -0.00000000e+00] km>, <Quantity [ -8.97717523e-16, -3.32749489e+00, -0.00000000e+00] km / s>)
+    >>> ss_f
+    36000 x 36000 km x 0.0 deg orbit around Earth (♁)
 
 More advanced plotting: :py:class:`~poliastro.plotting.OrbitPlotter` objects
 ----------------------------------------------------------------------------
@@ -221,16 +268,18 @@ we can query the position and velocity of the planets of the Solar System.
 
 The function :py:func:`poliastro.ephem.get_body_ephem` will return
 position and velocity vectors using low precision ephemerides available in
-Astropy and an ``astropy.time.Time``::
+Astropy and an :py:mod:`astropy.time.Time`:
 
-    >>> from astropy import time
-    >>> epoch = time.Time("2015-05-09 10:43")
+.. code-block:: python
+
+    from astropy import time
+    epoch = time.Time("2015-05-09 10:43")  # UTC by default
+
+And finally, retrieve the planet orbit::
+
     >>> from poliastro import ephem
-    >>> r, v = ephem.get_body_ephem("earth", epoch)
-    >>> r
-    <Quantity [ -9.99804957e+07, -1.03444423e+08, -4.48688994e+07] km>
-    >>> v
-    <Quantity [ 1879036.90811082,-1579527.58964453, -684736.68156739] km / d>
+    >>> Orbit.from_body_ephem(Earth, epoch)
+    1 x 1 AU x 23.4 deg orbit around Sun (☉)
 
 This does not require any external download. If on the other hand we want
 to use higher precision ephemerides, we can tell Astropy to do so::
@@ -266,23 +315,26 @@ perfect complement to this feature!
 
 For instance, this is a simplified version of the example
 `Going to Mars with Python using poliastro`_, where the orbit of the
-Mars Science Laboratory mission (rover Curiosity) is determined::
+Mars Science Laboratory mission (rover Curiosity) is determined:
 
-    >>> from astropy import time
-    >>> date_launch = time.Time('2011-11-26 15:02', scale='utc')
-    >>> date_arrival = time.Time('2012-08-06 05:17', scale='utc')
-    >>> tof = date_arrival - date_launch
-    >>> from poliastro import ephem
-    >>> r0, _ = ephem.planet_ephem(ephem.EARTH, date_launch)
-    >>> r, _ = ephem.planet_ephem(ephem.MARS, date_arrival)
-    >>> from poliastro import iod
-    >>> from poliastro.bodies import Sun
-    >>> (v0, v), = iod.lambert(Sun.k, r0, r, tof)
+.. code-block:: python
+
+    date_launch = time.Time('2011-11-26 15:02', scale='utc')
+    date_arrival = time.Time('2012-08-06 05:17', scale='utc')
+    tof = date_arrival - date_launch
+
+    ss0 = Orbit.from_body_ephem(Earth, date_launch)
+    ssf = Orbit.from_body_ephem(Mars, date_arrival)
+
+    from poliastro import iod
+    (v0, v), = iod.lambert(Sun.k, ss0.r, ssf.r, tof)
+
+And these are the results::
+
     >>> v0
     <Quantity [-29.29150998, 14.53326521,  5.41691336] km / s>
     >>> v
     <Quantity [ 17.6154992 ,-10.99830723, -4.20796062] km / s>
-
 
 .. figure:: _static/msl.png
    :align: center
@@ -299,8 +351,8 @@ More correctly, their perihelion (closest approach to the Sun) is less than 1.3 
 Currently, they are being an important subject of study for scientists around the world, due to their status as the relatively
 unchanged remains from the solar system formation process.
 
-Because of that, a new module, related to NEOs, has been added (and hopefully
-will be regularly updated) to ``poliastro``, as part of `SOCIS 2017 project`_.
+Because of that, a new module related to NEOs has been added to ``poliastro``
+as part of `SOCIS 2017 project`_.
 
 For the moment, it is possible to search NEOs by name (also using wildcards),
 and get their orbits straight from NASA APIs, using :py:func:`~poliastro.neos.orbit_from_name`.
@@ -308,20 +360,16 @@ For example, we can get `Apophis asteroid (99942 Apophis)`_ orbit with one comma
 
 .. code-block:: python
 
-    from poliastro import neos
-    from poliastro.bodies import Sun, Earth
-    from poliastro.twobody.orbit import Orbit
-    from poliastro.plotting import OrbitPlotter
-    
-    op = OrbitPlotter()
+    from poliastro.neos import neows
 
-    apophis_orbit = neos.orbit_from_name('apophis') #Also '99942' or '99942 apophis' could be used
+    apophis_orbit = neosws.orbit_from_name('apophis')  # Also '99942' or '99942 apophis' works
     earth_orbit =  Orbit.from_body_ephem(Earth)
 
+    op = OrbitPlotter()
     op.plot(earth_orbit, label='Earth')
     op.plot(apophis_orbit, label='Apophis')
 
-.. figure:: _static/apophis.png
+.. figure:: _static/neos.png
    :align: center
    :alt: Apophis asteroid orbit
    

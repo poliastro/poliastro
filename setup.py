@@ -60,6 +60,14 @@ setup(
     ],
     extras_require={
         'fast': ["numba>=0.25"],
+        'dev': [
+            "pep8",
+            "mypy",
+            "sphinx",
+            "sphinx_rtd_theme",
+            "nbsphinx",
+            "ipython"
+        ]
     },
     packages=find_packages('src'),
     package_dir={'': 'src'},

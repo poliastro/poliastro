@@ -27,6 +27,21 @@ any inconsistency or opportunity for improvement, you can edit those too.
 Besides, the `wiki`_ is open for everybody to edit, so feel free to add
 new content.
 
+To build the docs, you must first create a development environment (see
+below) and then in the ``docs/`` directory run::
+
+    $ cd docs
+    $ make html
+
+After this, the new docs will be inside ``build/html``. You can open
+them by running an HTTP server::
+
+    $ cd build/html
+    $ python -m http.server
+    Serving HTTP on 0.0.0.0 port 8000 ...
+
+And point your browser to http://0.0.0.0:8000.
+
 Code writing
 ------------
 
@@ -82,3 +97,25 @@ coverage rate should increase or stay the same. Automatic services will ensure
 your code works on all the operative systems and package combinations
 poliastro support - specifically, note that poliastro is a Python 3 only
 library.
+
+Development environment
+-----------------------
+
+These are some succint steps to set up a development environment:
+
+1. `Install git <https://git-scm.com/>`_ on your computer.
+2. `Register to GitHub <https://github.com/>`_.
+3. `Fork poliastro <https://help.github.com/articles/fork-a-repo/>`_.
+4. `Clone your fork <https://help.github.com/articles/cloning-a-repository/>`_.
+5. Install it in development mode using
+   :code:`pip install --editable /path/to/poliastro/[dev]` (this means that the
+   installed code will change as soon as you change it in the download
+   location).
+6. Create a new branch.
+7. Make changes and commit.
+8. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
+9. `Open a pull request! <https://help.github.com/articles/creating-a-pull-request/>`_
+
+For more detailed explanations, please check out the `Astropy development docs`__.
+
+.. __: http://docs.astropy.org/en/stable/development/workflow/development_workflow.html
