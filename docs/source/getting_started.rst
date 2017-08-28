@@ -37,19 +37,22 @@ If the installation fails for any reason, please open an issue in the
 Alternative installation methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you don't want to use conda you can `install poliastro from PyPI`_ on Linux
-and OS X using pip::
+If you don't want to use conda you can `install poliastro from PyPI`_
+using pip::
 
   $ pip install numpy  # Run this one first!
-  $ pip install scipy  # If this does not work, use conda
   $ pip install poliastro
 
-If your platform is supported you can also install the accelerated version of
-poliastro using pip::
+.. warning::
 
-  $ pip install poliastro[fast]
+    At the time of writing, this installation process requires
+    development versions of NumPy, SciPy and Numba to succeed on Windows.
+    To install these versions, please check out the following links:
 
-However keep in mind that conda does this automatically on all platforms.
+    * https://mail.python.org/pipermail/scipy-dev/2017-August/022050.html
+    * https://groups.google.com/a/continuum.io/d/msg/numba-users/OuBmvN7zpVA/GCMdTRoDCwAJ
+
+    If these installation steps fail for you, please consider using conda.
 
 Finally, you can also install the latest development version of poliastro
 `directly from GitHub`_::

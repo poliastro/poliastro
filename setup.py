@@ -52,14 +52,14 @@ setup(
         "scipy",
         "beautifulsoup4",
         "requests",
-        "pandas"
+        "pandas",
+        "numba>=0.25",
     ],
     tests_require=[
         "coverage",
         "pytest-cov",
     ],
     extras_require={
-        'fast': ["numba>=0.25"],
         'dev': [
             "pep8",
             "mypy",
