@@ -7,6 +7,7 @@ from astropy import units as u
 
 from astropy import time
 
+from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem
 from poliastro.twobody.propagation import propagate
 
@@ -16,7 +17,6 @@ import poliastro.twobody.equinoctial
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
-J2000 = time.Time("J2000", scale='utc')
 
 
 class Orbit(object):
