@@ -10,6 +10,7 @@ from astropy import time
 
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
+from poliastro.constants import J2000
 
 
 def test_default_time_for_new_state():
@@ -17,7 +18,7 @@ def test_default_time_for_new_state():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
-    expected_epoch = time.Time("J2000", scale='utc')
+    expected_epoch = J2000
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     assert ss.epoch == expected_epoch
 
