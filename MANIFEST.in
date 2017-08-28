@@ -3,7 +3,7 @@ graft docs
 include COPYING
 include AUTHORS
 
-recursive-include src/poliastro/neos/tests *.html
+recursive-include src/poliastro/tests *.py *.html
 
 prune docs/source/examples/.ipynb_checkpoints
 global-exclude *.py[cod] __pycache__ *.so *.dylib
