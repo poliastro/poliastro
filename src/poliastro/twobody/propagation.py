@@ -8,7 +8,8 @@ from scipy.integrate import ode
 
 from astropy import units as u
 
-from poliastro.jit import jit
+from numba import njit as jit
+
 from poliastro.stumpff import c2, c3
 
 
