@@ -47,8 +47,8 @@ position and velocity vectors we can use
 And that's it! Notice a couple of things:
 
 * Defining vectorial physical quantities using Astropy units is very easy.
-  The list is automatically converted to a :code:`Quantity`, which is actually
-  a subclass of NumPy arrays.
+  The list is automatically converted to a :py:mod:`astropy.units.Quantity`,
+  which is actually a subclass of NumPy arrays.
 * If we display the orbit we just created, we get a string with the radius of
   pericenter, radius of apocenter, inclination and attractor::
 
@@ -268,7 +268,7 @@ we can query the position and velocity of the planets of the Solar System.
 
 The function :py:func:`poliastro.ephem.get_body_ephem` will return
 position and velocity vectors using low precision ephemerides available in
-Astropy and an ``astropy.time.Time``:
+Astropy and an :py:mod:`astropy.time.Time`:
 
 .. code-block:: python
 

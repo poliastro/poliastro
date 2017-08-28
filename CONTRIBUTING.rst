@@ -34,7 +34,7 @@ below) and then in the ``docs/`` directory run::
     $ make html
 
 After this, the new docs will be inside ``build/html``. You can open
-them by running an HTTP server:
+them by running an HTTP server::
 
     $ cd build/html
     $ python -m http.server
