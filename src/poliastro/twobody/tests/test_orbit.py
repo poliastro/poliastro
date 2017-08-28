@@ -12,6 +12,7 @@ from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
 from poliastro.constants import J2000
 
+
 def test_default_time_for_new_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
