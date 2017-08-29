@@ -58,7 +58,7 @@ It is released under the MIT license.
     
     plot(molniya)
 
-.. image:: https://github.com/poliastro/poliastro/raw/master/examples/molniya.png
+.. image:: https://github.com/poliastro/poliastro/raw/master/docs/source/examples/molniya.png
    :align: center
 
 Documentation
