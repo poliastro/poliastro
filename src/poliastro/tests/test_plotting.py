@@ -34,7 +34,6 @@ def test_axes_labels_and_title():
 
     assert ax.get_xlabel() == "$x$ (km)"
     assert ax.get_ylabel() == "$y$ (km)"
-    assert ax.get_title() == str(ss.epoch.iso)
 
 
 def test_number_of_lines_for_osculating_orbit():
