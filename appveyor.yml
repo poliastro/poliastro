@@ -16,26 +16,23 @@ matrix:
   fast_finish: true
 
 install:
-  - "set PATH=C:\\Miniconda3-x64;C:\\Miniconda3-x64\\Scripts;%PATH%"
-
-  # Install the build and runtime dependencies of the project.
-  - "conda config --set always_yes yes --set changeps1 no"
-  - "conda config --add channels conda-forge"
-  - "conda update -q conda"
-  - "conda info -a"
-  - "conda create -q -n test-environment python"
-  - "activate test-environment"
+  - "set PYTHON_BIN=C:\\Python36-x64\\python.exe"
+  - "set PIP_BIN=C:\\Python36-x64\\Scripts\\pip.exe"
+  - "set SPHINX_BIN=C:\\Python36-x64\\Scripts\\sphinx-build.exe"
 
   # Check that we have the expected version of Python
-  - "python --version"
+  - "%PYTHON_BIN% --version"
 
   # Install dependencies
-  - "conda install -q numpy scipy pandoc"
-  - "pip install ."  # Test installation correctness
-  - "pip install .[dev]"  # Test development dependencies
+  - "choco install pandoc"
+
+  - "%PIP_BIN% install numpy"
+  - "%PIP_BIN% install --pre scipy --find-links https://7933911d6844c6c53a7d-47bd50c35cd79bd838daf386af554a83.ssl.cf2.rackcdn.com/"
+  - "%PIP_BIN% install --pre numba --extra-index-url https://pypi.anaconda.org/numba/simple"
+  - "%PIP_BIN% install .[dev]"  # Test installation correctness
 
 build: off
 
 test_script:
-  - "python setup.py test -vv"  # Test against installed code
-  - "sphinx-build -vW -b html docs/source _HTMLTest" # Test docs build
+  - "%PYTHON_BIN% setup.py test -vv"  # Test against installed code
+  - "%SPHINX_BIN% -vW -b html docs/source _HTMLTest" # Test docs build

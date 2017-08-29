@@ -5,7 +5,8 @@ import numpy as np
 from numpy import pi
 from astropy import units as u
 
-from poliastro.jit import jit
+from numba import njit as jit
+
 from poliastro.util import norm
 from poliastro.hyper import hyp2f1b
 
