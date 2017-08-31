@@ -57,6 +57,8 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
+        self._epoch_handles = []
+        self._epoch_labels = []
         self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
@@ -101,7 +103,7 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, osculating=True, label=None):
+    def plot(self, orbit, osculating=True, label=None, epoch_label=True):
         """Plots state and osculating orbit in their plane.
 
         """
@@ -149,6 +151,19 @@ class OrbitPlotter(object):
             l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
                               '--', color=l.get_color())
             lines.append(l)
+
+        if epoch_label:
+            self._epoch_handles.append(l)
+
+            orbit.epoch.out_subfmt = 'date_hm'
+            self._epoch_labels.append(orbit.epoch.iso)
+
+            epochs_legend = self.ax.findobj(lambda x: True if x.aname == 'epochs' else False)
+            if epochs_legend:
+                epochs_legend[0].remove()
+            temp_legend = self.ax.legend(self._epoch_handles, self._epoch_labels, loc='best')
+            temp_legend.aname = 'epochs'
+            self.ax.add_artist(temp_legend)
 
         if label:
             # This will apply the label to either the point or the osculating
