@@ -22,7 +22,7 @@ def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
             'ascending_node_longitude': '304.3221633898424',
             'perihelion_argument': '178.8165910886752',
             'mean_anomaly': '71.28027812836476',
-            "orbit_determination_date": "2017-06-06 06:20:43",
+            'epoch_osculation': '2458000.5',
         }
     }
 

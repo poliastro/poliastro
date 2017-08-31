@@ -52,7 +52,7 @@ def orbit_from_spk_id(spk_id):
     argp = float(orbital_data['perihelion_argument']) * u.deg
     m = float(orbital_data['mean_anomaly']) * u.deg
     nu = M_to_nu(m.to(u.rad), ecc)
-    epoch = Time(orbital_data['orbit_determination_date'])
+    epoch = Time(float(orbital_data['epoch_osculation']), format='jd', scale='tdb')
 
     return Orbit.from_classical(attractor, a, ecc, inc,
                                 raan, argp, nu, epoch)
