@@ -163,6 +163,7 @@ class OrbitPlotter(object):
                 epochs_legend[0].remove()
             temp_legend = self.ax.legend(self._epoch_handles, self._epoch_labels, loc='best')
             temp_legend.aname = 'epochs'
+            temp_legend.draggable()
             self.ax.add_artist(temp_legend)
 
         if label:
@@ -170,6 +171,7 @@ class OrbitPlotter(object):
             # orbit depending on the last plotted line, as they share variable
             l.set_label(label)
             self.ax.legend()
+            self.ax.get_legend().draggable()
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
