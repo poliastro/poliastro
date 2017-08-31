@@ -4,6 +4,7 @@ import pytest
 import astropy.units as u
 
 import matplotlib.pyplot as plt
+from matplotlib.legend import Legend
 
 from poliastro.examples import iss
 
@@ -35,6 +36,23 @@ def test_axes_labels_and_title():
     assert ax.get_xlabel() == "$x$ (km)"
     assert ax.get_ylabel() == "$y$ (km)"
 
+
+def test_not_legends():
+    op = OrbitPlotter()
+    ss = iss
+    op.plot(ss, epoch_label=False)
+    legends = plt.gca().findobj(Legend)
+
+    assert not legends
+
+
+def test_legends():
+    op = OrbitPlotter()
+    ss = iss
+    op.plot(ss, label='iss', epoch_label=True)
+    legends = plt.gca().findobj(Legend)
+
+    assert len(legends) == 2
 
 def test_number_of_lines_for_osculating_orbit():
     _, (ax1, ax2) = plt.subplots(ncols=2)
