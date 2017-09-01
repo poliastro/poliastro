@@ -2,6 +2,8 @@
 """ Plotting utilities.
 
 """
+from typing import List
+
 import numpy as np
 
 import matplotlib as mpl
@@ -57,8 +59,8 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
-        self._epoch_handles = []
-        self._epoch_labels = []
+        self._epoch_handles = []  # type: List[mpl.lines.Line2D]
+        self._epoch_labels = []  # type: List[str]
         self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):

@@ -54,6 +54,7 @@ def test_legends():
 
     assert len(legends) == 2
 
+
 def test_number_of_lines_for_osculating_orbit():
     _, (ax1, ax2) = plt.subplots(ncols=2)
     op1 = OrbitPlotter(ax1)
