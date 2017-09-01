@@ -2,6 +2,8 @@
 """ Plotting utilities.
 
 """
+from typing import List
+
 import numpy as np
 
 import matplotlib as mpl
@@ -57,6 +59,8 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
+        self._epoch_handles = []  # type: List[mpl.lines.Line2D]
+        self._epoch_labels = []  # type: List[str]
         self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
@@ -101,7 +105,7 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, osculating=True, label=None):
+    def plot(self, orbit, osculating=True, label=None, epoch_label=True):
         """Plots state and osculating orbit in their plane.
 
         """
@@ -150,13 +154,33 @@ class OrbitPlotter(object):
                               '--', color=l.get_color())
             lines.append(l)
 
+        if epoch_label:
+            self._epoch_handles.append(l)
+
+            orbit.epoch.out_subfmt = 'date_hm'
+            self._epoch_labels.append(orbit.epoch.iso)
+
+            epochs_legend = self.ax.findobj(lambda x: True if x.aname == 'epochs' else False)
+            if epochs_legend:
+                epochs_legend[0].remove()
+            temp_legend = self.ax.legend(self._epoch_handles, self._epoch_labels, loc='best')
+            temp_legend.aname = 'epochs'
+            temp_legend.draggable()
+            self.ax.add_artist(temp_legend)
+
         if label:
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
             l.set_label(label)
             self.ax.legend()
+            self.ax.get_legend().draggable()
 
-        self.ax.set_title(orbit.epoch.iso)
+        # If orbit is plotted without label, but with epoch_label,
+        # self.ax.legend() has to be called
+        if not label and epoch_label and self.ax.get_legend():
+            self.ax.legend()
+            self.ax.get_legend().draggable()
+
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
