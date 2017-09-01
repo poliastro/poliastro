@@ -2,6 +2,8 @@
 """ Plotting utilities.
 
 """
+from typing import List
+
 import numpy as np
 
 import matplotlib as mpl
@@ -153,8 +155,23 @@ class OrbitPlotter(object):
         if label:
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
-            l.set_label(label)
-            self.ax.legend()
+            handles = []  # type: List[mpl.lines.Line2D]
+            labels = []  # type: List[str]
+
+            orbit.epoch.out_subfmt = 'date_hm'
+            label = '{}  -  {}'.format(label, orbit.epoch.iso)
+
+            legends = self.ax.figure.legends
+            if legends:
+                handles = legends[0].get_lines()
+                labels = [text.get_text() for text in legends[0].get_texts()]
+                legends[0].remove()
+
+            handles.append(l)
+            labels.append(label)
+            # temp_legend = self.ax.legend(handles, labels, loc='best')
+            self.ax.figure.legend(handles, labels, mode="expand", loc="lower center", fancybox=True,
+                                  title="Name and epoch of orbits")
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
