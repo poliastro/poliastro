@@ -156,7 +156,6 @@ class OrbitPlotter(object):
             l.set_label(label)
             self.ax.legend()
 
-        self.ax.set_title(orbit.epoch.iso)
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
