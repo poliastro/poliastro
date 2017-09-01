@@ -47,3 +47,15 @@ def test_number_of_lines_for_osculating_orbit():
 
     assert len(l1) == 1
     assert len(l2) == 2
+
+
+def test_legend():
+    op = OrbitPlotter()
+    ss = iss
+    op.plot(ss, label='ISS')
+    legend = plt.gcf().legends[0]
+
+    ss.epoch.out_subfmt = 'date_hm'
+    label = '{}  -  {}'.format('ISS', ss.epoch.iso)
+
+    assert legend.get_texts()[0].get_text() == label

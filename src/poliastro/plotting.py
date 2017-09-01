@@ -169,9 +169,8 @@ class OrbitPlotter(object):
 
             handles.append(l)
             labels.append(label)
-            # temp_legend = self.ax.legend(handles, labels, loc='best')
             self.ax.figure.legend(handles, labels, mode="expand", loc="lower center", fancybox=True,
-                                  title="Name and epoch of orbits")
+                                  title="Names and epochs")
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
