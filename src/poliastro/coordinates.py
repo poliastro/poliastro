@@ -4,14 +4,15 @@ This module complements :py:mod:`astropy.coordinates`.
 
 """
 
-import math
+from math import sin, cos, sqrt
 
-import astropy.time as time
 import astropy.coordinates as coordinates
 import astropy.units as u
+import numpy as np
 
 from poliastro.util import transform
 from poliastro.constants import J2000
+from poliastro.twobody.rv import rv2coe
 
 
 def body_centered_to_icrs(r, v, source_body, epoch=J2000, rotate_meridian=False):
@@ -97,3 +98,33 @@ def icrs_to_body_centered(r, v, target_body, epoch=J2000, rotate_meridian=False)
         v_f = transform(v_f, W, 'z')
 
     return r_f.to(r.unit), v_f.to(v.unit)
+
+
+def inertial_body_centered_to_pqw(r, v, source_body):
+    """Converts position and velocity from inertial body-centered frame to perifocal frame.
+
+    Parameters
+    ----------
+    r : ~astropy.units.Quantity
+        Position vector in a inertial body-centered reference frame.
+    v : ~astropy.units.Quantity
+        Velocity vector in a inertial body-centered reference frame.
+    source_body : Body
+        Source body.
+
+    Returns
+    -------
+    r_pqw, v_pqw : tuple (~astropy.units.Quantity)
+        Position and velocity vectors in ICRS.
+
+
+    """
+    r = r.to('km').value
+    v = v.to('km/s').value
+    k = source_body.k.to('km^3 / s^2').value
+
+    p, ecc, inc, _, _, nu = rv2coe(k, r, v)
+
+    r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T * u.km
+    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T * u.km / u.s
+    return r_pqw, v_pqw
