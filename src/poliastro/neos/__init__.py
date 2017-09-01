@@ -4,3 +4,4 @@ Functions related with NEOs and different NASA APIs.
 All of them are coded as part of SOCIS 2017 proposal.
 
 """
+from poliastro.neos import neows, dastcom5
