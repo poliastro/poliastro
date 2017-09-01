@@ -175,6 +175,12 @@ class OrbitPlotter(object):
             self.ax.legend()
             self.ax.get_legend().draggable()
 
+        # If orbit is plotted without label, but with epoch_label,
+        # self.ax.legend() has to be called
+        if not label and epoch_label and self.ax.get_legend():
+            self.ax.legend()
+            self.ax.get_legend().draggable()
+
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
