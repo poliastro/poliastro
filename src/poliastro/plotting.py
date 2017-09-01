@@ -57,6 +57,7 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
+        self._orbits = []  # type: list
         self._attractor_radius = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
@@ -101,13 +102,18 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, osculating=True, label=None):
+    def plot(self, orbit, osculating=True, label=None, propagate=False):
         """Plots state and osculating orbit in their plane.
 
         """
         # TODO: This function needs a refactoring
         if not self._frame:
             self.set_frame(*orbit.pqw())
+
+        # Propagates backwards of forwards to the last added orbit epoch.
+        if propagate:
+            if self._orbits:
+                orbit = orbit.propagate(self._orbits[-1].epoch - orbit.epoch)
 
         # if new attractor radius is smaller, plot it
         new_radius = max(orbit.attractor.R.to(u.km).value,
@@ -116,6 +122,8 @@ class OrbitPlotter(object):
             self.set_attractor(orbit)
         elif new_radius < self._attractor_radius:
             self.set_attractor(orbit)
+
+        self._orbits.append(orbit)
 
         lines = []
 
