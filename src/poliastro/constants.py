@@ -35,79 +35,85 @@ GM_earth = Constant('GM_earth', 'Geocentric gravitational constant', 3.986004418
 
 # Anderson, John D. et al. “The Mass, Gravity Field, and Ephemeris of Mercury.” Icarus 71.3 (1987): 337–349.
 # Crossref. Web. DOI: 10.1016/0019-1035(87)90033-9
-GM_mercury = Constant('GM_mercury', 'Mercury gravitational constant', 22032.09, 'km3 / (s2)', 0.91,
+GM_mercury = Constant('GM_mercury', 'Mercury gravitational constant', 2.203209e10, 'm3 / (s2)', 0.91,
                       'IAU 2009 system of astronomical constants')
 
 # Konopliv, A.S., W.B. Banerdt, and W.L. Sjogren. “Venus Gravity: 180th Degree and Order Model.”
 # Icarus 139.1 (1999): 3–18. Crossref. Web. DOI: 10.1006/icar.1999.6086
-GM_venus = Constant('GM_venus', 'Venus gravitational constant', 324858.592, 'km3 / (s2)', 0.006,
+GM_venus = Constant('GM_venus', 'Venus gravitational constant', 3.24858592e11, 'm3 / (s2)', 0.006,
                     'IAU 2009 system of astronomical constants')
 
 # Konopliv, Alex S. et al. “A Global Solution for the Mars Static and Seasonal Gravity, Mars Orientation, Phobos and
-# Deimos Masses, and Mars Ephemeris.” Icarus 182.1 (2006): 23–50. Crossref. Web. DOI: 10.1016/j.icarus.2005.12.025
-GM_mars = Constant('GM_mars', 'Mars gravitational constant', 42828.37440, 'km3 / (s2)', 0.00028,
+# Deimos Masses, and Mars Ephemeris.” Icarus 182.1 (2006): 23–50.
+# Crossref. Web. DOI: 10.1016/j.icarus.2005.12.025
+GM_mars = Constant('GM_mars', 'Mars gravitational constant', 4.282837440e10, 'm3 / (s2)', 0.00028,
                    'IAU 2009 system of astronomical constants')
 
 # Jacobson, R. A. et al. “A comprehensive orbit reconstruction for the galileo prime mission in the JS200 system.”
-# The Journal of the Astronautical Sciences 48.4 (2000): 495–516. Crossref. Web.
+# The Journal of the Astronautical Sciences 48.4 (2000): 495–516.
+# Crossref. Web.
 GM_jupiter = Constant('GM_jupiter', 'Jovian system gravitational constant', 126712762.53, 'km3 / (s2)', 2.00,
                       'IAU 2009 system of astronomical constants')
 
 # Jacobson, R. A. et al. “The Gravity Field of the Saturnian System from Satellite Observations and Spacecraft
-# Tracking Data.” The Astronomical Journal 132.6 (2006): 2520–2526. Crossref. Web. DOI: 10.1086/508812
-GM_saturn = Constant('GM_saturn', 'Saturn gravitational constant', 37931207.7, 'km3 / (s2)', 1.1,
+# Tracking Data.” The Astronomical Journal 132.6 (2006): 2520–2526.
+# Crossref. Web. DOI: 10.1086/508812
+GM_saturn = Constant('GM_saturn', 'Saturn gravitational constant', 3.79312077e13, 'm3 / (s2)', 1.1,
                      'IAU 2009 system of astronomical constants')
 
 # Jacobson, R. A. et al. “The Masses of Uranus and Its Major Satellites from Voyager Tracking Data and Earth-Based
-# Uranian Satellite Data.” The Astronomical Journal 103 (1992): 2068. Crossref. Web. DOI: 10.1086/116211
-GM_uranus = Constant('GM_uranus', 'Uranus gravitational constant', 5793939.3, 'km3 / (s2)', 13.0,
+# Uranian Satellite Data.” The Astronomical Journal 103 (1992): 2068.
+# Crossref. Web. DOI: 10.1086/116211
+GM_uranus = Constant('GM_uranus', 'Uranus gravitational constant', 5.7939393e12, 'm3 / (s2)', 13.0,
                      'IAU 2009 system of astronomical constants')
 
 # Jacobson, R. A. “THE ORBITS OF THE NEPTUNIAN SATELLITES AND THE ORIENTATION OF THE POLE OF NEPTUNE.”
-# The Astronomical Journal 137.5 (2009): 4322–4329. Crossref. Web. DOI: 10.1088/0004-6256/137/5/4322
-GM_neptune = Constant('GM_neptune', 'Neptunian system gravitational constant', 6836527.100580397, 'km3 / (s2)', 10.0,
+# The Astronomical Journal 137.5 (2009): 4322–4329. Crossref. Web. DOI:
+# 10.1088/0004-6256/137/5/4322
+GM_neptune = Constant('GM_neptune', 'Neptunian system gravitational constant', 6.836527100580397e12, 'm3 / (s2)', 10.0,
                       'IAU 2009 system of astronomical constants')
 
 # Tholen, David J. et al. “MASSES OF NIX AND HYDRA.” The Astronomical Journal 135.3 (2008): 777–784. Crossref. Web.
 # DOI: 10.1088/0004-6256/135/3/777
-GM_pluto = Constant('GM_pluto', 'Pluto gravitational constant', 870.3, 'km3 / (s2)', 3.7,
+GM_pluto = Constant('GM_pluto', 'Pluto gravitational constant', 8.703e8, 'm3 / (s2)', 3.7,
                     'IAU 2009 system of astronomical constants')
 
 # Lemoine, Frank G. et al. “High-Degree Gravity Models from GRAIL Primary Mission Data.”
-# Journal of Geophysical Research: Planets 118.8 (2013): 1676–1698. Crossref. Web. DOI: 10.1002/jgre.20118
-GM_moon = Constant('GM_moon', 'Moon gravitational constant', 4902.79981, 'km3 / (s2)', 0.00000774,
+# Journal of Geophysical Research: Planets 118.8 (2013): 1676–1698.
+# Crossref. Web. DOI: 10.1002/jgre.20118
+GM_moon = Constant('GM_moon', 'Moon gravitational constant', 4.90279981e9, 'm3 / (s2)', 0.00000774,
                    'Journal of Geophysical Research: Planets 118.8 (2013)')
 
 
-R_sun = Constant('R_sun', 'Sun equatorial radius', 696000, 'km', 0,
+R_sun = Constant('R_sun', 'Sun equatorial radius', 6.96000e8, 'm', 0,
                  'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_earth = Constant('R_earth', 'Earth equatorial radius', 6378.1366, 'km', 0.0001,
+R_earth = Constant('R_earth', 'Earth equatorial radius', 6.3781366e6, 'm', 0.0001,
                    'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_mercury = Constant('R_mercury', 'Mercury equatorial radius', 2439.7, 'km', 1.0,
+R_mercury = Constant('R_mercury', 'Mercury equatorial radius', 2.4397e6, 'm', 1.0,
                      'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_venus = Constant('R_venus', 'Venus equatorial radius', 6051.8, 'km', 1.0,
+R_venus = Constant('R_venus', 'Venus equatorial radius', 6.0518e6, 'm', 1.0,
                    'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_mars = Constant('R_mars', 'Mars equatorial radius', 3396.19, 'km', 0.1,
+R_mars = Constant('R_mars', 'Mars equatorial radius', 3.39619e6, 'm', 0.1,
                   'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_jupiter = Constant('R_jupiter', 'Jupiter equatorial radius', 71492, 'km', 4,
+R_jupiter = Constant('R_jupiter', 'Jupiter equatorial radius', 7.1492e7, 'm', 4,
                      'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_saturn = Constant('R_saturn', 'Saturn equatorial radius', 60268, 'km', 4,
+R_saturn = Constant('R_saturn', 'Saturn equatorial radius', 6.0268e7, 'm', 4,
                     'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_uranus = Constant('R_uranus', 'Uranus equatorial radius', 25559, 'km', 4,
+R_uranus = Constant('R_uranus', 'Uranus equatorial radius', 2.5559e7, 'm', 4,
                     'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_neptune = Constant('R_neptune', 'Neptune equatorial radius', 24764, 'km', 15,
+R_neptune = Constant('R_neptune', 'Neptune equatorial radius', 2.4764e7, 'm', 15,
                      'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_pluto = Constant('R_pluto', 'Pluto effective radius', 1195, 'km', 5,
+R_pluto = Constant('R_pluto', 'Pluto effective radius', 1.195e6, 'm', 5,
                    'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
 
-R_moon = Constant('R_moon', 'Moon equatorial radius', 1737.4, 'km', 1,
+R_moon = Constant('R_moon', 'Moon equatorial radius', 1.7374e6, 'm', 1,
                   'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009')
