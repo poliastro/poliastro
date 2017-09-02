@@ -17,7 +17,7 @@ def compute_soi(body, a=None):
     """
     # Compute semimajor axis at epoch J2000 for the body if it was not
     # introduced by the user
-    if a == None:
+    if a is None:
         ss = Orbit.from_body_ephem(body, J2000)
         a = ss.a
 
