@@ -159,7 +159,7 @@ class OrbitPlotter(object):
             labels = []  # type: List[str]
 
             orbit.epoch.out_subfmt = 'date_hm'
-            label = '{}  -  {}'.format(label, orbit.epoch.iso)
+            label = '{} ({})'.format(orbit.epoch.iso, label)
 
             legends = self.ax.figure.legends
             if legends:
