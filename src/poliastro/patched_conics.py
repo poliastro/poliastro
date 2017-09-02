@@ -21,8 +21,6 @@ def compute_soi(body, a=None):
         ss = Orbit.from_body_ephem(body, J2000)
         a = ss.a
 
-    try:
-        r_soi = a * (body.k / body.parent.k)**(2 / 5)
-        return r_soi.decompose()
-    except AttributeError:
-        print('Body has no parent body assigned.')
+    r_SOI = a * (body.k / body.parent.k)**(2 / 5)
+
+    return r_SOI.decompose()
