@@ -103,7 +103,7 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, osculating=True, label=None):
+    def plot(self, orbit, label=None):
         """Plots state and osculating orbit in their plane.
 
         """
@@ -147,10 +147,9 @@ class OrbitPlotter(object):
                           'o', mew=0)
         lines.append(l)
 
-        if osculating:
-            l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
-                              '--', color=l.get_color())
-            lines.append(l)
+        l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
+                          '--', color=l.get_color())
+        lines.append(l)
 
         if label:
             # This will apply the label to either the point or the osculating

@@ -37,16 +37,12 @@ def test_axes_labels_and_title():
 
 
 def test_number_of_lines_for_osculating_orbit():
-    _, (ax1, ax2) = plt.subplots(ncols=2)
-    op1 = OrbitPlotter(ax1)
-    op2 = OrbitPlotter(ax2)
+    op1 = OrbitPlotter()
     ss = iss
 
-    l1 = op1.plot(ss, osculating=False)
-    l2 = op2.plot(ss, osculating=True)
+    l1 = op1.plot(ss)
 
-    assert len(l1) == 1
-    assert len(l2) == 2
+    assert len(l1) == 2
 
 
 def test_legend():
