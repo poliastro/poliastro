@@ -5,6 +5,7 @@ import os
 import re
 import zipfile
 import urllib.request
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -331,10 +332,17 @@ def orbit_from_name(name):
 
     """
     records = record_from_name(name)
-    orbits = []
-    for record in records:
-        orbits.append(orbit_from_record(record))
-    return orbits
+    if len(records) > 1:
+        names = []
+        for record in records:
+            if _record_is_asteroid(record):
+                names.append(read_record(record)['ASTNAM'])
+            else:
+                names.append(read_record(record)['COMNAM'])
+        warning = '{} bodies matched "{}" string.\nReturning the first one'.format(len(records), name)
+        warnings.warn(warning)
+
+    return orbit_from_record(records[0])
 
 
 def orbit_from_record(record):
@@ -464,9 +472,9 @@ def read_record(record):
     ast_path = os.path.join(DBS_LOCAL_PATH, 'dast5_le.dat')
     com_path = os.path.join(DBS_LOCAL_PATH, 'dcom5_le.dat')
     # ENDPT1 indicates end of numbered asteroids records
-    if record <= int(ast_header['ENDPT2'][0].item()):
+    if _record_is_asteroid(record):
         # ENDPT2 indicates end of unnumbered asteroids records
-        if record <= int(ast_header['ENDPT1'][0].item()):
+        if _record_is_numbered_asteroid(record):
             # phis_rec = record_size * (record_number - IBIAS - 1 (header record))
             phis_rec = 835 * (record - ast_header['IBIAS0'][0].item() - 1)
         else:
@@ -481,6 +489,24 @@ def read_record(record):
             f.seek(phis_rec, os.SEEK_SET)
             body_data = np.fromfile(f, dtype=COM_DTYPE, count=1)
     return body_data
+
+
+def _record_is_asteroid(record):
+    ast_header, com_header = read_headers()
+
+    if record <= int(ast_header['ENDPT2'][0].item()):
+        return True
+    else:
+        return False
+
+
+def _record_is_numbered_asteroid(record):
+    ast_header, com_header = read_headers()
+
+    if record <= int(ast_header['ENDPT1'][0].item()):
+        return True
+    else:
+        return False
 
 
 def download_dastcom5():
