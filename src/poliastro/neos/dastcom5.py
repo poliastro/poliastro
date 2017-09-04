@@ -369,7 +369,7 @@ def orbit_from_record(record):
     argp = body_data['W'].item() * u.deg
     m = body_data['MA'].item() * u.deg
     nu = M_to_nu(m, ecc)
-    epoch = Time(body_data['EPOCH'].item(), format='jd')
+    epoch = Time(body_data['EPOCH'].item(), format='jd', scale='tdb')
 
     orbit = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch)
     return orbit
