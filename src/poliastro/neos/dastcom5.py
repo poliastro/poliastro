@@ -391,13 +391,21 @@ def record_from_name(name):
         DASTCOM5 database logical records matching str.
 
     """
-    idx_path = os.path.join(DBS_LOCAL_PATH, 'dastcom.idx')
     records = []
+    lines = body_strings_from_name(name)
+    for line in lines:
+        records.append(int(line[:6].lstrip()))
+    return records
+
+
+def body_strings_from_name(name):
+    idx_path = os.path.join(DBS_LOCAL_PATH, 'dastcom.idx')
+    lines = []
     with open(idx_path, 'r') as inF:
         for line in inF:
             if re.search(r"\b" + name.casefold() + r"\b", line.casefold()):
-                records.append(int(line[:6].lstrip()))
-    return records
+                lines.append(line)
+    return lines
 
 
 def read_headers():
