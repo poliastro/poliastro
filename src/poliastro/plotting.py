@@ -2,6 +2,8 @@
 """ Plotting utilities.
 
 """
+from typing import List
+
 import numpy as np
 
 import matplotlib as mpl
@@ -101,7 +103,7 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, osculating=True, label=None):
+    def plot(self, orbit, label=None):
         """Plots state and osculating orbit in their plane.
 
         """
@@ -145,18 +147,30 @@ class OrbitPlotter(object):
                           'o', mew=0)
         lines.append(l)
 
-        if osculating:
-            l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
-                              '--', color=l.get_color())
-            lines.append(l)
+        l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
+                          '--', color=l.get_color())
+        lines.append(l)
 
         if label:
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
-            l.set_label(label)
-            self.ax.legend()
+            handles = []  # type: List[mpl.lines.Line2D]
+            labels = []  # type: List[str]
 
-        self.ax.set_title(orbit.epoch.iso)
+            orbit.epoch.out_subfmt = 'date_hm'
+            label = '{} ({})'.format(orbit.epoch.iso, label)
+
+            legends = self.ax.figure.legends
+            if legends:
+                handles = legends[0].get_lines()
+                labels = [text.get_text() for text in legends[0].get_texts()]
+                legends[0].remove()
+
+            handles.append(l)
+            labels.append(label)
+            self.ax.figure.legend(handles, labels, mode="expand", loc="lower center", fancybox=True,
+                                  title="Names and epochs")
+
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)

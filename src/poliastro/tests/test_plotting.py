@@ -34,17 +34,24 @@ def test_axes_labels_and_title():
 
     assert ax.get_xlabel() == "$x$ (km)"
     assert ax.get_ylabel() == "$y$ (km)"
-    assert ax.get_title() == str(ss.epoch.iso)
 
 
 def test_number_of_lines_for_osculating_orbit():
-    _, (ax1, ax2) = plt.subplots(ncols=2)
-    op1 = OrbitPlotter(ax1)
-    op2 = OrbitPlotter(ax2)
+    op1 = OrbitPlotter()
     ss = iss
 
-    l1 = op1.plot(ss, osculating=False)
-    l2 = op2.plot(ss, osculating=True)
+    l1 = op1.plot(ss)
 
-    assert len(l1) == 1
-    assert len(l2) == 2
+    assert len(l1) == 2
+
+
+def test_legend():
+    op = OrbitPlotter()
+    ss = iss
+    op.plot(ss, label='ISS')
+    legend = plt.gcf().legends[0]
+
+    ss.epoch.out_subfmt = 'date_hm'
+    label = '{} ({})'.format(ss.epoch.iso, 'ISS')
+
+    assert legend.get_texts()[0].get_text() == label
