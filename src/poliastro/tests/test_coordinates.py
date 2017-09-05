@@ -1,10 +1,11 @@
 import astropy.units as u
 from astropy import time
 from astropy.tests.helper import assert_quantity_allclose
+from numpy.linalg import norm
 
 from poliastro import coordinates, bodies
-from poliastro.constants import J2000
-
+from poliastro.examples import molniya
+from poliastro.twobody.orbit import Orbit
 
 # Note that function are tested using astropy current builtin ephemeris.
 # Horizons uses JPL ephemeris DE431, so expected values are hardcoded,
@@ -36,3 +37,12 @@ def test_icrs_to_body_centered_transformation():
 
     assert_quantity_allclose(r, expected_r)
     assert_quantity_allclose(v, expected_v)
+
+
+def test_inertial_body_centered_to_pqw():
+    molniya_r_peri, molniya_v_peri = coordinates.inertial_body_centered_to_pqw(molniya.r, molniya.v, bodies.Earth)
+
+    molniya_peri = Orbit.from_vectors(bodies.Earth, molniya_r_peri, molniya_v_peri, molniya.epoch)
+
+    assert_quantity_allclose(molniya_peri.e_vec[-2:], [0, 0])
+    assert_quantity_allclose(norm(molniya_peri.e_vec), norm(molniya.e_vec))
