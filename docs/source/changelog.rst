@@ -13,13 +13,13 @@ New features:
 * **Pip packaging**: troublesome dependencies have been released in wheel format,
   so poliastro can now be installed using pip from all platforms.
 * **Coordinates module**: new module containing transformations between ICRS
-  and body-centered frame, and perifocal to body_centered.
-* **NEOS package**: a new package has been added to poliastro, NEOS package.
-  It provides several ways of getting NEOs (Near Earth Objects) data from NASA
+  and body-centered frame, and perifocal to body_centered, :py:mod:`~poliastro.coordinates`.
+* **NEOS package**: a new package has been added to poliastro, :py:mod:`~poliastro.neos`
+  package. It provides several ways of getting NEOs (Near Earth Objects) data from NASA
   databases, online and offline.
 * **New bodies**: added solar system planets (and Pluto and Moon), to bodies
   module, as well as rotational elements used in body centered frames.
-* **New constants module**: poliastro has now a constants module, with GMs and
+* **New constants module**: poliastro has now a :py:mod:`~poliastro.constants` module, with GMs and
   radii of solar system bodies.
 * **Bodies now have a parent**. It is now possible to specify the attractor
   of a body.
@@ -68,8 +68,9 @@ Bugs fixed:
 Backward incompatible changes:
 ..............................
 
-* **Non-osculating orbits**: removed support for non-osculating orbits. `plotting.plot()` calls
-  containing `osculating` parameter should be replaced.
+* **Non-osculating orbits**: removed support for non-osculating orbits.
+  :code:`plotting.plot()` calls containing :code:`osculating` parameter should be
+  replaced.
 
 poliastro 0.6.0 - 2017-02-12
 ----------------------------
