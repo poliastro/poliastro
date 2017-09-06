@@ -8,6 +8,7 @@ This is a new major release, which adds new packages and modules,
 besides fixing several issues.
 
 New features:
+.............
 
 * **Pip packaging**: troublesome dependencies have been released in wheel format,
   so poliastro can now be installed using pip from all platforms.
@@ -31,6 +32,7 @@ New features:
 
 
 Other highlights:
+.................
 
 * **Added Jupyter examples**: poliastro examples are now available in the
   documentation as Jupyter notebooks, thanks to `nbsphinx`_.
@@ -51,6 +53,7 @@ Other highlights:
 .. _`Open Astronomy`: http://openastronomy.org/members/
 
 Bugs fixed:
+...........
 
 * `Issue #205`_: Bug when plotting orbits with different epochs.
 * `Issue #128`_: Missing ephemerides if no files on import time.
@@ -63,6 +66,7 @@ Bugs fixed:
 .. _`Issue #130`: https://github.com/poliastro/poliastro/issues/130
 
 Backward incompatible changes:
+..............................
 
 * **Non-osculating orbits**: removed support for non-osculating orbits. `plotting.plot()` calls
   containing `osculating` parameter should be replaced.
@@ -74,6 +78,7 @@ This major release was focused on refactoring some internal core
 parts and improving the propagation functionality.
 
 Highlights:
+...........
 
 * **Support Python 3.6**. See `#144`_.
 * **Introduced ``Orbit`` objects** to replace ``State`` ones. The latter
@@ -94,12 +99,14 @@ This is a new major release, focused on expanding the initial orbit
 determination capabilities and solving some infrastructure challenges.
 
 New features:
+.............
 
 * **Izzo's algorithm for the Lambert problem**: Thanks to this algorithm
   multirevolution solutions are also returned. The old algorithm is kept
   on a separate module.
 
 Other highlights:
+.................
 
 * **Documentation on Read the Docs**: You can now browse previous releases
   of the package and easily switch between released and development versions.
@@ -112,12 +119,14 @@ Other highlights:
 .. _`python-astrodynamics`: http://python-astrodynamics.org/
 
 Bugs fixed:
+...........
 
 * `Issue #110`_: Bug when plotting State with non canonical units
 
 .. _`Issue #110`: https://github.com/poliastro/poliastro/issues/110
 
 Backward incompatible changes:
+..............................
 
 * **Drop Legacy Python**: poliastro 0.5.x and later will support only
   Python 3.x. We recommend our potential users to create dedicated virtual
@@ -145,6 +154,7 @@ and an important backwards incompatible change was introduced related to
 classical orbital elements.
 
 New features:
+.............
 
 * **Angle conversion functions**: Finally brought back from poliastro 0.1,
   new functions were added to convert between true \\(\\nu\\), eccentric
@@ -160,6 +170,7 @@ New features:
 .. _`#64`: https://github.com/poliastro/poliastro/pull/64
 
 Other highlights:
+.................
 
 * **MIT license**: The project has been relicensed to a more popular license.
   poliastro remains commercial-friendly through a permissive, OSI-approved
@@ -169,6 +180,7 @@ Other highlights:
   only*.
 
 Bugs fixed:
+...........
 
 * `Issue #62`_: Conversion between coe and rv is not transitive
 * `Issue #69`_: Incorrect plotting of certain closed orbits
@@ -177,6 +189,7 @@ Bugs fixed:
 .. _`Issue #69`: https://github.com/poliastro/poliastro/issues/69
 
 Backward incompatible changes:
+..............................
 
 * **Creation of orbits from classical elements**: poliastro has
   switched to the *semilatus rectum* \\(p\\) instead of the semimajor
@@ -194,6 +207,7 @@ This is a new minor release, with some bug fixes backported from the main
 development branch.
 
 Bugs fixed:
+...........
 
 * Fixed installation problem in Python 2.
 * `Issue #49`_: Fix velocity units in ``ephem``.
@@ -210,6 +224,7 @@ Lambert problem solving and ephemerides computation came back, and a couple
 of bugs were fixed.
 
 New features:
+.............
 
 * **Pure Python codebase**: Forget about Fortran linking problems and
   nightmares on Windows, because now poliastro is a pure Python package.
@@ -230,6 +245,7 @@ New features:
 .. _`poliastro binstar channel`: https://binstar.org/poliastro
 
 Bugs fixed:
+...........
 
 * `Issue #19`_: Fixed plotting region for parabolic orbits.
 * `Issue #37`_: Fixed creation of parabolic orbits.
