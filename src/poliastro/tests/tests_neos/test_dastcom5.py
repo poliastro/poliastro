@@ -28,7 +28,7 @@ def test_orbit_from_name(mock_record_from_name, mock_orbit_from_record):
     mock_orbit_from_record.return_value = iss
     mock_record_from_name.return_value = [1]
 
-    assert dastcom5.orbit_from_name(name) == iss
+    assert dastcom5.orbit_from_name(name) == [iss]
     mock_record_from_name.assert_called_with(name)
 
 
@@ -39,7 +39,7 @@ def test_record_from_name(mock_record_from_name, mock_orbit_from_record):
     mock_orbit_from_record.return_value = iss
     mock_record_from_name.return_value = [1]
 
-    assert dastcom5.orbit_from_name(name) == iss
+    assert dastcom5.orbit_from_name(name) == [iss]
     mock_record_from_name.assert_called_with(name)
 
 
