@@ -384,13 +384,29 @@ def record_from_name(name):
 
     """
     records = []
-    lines = body_strings_from_name(name)
+    lines = string_record_from_name(name)
     for line in lines:
         records.append(int(line[:6].lstrip()))
     return records
 
 
-def body_strings_from_name(name):
+def string_record_from_name(name):
+    """Search `dastcom.idx` and return body full record.
+
+    Search DASTCOM5 index and return body records that match string,
+    containing logical record, name, alternative designations, SPK-ID, etc.
+
+    Parameters
+    ----------
+    name : str
+        Body name.
+
+    Returns
+    -------
+    lines: list(str)
+        Body records
+    """
+
     idx_path = os.path.join(DBS_LOCAL_PATH, 'dastcom.idx')
     lines = []
     with open(idx_path, 'r') as inF:
