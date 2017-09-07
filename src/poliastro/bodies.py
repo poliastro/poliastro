@@ -58,10 +58,10 @@ class _Body(object):
 
 
 class Body(_Body):
-    """Class to represent a generic body of the Solar System.
+    """Class to represent a generic body.
 
     """
-    def __init__(self, parent, k, name, symbol=None, R=0 * u.km):
+    def __init__(self, parent, k, name, symbol=None, R=0 * u.km, **kwargs):
         """Constructor.
 
         Parameters
@@ -83,11 +83,19 @@ class Body(_Body):
         self.name = name
         self.symbol = symbol
         self.R = R
+        self.kwargs = kwargs
 
     @classmethod
     @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
-    def from_parameters(cls, parent, k, name, symbol, R):
-        return cls(parent, k, name, symbol, R)
+    def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
+        return cls(parent, k, name, symbol, R, **kwargs)
+
+    @classmethod
+    def from_relative(cls, reference, parent=None, k=None, name=None,
+                      symbol=None, R=None, **kwargs):
+        k = k * reference.k
+        R = R * reference.R
+        return cls(parent, k, name, symbol, R, **kwargs)
 
 
 class _Sun(_Body):
