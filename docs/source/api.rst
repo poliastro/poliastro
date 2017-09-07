@@ -134,6 +134,12 @@ poliastro.maneuver module
     :members:
     :special-members: __init__
 
+poliastro.patched_conics module
+-------------------------------
+
+.. automodule:: poliastro.patched_conics
+    :members:
+
 poliastro.plotting module
 -------------------------
 

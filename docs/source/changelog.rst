@@ -13,6 +13,8 @@ New features:
 * **NEOS package**: a new package has been added to poliastro, :py:mod:`~poliastro.neos`
   package. It provides several ways of getting NEOs (Near Earth Objects) data from NASA
   databases, online and offline.
+* **New patched conics module**. New module containing a function to compute
+  the radius of the Sphere of Influence (SOI).
 * **Use Astropy for body ephemerides**. Instead of downloading the SPK
   files ourselves, now we use Astropy builtin capabilities. This also
   allows the user to select a builtin ephemerides that does not require
