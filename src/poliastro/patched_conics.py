@@ -1,8 +1,8 @@
-# coding: utf-8
 """Patched Conics Computations
 
 Contains methods to compute interplanetary trajectories approximating the three
 body problem with Patched Conics.
+
 """
 
 from astropy import units as u
@@ -26,6 +26,7 @@ def compute_soi(body, a=None):
     -------
     astropy.units.quantity.Quantity
         Approximated radius of the Sphere of Influence (SOI) [m]
+
     """
     # Compute semimajor axis at epoch J2000 for the body if it was not
     # introduced by the user
