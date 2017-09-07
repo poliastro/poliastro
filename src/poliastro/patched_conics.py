@@ -12,8 +12,20 @@ from poliastro.constants import J2000
 
 @u.quantity_input(a=u.m)
 def compute_soi(body, a=None):
-    """Computes the approximated radius of the Laplace Sphere of Influence (SOI)
- for a body (:py:class:`~Body` class).
+    """Approximated radius of the Laplace Sphere of Influence (SOI) for a body.
+
+    Parameters
+    ----------
+    body : `~poliastro.bodies.Body`
+           Astronomical body which the SOI's radius is computed for
+
+    a : float or None, optional
+        Semimajor Axis of the body's orbit
+
+    Returns
+    -------
+    astropy.units.quantity.Quantity
+        Approximated radius of the Sphere of Influence (SOI) [m]
     """
     # Compute semimajor axis at epoch J2000 for the body if it was not
     # introduced by the user
