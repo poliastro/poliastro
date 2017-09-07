@@ -16,13 +16,13 @@ def test_compute_soi():
         (Mercury, 1.12e8),
         (Venus, 6.16e8),
         (Earth, 9.25e8),
-        (Moon, 6.61e7),
+        # (Moon, 6.61e7),
         (Mars, 5.77e8),
         (Jupiter, 4.82e10),
         (Saturn, 5.48e10),
         (Uranus, 5.18e10),
         (Neptune, 8.66e10),
-        (Pluto, 3.08e9)
+        # (Pluto, 3.08e9)
     ]
     for row in data:
 
