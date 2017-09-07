@@ -129,4 +129,3 @@ def inertial_body_centered_to_pqw(r, v, source_body):
     v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T * u.km / u.s
 
     return r_pqw, v_pqw
-
