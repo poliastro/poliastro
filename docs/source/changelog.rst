@@ -1,26 +1,76 @@
 What's new
 ==========
 
-Unreleased
-----------
+poliastro 0.7.0 - 2017-09-07
+----------------------------
 
-Highlights:
+This is a new major release, which adds new packages and modules,
+besides fixing several issues.
 
+New features:
+.............
+
+* **Pip packaging**: troublesome dependencies have been released in wheel format,
+  so poliastro can now be installed using pip from all platforms.
+* **Coordinates module**: new module containing transformations between ICRS
+  and body-centered frame, and perifocal to body_centered, :py:mod:`~poliastro.coordinates`.
+* **NEOS package**: a new package has been added to poliastro, :py:mod:`~poliastro.neos`
+  package. It provides several ways of getting NEOs (Near Earth Objects) data from NASA
+  databases, online and offline.
+* **New bodies**: added solar system planets (and Pluto and Moon), to bodies
+  module, as well as rotational elements used in body centered frames.
+* **New constants module**: poliastro has now a :py:mod:`~poliastro.constants` module, with GMs and
+  radii of solar system bodies.
 * **Bodies now have a parent**. It is now possible to specify the attractor
   of a body.
 * **Use Astropy for body ephemerides**. Instead of downloading the SPK
   files ourselves, now we use Astropy builtin capabilities. This also
   allows the user to select a builtin ephemerides that does not require
-  external downloads. See `#131` for details.
+  external downloads. See `#131`_ for details.
+
+.. _`#131`: https://github.com/poliastro/poliastro/issues/131
+
+
+Other highlights:
+.................
+
+* **Added Jupyter examples**: poliastro examples are now available in the
+  documentation as Jupyter notebooks, thanks to `nbsphinx`_.
+* **New Code of Conduct**: poliastro community now has a Code of conduct.
+* **Joined Open Astronomy**: we are now part of `Open Astronomy`_, a 
+  collaboration between open source astronomy and astrophysics projects
+  to share resources, ideas, and to improve code.
+* **Included PEP8 and MyPy checks**: code is checked for errors during CI,
+  testing both PEP8 and MyPy complience.
+* **Documentation update**: documentation has been updated with new installation
+  ways, propagation and NEOs examples, "refactored" code and images, improved contribution
+  guidelines and intersphinx extension.
+* **Docs in CI**: added docs to continuous integration.
+* **New success stories**: two new success stories has been added to documentation.
+* **Legend plotting**: now label and epoch are in a figure legend.
+
+.. _`nbsphinx`: http://nbsphinx.readthedocs.io/en/latest/
+.. _`Open Astronomy`: http://openastronomy.org/members/
 
 Bugs fixed:
+...........
 
-* `Issue #128`_: Missing ephemerides if no files on import time
-* Slightly incorrect ephemerides results due to improper time scale, see
-  `#131`_.
+* `Issue #205`_: Bug when plotting orbits with different epochs.
+* `Issue #128`_: Missing ephemerides if no files on import time.
+* `Issue #131`_: Slightly incorrect ephemerides results due to improper time scale.
+* `Issue #130`_: Wrong attractor size when plotting different orbits.
 
+.. _`Issue #205`: https://github.com/poliastro/poliastro/issues/205
 .. _`Issue #128`: https://github.com/poliastro/poliastro/issues/128
-.. _`#131`: https://github.com/poliastro/poliastro/issues/131
+.. _`Issue #131`: https://github.com/poliastro/poliastro/issues/131
+.. _`Issue #130`: https://github.com/poliastro/poliastro/issues/130
+
+Backward incompatible changes:
+..............................
+
+* **Non-osculating orbits**: removed support for non-osculating orbits.
+  :code:`plotting.plot()` calls containing :code:`osculating` parameter should be
+  replaced.
 
 poliastro 0.6.0 - 2017-02-12
 ----------------------------
@@ -29,6 +79,7 @@ This major release was focused on refactoring some internal core
 parts and improving the propagation functionality.
 
 Highlights:
+...........
 
 * **Support Python 3.6**. See `#144`_.
 * **Introduced ``Orbit`` objects** to replace ``State`` ones. The latter
@@ -49,12 +100,14 @@ This is a new major release, focused on expanding the initial orbit
 determination capabilities and solving some infrastructure challenges.
 
 New features:
+.............
 
 * **Izzo's algorithm for the Lambert problem**: Thanks to this algorithm
   multirevolution solutions are also returned. The old algorithm is kept
   on a separate module.
 
 Other highlights:
+.................
 
 * **Documentation on Read the Docs**: You can now browse previous releases
   of the package and easily switch between released and development versions.
@@ -67,12 +120,14 @@ Other highlights:
 .. _`python-astrodynamics`: http://python-astrodynamics.org/
 
 Bugs fixed:
+...........
 
 * `Issue #110`_: Bug when plotting State with non canonical units
 
 .. _`Issue #110`: https://github.com/poliastro/poliastro/issues/110
 
 Backward incompatible changes:
+..............................
 
 * **Drop Legacy Python**: poliastro 0.5.x and later will support only
   Python 3.x. We recommend our potential users to create dedicated virtual
@@ -100,6 +155,7 @@ and an important backwards incompatible change was introduced related to
 classical orbital elements.
 
 New features:
+.............
 
 * **Angle conversion functions**: Finally brought back from poliastro 0.1,
   new functions were added to convert between true \\(\\nu\\), eccentric
@@ -115,6 +171,7 @@ New features:
 .. _`#64`: https://github.com/poliastro/poliastro/pull/64
 
 Other highlights:
+.................
 
 * **MIT license**: The project has been relicensed to a more popular license.
   poliastro remains commercial-friendly through a permissive, OSI-approved
@@ -124,6 +181,7 @@ Other highlights:
   only*.
 
 Bugs fixed:
+...........
 
 * `Issue #62`_: Conversion between coe and rv is not transitive
 * `Issue #69`_: Incorrect plotting of certain closed orbits
@@ -132,6 +190,7 @@ Bugs fixed:
 .. _`Issue #69`: https://github.com/poliastro/poliastro/issues/69
 
 Backward incompatible changes:
+..............................
 
 * **Creation of orbits from classical elements**: poliastro has
   switched to the *semilatus rectum* \\(p\\) instead of the semimajor
@@ -149,6 +208,7 @@ This is a new minor release, with some bug fixes backported from the main
 development branch.
 
 Bugs fixed:
+...........
 
 * Fixed installation problem in Python 2.
 * `Issue #49`_: Fix velocity units in ``ephem``.
@@ -165,6 +225,7 @@ Lambert problem solving and ephemerides computation came back, and a couple
 of bugs were fixed.
 
 New features:
+.............
 
 * **Pure Python codebase**: Forget about Fortran linking problems and
   nightmares on Windows, because now poliastro is a pure Python package.
@@ -185,6 +246,7 @@ New features:
 .. _`poliastro binstar channel`: https://binstar.org/poliastro
 
 Bugs fixed:
+...........
 
 * `Issue #19`_: Fixed plotting region for parabolic orbits.
 * `Issue #37`_: Fixed creation of parabolic orbits.
