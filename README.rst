@@ -12,16 +12,16 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez |orcid|
-:Version: 0.7.dev0
+:Version: 0.7.0b1
 
-.. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square
+.. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/0.7.x.svg?style=flat-square
    :target: https://travis-ci.org/poliastro/poliastro
 
-.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square
-   :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
+.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/0.7.x.svg?style=flat-square
+   :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/0.7.x
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
-   :target: https://codecov.io/github/poliastro/poliastro?branch=master
+   :target: https://codecov.io/github/poliastro/poliastro?branch=0.7.x
 
 .. |codeclimate| image:: https://img.shields.io/codeclimate/github/poliastro/poliastro.svg?style=flat-square
    :target: https://lima.codeclimate.com/github/poliastro/poliastro
@@ -30,7 +30,7 @@
    :target: http://docs.poliastro.space/en/latest/?badge=latest
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
-   :target: https://github.com/poliastro/poliastro/raw/master/COPYING
+   :target: https://github.com/poliastro/poliastro/raw/0.7.x/COPYING
 
 .. |doi| image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg?style=flat-square
    :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
@@ -58,7 +58,7 @@ It is released under the MIT license.
     
     plot(molniya)
 
-.. image:: https://github.com/poliastro/poliastro/raw/master/docs/source/examples/molniya.png
+.. image:: https://github.com/poliastro/poliastro/raw/0.7.x/docs/source/examples/molniya.png
    :align: center
 
 Documentation
@@ -154,7 +154,7 @@ Contributing
 poliastro is a community project, hence all contributions are more than
 welcome! For more information, head to `CONTRIBUTING.rst`_.
 
-.. _`CONTRIBUTING.rst`: https://github.com/poliastro/poliastro/blob/master/CONTRIBUTING.rst
+.. _`CONTRIBUTING.rst`: https://github.com/poliastro/poliastro/blob/0.7.x/CONTRIBUTING.rst
 
 Support
 =======
