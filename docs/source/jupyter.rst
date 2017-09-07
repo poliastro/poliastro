@@ -3,7 +3,8 @@ Jupyter notebooks
 
 .. toctree::
    :maxdepth: 1
-   
+
+   /examples/Catch that asteroid!.ipynb
    /examples/Comparing Hohmann and bielliptic transfers.ipynb
    /examples/Exploring the New Horizons launch.ipynb
    /examples/Going to Jupiter with Python using Jupyter and poliastro.ipynb
