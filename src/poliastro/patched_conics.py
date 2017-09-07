@@ -39,8 +39,8 @@ def compute_soi(body, a=None):
             return r_SOI.decompose()
 
         except KeyError:
-            print("To compute the semimajor axis for Moon",
-                  " and Pluto use the JPL ephemeris: ")
-            print(">>> from astropy.coordinates import solar_system_ephemeris")
-            print('>>> solar_system_ephemeris.set("jpl")')
-            pass
+            raise RuntimeError(
+                """To compute the semimajor axis for Moon and Pluto use the JPL ephemeris:
+
+>>> from astropy.coordinates import solar_system_ephemeris
+>>> solar_system_ephemeris.set("jpl")""")
