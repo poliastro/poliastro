@@ -1,8 +1,8 @@
 What's new
 ==========
 
-poliastro 0.7.0 - 2017-09-07
-----------------------------
+poliastro 0.7.0b1 - 2017-09-07
+------------------------------
 
 This is a new major release, which adds new packages and modules,
 besides fixing several issues.
@@ -10,23 +10,19 @@ besides fixing several issues.
 New features:
 .............
 
-* **Pip packaging**: troublesome dependencies have been released in wheel format,
-  so poliastro can now be installed using pip from all platforms.
-* **Coordinates module**: new module containing transformations between ICRS
-  and body-centered frame, and perifocal to body_centered, :py:mod:`~poliastro.coordinates`.
 * **NEOS package**: a new package has been added to poliastro, :py:mod:`~poliastro.neos`
   package. It provides several ways of getting NEOs (Near Earth Objects) data from NASA
   databases, online and offline.
-* **New bodies**: added solar system planets (and Pluto and Moon), to bodies
-  module, as well as rotational elements used in body centered frames.
-* **New constants module**: poliastro has now a :py:mod:`~poliastro.constants` module, with GMs and
-  radii of solar system bodies.
-* **Bodies now have a parent**. It is now possible to specify the attractor
-  of a body.
 * **Use Astropy for body ephemerides**. Instead of downloading the SPK
   files ourselves, now we use Astropy builtin capabilities. This also
   allows the user to select a builtin ephemerides that does not require
   external downloads. See `#131`_ for details.
+* **Coordinates module**: new module containing transformations between ICRS
+  and body-centered frame, and perifocal to body_centered, :py:mod:`~poliastro.coordinates`.
+* **Pip packaging**: troublesome dependencies have been released in wheel format,
+  so poliastro can now be installed using pip from all platforms.
+* **Legend plotting**: now label and epoch are in a figure legend, which ends with
+  the ambiguity of the epochs when having several plots in the same figure.
 
 .. _`#131`: https://github.com/poliastro/poliastro/issues/131
 
@@ -34,23 +30,43 @@ New features:
 Other highlights:
 .................
 
+* **Joined Open Astronomy**: we are now part of `Open Astronomy`_, a
+  collaboration between open source astronomy and astrophysics projects
+  to share resources, ideas, and to improve code.
+* **New constants module**: poliastro has now a :py:mod:`~poliastro.constants` module,
+  with GMs and radii of solar system bodies.
 * **Added Jupyter examples**: poliastro examples are now available in the
   documentation as Jupyter notebooks, thanks to `nbsphinx`_.
 * **New Code of Conduct**: poliastro community now has a Code of conduct.
-* **Joined Open Astronomy**: we are now part of `Open Astronomy`_, a 
-  collaboration between open source astronomy and astrophysics projects
-  to share resources, ideas, and to improve code.
-* **Included PEP8 and MyPy checks**: code is checked for errors during CI,
-  testing both PEP8 and MyPy complience.
 * **Documentation update**: documentation has been updated with new installation
   ways, propagation and NEOs examples, "refactored" code and images, improved contribution
   guidelines and intersphinx extension.
-* **Docs in CI**: added docs to continuous integration.
-* **New success stories**: two new success stories has been added to documentation.
-* **Legend plotting**: now label and epoch are in a figure legend.
+* **New success stories**: two new success stories have been added to documentation.
+* **Bodies now have a parent**. It is now possible to specify the attractor
+  of a body.
+* **Relative definition of Bodies**. Now it is possible to define Body parameters
+  with respect to another body, and also add any number of properties in a simple
+  way.
 
 .. _`nbsphinx`: http://nbsphinx.readthedocs.io/en/latest/
 .. _`Open Astronomy`: http://openastronomy.org/members/
+
+New contributors
+................
+
+Thanks to the generous SOCIS grant from the European Space Agency,
+Antonio Hidalgo has devoted three months developing poliastro full time
+and gained write acces to the repository.
+
+This is the complete list of the people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* MiguelHB+
+* Antonio Hidalgo+
+* Zac Miller+
+* Fran Navarro+
+* Pablo Rodríguez Robles+
 
 Bugs fixed:
 ...........
