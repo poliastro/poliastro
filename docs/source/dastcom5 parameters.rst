@@ -5,7 +5,7 @@ Dastcom5 parameters
 
 * *a* if it is available for asteroids.
 * *c* if it is available for comets.
-* *[number]+* depending since which version of DASTCOM5 is available.
+* *[number]+* since which version of DASTCOM5 is available.
 
 
 +------+--------+-----------------------------------------------------------+
