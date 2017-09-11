@@ -154,22 +154,14 @@ class OrbitPlotter(object):
         if label:
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
-            handles = []  # type: List[mpl.lines.Line2D]
-            labels = []  # type: List[str]
-
+            if not self.ax.get_legend():
+                size = self.ax.figure.get_size_inches() + [8, 0]
+                self.ax.figure.set_size_inches(size)
             orbit.epoch.out_subfmt = 'date_hm'
             label = '{} ({})'.format(orbit.epoch.iso, label)
 
-            legends = self.ax.figure.legends
-            if legends:
-                handles = legends[0].get_lines()
-                labels = [text.get_text() for text in legends[0].get_texts()]
-                legends[0].remove()
-
-            handles.append(l)
-            labels.append(label)
-            self.ax.figure.legend(handles, labels, mode="expand", loc="lower center", fancybox=True,
-                                  title="Names and epochs")
+            l.set_label(label)
+            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")

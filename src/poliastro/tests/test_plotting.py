@@ -49,7 +49,7 @@ def test_legend():
     op = OrbitPlotter()
     ss = iss
     op.plot(ss, label='ISS')
-    legend = plt.gcf().legends[0]
+    legend = plt.gca().get_legend()
 
     ss.epoch.out_subfmt = 'date_hm'
     label = '{} ({})'.format(ss.epoch.iso, 'ISS')
