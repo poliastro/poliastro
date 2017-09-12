@@ -18,7 +18,7 @@ NEOWS_URL = 'https://api.nasa.gov/neo/rest/v1/neo/'
 SBDB_URL = 'https://ssd.jpl.nasa.gov/sbdb.cgi'
 
 
-def orbit_from_spk_id(spk_id):
+def orbit_from_spk_id(spk_id, api_key='DEMO_KEY'):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a SPK-ID.
 
     Retrieve info from NASA NeoWS API, and therefore
@@ -28,8 +28,8 @@ def orbit_from_spk_id(spk_id):
     ----------
     spk_id : str
         SPK-ID number, which is given to each body by JPL.
-    epoch : ~astropy.time.Time, optional
-            Epoch
+    api_key : str
+        NASA OPEN APIs key (default: `DEMO_KEY`)
 
     Returns
     -------
@@ -37,7 +37,7 @@ def orbit_from_spk_id(spk_id):
         NEA orbit.
 
     """
-    payload = {'api_key': 'DEMO_KEY'}
+    payload = {'api_key': api_key}
 
     response = requests.get(NEOWS_URL + spk_id, params=payload)
     response.raise_for_status()
@@ -106,7 +106,7 @@ def spk_id_from_name(name):
                          SBDB_URL + '?sstr=' + name + ' for more information.')
 
 
-def orbit_from_name(name):
+def orbit_from_name(name, api_key='DEMO_KEY'):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
 
     Retrieve info from NASA NeoWS API, and therefore
@@ -116,6 +116,8 @@ def orbit_from_name(name):
     ----------
     name : str
         NEA name.
+    api_key : str
+        NASA OPEN APIs key (default: `DEMO_KEY`)
 
     Returns
     -------
@@ -125,4 +127,4 @@ def orbit_from_name(name):
     """
     spk_id = spk_id_from_name(name)
     if spk_id is not None:
-        return orbit_from_spk_id(spk_id)
+        return orbit_from_spk_id(spk_id, api_key)

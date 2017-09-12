@@ -361,7 +361,7 @@ def orbit_from_record(record):
     argp = body_data['W'].item() * u.deg
     m = body_data['MA'].item() * u.deg
     nu = M_to_nu(m, ecc)
-    epoch = Time(body_data['EPOCH'].item(), format='jd')
+    epoch = Time(body_data['EPOCH'].item(), format='jd', scale='tdb')
 
     orbit = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch)
     return orbit
@@ -383,13 +383,37 @@ def record_from_name(name):
         DASTCOM5 database logical records matching str.
 
     """
-    idx_path = os.path.join(DBS_LOCAL_PATH, 'dastcom.idx')
     records = []
+    lines = string_record_from_name(name)
+    for line in lines:
+        records.append(int(line[:6].lstrip()))
+    return records
+
+
+def string_record_from_name(name):
+    """Search `dastcom.idx` and return body full record.
+
+    Search DASTCOM5 index and return body records that match string,
+    containing logical record, name, alternative designations, SPK-ID, etc.
+
+    Parameters
+    ----------
+    name : str
+        Body name.
+
+    Returns
+    -------
+    lines: list(str)
+        Body records
+    """
+
+    idx_path = os.path.join(DBS_LOCAL_PATH, 'dastcom.idx')
+    lines = []
     with open(idx_path, 'r') as inF:
         for line in inF:
             if re.search(r"\b" + name.casefold() + r"\b", line.casefold()):
-                records.append(int(line[:6].lstrip()))
-    return records
+                lines.append(line)
+    return lines
 
 
 def read_headers():

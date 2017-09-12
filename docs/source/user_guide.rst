@@ -362,7 +362,7 @@ For example, we can get `Apophis asteroid (99942 Apophis)`_ orbit with one comma
 
     from poliastro.neos import neows
 
-    apophis_orbit = neosws.orbit_from_name('apophis')  # Also '99942' or '99942 apophis' works
+    apophis_orbit = neows.orbit_from_name('apophis')  # Also '99942' or '99942 apophis' works
     earth_orbit =  Orbit.from_body_ephem(Earth)
 
     op = OrbitPlotter()

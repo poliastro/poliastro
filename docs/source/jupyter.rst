@@ -12,3 +12,4 @@ Jupyter notebooks
    /examples/Propagation using Cowell's formulation.ipynb
    /examples/Revisiting Lambert's problem in Python.ipynb
    /examples/Studying Hohmann transfers.ipynb
+   /examples/Using NEOS package.ipynb
