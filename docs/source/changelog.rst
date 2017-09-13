@@ -1,6 +1,11 @@
 What's new
 ==========
 
+Unreleased
+----------
+
+* New :py:mod:`~poliastro.frames` module with coordinate frames definitions.
+
 poliastro 0.7.0b1 - 2017-09-07
 ------------------------------
 

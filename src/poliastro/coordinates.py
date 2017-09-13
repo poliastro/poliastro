@@ -6,13 +6,14 @@ This module complements :py:mod:`astropy.coordinates`.
 
 from math import sin, cos, sqrt
 
-import astropy.coordinates as coordinates
-import astropy.units as u
 import numpy as np
 
-from poliastro.util import transform
+import astropy.units as u
+from astropy.coordinates import get_body_barycentric_posvel
+
 from poliastro.constants import J2000
 from poliastro.twobody.rv import rv2coe
+from poliastro.util import transform
 
 
 def body_centered_to_icrs(r, v, source_body, epoch=J2000, rotate_meridian=False):
@@ -50,7 +51,7 @@ def body_centered_to_icrs(r, v, source_body, epoch=J2000, rotate_meridian=False)
     v_trans1 = transform(v, -(90 * u.deg - dec), 'x')
     v_trans2 = transform(v_trans1, -(90 * u.deg + ra), 'z')
 
-    icrs_frame_pos_coord, icrs_frame_vel_coord = coordinates.get_body_barycentric_posvel(source_body.name, time=epoch)
+    icrs_frame_pos_coord, icrs_frame_vel_coord = get_body_barycentric_posvel(source_body.name, time=epoch)
 
     r_f = icrs_frame_pos_coord.xyz + r_trans2
     v_f = icrs_frame_vel_coord.xyz + v_trans2
@@ -83,7 +84,7 @@ def icrs_to_body_centered(r, v, target_body, epoch=J2000, rotate_meridian=False)
 
     ra, dec, W = target_body.rot_elements_at_epoch(epoch)
 
-    icrs_frame_pos_coord, icrs_frame_vel_coord = coordinates.get_body_barycentric_posvel(target_body.name, time=epoch)
+    icrs_frame_pos_coord, icrs_frame_vel_coord = get_body_barycentric_posvel(target_body.name, time=epoch)
 
     r_trans1 = r - icrs_frame_pos_coord.xyz
     r_trans2 = transform(r_trans1, (90 * u.deg + ra), 'z')

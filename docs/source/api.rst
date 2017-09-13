@@ -128,6 +128,12 @@ poliastro.examples module
 .. automodule:: poliastro.examples
     :members:
 
+poliastro.frames module
+-----------------------
+
+.. automodule:: poliastro.frames
+    :members:
+
 poliastro.hyper module
 ----------------------
 
