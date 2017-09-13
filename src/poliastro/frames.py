@@ -63,4 +63,3 @@ def _ecliptic_to_icrs(from_coo, to_frame):
 
     newrepr = intermed_repr + bary_sun_pos
     return to_frame.realize_frame(newrepr)
-
