@@ -1,13 +1,8 @@
 What's new
 ==========
 
-Unreleased
-----------
-
-* New :py:mod:`~poliastro.frames` module with coordinate frames definitions.
-
-poliastro 0.7.0b1 - 2017-09-07
-------------------------------
+poliastro 0.7.0 - 2017-09-15
+----------------------------
 
 This is a new major release, which adds new packages and modules,
 besides fixing several issues.
@@ -24,8 +19,10 @@ New features:
   files ourselves, now we use Astropy builtin capabilities. This also
   allows the user to select a builtin ephemerides that does not require
   external downloads. See `#131`_ for details.
-* **Coordinates module**: new module containing transformations between ICRS
-  and body-centered frame, and perifocal to body_centered, :py:mod:`~poliastro.coordinates`.
+* **Coordinates and frames modules**: new modules containing transformations between ICRS
+  and body-centered frame, and perifocal to body_centered, :py:mod:`~poliastro.coordinates`
+  as well as Heliocentric coordinate frame in :py:mod:`~poliastro.frames` based on Astropy
+  for NEOs.
 * **Pip packaging**: troublesome dependencies have been released in wheel format,
   so poliastro can now be installed using pip from all platforms.
 * **Legend plotting**: now label and epoch are in a figure legend, which ends with
