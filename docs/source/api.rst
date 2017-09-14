@@ -78,6 +78,13 @@ poliastro.neos.dastcom5 module
 .. automodule:: poliastro.neos.dastcom5
     :members:
 
+dastcom5 parameters
+...................
+.. toctree::
+   :maxdepth: 2
+
+   dastcom5 parameters
+
 poliastro.neos.neows module
 ***************************
 
@@ -119,6 +126,12 @@ poliastro.examples module
 -------------------------
 
 .. automodule:: poliastro.examples
+    :members:
+
+poliastro.frames module
+-----------------------
+
+.. automodule:: poliastro.frames
     :members:
 
 poliastro.hyper module

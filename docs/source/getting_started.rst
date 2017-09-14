@@ -46,11 +46,14 @@ using pip::
 .. warning::
 
     At the time of writing, this installation process requires
-    development versions of NumPy, SciPy and Numba to succeed on Windows.
-    To install these versions, please check out the following links:
+    a development version of SciPy to succeed on Windows.
+    To install it, please check out this link:
 
-    * https://mail.python.org/pipermail/scipy-dev/2017-August/022050.html
-    * https://groups.google.com/a/continuum.io/d/msg/numba-users/OuBmvN7zpVA/GCMdTRoDCwAJ
+    https://mail.python.org/pipermail/scipy-dev/2017-August/022050.html
+
+    The complete command would be::
+
+        $ pip install --pre poliastro -f https://7933911d6844c6c53a7d-47bd50c35cd79bd838daf386af554a83.ssl.cf2.rackcdn.com/
 
     If these installation steps fail for you, please consider using conda.
 
