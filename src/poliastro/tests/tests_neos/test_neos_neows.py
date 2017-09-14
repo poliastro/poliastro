@@ -26,16 +26,27 @@ def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
         }
     }
 
+    icrs_data = {
+        'orbital_data': {
+            'eccentricity': '0.22045834954894472',
+            'semi_major_axis': '1.4454058710517677',
+            'inclination': '30.82410078967394',
+            'ascending_node_longitude': '342.2929915242896',
+            'perihelion_argument': '137.7817941972375',
+            'mean_anomaly': '72.57518304202917',
+            'epoch_osculation': '2458000.5',
+        }
+    }
     mock_response.json.return_value = mock_orbital_data
     mock_get.return_value = mock_response
     ss = neows.orbit_from_spk_id('')
 
-    assert ss.ecc == mock_orbital_data['orbital_data']['eccentricity'] * u.one
-    assert ss.a == mock_orbital_data['orbital_data']['semi_major_axis'] * u.AU
-    assert ss.inc == mock_orbital_data['orbital_data']['inclination'] * u.deg
-    assert ss.raan == mock_orbital_data['orbital_data']['ascending_node_longitude'] * u.deg
-    assert ss.argp == mock_orbital_data['orbital_data']['perihelion_argument'] * u.deg
-    assert nu_to_M(ss.nu, ss.ecc) == mock_orbital_data['orbital_data']['mean_anomaly'] * u.deg
+    assert ss.ecc == icrs_data['orbital_data']['eccentricity'] * u.one
+    assert ss.a == icrs_data['orbital_data']['semi_major_axis'] * u.AU
+    assert ss.inc == icrs_data['orbital_data']['inclination'] * u.deg
+    assert ss.raan == icrs_data['orbital_data']['ascending_node_longitude'] * u.deg
+    assert ss.argp == icrs_data['orbital_data']['perihelion_argument'] * u.deg
+    assert nu_to_M(ss.nu, ss.ecc) == icrs_data['orbital_data']['mean_anomaly'] * u.deg
 
 
 @mock.patch('poliastro.neos.neows.requests.get')
