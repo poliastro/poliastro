@@ -23,14 +23,14 @@ BODY_COLORS = {
 }
 
 
-def plot(state, label=None):
+def plot(state, label=None, color=None):
     """Plots a ``State``.
 
     For more advanced tuning, use the :py:class:`OrbitPlotter` class.
 
     """
     op = OrbitPlotter()
-    return op.plot(state, label=label)
+    return op.plot(state, label=label, color=color)
 
 
 class OrbitPlotter(object):
@@ -103,7 +103,7 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, label=None):
+    def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
 
         """
@@ -144,7 +144,7 @@ class OrbitPlotter(object):
 
         # Plot current position
         l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
-                          'o', mew=0)
+                          'o', mew=0, color=color)
         lines.append(l)
 
         l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
