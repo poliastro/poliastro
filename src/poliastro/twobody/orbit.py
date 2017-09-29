@@ -1,5 +1,4 @@
-# coding: utf-8
-from datetime import datetime
+from warnings import warn
 
 import numpy as np
 
@@ -8,7 +7,7 @@ from astropy import units as u
 from astropy import time
 
 from poliastro.constants import J2000
-from poliastro.ephem import get_body_ephem
+from poliastro.ephem import get_body_ephem, TimeScaleWarning
 from poliastro.twobody.propagation import propagate
 
 import poliastro.twobody.rv
@@ -125,7 +124,12 @@ class Orbit(object):
 
         """
         if not epoch:
-            epoch = time.Time.now()
+            epoch = time.Time.now().tdb
+        elif epoch.scale != 'tdb':
+            epoch = epoch.tdb
+            warn("Input time was converted to scale='tdb' with value "
+                 "{}. Use Time(..., scale='tdb') instead."
+                 .format(epoch.tdb.value), TimeScaleWarning)
 
         r, v = get_body_ephem(body.name, epoch)
         return cls.from_vectors(body.parent, r, v, epoch)
