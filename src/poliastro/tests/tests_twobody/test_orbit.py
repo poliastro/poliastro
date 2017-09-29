@@ -1,4 +1,3 @@
-# coding: utf-8
 import pytest
 
 from numpy.testing import assert_allclose
@@ -9,6 +8,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy import time
 
 from poliastro.bodies import Sun, Earth
+from poliastro.ephem import TimeScaleWarning
 from poliastro.twobody import Orbit
 from poliastro.constants import J2000
 
@@ -83,6 +83,17 @@ def test_orbit_from_ephem_with_no_epoch_is_today():
     body = Earth
     ss = Orbit.from_body_ephem(body)
     assert (time.Time.now() - ss.epoch).sec < 1
+
+
+def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
+    body = Earth
+    epoch = time.Time("2017-09-29 07:31:26", scale="utc")
+    expected_epoch_string = "2017-09-29 07:32:35.182"  # epoch.tdb.value
+
+    Orbit.from_body_ephem(body, epoch)
+
+    w = recwarn.pop(TimeScaleWarning)
+    assert expected_epoch_string in str(w.message)
 
 
 def test_circular_has_proper_semimajor_axis():

@@ -6,6 +6,10 @@ from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
 
 
+class TimeScaleWarning(UserWarning):
+    pass
+
+
 def get_body_ephem(body, epoch):
     """Position and velocity vectors of a given body at a certain time.
 
