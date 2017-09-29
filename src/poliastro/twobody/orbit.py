@@ -128,7 +128,7 @@ class Orbit(object):
         elif epoch.scale != 'tdb':
             epoch = epoch.tdb
             warn("Input time was converted to scale='tdb' with value "
-                 "{}. Use Time(..., scale='tdb') or Time(...).tdb instead."
+                 "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
 
         r, v = get_body_ephem(body.name, epoch)
