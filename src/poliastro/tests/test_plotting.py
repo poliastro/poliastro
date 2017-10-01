@@ -55,14 +55,15 @@ def test_legend():
     label = '{} ({})'.format(ss.epoch.iso, 'ISS')
 
     assert legend.get_texts()[0].get_text() == label
-    
+
+
 def test_color():
     op = OrbitPlotter()
     ss = iss
     c = "#FF0000"
     op.plot(ss, label='ISS', color=c)
     ax = plt.gca()
-    
+
     assert ax.get_legend().get_lines()[0].get_c() == c
     for element in ax.get_lines():
         assert element.get_c() == c
