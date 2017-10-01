@@ -1,10 +1,13 @@
-# coding: utf-8
-from numpy.testing import assert_allclose
+from pytest import approx
+
 import numpy as np
+from numpy.testing import assert_allclose
 
 from astropy import units as u
+from astropy import time
 from astropy.tests.helper import assert_quantity_allclose
 
+from poliastro.constants import J2000
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
@@ -144,3 +147,23 @@ def test_cowell_propagation_circle_to_circle():
     dv = abs(norm(ss_final.v) - norm(ss.v))
     accel_dt = accel * u.km / u.s**2 * tof
     assert_quantity_allclose(dv, accel_dt, rtol=1e-2)
+
+
+def test_propagate_to_date_has_proper_epoch():
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    init_epoch = J2000
+    final_epoch = time.Time("2000-01-01 12:40:00", scale="tdb")
+
+    expected_r = [-4219.7527, 4363.0292, -3958.7666] * u.km
+    expected_v = [3.689866, -1.916735, -6.112511] * u.km / u.s
+
+    ss0 = Orbit.from_vectors(Earth, r0, v0, epoch=init_epoch)
+    ss1 = ss0.propagate(final_epoch)
+
+    r, v = ss1.rv()
+
+    assert_quantity_allclose(r, expected_r, rtol=1e-5)
+    assert_quantity_allclose(v, expected_v, rtol=1e-4)
+    assert (ss1.epoch - final_epoch).sec == approx(0.0)
