@@ -47,7 +47,6 @@ before_script:
 
 script:
   - python setup.py test -vv  # Test against installed code
-  - jupyter nbextension enable --py --sys-prefix widgetsnbextension
   - sphinx-build -vW -b html docs/source _HTMLTest  # Test docs build
 
 after_success:
