@@ -66,7 +66,9 @@ setup(
             "sphinx",
             "sphinx_rtd_theme",
             "nbsphinx",
-            "jupyter"
+            "ipython",
+            "jupyter-client",
+            "ipykernel"
         ]
     },
     packages=find_packages('src'),
