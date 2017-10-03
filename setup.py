@@ -68,7 +68,8 @@ setup(
             "nbsphinx",
             "ipython",
             "jupyter-client",
-            "ipykernel"
+            "ipykernel",
+            "ipywidgets"
         ]
     },
     packages=find_packages('src'),
