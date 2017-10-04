@@ -166,4 +166,6 @@ def test_propagate_to_date_has_proper_epoch():
 
     assert_quantity_allclose(r, expected_r, rtol=1e-5)
     assert_quantity_allclose(v, expected_v, rtol=1e-4)
-    assert (ss1.epoch - final_epoch).sec == approx(0.0)
+
+    # Tolerance should be higher, see https://github.com/astropy/astropy/issues/6638
+    assert (ss1.epoch - final_epoch).sec == approx(0.0, abs=1e-6)
