@@ -246,7 +246,7 @@ class Orbit(object):
         attractor = self.attractor
         for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
-                orbit_new = orbit_new.propagate(time_of_flight=delta_t)
+                orbit_new = orbit_new.propagate(delta_t)
             r, v = orbit_new.rv()
             vnew = v + delta_v
             orbit_new = self.from_vectors(attractor, r, vnew, orbit_new.epoch)
