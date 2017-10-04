@@ -210,10 +210,22 @@ class Orbit(object):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, time_of_flight, rtol=1e-10):
+    def propagate(self, epoch_or_duration, rtol=1e-10):
         """Propagate this `Orbit` some `time` and return the result.
 
+        Parameters
+        ----------
+        epoch_or_duration : Time, TimeDelta or equivalent
+            Final epoch or time of flight.
+        rtol : float, optional
+            Relative tolerance for the propagation algorithm, default to 1e-10.
+
         """
+        if isinstance(epoch_or_duration, time.Time) and not isinstance(epoch_or_duration, time.TimeDelta):
+            time_of_flight = epoch_or_duration - self.epoch
+        else:
+            time_of_flight = time.TimeDelta(epoch_or_duration)
+
         return propagate(self, time_of_flight, rtol=rtol)
 
     def apply_maneuver(self, maneuver, intermediate=False):
@@ -234,7 +246,7 @@ class Orbit(object):
         attractor = self.attractor
         for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
-                orbit_new = orbit_new.propagate(time_of_flight=delta_t)
+                orbit_new = orbit_new.propagate(delta_t)
             r, v = orbit_new.rv()
             vnew = v + delta_v
             orbit_new = self.from_vectors(attractor, r, vnew, orbit_new.epoch)
