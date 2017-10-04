@@ -32,6 +32,23 @@ def test_propagation():
     assert_quantity_allclose(v, expected_v, rtol=1e-4)
 
 
+def test_propagate_accepts_timedelta():
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    expected_r = [-4219.7527, 4363.0292, -3958.7666] * u.km
+    expected_v = [3.689866, -1.916735, -6.112511] * u.km / u.s
+
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
+    tof = time.TimeDelta(40 * u.min)
+    ss1 = ss0.propagate(tof)
+
+    r, v = ss1.rv()
+
+    assert_quantity_allclose(r, expected_r, rtol=1e-5)
+    assert_quantity_allclose(v, expected_v, rtol=1e-4)
+
+
 def test_propagation_hyperbolic():
     # Data from Curtis, example 3.5
     r0 = [Earth.R.to(u.km).value + 300, 0, 0] * u.km

@@ -221,7 +221,7 @@ class Orbit(object):
             Relative tolerance for the propagation algorithm, default to 1e-10.
 
         """
-        if isinstance(epoch_or_duration, time.Time):
+        if isinstance(epoch_or_duration, time.Time) and not isinstance(epoch_or_duration, time.TimeDelta):
             time_of_flight = epoch_or_duration - self.epoch
         else:
             time_of_flight = time.TimeDelta(epoch_or_duration)
