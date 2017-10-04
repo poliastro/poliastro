@@ -117,6 +117,12 @@ intersphinx_mapping = {
     'matplotlib': ('http://matplotlib.org', None)
 }
 
+#Nbsphinx configuration
+nbsphinx_execute = 'always'
+
+# Controls when a cell will time out (defaults to 30; use -1 for no timeout):
+nbsphinx_timeout = 60
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
