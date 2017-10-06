@@ -63,7 +63,7 @@ setup(
         'dev': [
             "pep8",
             "mypy",
-            "sphinx",
+            "sphinx<1.6",
             "sphinx_rtd_theme",
             "nbsphinx",
             "ipython",
