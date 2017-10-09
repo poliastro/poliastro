@@ -1,0 +1,2 @@
+# Used for beta.mybinder.org
+https://github.com/poliastro/poliastro/archive/master.zip

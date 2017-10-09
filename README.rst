@@ -77,7 +77,8 @@ Examples
 ========
 
 .. |mybinder| image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
-   :target: http://mybinder.org/repo/poliastro/poliastro
+   :target: https://beta.mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb
+
 
 |mybinder|
 
@@ -85,9 +86,9 @@ In the examples directory you can find several Jupyter notebooks with specific
 applications of poliastro. You can launch a cloud Jupyter server using `binder`_ to edit
 the notebooks without installing anything. Try it out!
 
-http://mybinder.org/repo/poliastro/poliastro
+https://beta.mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb
 
-.. _binder: http://mybinder.org/
+.. _binder: https://beta.mybinder.org/
 
 Requirements
 ============
