@@ -43,9 +43,9 @@ and `chat`_.
 You can browse the gallery of examples using `binder`_, a cloud Jupyter notebook server:
 
 .. image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
-   :target: http://mybinder.org/repo/poliastro/poliastro
+   :target: https://beta.mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb
 
-.. _binder: http://mybinder.org/
+.. _binder: https://beta.mybinder.org/
 
 The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
 contributions and feedback are more than welcome:
