@@ -281,7 +281,6 @@ class Orbit(object):
 
             # Use class docstring to properly translate properties, see
             # https://stackoverflow.com/a/38118315/554319
-            # FIXME: Docstring comes from different sources
             delegated_.__doc__ = getattr(self.state.__class__, item).__doc__
 
             # Transform to a property
