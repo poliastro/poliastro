@@ -1,4 +1,3 @@
-# coding: utf-8
 """Functions to define orbits from classical orbital elements.
 
 """
@@ -8,8 +7,8 @@ from astropy import units as u
 
 from poliastro.util import transform
 
-import poliastro.twobody.rv
-import poliastro.twobody.equinoctial
+from poliastro.twobody import rv
+from poliastro.twobody import equinoctial
 
 from ._base import BaseState
 
@@ -150,9 +149,10 @@ class ClassicalState(BaseState):
                       self.argp.to(u.rad).value,
                       self.nu.to(u.rad).value)
 
-        return poliastro.twobody.rv.RVState(self.attractor,
-                                            r * u.km,
-                                            v * u.km / u.s)
+        return rv.RVState(
+            self.attractor,
+            r * u.km,
+            v * u.km / u.s)
 
     def to_classical(self):
         """Converts to classical orbital elements representation.
@@ -171,7 +171,7 @@ class ClassicalState(BaseState):
                                    self.argp.to(u.rad).value,
                                    self.nu.to(u.rad).value)
 
-        return poliastro.twobody.equinoctial.ModifiedEquinoctialState(
+        return equinoctial.ModifiedEquinoctialState(
             self.attractor,
             p * u.km,
             f * u.rad,

@@ -1,9 +1,5 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# http://stackoverflow.com/a/10975371/554319
 import os
-import io
 import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test
@@ -28,6 +24,7 @@ class PyTest(test):
         import pytest
 
         sys.exit(pytest.main(shlex.split(self.pytest_args)))
+
 
 # http://blog.ionelmc.ro/2014/05/25/python-packaging/
 setup(
@@ -94,7 +91,7 @@ setup(
         "Topic :: Scientific/Engineering :: Physics",
         "Topic :: Scientific/Engineering :: Astronomy",
     ],
-    long_description=io.open('README.rst', encoding='utf-8').read(),
+    long_description=open('README.rst', encoding='utf-8').read(),
     package_data={"poliastro": ['tests/*.py']},
     include_package_data=True,
     zip_safe=False,

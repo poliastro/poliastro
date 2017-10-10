@@ -1,4 +1,3 @@
-# coding: utf-8
 """Bodies of the Solar System.
 
 Contains some predefined bodies of the Solar System:

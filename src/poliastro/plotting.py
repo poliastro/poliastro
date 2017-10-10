@@ -1,9 +1,6 @@
-# coding: utf-8
 """ Plotting utilities.
 
 """
-from typing import List
-
 import numpy as np
 
 import matplotlib as mpl

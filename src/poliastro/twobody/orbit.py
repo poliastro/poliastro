@@ -3,16 +3,17 @@ from warnings import warn
 import numpy as np
 
 from astropy import units as u
-
 from astropy import time
 
 from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem, TimeScaleWarning
 from poliastro.twobody.propagation import propagate
 
-import poliastro.twobody.rv
-import poliastro.twobody.classical
-import poliastro.twobody.equinoctial
+from poliastro.twobody import rv
+from poliastro.twobody import classical
+from poliastro.twobody import equinoctial
+
+from ._base import BaseState
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
@@ -26,11 +27,26 @@ class Orbit(object):
     def __init__(self, state, epoch):
         """Constructor.
 
+        Parameters
+        ----------
+        state : BaseState
+            Position and velocity or orbital elements.
+        epoch : ~astropy.time.Time
+            Epoch of the orbit.
+
         """
-        #: Position and velocity or classical elements
-        self.state = state
-        #: Epoch of the orbit
-        self.epoch = epoch
+        self._state = state  # type: BaseState
+        self._epoch = epoch  # type: time.Time
+
+    @property
+    def state(self):
+        """Position and velocity or orbital elements. """
+        return self._state
+
+    @property
+    def epoch(self):
+        """Epoch of the orbit. """
+        return self._epoch
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
@@ -51,7 +67,7 @@ class Orbit(object):
         """
         assert np.any(r.value), "Position vector must be non zero"
 
-        ss = poliastro.twobody.rv.RVState(
+        ss = rv.RVState(
             attractor, r, v)
         return cls(ss, epoch)
 
@@ -85,7 +101,7 @@ class Orbit(object):
         elif not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
 
-        ss = poliastro.twobody.classical.ClassicalState(
+        ss = classical.ClassicalState(
             attractor, a, ecc, inc, raan, argp, nu)
         return cls(ss, epoch)
 
@@ -114,7 +130,7 @@ class Orbit(object):
             Epoch, default to J2000.
 
         """
-        ss = poliastro.twobody.equinoctial.ModifiedEquinoctialState(
+        ss = equinoctial.ModifiedEquinoctialState(
             attractor, p, f, g, h, k, L)
         return cls(ss, epoch)
 
@@ -187,7 +203,7 @@ class Orbit(object):
         """
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
         ecc = 1.0 * u.one
-        r, v = poliastro.twobody.classical.coe2rv(
+        r, v = classical.coe2rv(
             k.to(u.km ** 3 / u.s ** 2).value,
             p.to(u.km).value, ecc.value, inc.to(u.rad).value,
             raan.to(u.rad).value, argp.to(u.rad).value,
@@ -257,129 +273,24 @@ class Orbit(object):
             res = orbit_new
         return res
 
-    def rv(self):
-        """Position and velocity vectors. """
-        return self.state.rv()
+    # Delegated properties (syntactic sugar)
+    def __getattr__(self, item):
+        if hasattr(self.state, item):
+            def delegated_(self_):
+                return getattr(self_.state, item)
 
-    def coe(self):
-        """Classical orbital elements. """
-        return self.state.coe()
+            # Use class docstring to properly translate properties, see
+            # https://stackoverflow.com/a/38118315/554319
+            delegated_.__doc__ = getattr(self.state.__class__, item).__doc__
 
-    def pqw(self):
-        """Perifocal frame (PQW) vectors. """
-        return self.state.pqw()
+            # Transform to a property
+            delegated = property(delegated_)
 
-    @property
-    def attractor(self):
-        """Main attractor body. """
-        return self.state.attractor
+        else:
+            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__, item))
 
-    @property
-    def r(self):
-        """Position vector. """
-        return self.state.r
+        # Bind the attribute
+        setattr(self.__class__, item, delegated)
 
-    @property
-    def v(self):
-        """Velocity vector. """
-        return self.state.v
-
-    @property
-    def a(self):
-        """Semimajor axis. """
-        return self.state.a
-
-    @property
-    def p(self):
-        """Semilatus rectum. """
-        return self.state.p
-
-    @property
-    def r_p(self):
-        """Radius of pericenter. """
-        return self.state.r_p
-
-    @property
-    def r_a(self):
-        """Radius of apocenter. """
-        return self.state.r_a
-
-    @property
-    def ecc(self):
-        """Eccentricity. """
-        return self.state.ecc
-
-    @property
-    def inc(self):
-        """Inclination. """
-        return self.state.inc
-
-    @property
-    def raan(self):
-        """Right ascension of the ascending node. """
-        return self.state.raan
-
-    @property
-    def argp(self):
-        """Argument of the perigee. """
-        return self.state.argp
-
-    @property
-    def nu(self):
-        """True anomaly. """
-        return self.state.nu
-
-    @property
-    def f(self):
-        """Second modified equinoctial element. """
-        return self.state.f
-
-    @property
-    def g(self):
-        """Third modified equinoctial element. """
-        return self.state.g
-
-    @property
-    def h(self):
-        """Fourth modified equinoctial element. """
-        return self.state.h
-
-    @property
-    def k(self):
-        """Fifth modified equinoctial element. """
-        return self.state.k
-
-    @property
-    def L(self):
-        """True longitude. """
-        return self.state.L
-
-    @property
-    def period(self):
-        """Period of the orbit. """
-        return self.state.period
-
-    @property
-    def n(self):
-        """Mean motion. """
-        return self.state.n
-
-    @property
-    def energy(self):
-        """Specific energy. """
-        return self.state.energy
-
-    @property
-    def e_vec(self):
-        """Eccentricity vector. """
-        return self.state.e_vec
-
-    @property
-    def h_vec(self):
-        """Specific angular momentum vector. """
-        return self.state.h_vec
-
-    @property
-    def arglat(self):
-        """Argument of latitude. """
-        return self.state.arglat
+        # Return the newly bound attribute
+        return getattr(self, item)

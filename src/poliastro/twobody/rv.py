@@ -1,4 +1,3 @@
-# coding: utf-8
 """Functions to define orbits from position and velocity vectors.
 
 """
@@ -7,8 +6,7 @@ from astropy import units as u
 
 from poliastro.util import norm
 
-import poliastro.twobody.classical
-import poliastro.twobody.equinoctial
+from poliastro.twobody import classical
 
 from ._base import BaseState
 
@@ -99,7 +97,7 @@ class RVState(BaseState):
 
         a = p / (1 - ecc**2)
 
-        return poliastro.twobody.classical.ClassicalState(
+        return classical.ClassicalState(
             self.attractor,
             a * u.km,
             ecc * u.one,

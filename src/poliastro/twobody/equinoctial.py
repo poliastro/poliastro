@@ -1,12 +1,10 @@
-# coding: utf-8
 """Functions to define orbits from modified equinoctial orbital elements.
 
 """
 import numpy as np
 from astropy import units as u
 
-import poliastro.twobody.rv
-import poliastro.twobody.classical
+from poliastro.twobody import classical
 
 from ._base import BaseState
 
@@ -77,7 +75,7 @@ class ModifiedEquinoctialState(BaseState):
 
         a = p / (1 - ecc**2)
 
-        return poliastro.twobody.classical.ClassicalState(
+        return classical.ClassicalState(
             self.attractor,
             a * u.km,
             ecc * u.one,

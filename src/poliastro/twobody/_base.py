@@ -1,4 +1,3 @@
-# coding: utf-8
 import numpy as np
 
 from astropy import units as u
@@ -19,7 +18,12 @@ class BaseState(object):
             Main attractor.
 
         """
-        self.attractor = attractor
+        self._attractor = attractor
+
+    @property
+    def attractor(self):
+        """Main attractor. """
+        return self._attractor
 
     @property
     def r(self):

@@ -1,4 +1,3 @@
-# coding: utf-8
 from numpy import cos, sin, cosh, sinh
 from numpy.testing import assert_allclose, assert_equal
 

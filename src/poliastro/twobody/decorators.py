@@ -1,7 +1,6 @@
 """Decorators.
 
 """
-
 from functools import wraps
 
 from astropy import units as u
