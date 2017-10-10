@@ -27,10 +27,18 @@ class Orbit(object):
         """Constructor.
 
         """
-        #: Position and velocity or classical elements
-        self.state = state
-        #: Epoch of the orbit
-        self.epoch = epoch
+        self._state = state
+        self._epoch = epoch
+
+    @property
+    def state(self):
+        """Position and velocity or classical elements. """
+        return self._state
+
+    @property
+    def epoch(self):
+        """Epoch of the orbit. """
+        return self._epoch
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
@@ -257,129 +265,25 @@ class Orbit(object):
             res = orbit_new
         return res
 
-    def rv(self):
-        """Position and velocity vectors. """
-        return self.state.rv()
+    # Delegated properties (syntactic sugar)
+    def __getattr__(self, item):
+        if hasattr(self.state, item):
+            def delegated(self_):
+                return getattr(self_.state, item)
 
-    def coe(self):
-        """Classical orbital elements. """
-        return self.state.coe()
+            # Use class docstring to properly translate properties, see
+            # https://stackoverflow.com/a/38118315/554319
+            # FIXME: Docstring comes from different sources
+            delegated.__doc__ = getattr(self.state.__class__, item).__doc__
 
-    def pqw(self):
-        """Perifocal frame (PQW) vectors. """
-        return self.state.pqw()
+            # Transform to a property
+            delegated = property(delegated)
 
-    @property
-    def attractor(self):
-        """Main attractor body. """
-        return self.state.attractor
+        else:
+            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__, item))
 
-    @property
-    def r(self):
-        """Position vector. """
-        return self.state.r
+        # Bind the attribute
+        setattr(self.__class__, item, delegated)
 
-    @property
-    def v(self):
-        """Velocity vector. """
-        return self.state.v
-
-    @property
-    def a(self):
-        """Semimajor axis. """
-        return self.state.a
-
-    @property
-    def p(self):
-        """Semilatus rectum. """
-        return self.state.p
-
-    @property
-    def r_p(self):
-        """Radius of pericenter. """
-        return self.state.r_p
-
-    @property
-    def r_a(self):
-        """Radius of apocenter. """
-        return self.state.r_a
-
-    @property
-    def ecc(self):
-        """Eccentricity. """
-        return self.state.ecc
-
-    @property
-    def inc(self):
-        """Inclination. """
-        return self.state.inc
-
-    @property
-    def raan(self):
-        """Right ascension of the ascending node. """
-        return self.state.raan
-
-    @property
-    def argp(self):
-        """Argument of the perigee. """
-        return self.state.argp
-
-    @property
-    def nu(self):
-        """True anomaly. """
-        return self.state.nu
-
-    @property
-    def f(self):
-        """Second modified equinoctial element. """
-        return self.state.f
-
-    @property
-    def g(self):
-        """Third modified equinoctial element. """
-        return self.state.g
-
-    @property
-    def h(self):
-        """Fourth modified equinoctial element. """
-        return self.state.h
-
-    @property
-    def k(self):
-        """Fifth modified equinoctial element. """
-        return self.state.k
-
-    @property
-    def L(self):
-        """True longitude. """
-        return self.state.L
-
-    @property
-    def period(self):
-        """Period of the orbit. """
-        return self.state.period
-
-    @property
-    def n(self):
-        """Mean motion. """
-        return self.state.n
-
-    @property
-    def energy(self):
-        """Specific energy. """
-        return self.state.energy
-
-    @property
-    def e_vec(self):
-        """Eccentricity vector. """
-        return self.state.e_vec
-
-    @property
-    def h_vec(self):
-        """Specific angular momentum vector. """
-        return self.state.h_vec
-
-    @property
-    def arglat(self):
-        """Argument of latitude. """
-        return self.state.arglat
+        # Return the newly bound attribute
+        return getattr(self, item)
