@@ -3,16 +3,17 @@ from warnings import warn
 import numpy as np
 
 from astropy import units as u
-
 from astropy import time
 
 from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem, TimeScaleWarning
 from poliastro.twobody.propagation import propagate
 
-import poliastro.twobody.rv
-import poliastro.twobody.classical
-import poliastro.twobody.equinoctial
+from poliastro.twobody import rv
+from poliastro.twobody import classical
+from poliastro.twobody import equinoctial
+
+from ._base import BaseState
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
@@ -26,13 +27,20 @@ class Orbit(object):
     def __init__(self, state, epoch):
         """Constructor.
 
+        Parameters
+        ----------
+        state : BaseState
+            Position and velocity or orbital elements.
+        epoch : ~astropy.time.Time
+            Epoch of the orbit.
+
         """
-        self._state = state
-        self._epoch = epoch
+        self._state = state  # type: BaseState
+        self._epoch = epoch  # type: time.Time
 
     @property
     def state(self):
-        """Position and velocity or classical elements. """
+        """Position and velocity or orbital elements. """
         return self._state
 
     @property
@@ -59,7 +67,7 @@ class Orbit(object):
         """
         assert np.any(r.value), "Position vector must be non zero"
 
-        ss = poliastro.twobody.rv.RVState(
+        ss = rv.RVState(
             attractor, r, v)
         return cls(ss, epoch)
 
@@ -93,7 +101,7 @@ class Orbit(object):
         elif not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
 
-        ss = poliastro.twobody.classical.ClassicalState(
+        ss = classical.ClassicalState(
             attractor, a, ecc, inc, raan, argp, nu)
         return cls(ss, epoch)
 
@@ -122,7 +130,7 @@ class Orbit(object):
             Epoch, default to J2000.
 
         """
-        ss = poliastro.twobody.equinoctial.ModifiedEquinoctialState(
+        ss = equinoctial.ModifiedEquinoctialState(
             attractor, p, f, g, h, k, L)
         return cls(ss, epoch)
 
@@ -195,7 +203,7 @@ class Orbit(object):
         """
         k = attractor.k.to(u.km ** 3 / u.s ** 2)
         ecc = 1.0 * u.one
-        r, v = poliastro.twobody.classical.coe2rv(
+        r, v = classical.coe2rv(
             k.to(u.km ** 3 / u.s ** 2).value,
             p.to(u.km).value, ecc.value, inc.to(u.rad).value,
             raan.to(u.rad).value, argp.to(u.rad).value,

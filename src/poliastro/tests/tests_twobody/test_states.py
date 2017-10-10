@@ -1,6 +1,3 @@
-# coding: utf-8
-import pytest
-
 from numpy.testing import assert_allclose
 
 from astropy import units as u
