@@ -23,8 +23,8 @@
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
-.. |codeclimate| image:: https://img.shields.io/codeclimate/github/poliastro/poliastro.svg?style=flat-square
-   :target: https://lima.codeclimate.com/github/poliastro/poliastro
+.. |codeclimate| image:: https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability
+   :target: https://codeclimate.com/github/poliastro/poliastro/maintainability
 
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
    :target: http://docs.poliastro.space/en/latest/?badge=latest
