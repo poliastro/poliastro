@@ -5,5 +5,8 @@ engines:
     enabled: true
   radon:
     enabled: true
+ratings:
+  paths:
+  - "**.py"
 exclude_paths:
   - "docs/source"
