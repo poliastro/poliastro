@@ -276,16 +276,16 @@ class Orbit(object):
     # Delegated properties (syntactic sugar)
     def __getattr__(self, item):
         if hasattr(self.state, item):
-            def delegated(self_):
+            def delegated_(self_):
                 return getattr(self_.state, item)
 
             # Use class docstring to properly translate properties, see
             # https://stackoverflow.com/a/38118315/554319
             # FIXME: Docstring comes from different sources
-            delegated.__doc__ = getattr(self.state.__class__, item).__doc__
+            delegated_.__doc__ = getattr(self.state.__class__, item).__doc__
 
             # Transform to a property
-            delegated = property(delegated)
+            delegated = property(delegated_)
 
         else:
             raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__, item))

@@ -149,9 +149,10 @@ class ClassicalState(BaseState):
                       self.argp.to(u.rad).value,
                       self.nu.to(u.rad).value)
 
-        return rv.RVState(self.attractor,
-                                            r * u.km,
-                                            v * u.km / u.s)
+        return rv.RVState(
+            self.attractor,
+            r * u.km,
+            v * u.km / u.s)
 
     def to_classical(self):
         """Converts to classical orbital elements representation.
