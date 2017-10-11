@@ -4,6 +4,7 @@
 import numpy as np
 
 from astropy.coordinates import matrix_utilities
+from astropy.time import Time
 
 
 def circular_velocity(k, a):
@@ -71,3 +72,24 @@ def norm(vec):
 
     """
     return np.sqrt(vec.dot(vec))
+
+
+def time_range(start, *, periods=50, spacing=None, end=None):
+    """Generates range of astronomical times.
+
+    """
+    if not isinstance(start, Time):
+        start = Time(start)
+
+    if spacing is not None and end is None:
+        result = start + spacing * np.arange(0, periods)
+
+    elif end is not None and spacing is None:
+        if not isinstance(end, Time):
+            end = Time(end)
+        result = start + (end - start) * np.linspace(0, 1, periods)
+
+    else:
+        raise ValueError("Either 'end' or 'spacing' must be specified")
+
+    return result
