@@ -9,6 +9,7 @@ from astropy.coordinates import CartesianRepresentation
 from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem, TimeScaleWarning
 from poliastro.twobody.propagation import propagate
+from poliastro.twobody.angles import M_to_nu, nu_to_M
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -245,10 +246,31 @@ class Orbit(object):
 
         return propagate(self, time_of_flight, rtol=rtol)
 
-    def sample(self, time_values):
+    def sample(self, *, num_points=None, time_values=None):
         """Samples an orbit to some specified time values.
 
+        Parameters
+        ----------
+        num_points : int
+            Number of points to sample (full period).
+        time_values : ~astropy.time.Time
+            Time values to compute the position.
+
+        Returns
+        -------
+        CartesianRepresentation
+            Position vector in each given value.
+
         """
+        if num_points is not None and time_values is None:
+            M_vals = np.linspace(0, 2 * np.pi, num_points + 1)[:-1] * u.rad
+            assert len(M_vals) == num_points
+            time_values = self.epoch + (M_vals / self.n).decompose()
+
+        elif ((num_points is not None and time_values is not None) or
+              (num_points is None and time_values is None)):
+            raise ValueError("Either 'num_points' or 'time_values' must be specified")
+
         values = np.zeros((len(time_values), 3)) * self.r.unit
         for ii, epoch in enumerate(time_values):
             rr = self.propagate(epoch).r

@@ -22,7 +22,7 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    rr = ss0.sample(sample_times)
+    rr = ss0.sample(time_values=sample_times)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
 
@@ -38,6 +38,21 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    rr = ss0.sample(sample_times)
+    rr = ss0.sample(time_values=sample_times)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
+
+
+@pytest.mark.parametrize("num_points", [2, 4, 6, 8, 10, 100])
+def test_sample_num_points(num_points):
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
+
+    expected_ss = ss0.propagate(ss0.period / 2)
+
+    rr = ss0.sample(num_points=num_points)
+
+    assert len(rr) == num_points
+    assert_quantity_allclose(rr[num_points // 2].get_xyz(), expected_ss.r)
