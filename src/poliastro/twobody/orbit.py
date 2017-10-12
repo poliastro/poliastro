@@ -4,9 +4,11 @@ import numpy as np
 
 from astropy import units as u
 from astropy import time
+from astropy.coordinates import CartesianRepresentation
 
 from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem, TimeScaleWarning
+from poliastro.twobody.angles import nu_to_M
 from poliastro.twobody.propagation import propagate
 
 from poliastro.twobody import rv
@@ -243,6 +245,61 @@ class Orbit(object):
             time_of_flight = time.TimeDelta(epoch_or_duration)
 
         return propagate(self, time_of_flight, rtol=rtol)
+
+    def sample(self, values=100):
+        """Samples an orbit to some specified time values.
+
+        .. versionadded:: 0.8.0
+
+        Parameters
+        ----------
+        values : Multiple options
+            Number of interval points (default to 100),
+            True anomaly values,
+            Time values.
+
+        Returns
+        -------
+        CartesianRepresentation
+            Position vector in each given value.
+
+        Notes
+        -----
+        When specifying a number of points, the initial and final
+        position is present twice inside the result (first and
+        last row). This is more useful for plotting.
+
+        Examples
+        --------
+        >>> from astropy import units as u
+        >>> from poliastro.examples import iss
+        >>> iss.sample()
+        >>> iss.sample(10)
+        >>> iss.sample([0, 180] * u.deg)
+        >>> iss.sample([0, 10, 20] * u.minute)
+        >>> iss.sample([iss.epoch + iss.period / 2])
+
+        """
+        if isinstance(values, int):
+            return self.sample(np.linspace(0, 2 * np.pi, values) * u.rad)
+
+        elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
+            values = self._generate_time_values(values)
+
+        return self._sample(values)
+
+    def _sample(self, time_values):
+        values = np.zeros((len(time_values), 3)) * self.r.unit
+        for ii, epoch in enumerate(time_values):
+            rr = self.propagate(epoch).r
+            values[ii] = rr
+
+        return CartesianRepresentation(values, xyz_axis=1)
+
+    def _generate_time_values(self, nu_vals):
+        M_vals = nu_to_M(nu_vals, self.ecc)
+        time_values = self.epoch + (M_vals / self.n).decompose()
+        return time_values
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.
