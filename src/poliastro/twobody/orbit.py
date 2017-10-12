@@ -4,6 +4,7 @@ import numpy as np
 
 from astropy import units as u
 from astropy import time
+from astropy.coordinates import CartesianRepresentation
 
 from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem, TimeScaleWarning
@@ -243,6 +244,17 @@ class Orbit(object):
             time_of_flight = time.TimeDelta(epoch_or_duration)
 
         return propagate(self, time_of_flight, rtol=rtol)
+
+    def sample(self, time_values):
+        """Samples an orbit to some specified time values.
+
+        """
+        values = np.zeros((len(time_values), 3)) * self.r.unit
+        for ii, epoch in enumerate(time_values):
+            rr = self.propagate(epoch).r
+            values[ii] = rr
+
+        return CartesianRepresentation(values, xyz_axis=1)
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.

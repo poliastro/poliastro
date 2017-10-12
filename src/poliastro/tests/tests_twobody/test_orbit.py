@@ -62,7 +62,7 @@ def test_bad_inclination_raises_exception():
     bad_inc = 200 * u.deg
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.from_classical(Sun, _d, _, bad_inc, _a, _a, _a)
+        ss = Orbit.from_classical(_body, _d, _, bad_inc, _a, _a, _a)
     assert ("ValueError: Inclination must be between 0 and 180 degrees"
             in excinfo.exconly())
 
