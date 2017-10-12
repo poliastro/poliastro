@@ -8,6 +8,19 @@ from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 
 
+def test_sample_angle_zero_returns_same():
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
+
+    nu_values = [0] * u.deg
+
+    rr = ss0.sample(nu_values)
+
+    assert (rr[0].get_xyz() == ss0.r).all()
+
+
 @pytest.mark.xfail
 @pytest.mark.parametrize("time_of_flight", [1 * u.min, 40 * u.min])
 def test_sample_one_point_equals_propagation_small_deltas(time_of_flight):
@@ -22,7 +35,7 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    rr = ss0.sample(time_values=sample_times)
+    rr = ss0.sample(sample_times)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
 
@@ -38,9 +51,25 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    rr = ss0.sample(time_values=sample_times)
+    rr = ss0.sample(sample_times)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
+
+
+def test_sample_nu_values():
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
+
+    nu_values = [0, 90, 180] * u.deg
+
+    expected_ss = ss0.propagate(ss0.period / 2)
+
+    rr = ss0.sample(nu_values)
+
+    assert len(rr) == len(nu_values)
+    assert_quantity_allclose(rr[-1].get_xyz(), expected_ss.r)
 
 
 @pytest.mark.parametrize("num_points", [3, 5, 7, 9, 11, 101])
@@ -52,7 +81,7 @@ def test_sample_num_points(num_points):
 
     expected_ss = ss0.propagate(ss0.period / 2)
 
-    rr = ss0.sample(num_points=num_points)
+    rr = ss0.sample(num_points)
 
     assert len(rr) == num_points
     assert_quantity_allclose(rr[num_points // 2].get_xyz(), expected_ss.r)
