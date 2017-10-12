@@ -261,10 +261,15 @@ class Orbit(object):
         CartesianRepresentation
             Position vector in each given value.
 
+        Notes
+        -----
+        When specifying a number of points, the initial and final
+        position is present twice inside the result (first and
+        last row). This is more useful for plotting.
+
         """
         if num_points is not None and time_values is None:
-            M_vals = np.linspace(0, 2 * np.pi, num_points + 1)[:-1] * u.rad
-            assert len(M_vals) == num_points
+            M_vals = np.linspace(0, 2 * np.pi, num_points) * u.rad
             time_values = self.epoch + (M_vals / self.n).decompose()
 
         elif ((num_points is not None and time_values is not None) or

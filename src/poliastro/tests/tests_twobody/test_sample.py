@@ -43,7 +43,7 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight):
     assert (rr[0].get_xyz() == expected_ss.r).all()
 
 
-@pytest.mark.parametrize("num_points", [2, 4, 6, 8, 10, 100])
+@pytest.mark.parametrize("num_points", [3, 5, 7, 9, 11, 101])
 def test_sample_num_points(num_points):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
