@@ -1,6 +1,16 @@
 What's new
 ==========
 
+poliastro 0.8 (Unreleased)
+--------------------------
+
+New features:
+.............
+
+* **Sampling method** for :py:class:`~poliastro.twobody.Orbit` objects that returns
+  an array of positions. This was already done in the plotting functions and will
+  help providing other applications, such as exporting an Orbit to other formats.
+
 poliastro 0.7.0 - 2017-09-15
 ----------------------------
 

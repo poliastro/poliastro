@@ -77,6 +77,22 @@ def norm(vec):
 def time_range(start, *, periods=50, spacing=None, end=None):
     """Generates range of astronomical times.
 
+    .. versionadded:: 0.8.0
+
+    Parameters
+    ----------
+    periods : int, optional
+        Number of periods, default to 50.
+    spacing : Time or Quantity, optional
+        Spacing between periods, optional.
+    end : Time or equivalent, optional
+        End date.
+
+    Returns
+    -------
+    Time
+        Array of time values.
+
     """
     start = Time(start)
 

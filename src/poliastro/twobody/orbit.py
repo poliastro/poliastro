@@ -249,12 +249,14 @@ class Orbit(object):
     def sample(self, values=100):
         """Samples an orbit to some specified time values.
 
+        .. versionadded:: 0.8.0
+
         Parameters
         ----------
         values : Multiple options
             Number of interval points (default to 100),
             True anomaly values,
-            Time values
+            Time values.
 
         Returns
         -------
