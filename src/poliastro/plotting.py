@@ -9,9 +9,7 @@ import matplotlib.pyplot as plt
 from astropy import units as u
 from astropy.coordinates.angles import Angle
 
-from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
-
 
 BODY_COLORS = {
     "Sun": "#ffcc00",
@@ -117,28 +115,15 @@ class OrbitPlotter(object):
             self.set_attractor(orbit)
 
         lines = []
-
-        nu_vals = self._generate_vals(orbit.state)
-
-        # Compute PQW coordinates
-        r_pqw, _ = rv_pqw(orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                          orbit.p.to(u.km).value,
-                          orbit.ecc.value,
-                          nu_vals.value)
-        r_pqw = r_pqw * u.km
-
-        # Express on inertial frame
-        e_vec, p_vec, h_vec = orbit.pqw()
-        p_vec = np.cross(h_vec, e_vec) * u.one
-        rr = (r_pqw[:, 0, None].dot(e_vec[None, :]) +
-              r_pqw[:, 1, None].dot(p_vec[None, :]))
+        
+        rr = orbit.sample(self.num_points).get_xyz().transpose()
 
         # Project on OrbitPlotter frame
         # x_vec, y_vec, z_vec = self._frame
         rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
         x = rr_proj.dot(self._frame[0])
         y = rr_proj.dot(self._frame[1])
-
+        
         # Plot current position
         l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
                           'o', mew=0, color=color)
