@@ -55,7 +55,7 @@ class OrbitPlotter(object):
         self.num_points = num_points
         self._frame = None
         self._attractor_radius = None
-        self.orbits = list(tuple()) #type: List[Tuple[poliastro.twobody.orbit.Orbit], str]
+        self.orbits = list(tuple())  # type: List[Tuple[poliastro.twobody.orbit.Orbit], str]
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.
@@ -85,7 +85,6 @@ class OrbitPlotter(object):
             self._attractor_radius = None
             for orbit, label in self.orbits:
                 self.plot(orbit, label)
-
 
     def set_attractor(self, orbit):
         """Sets plotting attractor.
@@ -125,7 +124,7 @@ class OrbitPlotter(object):
             self.set_attractor(orbit)
 
         lines = []
-        
+
         rr = orbit.sample(self.num_points).get_xyz().transpose()
 
         # Project on OrbitPlotter frame
@@ -133,7 +132,7 @@ class OrbitPlotter(object):
         rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
         x = rr_proj.dot(self._frame[0])
         y = rr_proj.dot(self._frame[1])
-        
+
         # Plot current position
         l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
                           'o', mew=0, color=color)
@@ -142,7 +141,7 @@ class OrbitPlotter(object):
         l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
                           '--', color=l.get_color())
         lines.append(l)
-        
+
         if label:
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
@@ -154,7 +153,7 @@ class OrbitPlotter(object):
 
             l.set_label(label)
             self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
-        
+
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)

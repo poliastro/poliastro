@@ -21,7 +21,7 @@ def test_set_frame():
     q = [0, 1, 0] * u.one
     w = [0, 0, 1] * u.one
     op.set_frame(p, q, w)
-    
+
     assert op._frame == (p, q, w)
 
 
