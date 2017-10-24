@@ -55,29 +55,37 @@ class OrbitPlotter(object):
         self.num_points = num_points
         self._frame = None
         self._attractor_radius = None
+        self.orbits = list(tuple()) #type: List[Tuple[poliastro.twobody.orbit.Orbit], str]
 
     def set_frame(self, p_vec, q_vec, w_vec):
-        """Sets perifocal frame if not existing.
+        """Sets perifocal frame.
 
         Raises
         ------
         ValueError
             If the vectors are not a set of mutually orthogonal unit vectors.
-        NotImplementedError
-            If the frame was already set up.
 
         """
-        if not self._frame:
-            if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
-                raise ValueError("Vectors must be unit.")
-            if not np.allclose([p_vec.dot(q_vec),
-                                q_vec.dot(w_vec),
-                                w_vec.dot(p_vec)], 0):
-                raise ValueError("Vectors must be mutually orthogonal.")
-            else:
-                self._frame = p_vec, q_vec, w_vec
+        old_frame = False
+        if self._frame is not None:
+            old_frame = True
+
+        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
+            raise ValueError("Vectors must be unit.")
+        if not np.allclose([p_vec.dot(q_vec),
+                            q_vec.dot(w_vec),
+                            w_vec.dot(p_vec)], 0):
+            raise ValueError("Vectors must be mutually orthogonal.")
         else:
-            raise NotImplementedError
+            self._frame = p_vec, q_vec, w_vec
+
+        if old_frame:
+            for artist in self.ax.lines + self.ax.collections:
+                artist.remove()
+            self._attractor_radius = None
+            for orbit, label in self.orbits:
+                self.plot(orbit, label)
+
 
     def set_attractor(self, orbit):
         """Sets plotting attractor.
@@ -102,7 +110,9 @@ class OrbitPlotter(object):
         """Plots state and osculating orbit in their plane.
 
         """
-        # TODO: This function needs a refactoring
+        if (orbit, label) not in self.orbits:
+            self.orbits.append((orbit, label))
+
         if not self._frame:
             self.set_frame(*orbit.pqw())
 
@@ -132,7 +142,7 @@ class OrbitPlotter(object):
         l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
                           '--', color=l.get_color())
         lines.append(l)
-
+        
         if label:
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line, as they share variable
@@ -144,7 +154,7 @@ class OrbitPlotter(object):
 
             l.set_label(label)
             self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
-
+        
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
