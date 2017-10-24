@@ -5,6 +5,7 @@ import numpy as np
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # noqa
 
 from astropy import units as u
 from astropy.coordinates.angles import Angle
@@ -28,6 +29,28 @@ def plot(state, label=None, color=None):
     """
     op = OrbitPlotter()
     return op.plot(state, label=label, color=color)
+
+
+def plot3d(orbit, *, label=None, ax=None, color=None):
+    if ax is None:
+        _, ax = plt.subplots(figsize=(6, 6), subplot_kw={'projection': '3d'})
+
+    rr = orbit.sample()
+
+    l, = ax.plot(rr.x, rr.y, rr.z, color=color)
+
+    if label:
+        orbit.epoch.out_subfmt = 'date_hm'
+        label = '{} ({})'.format(orbit.epoch.iso, label)
+
+        l.set_label(label)
+        ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+
+    ax.set_xlabel("$x$ (km)")
+    ax.set_ylabel("$y$ (km)")
+    ax.set_zlabel("$z$ (km)")
+
+    return ax
 
 
 class OrbitPlotter(object):
