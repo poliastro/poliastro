@@ -3,6 +3,8 @@
 """
 import numpy as np
 
+from typing import List, Tuple
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -10,6 +12,7 @@ from astropy import units as u
 from astropy.coordinates.angles import Angle
 
 from poliastro.util import norm
+from poliastro.twobody.orbit import Orbit
 
 BODY_COLORS = {
     "Sun": "#ffcc00",
@@ -55,7 +58,11 @@ class OrbitPlotter(object):
         self.num_points = num_points
         self._frame = None
         self._attractor_radius = None
-        self.orbits = list(tuple())  # type: List[Tuple[poliastro.twobody.orbit.Orbit], str]
+        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
+
+    @property
+    def orbits(self):
+        return self._orbits
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.
@@ -72,9 +79,9 @@ class OrbitPlotter(object):
 
         if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
             raise ValueError("Vectors must be unit.")
-        if not np.allclose([p_vec.dot(q_vec),
-                            q_vec.dot(w_vec),
-                            w_vec.dot(p_vec)], 0):
+        elif not np.allclose([p_vec.dot(q_vec),
+                              q_vec.dot(w_vec),
+                              w_vec.dot(p_vec)], 0):
             raise ValueError("Vectors must be mutually orthogonal.")
         else:
             self._frame = p_vec, q_vec, w_vec
@@ -83,7 +90,7 @@ class OrbitPlotter(object):
             for artist in self.ax.lines + self.ax.collections:
                 artist.remove()
             self._attractor_radius = None
-            for orbit, label in self.orbits:
+            for orbit, label in self._orbits:
                 self.plot(orbit, label)
 
     def set_attractor(self, orbit):
@@ -109,8 +116,8 @@ class OrbitPlotter(object):
         """Plots state and osculating orbit in their plane.
 
         """
-        if (orbit, label) not in self.orbits:
-            self.orbits.append((orbit, label))
+        if (orbit, label) not in self._orbits:
+            self._orbits.append((orbit, label))
 
         if not self._frame:
             self.set_frame(*orbit.pqw())
