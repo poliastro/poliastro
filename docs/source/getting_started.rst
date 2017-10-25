@@ -43,20 +43,6 @@ using pip::
   $ pip install numpy  # Run this one first!
   $ pip install poliastro
 
-.. warning::
-
-    At the time of writing, this installation process requires
-    a development version of SciPy to succeed on Windows.
-    To install it, please check out this link:
-
-    https://mail.python.org/pipermail/scipy-dev/2017-August/022050.html
-
-    The complete command would be::
-
-        $ pip install --pre poliastro -f https://7933911d6844c6c53a7d-47bd50c35cd79bd838daf386af554a83.ssl.cf2.rackcdn.com/
-
-    If these installation steps fail for you, please consider using conda.
-
 Finally, you can also install the latest development version of poliastro
 `directly from GitHub`_::
 
