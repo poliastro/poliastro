@@ -27,6 +27,18 @@ def test_true_to_eccentric():
         assert_quantity_allclose(E, expected_E, rtol=1e-6)
 
 
+def test_true_to_eccentric_hyperbolic():
+    # Data from Curtis, H. (2013). *Orbital mechanics for engineering students*.
+    # Example 3.5
+    nu = 100 * u.deg
+    ecc = 2.7696 * u.one
+    expected_F = 2.2927 * u.rad
+
+    F = angles.nu_to_F(nu, ecc)
+
+    assert_quantity_allclose(F, expected_F, rtol=1e-4)
+
+
 def test_mean_to_true():
     # Data from Schlesinger & Udick, 1912
     data = [
@@ -75,6 +87,18 @@ def test_true_to_mean():
         M = angles.nu_to_M(nu, ecc)
 
         assert_quantity_allclose(M, expected_M, rtol=1e-4)
+
+
+def test_true_to_mean_hyperbolic():
+    # Data from Curtis, H. (2013). *Orbital mechanics for engineering students*.
+    # Example 3.5
+    nu = 100 * u.deg
+    ecc = 2.7696 * u.one
+    expected_M = 11.279 * u.rad
+
+    M = angles.nu_to_M(nu, ecc)
+
+    assert_quantity_allclose(M, expected_M, rtol=1e-4)
 
 
 def test_flight_path_angle():
