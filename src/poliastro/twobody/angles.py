@@ -109,8 +109,8 @@ def F_to_nu(F, ecc):
         True anomaly (rad).
 
     """
-    nu = 2 * np.arctan((np.exp(F) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1)) /
-                       (np.exp(F) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1)))
+    nu = 2 * np.arctan((np.exp(F.value) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1)) /
+                       (np.exp(F.value) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1)))
     return nu
 
 
