@@ -66,8 +66,9 @@ def nu_to_F(nu, ecc):
     Taken from Curtis, H. (2013). *Orbital mechanics for engineering students*. 167
 
     """
-    F = np.log((np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2)) /
-               (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2))) * u.rad
+    # F = np.log((np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2)) /
+    #           (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2))) * u.rad
+    F = 2 * np.arctan(np.sqrt((ecc - 1) / (ecc + 1))*np.tan(nu / 2))
     return F
 
 
