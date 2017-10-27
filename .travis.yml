@@ -38,6 +38,7 @@ before_install:
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then HOMEBREW_NO_AUTO_UPDATE=1 brew install python3; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python3 -m venv venv; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then source venv/bin/activate; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python3 -m pip install --upgrade pip; fi
 
 install:
   - pip install numpy  # Required
