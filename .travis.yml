@@ -29,6 +29,8 @@ matrix:
     - os: linux
       python: pypy3
       env: PIP_EXTRA_INDEX_URL=https://antocuni.github.io/pypy-wheels/ubuntu/ RUN_MYPY="false"
+  allow_failures:
+    - python: pypy3
 
 addons:
   apt:
