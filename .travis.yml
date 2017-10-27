@@ -33,6 +33,9 @@ addons:
   apt:
     packages:
       - pandoc
+      - libatlas-dev
+      - libblas-dev
+      - liblapack-dev
 
 before_install:
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then HOMEBREW_NO_AUTO_UPDATE=1 brew install python3; fi
