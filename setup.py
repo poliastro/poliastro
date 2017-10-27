@@ -50,16 +50,15 @@ setup(
         "beautifulsoup4",
         "requests",
         "pandas",
-        "numba>=0.25",
     ],
     tests_require=[
         "coverage",
         "pytest-cov",
     ],
     extras_require={
+        ':implementation_name=="cpython"': "numba>=0.25",
         'dev': [
             "pep8",
-            "mypy",
             "sphinx<1.6",
             "sphinx_rtd_theme",
             "nbsphinx",
