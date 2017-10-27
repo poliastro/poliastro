@@ -3,7 +3,7 @@
 """
 import numpy as np
 
-from numba import njit as jit
+from poliastro.jit import jit
 
 
 @jit
