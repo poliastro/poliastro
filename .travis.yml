@@ -24,6 +24,9 @@ matrix:
       python: 3.5
     - os: linux
       python: 3.6
+    - os: linux
+      python: pypy3
+      env: PIP_EXTRA_INDEX_URL=https://antocuni.github.io/pypy-wheels/ubuntu/
 
 addons:
   apt:
