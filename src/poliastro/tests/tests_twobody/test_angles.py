@@ -101,6 +101,18 @@ def test_true_to_mean_hyperbolic():
     assert_quantity_allclose(M, expected_M, rtol=1e-4)
 
 
+def test_mean_to_true_hyperbolic():
+    # Data from Curtis, H. (2013). *Orbital mechanics for engineering students*.
+    # Example 3.5
+    M = 11.279 * u.rad
+    ecc = 2.7696 * u.one
+    expected_nu = 100 * u.deg
+
+    nu = angles.M_to_nu(M, ecc)
+
+    assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
+
+
 def test_flight_path_angle():
     # Data from Curtis, example 2.5
     nu = 109.5 * u.deg
