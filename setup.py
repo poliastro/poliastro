@@ -59,7 +59,6 @@ setup(
         ':implementation_name=="cpython"': "numba>=0.25",
         'dev': [
             "pep8",
-            "mypy",
             "sphinx<1.6",
             "sphinx_rtd_theme",
             "nbsphinx",
