@@ -14,7 +14,8 @@ branches:
     - 0.7.x
 
 env:
-  - MPLBACKEND="Agg"
+  global:
+    - MPLBACKEND="Agg"
 
 matrix:
   include:
