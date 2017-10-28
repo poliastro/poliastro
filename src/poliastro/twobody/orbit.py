@@ -5,7 +5,6 @@ import numpy as np
 from astropy import units as u
 from astropy import time
 from astropy.coordinates import CartesianRepresentation
-from astropy.coordinates.angles import Angle
 
 from poliastro.constants import J2000
 from poliastro.ephem import get_body_ephem, TimeScaleWarning
@@ -282,16 +281,15 @@ class Orbit(object):
 
         """
         if isinstance(values, int):
-            nu_vals = np.linspace(0, 2 * np.pi, values) * u.rad
-            if self.ecc >= 1:
+            if self.ecc < 1:
+                nu_values = np.linspace(0, 2 * np.pi, values) * u.rad
+            else:
                 # Select a sensible limiting value for non-closed orbits
                 # This corresponds to r = 3p
-                nu_limit = Angle(np.arccos(-(1 - 1 / 3.) / self.ecc))
-                nu_invalid = ((nu_vals > nu_limit) &
-                              (nu_vals < (-nu_limit).wrap_at('360d')))
-                nu_vals = np.delete(nu_vals, nu_invalid)
+                nu_limit = np.arccos(-(1 - 1 / 3.) / self.ecc)
+                nu_values = np.linspace(-nu_limit, nu_limit, values)
 
-            return self.sample(nu_vals)
+            return self.sample(nu_values)
 
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
@@ -308,7 +306,6 @@ class Orbit(object):
 
     def _generate_time_values(self, nu_vals):
         M_vals = nu_to_M(nu_vals, self.ecc)
-
         time_values = self.epoch + (M_vals / self.n).decompose()
         return time_values
 
