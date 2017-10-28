@@ -68,7 +68,7 @@ def nu_to_F(nu, ecc):
     """
     # F = np.log((np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2)) /
     #           (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2))) * u.rad
-    F = 2 * np.arctan(np.sqrt((ecc - 1) / (ecc + 1))*np.tan(nu / 2))
+    F = 2 * np.arctan(np.sqrt((ecc - 1) / (ecc + 1)) * np.tan(nu / 2))
     return F
 
 

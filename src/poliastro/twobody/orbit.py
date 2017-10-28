@@ -288,7 +288,7 @@ class Orbit(object):
                 # This corresponds to r = 3p
                 nu_limit = Angle(np.arccos(-(1 - 1 / 3.) / self.ecc))
                 nu_invalid = ((nu_vals > nu_limit) &
-                            (nu_vals < (-nu_limit).wrap_at('360d')))
+                              (nu_vals < (-nu_limit).wrap_at('360d')))
                 nu_vals = np.delete(nu_vals, nu_invalid)
 
             return self.sample(nu_vals)
