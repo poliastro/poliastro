@@ -100,8 +100,12 @@ class Orbit(object):
         """
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use Orbit.parabolic instead")
-        elif not 0 * u.deg <= inc <= 180 * u.deg:
+
+        if not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
+
+        if ecc > 1 and a > 0:
+            raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         ss = classical.ClassicalState(
             attractor, a, ecc, inc, raan, argp, nu)
