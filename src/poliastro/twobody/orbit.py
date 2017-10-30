@@ -246,7 +246,7 @@ class Orbit(object):
 
         return propagate(self, time_of_flight, rtol=rtol)
 
-    def sample(self, values=100):
+    def sample(self, values=None):
         """Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
@@ -280,7 +280,7 @@ class Orbit(object):
         >>> iss.sample([iss.epoch + iss.period / 2])
 
         """
-        if isinstance(values, int):
+        if values is None or isinstance(values, int):
             return self.sample(np.linspace(0, 2 * np.pi, values) * u.rad)
 
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):

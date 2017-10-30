@@ -1,7 +1,7 @@
 """ Plotting utilities.
 
 """
-from typing import List, Tuple
+from typing import List, Tuple, Any
 
 import numpy as np
 
@@ -35,9 +35,9 @@ def plot(state, label=None, color=None):
     return op.plot(state, label=label, color=color)
 
 
-def plot3d(orbit, *, label=None, color=None):
+def plot3d(orbit, sampling=None, *, label=None, color=None):
     frame = OrbitPlotter3D()
-    frame.plot(orbit, label=label, color=color)
+    frame.plot(orbit, sampling, label=label, color=color)
     return frame
 
 
@@ -199,10 +199,10 @@ class OrbitPlotter3D:
     def __init__(self, figsize=None):
         _, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': '3d'})
         self._ax = ax
-        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
+        self._orbits = list(tuple())  # type: List[Tuple[Orbit, Any, str, str]]
 
-    def _plot_orbit(self, orbit, label, color):
-        rr = orbit.sample()
+    def _plot_orbit(self, orbit, sampling, label, color):
+        rr = orbit.sample(sampling)
         line, = self._ax.plot(rr.x, rr.y, rr.z, color=color)
         if label:
             line.set_label(label)
@@ -219,8 +219,8 @@ class OrbitPlotter3D:
     def _redraw(self):
         self._ax.cla()
 
-        for orbit, label, color in self._orbits:
-            self._plot_orbit(orbit, label, color)
+        for args in self._orbits:
+            self._plot_orbit(*args)
 
         self._decorate()
 
@@ -228,16 +228,16 @@ class OrbitPlotter3D:
         self._ax.view_init(elev, azim)
         self._redraw()
 
-    def plot(self, orbit, label=None, color=None):
+    def plot(self, orbit, sampling=None, *, label=None, color=None):
         if label:
             orbit.epoch.out_subfmt = 'date_hm'
             label = '{} ({})'.format(orbit.epoch.iso, label)
 
         self._orbits.append(
-            (orbit, label, color)
+            (orbit, sampling, label, color)
         )
 
-        self._plot_orbit(orbit, label, color)
+        self._plot_orbit(orbit, sampling, label, color)
         self._decorate()
 
     def show(self):
