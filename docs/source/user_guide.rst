@@ -16,11 +16,10 @@ First of all, we have to import the relevant modules and classes:
 
 .. code-block:: python
 
-    # If using the Jupyter notebook, use %matplotlib inline
-    %matplotlib inline
-
     import numpy as np
     import matplotlib.pyplot as plt
+    plt.ion()  # To immediately show plots
+
     from astropy import units as u
 
     from poliastro.bodies import Earth, Mars, Sun
