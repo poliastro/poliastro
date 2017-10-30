@@ -13,6 +13,8 @@ from astropy.coordinates.angles import Angle
 from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
 
+from poliastro.twobody.orbit import Orbit
+
 
 BODY_COLORS = {
     "Sun": "#ffcc00",
@@ -31,26 +33,10 @@ def plot(state, label=None, color=None):
     return op.plot(state, label=label, color=color)
 
 
-def plot3d(orbit, *, label=None, ax=None, color=None):
-    if ax is None:
-        _, ax = plt.subplots(figsize=(6, 6), subplot_kw={'projection': '3d'})
-
-    rr = orbit.sample()
-
-    l, = ax.plot(rr.x, rr.y, rr.z, color=color)
-
-    if label:
-        orbit.epoch.out_subfmt = 'date_hm'
-        label = '{} ({})'.format(orbit.epoch.iso, label)
-
-        l.set_label(label)
-        ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
-
-    ax.set_xlabel("$x$ (km)")
-    ax.set_ylabel("$y$ (km)")
-    ax.set_zlabel("$z$ (km)")
-
-    return ax
+def plot3d(orbit, *, label=None, color=None):
+    frame = OrbitPlotter3D()
+    frame.plot(orbit, label=label, color=color)
+    return frame
 
 
 class OrbitPlotter(object):
@@ -205,3 +191,52 @@ class OrbitPlotter(object):
             nu_vals[nu_invalid] = np.nan
 
         return nu_vals
+
+
+class OrbitPlotter3D:
+    def __init__(self, figsize=None):
+        _, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': '3d'})
+        self._ax = ax
+        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
+
+    def _plot_orbit(self, orbit, label, color):
+        rr = orbit.sample()
+        line, = self._ax.plot(rr.x, rr.y, rr.z, color=color)
+        if label:
+            line.set_label(label)
+
+    def _decorate(self):
+        if any(label is not None for (_, label, _) in self._orbits):
+            self._ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+
+        # TODO: Check the more appropriate unit
+        self._ax.set_xlabel("$x$ (km)")
+        self._ax.set_ylabel("$y$ (km)")
+        self._ax.set_zlabel("$z$ (km)")
+
+    def _redraw(self):
+        self._ax.cla()
+
+        for orbit, label, color in self._orbits:
+            self._plot_orbit(orbit, label, color)
+
+        self._decorate()
+
+    def set_view(self, elev=None, azim=None):
+        self._ax.view_init(elev, azim)
+        self._redraw()
+
+    def plot(self, orbit, label=None, color=None):
+        if label:
+            orbit.epoch.out_subfmt = 'date_hm'
+            label = '{} ({})'.format(orbit.epoch.iso, label)
+
+        self._orbits.append(
+            (orbit, label, color)
+        )
+
+        self._plot_orbit(orbit, label, color)
+        self._decorate()
+
+    def show(self):
+        return self._ax.figure
