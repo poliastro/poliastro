@@ -38,6 +38,8 @@ def plot(state, label=None, color=None):
 def plot3d(orbit, sampling=None, *, label=None, color=None):
     frame = OrbitPlotter3D()
     frame.plot(orbit, sampling, label=label, color=color)
+    frame.show()
+
     return frame
 
 
@@ -276,9 +278,6 @@ class OrbitPlotter3D:
         )
         self._data.append(trace)
 
-    def _show(self):
-        iplot(self._figure)
-
     def plot(self, orbit, sampling=None, *, label=None, color=None):
         label = _generate_label(orbit, label)
 
@@ -289,4 +288,6 @@ class OrbitPlotter3D:
         self._draw_attractor(orbit.attractor)
 
         self._plot_orbit(orbit, sampling, label, color)
-        self._show()
+
+    def show(self):
+        iplot(self._figure)
