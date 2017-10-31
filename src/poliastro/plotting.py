@@ -222,7 +222,7 @@ def _generate_sphere(radius, num=20):
 class OrbitPlotter3D:
     def __init__(self):
         self._orbits = []  # type: List[tuple]
-        self._attractor_radius = 0
+        self._attractor_radius = np.inf
 
         layout = Layout(
             width=800,
@@ -247,17 +247,21 @@ class OrbitPlotter3D:
             layout=layout
         )
 
-    def _draw_attractor(self, attractor):
-        # TODO: Use sensible radius for attractor
-        if self._attractor_radius == 0:
-            radius = attractor.R.to(u.km).value
-            color = BODY_COLORS.get(attractor.name, "#999999")
+    def _draw_attractor(self, orbit, threshold=0.15):
+        # Select a sensible value for the radius: realistic for low orbits,
+        # visible for high and very high orbits
+        radius = max(orbit.attractor.R.to(u.km), orbit.r_p.to(u.km) * threshold).value
+
+        # If the resulting radius is smaller than the current one, redraw it
+        if radius < self._attractor_radius:
+            name = orbit.attractor.name
+            color = BODY_COLORS.get(name, "#999999")
 
             xx, yy, zz = _generate_sphere(radius)
 
             sphere = Surface(
                 x=xx, y=yy, z=zz,
-                name=attractor.name,
+                name=name,
                 colorscale=[[0, color], [1, color]],
                 cauto=False, cmin=1, cmax=1, showscale=False,  # Boilerplate
             )
@@ -285,7 +289,7 @@ class OrbitPlotter3D:
             (orbit, sampling, label, color)
         )
 
-        self._draw_attractor(orbit.attractor)
+        self._draw_attractor(orbit)
 
         self._plot_orbit(orbit, sampling, label, color)
 
