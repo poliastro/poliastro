@@ -224,7 +224,7 @@ class OrbitPlotter3D:
         self._orbits = []  # type: List[tuple]
 
         self._layout = Layout(
-            autosize=False,
+            autosize=True,
             scene=dict(
                 xaxis=dict(
                     title="x (km)",
