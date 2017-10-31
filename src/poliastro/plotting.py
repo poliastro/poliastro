@@ -222,7 +222,6 @@ def _generate_sphere(radius, num=20):
 class OrbitPlotter3D:
     def __init__(self):
         self._orbits = []  # type: List[tuple]
-        self._attractor_radius = np.inf
 
         self._layout = Layout(
             autosize=False,
@@ -240,6 +239,9 @@ class OrbitPlotter3D:
             ),
         )
         self._data = []  # type: List[dict]
+
+        self._attractor_data = {}  # type: dict
+        self._attractor_radius = np.inf
 
     def _draw_attractor(self, orbit, threshold=0.15):
         # Select a sensible value for the radius: realistic for low orbits,
@@ -260,8 +262,9 @@ class OrbitPlotter3D:
                 cauto=False, cmin=1, cmax=1, showscale=False,  # Boilerplate
             )
 
+            # Overwrite stored properties
             self._attractor_radius = radius
-            self._data.append(sphere)
+            self._attractor_data = sphere
 
     def _plot_orbit(self, orbit, sampling, label, color):
         rr = orbit.sample(sampling)
@@ -279,16 +282,14 @@ class OrbitPlotter3D:
     def plot(self, orbit, sampling=None, *, label=None, color=None):
         label = _generate_label(orbit, label)
 
+        self._draw_attractor(orbit)
         self._orbits.append(
             (orbit, sampling, label, color)
         )
-
-        self._draw_attractor(orbit)
-
         self._plot_orbit(orbit, sampling, label, color)
 
     def show(self):
         iplot(dict(
-            data=self._data,
+            data=self._data + [self._attractor_data],
             layout=self._layout,
         ))
