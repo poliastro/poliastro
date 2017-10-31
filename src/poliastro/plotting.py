@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  # noqa
+from mpl_toolkits.mplot3d import art3d
 
 from astropy import units as u
 from astropy.coordinates.angles import Angle
@@ -200,6 +201,21 @@ class OrbitPlotter3D:
         _, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': '3d'})
         self._ax = ax
         self._orbits = list(tuple())  # type: List[Tuple[Orbit, Any, str, str]]
+        self._attractor_radius = 0
+
+    def _draw_attractor(self, attractor):
+        # TODO: Use sensible radius for attractor
+        if self._attractor_radius == 0:
+            radius = attractor.R.to(u.km).value
+            self._attractor_radius = radius
+
+            color = BODY_COLORS.get(attractor.name, "#999999")
+
+            uu, vv = np.mgrid[0:2 * np.pi:20j, 0:np.pi:10j]
+            xx = radius * np.cos(uu) * np.sin(vv)
+            yy = radius * np.sin(uu) * np.sin(vv)
+            zz = radius * np.cos(vv)
+            self._ax.plot_surface(xx, yy, zz, color=color)
 
     def _plot_orbit(self, orbit, sampling, label, color):
         rr = orbit.sample(sampling)
@@ -208,7 +224,7 @@ class OrbitPlotter3D:
             line.set_label(label)
 
     def _decorate(self):
-        if any(label is not None for (_, label, _) in self._orbits):
+        if any(label is not None for (_, _, label, _) in self._orbits):
             self._ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
 
         # TODO: Check the more appropriate unit
@@ -236,6 +252,8 @@ class OrbitPlotter3D:
         self._orbits.append(
             (orbit, sampling, label, color)
         )
+
+        self._draw_attractor(orbit.attractor)
 
         self._plot_orbit(orbit, sampling, label, color)
         self._decorate()
