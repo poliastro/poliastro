@@ -224,9 +224,7 @@ class OrbitPlotter3D:
         self._orbits = []  # type: List[tuple]
         self._attractor_radius = np.inf
 
-        layout = Layout(
-            width=800,
-            height=700,
+        self._layout = Layout(
             autosize=False,
             scene=dict(
                 xaxis=dict(
@@ -238,14 +236,10 @@ class OrbitPlotter3D:
                 zaxis=dict(
                     title="z (km)",
                 ),
-                aspectratio=dict(x=1, y=1, z=1.5),
+                aspectmode="data",  # Important!
             ),
         )
         self._data = []  # type: List[dict]
-        self._figure = dict(
-            data=self._data,
-            layout=layout
-        )
 
     def _draw_attractor(self, orbit, threshold=0.15):
         # Select a sensible value for the radius: realistic for low orbits,
@@ -294,4 +288,7 @@ class OrbitPlotter3D:
         self._plot_orbit(orbit, sampling, label, color)
 
     def show(self):
-        iplot(self._figure)
+        iplot(dict(
+            data=self._data,
+            layout=self._layout,
+        ))
