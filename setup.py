@@ -50,6 +50,7 @@ setup(
         "beautifulsoup4",
         "requests",
         "pandas",
+        "plotly",
     ],
     tests_require=[
         "coverage",

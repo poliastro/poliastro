@@ -1,22 +1,21 @@
 """ Plotting utilities.
 
 """
-from typing import List, Tuple, Any
+from typing import List
 
 import numpy as np
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # noqa
-from mpl_toolkits.mplot3d import art3d
+
+from plotly.offline import iplot
+from plotly.graph_objs import Scatter3d, Surface, Layout
 
 from astropy import units as u
 from astropy.coordinates.angles import Angle
 
 from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
-
-from poliastro.twobody.orbit import Orbit
 
 
 BODY_COLORS = {
@@ -196,58 +195,92 @@ class OrbitPlotter(object):
         return nu_vals
 
 
+def _generate_label(orbit, label):
+    orbit.epoch.out_subfmt = 'date_hm'
+    label_ = '{}'.format(orbit.epoch.iso)
+    if label:
+        orbit.epoch.out_subfmt = 'date_hm'
+        label_ += ' ({})'.format(label)
+
+    return label_
+
+
+def _generate_sphere(radius, num=20):
+    u1 = np.linspace(0, 2 * np.pi, num)
+    v1 = u1.copy()
+    uu, vv = np.meshgrid(u1, v1)
+
+    xx = radius * np.cos(uu) * np.sin(vv)
+    yy = radius * np.sin(uu) * np.sin(vv)
+    zz = radius * np.cos(vv)
+
+    return xx, yy, zz
+
+
 class OrbitPlotter3D:
-    def __init__(self, figsize=None):
-        _, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': '3d'})
-        self._ax = ax
-        self._orbits = list(tuple())  # type: List[Tuple[Orbit, Any, str, str]]
+    def __init__(self):
+        self._orbits = []  # type: List[tuple]
         self._attractor_radius = 0
+
+        layout = Layout(
+            width=800,
+            height=700,
+            autosize=False,
+            scene=dict(
+                xaxis=dict(
+                    title="x (km)",
+                ),
+                yaxis=dict(
+                    title="y (km)",
+                ),
+                zaxis=dict(
+                    title="z (km)",
+                ),
+                aspectratio=dict(x=1, y=1, z=1.5),
+            ),
+        )
+        self._data = []  # type: List[dict]
+        self._figure = dict(
+            data=self._data,
+            layout=layout
+        )
 
     def _draw_attractor(self, attractor):
         # TODO: Use sensible radius for attractor
         if self._attractor_radius == 0:
             radius = attractor.R.to(u.km).value
-            self._attractor_radius = radius
-
             color = BODY_COLORS.get(attractor.name, "#999999")
 
-            uu, vv = np.mgrid[0:2 * np.pi:20j, 0:np.pi:10j]
-            xx = radius * np.cos(uu) * np.sin(vv)
-            yy = radius * np.sin(uu) * np.sin(vv)
-            zz = radius * np.cos(vv)
-            self._ax.plot_surface(xx, yy, zz, color=color)
+            xx, yy, zz = _generate_sphere(radius)
+
+            sphere = Surface(
+                x=xx, y=yy, z=zz,
+                name=attractor.name,
+                colorscale=[[0, color], [1, color]],
+                cauto=False, cmin=1, cmax=1, showscale=False,  # Boilerplate
+            )
+
+            self._attractor_radius = radius
+            self._data.append(sphere)
 
     def _plot_orbit(self, orbit, sampling, label, color):
         rr = orbit.sample(sampling)
-        line, = self._ax.plot(rr.x, rr.y, rr.z, color=color)
-        if label:
-            line.set_label(label)
+        trace = Scatter3d(
+            x=rr.x.value, y=rr.y.value, z=rr.z.value,
+            name=label,
+            line=dict(
+                color=color,
+                width=5,
+            ),
+            mode="lines",  # Boilerplate
+        )
+        self._data.append(trace)
 
-    def _decorate(self):
-        if any(label is not None for (_, _, label, _) in self._orbits):
-            self._ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
-
-        # TODO: Check the more appropriate unit
-        self._ax.set_xlabel("$x$ (km)")
-        self._ax.set_ylabel("$y$ (km)")
-        self._ax.set_zlabel("$z$ (km)")
-
-    def _redraw(self):
-        self._ax.cla()
-
-        for args in self._orbits:
-            self._plot_orbit(*args)
-
-        self._decorate()
-
-    def set_view(self, elev=None, azim=None):
-        self._ax.view_init(elev, azim)
-        self._redraw()
+    def _show(self):
+        iplot(self._figure)
 
     def plot(self, orbit, sampling=None, *, label=None, color=None):
-        if label:
-            orbit.epoch.out_subfmt = 'date_hm'
-            label = '{} ({})'.format(orbit.epoch.iso, label)
+        label = _generate_label(orbit, label)
 
         self._orbits.append(
             (orbit, sampling, label, color)
@@ -256,7 +289,4 @@ class OrbitPlotter3D:
         self._draw_attractor(orbit.attractor)
 
         self._plot_orbit(orbit, sampling, label, color)
-        self._decorate()
-
-    def show(self):
-        return self._ax.figure
+        self._show()
