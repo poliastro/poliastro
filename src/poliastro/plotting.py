@@ -240,17 +240,32 @@ class OrbitPlotter3D:
         )
         self._data = []  # type: List[dict]
 
+        # TODO: Refactor?
+        self._attractor = None
         self._attractor_data = {}  # type: dict
         self._attractor_radius = np.inf
 
+    def _set_attractor(self, orbit):
+        # Prevent the user from plotting orbits around different attractors
+        # See https://github.com/poliastro/poliastro/issues/204
+        if self._attractor is None:
+            self._attractor = orbit.attractor
+
+        elif orbit.attractor is not self._attractor:
+            raise NotImplementedError("Only orbits around the same attractor can be plotted")
+
+        return self._attractor
+
     def _draw_attractor(self, orbit, threshold=0.15):
+        attractor = self._set_attractor(orbit)
+
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
-        radius = max(orbit.attractor.R.to(u.km), orbit.r_p.to(u.km) * threshold).value
+        radius = max(attractor.R.to(u.km), orbit.r_p.to(u.km) * threshold).value
 
         # If the resulting radius is smaller than the current one, redraw it
         if radius < self._attractor_radius:
-            name = orbit.attractor.name
+            name = attractor.name
             color = BODY_COLORS.get(name, "#999999")
 
             xx, yy, zz = _generate_sphere(radius)
