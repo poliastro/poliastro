@@ -265,8 +265,8 @@ Thanks to Astropy and jplephem, poliastro can now read Satellite
 Planet Kernel (SPK) files, part of NASA's SPICE toolkit. This means that
 we can query the position and velocity of the planets of the Solar System.
 
-The function :py:func:`poliastro.ephem.get_body_ephem` will return
-position and velocity vectors using low precision ephemerides available in
+The method :py:meth:`~poliastro.twobody.orbit.Orbit.get_body_ephem` will return
+a planetary orbit using low precision ephemerides available in
 Astropy and an :py:mod:`astropy.time.Time`:
 
 .. code-block:: python

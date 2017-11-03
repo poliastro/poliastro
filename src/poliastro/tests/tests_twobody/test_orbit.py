@@ -8,8 +8,8 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy import time
 
 from poliastro.bodies import Sun, Earth
-from poliastro.ephem import TimeScaleWarning
 from poliastro.twobody import Orbit
+from poliastro.twobody.orbit import TimeScaleWarning
 from poliastro.constants import J2000
 
 

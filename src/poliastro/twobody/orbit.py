@@ -4,10 +4,9 @@ import numpy as np
 
 from astropy import units as u
 from astropy import time
-from astropy.coordinates import CartesianRepresentation
+from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel
 
 from poliastro.constants import J2000
-from poliastro.ephem import get_body_ephem, TimeScaleWarning
 from poliastro.twobody.angles import nu_to_M
 from poliastro.twobody.propagation import propagate
 
@@ -19,6 +18,10 @@ from ._base import BaseState
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
+
+
+class TimeScaleWarning(UserWarning):
+    pass
 
 
 class Orbit(object):
@@ -149,8 +152,8 @@ class Orbit(object):
                  "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
 
-        r, v = get_body_ephem(body.name, epoch)
-        return cls.from_vectors(body.parent, r, v, epoch)
+        r, v = get_body_barycentric_posvel(body.name, epoch)
+        return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
