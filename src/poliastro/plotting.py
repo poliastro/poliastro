@@ -301,11 +301,14 @@ class OrbitPlotter3D:
         trajectory = orbit.sample(sampling)
         self._plot_trajectory(trajectory, label, color)
 
-        self._draw_attractor(orbit)
-        self._orbits.append(
-            (orbit, sampling, label, color)
-        )
-        self._plot_orbit(orbit, sampling, label, color)
+    def plot_trajectory(self, trajectory, *, label=None, color=None):
+        if self._attractor is None:
+            raise ValueError("An attractor must be set up first, please use "
+                             "set_attractor(Major_Body).")
+        else:
+            self._redraw_attractor(trajectory.norm().min() * 0.15)  # Arbitrary threshold
+
+        self._plot_trajectory(trajectory, str(label), color)
 
     def show(self):
         # If there are no orbits, draw only the attractor
