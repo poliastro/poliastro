@@ -300,6 +300,22 @@ class OrbitPlotter3D:
         elif attractor is not self._attractor:
             raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
 
+    @u.quantity_input(elev=u.rad, azim=u.rad)
+    def set_view(self, elev, azim, distance=5):
+        x = distance * np.cos(elev) * np.cos(azim)
+        y = distance * np.cos(elev) * np.sin(azim)
+        z = distance * np.sin(elev)
+
+        self._layout.update({
+            "scene": {
+                "camera": {
+                    "eye": {
+                        "x": x.value, "y": y.value, "z": z.value
+                    }
+                }
+            }
+        })
+
     def plot(self, orbit, sampling=None, *, label=None, color=None):
         self.set_attractor(orbit.attractor)
 
