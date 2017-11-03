@@ -245,27 +245,14 @@ class OrbitPlotter3D:
         self._attractor_data = {}  # type: dict
         self._attractor_radius = np.inf
 
-    def _set_attractor(self, orbit):
-        # Prevent the user from plotting orbits around different attractors
-        # See https://github.com/poliastro/poliastro/issues/204
-        if self._attractor is None:
-            self._attractor = orbit.attractor
-
-        elif orbit.attractor is not self._attractor:
-            raise NotImplementedError("Only orbits around the same attractor can be plotted")
-
-        return self._attractor
-
-    def _draw_attractor(self, orbit, threshold=0.15):
-        attractor = self._set_attractor(orbit)
-
+    def _redraw_attractor(self, min_radius=0 * u.km):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
-        radius = max(attractor.R.to(u.km), orbit.r_p.to(u.km) * threshold).value
+        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km)).value
 
         # If the resulting radius is smaller than the current one, redraw it
         if radius < self._attractor_radius:
-            name = attractor.name
+            name = self._attractor.name
             color = BODY_COLORS.get(name, "#999999")
 
             xx, yy, zz = _generate_sphere(radius)
@@ -281,10 +268,14 @@ class OrbitPlotter3D:
             self._attractor_radius = radius
             self._attractor_data = sphere
 
-    def _plot_orbit(self, orbit, sampling, label, color):
-        rr = orbit.sample(sampling)
+    def _plot_trajectory(self, trajectory, label, color):
+        # Store data for future redrawings
+        self._orbits.append(
+            (trajectory, label, color)
+        )
+
         trace = Scatter3d(
-            x=rr.x.value, y=rr.y.value, z=rr.z.value,
+            x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value, z=trajectory.z.to(u.km).value,
             name=label,
             line=dict(
                 color=color,
@@ -294,8 +285,21 @@ class OrbitPlotter3D:
         )
         self._data.append(trace)
 
+    def set_attractor(self, attractor):
+        if self._attractor is None:
+            self._attractor = attractor
+
+        elif attractor is not self._attractor:
+            raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
+
     def plot(self, orbit, sampling=None, *, label=None, color=None):
+        self.set_attractor(orbit.attractor)
+
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
+
         label = _generate_label(orbit, label)
+        trajectory = orbit.sample(sampling)
+        self._plot_trajectory(trajectory, label, color)
 
         self._draw_attractor(orbit)
         self._orbits.append(
@@ -304,6 +308,10 @@ class OrbitPlotter3D:
         self._plot_orbit(orbit, sampling, label, color)
 
     def show(self):
+        # If there are no orbits, draw only the attractor
+        if not self._data:
+            self._redraw_attractor()
+
         iplot(dict(
             data=self._data + [self._attractor_data],
             layout=self._layout,
