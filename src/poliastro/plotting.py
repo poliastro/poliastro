@@ -3,12 +3,14 @@
 """
 from typing import List
 
+import os.path
+
 import numpy as np
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from plotly.offline import iplot
+from plotly.offline import iplot, plot as export
 from plotly.graph_objs import Scatter3d, Surface, Layout
 
 from astropy import units as u
@@ -244,6 +246,13 @@ class OrbitPlotter3D:
         self._attractor_data = {}  # type: dict
         self._attractor_radius = np.inf
 
+    @property
+    def figure(self):
+        return dict(
+            data=self._data + [self._attractor_data],
+            layout=self._layout,
+        )
+
     def _redraw_attractor(self, min_radius=0 * u.km):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
@@ -309,12 +318,25 @@ class OrbitPlotter3D:
 
         self._plot_trajectory(trajectory, str(label), color)
 
-    def show(self):
+    def _prepare_plot(self, **layout_kwargs):
         # If there are no orbits, draw only the attractor
         if not self._data:
             self._redraw_attractor()
 
-        iplot(dict(
-            data=self._data + [self._attractor_data],
-            layout=self._layout,
-        ))
+        if layout_kwargs:
+            self._layout.update(layout_kwargs)
+
+    def show(self, **layout_kwargs):
+        self._prepare_plot(**layout_kwargs)
+
+        iplot(self.figure)
+
+    def savefig(self, filename, **layout_kwargs):
+        self._prepare_plot(**layout_kwargs)
+
+        basename, ext = os.path.splitext(filename)
+        export(
+            self.figure,
+            image=ext[1:], image_filename=basename,
+            show_link=False,  # Boilerplate
+        )
