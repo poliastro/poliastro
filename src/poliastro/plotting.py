@@ -237,8 +237,6 @@ def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
 
 class OrbitPlotter3D:
     def __init__(self):
-        self._orbits = []  # type: List[tuple]
-
         self._layout = Layout(
             autosize=True,
             scene=dict(
@@ -285,11 +283,6 @@ class OrbitPlotter3D:
             self._attractor_data = sphere
 
     def _plot_trajectory(self, trajectory, label, color, dashed):
-        # Store data for future redrawings
-        self._orbits.append(
-            (trajectory, label, color)
-        )
-
         trace = Scatter3d(
             x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value, z=trajectory.z.to(u.km).value,
             name=label,
