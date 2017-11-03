@@ -37,9 +37,9 @@ def plot(state, label=None, color=None):
     return op.plot(state, label=label, color=color)
 
 
-def plot3d(orbit, sampling=None, *, label=None, color=None):
+def plot3d(orbit, *, label=None, color=None):
     frame = OrbitPlotter3D()
-    frame.plot(orbit, sampling, label=label, color=color)
+    frame.plot(orbit, label=label, color=color)
     frame.show()
 
     return frame
@@ -316,13 +316,13 @@ class OrbitPlotter3D:
             }
         })
 
-    def plot(self, orbit, sampling=None, *, label=None, color=None):
+    def plot(self, orbit, *, label=None, color=None):
         self.set_attractor(orbit.attractor)
 
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
 
         label = _generate_label(orbit, label)
-        trajectory = orbit.sample(sampling)
+        trajectory = orbit.sample()
         self._plot_trajectory(trajectory, label, color)
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
