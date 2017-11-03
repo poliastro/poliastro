@@ -4,12 +4,14 @@
 from typing import List
 
 import os.path
+from itertools import cycle
 
 import numpy as np
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+import plotly.colors
 from plotly.offline import iplot, plot as export
 from plotly.graph_objs import Scatter3d, Surface, Layout
 
@@ -208,16 +210,29 @@ def _generate_label(orbit, label):
     return label_
 
 
-def _generate_sphere(radius, num=20):
+def _generate_sphere(radius, center, num=20):
     u1 = np.linspace(0, 2 * np.pi, num)
     v1 = u1.copy()
     uu, vv = np.meshgrid(u1, v1)
 
-    xx = radius * np.cos(uu) * np.sin(vv)
-    yy = radius * np.sin(uu) * np.sin(vv)
-    zz = radius * np.cos(vv)
+    x_center, y_center, z_center = center
+
+    xx = x_center + radius * np.cos(uu) * np.sin(vv)
+    yy = y_center + radius * np.sin(uu) * np.sin(vv)
+    zz = z_center + radius * np.cos(vv)
 
     return xx, yy, zz
+
+
+def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
+    xx, yy, zz = _generate_sphere(radius, center)
+    sphere = Surface(
+        x=xx.to(u.km).value, y=yy.to(u.km).value, z=zz.to(u.km).value,
+        name=name,
+        colorscale=[[0, color], [1, color]],
+        cauto=False, cmin=1, cmax=1, showscale=False,  # Boilerplate
+    )
+    return sphere
 
 
 class OrbitPlotter3D:
@@ -244,7 +259,9 @@ class OrbitPlotter3D:
         # TODO: Refactor?
         self._attractor = None
         self._attractor_data = {}  # type: dict
-        self._attractor_radius = np.inf
+        self._attractor_radius = np.inf * u.km
+
+        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
 
     @property
     def figure(self):
@@ -256,27 +273,18 @@ class OrbitPlotter3D:
     def _redraw_attractor(self, min_radius=0 * u.km):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
-        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km)).value
+        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
 
         # If the resulting radius is smaller than the current one, redraw it
         if radius < self._attractor_radius:
-            name = self._attractor.name
-            color = BODY_COLORS.get(name, "#999999")
-
-            xx, yy, zz = _generate_sphere(radius)
-
-            sphere = Surface(
-                x=xx, y=yy, z=zz,
-                name=name,
-                colorscale=[[0, color], [1, color]],
-                cauto=False, cmin=1, cmax=1, showscale=False,  # Boilerplate
-            )
+            sphere = _plot_sphere(
+                radius, BODY_COLORS.get(self._attractor.name, "#999999"), self._attractor.name)
 
             # Overwrite stored properties
             self._attractor_radius = radius
             self._attractor_data = sphere
 
-    def _plot_trajectory(self, trajectory, label, color):
+    def _plot_trajectory(self, trajectory, label, color, dashed):
         # Store data for future redrawings
         self._orbits.append(
             (trajectory, label, color)
@@ -288,6 +296,7 @@ class OrbitPlotter3D:
             line=dict(
                 color=color,
                 width=5,
+                dash='dash' if dashed else 'solid',
             ),
             mode="lines",  # Boilerplate
         )
@@ -317,13 +326,24 @@ class OrbitPlotter3D:
         })
 
     def plot(self, orbit, *, label=None, color=None):
+        if color is None:
+            color = next(self._color_cycle)
+
         self.set_attractor(orbit.attractor)
 
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
 
         label = _generate_label(orbit, label)
         trajectory = orbit.sample()
-        self._plot_trajectory(trajectory, label, color)
+
+        self._plot_trajectory(trajectory, label, color, True)
+
+        # Plot sphere in the position of the body
+        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
+        sphere = _plot_sphere(
+            radius, color, label, center=orbit.r)
+
+        self._data.append(sphere)
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
         if self._attractor is None:
@@ -332,7 +352,7 @@ class OrbitPlotter3D:
         else:
             self._redraw_attractor(trajectory.norm().min() * 0.15)  # Arbitrary threshold
 
-        self._plot_trajectory(trajectory, str(label), color)
+        self._plot_trajectory(trajectory, str(label), color, False)
 
     def _prepare_plot(self, **layout_kwargs):
         # If there are no orbits, draw only the attractor
