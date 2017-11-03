@@ -201,7 +201,6 @@ def _generate_label(orbit, label):
     orbit.epoch.out_subfmt = 'date_hm'
     label_ = '{}'.format(orbit.epoch.iso)
     if label:
-        orbit.epoch.out_subfmt = 'date_hm'
         label_ += ' ({})'.format(label)
 
     return label_
