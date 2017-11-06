@@ -9,6 +9,7 @@ Jupyter notebooks
    /examples/Exploring the New Horizons launch.ipynb
    /examples/Going to Mars with Python using poliastro.ipynb
    /examples/Going to Jupiter with Python using Jupyter and poliastro.ipynb
+   /examples/Plotting in 3D.ipynb
    /examples/Propagation using Cowell's formulation.ipynb
    /examples/Revisiting Lambert's problem in Python.ipynb
    /examples/Studying Hohmann transfers.ipynb
