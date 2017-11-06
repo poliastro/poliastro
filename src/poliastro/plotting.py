@@ -312,7 +312,7 @@ class OrbitPlotter3D:
             "scene": {
                 "camera": {
                     "eye": {
-                        "x": x.value, "y": y.value, "z": z.value
+                        "x": x.to(u.km).value, "y": y.to(u.km).value, "z": z.to(u.km).value
                     }
                 }
             }
