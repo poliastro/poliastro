@@ -91,6 +91,8 @@ class OrbitPlotter(object):
         self._attractor_radius = None
         for orbit, label in self._orbits:
             self.plot(orbit, label)
+        self.ax.relim()
+        self.ax.autoscale()
 
     def set_attractor(self, orbit):
         """Sets plotting attractor.
