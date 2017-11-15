@@ -103,8 +103,12 @@ class Orbit(object):
         """
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use Orbit.parabolic instead")
-        elif not 0 * u.deg <= inc <= 180 * u.deg:
+
+        if not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
+
+        if ecc > 1 and a > 0:
+            raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         ss = classical.ClassicalState(
             attractor, a, ecc, inc, raan, argp, nu)
@@ -287,7 +291,15 @@ class Orbit(object):
             return self.sample(100)
 
         elif isinstance(values, int):
-            return self.sample(np.linspace(0, 2 * np.pi, values) * u.rad)
+            if self.ecc < 1:
+                nu_values = np.linspace(0, 2 * np.pi, values) * u.rad
+            else:
+                # Select a sensible limiting value for non-closed orbits
+                # This corresponds to r = 3p
+                nu_limit = np.arccos(-(1 - 1 / 3.) / self.ecc)
+                nu_values = np.linspace(-nu_limit, nu_limit, values)
+
+            return self.sample(nu_values)
 
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)

@@ -53,7 +53,7 @@ install:
   - pip install .[dev]  # Test development dependencies
 
 before_script:
-  - pep8 setup.py src/  # Check PEP8 compliance
+  - pycodestyle setup.py src/  # Check PEP8 compliance
   - if [[ $RUN_MYPY == 'true' ]]; then mypy --ignore-missing-imports --check-untyped-defs src/; fi
 
 script:

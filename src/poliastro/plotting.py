@@ -8,6 +8,8 @@ from itertools import cycle
 
 import numpy as np
 
+from typing import List, Tuple
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -18,9 +20,8 @@ from plotly.graph_objs import Scatter3d, Surface, Layout
 from astropy import units as u
 from astropy.coordinates.angles import Angle
 
-from poliastro.twobody.classical import rv_pqw
 from poliastro.util import norm
-
+from poliastro.twobody.orbit import Orbit
 
 BODY_COLORS = {
     "Sun": "#ffcc00",
@@ -74,29 +75,41 @@ class OrbitPlotter(object):
         self.num_points = num_points
         self._frame = None
         self._attractor_radius = None
+        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
+
+    @property
+    def orbits(self):
+        return self._orbits
 
     def set_frame(self, p_vec, q_vec, w_vec):
-        """Sets perifocal frame if not existing.
+        """Sets perifocal frame.
 
         Raises
         ------
         ValueError
             If the vectors are not a set of mutually orthogonal unit vectors.
-        NotImplementedError
-            If the frame was already set up.
 
         """
-        if not self._frame:
-            if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
-                raise ValueError("Vectors must be unit.")
-            if not np.allclose([p_vec.dot(q_vec),
-                                q_vec.dot(w_vec),
-                                w_vec.dot(p_vec)], 0):
-                raise ValueError("Vectors must be mutually orthogonal.")
-            else:
-                self._frame = p_vec, q_vec, w_vec
+        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
+            raise ValueError("Vectors must be unit.")
+        elif not np.allclose([p_vec.dot(q_vec),
+                              q_vec.dot(w_vec),
+                              w_vec.dot(p_vec)], 0):
+            raise ValueError("Vectors must be mutually orthogonal.")
         else:
-            raise NotImplementedError
+            self._frame = p_vec, q_vec, w_vec
+
+        if self._orbits:
+            self._redraw()
+
+    def _redraw(self):
+        for artist in self.ax.lines + self.ax.collections:
+            artist.remove()
+        self._attractor_radius = None
+        for orbit, label in self._orbits:
+            self.plot(orbit, label)
+        self.ax.relim()
+        self.ax.autoscale()
 
     def set_attractor(self, orbit):
         """Sets plotting attractor.
@@ -121,9 +134,11 @@ class OrbitPlotter(object):
         """Plots state and osculating orbit in their plane.
 
         """
-        # TODO: This function needs a refactoring
         if not self._frame:
             self.set_frame(*orbit.pqw())
+
+        if (orbit, label) not in self._orbits:
+            self._orbits.append((orbit, label))
 
         # if new attractor radius is smaller, plot it
         new_radius = max(orbit.attractor.R.to(u.km).value,
@@ -135,20 +150,7 @@ class OrbitPlotter(object):
 
         lines = []
 
-        nu_vals = self._generate_vals(orbit.state)
-
-        # Compute PQW coordinates
-        r_pqw, _ = rv_pqw(orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                          orbit.p.to(u.km).value,
-                          orbit.ecc.value,
-                          nu_vals.value)
-        r_pqw = r_pqw * u.km
-
-        # Express on inertial frame
-        e_vec, p_vec, h_vec = orbit.pqw()
-        p_vec = np.cross(h_vec, e_vec) * u.one
-        rr = (r_pqw[:, 0, None].dot(e_vec[None, :]) +
-              r_pqw[:, 1, None].dot(p_vec[None, :]))
+        rr = orbit.sample(self.num_points).get_xyz().transpose()
 
         # Project on OrbitPlotter frame
         # x_vec, y_vec, z_vec = self._frame

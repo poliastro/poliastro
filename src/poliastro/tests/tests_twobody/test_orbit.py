@@ -67,6 +67,18 @@ def test_bad_inclination_raises_exception():
             in excinfo.exconly())
 
 
+def test_bad_hyperbolic_raises_exception():
+    bad_a = 1.0 * u.AU
+    ecc = 1.5 * u.one
+    _a = 1.0 * u.deg  # Unused angle
+    _inc = 100 * u.deg  # Unused inclination
+    _body = Sun  # Unused body
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
+    assert ("Hyperbolic orbits have negative semimajor axis"
+            in excinfo.exconly())
+
+
 def test_apply_maneuver_changes_epoch():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -147,3 +159,39 @@ def test_orbit_representation():
     expected_str = "6978 x 6978 km x 20.0 deg orbit around Earth (\u2641)"
 
     assert str(ss) == repr(ss) == expected_str
+
+
+def test_sample_numpoints():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
+    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
+
+    assert len(ss.sample(values=50)) == 50
+
+
+def test_sample_with_time_value():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
+    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
+
+    expected_r = [ss.r]
+    r = ss.sample(values=[ss.period]).get_xyz().transpose()
+
+    assert_quantity_allclose(r, expected_r, rtol=1.e-7)
+
+
+def test_sample_with_nu_value():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
+    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
+
+    expected_r = [ss.r]
+    r = ss.sample(values=[360] * u.deg).get_xyz().transpose()
+
+    assert_quantity_allclose(r, expected_r, rtol=1.e-7)
