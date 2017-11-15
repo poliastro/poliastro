@@ -44,12 +44,13 @@ setup(
     install_requires=[
         "numpy",
         "astropy>=2.0.1,<3.*",
-        "matplotlib",
+        "matplotlib>=2.0",
         "jplephem",
         "scipy",
         "beautifulsoup4",
         "requests",
         "pandas",
+        "plotly",
     ],
     tests_require=[
         "coverage",
@@ -62,7 +63,7 @@ setup(
             "sphinx<1.6",
             "sphinx_rtd_theme",
             "nbsphinx",
-            "ipython",
+            "ipython>=5.0",
             "jupyter-client",
             "ipykernel",
             "ipywidgets"
