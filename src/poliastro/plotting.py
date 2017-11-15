@@ -73,10 +73,6 @@ class OrbitPlotter(object):
             If the vectors are not a set of mutually orthogonal unit vectors.
 
         """
-        old_frame = False
-        if self._frame is not None:
-            old_frame = True
-
         if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
             raise ValueError("Vectors must be unit.")
         elif not np.allclose([p_vec.dot(q_vec),
@@ -86,12 +82,15 @@ class OrbitPlotter(object):
         else:
             self._frame = p_vec, q_vec, w_vec
 
-        if old_frame:
-            for artist in self.ax.lines + self.ax.collections:
-                artist.remove()
-            self._attractor_radius = None
-            for orbit, label in self._orbits:
-                self.plot(orbit, label)
+        if self._orbits:
+            self._redraw()
+
+    def _redraw(self):
+        for artist in self.ax.lines + self.ax.collections:
+            artist.remove()
+        self._attractor_radius = None
+        for orbit, label in self._orbits:
+            self.plot(orbit, label)
 
     def set_attractor(self, orbit):
         """Sets plotting attractor.
@@ -116,11 +115,11 @@ class OrbitPlotter(object):
         """Plots state and osculating orbit in their plane.
 
         """
-        if (orbit, label) not in self._orbits:
-            self._orbits.append((orbit, label))
-
         if not self._frame:
             self.set_frame(*orbit.pqw())
+
+        if (orbit, label) not in self._orbits:
+            self._orbits.append((orbit, label))
 
         # if new attractor radius is smaller, plot it
         new_radius = max(orbit.attractor.R.to(u.km).value,
