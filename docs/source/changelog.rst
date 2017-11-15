@@ -4,12 +4,22 @@ What's new
 poliastro 0.8 (Unreleased)
 --------------------------
 
-New features:
-.............
+New features
+............
 
 * **Sampling method** for :py:class:`~poliastro.twobody.Orbit` objects that returns
   an array of positions. This was already done in the plotting functions and will
   help providing other applications, such as exporting an Orbit to other formats.
+* **3D plotting functions**: finally poliastro features a new high level object,
+  :py:class:`poliastro.plotting.OrbitPlotter3D`, that uses Plotly to represent
+  orbit and trajectories in 3D. The venerable notebook about the trajectory of
+  rover Curiosity has been updated accordingly.
+
+Backward incompatible changes
+.............................
+
+* The :code:`ephem` module has been removed in favor of the
+  :code:`astropy.coordinates.get_body_barycentric_posvel` function.
 
 poliastro 0.7.0 - 2017-09-15
 ----------------------------
