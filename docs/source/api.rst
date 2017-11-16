@@ -116,12 +116,6 @@ poliastro.cli module
 .. automodule:: poliastro.cli
     :members:
 
-poliastro.ephem module
-----------------------
-
-.. automodule:: poliastro.ephem
-    :members:
-
 poliastro.examples module
 -------------------------
 

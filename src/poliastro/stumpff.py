@@ -4,7 +4,7 @@
 import numpy as np
 from math import gamma
 
-from numba import njit as jit
+from poliastro.jit import jit
 
 
 @jit

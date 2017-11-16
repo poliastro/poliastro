@@ -113,7 +113,7 @@ class BaseState(object):
     @property
     def n(self):
         """Mean motion. """
-        return np.sqrt(self.attractor.k / self.a ** 3) * u.rad
+        return (np.sqrt(self.attractor.k / abs(self.a ** 3)) * u.rad).decompose()
 
     @property
     def energy(self):

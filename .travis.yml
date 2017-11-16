@@ -14,7 +14,9 @@ branches:
     - 0.7.x
 
 env:
-  - MPLBACKEND="Agg"
+  global:
+    - MPLBACKEND="Agg"
+    - RUN_MYPY="true"
 
 matrix:
   include:
@@ -24,16 +26,26 @@ matrix:
       python: 3.5
     - os: linux
       python: 3.6
+    - os: linux
+      python: pypy3
+      env: PIP_EXTRA_INDEX_URL=https://antocuni.github.io/pypy-wheels/ubuntu/ RUN_MYPY="false"
+  allow_failures:
+    - python: pypy3
 
 addons:
   apt:
     packages:
       - pandoc
+      - libatlas-dev
+      - libblas-dev
+      - liblapack-dev
 
 before_install:
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then HOMEBREW_NO_AUTO_UPDATE=1 brew install python3; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python3 -m venv venv; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then source venv/bin/activate; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python3 -m pip install --upgrade pip; fi
+  - if [[ $RUN_MYPY == 'true' ]]; then pip install mypy; fi
 
 install:
   - pip install numpy  # Required
@@ -41,8 +53,8 @@ install:
   - pip install .[dev]  # Test development dependencies
 
 before_script:
-  - pep8 setup.py src/  # Check PEP8 compliance
-  - mypy --ignore-missing-imports --check-untyped-defs src/  # Check MyPy diagnostics
+  - pycodestyle setup.py src/  # Check PEP8 compliance
+  - if [[ $RUN_MYPY == 'true' ]]; then mypy --ignore-missing-imports --check-untyped-defs src/; fi
 
 script:
   - python setup.py test -vv  # Test against installed code

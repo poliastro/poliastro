@@ -112,6 +112,7 @@ class _Sun(_Body):
 
         return ra, dec, W
 
+
 Sun = _Sun()
 
 
@@ -323,5 +324,6 @@ class _Moon(_Body):
              0.0019 * math.sin(E12.to('rad').value) - 0.0044 * math.sin(E13.to('rad').value)) * u.deg
 
         return ra, dec, W
+
 
 Moon = _Moon()

@@ -4,9 +4,10 @@ import numpy as np
 
 from astropy import units as u
 from astropy import time
+from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel
 
 from poliastro.constants import J2000
-from poliastro.ephem import get_body_ephem, TimeScaleWarning
+from poliastro.twobody.angles import nu_to_M
 from poliastro.twobody.propagation import propagate
 
 from poliastro.twobody import rv
@@ -17,6 +18,10 @@ from ._base import BaseState
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
+
+
+class TimeScaleWarning(UserWarning):
+    pass
 
 
 class Orbit(object):
@@ -98,8 +103,12 @@ class Orbit(object):
         """
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use Orbit.parabolic instead")
-        elif not 0 * u.deg <= inc <= 180 * u.deg:
+
+        if not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
+
+        if ecc > 1 and a > 0:
+            raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         ss = classical.ClassicalState(
             attractor, a, ecc, inc, raan, argp, nu)
@@ -147,8 +156,8 @@ class Orbit(object):
                  "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
 
-        r, v = get_body_ephem(body.name, epoch)
-        return cls.from_vectors(body.parent, r, v, epoch)
+        r, v = get_body_barycentric_posvel(body.name, epoch)
+        return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
@@ -243,6 +252,72 @@ class Orbit(object):
             time_of_flight = time.TimeDelta(epoch_or_duration)
 
         return propagate(self, time_of_flight, rtol=rtol)
+
+    def sample(self, values=None):
+        """Samples an orbit to some specified time values.
+
+        .. versionadded:: 0.8.0
+
+        Parameters
+        ----------
+        values : Multiple options
+            Number of interval points (default to 100),
+            True anomaly values,
+            Time values.
+
+        Returns
+        -------
+        CartesianRepresentation
+            Position vector in each given value.
+
+        Notes
+        -----
+        When specifying a number of points, the initial and final
+        position is present twice inside the result (first and
+        last row). This is more useful for plotting.
+
+        Examples
+        --------
+        >>> from astropy import units as u
+        >>> from poliastro.examples import iss
+        >>> iss.sample()
+        >>> iss.sample(10)
+        >>> iss.sample([0, 180] * u.deg)
+        >>> iss.sample([0, 10, 20] * u.minute)
+        >>> iss.sample([iss.epoch + iss.period / 2])
+
+        """
+        if values is None:
+            return self.sample(100)
+
+        elif isinstance(values, int):
+            if self.ecc < 1:
+                nu_values = np.linspace(0, 2 * np.pi, values) * u.rad
+            else:
+                # Select a sensible limiting value for non-closed orbits
+                # This corresponds to r = 3p
+                nu_limit = np.arccos(-(1 - 1 / 3.) / self.ecc)
+                nu_values = np.linspace(-nu_limit, nu_limit, values)
+
+            return self.sample(nu_values)
+
+        elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
+            values = self._generate_time_values(values)
+
+        return self._sample(values)
+
+    def _sample(self, time_values):
+        values = np.zeros((len(time_values), 3)) * self.r.unit
+        for ii, epoch in enumerate(time_values):
+            rr = self.propagate(epoch).r
+            values[ii] = rr
+
+        return CartesianRepresentation(values, xyz_axis=1)
+
+    def _generate_time_values(self, nu_vals):
+        M_vals = nu_to_M(nu_vals, self.ecc)
+        time_values = self.epoch + (M_vals / self.n).decompose()
+        return time_values
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.

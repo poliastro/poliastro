@@ -44,26 +44,26 @@ setup(
     install_requires=[
         "numpy",
         "astropy>=2.0.1,<3.*",
-        "matplotlib",
+        "matplotlib>=2.0",
         "jplephem",
         "scipy",
         "beautifulsoup4",
         "requests",
         "pandas",
-        "numba>=0.25",
+        "plotly",
     ],
     tests_require=[
         "coverage",
         "pytest-cov",
     ],
     extras_require={
+        ':implementation_name=="cpython"': "numba>=0.25",
         'dev': [
-            "pep8",
-            "mypy",
+            "pycodestyle",
             "sphinx<1.6",
             "sphinx_rtd_theme",
             "nbsphinx",
-            "ipython",
+            "ipython>=5.0",
             "jupyter-client",
             "ipykernel",
             "ipywidgets"

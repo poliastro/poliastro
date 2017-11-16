@@ -28,8 +28,6 @@ install:
   - "choco install pandoc"
 
   - "%PIP_BIN% install numpy"
-  - "%PIP_BIN% install --pre scipy --find-links https://7933911d6844c6c53a7d-47bd50c35cd79bd838daf386af554a83.ssl.cf2.rackcdn.com/"
-  - "%PIP_BIN% install --pre numba --extra-index-url https://pypi.anaconda.org/numba/simple"
   - "%PIP_BIN% install .[dev]"  # Test installation correctness
 
 build: off
