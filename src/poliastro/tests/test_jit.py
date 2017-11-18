@@ -1,6 +1,9 @@
+from contextlib import contextmanager
+
 from poliastro import jit
 
 
+@contextmanager
 def _fake_numba_import():
     # Black magic, beware
     # https://stackoverflow.com/a/2484402/554319
@@ -26,6 +29,12 @@ def _fake_numba_import():
 
     sys.meta_path.insert(0, fail_loader)
 
+    yield
+
+    sys.meta_path.remove(fail_loader)
+    import numba
+    from poliastro import jit
+
 
 def test_ijit_returns_same_function_without_args():
     def expected_foo():
@@ -42,11 +51,10 @@ def test_ijit_returns_same_function_with_args():
 
 
 def test_no_numba_emits_warning(recwarn):
-    _fake_numba_import()
+    with _fake_numba_import():
+        from poliastro import jit
 
-    from poliastro import jit
-
-    assert len(recwarn) == 1
-    w = recwarn.pop(UserWarning)
-    assert issubclass(w.category, UserWarning)
-    assert "Could not import numba package" in str(w.message)
+        assert len(recwarn) == 1
+        w = recwarn.pop(UserWarning)
+        assert issubclass(w.category, UserWarning)
+        assert "Could not import numba package" in str(w.message)
