@@ -1,8 +1,8 @@
 What's new
 ==========
 
-poliastro 0.8 (Unreleased)
---------------------------
+poliastro 0.8.0 - 2017-11-18
+----------------------------
 
 This is a new major release, focused on bringing 3D plotting functions and
 preparing the material for the Open Source Cubesat Workshop.
