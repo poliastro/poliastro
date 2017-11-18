@@ -1,3 +1,5 @@
+import pytest
+
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
@@ -33,3 +35,9 @@ def test_compute_soi():
         r_SOI = compute_soi(body)
 
         assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
+
+
+def test_compute_missing_body_soi_raises_error():
+    with pytest.raises(RuntimeError) as excinfo:
+        r_SOI = compute_soi(Moon)
+    assert "To compute the semimajor axis for Moon and Pluto use the JPL ephemeris" in excinfo.exconly()

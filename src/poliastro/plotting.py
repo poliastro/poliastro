@@ -1,8 +1,6 @@
 """ Plotting utilities.
 
 """
-from typing import List
-
 import os.path
 from itertools import cycle
 
@@ -18,7 +16,6 @@ from plotly.offline import iplot, plot as export
 from plotly.graph_objs import Scatter3d, Surface, Layout
 
 from astropy import units as u
-from astropy.coordinates.angles import Angle
 
 from poliastro.util import norm
 from poliastro.twobody.orbit import Orbit
@@ -184,23 +181,6 @@ class OrbitPlotter(object):
         self.ax.set_aspect(1)
 
         return lines
-
-    def _generate_vals(self, state):
-        """Generate points of the osculating orbit.
-
-        """
-        nu_vals = Angle((np.linspace(0, 2 * np.pi, self.num_points) +
-                         state.nu.to(u.rad).value) * u.rad).wrap_at('360d')
-
-        if state.ecc >= 1:
-            # Select a sensible limiting value for non-closed orbits
-            # This corresponds to r = 3p
-            nu_limit = Angle(np.arccos(-(1 - 1 / 3.) / state.ecc))
-            nu_invalid = ((nu_vals > nu_limit) &
-                          (nu_vals < (-nu_limit).wrap_at('360d')))
-            nu_vals[nu_invalid] = np.nan
-
-        return nu_vals
 
 
 def _generate_label(orbit, label):
