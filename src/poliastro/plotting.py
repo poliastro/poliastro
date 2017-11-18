@@ -218,6 +218,9 @@ def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
 
 
 class OrbitPlotter3D:
+    """OrbitPlotter3D class.
+
+    """
     def __init__(self):
         self._layout = Layout(
             autosize=True,
@@ -278,6 +281,14 @@ class OrbitPlotter3D:
         self._data.append(trace)
 
     def set_attractor(self, attractor):
+        """Sets plotting attractor.
+
+        Parameters
+        ----------
+        attractor : ~poliastro.bodies.Body
+            Central body.
+
+        """
         if self._attractor is None:
             self._attractor = attractor
 
@@ -301,6 +312,9 @@ class OrbitPlotter3D:
         })
 
     def plot(self, orbit, *, label=None, color=None):
+        """Plots state and osculating orbit in their plane.
+
+        """
         if color is None:
             color = next(self._color_cycle)
 
@@ -321,6 +335,16 @@ class OrbitPlotter3D:
         self._data.append(sphere)
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
+        """Plots a precomputed trajectory.
+
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        trajectory : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+
+        """
         if self._attractor is None:
             raise ValueError("An attractor must be set up first, please use "
                              "set_attractor(Major_Body).")

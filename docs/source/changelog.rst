@@ -4,6 +4,9 @@ What's new
 poliastro 0.8 (Unreleased)
 --------------------------
 
+This is a new major release, focused on bringing 3D plotting functions and
+preparing the material for the Open Source Cubesat Workshop.
+
 New features
 ............
 
@@ -14,6 +17,40 @@ New features
   :py:class:`poliastro.plotting.OrbitPlotter3D`, that uses Plotly to represent
   orbit and trajectories in 3D. The venerable notebook about the trajectory of
   rover Curiosity has been updated accordingly.
+* **Propagation to a certain date**: now apart from specifying the total elapsed
+  time for propagation or time of flight, we can directly specify a target date
+  in :py:meth:`poliastro.twobody.orbit.Orbit.propagate`.
+* **Hyperbolic anomaly conversion**: we implemented the conversion of hyperbolic
+  to mean and true anomaly to complement the existing eccentric anomaly functions
+  and improve the handling of hyperbolic orbits in :py:mod:`poliastro.twobody.angles`.
+
+Other highlights
+................
+
+* **poliastro is now an Astropy affiliated package**, which gives the project a privileged
+  position in the Python ecosystem. Thank you, Astropy core developers! You can read
+  `the evaluation here <https://github.com/poliastro/poliastro/issues/279>`_.
+* **poliastro will be presented at the first Open Source Cubesat Workshop** to be held
+  at the European Space Operations Centre in Darmstadt, Germany. You can read
+  `the full program of the event here <http://oscw.space/>`_.
+
+New contributors
+................
+
+This is the complete list of the people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Antonio Hidalgo
+* mattrossman+
+* Roshan Jossey+
+
+Bugs fixed:
+...........
+
+* `Issue #275`_: Converting from true to mean anomaly fails for hyperbolic orbits
+
+.. _`Issue #275`: https://github.com/poliastro/poliastro/issues/275
 
 Backward incompatible changes
 .............................
