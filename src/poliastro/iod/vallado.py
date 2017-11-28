@@ -61,7 +61,10 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
 
     norm_r0 = np.dot(r0, r0)**.5
     norm_r = np.dot(r, r)**.5
-    cos_dnu = np.dot(r0, r) / (norm_r0 * norm_r)
+    norm_r0_times_norm_r = norm_r0 * norm_r
+    norm_r0_plus_norm_r = norm_r0 + norm_r
+
+    cos_dnu = np.dot(r0, r) / norm_r0_times_norm_r
 
     A = t_m * (norm_r * norm_r0 * (1 + cos_dnu))**.5
 
@@ -73,16 +76,17 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
     psi_up = 4 * np.pi
 
     count = 0
+
     while count < numiter:
-        y = norm_r0 + norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
-        if A > 0.0 and y < 0.0:
+        y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
+        if A > 0.0:
             # Readjust xi_low until y > 0.0
             # Translated directly from Vallado
             while y < 0.0:
                 psi_low = psi
                 psi = (0.8 * (1.0 / c3(psi)) *
-                       (1.0 - (norm_r0 + norm_r) * np.sqrt(c2(psi)) / A))
-                y = norm_r0 + norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
+                       (1.0 - norm_r0_times_norm_r * np.sqrt(c2(psi)) / A))
+                y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
 
         xi = np.sqrt(y / c2(psi))
         tof_new = (xi**3 * c3(psi) + A * np.sqrt(y)) / np.sqrt(k)
@@ -90,14 +94,13 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
         # Convergence check
         if np.abs((tof_new - tof) / tof) < rtol:
             break
-        else:
-            count += 1
-            # Bisection check
-            if tof_new <= tof:
-                psi_low = psi
-            else:
-                psi_up = psi
-            psi = (psi_up + psi_low) / 2
+        count += 1
+        # Bisection check
+        condition = (tof_new <= tof)
+        psi_low = psi_low + (psi - psi_low) * condition
+        psi_up = psi_up + (psi - psi_up) * (not condition)
+
+        psi = (psi_up + psi_low) / 2
     else:
         raise RuntimeError("Maximum number of iterations reached")
 
