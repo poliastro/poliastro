@@ -3,22 +3,21 @@
 """
 import os.path
 from itertools import cycle
-
-import numpy as np
-
 from typing import List, Tuple
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
-import plotly.colors
-from plotly.offline import iplot, plot as export
-from plotly.graph_objs import Scatter3d, Surface, Layout
-
+import numpy as np
 from astropy import units as u
 
-from poliastro.util import norm
+import plotly.colors
+from plotly.graph_objs import Layout, Scatter3d, Surface
+from plotly.offline import iplot
+from plotly.offline import plot as export
+from poliastro.bodies import (Earth, Jupiter, Mars, Mercury, Neptune, Saturn,
+                              Uranus, Venus)
 from poliastro.twobody.orbit import Orbit
+from poliastro.util import norm
 
 BODY_COLORS = {
     "Sun": "#ffcc00",
@@ -375,3 +374,19 @@ class OrbitPlotter3D:
             image=ext[1:], image_filename=basename,
             show_link=False,  # Boilerplate
         )
+
+
+def plot_solar_system(epoch=None):
+    orbits = []
+    orbits.append(Orbit.from_body_ephem(Earth, epoch))
+    orbits.append(Orbit.from_body_ephem(Mars, epoch))
+    orbits.append(Orbit.from_body_ephem(Mercury, epoch))
+    orbits.append(Orbit.from_body_ephem(Jupiter, epoch))
+    orbits.append(Orbit.from_body_ephem(Venus, epoch))
+    orbits.append(Orbit.from_body_ephem(Saturn, epoch))
+    orbits.append(Orbit.from_body_ephem(Uranus, epoch))
+    orbits.append(Orbit.from_body_ephem(Neptune, epoch))
+    op = OrbitPlotter()
+    for orbit in orbits:
+        op.plot(orbit)
+    return op
