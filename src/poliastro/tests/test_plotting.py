@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from poliastro.examples import iss
 
-from poliastro.plotting import OrbitPlotter
+from poliastro.plotting import OrbitPlotter, plot_solar_system
 
 
 def test_orbitplotter_has_axes():
@@ -66,3 +66,9 @@ def test_color():
     assert ax.get_legend().get_lines()[0].get_c() == c
     for element in ax.get_lines():
         assert element.get_c() == c
+
+
+def test_plot_solar_system():
+    op = plot_solar_system()
+    assert len(op._orbits) == 8
+    assert isinstance(op, OrbitPlotter)
