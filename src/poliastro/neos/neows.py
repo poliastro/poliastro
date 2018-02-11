@@ -8,10 +8,12 @@ import requests
 
 import astropy.units as u
 from astropy.time import Time
+from astropy.coordinates import CartesianDifferential, CartesianRepresentation, ICRS
 
 from poliastro.twobody.orbit import Orbit
 from poliastro.bodies import Sun
 from poliastro.twobody.angles import M_to_nu
+from poliastro.frames import _ecliptic_to_icrs, HeliocentricEclipticJ2000
 
 # Base URLs
 NEOWS_URL = 'https://api.nasa.gov/neo/rest/v1/neo/'
@@ -54,8 +56,16 @@ def orbit_from_spk_id(spk_id, api_key='DEMO_KEY'):
     nu = M_to_nu(m.to(u.rad), ecc)
     epoch = Time(float(orbital_data['epoch_osculation']), format='jd', scale='tdb')
 
-    return Orbit.from_classical(attractor, a, ecc, inc,
-                                raan, argp, nu, epoch)
+    ss = Orbit.from_classical(attractor, a, ecc, inc,
+                              raan, argp, nu, epoch)
+    r, v = ss.rv()
+    eclip_coor = HeliocentricEclipticJ2000(x=r[0], y=r[1], z=r[2], d_x=v[0], d_y=v[1], d_z=v[2],
+                                           representation=CartesianRepresentation,
+                                           differential_cls=CartesianDifferential, obstime=epoch)
+    icrs_coor = eclip_coor.transform_to(ICRS())
+    icrs_r = icrs_coor.cartesian.xyz
+    icrs_v = icrs_coor.cartesian.differentials['s'].d_xyz
+    return Orbit.from_vectors(attractor, icrs_r, icrs_v, epoch)
 
 
 def spk_id_from_name(name):

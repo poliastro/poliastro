@@ -10,10 +10,12 @@ import numpy as np
 import pandas as pd
 import astropy.units as u
 from astropy.time import Time
+from astropy.coordinates import ICRS, CartesianDifferential, CartesianRepresentation
 
 from poliastro.twobody.orbit import Orbit
 from poliastro.bodies import Sun
 from poliastro.twobody.angles import M_to_nu
+from poliastro.frames import HeliocentricEclipticJ2000
 
 AST_DTYPE = np.dtype([
     ("NO", np.int32),
@@ -363,8 +365,15 @@ def orbit_from_record(record):
     nu = M_to_nu(m, ecc)
     epoch = Time(body_data['EPOCH'].item(), format='jd', scale='tdb')
 
-    orbit = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch)
-    return orbit
+    ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch)
+    r, v = ss.rv()
+    eclip_coor = HeliocentricEclipticJ2000(x=r[0], y=r[1], z=r[2], d_x=v[0], d_y=v[1], d_z=v[2],
+                                           representation=CartesianRepresentation,
+                                           differential_cls=CartesianDifferential, obstime=epoch)
+    icrs_coor = eclip_coor.transform_to(ICRS())
+    icrs_r = icrs_coor.cartesian.xyz
+    icrs_v = icrs_coor.cartesian.differentials['s'].d_xyz
+    return Orbit.from_vectors(Sun, icrs_r, icrs_v, epoch)
 
 
 def record_from_name(name):
