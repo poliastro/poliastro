@@ -18,7 +18,10 @@ from plotly.graph_objs import Scatter3d, Surface, Layout
 from astropy import units as u
 
 from poliastro.util import norm
+from poliastro.bodies import (Earth, Jupiter, Mars, Mercury, Neptune, Saturn,
+                              Uranus, Venus)
 from poliastro.twobody.orbit import Orbit
+
 
 BODY_COLORS = {
     "Sun": "#ffcc00",
@@ -375,3 +378,20 @@ class OrbitPlotter3D:
             image=ext[1:], image_filename=basename,
             show_link=False,  # Boilerplate
         )
+
+
+def plot_solar_system(epoch=None):
+    """
+    Plots the whole solar system in one single call.
+
+    Parameters
+    ------------
+
+    Epoch Value. By default is None.
+    """
+    orbits = [Earth, Mars, Mercury, Jupiter, Venus, Saturn, Uranus, Neptune]
+    op = OrbitPlotter()
+    for orbit in orbits:
+        orb = Orbit.from_body_ephem(orbit)
+        op.plot(orb)
+    return op

@@ -21,7 +21,6 @@ def test_sample_angle_zero_returns_same():
     assert (rr[0].get_xyz() == ss0.r).all()
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize("time_of_flight", [1 * u.min, 40 * u.min])
 def test_sample_one_point_equals_propagation_small_deltas(time_of_flight):
     # Time arithmetic loses precision, see
