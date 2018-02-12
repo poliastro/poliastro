@@ -68,7 +68,10 @@ def test_color():
         assert element.get_c() == c
 
 
-def test_plot_solar_system():
-    op = plot_solar_system()
-    assert len(op._orbits) == 8
+def test_plot_solar_system(outer=True):
+    op = plot_solar_system(outer)
+    if outer:
+        assert len(op._orbits) == 8
+    else:
+        assert len(op.orbits) == 4
     assert isinstance(op, OrbitPlotter)

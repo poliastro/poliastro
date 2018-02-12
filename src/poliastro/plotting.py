@@ -380,24 +380,23 @@ class OrbitPlotter3D:
         )
 
 
-def plot_solar_system(epoch=None, outer=True):
+def plot_solar_system(outer=True, epoch=None):
     """
     Plots the whole solar system in one single call.
 
     Parameters
     ------------
 
+        outer : To print only the inner solar system , pass outer=False else it will print the whole solar system
     Epoch Value : By default its None.
-    outer : To print only the inner solar system , pass outer=False else it will print the whole solar system
-    
     """
-    if outer==True:
+    if outer:
         orbits = [Earth, Mars, Mercury, Jupiter, Venus, Saturn, Uranus, Neptune]
         op = OrbitPlotter()
         for orbit in orbits:
             orb = Orbit.from_body_ephem(orbit, epoch)
             op.plot(orb, label=str(orbit))
-    elif outer==False:
+    else:
         orbits = [Earth, Mars, Mercury, Venus]
         op = OrbitPlotter()
         for orbit in orbits:
