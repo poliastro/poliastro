@@ -292,7 +292,7 @@ This in turn will download the ephemerides files from NASA and use them
 for future computations. For more information, check out
 `Astropy documentation on ephemerides`_.
 
-.. _Astropy documentation on ephemerides: http://docs.astropy.org/en/v1.3.1/coordinates/solarsystem.html
+.. _Astropy documentation on ephemerides: http://docs.astropy.org/en/v2.0.4/coordinates/solarsystem.html
 
 .. note:: The position and velocity vectors are given with respect to the
     Solar System Barycenter in the **International Celestial Reference Frame**
