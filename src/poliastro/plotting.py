@@ -387,8 +387,8 @@ def plot_solar_system(outer=True, epoch=None):
     Parameters
     ------------
 
-        outer : To print only the inner solar system , pass outer=False else it will print the whole solar system
-    Epoch Value : By default its None.
+    outer : To print only the inner solar system , pass outer=False else it will print the whole solar system
+    epoch: Epoch Value of the plot. By default the value is None.
     """
     if outer:
         orbits = [Earth, Mars, Mercury, Jupiter, Venus, Saturn, Uranus, Neptune]
