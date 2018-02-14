@@ -68,7 +68,10 @@ def test_color():
         assert element.get_c() == c
 
 
-def test_plot_solar_system():
-        assert len(plot_solar_system(True).orbits) == 8
-        assert len(plot_solar_system(False).orbits) == 4
-        assert isinstance(plot_solar_system(), OrbitPlotter)
+@pytest.mark.parametrize("outer,expected", [
+    (True, 8),
+    (False, 4),
+])
+def test_plot_solar_system(outer, expected):
+    assert len(plot_solar_system(outer).orbits) == expected
+    assert isinstance(plot_solar_system(), OrbitPlotter)

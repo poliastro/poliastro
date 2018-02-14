@@ -58,6 +58,7 @@ class OrbitPlotter(object):
     :py:meth:`set_frame` to set the frame before plotting.
 
     """
+
     def __init__(self, ax=None, num_points=100):
         """Constructor.
 
@@ -224,6 +225,7 @@ class OrbitPlotter3D:
     """OrbitPlotter3D class.
 
     """
+
     def __init__(self):
         self._layout = Layout(
             autosize=True,
@@ -390,16 +392,15 @@ def plot_solar_system(outer=True, epoch=None):
     outer : To print only the inner solar system , pass outer=False else it will print the whole solar system
     epoch: Epoch Value of the plot. By default the value is None.
     """
-    if outer:
-        orbits = [Earth, Mars, Mercury, Jupiter, Venus, Saturn, Uranus, Neptune]
-        op = OrbitPlotter()
-        for orbit in orbits:
+    orbits = [Earth, Mars, Mercury, Venus, Jupiter, Saturn, Uranus, Neptune]
+    op = OrbitPlotter()
+    for orbit in orbits:
+        if outer:
             orb = Orbit.from_body_ephem(orbit, epoch)
             op.plot(orb, label=str(orbit))
-    else:
-        orbits = [Earth, Mars, Mercury, Venus]
-        op = OrbitPlotter()
-        for orbit in orbits:
+        else:
+            if orbit == Jupiter:
+                break
             orb = Orbit.from_body_ephem(orbit, epoch)
             op.plot(orb, label=str(orbit))
     return op
