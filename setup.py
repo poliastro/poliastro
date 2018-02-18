@@ -43,7 +43,7 @@ setup(
     python_requires=">=3.5",
     install_requires=[
         "numpy",
-        "astropy>=2.0.3,<4.*",
+        "astropy>=3.0,<4.*",
         "matplotlib>=2.0",
         "jplephem",
         "scipy",
@@ -51,6 +51,7 @@ setup(
         "requests",
         "pandas",
         "plotly",
+        "callhorizons",
     ],
     tests_require=[
         "coverage",

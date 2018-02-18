@@ -301,8 +301,8 @@ class OrbitPlotter3D:
         elif attractor is not self._attractor:
             raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
 
-    @u.quantity_input(elev=u.rad, azim=u.rad)
-    def set_view(self, elev, azim, distance=5):
+    @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
+    def set_view(self, elev, azim, distance=5 * u.km):
         x = distance * np.cos(elev) * np.cos(azim)
         y = distance * np.cos(elev) * np.sin(azim)
         z = distance * np.sin(elev)
@@ -389,19 +389,23 @@ def plot_solar_system(outer=True, epoch=None):
 
     Parameters
     ------------
+    outer : bool, optional
+        Whether to print the outer Solar System, default to True.
+    epoch: ~astropy.time.Time, optional
+        Epoch value of the plot, default to J2000.
 
-    outer : To print only the inner solar system , pass outer=False else it will print the whole solar system
-    epoch: Epoch Value of the plot. By default the value is None.
     """
-    orbits = [Earth, Mars, Mercury, Venus, Jupiter, Saturn, Uranus, Neptune]
+    bodies = [Mercury, Venus, Earth, Mars]
+    if outer:
+        bodies.extend([Jupiter, Saturn, Uranus, Neptune])
+
     op = OrbitPlotter()
-    for orbit in orbits:
-        if outer:
-            orb = Orbit.from_body_ephem(orbit, epoch)
-            op.plot(orb, label=str(orbit))
-        else:
-            if orbit == Jupiter:
-                break
-            orb = Orbit.from_body_ephem(orbit, epoch)
-            op.plot(orb, label=str(orbit))
+    for body in bodies:
+        orb = Orbit.from_body_ephem(body, epoch)
+        op.plot(orb, label=str(body))
+
+    # Sets frame to the orbit of the Earth by default
+    # TODO: Wait until https://github.com/poliastro/poliastro/issues/316
+    # op.set_frame(*Orbit.from_body_ephem(Earth, epoch).pqw())
+
     return op
