@@ -328,7 +328,7 @@ class OrbitPlotter3D:
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
 
         label = _generate_label(orbit, label)
-        trajectory = orbit.sample()
+        _, trajectory = orbit.sample()
 
         self._plot_trajectory(trajectory, label, color, True)
 
