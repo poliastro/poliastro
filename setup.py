@@ -51,6 +51,7 @@ setup(
         "requests",
         "pandas",
         "plotly",
+        "callhorizons",
     ],
     tests_require=[
         "coverage",
