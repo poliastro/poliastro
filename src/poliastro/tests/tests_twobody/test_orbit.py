@@ -169,7 +169,7 @@ def test_sample_numpoints():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     times, positions = ss.sample(values=50)
 
-    assert len(positions) == 50 and len(times) == 50
+    assert len(positions) == len(times) == 50
 
 
 def test_sample_with_time_value():
