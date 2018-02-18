@@ -267,8 +267,9 @@ class Orbit(object):
 
         Returns
         -------
-        CartesianRepresentation
-            Position vector in each given value.
+        (Time, CartesianRepresentation)
+            A tuple containing Time and Position vector in each
+            given value.
 
         Notes
         -----
@@ -304,7 +305,7 @@ class Orbit(object):
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
 
-        return self._sample(values)
+        return (values, self._sample(values))
 
     def _sample(self, time_values):
         values = np.zeros((len(time_values), 3)) * self.r.unit

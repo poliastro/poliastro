@@ -151,7 +151,8 @@ class OrbitPlotter(object):
 
         lines = []
 
-        rr = orbit.sample(self.num_points).get_xyz().transpose()
+        _, positions = orbit.sample(self.num_points)
+        rr = positions.get_xyz().transpose()
 
         # Project on OrbitPlotter frame
         # x_vec, y_vec, z_vec = self._frame
@@ -328,7 +329,7 @@ class OrbitPlotter3D:
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
 
         label = _generate_label(orbit, label)
-        trajectory = orbit.sample()
+        _, trajectory = orbit.sample()
 
         self._plot_trajectory(trajectory, label, color, True)
 
