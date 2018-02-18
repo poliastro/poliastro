@@ -151,7 +151,8 @@ class OrbitPlotter(object):
 
         lines = []
 
-        rr = orbit.sample(self.num_points).get_xyz().transpose()
+        _, positions = orbit.sample(self.num_points)
+        rr = positions.get_xyz().transpose()
 
         # Project on OrbitPlotter frame
         # x_vec, y_vec, z_vec = self._frame

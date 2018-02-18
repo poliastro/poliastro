@@ -16,7 +16,7 @@ def test_sample_angle_zero_returns_same():
 
     nu_values = [0] * u.deg
 
-    rr = ss0.sample(nu_values)
+    _, rr = ss0.sample(nu_values)
 
     assert (rr[0].get_xyz() == ss0.r).all()
 
@@ -34,7 +34,7 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    rr = ss0.sample(sample_times)
+    _, rr = ss0.sample(sample_times)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
 
@@ -50,7 +50,7 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    rr = ss0.sample(sample_times)
+    _, rr = ss0.sample(sample_times)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
 
@@ -65,7 +65,7 @@ def test_sample_nu_values():
 
     expected_ss = ss0.propagate(ss0.period / 2)
 
-    rr = ss0.sample(nu_values)
+    _, rr = ss0.sample(nu_values)
 
     assert len(rr) == len(nu_values)
     assert_quantity_allclose(rr[-1].get_xyz(), expected_ss.r)
@@ -80,7 +80,7 @@ def test_sample_num_points(num_points):
 
     expected_ss = ss0.propagate(ss0.period / 2)
 
-    rr = ss0.sample(num_points)
+    _, rr = ss0.sample(num_points)
 
     assert len(rr) == num_points
     assert_quantity_allclose(rr[num_points // 2].get_xyz(), expected_ss.r)
