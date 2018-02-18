@@ -6,6 +6,7 @@ from astropy.time import Time
 
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
+from poliastro.twobody.propagation import propagate
 
 
 def test_sample_angle_zero_returns_same():
@@ -21,8 +22,11 @@ def test_sample_angle_zero_returns_same():
     assert (rr[0].get_xyz() == ss0.r).all()
 
 
-@pytest.mark.parametrize("time_of_flight", [1 * u.min, 40 * u.min])
-def test_sample_one_point_equals_propagation_small_deltas(time_of_flight):
+@pytest.mark.parametrize("time_of_flight,function", [
+    (1 * u.min, propagate),
+    (40 * u.min, propagate),
+])
+def test_sample_one_point_equals_propagation_small_deltas(time_of_flight, function):
     # Time arithmetic loses precision, see
     # https://github.com/astropy/astropy/issues/6638
     # Data from Vallado, example 2.4
@@ -32,15 +36,18 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight):
 
     sample_times = Time([ss0.epoch + time_of_flight])
 
-    expected_ss = ss0.propagate(time_of_flight)
+    expected_ss = ss0.propagate(time_of_flight, function)
 
-    _, rr = ss0.sample(sample_times)
+    _, rr = ss0.sample(sample_times, function)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
 
 
-@pytest.mark.parametrize("time_of_flight", [6 * u.h, 2 * u.day])
-def test_sample_one_point_equals_propagation_big_deltas(time_of_flight):
+@pytest.mark.parametrize("time_of_flight,function", [
+    (6 * u.h, propagate),
+    (2 * u.day, propagate),
+])
+def test_sample_one_point_equals_propagation_big_deltas(time_of_flight, function):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
@@ -50,7 +57,7 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    _, rr = ss0.sample(sample_times)
+    _, rr = ss0.sample(sample_times, function)
 
     assert (rr[0].get_xyz() == expected_ss.r).all()
 

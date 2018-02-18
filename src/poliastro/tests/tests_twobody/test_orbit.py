@@ -168,7 +168,6 @@ def test_sample_numpoints():
     _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     times, positions = ss.sample(values=50)
-
     assert len(positions) == len(times) == 50
 
 
@@ -180,7 +179,7 @@ def test_sample_with_time_value():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
-    _, positions = ss.sample(values=[ss.period])
+    _, positions = ss.sample(values=[360] * u.deg)
     r = positions.get_xyz().transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
