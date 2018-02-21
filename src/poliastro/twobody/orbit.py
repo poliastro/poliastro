@@ -4,10 +4,13 @@ import numpy as np
 
 from astropy import units as u
 from astropy import time
+
 from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M
+from poliastro.twobody.angles import E_to_nu
+from poliastro.twobody.angles import nu_to_E
 from poliastro.twobody.propagation import propagate, cowell
 
 from poliastro.twobody import rv
@@ -294,12 +297,17 @@ class Orbit(object):
 
         elif isinstance(values, int):
             if self.ecc < 1:
-                nu_values = np.linspace(0, 2 * np.pi, values) * u.rad
+                # first sample eccenric anomaly, then transform into true anomaly
+                E_values = np.linspace(0, 2 * np.pi, values) * u.rad
+                nu_values = E_to_nu(E_values, self.ecc)
+                
             else:
                 # Select a sensible limiting value for non-closed orbits
                 # This corresponds to r = 3p
                 nu_limit = np.arccos(-(1 - 1 / 3.) / self.ecc)
-                nu_values = np.linspace(-nu_limit, nu_limit, values)
+                E_limit = nu_to_E(nu_limit, self.ecc) / u.rad
+                E_values = np.linspace(-E_limit, E_limit, values) * u.rad
+                nu_values = E_to_nu(E_values, self.ecc)
 
             return self.sample(nu_values, function)
 

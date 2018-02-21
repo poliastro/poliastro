@@ -59,7 +59,7 @@ class OrbitPlotter(object):
 
     """
 
-    def __init__(self, ax=None, num_points=300):
+    def __init__(self, ax=None, num_points=150):
         """Constructor.
 
         Parameters
