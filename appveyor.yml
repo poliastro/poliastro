@@ -20,7 +20,6 @@ matrix:
 install:
   - "set PYTHON_BIN=C:\\Python36-x64\\python.exe"
   - "set PIP_BIN=C:\\Python36-x64\\Scripts\\pip.exe"
-  - "set SPHINX_BIN=C:\\Python36-x64\\Scripts\\sphinx-build.exe"
 
   # Check that we have the expected version of Python
   - "%PYTHON_BIN% --version"
@@ -35,4 +34,3 @@ build: off
 
 test_script:
   - "%PYTHON_BIN% setup.py test -vv"  # Test against installed code
-  - "%SPHINX_BIN% -vW -b html docs/source _HTMLTest" # Test docs build
