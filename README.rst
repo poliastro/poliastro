@@ -228,3 +228,8 @@ in 2017, maintaining its focus on interplanetary applications. Expect better
 algorithms, easier 3D plotting and optimization techniques. The best way
 to get an idea of the roadmap is to check the Kanban board at Waffle.io
 (see `Contributing`_).
+
+
+.. image:: https://badges.gitter.im/poliastro/poliastro.svg
+   :alt: Join the chat at https://gitter.im/poliastro/poliastro
+   :target: https://gitter.im/poliastro/poliastro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
