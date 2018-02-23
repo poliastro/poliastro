@@ -6,6 +6,8 @@ from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from astropy import time
+from astropy.time import Time
+from astropy.coordinates import CartesianRepresentation
 
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
@@ -197,3 +199,14 @@ def test_sample_with_nu_value():
     r = positions.get_xyz().transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
+
+
+def test_nu_value_check():
+    _d = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km
+    _v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
+    ss = Orbit.from_vectors(Sun, _d, _v, Time('2015-07-14 07:59', scale='tdb'))
+    values, positions = ss.sample(100)
+
+    assert isinstance(positions, CartesianRepresentation)
+    assert isinstance(values, Time)
+    assert len(positions) == len(values) == 101
