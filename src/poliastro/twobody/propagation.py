@@ -123,9 +123,12 @@ def mean_motion(k, r0, v0, tof, **kwargs):
 
     Note
     -----
-    This method takes initial \vec{r}, \vec{v}, calculates classical orbit parameters
-    increases mean anomaly and performs inverse transformation to get final \vec{r}, \vec{v}
-    The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9
+    This method takes initial \vec{r}, \vec{v}, 
+    calculates classical orbit parameters
+    increases mean anomaly and performs inverse 
+    transformation to get final \vec{r}, \vec{v}
+    The logic is based on formulae (4), (6) and (7) 
+    from http://dx.doi.org/10.1007/s10569-013-9476-9
 
     """
 
@@ -138,24 +141,28 @@ def mean_motion(k, r0, v0, tof, **kwargs):
     # elliptic or hyperbolic orbits
     if ecc != 1.0:
         a = p / (1.0 - ecc ** 2)
-        # given the initial mean anomaly, calculate mean anomaly at the end, mean motion (n) equals sqrt(mu / |a^3|)
-        M = M0 + tof * np.sqrt(k / np.abs(a ** 3))
-        nu = (M_to_nu(M * u.rad, ecc) / u.rad).to('').value
+        # given the initial mean anomaly, calculate mean anomaly 
+        # at the end, mean motion (n) equals sqrt(mu / |a^3|)
+        with u.set_enabled_equivalencies(u.dimensionless_angles()):
+            M = M0 + tof * np.sqrt(k / np.abs(a ** 3)) * u.rad
+            nu = M_to_nu(M, ecc)
         
     # parabolic orbit
     else:
         q = p / 2.0
         # mean motion n = sqrt(mu / 2 q^3) for parabolic orbit
-        M = M0 + tof * np.sqrt(k / (2.0 * q ** 3))
+        with u.set_enabled_equivalencies(u.dimensionless_angles()):
+            M = M0 + tof * np.sqrt(k / (2.0 * q ** 3))
 
-        # using Barker's equation, which is solved analytically for parabolic orbit, get true anomaly
+        # using Barker's equation, which is solved analytically 
+        # for parabolic orbit, get true anomaly
         B = 3.0 * M / 2.0
         A = (B + np.sqrt(1.0 + B ** 2)) ** (2.0 / 3.0)
         D = 2.0 * A * B / (1.0 + A + A ** 2)
 
         nu = 2.0 * np.arctan(D)
-
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    with u.set_enabled_equivalencies(u.dimensionless_angles()):
+        return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 def kepler(k, r0, v0, tof, rtol=1e-10, *, numiter=35):
     """Propagates Keplerian orbit.
