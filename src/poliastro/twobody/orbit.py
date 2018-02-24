@@ -305,6 +305,7 @@ class Orbit(object):
                 # This corresponds to r = 3p
                 nu_limit = np.arccos(-(1 - 1 / 3.) / self.ecc)
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
+                nu_values = np.insert(nu_values, 0, self.ecc)
 
             return self.sample(nu_values, function)
 
