@@ -7,7 +7,7 @@ from astropy.time import Time
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import propagate
-
+import numpy as np
 
 def test_sample_angle_zero_returns_same():
     # Data from Vallado, example 2.4
@@ -16,10 +16,9 @@ def test_sample_angle_zero_returns_same():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
 
     nu_values = [0] * u.deg
-
     _, rr = ss0.sample(nu_values)
 
-    assert (rr[0].get_xyz() == ss0.r).all()
+    assert_quantity_allclose(rr[0].get_xyz(), ss0.r)
 
 
 @pytest.mark.parametrize("time_of_flight,function", [
@@ -40,7 +39,7 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight, functi
 
     _, rr = ss0.sample(sample_times, function)
 
-    assert (rr[0].get_xyz() == expected_ss.r).all()
+    assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r)
 
 
 @pytest.mark.parametrize("time_of_flight,function", [
@@ -59,7 +58,7 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight, function
 
     _, rr = ss0.sample(sample_times, function)
 
-    assert (rr[0].get_xyz() == expected_ss.r).all()
+    assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r)
 
 
 def test_sample_nu_values():
