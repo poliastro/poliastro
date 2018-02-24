@@ -33,4 +33,4 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON_BIN% setup.py test -vv"  # Test against installed code
+  - "%PYTHON_BIN% pytest -vv"  # Test against installed code

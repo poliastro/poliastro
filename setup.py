@@ -2,28 +2,12 @@
 import os
 import sys
 from setuptools import setup, find_packages
-from setuptools.command.test import test
 
 
 # https://packaging.python.org/guides/single-sourcing-package-version/
 version = {}
 with open(os.path.join("src", "poliastro", "__init__.py")) as fp:
     exec(fp.read(), version)
-
-
-# https://docs.pytest.org/en/latest/goodpractices.html#manual-integration
-class PyTest(test):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
-
-    def initialize_options(self):
-        test.initialize_options(self)
-        self.pytest_args = ''
-
-    def run_tests(self):
-        import shlex
-        import pytest
-
-        sys.exit(pytest.main(shlex.split(self.pytest_args)))
 
 
 # http://blog.ionelmc.ro/2014/05/25/python-packaging/
@@ -53,13 +37,11 @@ setup(
         "plotly",
         "callhorizons",
     ],
-    tests_require=[
-        "coverage",
-        "pytest-cov",
-    ],
     extras_require={
         ':implementation_name=="cpython"': "numba>=0.25",
         'dev': [
+            "coverage",
+            "pytest-cov",
             "pycodestyle",
             "sphinx<1.6",
             "sphinx_rtd_theme",
@@ -67,7 +49,7 @@ setup(
             "ipython>=5.0",
             "jupyter-client",
             "ipykernel",
-            "ipywidgets"
+            "ipywidgets",
         ]
     },
     packages=find_packages('src'),
@@ -96,5 +78,4 @@ setup(
     package_data={"poliastro": ['tests/*.py']},
     include_package_data=True,
     zip_safe=False,
-    cmdclass={'test': PyTest},
 )
