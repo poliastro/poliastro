@@ -9,6 +9,7 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import propagate
 import numpy as np
 
+
 def test_sample_angle_zero_returns_same():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
