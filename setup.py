@@ -75,7 +75,6 @@ setup(
         "Topic :: Scientific/Engineering :: Astronomy",
     ],
     long_description=open('README.rst', encoding='utf-8').read(),
-    package_data={"poliastro": ['tests/*.py']},
     include_package_data=True,
     zip_safe=False,
 )
