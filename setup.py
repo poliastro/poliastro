@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import sys
 from setuptools import setup, find_packages
 
 
@@ -17,7 +16,7 @@ setup(
     description="Python package for Orbital Mechanics",
     author="Juan Luis Cano",
     author_email="hello@juanlu.space",
-    url="http://poliastro.github.io/",
+    url="http://blog.poliastro.space/",
     download_url="https://github.com/poliastro/poliastro",
     license="MIT",
     keywords=[
