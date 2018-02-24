@@ -63,7 +63,7 @@ before_script:
   - if [[ $RUN_MYPY == 'true' ]]; then mypy --ignore-missing-imports --check-untyped-defs src/; fi
 
 script:
-  - python setup.py test -vv  # Test against installed code
+  - pytest -vv  # Test against installed code
   - if [[ $RUN_NTB == 'true' ]]; then sphinx-build -vW -b html docs/source _HTMLTest; fi  # Test docs build
 
 after_success:
@@ -71,7 +71,7 @@ after_success:
   - pip uninstall poliastro -y
   - pip install -e .
 
-  - NUMBA_DISABLE_JIT=1 python setup.py test -a "--cov"
+  - NUMBA_DISABLE_JIT=1 pytest --cov
 
   # Publish coverage
   - pip install codecov

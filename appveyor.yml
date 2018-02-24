@@ -2,7 +2,7 @@
 # Windows
 # File shamelessly inspired by Astropy
 
-version: 0.7.dev0-{build}
+version: 0.8.dev0-{build}
 
 branches:
   only:
@@ -33,4 +33,4 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON_BIN% setup.py test -vv"  # Test against installed code
+  - "%PYTHON_BIN% -m pytest -vv"  # Test against installed code
