@@ -237,7 +237,7 @@ class Orbit(object):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, epoch_or_duration, method=kepler, function=propagate, rtol=1e-10):
+    def propagate(self, epoch_or_duration, method=kepler, rtol=1e-10):
         """Propagate this `Orbit` some `time` and return the result.
 
         Parameters
@@ -253,7 +253,7 @@ class Orbit(object):
         else:
             time_of_flight = time.TimeDelta(epoch_or_duration)
 
-        return function(self, time_of_flight, method=method, rtol=rtol)
+        return propagate(self, time_of_flight, method=method, rtol=rtol)
 
     def sample(self, values=None, function=propagate):
         """Samples an orbit to some specified time values.
