@@ -9,7 +9,7 @@ from astropy.coordinates import CartesianRepresentation, get_body_barycentric_po
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu, nu_to_E
-from poliastro.twobody.propagation import propagate, cowell
+from poliastro.twobody.propagation import propagate, cowell, kepler, mean_motion
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -237,7 +237,7 @@ class Orbit(object):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, epoch_or_duration, function=propagate, rtol=1e-10):
+    def propagate(self, epoch_or_duration, method=kepler, function=propagate, rtol=1e-10):
         """Propagate this `Orbit` some `time` and return the result.
 
         Parameters
@@ -253,7 +253,7 @@ class Orbit(object):
         else:
             time_of_flight = time.TimeDelta(epoch_or_duration)
 
-        return function(self, time_of_flight, rtol=rtol)
+        return function(self, time_of_flight, merhod=method, rtol=rtol)
 
     def sample(self, values=None, function=propagate):
         """Samples an orbit to some specified time values.

@@ -1,4 +1,5 @@
 from pytest import approx
+import pytest
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -10,12 +11,13 @@ from astropy.tests.helper import assert_quantity_allclose
 from poliastro.constants import J2000
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell
+from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 from poliastro.util import norm
 
 
-def test_propagation():
+@pytest.mark.parametrize('method', [kepler, mean_motion])
+def test_propagation(method):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
@@ -24,7 +26,7 @@ def test_propagation():
 
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 40 * u.min
-    ss1 = ss0.propagate(tof)
+    ss1 = ss0.propagate(tof, method=method)
 
     r, v = ss1.rv()
 
