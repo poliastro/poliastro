@@ -253,7 +253,7 @@ class Orbit(object):
         else:
             time_of_flight = time.TimeDelta(epoch_or_duration)
 
-        return function(self, time_of_flight, merhod=method, rtol=rtol)
+        return function(self, time_of_flight, method=method, rtol=rtol)
 
     def sample(self, values=None, function=propagate):
         """Samples an orbit to some specified time values.
