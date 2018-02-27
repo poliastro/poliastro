@@ -1,4 +1,5 @@
 from pytest import approx
+import pytest
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -7,15 +8,17 @@ from astropy import units as u
 from astropy import time
 from astropy.tests.helper import assert_quantity_allclose
 
+from poliastro.twobody.rv import rv2coe
 from poliastro.constants import J2000
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell
+from poliastro.twobody.propagation import cowell, kepler, mean_motion, cowell
 
 from poliastro.util import norm
 
 
-def test_propagation():
+@pytest.mark.parametrize('method', [kepler, mean_motion, cowell])
+def test_propagation(method):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
@@ -24,7 +27,7 @@ def test_propagation():
 
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 40 * u.min
-    ss1 = ss0.propagate(tof)
+    ss1 = ss0.propagate(tof, method=method)
 
     r, v = ss1.rv()
 
@@ -63,6 +66,23 @@ def test_propagation_hyperbolic():
 
     assert_quantity_allclose(norm(r), expected_r_norm, rtol=1e-4)
     assert_quantity_allclose(norm(v), expected_v_norm, rtol=1e-3)
+
+
+def test_propagation_mean_motion_parabolic():
+    # example from Howard Curtis (3rd edition), section 3.5, problem 3.15
+    p = 2.0 * 6600 * u.km
+    _a = 0.0 * u.deg
+    orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
+    orbit = orbit.propagate(0.8897 / 2.0 * u.h, method=mean_motion)
+
+    _, _, _, _, _, nu0 = rv2coe(Earth.k.to(u.km**3 / u.s**2).value,
+                                orbit.r.to(u.km).value,
+                                orbit.v.to(u.km / u.s).value)
+    assert_quantity_allclose(nu0, np.deg2rad(90.0), rtol=1e-4)
+
+    orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
+    orbit = orbit.propagate(36.0 * u.h, method=mean_motion)
+    assert_quantity_allclose(norm(orbit.r.to(u.km).value), 304700.0, rtol=1e-4)
 
 
 def test_propagation_zero_time_returns_same_state():

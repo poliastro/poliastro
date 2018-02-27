@@ -1,4 +1,4 @@
-"""Propagation algorithms.
+"""Propagation algorithms
 
 """
 import numpy as np
@@ -6,6 +6,9 @@ import numpy as np
 from scipy.integrate import ode
 
 from astropy import units as u
+from poliastro.twobody.rv import rv2coe
+from poliastro.twobody.classical import coe2rv
+from poliastro.twobody.angles import nu_to_M, M_to_nu
 
 from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
@@ -103,6 +106,61 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     return r, v
 
 
+def mean_motion(k, r0, v0, tof, **kwargs):
+    """Propagates orbit using mean motion
+
+    Parameters
+    ----------
+    k : float
+        Gravitational constant of main attractor (km^3 / s^2).
+    r0 : array
+        Initial position (km).
+    v0 : array
+        Initial velocity (km).
+    ad : function(t0, u, k), optional
+         Non Keplerian acceleration (km/s2), default to None.
+    tof : float
+        Time of flight (s).
+
+    Note
+    -----
+    This method takes initial \vec{r}, \vec{v}, calculates classical orbit parameters,
+    increases mean anomaly and performs inverse transformation to get final \vec{r}, \vec{v}
+    The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9
+    """
+
+    # get the initial true anomaly and orbit parameters that are constant over time
+    p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
+
+    # get the initial mean anomaly
+    M0 = nu_to_M(nu0, ecc)
+    # elliptic or hyperbolic orbits
+    if not np.isclose(ecc, 1.0, rtol=1e-06):
+        a = p / (1.0 - ecc ** 2)
+        # given the initial mean anomaly, calculate mean anomaly
+        # at the end, mean motion (n) equals sqrt(mu / |a^3|)
+        with u.set_enabled_equivalencies(u.dimensionless_angles()):
+            M = M0 + tof * np.sqrt(k / np.abs(a ** 3)) * u.rad
+            nu = M_to_nu(M, ecc)
+
+    # parabolic orbit
+    else:
+        q = p / 2.0
+        # mean motion n = sqrt(mu / 2 q^3) for parabolic orbit
+        with u.set_enabled_equivalencies(u.dimensionless_angles()):
+            M = M0 + tof * np.sqrt(k / (2.0 * q ** 3))
+
+        # using Barker's equation, which is solved analytically
+        # for parabolic orbit, get true anomaly
+        B = 3.0 * M / 2.0
+        A = (B + np.sqrt(1.0 + B ** 2)) ** (2.0 / 3.0)
+        D = 2.0 * A * B / (1.0 + A + A ** 2)
+
+        nu = 2.0 * np.arctan(D)
+    with u.set_enabled_equivalencies(u.dimensionless_angles()):
+        return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
+
 def kepler(k, r0, v0, tof, rtol=1e-10, *, numiter=35):
     """Propagates Keplerian orbit.
 
@@ -146,7 +204,7 @@ def kepler(k, r0, v0, tof, rtol=1e-10, *, numiter=35):
     return r, v
 
 
-def propagate(orbit, time_of_flight, *, method=kepler, rtol=1e-10, **kwargs):
+def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
 
     """

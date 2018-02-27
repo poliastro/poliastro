@@ -9,7 +9,7 @@ from astropy.coordinates import CartesianRepresentation, get_body_barycentric_po
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu, nu_to_E
-from poliastro.twobody.propagation import propagate, cowell
+from poliastro.twobody.propagation import propagate, cowell, kepler, mean_motion
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -237,7 +237,7 @@ class Orbit(object):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, epoch_or_duration, function=propagate, rtol=1e-10):
+    def propagate(self, epoch_or_duration, method=mean_motion, rtol=1e-10):
         """Propagate this `Orbit` some `time` and return the result.
 
         Parameters
@@ -253,9 +253,9 @@ class Orbit(object):
         else:
             time_of_flight = time.TimeDelta(epoch_or_duration)
 
-        return function(self, time_of_flight, rtol=rtol)
+        return propagate(self, time_of_flight, method=method, rtol=rtol)
 
-    def sample(self, values=None, function=propagate):
+    def sample(self, values=None, method=mean_motion):
         """Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
@@ -291,7 +291,7 @@ class Orbit(object):
 
         """
         if values is None:
-            return self.sample(100, function)
+            return self.sample(100, method)
 
         elif isinstance(values, int):
             if self.ecc < 1:
@@ -307,16 +307,16 @@ class Orbit(object):
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
                 nu_values = np.insert(nu_values, 0, self.ecc)
 
-            return self.sample(nu_values, function)
+            return self.sample(nu_values, method)
 
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
-        return (values, self._sample(values, function))
+        return (values, self._sample(values, method))
 
-    def _sample(self, time_values, function=propagate):
+    def _sample(self, time_values, method=mean_motion):
         values = np.zeros((len(time_values), 3)) * self.r.unit
         for ii, epoch in enumerate(time_values):
-            rr = self.propagate(epoch, function).r
+            rr = self.propagate(epoch, method).r
             values[ii] = rr
 
         return CartesianRepresentation(values, xyz_axis=1)
