@@ -398,7 +398,8 @@ def plot_solar_system(outer=True, epoch=None, function=OrbitPlotter):
     epoch: ~astropy.time.Time, optional
         Epoch value of the plot, default to J2000.
     function: optional
-        Whether to print solar system in 2D or 3D, OrbitPlotter for 2D and OrbitPlotter3D for 3D, default to OrbitPlotter.
+        Whether to print solar system in 2D or 3D,
+        OrbitPlotter for 2D and OrbitPlotter3D for 3D, default to OrbitPlotter.
     """
     bodies = [Mercury, Venus, Earth, Mars]
     if outer:
