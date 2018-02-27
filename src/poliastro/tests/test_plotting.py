@@ -74,7 +74,7 @@ def test_color():
 ])
 def test_plot_solar_system(outer, expected, dim):
     assert len(plot_solar_system(outer).orbits) == expected
-    if dim==3:
-        assert isinstance(plot_solar_system(), OrbitPlotter3D)
+    if dim == 3:
+        assert isinstance(plot_solar_system(dim), OrbitPlotter3D)
     else:
         assert isinstance(plot_solar_system(), OrbitPlotter)
