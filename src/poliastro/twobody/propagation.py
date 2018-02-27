@@ -131,10 +131,11 @@ def mean_motion(k, r0, v0, tof, **kwargs):
 
     # get the initial true anomaly and orbit parameters that are constant over time
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
+
     # get the initial mean anomaly
     M0 = nu_to_M(nu0, ecc)
     # elliptic or hyperbolic orbits
-    if ecc != 1.0:
+    if not np.isclose(ecc, 1.0, rtol=1e-06):
         a = p / (1.0 - ecc ** 2)
         # given the initial mean anomaly, calculate mean anomaly
         # at the end, mean motion (n) equals sqrt(mu / |a^3|)
