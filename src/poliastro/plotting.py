@@ -22,6 +22,10 @@ from poliastro.bodies import (Earth, Jupiter, Mars, Mercury, Neptune, Saturn,
                               Uranus, Venus)
 from poliastro.twobody.orbit import Orbit
 
+from plotly.offline import init_notebook_mode
+
+init_notebook_mode(connected=True)
+
 
 BODY_COLORS = {
     "Sun": "#ffcc00",
@@ -383,7 +387,7 @@ class OrbitPlotter3D:
         )
 
 
-def plot_solar_system(outer=True, epoch=None):
+def plot_solar_system(outer=True, epoch=None, dim=2):
     """
     Plots the whole solar system in one single call.
 
@@ -393,16 +397,21 @@ def plot_solar_system(outer=True, epoch=None):
         Whether to print the outer Solar System, default to True.
     epoch: ~astropy.time.Time, optional
         Epoch value of the plot, default to J2000.
-
+    dim: int, optional
+        Whether to print solar system in 2D or 3D, 2 for 2D and 3 for 3D, default to 2. 
     """
     bodies = [Mercury, Venus, Earth, Mars]
     if outer:
         bodies.extend([Jupiter, Saturn, Uranus, Neptune])
-
-    op = OrbitPlotter()
+    if dim==2:
+        op = OrbitPlotter()
+    elif dim==3:
+        op = OrbitPlotter3D()
     for body in bodies:
         orb = Orbit.from_body_ephem(body, epoch)
         op.plot(orb, label=str(body))
+    if dim==3:
+        op.show()
 
     # Sets frame to the orbit of the Earth by default
     # TODO: Wait until https://github.com/poliastro/poliastro/issues/316
