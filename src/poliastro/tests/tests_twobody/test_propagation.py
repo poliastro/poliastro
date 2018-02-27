@@ -8,15 +8,16 @@ from astropy import units as u
 from astropy import time
 from astropy.tests.helper import assert_quantity_allclose
 
+from poliastro.twobody.rv import rv2coe
 from poliastro.constants import J2000
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell, kepler, mean_motion
+from poliastro.twobody.propagation import cowell, kepler, mean_motion, cowell
 
 from poliastro.util import norm
 
 
-@pytest.mark.parametrize('method', [kepler, mean_motion])
+@pytest.mark.parametrize('method', [kepler, mean_motion, cowell])
 def test_propagation(method):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
@@ -65,6 +66,23 @@ def test_propagation_hyperbolic():
 
     assert_quantity_allclose(norm(r), expected_r_norm, rtol=1e-4)
     assert_quantity_allclose(norm(v), expected_v_norm, rtol=1e-3)
+
+
+def test_propagation_mean_motion_parabolic():
+    # example from Howard Curtis, section 3.5, problem 3.15
+    p = 13200.0 * u.km
+    _a = 0.0 * u.deg
+    orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
+    orbit = orbit.propagate(0.8897 * 3600.0 / 2.0 * u.s, method=mean_motion)
+
+    _, _, _, _, _, nu0 = rv2coe(Earth.k.to(u.km**3 / u.s**2).value,
+                                orbit.r.to(u.km).value,
+                                orbit.v.to(u.km / u.s).value)
+    assert_quantity_allclose(nu0, np.deg2rad(90.0), rtol=1e-4)
+
+    orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
+    orbit = orbit.propagate(36.0 * 3600.0 * u.s, method=mean_motion)
+    assert_quantity_allclose(np.sqrt(np.sum(np.array(orbit.r.to(u.km).value) ** 2)), 304700.0, rtol=1e-4)
 
 
 def test_propagation_zero_time_returns_same_state():
