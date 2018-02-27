@@ -387,7 +387,7 @@ class OrbitPlotter3D:
         )
 
 
-def plot_solar_system(outer=True, epoch=None, dim=2):
+def plot_solar_system(outer=True, epoch=None, function=OrbitPlotter):
     """
     Plots the whole solar system in one single call.
 
@@ -397,24 +397,20 @@ def plot_solar_system(outer=True, epoch=None, dim=2):
         Whether to print the outer Solar System, default to True.
     epoch: ~astropy.time.Time, optional
         Epoch value of the plot, default to J2000.
-    dim: int, optional
-        Whether to print solar system in 2D or 3D, 2 for 2D and 3 for 3D, default to 2.
+    function: optional
+        Whether to print solar system in 2D or 3D, OrbitPlotter for 2D and OrbitPlotter3D for 3D, default to OrbitPlotter.
     """
     bodies = [Mercury, Venus, Earth, Mars]
     if outer:
         bodies.extend([Jupiter, Saturn, Uranus, Neptune])
-    if dim == 2:
-        op = OrbitPlotter()
-    elif dim == 3:
-        op = OrbitPlotter3D()
+    op = function()
     for body in bodies:
         orb = Orbit.from_body_ephem(body, epoch)
         op.plot(orb, label=str(body))
-    if dim == 3:
+    if function == OrbitPlotter3D:
         op.show()
 
     # Sets frame to the orbit of the Earth by default
     # TODO: Wait until https://github.com/poliastro/poliastro/issues/316
     # op.set_frame(*Orbit.from_body_ephem(Earth, epoch).pqw())
-
     return op
