@@ -69,11 +69,11 @@ def test_propagation_hyperbolic():
 
 
 def test_propagation_mean_motion_parabolic():
-    # example from Howard Curtis, section 3.5, problem 3.15
-    p = 13200.0 * u.km
+    # example from Howard Curtis (3rd edition), section 3.5, problem 3.15
+    p = 2.0 * 6600 * u.km
     _a = 0.0 * u.deg
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
-    orbit = orbit.propagate(0.8897 * 3600.0 / 2.0 * u.s, method=mean_motion)
+    orbit = orbit.propagate(0.8897 / 2.0 * u.h, method=mean_motion)
 
     _, _, _, _, _, nu0 = rv2coe(Earth.k.to(u.km**3 / u.s**2).value,
                                 orbit.r.to(u.km).value,
@@ -81,8 +81,8 @@ def test_propagation_mean_motion_parabolic():
     assert_quantity_allclose(nu0, np.deg2rad(90.0), rtol=1e-4)
 
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
-    orbit = orbit.propagate(36.0 * 3600.0 * u.s, method=mean_motion)
-    assert_quantity_allclose(np.sqrt(np.sum(np.array(orbit.r.to(u.km).value) ** 2)), 304700.0, rtol=1e-4)
+    orbit = orbit.propagate(36.0 * u.h, method=mean_motion)
+    assert_quantity_allclose(norm(orbit.r.to(u.km).value), 304700.0, rtol=1e-4)
 
 
 def test_propagation_zero_time_returns_same_state():

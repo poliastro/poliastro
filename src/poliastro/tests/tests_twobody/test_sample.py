@@ -6,7 +6,7 @@ from astropy.time import Time
 
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import propagate, kepler, mean_motion
+from poliastro.twobody.propagation import kepler, mean_motion, cowell
 import numpy as np
 
 
@@ -22,12 +22,8 @@ def test_sample_angle_zero_returns_same():
     assert_quantity_allclose(rr[0].get_xyz(), ss0.r)
 
 
-@pytest.mark.parametrize("time_of_flight,method", [
-    (1 * u.min, kepler),
-    (40 * u.min, kepler),
-    (1 * u.min, mean_motion),
-    (40 * u.min, mean_motion),
-])
+@pytest.mark.parametrize("time_of_flight", [1 * u.min, 40 * u.min])
+@pytest.mark.parametrize("method", [kepler, mean_motion, cowell])
 def test_sample_one_point_equals_propagation_small_deltas(time_of_flight, method):
     # Time arithmetic loses precision, see
     # https://github.com/astropy/astropy/issues/6638
@@ -45,12 +41,8 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight, method
     assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r)
 
 
-@pytest.mark.parametrize("time_of_flight,method", [
-    (6 * u.h, kepler),
-    (2 * u.day, kepler),
-    (6 * u.h, mean_motion),
-    (2 * u.day, mean_motion),
-])
+@pytest.mark.parametrize("time_of_flight", [6 * u.h, 2 * u.day])
+@pytest.mark.parametrize("method", [kepler, mean_motion, cowell])
 def test_sample_one_point_equals_propagation_big_deltas(time_of_flight, method):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
