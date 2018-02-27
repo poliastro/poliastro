@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from poliastro.examples import iss
 
-from poliastro.plotting import OrbitPlotter, plot_solar_system
+from poliastro.plotting import OrbitPlotter, OrbitPlotter3D, plot_solar_system
 
 
 def test_orbitplotter_has_axes():
@@ -68,10 +68,13 @@ def test_color():
         assert element.get_c() == c
 
 
-@pytest.mark.parametrize("outer,expected", [
-    (True, 8),
-    (False, 4),
+@pytest.mark.parametrize("outer,expected,dim", [
+    (True, 8, 2),
+    (False, 4, 3),
 ])
-def test_plot_solar_system(outer, expected):
+def test_plot_solar_system(outer, expected, dim):
     assert len(plot_solar_system(outer).orbits) == expected
-    assert isinstance(plot_solar_system(), OrbitPlotter)
+    if dim==3:
+        assert isinstance(plot_solar_system(), OrbitPlotter3D)
+    else:
+        assert isinstance(plot_solar_system(), OrbitPlotter)
