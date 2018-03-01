@@ -181,7 +181,7 @@ def test_sample_with_time_value():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
-    _, positions = ss.sample(values=[360] * u.deg)
+    _, positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.get_xyz().transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
@@ -195,7 +195,7 @@ def test_sample_with_nu_value():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
-    _, positions = ss.sample(values=[360] * u.deg)
+    _, positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.get_xyz().transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)

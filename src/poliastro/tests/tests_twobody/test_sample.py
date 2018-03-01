@@ -19,7 +19,7 @@ def test_sample_angle_zero_returns_same():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
 
     nu_values = [0] * u.deg
-    _, rr = ss0.sample(nu_values)
+    _, rr = ss0.sample(ss0.nu + nu_values)
 
     assert_quantity_allclose(rr[0].get_xyz(), ss0.r)
 
