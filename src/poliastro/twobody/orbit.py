@@ -298,20 +298,25 @@ class Orbit(object):
                 # first sample eccentric anomaly, then transform into true anomaly
                 # why sampling eccentric anomaly uniformly to minimize error in the apocenter, see
                 # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
+                # Start from pericenter
                 E_values = np.linspace(0, 2 * np.pi, values) * u.rad
                 nu_values = E_to_nu(E_values, self.ecc)
             else:
                 # Select a sensible limiting value for non-closed orbits
-                # This corresponds to r = 3p
-                nu_limit = np.arccos(-(1 - 1 / 3.) / self.ecc)
+                # This corresponds to max(r = 3p, r = self.r)
+                # We have to wrap nu in [-180, 180) to compare it with the output of
+                # the arc cosine, which is in the range [0, 180)
+                # Start from -nu_limit
+                wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
+                nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), wrapped_nu)
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
-                nu_values = np.insert(nu_values, 0, self.ecc)
 
             return self.sample(nu_values, method)
 
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
-        return (values, self._sample(values, method))
+
+        return values, self._sample(values, method)
 
     def _sample(self, time_values, method=mean_motion):
         values = np.zeros((len(time_values), 3)) * self.r.unit
@@ -322,7 +327,8 @@ class Orbit(object):
         return CartesianRepresentation(values, xyz_axis=1)
 
     def _generate_time_values(self, nu_vals):
-        M_vals = nu_to_M(nu_vals, self.ecc)
+        # Subtract current anomaly to start from the desired point
+        M_vals = nu_to_M(nu_vals, self.ecc) - nu_to_M(self.nu, self.ecc)
         time_values = self.epoch + (M_vals / self.n).decompose()
         return time_values
 
