@@ -131,6 +131,12 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
+    def _project(self, rr):
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
+        return x, y
+
     def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
 
@@ -156,15 +162,15 @@ class OrbitPlotter(object):
 
         # Project on OrbitPlotter frame
         # x_vec, y_vec, z_vec = self._frame
-        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
-        x = rr_proj.dot(self._frame[0])
-        y = rr_proj.dot(self._frame[1])
+        x, y = self._project(rr)
+        x0, y0 = self._project(orbit.r[None])
 
         # Plot current position
-        l, = self.ax.plot(x[0].to(u.km).value, y[0].to(u.km).value,
+        l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
         lines.append(l)
 
+        # Plot trajectory
         l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
                           '--', color=l.get_color())
         lines.append(l)
