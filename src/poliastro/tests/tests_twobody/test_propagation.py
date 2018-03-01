@@ -12,7 +12,8 @@ from poliastro.twobody.rv import rv2coe
 from poliastro.constants import J2000
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell, kepler, mean_motion, cowell
+from poliastro.twobody.propagation import cowell, kepler, mean_motion
+from poliastro.examples import iss
 
 from poliastro.util import norm
 
@@ -206,3 +207,25 @@ def test_propagate_to_date_has_proper_epoch():
 
     # Tolerance should be higher, see https://github.com/astropy/astropy/issues/6638
     assert (ss1.epoch - final_epoch).sec == approx(0.0, abs=1e-6)
+
+
+@pytest.mark.filterwarnings('ignore:ERFA')
+@pytest.mark.filterwarnings('ignore::UserWarning')
+@pytest.mark.parametrize('method', [
+    mean_motion,
+    pytest.param(cowell, marks=pytest.mark.xfail),
+    pytest.param(kepler, marks=pytest.mark.xfail),
+])
+def test_propagate_long_times_keeps_geometry(method):
+    # See https://github.com/poliastro/poliastro/issues/265
+    time_of_flight = 100 * u.year
+
+    res = iss.propagate(time_of_flight, method=method)
+
+    assert_quantity_allclose(iss.a, res.a)
+    assert_quantity_allclose(iss.ecc, res.ecc)
+    assert_quantity_allclose(iss.inc, res.inc)
+    assert_quantity_allclose(iss.raan, res.raan)
+    assert_quantity_allclose(iss.argp, res.argp)
+
+    assert_quantity_allclose((res.epoch - iss.epoch).to(time_of_flight.unit), time_of_flight)
