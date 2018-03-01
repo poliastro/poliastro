@@ -107,7 +107,7 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
 
 
 def mean_motion(k, r0, v0, tof, **kwargs):
-    """Propagates orbit using mean motion
+    r"""Propagates orbit using mean motion
 
     Parameters
     ----------
@@ -122,11 +122,12 @@ def mean_motion(k, r0, v0, tof, **kwargs):
     tof : float
         Time of flight (s).
 
-    Note
+    Notes
     -----
-    This method takes initial \vec{r}, \vec{v}, calculates classical orbit parameters,
-    increases mean anomaly and performs inverse transformation to get final \vec{r}, \vec{v}
+    This method takes initial :math:`\vec{r}, \vec{v}`, calculates classical orbit parameters,
+    increases mean anomaly and performs inverse transformation to get final :math:`\vec{r}, \vec{v}`
     The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9
+
     """
 
     # get the initial true anomaly and orbit parameters that are constant over time
