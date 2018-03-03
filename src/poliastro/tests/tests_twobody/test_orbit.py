@@ -9,6 +9,7 @@ from astropy import time
 from astropy.time import Time
 from astropy.coordinates import CartesianRepresentation
 
+from poliastro.twobody.rv import rv2coe
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
