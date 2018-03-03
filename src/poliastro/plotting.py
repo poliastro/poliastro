@@ -112,6 +112,14 @@ class OrbitPlotter(object):
         self.ax.relim()
         self.ax.autoscale()
 
+    def plot_trajectory(self, trajectory, color, label=None):
+        lines = []
+        rr = trajectory.get_xyz().transpose()
+        x, y = self._project(rr)
+        a, = self.ax.plot(x.to(u.km).value, y.to(u.km).value, '--', color=color, label=label)
+        lines.append(a)
+        return lines
+
     def set_attractor(self, orbit):
         """Sets plotting attractor.
 
@@ -137,6 +145,14 @@ class OrbitPlotter(object):
         y = rr_proj.dot(self._frame[1])
         return x, y
 
+    def verify_attractor(self, orbit):
+        new_radius = max(orbit.attractor.R.to(u.km).value,
+                         orbit.r_p.to(u.km).value / 6)
+        if not self._attractor_radius:
+            self.set_attractor(orbit)
+        elif new_radius < self._attractor_radius:
+            self.set_attractor(orbit)
+
     def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
 
@@ -147,32 +163,15 @@ class OrbitPlotter(object):
         if (orbit, label) not in self._orbits:
             self._orbits.append((orbit, label))
 
-        # if new attractor radius is smaller, plot it
-        new_radius = max(orbit.attractor.R.to(u.km).value,
-                         orbit.r_p.to(u.km).value / 6)
-        if not self._attractor_radius:
-            self.set_attractor(orbit)
-        elif new_radius < self._attractor_radius:
-            self.set_attractor(orbit)
-
-        lines = []
-
+        self.verify_attractor(orbit)
         _, positions = orbit.sample(self.num_points)
-        rr = positions.get_xyz().transpose()
 
-        # Project on OrbitPlotter frame
-        # x_vec, y_vec, z_vec = self._frame
-        x, y = self._project(rr)
         x0, y0 = self._project(orbit.r[None])
-
         # Plot current position
         l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
-        lines.append(l)
 
-        # Plot trajectory
-        l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
-                          '--', color=l.get_color())
+        lines = self.plot_trajectory(positions, l.get_color())
         lines.append(l)
 
         if label:
@@ -181,9 +180,7 @@ class OrbitPlotter(object):
             if not self.ax.get_legend():
                 size = self.ax.figure.get_size_inches() + [8, 0]
                 self.ax.figure.set_size_inches(size)
-            orbit.epoch.out_subfmt = 'date_hm'
-            label = '{} ({})'.format(orbit.epoch.iso, label)
-
+            label = _generate_label(orbit, label)
             l.set_label(label)
             self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
 
