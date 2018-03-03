@@ -25,6 +25,20 @@ def test_default_time_for_new_state():
     assert ss.epoch == expected_epoch
 
 
+def setting_same_nu_doesnt_change_anything():
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
+
+    nu = rv2coe(ss0.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                ss0.r.to(u.km).value, 
+                ss0.v.to(u.km / u.s).value)[-1]
+    ss = ss0.set_true_anomaly(nu)
+
+    assert_quantity_allclose(r0, ss.r)
+    assert_quantity_allclose(v0, ss.v)
+
+
 def test_state_raises_unitserror_if_elements_units_are_wrong():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value

@@ -237,6 +237,17 @@ class Orbit(object):
     def __repr__(self):
         return self.__str__()
 
+
+    def set_true_anomaly(self, target_nu):
+        p, ecc, inc, raan, argp, _ = rv.rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                                               self.r.to(u.km).value,
+                                               self.v.to(u.km / u.s).value)
+
+        return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km, 
+                                   ecc * u.one, inc * u.rad, raan * u.rad, 
+                                   argp * u.rad, target_nu * u.rad)
+
+
     def propagate(self, epoch_or_duration, method=mean_motion, rtol=1e-10):
         """Propagate this `Orbit` some `time` and return the result.
 
