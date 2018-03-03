@@ -31,7 +31,7 @@ def setting_same_nu_doesnt_change_anything():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
 
     nu = rv2coe(ss0.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                ss0.r.to(u.km).value, 
+                ss0.r.to(u.km).value,
                 ss0.v.to(u.km / u.s).value)[-1]
     ss = ss0.set_true_anomaly(nu)
 
@@ -217,8 +217,10 @@ def test_sample_with_nu_value():
 
 def test_hyperbolic_nu_value_check():
     # A custom hyperbolic orbit
-    r = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km
-    v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
+    r = [1.197659243752796E+09, -4.443716685978071E+09, -
+         1.747610548576734E+09] * u.km
+    v = [5.540549267188614E+00, -1.251544669134140E+01, -
+         4.848892572767733E+00] * u.km / u.s
 
     ss = Orbit.from_vectors(Sun, r, v, Time('2015-07-14 07:59', scale='tdb'))
 
