@@ -25,7 +25,7 @@ def test_default_time_for_new_state():
     assert ss.epoch == expected_epoch
 
 
-def setting_same_nu_doesnt_change_anything():
+def test_setting_same_nu_doesnt_change_anything():
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
     ss0 = Orbit.from_vectors(Earth, r0, v0)
