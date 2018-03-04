@@ -134,8 +134,8 @@ class OrbitPlotter(object):
 
         Parameters
         ----------
-        orbit : ~poliastro.twobody.orbit.Orbit
-            orbit with attractor to plot.
+        attractor : ~poliastro.bodies.Body
+            Central body.
 
         """
         if self._attractor is None:
