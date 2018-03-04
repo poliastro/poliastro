@@ -75,6 +75,7 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
+        self._attractor = None
         self._attractor_radius = None
         self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
 
@@ -113,6 +114,14 @@ class OrbitPlotter(object):
         self.ax.autoscale()
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
+        """Plots a precomputed trajectory.
+
+        Parameters
+        ----------
+        trajectory : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+
+        """
         lines = []
         rr = trajectory.get_xyz().transpose()
         x, y = self._project(rr)
@@ -120,7 +129,7 @@ class OrbitPlotter(object):
         lines.append(a)
         return lines
 
-    def set_attractor(self, orbit):
+    def set_attractor(self, attractor):
         """Sets plotting attractor.
 
         Parameters
@@ -129,21 +138,27 @@ class OrbitPlotter(object):
             orbit with attractor to plot.
 
         """
-        radius = max(orbit.attractor.R.to(u.km).value,
-                     orbit.r_p.to(u.km).value / 6)
-        color = BODY_COLORS.get(orbit.attractor.name, "#999999")
-        self._attractor_radius = radius
+        if self._attractor is None:
+            self._attractor = attractor
 
-        for attractor in self.ax.findobj(match=mpl.patches.Circle):
-            attractor.remove()
-
-        self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
+        elif attractor is not self._attractor:
+            raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
 
     def _project(self, rr):
         rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
         x = rr_proj.dot(self._frame[0])
         y = rr_proj.dot(self._frame[1])
         return x, y
+
+    def _redraw_attractor(self, min_radius=0 * u.km): #orbit.r_p.to(u.km).value / 6
+        radius = max(self._attractor.R.to(u.km).value, min_radius.to(u.km).value)
+        color = BODY_COLORS.get(self._attractor.name, "#999999")
+        self._attractor_radius = radius
+
+        for attractor in self.ax.findobj(match=mpl.patches.Circle):
+            attractor.remove()
+
+        self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
     def verify_attractor(self, orbit):
         new_radius = max(orbit.attractor.R.to(u.km).value,
@@ -163,7 +178,9 @@ class OrbitPlotter(object):
         if (orbit, label) not in self._orbits:
             self._orbits.append((orbit, label))
 
-        self.verify_attractor(orbit)
+        self.set_attractor(orbit.attractor)
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
+        # self.verify_attractor(orbit)
         _, positions = orbit.sample(self.num_points)
 
         x0, y0 = self._project(orbit.r[None])
