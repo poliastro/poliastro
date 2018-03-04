@@ -9,6 +9,7 @@ from astropy import time
 from astropy.time import Time
 from astropy.coordinates import CartesianRepresentation
 
+from poliastro.twobody.rv import rv2coe
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
@@ -53,8 +54,7 @@ def test_parabolic_elements_fail_early():
     _a = 1.0 * u.deg  # Unused angle
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
-    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead"
-            in excinfo.exconly())
+    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead" in excinfo.exconly())
 
 
 def test_bad_inclination_raises_exception():
@@ -65,8 +65,7 @@ def test_bad_inclination_raises_exception():
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_classical(_body, _d, _, bad_inc, _a, _a, _a)
-    assert ("ValueError: Inclination must be between 0 and 180 degrees"
-            in excinfo.exconly())
+    assert ("ValueError: Inclination must be between 0 and 180 degrees" in excinfo.exconly())
 
 
 def test_bad_hyperbolic_raises_exception():
@@ -77,8 +76,7 @@ def test_bad_hyperbolic_raises_exception():
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
-    assert ("Hyperbolic orbits have negative semimajor axis"
-            in excinfo.exconly())
+    assert ("Hyperbolic orbits have negative semimajor axis" in excinfo.exconly())
 
 
 def test_apply_maneuver_changes_epoch():
