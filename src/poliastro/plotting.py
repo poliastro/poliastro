@@ -150,7 +150,7 @@ class OrbitPlotter(object):
         y = rr_proj.dot(self._frame[1])
         return x, y
 
-    def _redraw_attractor(self, min_radius=0 * u.km): #orbit.r_p.to(u.km).value / 6
+    def _redraw_attractor(self, min_radius=0 * u.km):
         radius = max(self._attractor.R.to(u.km).value, min_radius.to(u.km).value)
         color = BODY_COLORS.get(self._attractor.name, "#999999")
         self._attractor_radius = radius
@@ -159,14 +159,6 @@ class OrbitPlotter(object):
             attractor.remove()
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
-
-    def verify_attractor(self, orbit):
-        new_radius = max(orbit.attractor.R.to(u.km).value,
-                         orbit.r_p.to(u.km).value / 6)
-        if not self._attractor_radius:
-            self.set_attractor(orbit)
-        elif new_radius < self._attractor_radius:
-            self.set_attractor(orbit)
 
     def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
@@ -180,7 +172,6 @@ class OrbitPlotter(object):
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
-        # self.verify_attractor(orbit)
         _, positions = orbit.sample(self.num_points)
 
         x0, y0 = self._project(orbit.r[None])
