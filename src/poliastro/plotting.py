@@ -75,6 +75,7 @@ class OrbitPlotter(object):
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
+        self._attractor = None
         self._attractor_radius = None
         self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
 
@@ -112,30 +113,52 @@ class OrbitPlotter(object):
         self.ax.relim()
         self.ax.autoscale()
 
-    def set_attractor(self, orbit):
+    def plot_trajectory(self, trajectory, *, label=None, color=None):
+        """Plots a precomputed trajectory.
+
+        Parameters
+        ----------
+        trajectory : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+
+        """
+        lines = []
+        rr = trajectory.get_xyz().transpose()
+        x, y = self._project(rr)
+        a, = self.ax.plot(x.to(u.km).value, y.to(u.km).value, '--', color=color, label=label)
+        lines.append(a)
+        return lines
+
+    def set_attractor(self, attractor):
         """Sets plotting attractor.
 
         Parameters
         ----------
-        orbit : ~poliastro.twobody.orbit.Orbit
-            orbit with attractor to plot.
+        attractor : ~poliastro.bodies.Body
+            Central body.
 
         """
-        radius = max(orbit.attractor.R.to(u.km).value,
-                     orbit.r_p.to(u.km).value / 6)
-        color = BODY_COLORS.get(orbit.attractor.name, "#999999")
-        self._attractor_radius = radius
+        if self._attractor is None:
+            self._attractor = attractor
 
-        for attractor in self.ax.findobj(match=mpl.patches.Circle):
-            attractor.remove()
-
-        self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
+        elif attractor is not self._attractor:
+            raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
 
     def _project(self, rr):
         rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
         x = rr_proj.dot(self._frame[0])
         y = rr_proj.dot(self._frame[1])
         return x, y
+
+    def _redraw_attractor(self, min_radius=0 * u.km):
+        radius = max(self._attractor.R.to(u.km).value, min_radius.to(u.km).value)
+        color = BODY_COLORS.get(self._attractor.name, "#999999")
+        self._attractor_radius = radius
+
+        for attractor in self.ax.findobj(match=mpl.patches.Circle):
+            attractor.remove()
+
+        self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
     def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
@@ -147,32 +170,16 @@ class OrbitPlotter(object):
         if (orbit, label) not in self._orbits:
             self._orbits.append((orbit, label))
 
-        # if new attractor radius is smaller, plot it
-        new_radius = max(orbit.attractor.R.to(u.km).value,
-                         orbit.r_p.to(u.km).value / 6)
-        if not self._attractor_radius:
-            self.set_attractor(orbit)
-        elif new_radius < self._attractor_radius:
-            self.set_attractor(orbit)
-
-        lines = []
-
+        self.set_attractor(orbit.attractor)
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
         _, positions = orbit.sample(self.num_points)
-        rr = positions.get_xyz().transpose()
 
-        # Project on OrbitPlotter frame
-        # x_vec, y_vec, z_vec = self._frame
-        x, y = self._project(rr)
         x0, y0 = self._project(orbit.r[None])
-
         # Plot current position
         l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
-        lines.append(l)
 
-        # Plot trajectory
-        l, = self.ax.plot(x.to(u.km).value, y.to(u.km).value,
-                          '--', color=l.get_color())
+        lines = self.plot_trajectory(positions, color=l.get_color())
         lines.append(l)
 
         if label:
@@ -181,9 +188,7 @@ class OrbitPlotter(object):
             if not self.ax.get_legend():
                 size = self.ax.figure.get_size_inches() + [8, 0]
                 self.ax.figure.set_size_inches(size)
-            orbit.epoch.out_subfmt = 'date_hm'
-            label = '{} ({})'.format(orbit.epoch.iso, label)
-
+            label = _generate_label(orbit, label)
             l.set_label(label)
             self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
 
