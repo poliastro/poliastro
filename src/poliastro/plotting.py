@@ -112,7 +112,7 @@ class OrbitPlotter(object):
         self.ax.relim()
         self.ax.autoscale()
 
-    def plot_trajectory(self, trajectory, color, label=None):
+    def plot_trajectory(self, trajectory, *, label=None, color=None):
         lines = []
         rr = trajectory.get_xyz().transpose()
         x, y = self._project(rr)
@@ -171,7 +171,7 @@ class OrbitPlotter(object):
         l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
 
-        lines = self.plot_trajectory(positions, l.get_color())
+        lines = self.plot_trajectory(positions, color=l.get_color())
         lines.append(l)
 
         if label:
