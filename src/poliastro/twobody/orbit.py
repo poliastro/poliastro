@@ -104,8 +104,7 @@ class Orbit(object):
 
         """
         if ecc == 1.0 * u.one:
-            raise ValueError(
-                "For parabolic orbits use Orbit.parabolic instead")
+            raise ValueError("For parabolic orbits use Orbit.parabolic instead")
 
         if not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
@@ -238,32 +237,34 @@ class Orbit(object):
     def __repr__(self):
         return self.__str__()
 
-    def set_true_anomaly(self, target_nu):
-        p, ecc, inc, raan, argp, _ = rv.rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                                               self.r.to(u.km).value,
-                                               self.v.to(u.km / u.s).value)
-
-        return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
-                                   ecc * u.one, inc * u.rad, raan * u.rad,
-                                   argp * u.rad, target_nu * u.rad)
-
-    def propagate(self, epoch_or_duration, method=mean_motion, rtol=1e-10):
-        """Propagate this `Orbit` some `time` and return the result.
+    def propagate(self, value, method=mean_motion, rtol=1e-10):
+        """ if value is true anomaly, propagate orbit to this anomaly and return the result
+            if time is provided, propagate this `Orbit` some `time` and return the result.
 
         Parameters
         ----------
-        epoch_or_duration : Time, TimeDelta or equivalent
-            Final epoch or time of flight.
+        value : Multiple options
+            True anomaly values,
+            Time values.
         rtol : float, optional
             Relative tolerance for the propagation algorithm, default to 1e-10.
 
         """
-        if isinstance(epoch_or_duration, time.Time) and not isinstance(epoch_or_duration, time.TimeDelta):
-            time_of_flight = epoch_or_duration - self.epoch
-        else:
-            time_of_flight = time.TimeDelta(epoch_or_duration)
+        if hasattr(value, "unit") and value.unit in ('rad', 'deg'):
+            p, ecc, inc, raan, argp, _ = rv.rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                                                   self.r.to(u.km).value,
+                                                   self.v.to(u.km / u.s).value)
 
-        return propagate(self, time_of_flight, method=method, rtol=rtol)
+            return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
+                                       ecc * u.one, inc * u.rad, raan * u.rad,
+                                       argp * u.rad, value)
+        else:
+            if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
+                time_of_flight = value - self.epoch
+            else:
+                time_of_flight = time.TimeDelta(value)
+
+            return propagate(self, time_of_flight, method=method, rtol=rtol)
 
     def sample(self, values=None, method=mean_motion):
         """Samples an orbit to some specified time values.
@@ -385,8 +386,7 @@ class Orbit(object):
             delegated = property(delegated_)
 
         else:
-            raise AttributeError(
-                "'{}' object has no attribute '{}'".format(self.__class__, item))
+            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__, item))
 
         # Bind the attribute
         setattr(self.__class__, item, delegated)

@@ -26,20 +26,6 @@ def test_default_time_for_new_state():
     assert ss.epoch == expected_epoch
 
 
-def test_setting_same_nu_doesnt_change_anything():
-    r0 = [1131.340, -2282.343, 6672.423] * u.km
-    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-    ss0 = Orbit.from_vectors(Earth, r0, v0)
-
-    nu = rv2coe(ss0.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                ss0.r.to(u.km).value,
-                ss0.v.to(u.km / u.s).value)[-1]
-    ss = ss0.set_true_anomaly(nu)
-
-    assert_quantity_allclose(r0, ss.r)
-    assert_quantity_allclose(v0, ss.v)
-
-
 def test_state_raises_unitserror_if_elements_units_are_wrong():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -68,8 +54,7 @@ def test_parabolic_elements_fail_early():
     _a = 1.0 * u.deg  # Unused angle
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
-    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead"
-            in excinfo.exconly())
+    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead" in excinfo.exconly())
 
 
 def test_bad_inclination_raises_exception():
@@ -80,8 +65,7 @@ def test_bad_inclination_raises_exception():
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_classical(_body, _d, _, bad_inc, _a, _a, _a)
-    assert ("ValueError: Inclination must be between 0 and 180 degrees"
-            in excinfo.exconly())
+    assert ("ValueError: Inclination must be between 0 and 180 degrees" in excinfo.exconly())
 
 
 def test_bad_hyperbolic_raises_exception():
@@ -92,8 +76,7 @@ def test_bad_hyperbolic_raises_exception():
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
-    assert ("Hyperbolic orbits have negative semimajor axis"
-            in excinfo.exconly())
+    assert ("Hyperbolic orbits have negative semimajor axis" in excinfo.exconly())
 
 
 def test_apply_maneuver_changes_epoch():
@@ -218,10 +201,8 @@ def test_sample_with_nu_value():
 
 def test_hyperbolic_nu_value_check():
     # A custom hyperbolic orbit
-    r = [1.197659243752796E+09, -4.443716685978071E+09, -
-         1.747610548576734E+09] * u.km
-    v = [5.540549267188614E+00, -1.251544669134140E+01, -
-         4.848892572767733E+00] * u.km / u.s
+    r = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km
+    v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
 
     ss = Orbit.from_vectors(Sun, r, v, Time('2015-07-14 07:59', scale='tdb'))
 

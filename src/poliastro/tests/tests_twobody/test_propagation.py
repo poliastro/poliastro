@@ -36,6 +36,32 @@ def test_propagation(method):
     assert_quantity_allclose(v, expected_v, rtol=1e-4)
 
 
+def test_propagating_to_certain_nu_is_correct():
+    # take an elliptic orbit
+    a = 1.0 * u.AU
+    ecc = 1.0 / 3.0 * u.one
+    _a = 0.0 * u.rad
+    elliptic = Orbit.from_classical(Sun, a, ecc, _a, _a, _a, _a)
+    r_ini, _ = elliptic.rv()
+
+    elliptic_at_perihelion = elliptic.propagate(0.0 * u.rad)
+    r_per, _ = elliptic_at_perihelion.rv()
+
+    elliptic_at_aphelion = elliptic.propagate(np.pi * u.rad)
+    r_ap, _ = elliptic_at_aphelion.rv()
+
+    assert_quantity_allclose(r_per, r_ini)
+    assert_quantity_allclose(norm(r_per), a * (1.0 - ecc))
+    assert_quantity_allclose(norm(r_ap), a * (1.0 + ecc))
+
+    # test 10 random true anomaly values
+    for _ in range(10):
+        nu = np.random.uniform(low=0.0, high=2 * np.pi)
+        elliptic = elliptic.propagate(nu * u.rad)
+        r, _ = elliptic.rv()
+        assert_quantity_allclose(norm(r), a * (1.0 - ecc ** 2) / (1 + ecc * np.cos(nu)))
+
+
 def test_propagate_accepts_timedelta():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
