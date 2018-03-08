@@ -72,7 +72,7 @@ class OrbitPlotter(object):
         """
         self.ax = ax
         if not self.ax:
-            _, self.ax = plt.subplots(figsize=(6, 6))
+            self.fig, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
         self._attractor = None
@@ -128,6 +128,9 @@ class OrbitPlotter(object):
         a, = self.ax.plot(x.to(u.km).value, y.to(u.km).value, '--', color=color, label=label)
         lines.append(a)
         return lines
+
+    def show(self):
+        return self.fig
 
     def set_attractor(self, attractor):
         """Sets plotting attractor.
