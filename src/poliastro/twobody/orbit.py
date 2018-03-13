@@ -319,7 +319,7 @@ class Orbit(object):
                 # the arc cosine, which is in the range [0, 180)
                 # Start from -nu_limit
                 wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
-                nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), wrapped_nu)
+                nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), abs(wrapped_nu))
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
 
             return self.sample(nu_values, method)

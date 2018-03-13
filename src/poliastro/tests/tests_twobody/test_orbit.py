@@ -211,3 +211,16 @@ def test_hyperbolic_nu_value_check():
     assert isinstance(positions, CartesianRepresentation)
     assert isinstance(values, Time)
     assert len(positions) == len(values) == 100
+
+
+def test_hyperbolic_modulus_wrapped_nu():
+    ss = Orbit.from_vectors(
+        Sun,
+        [-9.77441841e+07, 1.01000539e+08, 4.37584668e+07] * u.km,
+        [23.75936985, -43.09599568, -8.7084724] * u.km / u.s,
+    )
+    num_values = 3
+
+    _, positions = ss.sample(num_values)
+
+    assert_quantity_allclose(positions[0].xyz, ss.r)
