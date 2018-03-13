@@ -1,6 +1,5 @@
 import pytest
 
-import numpy as np
 from numpy.testing import assert_allclose
 
 from astropy import units as u
@@ -215,17 +214,13 @@ def test_hyperbolic_nu_value_check():
 
 
 def test_hyperbolic_modulus_wrapped_nu():
-    a = Orbit.from_vectors(
+    ss = Orbit.from_vectors(
         Sun,
         [-9.77441841e+07, 1.01000539e+08, 4.37584668e+07] * u.km,
         [23.75936985, -43.09599568, -8.7084724] * u.km / u.s,
     )
-    values = 100
-    wrapped_nu = a.nu if a.nu < 180 * u.deg else a.nu - 360 * u.deg
-    nu_limit = max(np.arccos(-(1 - 1 / 3.) / a.ecc), abs(wrapped_nu))
-    nu_values = np.linspace(-nu_limit, nu_limit, values)
-    values1, positions1 = a.sample(100)
-    values2, positions2 = a.sample(nu_values)
-    assert positions1[0].x == positions2[0].x
-    assert positions1[0].y == positions2[0].y
-    assert positions1[0].z == positions2[0].z
+    num_values = 3
+
+    _, positions = ss.sample(num_values)
+
+    assert_quantity_allclose(positions[0].xyz, ss.r)
