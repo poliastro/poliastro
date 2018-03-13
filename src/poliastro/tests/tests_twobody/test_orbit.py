@@ -222,11 +222,10 @@ def test_hyperbolic_modulus_wrapped_nu():
     )
     values = 100
     wrapped_nu = a.nu if a.nu < 180 * u.deg else a.nu - 360 * u.deg
-    nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), abs(wrapped_nu))
+    nu_limit = max(np.arccos(-(1 - 1 / 3.) / a.ecc), abs(wrapped_nu))
     nu_values = np.linspace(-nu_limit, nu_limit, values)
     values1, positions1 = a.sample(100)
     values2, positions2 = a.sample(nu_values)
-    void = CartesianRepresentation(0, 0, 0) * u.km
-    assert (positions1[60] - positions2[60]).x == void.x
-    assert (positions1[60] - positions2[60]).y == void.y
-    assert (positions1[60] - positions2[60]).z == void.z
+    assert positions1[0].x == positions2[0].x
+    assert positions1[0].y == positions2[0].y
+    assert positions1[0].z == positions2[0].z
