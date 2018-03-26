@@ -10,6 +10,7 @@ from typing import List, Tuple
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 import plotly.colors
 from plotly.offline import iplot, plot as export
@@ -28,7 +29,6 @@ BODY_COLORS = {
     "Earth": "#204a87",
     "Jupiter": "#ba3821",
 }
-
 
 def plot(state, label=None, color=None):
     """Plots a ``State``.
@@ -59,7 +59,7 @@ class OrbitPlotter(object):
 
     """
 
-    def __init__(self, ax=None, num_points=150):
+    def __init__(self, fig=None, ax=None, num_points=150):
         """Constructor.
 
         Parameters
@@ -70,9 +70,10 @@ class OrbitPlotter(object):
             Number of points to use in plots, default to 150.
 
         """
+        self.fig = fig
         self.ax = ax
         if not self.ax:
-            _, self.ax = plt.subplots(figsize=(6, 6))
+            self.fig, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
         self._attractor = None
@@ -198,6 +199,55 @@ class OrbitPlotter(object):
 
         return lines
 
+    def set_lines_up_to_instant(frame, self, x, y, lines):
+        """Plots a frame of the precomputed trajectory.
+
+        Parameters
+        ----------
+        frame : current plotting frame.
+        x : x values of the trajectory to plot.
+        y : y values of the trajectory to plot.
+        lines : plot information
+        """
+        lines.set_data(x[:int(frame)], y[:int(frame)])
+        return lines
+
+    def animate(self, orbit, label=None, color=None):
+        """Plots state and osculating animated orbit in their plane.
+
+        """
+        if not self._frame:
+            self.set_frame(*orbit.pqw())
+
+        if (orbit, label) not in self._orbits:
+            self._orbits.append((orbit, label))
+
+        self.set_attractor(orbit.attractor)
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
+
+        _, positions_in_tuples = orbit.sample(self.num_points)
+        positions = positions_in_tuples.get_xyz().transpose()
+        x, y = self._project(positions)
+
+        # The following should be in a init_animation function, but I [aeronau] still don't know how to pass the arguments to the init function
+        xmax = np.amax(x.to(u.km).value)
+        xmin = np.amin(x.to(u.km).value)
+        ymax = np.amax(y.to(u.km).value)
+        ymin = np.amin(y.to(u.km).value)
+        self.ax.set_xlim(xmin, xmax)
+        self.ax.set_ylim(ymin, ymax)
+
+        lines = []
+        a, = self.ax.plot([], [], '--', color=color, label=label)
+
+        ani = FuncAnimation(self.fig, self.set_lines_up_to_instant, frames=np.linspace(0, len(x) - 1, len(x)), fargs=(self, x.to(u.km).value, y.to(u.km).value, a), blit=True, save_count=len(x))
+
+        lines.append(a)
+
+        self.ax.set_xlabel("$x$ (km)")
+        self.ax.set_ylabel("$y$ (km)")
+        self.ax.set_aspect(1)
+        return lines
 
 def _generate_label(orbit, label):
     orbit.epoch.out_subfmt = 'date_hm'
