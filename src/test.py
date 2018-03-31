@@ -5,6 +5,10 @@ from poliastro.plotting import *
 from poliastro.twobody import Orbit
 from poliastro.bodies import Earth
 ss_i = Orbit.circular(Earth, alt=700 * u.km)
+ss_f = Orbit.circular(Earth, alt=1000 * u.km)
+ss_n = Orbit.circular(Earth, alt=1500 * u.km)
 op = OrbitPlotter()
-op.animate(ss_i)
-plt.show()
+op.plot(ss_i)
+op.plot(ss_n)
+op.animate(ss_f)
+fig.canvas.draw_idle()

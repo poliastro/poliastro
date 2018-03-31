@@ -39,6 +39,15 @@ def plot(state, label=None, color=None):
     op = OrbitPlotter()
     return op.plot(state, label=label, color=color)
 
+def animate(state, label=None, color=None):
+    """Animates a ``State``.
+
+    For more advanced tuning, use the :py:class:`OrbitPlotter` class.
+
+    """
+    op = OrbitPlotter()
+    return op.animate(state, label=label, color=color)
+
 
 def plot3d(orbit, *, label=None, color=None):
     frame = OrbitPlotter3D()
@@ -164,7 +173,6 @@ class OrbitPlotter(object):
 
     def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
-
         """
         if not self._frame:
             self.set_frame(*orbit.pqw())
@@ -178,7 +186,7 @@ class OrbitPlotter(object):
 
         x0, y0 = self._project(orbit.r[None])
         # Plot current position
-        l, = self.ax.plot(x[:int(frame)], x[:int(frame)],
+        l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
 
         lines = self.plot_trajectory(positions, color=l.get_color())
@@ -200,21 +208,6 @@ class OrbitPlotter(object):
 
         return lines
 
-
-    def __update_animation(frame, self, x, y, lines):
-        """Plots a frame of the precomputed trajectory.
-
-        Parameters
-        ----------
-        frame : current plotting frame.
-        x : x values of the trajectory to plot.
-        y : y values of the trajectory to plot.
-        lines : plot information
-        """
-
-        lines.set_data(x[:int(frame)], y[:int(frame)])
-        return lines,
-
     def animate(self, orbit, label=None, color=None):
         """Plots state and osculating animated orbit in their plane.
 
@@ -229,31 +222,43 @@ class OrbitPlotter(object):
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
 
-        _, positions = orbit.sample(self.num_points)
-
-        x0, y0 = self._project(orbit.r[None])
-        l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
-                          'o', mew=0, color=color)
-
         _, positions_in_tuples = orbit.sample(self.num_points)
-        positions = positions_in_tuples.get_xyz().transpose()
+        positions = positions_in_tuples.get_xyz().transpose().to(u.km).value
         x, y = self._project(positions)
 
-        # The following should be in a init_animation function, but I [aeronau] still don't know how to pass the arguments to the init function
-        xmax = np.amax(x.to(u.km).value)
-        xmin = np.amin(x.to(u.km).value)
-        ymax = np.amax(y.to(u.km).value)
-        ymin = np.amin(y.to(u.km).value)
-        self.ax.set_xlim(xmin, xmax)
-        self.ax.set_ylim(ymin, ymax)
+        l, = self.ax.plot([], [],
+                  'o', mew=0, color=color)
+        ln, = self.ax.plot([], [], '--', color=l.get_color(), label=label,
+                           animated=True)
 
-        lines, = self.ax.plot([], [], '--', color=color, label=label, animated=True)
-
-        ani = FuncAnimation(self.fig, self.__update_animation, frames=np.linspace(0, 99, 100), fargs=(self, x.to(u.km).value, y.to(u.km).value, lines), blit=True, save_count=len(x))
+        if label:
+            # This will apply the label to either the point or the osculating
+            # orbit depending on the last plotted line, as they share variable
+            if not self.ax.get_legend():
+                size = self.ax.figure.get_size_inches() + [8, 0]
+                self.ax.figure.set_size_inches(size)
+            label = _generate_label(orbit, label)
+            l.set_label(label)
+            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
+
+        def init():
+            return l, ln
+
+        def update(frame):
+            l.set_data(x[int(frame)], y[int(frame)])
+            ln.set_data(x[:int(frame)], y[:int(frame)])
+            return l, ln
+
+        # The plotting rate is not representative of the velocity
+        ani = FuncAnimation(self.fig, update,
+                            frames=np.linspace(0, len(x)-1, len(x)),
+                            init_func=init, blit=True)
+        plt.show()
+
         return ani
 
 def _generate_label(orbit, label):
