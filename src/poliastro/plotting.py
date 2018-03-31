@@ -256,8 +256,9 @@ class OrbitPlotter(object):
         # The plotting rate is not representative of the velocity
         ani = FuncAnimation(self.fig, update,
                             frames=np.linspace(0, len(x)-1, len(x)),
-                            init_func=init, blit=True)
+                            init_func=init, blit=True,repeat=False)
         plt.show()
+        self.fig.clear()
 
         return ani
 
