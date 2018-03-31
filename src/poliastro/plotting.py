@@ -59,7 +59,7 @@ class OrbitPlotter(object):
 
     """
 
-    def __init__(self, fig=None, ax=None, num_points=150):
+    def __init__(self, ax=None, num_points=150):
         """Constructor.
 
         Parameters
@@ -70,9 +70,10 @@ class OrbitPlotter(object):
             Number of points to use in plots, default to 150.
 
         """
-        self.fig = fig
-        self.ax = ax
-        if not self.ax:
+        if ax:
+            self.ax = ax
+            self.fig = ax.figure
+        else:
             self.fig, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
@@ -177,7 +178,7 @@ class OrbitPlotter(object):
 
         x0, y0 = self._project(orbit.r[None])
         # Plot current position
-        l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
+        l, = self.ax.plot(x[:int(frame)], x[:int(frame)],
                           'o', mew=0, color=color)
 
         lines = self.plot_trajectory(positions, color=l.get_color())
@@ -199,7 +200,8 @@ class OrbitPlotter(object):
 
         return lines
 
-    def set_lines_up_to_instant(frame, self, x, y, lines):
+
+    def __update_animation(frame, self, x, y, lines):
         """Plots a frame of the precomputed trajectory.
 
         Parameters
@@ -209,13 +211,15 @@ class OrbitPlotter(object):
         y : y values of the trajectory to plot.
         lines : plot information
         """
+
         lines.set_data(x[:int(frame)], y[:int(frame)])
-        return lines
+        return lines,
 
     def animate(self, orbit, label=None, color=None):
         """Plots state and osculating animated orbit in their plane.
 
         """
+
         if not self._frame:
             self.set_frame(*orbit.pqw())
 
@@ -224,6 +228,12 @@ class OrbitPlotter(object):
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
+
+        _, positions = orbit.sample(self.num_points)
+
+        x0, y0 = self._project(orbit.r[None])
+        l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
+                          'o', mew=0, color=color)
 
         _, positions_in_tuples = orbit.sample(self.num_points)
         positions = positions_in_tuples.get_xyz().transpose()
@@ -237,17 +247,14 @@ class OrbitPlotter(object):
         self.ax.set_xlim(xmin, xmax)
         self.ax.set_ylim(ymin, ymax)
 
-        lines = []
-        a, = self.ax.plot([], [], '--', color=color, label=label)
+        lines, = self.ax.plot([], [], '--', color=color, label=label, animated=True)
 
-        ani = FuncAnimation(self.fig, self.set_lines_up_to_instant, frames=np.linspace(0, len(x) - 1, len(x)), fargs=(self, x.to(u.km).value, y.to(u.km).value, a), blit=True, save_count=len(x))
-
-        lines.append(a)
+        ani = FuncAnimation(self.fig, self.__update_animation, frames=np.linspace(0, 99, 100), fargs=(self, x.to(u.km).value, y.to(u.km).value, lines), blit=True, save_count=len(x))
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
-        return lines
+        return ani
 
 def _generate_label(orbit, label):
     orbit.epoch.out_subfmt = 'date_hm'
