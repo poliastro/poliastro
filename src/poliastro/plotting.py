@@ -396,14 +396,10 @@ class OrbitPlotter3D:
 
 def _generate_circle(radius, center, num=500):
     u1 = np.linspace(0, 2 * np.pi, num)
-    #v1 = u1.copy()
-    #u1 = np.meshgrid(u1, v1)
-    #v1 = np.linspace(0, 1, num)
-    v1 = 1
     x_center, y_center, z_center = center
 
-    xx = x_center + radius * np.cos(u1) * v1
-    yy = y_center + radius * np.sin(u1) * v1
+    xx = x_center + radius * np.cos(u1)
+    yy = y_center + radius * np.sin(u1)
 
     return xx, yy
 

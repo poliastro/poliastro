@@ -16,7 +16,6 @@ def test_get_figure_has_expected_properties():
     assert figure["layout"]["autosize"] is True
     assert "xaxis" in figure["layout"]["scene"]
     assert "yaxis" in figure["layout"]["scene"]
-    assert "zaxis" in figure["layout"]["scene"]
     assert "aspectmode" in figure["layout"]["scene"]
 
 
@@ -69,4 +68,3 @@ def test_set_view():
     eye = frame.figure["layout"]["scene"]["camera"]["eye"]
     assert eye["x"] == 1
     assert eye["y"] == 0
-    assert eye["z"] == 0
