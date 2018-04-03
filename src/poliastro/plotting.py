@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 import plotly.colors
 from plotly.offline import iplot, plot as export
-from plotly.graph_objs import Scatter3d, Surface, Layout
+from plotly.graph_objs import Scatter3d, Surface, Layout, Scatter
 
 from astropy import units as u
 
@@ -350,6 +350,202 @@ class OrbitPlotter3D:
             radius, color, label, center=orbit.r)
 
         self._data.append(sphere)
+
+    def plot_trajectory(self, trajectory, *, label=None, color=None):
+        """Plots a precomputed trajectory.
+
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        trajectory : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+
+        """
+        if self._attractor is None:
+            raise ValueError("An attractor must be set up first, please use "
+                             "set_attractor(Major_Body).")
+        else:
+            self._redraw_attractor(trajectory.norm().min() * 0.15)  # Arbitrary threshold
+
+        self._plot_trajectory(trajectory, str(label), color, False)
+
+    def _prepare_plot(self, **layout_kwargs):
+        # If there are no orbits, draw only the attractor
+        if not self._data:
+            self._redraw_attractor()
+
+        if layout_kwargs:
+            self._layout.update(layout_kwargs)
+
+    def show(self, **layout_kwargs):
+        self._prepare_plot(**layout_kwargs)
+
+        iplot(self.figure)
+
+    def savefig(self, filename, **layout_kwargs):
+        self._prepare_plot(**layout_kwargs)
+
+        basename, ext = os.path.splitext(filename)
+        export(
+            self.figure,
+            image=ext[1:], image_filename=basename,
+            show_link=False,  # Boilerplate
+        )
+
+
+def _generate_circle(radius, center, num=500):
+    u1 = np.linspace(0, 2 * np.pi, num)
+    #v1 = u1.copy()
+    #u1 = np.meshgrid(u1, v1)
+    #v1 = np.linspace(0, 1, num)
+    v1 = 1
+    x_center, y_center, z_center = center
+
+    xx = x_center + radius * np.cos(u1) * v1
+    yy = y_center + radius * np.sin(u1) * v1
+
+    return xx, yy
+
+
+class OrbitPlotter2D:
+    """OrbitPlotter2D class.
+
+    """
+
+    def __init__(self):
+        self._layout = Layout(
+            autosize=True,
+            scene=dict(
+                xaxis=dict(
+                    title="x (km)",
+                ),
+                yaxis=dict(
+                    title="y (km)",
+                ),
+                aspectmode="data",  # Important!
+            ),
+        )
+        self._layout.update({
+            "shapes": []
+        })
+        self._data = []  # type: List[dict]
+        self._attractor = None
+        self._attractor_data = {}  # type: dict
+        self._attractor_radius = np.inf * u.km
+
+        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+
+    @property
+    def figure(self):
+        return dict(
+            data=self._data + [self._attractor_data],
+            layout=self._layout,
+        )
+
+    def _plot_circle(self, radius, color, name, center=[0, 0, 0] * u.km):
+        xx, yy = _generate_circle(radius, center)
+        x_center, y_center, z_center = center
+        trace = Scatter(x=xx.to(u.km).value, y=yy.to(u.km).value, mode='markers', line=dict(color=color, width=5,
+                                                                                            dash='dash',), name=name)
+        self._layout["shapes"].append(
+            {
+                'type': 'circle',
+                'xref': 'x.to(u.km).value',
+                'yref': 'y.to(u.km).value',
+                'x0': (x_center - radius).to(u.km).value,
+                'y0': (y_center - radius).to(u.km).value,
+                'x1': (x_center + radius).to(u.km).value,
+                'y1': (y_center + radius).to(u.km).value,
+                'opacity': 1,
+                'fillcolor': color,
+                'line': {
+                    'color': color,
+                },
+            },
+
+        )
+        return trace
+
+    def _redraw_attractor(self, min_radius=0 * u.km):
+        # Select a sensible value for the radius: realistic for low orbits,
+        # visible for high and very high orbits
+        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
+
+        # If the resulting radius is smaller than the current one, redraw it
+        if radius < self._attractor_radius:
+            circle = self._plot_circle(
+                radius, BODY_COLORS.get(self._attractor.name, "#999999"), self._attractor.name)
+
+            # Overwrite stored properties
+            self._attractor_radius = radius
+            self._attractor_data = circle
+
+    def _plot_trajectory(self, trajectory, label, color, dashed):
+        trace = Scatter(
+            x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value,
+            name=label,
+            line=dict(
+                color=color,
+                width=2,
+                dash='dash' if dashed else 'solid',
+            ),
+            mode="lines",  # Boilerplate
+        )
+        self._data.append(trace)
+
+    def set_attractor(self, attractor):
+        """Sets plotting attractor.
+
+        Parameters
+        ----------
+        attractor : ~poliastro.bodies.Body
+            Central body.
+
+        """
+        if self._attractor is None:
+            self._attractor = attractor
+
+        elif attractor is not self._attractor:
+            raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
+
+    @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
+    def set_view(self, elev, azim, distance=5 * u.km):
+        x = distance * np.cos(azim)
+        y = distance * np.sin(azim)
+
+        self._layout.update({
+            "scene": {
+                "camera": {
+                    "eye": {
+                        "x": x.to(u.km).value, "y": y.to(u.km).value
+                    }
+                }
+            }
+        })
+
+    def plot(self, orbit, *, label=None, color=None):
+        """Plots state and osculating orbit in their plane.
+
+        """
+        if color is None:
+            color = next(self._color_cycle)
+
+        self.set_attractor(orbit.attractor)
+
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
+
+        label = _generate_label(orbit, label)
+        _, trajectory = orbit.sample()
+
+        self._plot_trajectory(trajectory, label, color, True)
+
+        # Plot sphere in the position of the body
+        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
+        circle = self._plot_circle(
+            radius, color, label, center=orbit.r)
+
+        self._data.append(circle)
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
         """Plots a precomputed trajectory.
