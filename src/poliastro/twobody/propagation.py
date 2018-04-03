@@ -117,8 +117,6 @@ def mean_motion(k, r0, v0, tof, **kwargs):
         Initial position (km).
     v0 : array
         Initial velocity (km).
-    ad : function(t0, u, k), optional
-         Non Keplerian acceleration (km/s2), default to None.
     tof : float
         Time of flight (s).
 
