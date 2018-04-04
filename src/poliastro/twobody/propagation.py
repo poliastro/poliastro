@@ -14,7 +14,7 @@ from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
 
-def func_twobody(t0, u_, k, ad):
+def func_twobody(t0, u_, k, ad, ad_kwargs):
     """Differential equation for the initial value two body problem.
 
     This function follows Cowell's formulation.
@@ -31,7 +31,7 @@ def func_twobody(t0, u_, k, ad):
          Non Keplerian acceleration (km/s2).
 
     """
-    ax, ay, az = ad(t0, u_, k)
+    ax, ay, az = ad(t0, u_, k, **ad_kwargs)
 
     x, y, z, vx, vy, vz = u_
     r3 = (x**2 + y**2 + z**2)**1.5
@@ -47,7 +47,7 @@ def func_twobody(t0, u_, k, ad):
     return du
 
 
-def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
+def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -91,7 +91,7 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     # Set the integrator
     rr = ode(func_twobody).set_integrator('dop853', rtol=rtol, nsteps=nsteps)
     rr.set_initial_value(u0)  # Initial time equal to 0.0
-    rr.set_f_params(k, ad)  # Parameters of the integration
+    rr.set_f_params(k, ad, ad_kwargs)  # Parameters of the integration
     if callback:
         rr.set_solout(callback)
 
