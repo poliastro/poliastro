@@ -447,8 +447,8 @@ class OrbitPlotter2D:
         self._layout["shapes"].append(
             {
                 'type': 'circle',
-                'xref': 'x.to(u.km).value',
-                'yref': 'y.to(u.km).value',
+                'xref': 'x',
+                'yref': 'y',
                 'x0': (x_center - radius).to(u.km).value,
                 'y0': (y_center - radius).to(u.km).value,
                 'x1': (x_center + radius).to(u.km).value,
@@ -507,6 +507,15 @@ class OrbitPlotter2D:
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
+        """Updates the layout according to angles.
+
+        Parameters
+        ----------
+        elev : float
+        azim : float
+        distance : float, optional
+
+        """
         x = distance * np.cos(azim)
         y = distance * np.sin(azim)
 
@@ -522,6 +531,12 @@ class OrbitPlotter2D:
 
     def plot(self, orbit, *, label=None, color=None):
         """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+        label : string, optional
+        color : string, optional
 
         """
         if color is None:
@@ -552,6 +567,8 @@ class OrbitPlotter2D:
         ----------
         trajectory : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
+        label : string, optional
+        color : string, optional
 
         """
         if self._attractor is None:
@@ -571,11 +588,22 @@ class OrbitPlotter2D:
             self._layout.update(layout_kwargs)
 
     def show(self, **layout_kwargs):
+        """Shows the plot in the Notebook.
+
+        """
         self._prepare_plot(**layout_kwargs)
 
         iplot(self.figure)
 
     def savefig(self, filename, **layout_kwargs):
+        """Function for saving the plot locally.
+
+        Parameters
+        ----------
+        filename : string, format = "anyname.anyformat"
+                    anyformat can only be jpeg, png, svg, webp
+
+        """
         self._prepare_plot(**layout_kwargs)
 
         basename, ext = os.path.splitext(filename)
