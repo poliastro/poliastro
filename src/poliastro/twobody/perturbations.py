@@ -4,19 +4,19 @@ from poliastro.util import norm
 from poliastro.bodies import Sun, Earth
 
 
-def J2_perturbation(t0, state, k, J2, R):
+def J2_perturbation(t0, state, k, factor):
     r"""Calculates J2_perturbation acceleration (km/s2)
 
     Parameters
     ----------
     t0 : float
         Current time (s)
-    u : numpy.ndarray
+    state : numpy.ndarray
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
-        Gravitational constant of main attractor (km^3 / s^2),
-    body : float, optional
-        The attracting body, default to Earth
+        gravitational constant, (km^3/s^2)
+    factor: float
+        2nd obliteness coefficient, J2 x R^2 (km^2)
 
     Notes
     -----
@@ -28,7 +28,7 @@ def J2_perturbation(t0, state, k, J2, R):
     r_vec = state[:3]
     r = norm(r_vec)
 
-    factor = (3.0 / 2.0) * k * (R.to(u.km).value ** 2) * J2 / (r ** 5)
+    factor = (3.0 / 2.0) * k * factor / (r ** 5)
 
     a_x = 5.0 * r_vec[2] ** 2 / r ** 2 - 1
     a_y = 5.0 * r_vec[2] ** 2 / r ** 2 - 1
