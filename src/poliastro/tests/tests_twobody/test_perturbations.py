@@ -18,7 +18,7 @@ def test_J2_propagation_Earth():
     orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
 
     tof = (48.0 * u.h).to(u.s).value
-    r, v = cowell(orbit, tof, ad=J2_perturbation, factor=((Earth.R.to(u.km).value ** 2) * Earth.J2))
+    r, v = cowell(orbit, tof, ad=J2_perturbation, J2=Earth.J2, R=Earth.R)
 
     _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
     _, _, _, raan, argp, _ = rv2coe(k, r, v)
