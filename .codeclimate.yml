@@ -1,9 +1,14 @@
-engines:
+version: "2"
+plugins:
   duplication:
     enabled: false
   fixme:
     enabled: true
   radon:
     enabled: true
-exclude_paths:
+checks:
+  argument-count:
+    config:
+      threshold: 6
+exclude_patterns:
   - "docs/source"
