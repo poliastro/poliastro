@@ -5,7 +5,7 @@ from poliastro.bodies import Sun, Earth
 
 
 def J2_perturbation(t0, state, k, J2, R):
-    r"""Calculates J2_perturbation acceleration (km/s2)
+    """Calculates J2_perturbation acceleration (km/s2)
 
     Parameters
     ----------
@@ -24,13 +24,12 @@ def J2_perturbation(t0, state, k, J2, R):
     -----
     The J2 accounts for the obliteness of the attractor. The formula is given in
     Howard Curtis, (12.30)
-
     """
 
     r_vec = state[:3]
     r = norm(r_vec)
 
-    factor = (3.0 / 2.0) * k * J2 * (R.to(u.km).value ** 2) / (r ** 5)
+    factor = (3.0 / 2.0) * k * J2 * (R ** 2) / (r ** 5)
 
     a_x = 5.0 * r_vec[2] ** 2 / r ** 2 - 1
     a_y = 5.0 * r_vec[2] ** 2 / r ** 2 - 1

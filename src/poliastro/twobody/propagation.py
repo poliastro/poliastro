@@ -28,8 +28,9 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
     k : float
         Standard gravitational parameter.
     ad : function(t0, u, k)
-         Non Keplerian acceleration (km/s2).
-
+        Non Keplerian acceleration (km/s2).
+    ad_kwargs : optional
+        perturbation parameters passed to ad
     """
     ax, ay, az = ad(t0, u_, k, **ad_kwargs)
 
@@ -52,7 +53,7 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_
 
     Parameters
     ----------
-    orbit : Orbit
+    orbit : ~poliastro.twobody.orbit.Orbit
         the Orbit object to propagate.
     ad : function(t0, u, k), optional
          Non Keplerian acceleration (km/s2), default to None.
@@ -109,7 +110,7 @@ def mean_motion(orbit, tof, **kwargs):
 
     Parameters
     ----------
-    orbit : Orbit
+    orbit : ~poliastro.twobody.orbit.Orbit
         the Orbit object to propagate.
     tof : float
         Time of flight (s).
@@ -163,7 +164,7 @@ def kepler(orbit, tof, rtol=1e-10, *, numiter=35, **kwargs):
 
     Parameters
     ----------
-    orbit : Orbit
+    orbit : ~poliastro.twobody.orbit.Orbit
         the Orbit object to propagate.
     tof : float
         Time of flight (s).

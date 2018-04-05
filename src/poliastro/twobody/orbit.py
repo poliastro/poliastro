@@ -248,7 +248,10 @@ class Orbit(object):
             Time values.
         rtol : float, optional
             Relative tolerance for the propagation algorithm, default to 1e-10.
-
+        method : function, optional
+            Method used for propagation
+        **kwargs
+            parameters used in perturbation models
         """
         if hasattr(value, "unit") and value.unit in ('rad', 'deg'):
             p, ecc, inc, raan, argp, _ = rv.rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
