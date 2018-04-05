@@ -237,7 +237,7 @@ class Orbit(object):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, value, method=mean_motion, rtol=1e-10):
+    def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
         """ if value is true anomaly, propagate orbit to this anomaly and return the result
             if time is provided, propagate this `Orbit` some `time` and return the result.
 
@@ -264,7 +264,7 @@ class Orbit(object):
             else:
                 time_of_flight = time.TimeDelta(value)
 
-            return propagate(self, time_of_flight, method=method, rtol=rtol)
+            return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
 
     def sample(self, values=None, method=mean_motion):
         """Samples an orbit to some specified time values.

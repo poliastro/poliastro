@@ -143,11 +143,11 @@ def test_apply_zero_maneuver_returns_equal_state():
 
 def test_cowell_propagation_callback():
     # Data from Vallado, example 2.4
-    k = Earth.k.to(u.km**3 / u.s**2).value
 
     r0 = np.array([1131.340, -2282.343, 6672.423])  # km
     v0 = np.array([-5.64305, 4.30333, 2.42879])  # km/s
     tof = 40 * 60.0  # s
+    orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
 
     results = []
 
@@ -156,7 +156,7 @@ def test_cowell_propagation_callback():
         row.extend(u_)
         results.append(row)
 
-    r, v = cowell(k, r0, v0, tof, callback=cb)
+    r, v = cowell(orbit, tof, callback=cb)
 
     assert len(results) == 17
     assert len(results[0]) == 7
@@ -165,16 +165,17 @@ def test_cowell_propagation_callback():
 
 def test_cowell_propagation_with_zero_acceleration_equals_kepler():
     # Data from Vallado, example 2.4
-    k = Earth.k.to(u.km**3 / u.s**2).value
 
     r0 = np.array([1131.340, -2282.343, 6672.423])  # km
     v0 = np.array([-5.64305, 4.30333, 2.42879])  # km/s
     tof = 40 * 60.0  # s
 
+    orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
+
     expected_r = np.array([-4219.7527, 4363.0292, -3958.7666])
     expected_v = np.array([3.689866, -1.916735, -6.112511])
 
-    r, v = cowell(k, r0, v0, tof, ad=None)
+    r, v = cowell(orbit, tof, ad=None)
 
     assert_allclose(r, expected_r, rtol=1e-5)
     assert_allclose(v, expected_v, rtol=1e-4)
@@ -195,9 +196,7 @@ def test_cowell_propagation_circle_to_circle():
     r0, v0 = ss.rv()
     k = ss.attractor.k
 
-    r, v = cowell(k.to(u.km**3 / u.s**2).value,
-                  r0.to(u.km).value,
-                  v0.to(u.km / u.s).value,
+    r, v = cowell(ss,
                   tof.to(u.s).value,
                   ad=constant_accel)
 
