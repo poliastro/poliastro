@@ -11,7 +11,7 @@ Unless otherwise specified, gravitational and mass parameters were obtained from
   Standards for Fundamental Astronomy.” Celestial Mechanics and Dynamical Astronomy 110.4 (2011): 293–304.
   Crossref. Web. `DOI: 10.1007/s10569-011-9352-4`_
 
-and radii were obtained from:
+radii were obtained from:
 
 * Archinal, B. A. et al. “Report of the IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009.”
   Celestial Mechanics and Dynamical Astronomy 109.2 (2010): 101–135. Crossref. Web. `DOI: 10.1007/s10569-010-9320-4`_
@@ -19,6 +19,9 @@ and radii were obtained from:
 .. _`DOI: 10.1007/s10569-011-9352-4`: http://dx.doi.org/10.1007/s10569-011-9352-4
 .. _`DOI: 10.1007/s10569-010-9320-4`: http://dx.doi.org/10.1007/s10569-010-9320-4
 
+J2 for the Sun was obtained from:
+    https://hal.archives-ouvertes.fr/hal-00433235/document (New values of gravitational moments J2 and J4 deduced
+from helioseismology, Redouane Mecheri et al)
 
 """
 
@@ -117,3 +120,9 @@ R_pluto = Constant('R_pluto', 'Pluto effective radius', 1.195e6, 'm', 5,
 
 R_moon = Constant('R_moon', 'Moon equatorial radius', 1.7374e6, 'm', 1,
                   'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009', system='si')
+
+J2_sun = Constant('J2_sun', 'Sun J2 non-obliteness coefficient', 2.20e-7, '', 0.01e-7,
+                  'HAL archives', system='si')
+
+J2_earth = Constant('J2_earth', 'Earth J2 non-obliteness coefficient', 0.00108263, '', 1,
+                    'HAL archives', system='si')

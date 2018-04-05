@@ -14,7 +14,7 @@ from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
 
-def func_twobody(t0, u_, k, ad):
+def func_twobody(t0, u_, k, ad, ad_kwargs):
     """Differential equation for the initial value two body problem.
 
     This function follows Cowell's formulation.
@@ -28,10 +28,11 @@ def func_twobody(t0, u_, k, ad):
     k : float
         Standard gravitational parameter.
     ad : function(t0, u, k)
-         Non Keplerian acceleration (km/s2).
-
+        Non Keplerian acceleration (km/s2).
+    ad_kwargs : optional
+        perturbation parameters passed to ad
     """
-    ax, ay, az = ad(t0, u_, k)
+    ax, ay, az = ad(t0, u_, k, **ad_kwargs)
 
     x, y, z, vx, vy, vz = u_
     r3 = (x**2 + y**2 + z**2)**1.5
@@ -47,17 +48,13 @@ def func_twobody(t0, u_, k, ad):
     return du
 
 
-def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
+def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
     ----------
-    k : float
-        Gravitational constant of main attractor (km^3 / s^2).
-    r0 : array
-        Initial position (km).
-    v0 : array
-        Initial velocity (km).
+    orbit : ~poliastro.twobody.orbit.Orbit
+        the Orbit object to propagate.
     ad : function(t0, u, k), optional
          Non Keplerian acceleration (km/s2), default to None.
     tof : float
@@ -80,8 +77,10 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     in the :py:class:`scipy.integrate.ode` module.
 
     """
-    x, y, z = r0
-    vx, vy, vz = v0
+    k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
+    x, y, z = orbit.r.to(u.km).value
+    vx, vy, vz = orbit.v.to(u.km / u.s).value
+
     u0 = np.array([x, y, z, vx, vy, vz])
 
     # Set the non Keplerian acceleration
@@ -91,7 +90,7 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     # Set the integrator
     rr = ode(func_twobody).set_integrator('dop853', rtol=rtol, nsteps=nsteps)
     rr.set_initial_value(u0)  # Initial time equal to 0.0
-    rr.set_f_params(k, ad)  # Parameters of the integration
+    rr.set_f_params(k, ad, ad_kwargs)  # Parameters of the integration
     if callback:
         rr.set_solout(callback)
 
@@ -106,19 +105,13 @@ def cowell(k, r0, v0, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000):
     return r, v
 
 
-def mean_motion(k, r0, v0, tof, **kwargs):
+def mean_motion(orbit, tof, **kwargs):
     r"""Propagates orbit using mean motion
 
     Parameters
     ----------
-    k : float
-        Gravitational constant of main attractor (km^3 / s^2).
-    r0 : array
-        Initial position (km).
-    v0 : array
-        Initial velocity (km).
-    ad : function(t0, u, k), optional
-         Non Keplerian acceleration (km/s2), default to None.
+    orbit : ~poliastro.twobody.orbit.Orbit
+        the Orbit object to propagate.
     tof : float
         Time of flight (s).
 
@@ -129,6 +122,10 @@ def mean_motion(k, r0, v0, tof, **kwargs):
     The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9
 
     """
+
+    k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
+    r0 = orbit.r.to(u.km).value
+    v0 = orbit.v.to(u.km / u.s).value
 
     # get the initial true anomaly and orbit parameters that are constant over time
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
@@ -162,17 +159,13 @@ def mean_motion(k, r0, v0, tof, **kwargs):
         return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
-def kepler(k, r0, v0, tof, rtol=1e-10, *, numiter=35):
+def kepler(orbit, tof, rtol=1e-10, *, numiter=35, **kwargs):
     """Propagates Keplerian orbit.
 
     Parameters
     ----------
-    k : float
-        Gravitational constant of main attractor (km^3 / s^2).
-    r0 : array
-        Initial position (km).
-    v0 : array
-        Initial velocity (km).
+    orbit : ~poliastro.twobody.orbit.Orbit
+        the Orbit object to propagate.
     tof : float
         Time of flight (s).
     rtol : float, optional
@@ -194,6 +187,10 @@ def kepler(k, r0, v0, tof, rtol=1e-10, *, numiter=35):
 
     """
     # Compute Lagrange coefficients
+    k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
+    r0 = orbit.r.to(u.km).value
+    v0 = orbit.v.to(u.km / u.s).value
+
     f, g, fdot, gdot = _kepler(k, r0, v0, tof, numiter, rtol)
 
     assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
@@ -209,11 +206,7 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
     """Propagate an orbit some time and return the result.
 
     """
-    r, v = method(orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                  orbit.r.to(u.km).value, orbit.v.to(u.km / u.s).value,
-                  time_of_flight.to(u.s).value,
-                  rtol=rtol,
-                  **kwargs)
+    r, v = method(orbit, time_of_flight.to(u.s).value, rtol=rtol, **kwargs)
     return orbit.from_vectors(orbit.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight)
 
 

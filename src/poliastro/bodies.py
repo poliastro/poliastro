@@ -103,6 +103,7 @@ class _Sun(_Body):
     name = "Sun"
     symbol = u"\u2609"
     R = constants.R_sun
+    J2 = constants.J2_sun
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -154,6 +155,7 @@ class _Earth(_Body):
     name = "Earth"
     symbol = u"\u2641"
     R = constants.R_earth
+    J2 = constants.J2_earth
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
