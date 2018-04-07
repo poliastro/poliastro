@@ -30,6 +30,7 @@ BODY_COLORS = {
     "Jupiter": "#ba3821",
 }
 
+
 def plot(state, label=None, color=None):
     """Plots a ``State``.
 
@@ -261,6 +262,7 @@ class OrbitPlotter(object):
         self.fig.clear()
 
         return ani
+
 
 def _generate_label(orbit, label):
     orbit.epoch.out_subfmt = 'date_hm'
