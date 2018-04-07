@@ -39,6 +39,7 @@ def plot(state, label=None, color=None):
     op = OrbitPlotter()
     return op.plot(state, label=label, color=color)
 
+
 def animate(state, label=None, color=None):
     """Animates a ``State``.
 
@@ -226,8 +227,7 @@ class OrbitPlotter(object):
         positions = positions_in_tuples.get_xyz().transpose().to(u.km).value
         x, y = self._project(positions)
 
-        l, = self.ax.plot([], [],
-                  'o', mew=0, color=color)
+        l, = self.ax.plot([], [], 'o', mew=0, color=color)
         ln, = self.ax.plot([], [], '--', color=l.get_color(), label=label,
                            animated=True)
 
@@ -255,8 +255,8 @@ class OrbitPlotter(object):
 
         # The plotting rate is not representative of the velocity
         ani = FuncAnimation(self.fig, update,
-                            frames=np.linspace(0, len(x)-1, len(x)),
-                            init_func=init, blit=True,repeat=False)
+                            frames=np.linspace(0, len(x) - 1, len(x)),
+                            init_func=init, blit=True, repeat=False)
         plt.show()
         self.fig.clear()
 
