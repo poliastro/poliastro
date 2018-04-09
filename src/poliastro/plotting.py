@@ -83,7 +83,7 @@ class OrbitPlotter(object):
         """
         if ax:
             self.ax = ax
-            self.fig = ax.figure
+            self.fig = ax.get_figure()
         else:
             self.fig, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
