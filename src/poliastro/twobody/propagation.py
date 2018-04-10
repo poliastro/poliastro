@@ -224,10 +224,10 @@ def _kepler(k, r0, v0, tof, numiter, rtol):
         xi_new = sqrt_mu * tof * alpha
     elif alpha < 0:
         # Hyperbolic orbit
-        xi_new = (np.sign(tof) * (-1 / alpha)**.5 *
-                  np.log((-2 * k * alpha * tof) /
-                         (dot_r0v0 + np.sign(tof) *
-                          np.sqrt(-k / alpha) * (1 - norm_r0 * alpha))))
+        xi_new = (np.sign(tof) * (-1 / alpha)**.5
+                  * np.log((-2 * k * alpha * tof)
+                           / (dot_r0v0 + np.sign(tof)
+                           * np.sqrt(-k / alpha) * (1 - norm_r0 * alpha))))
     else:
         # Parabolic orbit
         # (Conservative initial guess)
@@ -240,12 +240,12 @@ def _kepler(k, r0, v0, tof, numiter, rtol):
         psi = xi * xi * alpha
         c2_psi = c2(psi)
         c3_psi = c3(psi)
-        norm_r = (xi * xi * c2_psi +
-                  dot_r0v0 / sqrt_mu * xi * (1 - psi * c3_psi) +
-                  norm_r0 * (1 - psi * c2_psi))
-        xi_new = xi + (sqrt_mu * tof - xi * xi * xi * c3_psi -
-                       dot_r0v0 / sqrt_mu * xi * xi * c2_psi -
-                       norm_r0 * xi * (1 - psi * c3_psi)) / norm_r
+        norm_r = (xi * xi * c2_psi
+                  + dot_r0v0 / sqrt_mu * xi * (1 - psi * c3_psi)
+                  + norm_r0 * (1 - psi * c2_psi))
+        xi_new = xi + (sqrt_mu * tof - xi * xi * xi * c3_psi
+                       - dot_r0v0 / sqrt_mu * xi * xi * c2_psi
+                       - norm_r0 * xi * (1 - psi * c3_psi)) / norm_r
         if abs(np.divide(xi_new - xi, xi_new)) < rtol or abs(xi_new - xi) < rtol:
             break
         else:

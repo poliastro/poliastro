@@ -199,12 +199,12 @@ class _Jupiter(_Body):
         Jd = (114.012305 + 6070.2476 * T) * u.deg
         Je = (49.511251 + 64.3000 * T) * u.deg
 
-        ra = (268.056595 - 0.006499 * T + 0.000117 * math.sin(Ja.to('rad').value) +
-              0.000938 * math.sin(Jb.to('rad').value) + 0.001432 * math.sin(Jc.to('rad').value) +
-              0.000030 * math.sin(Jd.to('rad').value) + 0.002150 * math.sin(Je.to('rad').value)) * u.deg
-        dec = (64.495303 + 0.002413 * T + 0.000050 * math.cos(Ja.to('rad').value) +
-               0.000404 * math.cos(Jb.to('rad').value) + 0.000617 * math.cos(Jc.to('rad').value) -
-               0.000013 * math.cos(Jd.to('rad').value) + 0.000926 * math.cos(Je.to('rad').value)) * u.deg
+        ra = (268.056595 - 0.006499 * T + 0.000117 * math.sin(Ja.to('rad').value)
+              + 0.000938 * math.sin(Jb.to('rad').value) + 0.001432 * math.sin(Jc.to('rad').value)
+              + 0.000030 * math.sin(Jd.to('rad').value) + 0.002150 * math.sin(Je.to('rad').value)) * u.deg
+        dec = (64.495303 + 0.002413 * T + 0.000050 * math.cos(Ja.to('rad').value)
+               + 0.000404 * math.cos(Jb.to('rad').value) + 0.000617 * math.cos(Jc.to('rad').value)
+               - 0.000013 * math.cos(Jd.to('rad').value) + 0.000926 * math.cos(Je.to('rad').value)) * u.deg
         W = (284.95 + 870.5366420 * d) * u.deg
 
         return ra, dec, W
@@ -311,21 +311,21 @@ class _Moon(_Body):
         E12 = (239.961 + 0.1643573 * d) * u.deg
         E13 = (25.053 + 12.9590088 * d) * u.deg
 
-        ra = (269.9949 + 0.0031 * T - 3.8787 * math.sin(E1.to('rad').value) - 0.1204 * math.sin(E2.to('rad').value) +
-              0.0700 * math.sin(E3.to('rad').value) - 0.0172 * math.sin(E4.to('rad').value) +
-              0.0072 * math.sin(E6.to('rad').value) - 0.0052 * math.sin(E10.to('rad').value) +
-              0.0043 * math.sin(E13.to('rad').value)) * u.deg
-        dec = (66.5392 + 0.0130 * T + 1.5419 * math.cos(E1.to('rad').value) + 0.0239 * math.cos(E2.to('rad').value) -
-               0.0278 * math.cos(E3.to('rad').value) + 0.0068 * math.cos(E4.to('rad').value) -
-               0.0029 * math.cos(E6.to('rad').value) + 0.0009 * math.cos(E7.to('rad').value) +
-               0.0008 * math.cos(E10.to('rad').value) - 0.0009 * math.cos(E13.to('rad').value)) * u.deg
-        W = (38.321 + 13.17635815 * d - 1.4e-12 * d ** 2 + 3.5610 * math.sin(E1.to('rad').value) +
-             0.1208 * math.sin(E2.to('rad').value) - 0.0642 * math.sin(E3.to('rad').value) +
-             0.0158 * math.sin(E4.to('rad').value) + 0.0252 * math.sin(E5.to('rad').value) -
-             0.0066 * math.sin(E6.to('rad').value) - 0.0047 * math.sin(E7.to('rad').value) -
-             0.0046 * math.sin(E8.to('rad').value) + 0.0028 * math.sin(E9.to('rad').value) +
-             0.0052 * math.sin(E10.to('rad').value) + 0.0040 * math.sin(E11.to('rad').value) +
-             0.0019 * math.sin(E12.to('rad').value) - 0.0044 * math.sin(E13.to('rad').value)) * u.deg
+        ra = (269.9949 + 0.0031 * T - 3.8787 * math.sin(E1.to('rad').value) - 0.1204 * math.sin(E2.to('rad').value)
+              + 0.0700 * math.sin(E3.to('rad').value) - 0.0172 * math.sin(E4.to('rad').value)
+              + 0.0072 * math.sin(E6.to('rad').value) - 0.0052 * math.sin(E10.to('rad').value)
+              + 0.0043 * math.sin(E13.to('rad').value)) * u.deg
+        dec = (66.5392 + 0.0130 * T + 1.5419 * math.cos(E1.to('rad').value) + 0.0239 * math.cos(E2.to('rad').value)
+               - 0.0278 * math.cos(E3.to('rad').value) + 0.0068 * math.cos(E4.to('rad').value)
+               - 0.0029 * math.cos(E6.to('rad').value) + 0.0009 * math.cos(E7.to('rad').value)
+               + 0.0008 * math.cos(E10.to('rad').value) - 0.0009 * math.cos(E13.to('rad').value)) * u.deg
+        W = (38.321 + 13.17635815 * d - 1.4e-12 * d ** 2 + 3.5610 * math.sin(E1.to('rad').value)
+             + 0.1208 * math.sin(E2.to('rad').value) - 0.0642 * math.sin(E3.to('rad').value)
+             + 0.0158 * math.sin(E4.to('rad').value) + 0.0252 * math.sin(E5.to('rad').value)
+             - 0.0066 * math.sin(E6.to('rad').value) - 0.0047 * math.sin(E7.to('rad').value)
+             - 0.0046 * math.sin(E8.to('rad').value) + 0.0028 * math.sin(E9.to('rad').value)
+             + 0.0052 * math.sin(E10.to('rad').value) + 0.0040 * math.sin(E11.to('rad').value)
+             + 0.0019 * math.sin(E12.to('rad').value) - 0.0044 * math.sin(E13.to('rad').value)) * u.deg
 
         return ra, dec, W
 

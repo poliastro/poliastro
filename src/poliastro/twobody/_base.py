@@ -118,8 +118,8 @@ class BaseState(object):
     @property
     def energy(self):
         """Specific energy. """
-        return (self.v.dot(self.v) / 2 -
-                self.attractor.k / np.sqrt(self.r.dot(self.r)))
+        return (self.v.dot(self.v) / 2
+                - self.attractor.k / np.sqrt(self.r.dot(self.r)))
 
     @property
     def e_vec(self):

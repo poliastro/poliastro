@@ -84,8 +84,8 @@ def _lambert(k, r0, r, tof, short, numiter, rtol):
             # Translated directly from Vallado
             while y < 0.0:
                 psi_low = psi
-                psi = (0.8 * (1.0 / c3(psi)) *
-                       (1.0 - norm_r0_times_norm_r * np.sqrt(c2(psi)) / A))
+                psi = (0.8 * (1.0 / c3(psi))
+                       * (1.0 - norm_r0_times_norm_r * np.sqrt(c2(psi)) / A))
                 y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
 
         xi = np.sqrt(y / c2(psi))

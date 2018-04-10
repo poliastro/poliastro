@@ -66,8 +66,8 @@ def nu_to_F(nu, ecc):
     Taken from Curtis, H. (2013). *Orbital mechanics for engineering students*. 167
 
     """
-    F = np.log((np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2)) /
-               (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2))) * u.rad
+    F = np.log((np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2))
+               / (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2))) * u.rad
     return F
 
 
@@ -110,8 +110,8 @@ def F_to_nu(F, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        nu = 2 * np.arctan((np.exp(F) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1)) /
-                           (np.exp(F) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1)))
+        nu = 2 * np.arctan((np.exp(F) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1))
+                           / (np.exp(F) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1)))
     return nu
 
 

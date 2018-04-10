@@ -102,8 +102,8 @@ def spk_id_from_name(name):
             bodies += body.string + '\n'
         raise ValueError(str(len(object_list)) + ' different bodies found:\n' + bodies)
     else:
-        raise ValueError('Object could not be found. You can visit: ' +
-                         SBDB_URL + '?sstr=' + name + ' for more information.')
+        raise ValueError('Object could not be found. You can visit: '
+                         + SBDB_URL + '?sstr=' + name + ' for more information.')
 
 
 def orbit_from_name(name, api_key='DEMO_KEY'):

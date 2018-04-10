@@ -298,8 +298,8 @@ def _householder(p0, T0, ll, M, tol, maxiter):
         fder3 = _tof_equation_p3(p0, y, T, fder, fder2, ll)
 
         # Householder step (quartic)
-        p = p0 - fval * ((fder ** 2 - fval * fder2 / 2) /
-                         (fder * (fder ** 2 - fval * fder2) + fder3 * fval ** 2 / 6))
+        p = p0 - fval * ((fder ** 2 - fval * fder2 / 2)
+                         / (fder * (fder ** 2 - fval * fder2) + fder3 * fval ** 2 / 6))
 
         if abs(p - p0) < tol:
             return p
