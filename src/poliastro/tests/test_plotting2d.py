@@ -56,12 +56,3 @@ def test_plot_trajectory_without_attractor_raises_error():
         frame.plot_trajectory({})
     assert ("An attractor must be set up first, please use "
             "set_attractor(Major_Body)." in excinfo.exconly())
-
-
-def test_set_view():
-    frame = OrbitPlotter2D()
-    frame.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
-
-    eye = frame.figure["layout"]["scene"]["camera"]["eye"]
-    assert eye["x"] == 1
-    assert eye["y"] == 0
