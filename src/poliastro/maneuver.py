@@ -33,7 +33,6 @@ class Maneuver(object):
 
         Notes
         -----
-        TODO: Fix docstring, *args convention
 
         """
         self.impulses = impulses
