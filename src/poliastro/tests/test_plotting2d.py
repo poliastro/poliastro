@@ -1,11 +1,10 @@
 import pytest
 
-from unittest import mock
-
 from astropy import units as u
 
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter2D
+from poliastro.bodies import Earth, Mars
 
 
 def test_get_figure_has_expected_properties():
@@ -20,18 +19,16 @@ def test_get_figure_has_expected_properties():
 
 
 def test_set_different_attractor_raises_error():
-    body1 = mock.MagicMock()
-    body1.name = "1"
+    body1 = Earth
 
-    body2 = mock.MagicMock()
-    body2.name = "2"
+    body2 = Mars
 
     frame = OrbitPlotter2D()
     frame.set_attractor(body1)
 
     with pytest.raises(NotImplementedError) as excinfo:
         frame.set_attractor(body2)
-    assert "Attractor has already been set to 1." in excinfo.exconly()
+    assert "Attractor has already been set to Earth." in excinfo.exconly()
 
 
 def test_plot_sets_attractor():
