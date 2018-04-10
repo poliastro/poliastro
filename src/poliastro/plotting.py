@@ -68,7 +68,6 @@ class OrbitPlotter(object):
             Axes in which to plot. If not given, new ones will be created.
         num_points : int, optional
             Number of points to use in plots, default to 150.
-
         """
         self.ax = ax
         if not self.ax:
@@ -90,7 +89,6 @@ class OrbitPlotter(object):
         ------
         ValueError
             If the vectors are not a set of mutually orthogonal unit vectors.
-
         """
         if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
             raise ValueError("Vectors must be unit.")
@@ -120,7 +118,6 @@ class OrbitPlotter(object):
         ----------
         trajectory : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-
         """
         lines = []
         rr = trajectory.get_xyz().transpose()
@@ -162,7 +159,6 @@ class OrbitPlotter(object):
 
     def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
-
         """
         if not self._frame:
             self.set_frame(*orbit.pqw())
@@ -235,7 +231,6 @@ def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
 
 class OrbitPlotter3D:
     """OrbitPlotter3D class.
-
     """
 
     def __init__(self):
@@ -304,7 +299,6 @@ class OrbitPlotter3D:
         ----------
         attractor : ~poliastro.bodies.Body
             Central body.
-
         """
         if self._attractor is None:
             self._attractor = attractor
@@ -360,7 +354,6 @@ class OrbitPlotter3D:
         ----------
         trajectory : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-
         """
         if self._attractor is None:
             raise ValueError("An attractor must be set up first, please use "
@@ -406,7 +399,6 @@ def _generate_circle(radius, center, num=500):
 
 class OrbitPlotter2D:
     """OrbitPlotter2D class.
-
     """
 
     def __init__(self):
@@ -497,7 +489,6 @@ class OrbitPlotter2D:
         ----------
         attractor : ~poliastro.bodies.Body
             Central body.
-
         """
         if self._attractor is None:
             self._attractor = attractor
@@ -513,7 +504,6 @@ class OrbitPlotter2D:
         orbit : ~poliastro.twobody.orbit.Orbit
         label : string, optional
         color : string, optional
-
         """
         if color is None:
             color = next(self._color_cycle)
@@ -565,7 +555,6 @@ class OrbitPlotter2D:
 
     def show(self, **layout_kwargs):
         """Shows the plot in the Notebook.
-
         """
         self._prepare_plot(**layout_kwargs)
 
@@ -578,7 +567,6 @@ class OrbitPlotter2D:
         ----------
         filename : string, format = "anyname.anyformat"
                     anyformat can only be jpeg, png, svg, webp
-
         """
         self._prepare_plot(**layout_kwargs)
 
@@ -600,7 +588,6 @@ def plot_solar_system(outer=True, epoch=None):
         Whether to print the outer Solar System, default to True.
     epoch: ~astropy.time.Time, optional
         Epoch value of the plot, default to J2000.
-
     """
     bodies = [Mercury, Venus, Earth, Mars]
     if outer:
