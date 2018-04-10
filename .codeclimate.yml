@@ -9,6 +9,6 @@ plugins:
 checks:
   argument-count:
     config:
-      threshold: 7
+      threshold: 8
 exclude_patterns:
   - "docs/source"
