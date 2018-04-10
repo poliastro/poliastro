@@ -505,30 +505,6 @@ class OrbitPlotter2D:
         elif attractor is not self._attractor:
             raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
 
-    @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
-    def set_view(self, elev, azim, distance=5 * u.km):
-        """Updates the layout according to angles.
-
-        Parameters
-        ----------
-        elev : float
-        azim : float
-        distance : float, optional
-
-        """
-        x = distance * np.cos(azim)
-        y = distance * np.sin(azim)
-
-        self._layout.update({
-            "scene": {
-                "camera": {
-                    "eye": {
-                        "x": x.to(u.km).value, "y": y.to(u.km).value
-                    }
-                }
-            }
-        })
-
     def plot(self, orbit, *, label=None, color=None):
         """Plots state and osculating orbit in their plane.
 
