@@ -4,7 +4,8 @@ from astropy import units as u
 
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter2D
-from poliastro.bodies import Earth, Mars
+from poliastro.bodies import Earth, Mars, Sun
+from poliastro.twobody.orbit import Orbit
 
 
 def test_get_figure_has_expected_properties():
@@ -56,3 +57,15 @@ def test_plot_trajectory_without_attractor_raises_error():
         frame.plot_trajectory({})
     assert ("An attractor must be set up first, please use "
             "set_attractor(Major_Body)." in excinfo.exconly())
+
+
+def test_plot_trajectory_plots_a_trajectory():
+    frame = OrbitPlotter2D()
+    assert len(frame._data) == 0
+
+    earth = Orbit.from_body_ephem(Earth)
+    _, trajectory = earth.sample()
+    frame.set_attractor(Sun)
+    frame.plot_trajectory(trajectory)
+    assert len(frame._data) == 1
+    assert frame._attractor == Sun
