@@ -126,3 +126,9 @@ J2_sun = Constant('J2_sun', 'Sun J2 non-obliteness coefficient', 2.20e-7, '', 0.
 
 J2_earth = Constant('J2_earth', 'Earth J2 non-obliteness coefficient', 0.00108263, '', 1,
                     'HAL archives', system='si')
+
+H0_earth = Constant('H0_earth', 'Earth H0 atmospheric scale height', 8500, 'm', 1,
+                    'de Pater and Lissauer 2010', system='si')
+
+rho0_earth = Constant('rho0_earth', 'Earth rho0 atmospheric density prefactor', 1.3, 'kg / (m3)', 1,
+                      'de Pater and Lissauer 2010', system='si')
