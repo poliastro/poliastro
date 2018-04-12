@@ -36,18 +36,18 @@ def test_J2_propagation_Earth():
 
 def test_atmospheric_drag():
     # http://farside.ph.utexas.edu/teaching/celestial/Celestialhtml/node94.html#sair (10.148)
-    # given the expression for \dot{a} / a, aproximate \Delta a \approx F_a * \Delta t
+    # given the expression for \dot{r} / r, aproximate \Delta r \approx F_r * \Delta t
 
     R = Earth.R.to(u.km).value
     k = Earth.k.to(u.km**3 / u.s**2).value
 
-    # parameters of a circular orbit with h = 10 km
-    h = 250  # km
-    r0 = np.array([R + h, 0, 0])  # km
-    v0 = np.array([0, np.sqrt(k / (R + h)), 0])  # km/s
+    # parameters of a circular orbit with h = 250 km (any value would do, but not too small)
+    orbit = Orbit.circular(Earth, 250 * u.km)
+    r0, _ = orbit.rv()
+    r0 = r0.to(u.km).value
 
     # parameters of a body
-    C_D = 2.2  # dimentionless
+    C_D = 2.2  # dimentionless (any value would do)
     A = ((np.pi / 4.0) * (u.m**2)).to(u.km**2).value  # km^2
     m = 100  # kg
     B = C_D * A / m
@@ -55,12 +55,13 @@ def test_atmospheric_drag():
     # parameters of the atmosphere
     rho0 = Earth.rho0.to(u.kg / u.km**3).value  # kg/km^3
     H0 = Earth.H0.to(u.km).value
-
-    orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
     tof = 100000  # s
 
-    dr_expected = -B * tof * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0))
+    dr_expected = -B * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
+    # assuming the atmospheric decay during tof is small,
+    # dr_expected = F_r * tof (Newton's integration formula), where
+    # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
 
-    r, v = cowell(orbit, tof, ad=atmospheric_drag, R=R, B=B, H0=H0, rho0=rho0)
+    r, v = cowell(orbit, tof, ad=atmospheric_drag, R=R, C_D=C_D, A=A, m=m, H0=H0, rho0=rho0)
 
     assert_quantity_allclose(norm(r) - norm(r0), dr_expected, rtol=1e-2)

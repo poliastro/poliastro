@@ -37,7 +37,7 @@ def J2_perturbation(t0, state, k, J2, R):
     return np.array([a_x, a_y, a_z]) * r_vec * factor
 
 
-def atmospheric_drag(t0, state, k, R, B, H0, rho0):
+def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     """Calculates atmospheric drag acceleration (km/s2)
 
     Parameters
@@ -48,10 +48,14 @@ def atmospheric_drag(t0, state, k, R, B, H0, rho0):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         gravitational constant, (km^3/s^2)
-    B: float
-        ballistic coefficient B = C_D[] x A[m^2] / m[kg], (m^2 / kg)
+    C_D: float
+        dimensionless drag coefficient ()
+    A: float
+        frontal area of the spacecraft (km^2)
+    m: float
+        mass of the spacecraft (kg)
     H0 : float
-        the e-times density decay heigth, (km)
+        atmospheric scale height, (km)
     rho0: float
         the exponent density pre-factor, (kg / m^3)
 
@@ -66,7 +70,7 @@ def atmospheric_drag(t0, state, k, R, B, H0, rho0):
 
     v_vec = state[3:]
     v = norm(v_vec)
-
+    B = C_D * A / m
     rho = rho0 * np.exp(-(H - R) / H0)
 
     return -(1.0 / 2.0) * rho * B * v * v_vec
