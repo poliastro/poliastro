@@ -2,6 +2,8 @@ import pytest
 
 from astropy import units as u
 
+from unittest import mock
+
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter2D
 from poliastro.bodies import Earth, Mars, Sun
@@ -69,3 +71,29 @@ def test_plot_trajectory_plots_a_trajectory():
     frame.plot_trajectory(trajectory)
     assert len(frame._data) == 1
     assert frame._attractor == Sun
+
+
+def test_show_calls_prepare_plot():
+    patcher = mock.patch.object(OrbitPlotter2D, '_prepare_plot')
+    patched = patcher.start()
+
+    m = OrbitPlotter2D()
+    earth = Orbit.from_body_ephem(Earth)
+    m.plot(orbit=earth, label="Obj")
+    m.show()
+
+    assert patched.call_count == 1
+    patched.assert_called_with()
+
+
+def test_savefig_calls_prepare_plot():
+    patcher = mock.patch.object(OrbitPlotter2D, '_prepare_plot')
+    patched = patcher.start()
+
+    m = OrbitPlotter2D()
+    earth = Orbit.from_body_ephem(Earth)
+    m.plot(orbit=earth, label="Obj")
+    m.savefig(filename="a.jpeg")
+
+    assert patched.call_count == 1
+    patched.assert_called_with()

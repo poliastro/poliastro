@@ -70,3 +70,41 @@ def test_set_view():
     assert eye["x"] == 1
     assert eye["y"] == 0
     assert eye["z"] == 0
+
+
+def test_plot_trajectory_plots_a_trajectory():
+    frame = OrbitPlotter3D()
+    assert len(frame._data) == 0
+
+    earth = Orbit.from_body_ephem(Earth)
+    _, trajectory = earth.sample()
+    frame.set_attractor(Sun)
+    frame.plot_trajectory(trajectory)
+    assert len(frame._data) == 1
+    assert frame._attractor == Sun
+
+
+def test_show_calls_prepare_plot():
+    patcher = mock.patch.object(OrbitPlotter3D, '_prepare_plot')
+    patched = patcher.start()
+
+    m = OrbitPlotter3D()
+    earth = Orbit.from_body_ephem(Earth)
+    m.plot(orbit=earth, label="Obj")
+    m.show()
+
+    assert patched.call_count == 1
+    patched.assert_called_with()
+
+
+def test_savefig_calls_prepare_plot():
+    patcher = mock.patch.object(OrbitPlotter3D, '_prepare_plot')
+    patched = patcher.start()
+
+    m = OrbitPlotter3D()
+    earth = Orbit.from_body_ephem(Earth)
+    m.plot(orbit=earth, label="Obj")
+    m.savefig(filename="a.jpeg")
+
+    assert patched.call_count == 1
+    patched.assert_called_with()
