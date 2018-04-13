@@ -156,6 +156,8 @@ class _Earth(_Body):
     symbol = u"\u2641"
     R = constants.R_earth
     J2 = constants.J2_earth
+    H0 = constants.H0_earth
+    rho0 = constants.rho0_earth
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
