@@ -90,7 +90,7 @@ def test_show_calls_prepare_plot():
 
     m = OrbitPlotter3D()
     earth = Orbit.from_body_ephem(Earth)
-    m.plot(orbit=earth, label="Obj")
+    m.plot(orbit=earth, label="Object")
     m.show()
 
     assert patched.call_count == 1
@@ -103,7 +103,7 @@ def test_savefig_calls_prepare_plot():
 
     m = OrbitPlotter3D()
     earth = Orbit.from_body_ephem(Earth)
-    m.plot(orbit=earth, label="Obj")
+    m.plot(orbit=earth, label="Object")
     m.savefig(filename="a.jpeg")
 
     assert patched.call_count == 1
