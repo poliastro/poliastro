@@ -49,6 +49,12 @@ poliastro.twobody.rv module
 .. automodule:: poliastro.twobody.rv
    :members:
 
+poliastro.twobody.perturbations module
+***********************************
+
+.. automodule:: poliastro.twobody.perturbations
+   :members:
+
 poliastro.iod package
 ---------------------
 
