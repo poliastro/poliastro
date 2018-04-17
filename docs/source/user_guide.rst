@@ -182,14 +182,15 @@ let us examine the effect of J2 perturbation::
     >>> r0 = np.array([-2384.46, 5729.01, 3050.46])  # km
     >>> v0 = np.array([-7.36138, -2.98997, 1.64354])  # km/s
     >>> orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
-    >>> tof = (48.0 * u.h).to(u.s).value
-    >>> r, v = cowell(orbit, tof, ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
+    >>> tof = (48.0 * u.h).to(u.s)
+    >>> orbit = orbit.propagate(tof, method=cowell, ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
+    >>> r, v = orbit.rv()
 
 The J2 perturbation changes the orbit parameters (from Curtis example 12.2)::
 
     >>> k = Earth.k.to(u.km**3 / u.s**2).value
     >>> _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
-    >>> _, _, _, raan, argp, _ = rv2coe(k, r, v)
+    >>> _, _, _, raan, argp, _ = rv2coe(k, r.value, v.value)
     >>> ((raan - raan0) / tof * u.rad / u.s).to(u.deg / u.h)
     <Quantity -0.17232668 deg / h>
     >>> ((argp - argp0) / tof * u.rad / u.s).to(u.deg / u.h)
