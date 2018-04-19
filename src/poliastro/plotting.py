@@ -10,6 +10,7 @@ from typing import List, Tuple
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 import plotly.colors
 from plotly.offline import iplot, plot as export
@@ -38,6 +39,16 @@ def plot(state, label=None, color=None):
     """
     op = OrbitPlotter()
     return op.plot(state, label=label, color=color)
+
+
+def animate(state, label=None, color=None):
+    """Animates a ``State``.
+
+    For more advanced tuning, use the :py:class:`OrbitPlotter` class.
+
+    """
+    op = OrbitPlotter()
+    return op.animate(state, label=label, color=color)
 
 
 def plot3d(orbit, *, label=None, color=None):
@@ -194,6 +205,59 @@ class OrbitPlotter(object):
         self.ax.set_aspect(1)
 
         return lines
+
+    def animate(self, orbit, label=None, color=None):
+        """Plots state and osculating animated orbit in their plane.
+
+        """
+
+        if not self._frame:
+            self.set_frame(*orbit.pqw())
+
+        if (orbit, label) not in self._orbits:
+            self._orbits.append((orbit, label))
+
+        self.set_attractor(orbit.attractor)
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
+
+        _, positions_in_tuples = orbit.sample(self.num_points)
+        positions = positions_in_tuples.get_xyz().transpose().to(u.km).value
+        x, y = self._project(positions)
+
+        l, = self.ax.plot([], [], 'o', mew=0, color=color)
+        ln, = self.ax.plot([], [], '--', color=l.get_color(), label=label,
+                           animated=True)
+
+        if label:
+            # This will apply the label to either the point or the osculating
+            # orbit depending on the last plotted line, as they share variable
+            if not self.ax.get_legend():
+                size = self.ax.figure.get_size_inches() + [8, 0]
+                self.ax.figure.set_size_inches(size)
+            label = _generate_label(orbit, label)
+            l.set_label(label)
+            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+
+        self.ax.set_xlabel("$x$ (km)")
+        self.ax.set_ylabel("$y$ (km)")
+        self.ax.set_aspect(1)
+
+        def init():
+            return l, ln
+
+        def update(frame):
+            l.set_data(x[int(frame)], y[int(frame)])
+            ln.set_data(x[:int(frame)], y[:int(frame)])
+            return l, ln
+
+        # The plotting rate is not representative of the velocity
+        ani = FuncAnimation(self.fig, update,
+                            frames=np.linspace(0, len(x) - 1, len(x)),
+                            init_func=init, blit=True, repeat=False)
+        plt.show()
+        self.fig.clear()
+
+        return ani
 
 
 def _generate_label(orbit, label):
