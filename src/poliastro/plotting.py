@@ -10,11 +10,10 @@ from typing import List, Tuple
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 import plotly.colors
 from plotly.offline import iplot, plot as export
-from plotly.graph_objs import Scatter3d, Surface, Layout
+from plotly.graph_objs import Scatter3d, Surface, Layout, Scatter
 
 from astropy import units as u
 
@@ -39,16 +38,6 @@ def plot(state, label=None, color=None):
     """
     op = OrbitPlotter()
     return op.plot(state, label=label, color=color)
-
-
-def animate(state, label=None, color=None):
-    """Animates a ``State``.
-
-    For more advanced tuning, use the :py:class:`OrbitPlotter` class.
-
-    """
-    op = OrbitPlotter()
-    return op.animate(state, label=label, color=color)
 
 
 def plot3d(orbit, *, label=None, color=None):
@@ -79,12 +68,10 @@ class OrbitPlotter(object):
             Axes in which to plot. If not given, new ones will be created.
         num_points : int, optional
             Number of points to use in plots, default to 150.
-
         """
-        if ax:
-            self.ax = ax
-            self.fig = ax.get_figure()
-        else:
+        self.ax = ax
+        self.fig = ax.get_figure()
+        if not self.ax:
             self.fig, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
@@ -103,7 +90,6 @@ class OrbitPlotter(object):
         ------
         ValueError
             If the vectors are not a set of mutually orthogonal unit vectors.
-
         """
         if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
             raise ValueError("Vectors must be unit.")
@@ -133,7 +119,6 @@ class OrbitPlotter(object):
         ----------
         trajectory : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-
         """
         lines = []
         rr = trajectory.get_xyz().transpose()
@@ -210,59 +195,6 @@ class OrbitPlotter(object):
 
         return lines
 
-    def animate(self, orbit, label=None, color=None):
-        """Plots state and osculating animated orbit in their plane.
-
-        """
-
-        if not self._frame:
-            self.set_frame(*orbit.pqw())
-
-        if (orbit, label) not in self._orbits:
-            self._orbits.append((orbit, label))
-
-        self.set_attractor(orbit.attractor)
-        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
-
-        _, positions_in_tuples = orbit.sample(self.num_points)
-        positions = positions_in_tuples.get_xyz().transpose().to(u.km).value
-        x, y = self._project(positions)
-
-        l, = self.ax.plot([], [], 'o', mew=0, color=color)
-        ln, = self.ax.plot([], [], '--', color=l.get_color(), label=label,
-                           animated=True)
-
-        if label:
-            # This will apply the label to either the point or the osculating
-            # orbit depending on the last plotted line, as they share variable
-            if not self.ax.get_legend():
-                size = self.ax.figure.get_size_inches() + [8, 0]
-                self.ax.figure.set_size_inches(size)
-            label = _generate_label(orbit, label)
-            l.set_label(label)
-            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
-
-        self.ax.set_xlabel("$x$ (km)")
-        self.ax.set_ylabel("$y$ (km)")
-        self.ax.set_aspect(1)
-
-        def init():
-            return l, ln
-
-        def update(frame):
-            l.set_data(x[int(frame)], y[int(frame)])
-            ln.set_data(x[:int(frame)], y[:int(frame)])
-            return l, ln
-
-        # The plotting rate is not representative of the velocity
-        ani = FuncAnimation(self.fig, update,
-                            frames=np.linspace(0, len(x) - 1, len(x)),
-                            init_func=init, blit=True, repeat=False)
-        plt.show()
-        self.fig.clear()
-
-        return ani
-
 
 def _generate_label(orbit, label):
     orbit.epoch.out_subfmt = 'date_hm'
@@ -300,7 +232,6 @@ def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
 
 class OrbitPlotter3D:
     """OrbitPlotter3D class.
-
     """
 
     def __init__(self):
@@ -369,7 +300,6 @@ class OrbitPlotter3D:
         ----------
         attractor : ~poliastro.bodies.Body
             Central body.
-
         """
         if self._attractor is None:
             self._attractor = attractor
@@ -425,7 +355,6 @@ class OrbitPlotter3D:
         ----------
         trajectory : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-
         """
         if self._attractor is None:
             raise ValueError("An attractor must be set up first, please use "
@@ -459,6 +388,197 @@ class OrbitPlotter3D:
         )
 
 
+def _generate_circle(radius, center, num=500):
+    u1 = np.linspace(0, 2 * np.pi, num)
+    x_center, y_center, z_center = center
+
+    xx = x_center + radius * np.cos(u1)
+    yy = y_center + radius * np.sin(u1)
+
+    return xx, yy
+
+
+class OrbitPlotter2D:
+    """OrbitPlotter2D class.
+    """
+
+    def __init__(self):
+        self._layout = Layout(
+            autosize=True,
+            scene=dict(
+                xaxis=dict(
+                    title="x (km)",
+                ),
+                yaxis=dict(
+                    title="y (km)",
+                ),
+                aspectmode="data",  # Important!
+            ),
+        )
+        self._layout.update({
+            "shapes": []
+        })
+        self._data = []  # type: List[dict]
+        self._attractor = None
+        self._attractor_data = {}  # type: dict
+        self._attractor_radius = np.inf * u.km
+
+        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+
+    @property
+    def figure(self):
+        return dict(
+            data=self._data + [self._attractor_data],
+            layout=self._layout,
+        )
+
+    def _plot_circle(self, radius, color, name, center=[0, 0, 0] * u.km):
+        xx, yy = _generate_circle(radius, center)
+        x_center, y_center, z_center = center
+        trace = Scatter(x=xx.to(u.km).value, y=yy.to(u.km).value, mode='markers', line=dict(color=color, width=5,
+                                                                                            dash='dash',), name=name)
+        self._layout["shapes"].append(
+            {
+                'type': 'circle',
+                'xref': 'x',
+                'yref': 'y',
+                'x0': (x_center - radius).to(u.km).value,
+                'y0': (y_center - radius).to(u.km).value,
+                'x1': (x_center + radius).to(u.km).value,
+                'y1': (y_center + radius).to(u.km).value,
+                'opacity': 1,
+                'fillcolor': color,
+                'line': {
+                    'color': color,
+                },
+            },
+
+        )
+        return trace
+
+    def _redraw_attractor(self, min_radius=0 * u.km):
+        # Select a sensible value for the radius: realistic for low orbits,
+        # visible for high and very high orbits
+        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
+
+        # If the resulting radius is smaller than the current one, redraw it
+        if radius < self._attractor_radius:
+            circle = self._plot_circle(
+                radius, BODY_COLORS.get(self._attractor.name, "#999999"), self._attractor.name)
+
+            # Overwrite stored properties
+            self._attractor_radius = radius
+            self._attractor_data = circle
+
+    def _plot_trajectory(self, trajectory, label, color, dashed):
+        trace = Scatter(
+            x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value,
+            name=label,
+            line=dict(
+                color=color,
+                width=2,
+                dash='dash' if dashed else 'solid',
+            ),
+            mode="lines",  # Boilerplate
+        )
+        self._data.append(trace)
+
+    def set_attractor(self, attractor):
+        """Sets plotting attractor.
+
+        Parameters
+        ----------
+        attractor : ~poliastro.bodies.Body
+            Central body.
+        """
+        if self._attractor is None:
+            self._attractor = attractor
+
+        elif attractor is not self._attractor:
+            raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
+
+    def plot(self, orbit, *, label=None, color=None):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+        label : string, optional
+        color : string, optional
+        """
+        if color is None:
+            color = next(self._color_cycle)
+
+        self.set_attractor(orbit.attractor)
+
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
+
+        label = _generate_label(orbit, label)
+        _, trajectory = orbit.sample()
+
+        self._plot_trajectory(trajectory, label, color, True)
+
+        # Plot sphere in the position of the body
+        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
+        circle = self._plot_circle(
+            radius, color, label, center=orbit.r)
+
+        self._data.append(circle)
+
+    def plot_trajectory(self, trajectory, *, label=None, color=None):
+        """Plots a precomputed trajectory.
+
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        trajectory : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : string, optional
+        color : string, optional
+
+        """
+        if self._attractor is None:
+            raise ValueError("An attractor must be set up first, please use "
+                             "set_attractor(Major_Body).")
+        else:
+            self._redraw_attractor(trajectory.norm().min() * 0.15)  # Arbitrary threshold
+
+        self._plot_trajectory(trajectory, str(label), color, False)
+
+    def _prepare_plot(self, **layout_kwargs):
+        # If there are no orbits, draw only the attractor
+        if not self._data:
+            self._redraw_attractor()
+
+        if layout_kwargs:
+            self._layout.update(layout_kwargs)
+
+    def show(self, **layout_kwargs):
+        """Shows the plot in the Notebook.
+        """
+        self._prepare_plot(**layout_kwargs)
+
+        iplot(self.figure)
+
+    def savefig(self, filename, **layout_kwargs):
+        """Function for saving the plot locally.
+
+        Parameters
+        ----------
+        filename : string, format = "anyname.anyformat"
+                    anyformat can only be jpeg, png, svg, webp
+        """
+        self._prepare_plot(**layout_kwargs)
+
+        basename, ext = os.path.splitext(filename)
+        export(
+            self.figure,
+            image=ext[1:], image_filename=basename,
+            show_link=False,  # Boilerplate
+        )
+
+
 def plot_solar_system(outer=True, epoch=None):
     """
     Plots the whole solar system in one single call.
@@ -469,7 +589,6 @@ def plot_solar_system(outer=True, epoch=None):
         Whether to print the outer Solar System, default to True.
     epoch: ~astropy.time.Time, optional
         Epoch value of the plot, default to J2000.
-
     """
     bodies = [Mercury, Venus, Earth, Mars]
     if outer:
