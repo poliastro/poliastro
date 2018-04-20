@@ -21,6 +21,7 @@ from poliastro.util import norm
 from poliastro.bodies import (Earth, Jupiter, Mars, Mercury, Neptune, Saturn,
                               Uranus, Venus)
 from poliastro.twobody.orbit import Orbit
+from poliastro.twobody.propagation import mean_motion, kepler
 
 
 BODY_COLORS = {
@@ -166,7 +167,7 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
 
-    def plot(self, orbit, label=None, color=None):
+    def plot(self, orbit, label=None, color=None, method=mean_motion):
         """Plots state and osculating orbit in their plane.
         """
         if not self._frame:
@@ -177,7 +178,7 @@ class OrbitPlotter(object):
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
-        _, positions = orbit.sample(self.num_points)
+        _, positions = orbit.sample(self.num_points, method)
 
         x0, y0 = self._project(orbit.r[None])
         # Plot current position
