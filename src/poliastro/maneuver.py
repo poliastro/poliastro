@@ -24,7 +24,7 @@ class Maneuver(object):
 
     """
     def __init__(self, *impulses):
-        """Constructor.
+        r"""Constructor.
 
         Parameters
         ----------
@@ -33,7 +33,7 @@ class Maneuver(object):
 
         Notes
         -----
-        TODO: Fix docstring, *args convention
+        TODO: Fix docstring, \*args convention
 
         """
         self.impulses = impulses

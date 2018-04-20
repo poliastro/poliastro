@@ -20,8 +20,9 @@ radii were obtained from:
 .. _`DOI: 10.1007/s10569-010-9320-4`: http://dx.doi.org/10.1007/s10569-010-9320-4
 
 J2 for the Sun was obtained from:
-    https://hal.archives-ouvertes.fr/hal-00433235/document (New values of gravitational moments J2 and J4 deduced
-from helioseismology, Redouane Mecheri et al)
+
+* https://hal.archives-ouvertes.fr/hal-00433235/document (New values of gravitational moments J2 and J4 deduced
+  from helioseismology, Redouane Mecheri et al)
 
 """
 
