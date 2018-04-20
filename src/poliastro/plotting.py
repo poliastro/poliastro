@@ -52,7 +52,7 @@ class OrbitPlotter(object):
     """OrbitPlotter class.
 
     This class holds the perifocal plane of the first
-    :py:class:`~poliastro.twobody.State` plotted in it using
+    :py:class:`~poliastro.twobody.orbit.Orbit` plotted in it using
     :py:meth:`plot`, so all following
     plots will be projected on that plane. Alternatively, you can call
     :py:meth:`set_frame` to set the frame before plotting.
@@ -232,7 +232,6 @@ def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
 class OrbitPlotter3D:
     """OrbitPlotter3D class.
     """
-
     def __init__(self):
         self._layout = Layout(
             autosize=True,
@@ -399,8 +398,12 @@ def _generate_circle(radius, center, num=500):
 
 class OrbitPlotter2D:
     """OrbitPlotter2D class.
-    """
 
+    Experimental alternative to :py:class:`OrbitPlotter`
+    that uses Plotly instead of matplotlib.
+    Some visualization issues pending, use with care.
+
+    """
     def __init__(self):
         self._layout = Layout(
             autosize=True,
