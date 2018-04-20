@@ -108,6 +108,8 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_
 def mean_motion(orbit, tof, **kwargs):
     r"""Propagates orbit using mean motion
 
+    .. versionadded:: 0.9.0
+
     Parameters
     ----------
     orbit : ~poliastro.twobody.orbit.Orbit

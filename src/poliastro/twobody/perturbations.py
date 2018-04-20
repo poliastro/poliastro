@@ -1,11 +1,11 @@
-from astropy import units as u
 import numpy as np
 from poliastro.util import norm
-from poliastro.bodies import Sun, Earth
 
 
 def J2_perturbation(t0, state, k, J2, R):
     """Calculates J2_perturbation acceleration (km/s2)
+
+    .. versionadded:: 0.9.0
 
     Parameters
     ----------
@@ -24,8 +24,8 @@ def J2_perturbation(t0, state, k, J2, R):
     -----
     The J2 accounts for the obliteness of the attractor. The formula is given in
     Howard Curtis, (12.30)
-    """
 
+    """
     r_vec = state[:3]
     r = norm(r_vec)
 
@@ -39,6 +39,8 @@ def J2_perturbation(t0, state, k, J2, R):
 
 def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     """Calculates atmospheric drag acceleration (km/s2)
+
+    .. versionadded:: 0.9.0
 
     Parameters
     ----------
@@ -64,8 +66,8 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     This function provides the acceleration due to atmospheric drag. We follow
     Howard Curtis, section 12.4
     the atmospheric density model is rho(H) = rho0 x exp(-H / H0)
-    """
 
+    """
     H = norm(state[:3])
 
     v_vec = state[3:]

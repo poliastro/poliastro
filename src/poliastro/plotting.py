@@ -31,7 +31,7 @@ BODY_COLORS = {
 
 
 def plot(state, label=None, color=None):
-    """Plots a ``State``.
+    """Plots an :py:class:`~poliastro.twobody.orbit.Orbit` in 2D.
 
     For more advanced tuning, use the :py:class:`OrbitPlotter` class.
 
@@ -41,6 +41,11 @@ def plot(state, label=None, color=None):
 
 
 def plot3d(orbit, *, label=None, color=None):
+    """Plots an :py:class:`~poliastro.twobody.orbit.Orbit` in 3D.
+
+    For more advanced tuning, use the :py:class:`OrbitPlotter3D` class.
+
+    """
     frame = OrbitPlotter3D()
     frame.plot(orbit, label=label, color=color)
     frame.show()
@@ -399,6 +404,8 @@ def _generate_circle(radius, center, num=500):
 class OrbitPlotter2D:
     """OrbitPlotter2D class.
 
+    .. versionadded:: 0.9.0
+
     Experimental alternative to :py:class:`OrbitPlotter`
     that uses Plotly instead of matplotlib.
     Some visualization issues pending, use with care.
@@ -584,6 +591,8 @@ class OrbitPlotter2D:
 def plot_solar_system(outer=True, epoch=None):
     """
     Plots the whole solar system in one single call.
+
+    .. versionadded:: 0.9.0
 
     Parameters
     ------------
