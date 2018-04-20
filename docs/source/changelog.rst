@@ -1,6 +1,70 @@
 What's new
 ==========
 
+poliastro 0.9 - TBD
+-------------------
+
+This major release received lots of improvements in the 2D plotting code
+and propagation functions, introduced the new perturbation framework and
+paved the way for the `Python in Astronomy 2018`_ workshop and the
+`Google Summer of Code 2018`_ program.
+
+.. _`Python in Astronomy 2018`: http://openastronomy.org/pyastro/2018/
+.. _`Google Summer of Code 2018`: https://summerofcode.withgoogle.com/
+
+New features
+............
+
+* **New experimental 2D Plotly backend**: A new :py:class:`~poliastro.plotting.OrbitPlotter2D`
+  class was introduced that uses Plotly instead of matplotlib for the rendering. There are
+  still some issues that should be resolved when we take advantage of the latest Plotly version,
+  hence the "experimental" nature.
+* **New propagators**: A new Keplerian propagator :py:meth:`~poliastro.twobody.propagation.mean_motion`
+  was introduced that has better convergence properties than :py:meth:`~poliastro.twobody.propagation.kepler`,
+  so now the user can choose between the two for propagating and sampling.
+* **New perturbation functions**: A new module :py:mod:`poliastro.twobody.perturbations` was introduced
+  that contains perturbation accelerations that can be readily used with
+  :py:meth:`~poliastro.twobody.propagation.cowell`. So far we implemented J2 and atmospheric drag effects,
+  and we will add more during the summer. Check out the User Guide for examples!
+* **Easy plotting of the Solar System**: A new function :py:meth:`~poliastro.plotting.plot_solar_system` was
+  added to easily visualize our inner or complete Solar System in 2D plots.
+
+Other highlights
+................
+
+* **poliastro participates in Google Summer of Code thanks to OpenAstronomy!**
+  More information `in the poliastro blog <http://blog.poliastro.space/2018/02/22/2018-02-22-join-poliastro-google-summer-of-code/>`_.
+* **poliastro will be presented at the Python in Astronomy 2018 workshop** to be held
+  at Center for Computational Astrophysics at the Flatiron Institute in New York, USA.
+  You can read `more details about the event here <http://openastronomy.org/pyastro/2018/>`_.
+
+New contributors
+................
+
+This is the complete list of the people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Pablo Galindo+
+* Matt Ettus+
+* Shreyas Bapat+
+* Ritiek Malhotra+
+* Nikita Astrakhantsev+
+
+Bugs fixed:
+...........
+
+* `Issue #294`_: Default steps 2D plots were too visible
+
+.. _`Issue #294`: https://github.com/poliastro/poliastro/issues/294
+
+Backward incompatible changes
+.............................
+
+* Now the :py:meth:`poliastro.twobody.Orbit.sample` method returns a tuple of (times, positions).
+* All the propagator methods changed their signature
+  and now accept :py:class:`~poliastro.twobody.Orbit` objects.
+
 poliastro 0.8.0 - 2017-11-18
 ----------------------------
 
