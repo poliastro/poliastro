@@ -61,6 +61,24 @@ And that's it! Notice a couple of things:
     >>> ss.epoch.iso
     '2000-01-01 12:00:00.000'
 
+* The *assumed* or *implicit* reference system is an **inertial reference system**.
+  For the case of the Solar System,
+  we can consider it to be the `International Celestial Reference System or ICRS`_.
+  The :py:attr:`Orbit.epoch` parameter does not affect the position of this reference system
+  and acts only as the reference date in which the orbit is defined.
+
+.. _`International Celestial Reference System or ICRS`: http://web.archive.org/web/20170920023932/http://aa.usno.navy.mil:80/faq/docs/ICRS_doc.php
+
+.. note::
+
+  At the moment, there is no explicit way to set the reference system of an orbit. This
+  is the focus of our next releases, so we will likely introduce changes in the near
+  future. Please subscribe to `this issue <https://github.com/poliastro/poliastro/issues/257>`_
+  to receive updates in your inbox.
+
+Intermezzo: quick visualization of the orbit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. figure:: _static/curtis.png
    :align: right
    :figwidth: 350
