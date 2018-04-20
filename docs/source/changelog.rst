@@ -21,11 +21,14 @@ New features
   hence the "experimental" nature.
 * **New propagators**: A new Keplerian propagator :py:meth:`~poliastro.twobody.propagation.mean_motion`
   was introduced that has better convergence properties than :py:meth:`~poliastro.twobody.propagation.kepler`,
-  so now the user can choose between the two for propagating and sampling.
+  so now the user can choose.
 * **New perturbation functions**: A new module :py:mod:`poliastro.twobody.perturbations` was introduced
   that contains perturbation accelerations that can be readily used with
   :py:meth:`~poliastro.twobody.propagation.cowell`. So far we implemented J2 and atmospheric drag effects,
   and we will add more during the summer. Check out the User Guide for examples!
+* **Support for different propagators in sampling**: With the introduction of new propagators and perturbation
+  accelerations, now the user can easily sample over a period of time using any of them. We are eager to see
+  what experiments you come up with!
 * **Easy plotting of the Solar System**: A new function :py:meth:`~poliastro.plotting.plot_solar_system` was
   added to easily visualize our inner or complete Solar System in 2D plots.
 
