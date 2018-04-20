@@ -50,7 +50,7 @@ poliastro.twobody.rv module
    :members:
 
 poliastro.twobody.perturbations module
-***********************************
+**************************************
 
 .. automodule:: poliastro.twobody.perturbations
    :members:

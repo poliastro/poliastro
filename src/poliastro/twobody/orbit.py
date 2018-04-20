@@ -29,6 +29,11 @@ class Orbit(object):
     """Position and velocity of a body with respect to an attractor
     at a given time (epoch).
 
+    Regardless of how the Orbit is created, the implicit
+    reference system is an inertial one. For the specific case
+    of the Solar System, this can be assumed to be the
+    International Celestial Reference System or ICRS.
+
     """
 
     def __init__(self, state, epoch):
