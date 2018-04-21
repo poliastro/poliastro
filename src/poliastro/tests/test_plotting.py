@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 
 from poliastro.examples import iss
 
+from poliastro.bodies import Earth, Mars
+
+from poliastro.twobody.orbit import Orbit
+
 from poliastro.plotting import OrbitPlotter, plot_solar_system
 
 
@@ -75,3 +79,14 @@ def test_color():
 def test_plot_solar_system(outer, expected):
     assert len(plot_solar_system(outer).orbits) == expected
     assert isinstance(plot_solar_system(), OrbitPlotter)
+
+
+def test_plot_trajectory_sets_label():
+    op = OrbitPlotter()
+    earth = Orbit.from_body_ephem(Earth)
+    mars = Orbit.from_body_ephem(Mars)
+    _, trajectory = earth.sample()
+    op.plot(mars, label="Mars")
+    op.plot_trajectory(trajectory, label="Earth")
+    legend = plt.gca().get_legend()
+    assert legend.get_texts()[1].get_text() == "Earth"

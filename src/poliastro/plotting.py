@@ -129,6 +129,10 @@ class OrbitPlotter(object):
         x, y = self._project(rr)
         a, = self.ax.plot(x.to(u.km).value, y.to(u.km).value, '--', color=color, label=label)
         lines.append(a)
+        if label:
+            a.set_label(label)
+            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+
         return lines
 
     def set_attractor(self, attractor):
@@ -180,7 +184,7 @@ class OrbitPlotter(object):
         l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
 
-        lines = self.plot_trajectory(positions, color=l.get_color())
+        lines = self.plot_trajectory(trajectory=positions, color=l.get_color())
         lines.append(l)
 
         if label:
@@ -237,6 +241,7 @@ def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
 class OrbitPlotter3D:
     """OrbitPlotter3D class.
     """
+
     def __init__(self):
         self._layout = Layout(
             autosize=True,
@@ -411,6 +416,7 @@ class OrbitPlotter2D:
     Some visualization issues pending, use with care.
 
     """
+
     def __init__(self):
         self._layout = Layout(
             autosize=True,
