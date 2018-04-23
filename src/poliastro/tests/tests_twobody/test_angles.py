@@ -3,6 +3,7 @@ import numpy as np
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
+import pytest
 from poliastro.twobody import angles
 
 
@@ -122,3 +123,11 @@ def test_flight_path_angle():
     gamma = angles.fp_angle(np.deg2rad(nu), ecc)
 
     assert_quantity_allclose(gamma, expected_gamma, rtol=1e-3)
+
+
+@pytest.mark.parametrize("expected_nu", np.linspace(-1 / 3.0, 1 / 3.0, num=100) * np.pi * u.rad)
+@pytest.mark.parametrize("ecc", [3200 * u.one, 1.5 * u.one])
+def test_mean_to_true_hyperbolic_highecc(expected_nu, ecc):
+    M = angles.nu_to_M(expected_nu, ecc)
+    nu = angles.M_to_nu(M, ecc)
+    assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
