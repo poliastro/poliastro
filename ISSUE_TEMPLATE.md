@@ -10,6 +10,15 @@
 
 `python -c "import poliastro.testing; poliastro.testing.test()"`
 
+`pip freeze | grep astropy`
+
+`pip freeze | grep poliastro`
+
+<!--- If the "pip freeze" commands don't work, you likely dont have pip installed. -->
+<!--- In that case, please include your current version of astropy & poliastro here-->
+
+* poliastro version => 
+* astropy version =>
 
 🎯 **Goal**
 <!--- Why is this change important to you? How would you use it? -->
