@@ -217,18 +217,14 @@ poliastro is focused on interplanetary applications. This has two consequences:
 * It leaves out certain features that would be too Earth-specific, such as
   TLE reading, SGP4 propagation, groundtrack plotting and others.
 
-Keep that in mind when asking for a feature. For a software package focused on
-Earth applications please refer to the `Python Astrodynamics Project`_, a
-still in progress joint effort between several developers.
-
 .. _`Related software`: http://docs.poliastro.space/en/latest/about.html#related-software
-.. _`Python Astrodynamics Project`: https://github.com/python-astrodynamics/astrodynamics
 
 What's the future of the project?
 ---------------------------------
 
-poliastro is actively maintained and will receive bug fixes and releases
-in 2017, maintaining its focus on interplanetary applications. Expect better
-algorithms, easier 3D plotting and optimization techniques. The best way
-to get an idea of the roadmap is to check the Kanban board at Waffle.io
-(see `Contributing`_).
+poliastro is actively maintained and receiving an influx of new contributors
+thanks to the generous sponsorship of Google and the European Space Agency.
+The best way to get an idea of the roadmap is to see the `Milestones`_ of
+the project.
+
+.. _`Milestones`: https://github.com/poliastro/poliastro/milestones
