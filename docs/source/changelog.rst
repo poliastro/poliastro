@@ -1,8 +1,8 @@
 What's new
 ==========
 
-poliastro 0.9 - TBD
--------------------
+poliastro 0.9.0 - 2018-04-25
+----------------------------
 
 This major release received lots of improvements in the 2D plotting code
 and propagation functions, introduced the new perturbation framework and
