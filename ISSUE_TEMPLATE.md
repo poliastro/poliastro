@@ -10,6 +10,9 @@
 
 `python -c "import poliastro.testing; poliastro.testing.test()"`
 
+`pip freeze | grep astropy`
+
+`pip freeze | grep poliastro`
 
 🎯 **Goal**
 <!--- Why is this change important to you? How would you use it? -->
