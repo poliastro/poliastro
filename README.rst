@@ -32,8 +32,8 @@
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/master/COPYING
 
-.. |doi| image:: https://zenodo.org/badge/12813/poliastro/poliastro.svg?style=flat-square
-   :target: https://zenodo.org/badge/latestdoi/12813/poliastro/poliastro
+.. |doi| image:: https://zenodo.org/badge/11178845.svg?style=flat-square
+   :target: https://zenodo.org/badge/latestdoi/1117884
 
 .. |astropy| image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat-square
    :target: http://www.astropy.org/
