@@ -33,7 +33,7 @@
    :target: https://github.com/poliastro/poliastro/raw/master/COPYING
 
 .. |doi| image:: https://zenodo.org/badge/11178845.svg?style=flat-square
-   :target: https://zenodo.org/badge/latestdoi/1117884
+   :target: https://zenodo.org/badge/latestdoi/11178845
 
 .. |astropy| image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat-square
    :target: http://www.astropy.org/
