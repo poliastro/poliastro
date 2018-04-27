@@ -57,7 +57,7 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight, method):
 
     _, rr = ss0.sample(sample_times, method)
 
-    assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r)
+    assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r, rtol=1e-6)
 
 
 def test_sample_nu_values():

@@ -15,6 +15,8 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.examples import iss
 
+from poliastro.neos import dastcom5
+
 from poliastro.util import norm
 
 
@@ -254,3 +256,17 @@ def test_propagate_long_times_keeps_geometry(method):
     assert_quantity_allclose(iss.argp, res.argp)
 
     assert_quantity_allclose((res.epoch - iss.epoch).to(time_of_flight.unit), time_of_flight)
+
+
+def test_long_propagations_kepler_agrees_mean_motion():
+    tof = 100 * u.year
+    r_mm, v_mm = iss.propagate(tof, method=mean_motion).rv()
+    r_k, v_k = iss.propagate(tof, method=kepler).rv()
+    assert_quantity_allclose(r_mm, r_k, rtol=1e-6)
+    assert_quantity_allclose(v_mm, v_k, rtol=1e-6)
+
+    halleys = dastcom5.orbit_from_name('1P')[0]
+    r_mm, v_mm = halleys.propagate(tof, method=mean_motion).rv()
+    r_k, v_k = halleys.propagate(tof, method=kepler).rv()
+    assert_quantity_allclose(r_mm, r_k, rtol=1e-6)
+    assert_quantity_allclose(v_mm, v_k, rtol=1e-6)

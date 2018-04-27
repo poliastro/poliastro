@@ -161,7 +161,7 @@ def mean_motion(orbit, tof, **kwargs):
         return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
-def kepler(orbit, tof, rtol=1e-10, *, numiter=35, **kwargs):
+def kepler(orbit, tof, *, numiter=350, **kwargs):
     """Propagates Keplerian orbit.
 
     Parameters
@@ -170,8 +170,6 @@ def kepler(orbit, tof, rtol=1e-10, *, numiter=35, **kwargs):
         the Orbit object to propagate.
     tof : float
         Time of flight (s).
-    rtol : float, optional
-        Maximum relative error permitted, default to 1e-10.
     numiter : int, optional
         Maximum number of iterations, default to 35.
 
@@ -193,7 +191,7 @@ def kepler(orbit, tof, rtol=1e-10, *, numiter=35, **kwargs):
     r0 = orbit.r.to(u.km).value
     v0 = orbit.v.to(u.km / u.s).value
 
-    f, g, fdot, gdot = _kepler(k, r0, v0, tof, numiter, rtol)
+    f, g, fdot, gdot = _kepler(k, r0, v0, tof, numiter)
 
     assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
 
@@ -213,7 +211,7 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
 
 
 @jit
-def _kepler(k, r0, v0, tof, numiter, rtol):
+def _kepler(k, r0, v0, tof, numiter):
     # Cache some results
     dot_r0v0 = np.dot(r0, v0)
     norm_r0 = np.dot(r0, r0) ** .5
@@ -248,7 +246,7 @@ def _kepler(k, r0, v0, tof, numiter, rtol):
         xi_new = xi + (sqrt_mu * tof - xi * xi * xi * c3_psi -
                        dot_r0v0 / sqrt_mu * xi * xi * c2_psi -
                        norm_r0 * xi * (1 - psi * c3_psi)) / norm_r
-        if abs(np.divide(xi_new - xi, xi_new)) < rtol or abs(xi_new - xi) < rtol:
+        if abs(xi_new - xi) < 1e-6:
             break
         else:
             count += 1
