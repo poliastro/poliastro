@@ -262,8 +262,8 @@ def test_long_propagations_kepler_agrees_mean_motion():
     tof = 100 * u.year
     r_mm, v_mm = iss.propagate(tof, method=mean_motion).rv()
     r_k, v_k = iss.propagate(tof, method=kepler).rv()
-    assert_quantity_allclose(r_mm, r_k, rtol=1e-6)
-    assert_quantity_allclose(v_mm, v_k, rtol=1e-6)
+    assert_quantity_allclose(r_mm, r_k)
+    assert_quantity_allclose(v_mm, v_k)
 
     r_halleys = [-9018878.63569932, -94116054.79839276, 22619058.69943215]  # km
     v_halleys = [-49.95092305, -12.94843055, -4.29251577]  # km/s
@@ -271,5 +271,5 @@ def test_long_propagations_kepler_agrees_mean_motion():
 
     r_mm, v_mm = halleys.propagate(tof, method=mean_motion).rv()
     r_k, v_k = halleys.propagate(tof, method=kepler).rv()
-    assert_quantity_allclose(r_mm, r_k, rtol=1e-6)
-    assert_quantity_allclose(v_mm, v_k, rtol=1e-6)
+    assert_quantity_allclose(r_mm, r_k)
+    assert_quantity_allclose(v_mm, v_k)
