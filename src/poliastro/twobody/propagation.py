@@ -246,7 +246,7 @@ def _kepler(k, r0, v0, tof, numiter):
         xi_new = xi + (sqrt_mu * tof - xi * xi * xi * c3_psi -
                        dot_r0v0 / sqrt_mu * xi * xi * c2_psi -
                        norm_r0 * xi * (1 - psi * c3_psi)) / norm_r
-        if abs(xi_new - xi) < 1e-6:
+        if abs(xi_new - xi) < 1e-7:
             break
         else:
             count += 1
