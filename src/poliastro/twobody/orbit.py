@@ -118,7 +118,7 @@ class Orbit(object):
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         ss = classical.ClassicalState(
-            attractor, a, ecc, inc, raan, argp, nu)
+            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
         return cls(ss, epoch)
 
     @classmethod
@@ -217,16 +217,9 @@ class Orbit(object):
             Epoch, default to J2000.
 
         """
-        k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        ecc = 1.0 * u.one
-        r, v = classical.coe2rv(
-            k.to(u.km ** 3 / u.s ** 2).value,
-            p.to(u.km).value, ecc.value, inc.to(u.rad).value,
-            raan.to(u.rad).value, argp.to(u.rad).value,
-            nu.to(u.rad).value)
-
-        ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
-        return ss
+        ss = classical.ClassicalState(
+            attractor, p, 1.0 * u.one, inc, raan, argp, nu)
+        return cls(ss, epoch)
 
     def __str__(self):
         if self.a > 1e7 * u.km:

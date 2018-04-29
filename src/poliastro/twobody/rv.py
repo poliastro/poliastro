@@ -95,11 +95,9 @@ class RVState(BaseState):
                     self.r.to(u.km).value,
                     self.v.to(u.km / u.s).value)
 
-        a = p / (1 - ecc**2)
-
         return classical.ClassicalState(
             self.attractor,
-            a * u.km,
+            p * u.km,
             ecc * u.one,
             inc * u.rad,
             raan * u.rad,

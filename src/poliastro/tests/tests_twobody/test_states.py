@@ -25,7 +25,7 @@ def test_state_has_elements_given_in_constructor():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = ClassicalState(Sun, a, ecc, inc, raan, argp, nu)
+    ss = ClassicalState(Sun, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
     assert ss.coe() == (a, ecc, inc, raan, argp, nu)
 
 
@@ -36,7 +36,7 @@ def test_state_has_individual_elements():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = ClassicalState(Sun, a, ecc, inc, raan, argp, nu)
+    ss = ClassicalState(Sun, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
     assert ss.a == a
     assert ss.ecc == ecc
     assert ss.inc == inc
@@ -58,7 +58,7 @@ def test_perigee_and_apogee():
     a = (expected_r_a + expected_r_p) / 2
     ecc = expected_r_a / a - 1
     _a = 1.0 * u.deg  # Unused angle
-    ss = ClassicalState(Earth, a, ecc, _a, _a, _a, _a)
+    ss = ClassicalState(Earth, a * (1 - ecc ** 2), ecc, _a, _a, _a, _a)
     assert_allclose(ss.r_a.to(u.km).value,
                     expected_r_a.to(u.km).value)
     assert_allclose(ss.r_p.to(u.km).value,
@@ -70,7 +70,6 @@ def test_convert_from_rv_to_coe():
     attractor = Earth
     p = 11067.790 * u.km
     ecc = 0.83285 * u.one
-    a = p / (1 - ecc ** 2)
     inc = 87.87 * u.deg
     raan = 227.89 * u.deg
     argp = 53.38 * u.deg
@@ -78,7 +77,7 @@ def test_convert_from_rv_to_coe():
     expected_r = [6525.344, 6861.535, 6449.125] * u.km
     expected_v = [4.902276, 5.533124, -1.975709] * u.km / u.s
 
-    r, v = ClassicalState(Earth, a, ecc, inc, raan, argp, nu).rv()
+    r, v = ClassicalState(attractor, p, ecc, inc, raan, argp, nu).rv()
 
     assert_quantity_allclose(r, expected_r, rtol=1e-5)
     assert_quantity_allclose(v, expected_v, rtol=1e-5)

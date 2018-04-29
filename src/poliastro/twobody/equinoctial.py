@@ -73,11 +73,9 @@ class ModifiedEquinoctialState(BaseState):
                                               self.k.to(u.rad).value,
                                               self.L.to(u.rad).value)
 
-        a = p / (1 - ecc**2)
-
         return classical.ClassicalState(
             self.attractor,
-            a * u.km,
+            p * u.km,
             ecc * u.one,
             inc * u.rad,
             raan * u.rad,
