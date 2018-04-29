@@ -15,6 +15,8 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.examples import iss
 
+from poliastro.neos import dastcom5
+
 from poliastro.util import norm
 
 
@@ -254,3 +256,35 @@ def test_propagate_long_times_keeps_geometry(method):
     assert_quantity_allclose(iss.argp, res.argp)
 
     assert_quantity_allclose((res.epoch - iss.epoch).to(time_of_flight.unit), time_of_flight)
+
+
+def test_long_propagations_kepler_agrees_mean_motion():
+    tof = 100 * u.year
+    r_mm, v_mm = iss.propagate(tof, method=mean_motion).rv()
+    r_k, v_k = iss.propagate(tof, method=kepler).rv()
+    assert_quantity_allclose(r_mm, r_k)
+    assert_quantity_allclose(v_mm, v_k)
+
+    r_halleys = [-9018878.63569932, -94116054.79839276, 22619058.69943215]  # km
+    v_halleys = [-49.95092305, -12.94843055, -4.29251577]  # km/s
+    halleys = Orbit.from_vectors(Sun, r_halleys * u.km, v_halleys * u.km / u.s)
+
+    r_mm, v_mm = halleys.propagate(tof, method=mean_motion).rv()
+    r_k, v_k = halleys.propagate(tof, method=kepler).rv()
+    assert_quantity_allclose(r_mm, r_k)
+    assert_quantity_allclose(v_mm, v_k)
+
+
+@pytest.mark.parametrize('method', [mean_motion, kepler])
+def test_long_propagation_preserves_orbit_elements(method):
+    tof = 100 * u.year
+    r_halleys = np.array([-9018878.63569932, -94116054.79839276, 22619058.69943215])  # km
+    v_halleys = np.array([-49.95092305, -12.94843055, -4.29251577])  # km/s
+    halleys = Orbit.from_vectors(Sun, r_halleys * u.km, v_halleys * u.km / u.s)
+
+    params_ini = rv2coe(Sun.k.to(u.km**3 / u.s**2).value, r_halleys, v_halleys)[:-1]
+    r_new, v_new = halleys.propagate(tof, method=method).rv()
+    params_final = rv2coe(Sun.k.to(u.km**3 / u.s**2).value,
+                          r_new.to(u.km).value, v_new.to(u.km / u.s).value)[:-1]
+    print(params_ini, params_final)
+    assert_quantity_allclose(params_ini, params_final)
