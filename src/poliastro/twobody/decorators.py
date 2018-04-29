@@ -13,6 +13,23 @@ u.km3s2 = u.km ** 3 / u.s ** 2
 
 
 def state_from_vector(func):
+    """Changes signature to receive Orbit instead of state array.
+
+    Examples
+    --------
+    >>> from poliastro.twobody.decorators import state_from_vector
+    >>> @state_from_vector
+    ... def func(_, ss):
+    ...     return ss.r, ss.v
+    ...
+    >>> func(0.0, [1, 2, 3, -1, -2, -3], 1.0)
+    (<Quantity [1., 2., 3.] km>, <Quantity [-1., -2., -3.] km / s>)
+
+    Notes
+    -----
+    Functions decorated with this will have poor performance.
+
+    """
 
     @wraps(func)
     def wrapper(t, u_, k, *args, **kwargs):
