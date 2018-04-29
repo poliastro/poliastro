@@ -32,12 +32,7 @@ def compute_soi(body, a=None):
     # introduced by the user
     if a is None:
         try:
-            ss = Orbit.from_body_ephem(body, J2000)
-            a = ss.a
-
-            r_SOI = a * (body.k / body.parent.k)**(2 / 5)
-
-            return r_SOI.decompose()
+            a = Orbit.from_body_ephem(body, J2000).a
 
         except KeyError:
             raise RuntimeError(
@@ -45,3 +40,7 @@ def compute_soi(body, a=None):
 
 >>> from astropy.coordinates import solar_system_ephemeris
 >>> solar_system_ephemeris.set("jpl")""")
+
+    r_SOI = a * (body.k / body.parent.k) ** (2 / 5)
+
+    return r_SOI.decompose()
