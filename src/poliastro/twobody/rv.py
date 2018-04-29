@@ -66,7 +66,7 @@ class RVState(BaseState):
 
     """
     def __init__(self, attractor, r, v):
-        super(RVState, self).__init__(attractor)
+        super().__init__(attractor)
         self._r = r
         self._v = v
 

@@ -21,7 +21,7 @@ from poliastro.util import norm
 from poliastro.bodies import (Earth, Jupiter, Mars, Mercury, Neptune, Saturn,
                               Uranus, Venus)
 from poliastro.twobody.orbit import Orbit
-from poliastro.twobody.propagation import mean_motion, kepler
+from poliastro.twobody.propagation import mean_motion
 
 
 BODY_COLORS = {

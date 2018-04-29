@@ -8,8 +8,8 @@ from astropy import time
 from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel
 
 from poliastro.constants import J2000
-from poliastro.twobody.angles import nu_to_M, E_to_nu, nu_to_E
-from poliastro.twobody.propagation import propagate, cowell, kepler, mean_motion
+from poliastro.twobody.angles import nu_to_M, E_to_nu
+from poliastro.twobody.propagation import propagate, mean_motion
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -236,8 +236,10 @@ class Orbit(object):
         return self.__str__()
 
     def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
-        """ if value is true anomaly, propagate orbit to this anomaly and return the result
-            if time is provided, propagate this `Orbit` some `time` and return the result.
+        """Propagates an orbit.
+
+        If value is true anomaly, propagate orbit to this anomaly and return the result.
+        Otherwise, if time is provided, propagate this `Orbit` some `time` and return the result.
 
         Parameters
         ----------
@@ -250,6 +252,7 @@ class Orbit(object):
             Method used for propagation
         **kwargs
             parameters used in perturbation models
+
         """
         if hasattr(value, "unit") and value.unit in ('rad', 'deg'):
             p, ecc, inc, raan, argp, _ = rv.rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,

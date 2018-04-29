@@ -99,7 +99,7 @@ class ClassicalState(BaseState):
 
     """
     def __init__(self, attractor, p, ecc, inc, raan, argp, nu):
-        super(ClassicalState, self).__init__(attractor)
+        super().__init__(attractor)
         self._p = p
         self._ecc = ecc
         self._inc = inc
