@@ -185,20 +185,33 @@ we can now retrieve the position of the ISS after some time::
 For more advanced propagation options, check out the
 :py:mod:`poliastro.twobody.propagation` module.
 
-Accounting non-keplerian orbits: perturbation
----------------------------------------------
+Studying non-keplerian orbits: perturbations
+--------------------------------------------
 
-poliastro has recently got the module accounting perturbations
-to the Newton gravitational law. The perturbation acceleration
-should be passed to the ``cowell`` propagation method along
-with the parameters describing the disturbing force. For instance,
+Apart from the Keplerian propagators, poliastro also allows
+the user to define custom perturbation accelerations to study
+non Keplerian orbits, thanks to Cowell's method::
+
+    >>> from poliastro.twobody.propagation import cowell
+    >>> from numba import njit
+    >>> r0 = [-2384.46, 5729.01, 3050.46] * u.km
+    >>> v0 = [-7.36138, -2.98997, 1.64354] * u.km / u.s
+    >>> initial = Orbit.from_vectors(Earth, r0, v0)
+    >>> @njit
+    ... def accel(t0, state, k):
+    ...     """Constant acceleration aligned with the velocity. """
+    ...     v_vec = state[3:]
+    ...     norm_v = (v_vec * v_vec).sum() ** .5
+    ...     return 1e-5 * v_vec / norm_v
+    ...
+    >>> initial.propagate(3 * u.day, method=cowell, ad=accel)
+    18255 x 21848 km x 28.0 deg orbit around Earth (♁)
+
+Some natural perturbations are available in poliastro to be used
+directly in this way. For instance,
 let us examine the effect of J2 perturbation::
 
     >>> from poliastro.twobody.perturbations import J2_perturbation
-    >>> from poliastro.twobody.propagation import cowell
-    >>> r0 = np.array([-2384.46, 5729.01, 3050.46]) * u.km
-    >>> v0 = np.array([-7.36138, -2.98997, 1.64354]) * u.km / u.s
-    >>> initial = Orbit.from_vectors(Earth, r0, v0)
     >>> tof = (48.0 * u.h).to(u.s)
     >>> final = initial.propagate(tof, method=cowell, ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
 
