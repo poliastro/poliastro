@@ -37,13 +37,13 @@ class BaseState(object):
 
     @property
     def a(self):
-        """Semimajor axis. """
-        return self.to_classical().a
+        """Semilatus rectum. """
+        return self.p / (1 - self.ecc**2)
 
     @property
     def p(self):
-        """Semilatus rectum. """
-        return self.a * (1 - self.ecc**2)
+        """Semimajor axis. """
+        return self.to_classical().p
 
     @property
     def r_p(self):

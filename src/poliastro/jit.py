@@ -1,4 +1,3 @@
-# coding: utf-8
 """Just-in-time compiler.
 
 Wraps numba if it is available as a module, uses an identity

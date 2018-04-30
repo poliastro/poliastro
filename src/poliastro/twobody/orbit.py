@@ -8,8 +8,8 @@ from astropy import time
 from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel
 
 from poliastro.constants import J2000
-from poliastro.twobody.angles import nu_to_M, E_to_nu, nu_to_E
-from poliastro.twobody.propagation import propagate, cowell, kepler, mean_motion
+from poliastro.twobody.angles import nu_to_M, E_to_nu
+from poliastro.twobody.propagation import propagate, mean_motion
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -118,7 +118,7 @@ class Orbit(object):
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         ss = classical.ClassicalState(
-            attractor, a, ecc, inc, raan, argp, nu)
+            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
         return cls(ss, epoch)
 
     @classmethod
@@ -217,16 +217,9 @@ class Orbit(object):
             Epoch, default to J2000.
 
         """
-        k = attractor.k.to(u.km ** 3 / u.s ** 2)
-        ecc = 1.0 * u.one
-        r, v = classical.coe2rv(
-            k.to(u.km ** 3 / u.s ** 2).value,
-            p.to(u.km).value, ecc.value, inc.to(u.rad).value,
-            raan.to(u.rad).value, argp.to(u.rad).value,
-            nu.to(u.rad).value)
-
-        ss = cls.from_vectors(attractor, r * u.km, v * u.km / u.s, epoch)
-        return ss
+        ss = classical.ClassicalState(
+            attractor, p, 1.0 * u.one, inc, raan, argp, nu)
+        return cls(ss, epoch)
 
     def __str__(self):
         if self.a > 1e7 * u.km:
@@ -243,8 +236,10 @@ class Orbit(object):
         return self.__str__()
 
     def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
-        """ if value is true anomaly, propagate orbit to this anomaly and return the result
-            if time is provided, propagate this `Orbit` some `time` and return the result.
+        """Propagates an orbit.
+
+        If value is true anomaly, propagate orbit to this anomaly and return the result.
+        Otherwise, if time is provided, propagate this `Orbit` some `time` and return the result.
 
         Parameters
         ----------
@@ -257,6 +252,7 @@ class Orbit(object):
             Method used for propagation
         **kwargs
             parameters used in perturbation models
+
         """
         if hasattr(value, "unit") and value.unit in ('rad', 'deg'):
             p, ecc, inc, raan, argp, _ = rv.rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,

@@ -66,7 +66,7 @@ class RVState(BaseState):
 
     """
     def __init__(self, attractor, r, v):
-        super(RVState, self).__init__(attractor)
+        super().__init__(attractor)
         self._r = r
         self._v = v
 
@@ -95,11 +95,9 @@ class RVState(BaseState):
                     self.r.to(u.km).value,
                     self.v.to(u.km / u.s).value)
 
-        a = p / (1 - ecc**2)
-
         return classical.ClassicalState(
             self.attractor,
-            a * u.km,
+            p * u.km,
             ecc * u.one,
             inc * u.rad,
             raan * u.rad,
