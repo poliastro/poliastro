@@ -42,7 +42,7 @@ setup(
             "coverage",
             "pytest-cov",
             "pycodestyle",
-            "sphinx<1.6",
+            "sphinx",
             "sphinx_rtd_theme",
             "nbsphinx",
             "ipython>=5.0",
