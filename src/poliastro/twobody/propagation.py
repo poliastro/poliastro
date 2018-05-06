@@ -62,7 +62,7 @@ def gravitational_jac(t, y, k):
     return jac
 
 
-def cowell(orbit, tof, rtol=1e-10, *, NEW_API=True, ad=None, **ad_kwargs):
+def cowell(orbit, tof, rtol=1e-10, *, ad=None, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -103,7 +103,7 @@ def cowell(orbit, tof, rtol=1e-10, *, NEW_API=True, ad=None, **ad_kwargs):
 
     f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
     jac_with_k = functools.partial(gravitational_jac, k=k)
-    rr = solve_ivp(f_with_ad, (0, tof), u0, t_eval=[tof], rtol=rtol)
+    rr = solve_ivp(f_with_ad, (0, tof), u0, t_eval=[tof], rtol=rtol, method='Radau', jac=jac_with_k)
     if rr.success:
         r, v = rr.y[:3, 0], rr.y[3:, 0]
     else:
