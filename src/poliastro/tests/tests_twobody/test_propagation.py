@@ -143,28 +143,6 @@ def test_apply_zero_maneuver_returns_equal_state():
                     ss.v.to(u.km / u.s).value)
 
 
-def test_cowell_propagation_callback():
-    # Data from Vallado, example 2.4
-
-    r0 = np.array([1131.340, -2282.343, 6672.423])  # km
-    v0 = np.array([-5.64305, 4.30333, 2.42879])  # km/s
-    tof = 40 * 60.0  # s
-    orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
-
-    results = []
-
-    def cb(t, u_):
-        row = [t]
-        row.extend(u_)
-        results.append(row)
-
-    r, v = cowell(orbit, tof, callback=cb)
-
-    assert len(results) == 17
-    assert len(results[0]) == 7
-    assert results[-1][0] == tof
-
-
 def test_cowell_propagation_with_zero_acceleration_equals_kepler():
     # Data from Vallado, example 2.4
 
@@ -240,7 +218,6 @@ def test_propagate_to_date_has_proper_epoch():
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.parametrize('method', [
     mean_motion,
-    pytest.param(cowell, marks=pytest.mark.xfail),
     pytest.param(kepler, marks=pytest.mark.xfail),
 ])
 def test_propagate_long_times_keeps_geometry(method):

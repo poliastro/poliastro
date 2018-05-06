@@ -2,8 +2,9 @@
 
 """
 import numpy as np
+import functools
 
-from scipy.integrate import ode
+from scipy.integrate import ode, solve_ivp
 
 from astropy import units as u
 from poliastro.twobody.rv import rv2coe
@@ -48,7 +49,20 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
     return du
 
 
-def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_kwargs):
+def gravitational_jac(t, y, k):
+    jac = np.zeros((6, 6))
+
+    # d\vec{v}/d\vec{v}
+    jac[0:3, 3:6] = np.diag([1, 1, 1])
+
+    # d (k\vec{x} / r^3) / d \vec{x}
+    r = np.sqrt(np.sum(y[0:3] ** 2))
+    jac[3:6, 0:3] = np.diag(3 * k * (y[0:3] ** 2) / (r ** 5) - k / (r ** 3))
+
+    return jac
+
+
+def cowell(orbit, tof, rtol=1e-10, *, NEW_API=True, ad=None, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -87,18 +101,11 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_
     if ad is None:
         ad = lambda t0, u_, k_: (0, 0, 0)
 
-    # Set the integrator
-    rr = ode(func_twobody).set_integrator('dop853', rtol=rtol, nsteps=nsteps)
-    rr.set_initial_value(u0)  # Initial time equal to 0.0
-    rr.set_f_params(k, ad, ad_kwargs)  # Parameters of the integration
-    if callback:
-        rr.set_solout(callback)
-
-    # Make integration step
-    rr.integrate(tof)
-
-    if rr.successful():
-        r, v = rr.y[:3], rr.y[3:]
+    f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
+    jac_with_k = functools.partial(gravitational_jac, k=k)
+    rr = solve_ivp(f_with_ad, (0, tof), u0, t_eval=[tof], rtol=rtol)
+    if rr.success:
+        r, v = rr.y[:3, 0], rr.y[3:, 0]
     else:
         raise RuntimeError("Integration failed")
 
