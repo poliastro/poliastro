@@ -397,3 +397,10 @@ class Orbit(object):
 
         # Return the newly bound attribute
         return getattr(self, item)
+
+    def __getstate__(self):
+        return self.state, self.epoch
+
+    def __setstate__(self, state):
+        self._state = state[0]
+        self._epoch = state[1]
