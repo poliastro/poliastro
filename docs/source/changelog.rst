@@ -1,6 +1,17 @@
 What's new
 ==========
 
+poliastro 0.9.1 - 2018-05-11
+----------------------------
+
+This is a minor release that fixes one single issue:
+
+* `Issue #369`_:  Orbit objects cannot be unpickled
+
+.. _`Issue #369`: https://github.com/poliastro/poliastro/issues/369
+
+Thanks to Joan Fort Alsina for reporting.
+
 poliastro 0.9.0 - 2018-04-25
 ----------------------------
 

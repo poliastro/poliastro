@@ -1,6 +1,7 @@
 import pytest
 
-from numpy.testing import assert_allclose
+import pickle
+from numpy.testing import assert_allclose, assert_array_equal
 
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
@@ -9,7 +10,6 @@ from astropy import time
 from astropy.time import Time
 from astropy.coordinates import CartesianRepresentation
 
-from poliastro.twobody.rv import rv2coe
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
@@ -224,3 +224,19 @@ def test_hyperbolic_modulus_wrapped_nu():
     _, positions = ss.sample(num_values)
 
     assert_quantity_allclose(positions[0].xyz, ss.r)
+
+
+def test_orbit_is_pickable():
+    # A custom hyperbolic orbit
+    r = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km
+    v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
+    epoch = Time('2015-07-14 07:59', scale='tdb')
+
+    ss = Orbit.from_vectors(Sun, r, v, epoch)
+
+    pickled = pickle.dumps(ss)
+    ss_result = pickle.loads(pickled)
+
+    assert_array_equal(ss.r, ss_result.r)
+    assert_array_equal(ss.v, ss_result.v)
+    assert ss_result.epoch == ss.epoch
