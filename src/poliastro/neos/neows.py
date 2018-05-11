@@ -91,8 +91,10 @@ def spk_id_from_name(name):
         complete_string = ''
         for string in data[1].stripped_strings:
             complete_string += string + ' '
-        regex = re.compile(r'Classification: ([\S\s]+) SPK-ID: (\d+)')
-        return regex.match(complete_string).group(2)
+        match = re.compile(r'Classification: ([\S\s]+) SPK-ID: (\d+)').match(complete_string)
+        if match:
+            return match.group(2)
+
     # If there is a 'center' sibling, it is a page with a list of possible objects
     elif page_identifier.find_next_sibling('center') is not None:
         object_list = page_identifier.find_next_sibling('center').table.find_all('td')
@@ -101,9 +103,10 @@ def spk_id_from_name(name):
         for body in object_list[:obj_num]:
             bodies += body.string + '\n'
         raise ValueError(str(len(object_list)) + ' different bodies found:\n' + bodies)
-    else:
-        raise ValueError('Object could not be found. You can visit: ' +
-                         SBDB_URL + '?sstr=' + name + ' for more information.')
+
+    # If everything else failed
+    raise ValueError('Object could not be found. You can visit: ' +
+                     SBDB_URL + '?sstr=' + name + ' for more information.')
 
 
 def orbit_from_name(name, api_key='DEMO_KEY'):
