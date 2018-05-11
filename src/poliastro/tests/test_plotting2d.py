@@ -16,9 +16,8 @@ def test_get_figure_has_expected_properties():
 
     assert figure["data"] == [{}]
     assert figure["layout"]["autosize"] is True
-    assert "xaxis" in figure["layout"]["scene"]
-    assert "yaxis" in figure["layout"]["scene"]
-    assert "aspectmode" in figure["layout"]["scene"]
+    assert "xaxis" in figure["layout"]
+    assert "yaxis" in figure["layout"]
 
 
 def test_set_different_attractor_raises_error():
