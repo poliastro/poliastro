@@ -429,7 +429,6 @@ class OrbitPlotter2D:
                 title="y (km)",
                 scaleanchor="x",
             ),
-            # aspectmode="data",  # Important!
         )
         self._layout.update({
             "shapes": []
