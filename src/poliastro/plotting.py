@@ -421,14 +421,13 @@ class OrbitPlotter2D:
     def __init__(self):
         self._layout = Layout(
             autosize=True,
-            scene=dict(
-                xaxis=dict(
-                    title="x (km)",
-                ),
-                yaxis=dict(
-                    title="y (km)",
-                ),
-                aspectmode="data",  # Important!
+            xaxis=dict(
+                title="x (km)",
+                constrain="domain",
+            ),
+            yaxis=dict(
+                title="y (km)",
+                scaleanchor="x",
             ),
         )
         self._layout.update({

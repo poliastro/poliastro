@@ -33,7 +33,7 @@ setup(
         "beautifulsoup4",
         "requests",
         "pandas",
-        "plotly",
+        "plotly>=2.6.0",
         "callhorizons",
     ],
     extras_require={
