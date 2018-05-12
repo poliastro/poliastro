@@ -29,6 +29,12 @@ def test_set_frame():
     assert op._frame == (p, q, w)
 
 
+def test_show():
+    op = OrbitPlotter()
+    op.plot(iss)
+    assert op.show() is op.fig
+
+
 def test_axes_labels_and_title():
     ax = plt.gca()
     op = OrbitPlotter(ax)
