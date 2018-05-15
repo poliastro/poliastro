@@ -104,6 +104,7 @@ poliastro requires the following Python packages:
 * numba (optional), for accelerating the code
 * jplephem, for the planetary ephemerides using SPICE kernels
 * matplotlib, for orbit plotting
+* plotly, for 2D and 3D interactive orbit plotting
 * SciPy, for root finding and numerical propagation
 
 poliastro is usually tested on Linux, Windows and OS X on Python
