@@ -38,8 +38,8 @@ class DOP835(OdeSolver):
                  beta_stabilizer=0.00, max_nsteps=100000,
                  vectorized=False, **extraneous):
         warn_extraneous(extraneous)
-        super(DOP835, self).__init__(fun, t0, y0, t_bound, vectorized,
-                                     support_complex=True)
+        super().__init__(fun, t0, y0, t_bound, vectorized,
+                         support_complex=True)
         self.y_old = None
         self.max_step = validate_max_step(max_step)
         self.beta_stabilizer = validate_beta_stabilizer(beta_stabilizer)
@@ -48,7 +48,7 @@ class DOP835(OdeSolver):
         self.rtol, self.atol = validate_tol(rtol, atol, self.n)
         self.min_step_change = min_step_change
         self.max_step_change = max_step_change
-        self.order = 7
+        self.order = 8
 
         self.f = self.fun(self.t, self.y)
         self.h_abs = select_initial_step(self.fun, self.t, self.y, self.f, self.direction,
@@ -174,7 +174,7 @@ def get_coeffs(s):
 
 class DOP835DenseOutput(DenseOutput):
     def __init__(self, t_old, t_new, y_old, interpolation):
-        super(DOP835DenseOutput, self).__init__(t_old, t_new)
+        super().__init__(t_old, t_new)
         self.h = t_new - t_old
         self.interpolation = copy(interpolation)
         self.y_old = y_old
