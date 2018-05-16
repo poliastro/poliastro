@@ -98,4 +98,6 @@ def test_cowell_converges_with_small_perturbations():
         norm_v = (v_vec * v_vec).sum() ** .5
         return 0.0 * v_vec / norm_v
 
-    final = initial.propagate(3 * u.day, method=cowell, ad=accel)
+    final = initial.propagate(initial.period, method=cowell, ad=accel)
+    assert_quantity_allclose(final.r, initial.r)
+    assert_quantity_allclose(final.v, initial.v)
