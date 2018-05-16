@@ -61,7 +61,7 @@ install:
 
 before_script:
   - pycodestyle setup.py src/  # Check PEP8 compliance
-  - if [[ $RUN_MYPY == 'true' ]]; then mypy --ignore-missing-imports --check-untyped-defs src/; fi
+  - if [[ $RUN_MYPY == 'true' ]]; then mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional src/; fi
 
 script:
   - pytest -vv  # Test against installed code

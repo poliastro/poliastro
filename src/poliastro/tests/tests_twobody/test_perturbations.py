@@ -65,3 +65,39 @@ def test_atmospheric_drag():
     r, v = cowell(orbit, tof, ad=atmospheric_drag, R=R, C_D=C_D, A=A, m=m, H0=H0, rho0=rho0)
 
     assert_quantity_allclose(norm(r) - norm(r0), dr_expected, rtol=1e-2)
+
+
+def test_cowell_works_with_small_perturbations():
+    r0 = [-2384.46, 5729.01, 3050.46] * u.km
+    v0 = [-7.36138, -2.98997, 1.64354] * u.km / u.s
+
+    r_expected = [13179.39566663877121754922, -13026.25123408228319021873, -9852.66213692844394245185] * u.km
+    v_expected = [2.78170542314378943516, 3.21596786944631274352, 0.16327165546278937791] * u.km / u.s
+
+    initial = Orbit.from_vectors(Earth, r0, v0)
+
+    def accel(t0, state, k):
+        v_vec = state[3:]
+        norm_v = (v_vec * v_vec).sum() ** .5
+        return 1e-5 * v_vec / norm_v
+
+    final = initial.propagate(3 * u.day, method=cowell, ad=accel)
+
+    assert_quantity_allclose(final.r, r_expected)
+    assert_quantity_allclose(final.v, v_expected)
+
+
+def test_cowell_converges_with_small_perturbations():
+    r0 = [-2384.46, 5729.01, 3050.46] * u.km
+    v0 = [-7.36138, -2.98997, 1.64354] * u.km / u.s
+
+    initial = Orbit.from_vectors(Earth, r0, v0)
+
+    def accel(t0, state, k):
+        v_vec = state[3:]
+        norm_v = (v_vec * v_vec).sum() ** .5
+        return 0.0 * v_vec / norm_v
+
+    final = initial.propagate(initial.period, method=cowell, ad=accel)
+    assert_quantity_allclose(final.r, initial.r)
+    assert_quantity_allclose(final.v, initial.v)

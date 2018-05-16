@@ -2,8 +2,10 @@
 
 """
 import numpy as np
+import functools
 
-from scipy.integrate import ode
+from scipy.integrate import solve_ivp
+from poliastro.integrators import DOP835
 
 from astropy import units as u
 from poliastro.twobody.rv import rv2coe
@@ -48,7 +50,24 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
     return du
 
 
-def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_kwargs):
+def gravitational_jac(t, y, k):
+    jac = np.zeros((6, 6))
+
+    # d\vec{v}/d\vec{v}
+    jac[0:3, 3:6] = np.diag([1, 1, 1])
+
+    # d (k\vec{x} / r^3) / d \vec{x}
+    r = np.sqrt(np.sum(y[0:3] ** 2))
+    jac[3:6, 0:3] = np.diag(3 * k * (y[0:3] ** 2) / (r ** 5) - k / (r ** 3))
+
+    return jac
+
+
+def zero_jac(t, y):
+    return np.zeros((6, 6))
+
+
+def cowell(orbit, tof, rtol=1e-10, *, ad=None, jac=None, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -61,10 +80,6 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_
         Time of flight (s).
     rtol : float, optional
         Maximum relative error permitted, default to 1e-10.
-    nsteps : int, optional
-        Maximum number of internal steps, default to 1000.
-    callback : callable, optional
-        Function called at each internal integrator step.
 
     Raises
     ------
@@ -85,19 +100,12 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, callback=None, nsteps=1000, **ad_
 
     # Set the non Keplerian acceleration
     if ad is None:
+        jac = functools.partial(gravitational_jac, k=k)
         ad = lambda t0, u_, k_: (0, 0, 0)
 
-    # Set the integrator
-    rr = ode(func_twobody).set_integrator('dop853', rtol=rtol, nsteps=nsteps)
-    rr.set_initial_value(u0)  # Initial time equal to 0.0
-    rr.set_f_params(k, ad, ad_kwargs)  # Parameters of the integration
-    if callback:
-        rr.set_solout(callback)
-
-    # Make integration step
-    rr.integrate(tof)
-
-    if rr.successful():
+    f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
+    rr = solve_ivp(f_with_ad, (0, tof), u0, t_eval=[tof], rtol=rtol, atol=1e-12, method=DOP835)
+    if rr.success:
         r, v = rr.y[:3], rr.y[3:]
     else:
         raise RuntimeError("Integration failed")
