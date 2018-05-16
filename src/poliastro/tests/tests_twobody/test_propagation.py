@@ -219,6 +219,7 @@ def test_propagate_to_date_has_proper_epoch():
 @pytest.mark.parametrize('method', [
     mean_motion,
     pytest.param(kepler, marks=pytest.mark.xfail),
+    pytest.param(cowell, marks=pytest.mark.skip(reason="for now propagation takes too long time"))
 ])
 def test_propagate_long_times_keeps_geometry(method):
     # See https://github.com/poliastro/poliastro/issues/265

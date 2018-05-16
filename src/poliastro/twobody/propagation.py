@@ -4,7 +4,8 @@
 import numpy as np
 import functools
 
-from scipy.integrate import ode, solve_ivp
+from scipy.integrate import solve_ivp
+from poliastro.integrators import DOP835
 
 from astropy import units as u
 from poliastro.twobody.rv import rv2coe
@@ -62,7 +63,11 @@ def gravitational_jac(t, y, k):
     return jac
 
 
-def cowell(orbit, tof, rtol=1e-10, *, ad=None, **ad_kwargs):
+def zero_jac(t, y):
+    return np.zeros((6, 6))
+
+
+def cowell(orbit, tof, rtol=1e-10, *, ad=None, jac=None, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -75,10 +80,6 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, **ad_kwargs):
         Time of flight (s).
     rtol : float, optional
         Maximum relative error permitted, default to 1e-10.
-    nsteps : int, optional
-        Maximum number of internal steps, default to 1000.
-    callback : callable, optional
-        Function called at each internal integrator step.
 
     Raises
     ------
@@ -99,13 +100,13 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, **ad_kwargs):
 
     # Set the non Keplerian acceleration
     if ad is None:
+        jac = functools.partial(gravitational_jac, k=k)
         ad = lambda t0, u_, k_: (0, 0, 0)
 
     f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
-    jac_with_k = functools.partial(gravitational_jac, k=k)
-    rr = solve_ivp(f_with_ad, (0, tof), u0, t_eval=[tof], rtol=rtol, method='Radau')
+    rr = solve_ivp(f_with_ad, (0, tof), u0, t_eval=[tof], rtol=rtol, atol=1e-12, method=DOP835)
     if rr.success:
-        r, v = rr.y[:3, 0], rr.y[3:, 0]
+        r, v = rr.y[:3], rr.y[3:]
     else:
         raise RuntimeError("Integration failed")
 
