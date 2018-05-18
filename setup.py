@@ -30,7 +30,7 @@ setup(
         "matplotlib>=2.0",
         "jplephem",
         "scipy",
-        "beautifulsoup4",
+        "beautifulsoup4>=4.5.3",
         "requests",
         "pandas",
         "plotly>=2.6.0",
