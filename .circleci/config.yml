@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.1
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install .[dev]
+
+      - run:
+          name: build docs
+          command: |
+            . venv/bin/activate
+            sphinx-build -vW -b html docs/source _HTMLTest
+
+      - store_artifacts:
+          path: docs-html
+          destination: docs-html

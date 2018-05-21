@@ -19,7 +19,6 @@ env:
   global:
     - MPLBACKEND="Agg"
     - RUN_MYPY="true"
-    - RUN_NTB="false"
 
 matrix:
   include:
@@ -32,12 +31,8 @@ matrix:
     - os: linux
       python: pypy3
       env: PIP_EXTRA_INDEX_URL=https://antocuni.github.io/pypy-wheels/ubuntu/ RUN_MYPY="false"
-    - os: linux
-      python: 3.6
-      env: RUN_NTB="true"
   allow_failures:
     - python: pypy3
-    - env: RUN_NTB="true"
 
 addons:
   apt:
@@ -65,7 +60,6 @@ before_script:
 
 script:
   - pytest -vv  # Test against installed code
-  - if [[ $RUN_NTB == 'true' ]]; then sphinx-build -vW -b html docs/source _HTMLTest; fi  # Test docs build
 
 after_success:
   # Uninstall to test coverage against sources
