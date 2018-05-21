@@ -40,7 +40,7 @@ Alternative installation methods
 If you don't want to use conda you can `install poliastro from PyPI`_
 using pip::
 
-  $ pip install numpy  # Run this one first!
+  $ pip install numpy  # Run this one first for pip 9 and older!
   $ pip install poliastro
 
 Finally, you can also install the latest development version of poliastro
