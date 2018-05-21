@@ -21,7 +21,7 @@ jobs:
           name: build docs
           command: |
             . venv/bin/activate
-            sphinx-build -vW -b html docs/source _HTMLTest
+            sphinx-build -vW -b html docs/source docs-html
 
       - store_artifacts:
           path: docs-html
