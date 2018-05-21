@@ -50,24 +50,7 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
     return du
 
 
-def gravitational_jac(t, y, k):
-    jac = np.zeros((6, 6))
-
-    # d\vec{v}/d\vec{v}
-    jac[0:3, 3:6] = np.diag([1, 1, 1])
-
-    # d (k\vec{x} / r^3) / d \vec{x}
-    r = np.sqrt(np.sum(y[0:3] ** 2))
-    jac[3:6, 0:3] = np.diag(3 * k * (y[0:3] ** 2) / (r ** 5) - k / (r ** 3))
-
-    return jac
-
-
-def zero_jac(t, y):
-    return np.zeros((6, 6))
-
-
-def cowell(orbit, tof, rtol=1e-10, *, ad=None, jac=None, **ad_kwargs):
+def cowell(orbit, tof, rtol=1e-10, *, ad=None, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -76,8 +59,9 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, jac=None, **ad_kwargs):
         the Orbit object to propagate.
     ad : function(t0, u, k), optional
          Non Keplerian acceleration (km/s2), default to None.
-    tof : float
-        Time of flight (s).
+    tof : Multiple options
+        Time to propagate, float (s),
+        Times to propagate, array of float (s).
     rtol : float, optional
         Maximum relative error permitted, default to 1e-10.
 
@@ -89,7 +73,9 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, jac=None, **ad_kwargs):
     Note
     -----
     This method uses a Dormand & Prince method of order 8(5,3) available
-    in the :py:class:`scipy.integrate.ode` module.
+    in the :py:class:`poliastro.integrators` module. If multiple tofs
+    are provided, the method propagates to the maximum value and
+    calculates the orher values via dense output
 
     """
     k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
@@ -100,17 +86,29 @@ def cowell(orbit, tof, rtol=1e-10, *, ad=None, jac=None, **ad_kwargs):
 
     # Set the non Keplerian acceleration
     if ad is None:
-        jac = functools.partial(gravitational_jac, k=k)
         ad = lambda t0, u_, k_: (0, 0, 0)
 
     f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
-    rr = solve_ivp(f_with_ad, (0, tof), u0, t_eval=[tof], rtol=rtol, atol=1e-12, method=DOP835)
-    if rr.success:
-        r, v = rr.y[:3], rr.y[3:]
-    else:
+
+    if not hasattr(tof, "__len__"):
+        tof = [tof]
+
+    result = solve_ivp(f_with_ad, (0, max(tof)), u0,
+                       rtol=rtol, atol=1e-12, method=DOP835,
+                       dense_output=True)
+    if not result.success:
         raise RuntimeError("Integration failed")
 
-    return r, v
+    rrs = []
+    vvs = []
+    for i in range(len(tof)):
+        y = result.sol(tof[i])
+        rrs.append(y[:3])
+        vvs.append(y[3:])
+
+    if len(tof) == 1:
+        return rrs[0], vvs[0]
+    return rrs, vvs
 
 
 def mean_motion(orbit, tof, **kwargs):

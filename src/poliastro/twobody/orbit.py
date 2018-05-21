@@ -9,7 +9,7 @@ from astropy.coordinates import CartesianRepresentation, get_body_barycentric_po
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
-from poliastro.twobody.propagation import propagate, mean_motion
+from poliastro.twobody.propagation import propagate, mean_motion, cowell
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -334,11 +334,17 @@ class Orbit(object):
         return values, self._sample(values, method)
 
     def _sample(self, time_values, method=mean_motion):
-        values = np.zeros((len(time_values), 3)) * self.r.unit
-        for ii, epoch in enumerate(time_values):
-            rr = self.propagate(epoch, method).r
-            values[ii] = rr
-
+        # if use cowell, propagate to max_time and use other values as intermediate (dense output)
+        if method == cowell:
+            values, _ = cowell(self, (time_values - self.epoch).to(u.s).value)
+            if len(time_values) == 1:
+                values = [values]
+            values = values * u.km
+        else:
+            values = np.zeros((len(time_values), 3)) * self.r.unit
+            for ii, epoch in enumerate(time_values):
+                rr = self.propagate(epoch, method).r
+                values[ii] = rr
         return CartesianRepresentation(values, xyz_axis=1)
 
     def _generate_time_values(self, nu_vals):
