@@ -135,7 +135,7 @@ def M_to_E(M, ecc):
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
         E = optimize.newton(_kepler_equation, M, _kepler_equation_prime,
-                            args=(M, ecc))
+                            args=(M, ecc), tol=1e-10)
     return E
 
 
@@ -157,7 +157,7 @@ def M_to_F(M, ecc):
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
         F = optimize.newton(_kepler_equation_hyper, np.arcsinh(M / ecc), _kepler_equation_prime_hyper,
-                            args=(M, ecc), maxiter=100)
+                            args=(M, ecc), maxiter=100, tol=1e-10)
     return F
 
 
