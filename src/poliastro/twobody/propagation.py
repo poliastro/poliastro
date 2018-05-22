@@ -50,7 +50,7 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
     return du
 
 
-def cowell(orbit, tof, rtol=1e-12, *, ad=None, **ad_kwargs):
+def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
