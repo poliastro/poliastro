@@ -337,8 +337,6 @@ class Orbit(object):
         # if use cowell, propagate to max_time and use other values as intermediate (dense output)
         if method == cowell:
             values, _ = cowell(self, (time_values - self.epoch).to(u.s).value)
-            if len(time_values) == 1:
-                values = [values]
             values = values * u.km
         else:
             values = np.zeros((len(time_values), 3)) * self.r.unit

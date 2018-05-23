@@ -90,7 +90,8 @@ def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
 
     f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
 
-    if not hasattr(tof, "__len__"):
+    multiple_input = hasattr(tof, "__len__")
+    if not multiple_input:
         tof = [tof]
 
     result = solve_ivp(f_with_ad, (0, max(tof)), u0,
@@ -106,7 +107,7 @@ def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
         rrs.append(y[:3])
         vvs.append(y[3:])
 
-    if len(tof) == 1:
+    if not multiple_input:
         return rrs[0], vvs[0]
     return rrs, vvs
 
