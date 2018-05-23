@@ -1,5 +1,6 @@
 import pytest
 
+import timeit
 from astropy.tests.helper import assert_quantity_allclose
 from astropy import units as u
 from astropy.time import Time
@@ -41,6 +42,18 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight, method
     _, rr = ss0.sample(sample_times, method)
 
     assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r)
+
+
+def test_sampling_cowell_dense_output_agrees_mean_motion():
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
+    sample_times = Time([ss0.epoch + x * u.h for x in range(100)])
+
+    _, rr = ss0.sample(sample_times, cowell)
+    for i, sample_time in enumerate(sample_times):
+        expected_ss = ss0.propagate(sample_time - ss0.epoch)
+        assert_quantity_allclose(rr[i].get_xyz(), expected_ss.r)
 
 
 @pytest.mark.parametrize("time_of_flight", [6 * u.h, 2 * u.day])
