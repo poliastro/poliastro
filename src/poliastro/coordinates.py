@@ -9,11 +9,12 @@ from math import sin, cos, sqrt
 import numpy as np
 
 import astropy.units as u
-from astropy.coordinates import get_body_barycentric_posvel
+from astropy.coordinates import get_body_barycentric_posvel, CartesianRepresentation, CartesianDifferential
 
 from poliastro.constants import J2000
 from poliastro.twobody.rv import rv2coe
 from poliastro.util import transform
+from poliastro.twobody.orbit import Orbit
 
 
 def body_centered_to_icrs(r, v, source_body, epoch=J2000, rotate_meridian=False):
@@ -130,3 +131,36 @@ def inertial_body_centered_to_pqw(r, v, source_body):
     v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T * u.km / u.s
 
     return r_pqw, v_pqw
+
+
+def change_frame(orbit, frame_orig, frame_dest):
+    """Transforms Orbit from one frame to another.
+    
+    Parameters
+    ----------
+    orbit : ~poliastro.bodies.Orbit
+        Orbit to transform
+    frame_orig : ~astropy.coordinates.BaseRADecFrame
+        Initial frame
+    frame_dest : ~astropy.coordinates.BaseRADecFrame
+        Final frame
+
+    Returns
+    -------
+    orbit: ~poliastro.bodies.Orbit
+        Orbit in the new frame
+
+    """
+
+    orbit_orig = frame_orig(x=orbit.r[0], y=orbit.r[1], z=orbit.r[2],
+                            v_x=orbit.v[0], v_y=orbit.v[1], v_z=orbit.v[2],
+                            representation=CartesianRepresentation,
+                            differential_type=CartesianDifferential)
+
+    orbit_dest = orbit_orig.transform_to(frame_dest(obstime=orbit.epoch))
+    orbit_dest.representation = CartesianRepresentation
+
+    return Orbit.from_vectors(orbit.attractor,
+                              [orbit_dest.x, orbit_dest.y, orbit_dest.z] * u.km,
+                              [orbit_dest.v_x, orbit_dest.v_y, orbit_dest.v_z] * (u.km / u.s),
+                              epoch=orbit.epoch)
