@@ -165,7 +165,7 @@ class Orbit(object):
         if get_velocity:
             r, v = get_body_barycentric_posvel(body.name, epoch, ephemeris='jpl')
             return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
-        
+
         r = get_body_barycentric(body.name, epoch)
         return cls.from_vectors(body.parent, r.xyz.to(u.km), np.array([0, 0, 0]) * u.km / u.s, epoch)
 

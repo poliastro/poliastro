@@ -1,11 +1,12 @@
 import pytest
 import functools
+import numpy as np
+
 from scipy.integrate import solve_ivp
 from poliastro.integrators import DOP835
 
 from astropy.time import Time
 from poliastro.twobody.propagation import cowell, func_twobody
-import numpy as np
 from poliastro.twobody.rv import rv2coe
 from astropy import units as u
 from poliastro.util import norm
@@ -13,8 +14,9 @@ from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, t
 from poliastro.bodies import Earth, Moon
 from astropy.tests.helper import assert_quantity_allclose
 from poliastro.twobody import Orbit
-from poliastro.coordinates import change_frame
+from poliastro.coordinates import transform
 from astropy.coordinates import ICRS, GCRS
+
 
 def test_J2_propagation_Earth():
     # from Curtis example 12.2:
@@ -109,27 +111,16 @@ def test_cowell_converges_with_small_perturbations():
     assert_quantity_allclose(final.v, initial.v)
 
 
-def test_moon_at_right_position():
-    epoch = Time(2456498.8333, format='jd', scale='tdb')
-    moon = Orbit.from_body_ephem(Moon, epoch)
-    moon = change_frame(moon, ICRS, GCRS)
-    r_expected = np.array([340958.0, -137043.0, -27521.3]) * u.km
-
-    assert_quantity_allclose(moon.r, r_expected, rtol=1e-2)
-
-
 def test_3rd_body():
     # example 12.11 from Howard Curtis
     epoch = Time(2454283.0, format='jd', scale='tdb')
-
 
     # propagate Moon in the interval (0, tof) and write it into the OdeSolution object
     tof = (60 * u.day).to(u.s).value
 
     moon = Orbit.from_body_ephem(Moon, epoch)
-    moon = change_frame(moon, ICRS, GCRS)
+    moon = transform(moon, ICRS, GCRS)
 
-    k = moon.attractor.k.to(u.km ** 3 / u.s ** 2).value
     x, y, z = moon.r.to(u.km).value
     vx, vy, vz = moon.v.to(u.km / u.s).value
 
@@ -137,7 +128,7 @@ def test_3rd_body():
 
     # Set the non Keplerian acceleration
     ad = lambda t0, u_, k_: (0, 0, 0)
-    f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=dict())
+    f_with_ad = functools.partial(func_twobody, k=Earth.k.to(u.km ** 3 / u.s ** 2).value, ad=ad, ad_kwargs=dict())
 
     moon_dense = solve_ivp(f_with_ad, (0, tof), u0,
                            rtol=1e-8, atol=1e-12, method=DOP835,
@@ -152,18 +143,32 @@ def test_3rd_body():
 
     initial = Orbit.from_classical(Earth, a, ecc, inc, raan, argp, nu, epoch=epoch)
 
-    r, v = cowell(initial, tof, rtol=1e-8, ad=third_body, 
+    r, v = cowell(initial, tof, rtol=1e-8, ad=third_body,
                   k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_dense)
-    _, _, _, raan, _, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
+    _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
-    assert_quantity_allclose((raan * u.rad).to(u.deg) - 360 * u.deg, -0.06 * u.deg, rtol=1e-2)
+    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -0.06 * u.deg, rtol=1e-2)
+    # assert_quantity_allclose((argp_f * u.rad - raan * u.rad).to(u.deg) - 360 * u.deg, -0.06 * u.deg, rtol=1e-2)
+    # assert_quantity_allclose((raan_f * u.rad - raan * u.rad).to(u.deg) - 360 * u.deg, -0.06 * u.deg, rtol=1e-2)
 
 
 def test_moon_at_right_position():
     # based on Cowell, example 12.10
     epoch = Time(2456498.8333, format='jd', scale='tdb')
     moon = Orbit.from_body_ephem(Moon, epoch)
-    moon = change_frame(moon, ICRS, GCRS)
-    r_expected = np.array([340958.0, 137043.0, 27521.3]) * u.km
+    moon = transform(moon, ICRS, GCRS)
+    r_expected = np.array([340883.595, -137975.741, -27888.668]) * u.km
 
     assert_quantity_allclose(moon.r, r_expected, rtol=1e-2)
+
+
+def test_moon_propagates_right():
+    # based on Cowell, example 12.10
+    epoch = Time(2456498.8333, format='jd', scale='tdb')
+    moon = Orbit.from_body_ephem(Moon, epoch)
+    moon_ini = transform(moon, ICRS, GCRS)
+
+    moon_final = moon_ini.propagate(20 * u.day)
+    moon_check = transform(Orbit.from_body_ephem(Moon, Time(2456498.8333 + 20, format='jd', scale='tdb')), ICRS, GCRS)
+
+    assert_quantity_allclose(moon_final.r, moon_check.r, rtol=1e-2)

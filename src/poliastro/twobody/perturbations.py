@@ -4,6 +4,7 @@ from poliastro.util import norm
 from poliastro.twobody import Orbit
 import astropy.units as u
 
+
 def J2_perturbation(t0, state, k, J2, R):
     """Calculates J2_perturbation acceleration (km/s2)
 

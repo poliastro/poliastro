@@ -133,9 +133,9 @@ def inertial_body_centered_to_pqw(r, v, source_body):
     return r_pqw, v_pqw
 
 
-def change_frame(orbit, frame_orig, frame_dest):
+def transform(orbit, frame_orig, frame_dest):
     """Transforms Orbit from one frame to another.
-    
+
     Parameters
     ----------
     orbit : ~poliastro.bodies.Orbit
