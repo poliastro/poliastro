@@ -96,6 +96,6 @@ def third_body(t0, state, k, k_third, third_body):
         third body that causes the perturbation
     """
 
-    body_r = third_body.sol(t0)[:3]
+    body_r = third_body(t0)
     delta_r = state[:3] - body_r
     return -k_third * delta_r / norm(delta_r) ** 3
