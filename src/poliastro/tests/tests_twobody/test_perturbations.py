@@ -112,7 +112,7 @@ def test_cowell_converges_with_small_perturbations():
     assert_quantity_allclose(final.v, initial.v)
 
 
-def test_3rd_body():
+def test_3rd_body_moon_heo():
     # example 12.11 from Howard Curtis
     j_date = 2454283.0
     tof_days = 60
@@ -134,6 +134,30 @@ def test_3rd_body():
     _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
     assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -0.06 * u.deg, rtol=1e-2)
+
+
+def test_3rd_body_moon_leo():
+    # example 12.11 from Howard Curtis
+    j_date = 2454283.0
+    tof_days = 20
+    tof = (tof_days * u.day).to(u.s).value
+    moon_r = build_ephem_interpolant(Moon, (j_date, j_date + tof_days), rtol=1e-2)
+
+    ecc = 0.01 * u.one
+    a = 6678.126 * u.km
+    raan = 0.0 * u.deg
+    inc = 28.5 * u.deg
+    argp = 0.0 * u.deg
+    nu = 0.0 * u.rad
+
+    epoch = Time(j_date, format='jd', scale='tdb')
+    initial = Orbit.from_classical(Earth, a, ecc, inc, raan, argp, nu, epoch=epoch)
+
+    r, v = cowell(initial, tof, rtol=1e-8, ad=third_body,
+                  k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_r)
+    _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
+
+    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -1.21 * 1e-4 * u.deg, rtol=1e-1)
 
 
 def test_moon_at_right_position():
