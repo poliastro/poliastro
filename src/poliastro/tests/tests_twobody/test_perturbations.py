@@ -134,12 +134,14 @@ def test_3rd_body_moon_heo():
     _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
     assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -0.06 * u.deg, rtol=1e-2)
+    assert_quantity_allclose((argp_f * u.rad).to(u.deg) - argp, 0.15 * u.deg, rtol=1e-1)
+    assert_quantity_allclose((inc_f * u.rad).to(u.deg) - inc, 0.08 * u.deg, rtol=1e-1)
 
 
 def test_3rd_body_moon_leo():
     # example 12.11 from Howard Curtis
     j_date = 2454283.0
-    tof_days = 20
+    tof_days = 60
     tof = (tof_days * u.day).to(u.s).value
     moon_r = build_ephem_interpolant(Moon, (j_date, j_date + tof_days), rtol=1e-2)
 
@@ -157,7 +159,9 @@ def test_3rd_body_moon_leo():
                   k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_r)
     _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
-    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -1.21 * 1e-4 * u.deg, rtol=1e-1)
+    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -2.18 * 1e-4 * u.deg, rtol=1e-1)
+    assert_quantity_allclose((inc_f * u.rad).to(u.deg) - inc, 6.0 * 1e-4 * u.deg, rtol=1e-1)
+    assert_quantity_allclose((argp_f * u.rad).to(u.deg) - argp, 1.5 * 1e-2 * u.deg, rtol=1e-1)
 
 
 def test_3rd_body_moon_geo():
@@ -181,7 +185,9 @@ def test_3rd_body_moon_geo():
                   k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_r)
     _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
-    assert_quantity_allclose((raan_f * u.rad).to(u.deg), 6.0 * u.deg, rtol=1e-1)
+    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - raan, 6.0 * u.deg, rtol=1e-1)
+    assert_quantity_allclose((argp_f * u.rad).to(u.deg) - argp, -11.0 * u.deg, rtol=1e-1)
+    assert_quantity_allclose((inc_f * u.rad).to(u.deg) - inc, 6.5 * 1e-3 * u.deg, rtol=1e-1)
 
 
 def test_moon_at_right_position():
