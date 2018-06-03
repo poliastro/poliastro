@@ -133,9 +133,10 @@ def test_3rd_body_moon_heo():
                   k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_r)
     _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
-    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -0.06 * u.deg, rtol=1e-2)
-    assert_quantity_allclose((argp_f * u.rad).to(u.deg) - argp, 0.15 * u.deg, rtol=1e-1)
-    assert_quantity_allclose((inc_f * u.rad).to(u.deg) - inc, 0.08 * u.deg, rtol=1e-1)
+    assert_quantity_allclose([(raan_f * u.rad).to(u.deg) - raan,
+                              (argp_f * u.rad).to(u.deg) - argp,
+                              (inc_f * u.rad).to(u.deg) - inc],
+                             [-0.06 * u.deg, 0.15 * u.deg, 0.08 * u.deg], rtol=1e-1)
 
 
 def test_3rd_body_moon_leo():
@@ -159,9 +160,10 @@ def test_3rd_body_moon_leo():
                   k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_r)
     _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
-    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -2.18 * 1e-4 * u.deg, rtol=1e-1)
-    assert_quantity_allclose((inc_f * u.rad).to(u.deg) - inc, 6.0 * 1e-4 * u.deg, rtol=1e-1)
-    assert_quantity_allclose((argp_f * u.rad).to(u.deg) - argp, 1.5 * 1e-2 * u.deg, rtol=1e-1)
+    assert_quantity_allclose([(raan_f * u.rad).to(u.deg) - 360 * u.deg,
+                              (inc_f * u.rad).to(u.deg) - inc,
+                              (argp_f * u.rad).to(u.deg) - argp],
+                             [-2.18 * 1e-4 * u.deg, 6.0 * 1e-4 * u.deg, 1.5 * 1e-2 * u.deg], rtol=1e-1)
 
 
 def test_3rd_body_moon_geo():
@@ -185,9 +187,10 @@ def test_3rd_body_moon_geo():
                   k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_r)
     _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
 
-    assert_quantity_allclose((raan_f * u.rad).to(u.deg) - raan, 6.0 * u.deg, rtol=1e-1)
-    assert_quantity_allclose((argp_f * u.rad).to(u.deg) - argp, -11.0 * u.deg, rtol=1e-1)
-    assert_quantity_allclose((inc_f * u.rad).to(u.deg) - inc, 6.5 * 1e-3 * u.deg, rtol=1e-1)
+    assert_quantity_allclose([(raan_f * u.rad).to(u.deg) - raan,
+                              (argp_f * u.rad).to(u.deg) - argp,
+                              (inc_f * u.rad).to(u.deg) - inc],
+                             [6.0 * u.deg, -11.0 * u.deg, 6.5 * 1e-3 * u.deg], rtol=1e-1)
 
 
 def test_moon_at_right_position():
