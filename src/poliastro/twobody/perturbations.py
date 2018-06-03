@@ -98,4 +98,4 @@ def third_body(t0, state, k, k_third, third_body):
 
     body_r = third_body(t0)
     delta_r = state[:3] - body_r
-    return -k_third * delta_r / norm(delta_r) ** 3
+    return -k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3

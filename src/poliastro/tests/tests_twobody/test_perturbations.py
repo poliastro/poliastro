@@ -160,6 +160,30 @@ def test_3rd_body_moon_leo():
     assert_quantity_allclose((raan_f * u.rad).to(u.deg) - 360 * u.deg, -1.21 * 1e-4 * u.deg, rtol=1e-1)
 
 
+def test_3rd_body_moon_geo():
+    # example 12.11 from Howard Curtis
+    j_date = 2454283.0
+    tof_days = 60
+    tof = (tof_days * u.day).to(u.s).value
+    moon_r = build_ephem_interpolant(Moon, (j_date, j_date + tof_days), rtol=1e-2)
+
+    ecc = 0.0001 * u.one
+    a = 42164 * u.km
+    raan = 0.0 * u.deg
+    inc = 1.0 * u.deg
+    argp = 0.0 * u.deg
+    nu = 0.0 * u.rad
+
+    epoch = Time(j_date, format='jd', scale='tdb')
+    initial = Orbit.from_classical(Earth, a, ecc, inc, raan, argp, nu, epoch=epoch)
+
+    r, v = cowell(initial, tof, rtol=1e-8, ad=third_body,
+                  k_third=Moon.k.to(u.km**3 / u.s**2).value, third_body=moon_r)
+    _, _, inc_f, raan_f, argp_f, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, r, v)
+
+    assert_quantity_allclose((raan_f * u.rad).to(u.deg), 6.0 * u.deg, rtol=1e-1)
+
+
 def test_moon_at_right_position():
     # based on Cowell, example 12.10
     epoch = Time(2456498.8333, format='jd', scale='tdb')

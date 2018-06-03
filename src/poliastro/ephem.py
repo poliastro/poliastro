@@ -9,7 +9,7 @@ from astropy.coordinates import ICRS, GCRS
 
 def build_ephem_interpolant(body, t_span, rtol=1e-5):
     T_approx = 2 * np.pi * np.sqrt(body.R ** 3 / body.k)
-    h = 0.5  # (T_approx * rtol ** (1.0 / 4.0)).to(u.day).value
+    h = 0.125  # (T_approx * rtol ** (1.0 / 4.0)).to(u.day).value
 
     t_values = np.linspace(t_span[0], t_span[1], int((t_span[1] - t_span[0]) / h))
     r_values = np.zeros((t_values.shape[0], 3))
