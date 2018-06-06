@@ -175,14 +175,8 @@ def test_variation_rates(test_params):
     tof = (tof_days * u.day).to(u.s).value
     body_r = build_ephem_interpolant(body, (j_date, j_date + tof_days), rtol=1e-2)
 
-    ecc = 0.0001 * u.one
-    a = 6678 * u.km
-    raan = 10.0 * u.deg
-    inc = 20.0 * u.deg
-    argp = 10.0 * u.deg
-    nu = 0.0 * u.rad
     epoch = Time(j_date, format='jd', scale='tdb')
-    initial = Orbit.from_classical(Earth, a, ecc, inc, raan, argp, nu, epoch=epoch)
+    initial = Orbit.from_classical(Earth, *moon_geo['orbit'], epoch=epoch)
 
     r, v = cowell(initial, tof, rtol=1e-12, ad=third_body,
                   k_third=body.k.to(u.km**3 / u.s**2).value, third_body=body_r)
