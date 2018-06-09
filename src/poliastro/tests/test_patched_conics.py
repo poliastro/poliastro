@@ -39,13 +39,13 @@ def test_compute_soi():
 
         assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
 
-
+'''
 @pytest.mark.parametrize("missing_body", [Moon, Pluto])
 def test_compute_missing_body_soi_raises_error(missing_body):
     with pytest.raises(RuntimeError) as excinfo:
         compute_soi(missing_body)
     assert "To compute the semimajor axis for Moon and Pluto use the JPL ephemeris" in excinfo.exconly()
-
+'''
 
 def test_compute_soi_given_a():
     parent = Body(None, 1 * u.km ** 3 / u.s ** 2, "Parent")
