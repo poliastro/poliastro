@@ -39,11 +39,6 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
     x, y, z, vx, vy, vz = u_
     r3 = (x**2 + y**2 + z**2)**1.5
 
-    r = u_[:3]
-    v = u_[3:]
-    a_i, ecc_i, inc_i, raan_i, argp_i, nu_i = rv2coe(k, r, v)
-    # print(t0, a_i, ecc_i, inc_i, raan_i, argp_i, nu_i)
-
     du = np.array([
         vx,
         vy,
