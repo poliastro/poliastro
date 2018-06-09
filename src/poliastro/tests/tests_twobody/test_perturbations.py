@@ -113,23 +113,29 @@ def test_cowell_converges_with_small_perturbations():
 
 
 moon_heo = {'body': Moon, 'tof': 60, 'raan': -0.06 * u.deg, 'argp': 0.15 * u.deg, 'inc': 0.08 * u.deg,
-            'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, 349.87078 * u.deg, 0.0 * u.rad]}
+            'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
+            'period': 28}
 
 moon_leo = {'body': Moon, 'tof': 60, 'raan': -2.18 * 1e-4 * u.deg,
             'argp': 15.0 * 1e-3 * u.deg, 'inc': 6.0 * 1e-4 * u.deg,
-            'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad]}
+            'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+            'period': 28}
 
 moon_geo = {'body': Moon, 'tof': 60, 'raan': 6.0 * u.deg, 'argp': -11.0 * u.deg, 'inc': 6.5 * 1e-3 * u.deg,
-            'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad]}
+            'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+            'period': 28}
 
 sun_heo = {'body': Sun, 'tof': 720, 'raan': -0.31 * u.deg, 'argp': 0.84 * u.deg, 'inc': 0.23 * u.deg,
-           'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, 349.87078 * u.deg, 0.0 * u.rad]}
+           'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
+           'period': 365}
 
 sun_leo = {'body': Sun, 'tof': 720, 'raan': -17.0 * 1e-3 * u.deg, 'argp': 0.11 * u.deg, 'inc': -0.3 * 1e-4 * u.deg,
-           'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad]}
+           'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+           'period': 365}
 
 sun_geo = {'body': Sun, 'tof': 720, 'raan': 25.0 * u.deg, 'argp': -22 * u.deg, 'inc': 0.125 * u.deg,
-           'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad]}
+           'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+           'period': 365}
 
 
 @pytest.mark.parametrize('test_params', [
@@ -140,16 +146,10 @@ sun_geo = {'body': Sun, 'tof': 720, 'raan': 25.0 * u.deg, 'argp': -22 * u.deg, '
 def test_3rd_body_Curtis(test_params):
     # based on example 12.11 from Howard Curtis
     body = test_params['body']
-    tof_days = test_params['tof']
 
     j_date = 2454283.0
-    tof = (tof_days * u.day).to(u.s).value
-
-    if body == Sun:
-        period = 365
-    if body == Moon:
-        period = 28
-    body_r = build_ephem_interpolant(body, period, (j_date, j_date + tof_days), rtol=1e-2)
+    tof = (test_params['tof'] * u.day).to(u.s).value
+    body_r = build_ephem_interpolant(body, test_params['period'], (j_date, j_date + test_params['tof']), rtol=1e-2)
 
     epoch = Time(j_date, format='jd', scale='tdb')
     initial = Orbit.from_classical(Earth, *test_params['orbit'], epoch=epoch)
@@ -159,22 +159,17 @@ def test_3rd_body_Curtis(test_params):
     incs, raans, argps = [], [], []
     for ti, ri, vi in zip(np.linspace(0, tof, 400), r, v):
         _, _, inc, raan, argp, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
-        argp = argp if argp < np.pi else argp - 2 * np.pi
-        raan = raan if raan < np.pi else raan - 2 * np.pi
-        inc = inc if inc < np.pi else inc - 2 * np.pi
-        incs.append(inc)
-        raans.append(raan)
-        argps.append(argp)
+
+        # fighting %2pi
+        argps.append((argp + np.pi) % (2 * np.pi) - np.pi)
+        raans.append((raan + np.pi) % (2 * np.pi) - np.pi)
+        incs.append((inc + np.pi) % (2 * np.pi) - np.pi)
 
     # averaging in order to get agreement with Curtis
     inc_f, raan_f, argp_f = np.mean(incs[-5:]), np.mean(raans[-5:]), np.mean(argps[-5:])
 
-    # fighting the % 2pi
-    test_params['orbit'][4] = test_params['orbit'][4] if test_params['orbit'][4] < 180 * u.deg \
-        else test_params['orbit'][4] - 360 * u.deg
     assert_quantity_allclose([(raan_f * u.rad).to(u.deg) - test_params['orbit'][3],
                               (inc_f * u.rad).to(u.deg) - test_params['orbit'][2],
                               (argp_f * u.rad).to(u.deg) - test_params['orbit'][4]],
                              [test_params['raan'], test_params['inc'], test_params['argp']],
                              rtol=1e-1)
-# test_3rd_body_Curtis(moon_heo)
