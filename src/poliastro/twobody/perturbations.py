@@ -92,7 +92,7 @@ def third_body(t0, state, k, k_third, third_body):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         gravitational constant, (km^3/s^2)
-    third_body: ~OdeSolution object
+    third_body: a callable object returning the position of 3rd body
         third body that causes the perturbation
     """
 
