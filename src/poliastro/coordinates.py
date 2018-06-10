@@ -140,9 +140,9 @@ def transform(orbit, frame_orig, frame_dest):
     ----------
     orbit : ~poliastro.bodies.Orbit
         Orbit to transform
-    frame_orig : ~astropy.coordinates.BaseRADecFrame
+    frame_orig : ~astropy.coordinates.BaseCoordinateFrame
         Initial frame
-    frame_dest : ~astropy.coordinates.BaseRADecFrame
+    frame_dest : ~astropy.coordinates.BaseCoordinateFrame
         Final frame
 
     Returns
@@ -161,6 +161,6 @@ def transform(orbit, frame_orig, frame_dest):
     orbit_dest.representation = CartesianRepresentation
 
     return Orbit.from_vectors(orbit.attractor,
-                              [orbit_dest.x, orbit_dest.y, orbit_dest.z] * u.km,
-                              [orbit_dest.v_x, orbit_dest.v_y, orbit_dest.v_z] * (u.km / u.s),
+                              orbit_dest.data.xyz,
+                              orbit_dest.data.differentials['s'].d_xyz,
                               epoch=orbit.epoch)
