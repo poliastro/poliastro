@@ -1,12 +1,8 @@
 import pytest
-import functools
 import numpy as np
 
-from scipy.integrate import solve_ivp
-from poliastro.integrators import DOP835
-
 from astropy.time import Time
-from poliastro.twobody.propagation import cowell, func_twobody
+from poliastro.twobody.propagation import cowell
 from poliastro.twobody.rv import rv2coe
 from poliastro.ephem import build_ephem_interpolant
 from astropy import units as u
@@ -15,8 +11,7 @@ from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, t
 from poliastro.bodies import Earth, Moon, Sun
 from astropy.tests.helper import assert_quantity_allclose
 from poliastro.twobody import Orbit
-# from poliastro.coordinates import transform
-from astropy.coordinates import ICRS, GCRS
+from astropy.coordinates import ICRS, GCRS, Angle
 
 
 def test_J2_propagation_Earth():
@@ -158,14 +153,13 @@ def test_3rd_body_Curtis(test_params):
 
     incs, raans, argps = [], [], []
     for ti, ri, vi in zip(np.linspace(0, tof, 400), r, v):
-        _, _, inc, raan, argp, _ = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
+        angles = Angle(rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)[2:5] * u.rad)  # inc, raan, argp
+        angles = angles.wrap_at(180 * u.deg)
+        incs.append(angles[0].value)
+        raans.append(angles[1].value)
+        argps.append(angles[2].value)
 
-        # fighting %2pi
-        argps.append((argp + np.pi) % (2 * np.pi) - np.pi)
-        raans.append((raan + np.pi) % (2 * np.pi) - np.pi)
-        incs.append((inc + np.pi) % (2 * np.pi) - np.pi)
-
-    # averaging in order to get agreement with Curtis
+    # averaging over 5 last values in the way Curtis does
     inc_f, raan_f, argp_f = np.mean(incs[-5:]), np.mean(raans[-5:]), np.mean(argps[-5:])
 
     assert_quantity_allclose([(raan_f * u.rad).to(u.deg) - test_params['orbit'][3],
