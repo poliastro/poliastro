@@ -596,46 +596,6 @@ class OrbitPlotter2D:
         )
 
 
-class _PlotlyOrbitPlotter:
-
-    def __init__(self, dim=2):
-        if dim == 3:
-            self._layout = Layout(
-                autosize=True,
-                scene=dict(
-                    xaxis=dict(
-                        title="x (km)",
-                    ),
-                    yaxis=dict(
-                        title="y (km)",
-                    ),
-                    zaxis=dict(
-                        title="z (km)",
-                    ),
-                    aspectmode="data",  # Important!
-                ),
-            )
-        else:
-            self._layout = Layout(
-                autosize=True,
-                xaxis=dict(
-                    title="x (km)",
-                    constrain="domain",
-                ),
-                yaxis=dict(
-                    title="y (km)",
-                    scaleanchor="x",
-                ),
-            )
-        self._data = []  # type: List[dict]
-        self._attractor = None
-        self._attractor_data = {}  # type: dict
-        self._attractor_radius = np.inf * u.km
-
-        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
-        self._dim = dim
-
-
 def plot_solar_system(outer=True, epoch=None):
     """
     Plots the whole solar system in one single call.
