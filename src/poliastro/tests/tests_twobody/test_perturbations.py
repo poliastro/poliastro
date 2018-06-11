@@ -1,13 +1,17 @@
 import pytest
-from poliastro.twobody.propagation import cowell
 import numpy as np
+
+from astropy.time import Time
+from poliastro.twobody.propagation import cowell
 from poliastro.twobody.rv import rv2coe
+from poliastro.ephem import build_ephem_interpolant
 from astropy import units as u
 from poliastro.util import norm
-from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag
-from poliastro.bodies import Earth
+from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, third_body
+from poliastro.bodies import Earth, Moon, Sun
 from astropy.tests.helper import assert_quantity_allclose
 from poliastro.twobody import Orbit
+from astropy.coordinates import ICRS, GCRS, Angle, solar_system_ephemeris
 
 
 def test_J2_propagation_Earth():
@@ -101,3 +105,66 @@ def test_cowell_converges_with_small_perturbations():
     final = initial.propagate(initial.period, method=cowell, ad=accel)
     assert_quantity_allclose(final.r, initial.r)
     assert_quantity_allclose(final.v, initial.v)
+
+
+moon_heo = {'body': Moon, 'tof': 60, 'raan': -0.06 * u.deg, 'argp': 0.15 * u.deg, 'inc': 0.08 * u.deg,
+            'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
+            'period': 28}
+
+moon_leo = {'body': Moon, 'tof': 60, 'raan': -2.18 * 1e-4 * u.deg,
+            'argp': 15.0 * 1e-3 * u.deg, 'inc': 6.0 * 1e-4 * u.deg,
+            'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+            'period': 28}
+
+moon_geo = {'body': Moon, 'tof': 60, 'raan': 6.0 * u.deg, 'argp': -11.0 * u.deg, 'inc': 6.5 * 1e-3 * u.deg,
+            'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+            'period': 28}
+
+sun_heo = {'body': Sun, 'tof': 720, 'raan': -0.31 * u.deg, 'argp': 0.84 * u.deg, 'inc': 0.23 * u.deg,
+           'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
+           'period': 365}
+
+sun_leo = {'body': Sun, 'tof': 720, 'raan': -17.0 * 1e-3 * u.deg, 'argp': 0.11 * u.deg, 'inc': -0.3 * 1e-4 * u.deg,
+           'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+           'period': 365}
+
+sun_geo = {'body': Sun, 'tof': 720, 'raan': 25.0 * u.deg, 'argp': -22 * u.deg, 'inc': 0.125 * u.deg,
+           'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
+           'period': 365}
+
+
+@pytest.mark.parametrize('test_params', [
+    moon_heo, moon_geo, moon_leo,
+    sun_heo, sun_geo,
+    pytest.param(sun_leo, marks=pytest.mark.skip(reason="here agreement required rtol=1e-10, too long for 720 days"))
+])
+def test_3rd_body_Curtis(test_params):
+    # based on example 12.11 from Howard Curtis
+    body = test_params['body']
+    solar_system_ephemeris.set("jpl")
+
+    j_date = 2454283.0
+    tof = (test_params['tof'] * u.day).to(u.s).value
+    body_r = build_ephem_interpolant(body, test_params['period'], (j_date, j_date + test_params['tof']), rtol=1e-2)
+
+    epoch = Time(j_date, format='jd', scale='tdb')
+    initial = Orbit.from_classical(Earth, *test_params['orbit'], epoch=epoch)
+    r, v = cowell(initial, np.linspace(0, tof, 400), rtol=1e-10, ad=third_body,
+                  k_third=body.k.to(u.km**3 / u.s**2).value, third_body=body_r)
+
+    incs, raans, argps = [], [], []
+    for ti, ri, vi in zip(np.linspace(0, tof, 400), r, v):
+        angles = Angle(rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)[2:5] * u.rad)  # inc, raan, argp
+        angles = angles.wrap_at(180 * u.deg)
+        incs.append(angles[0].value)
+        raans.append(angles[1].value)
+        argps.append(angles[2].value)
+
+    # averaging over 5 last values in the way Curtis does
+    inc_f, raan_f, argp_f = np.mean(incs[-5:]), np.mean(raans[-5:]), np.mean(argps[-5:])
+
+    assert_quantity_allclose([(raan_f * u.rad).to(u.deg) - test_params['orbit'][3],
+                              (inc_f * u.rad).to(u.deg) - test_params['orbit'][2],
+                              (argp_f * u.rad).to(u.deg) - test_params['orbit'][4]],
+                             [test_params['raan'], test_params['inc'], test_params['argp']],
+                             rtol=1e-1)

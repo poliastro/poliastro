@@ -5,7 +5,7 @@ import numpy as np
 from astropy import units as u
 from astropy import time
 
-from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel
+from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, get_body_barycentric
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
@@ -162,7 +162,6 @@ class Orbit(object):
             warn("Input time was converted to scale='tdb' with value "
                  "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
-
         r, v = get_body_barycentric_posvel(body.name, epoch)
         return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
 

@@ -1,5 +1,8 @@
+from astropy.time import Time
 import numpy as np
 from poliastro.util import norm
+from poliastro.twobody import Orbit
+import astropy.units as u
 
 
 def J2_perturbation(t0, state, k, J2, R):
@@ -76,3 +79,23 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     rho = rho0 * np.exp(-(H - R) / H0)
 
     return -(1.0 / 2.0) * rho * B * v * v_vec
+
+
+def third_body(t0, state, k, k_third, third_body):
+    """Calculates 3rd body acceleration (km/s2)
+
+    Parameters
+    ----------
+    t0 : float
+        Current time (s)
+    state : numpy.ndarray
+        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+    k : float
+        gravitational constant, (km^3/s^2)
+    third_body: a callable object returning the position of 3rd body
+        third body that causes the perturbation
+    """
+
+    body_r = third_body(t0)
+    delta_r = body_r - state[:3]
+    return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
