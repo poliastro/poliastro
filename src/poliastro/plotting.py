@@ -166,8 +166,8 @@ class OrbitPlotter(object):
 
         if radius < self._attractor_radius:
             self._attractor_radius = radius
-        
-        self.ax.add_patch(mpl.patches.Circle((0, 0), self._attractor_radius, lw=0, color=color))    
+
+        self.ax.add_patch(mpl.patches.Circle((0, 0), self._attractor_radius, lw=0, color=color))
 
     def plot(self, orbit, label=None, color=None, method=mean_motion):
         """Plots state and osculating orbit in their plane.
@@ -595,23 +595,24 @@ class OrbitPlotter2D:
             show_link=False,  # Boilerplate
         )
 
+
 class _PlotlyOrbitPlotter:
 
     def __init__(self, dim=2):
-        if dim==3:
+        if dim == 3:
             self._layout = Layout(
                 autosize=True,
                 scene=dict(
-                xaxis=dict(
-                    title="x (km)",
-                ),
-                yaxis=dict(
-                    title="y (km)",
-                ),
-                zaxis=dict(
-                    title="z (km)",
-                ),
-                aspectmode="data",  # Important!
+                    xaxis=dict(
+                        title="x (km)",
+                    ),
+                    yaxis=dict(
+                        title="y (km)",
+                    ),
+                    zaxis=dict(
+                        title="z (km)",
+                    ),
+                    aspectmode="data",  # Important!
                 ),
             )
         else:
