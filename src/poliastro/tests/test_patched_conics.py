@@ -40,7 +40,6 @@ def test_compute_soi():
         assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize("missing_body", [Moon, Pluto])
 def test_compute_missing_body_soi_raises_error(missing_body):
     with pytest.raises(RuntimeError) as excinfo:

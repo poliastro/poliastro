@@ -11,7 +11,7 @@ from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, t
 from poliastro.bodies import Earth, Moon, Sun
 from astropy.tests.helper import assert_quantity_allclose
 from poliastro.twobody import Orbit
-from astropy.coordinates import ICRS, GCRS, Angle
+from astropy.coordinates import ICRS, GCRS, Angle, solar_system_ephemeris
 
 
 def test_J2_propagation_Earth():
@@ -141,6 +141,7 @@ sun_geo = {'body': Sun, 'tof': 720, 'raan': 25.0 * u.deg, 'argp': -22 * u.deg, '
 def test_3rd_body_Curtis(test_params):
     # based on example 12.11 from Howard Curtis
     body = test_params['body']
+    solar_system_ephemeris.set("jpl")
 
     j_date = 2454283.0
     tof = (test_params['tof'] * u.day).to(u.s).value

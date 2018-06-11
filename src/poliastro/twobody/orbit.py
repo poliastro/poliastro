@@ -151,7 +151,7 @@ class Orbit(object):
         return cls(ss, epoch)
 
     @classmethod
-    def from_body_ephem(cls, body, epoch=None, ephemeris='jpl'):
+    def from_body_ephem(cls, body, epoch=None):
         """Return osculating `Orbit` of a body at a given time.
 
         """
@@ -162,7 +162,7 @@ class Orbit(object):
             warn("Input time was converted to scale='tdb' with value "
                  "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
-        r, v = get_body_barycentric_posvel(body.name, epoch, ephemeris=ephemeris)
+        r, v = get_body_barycentric_posvel(body.name, epoch)
         return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
 
     @classmethod
