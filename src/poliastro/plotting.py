@@ -81,7 +81,7 @@ class OrbitPlotter(object):
         self.num_points = num_points
         self._frame = None
         self._attractor = None
-        self._attractor_radius = None
+        self._attractor_radius = np.inf
         self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
 
     @property
@@ -160,12 +160,14 @@ class OrbitPlotter(object):
     def _redraw_attractor(self, min_radius=0 * u.km):
         radius = max(self._attractor.R.to(u.km).value, min_radius.to(u.km).value)
         color = BODY_COLORS.get(self._attractor.name, "#999999")
-        self._attractor_radius = radius
 
         for attractor in self.ax.findobj(match=mpl.patches.Circle):
             attractor.remove()
 
-        self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
+        if radius < self._attractor_radius:
+            self._attractor_radius = radius
+        
+        self.ax.add_patch(mpl.patches.Circle((0, 0), self._attractor_radius, lw=0, color=color))    
 
     def plot(self, orbit, label=None, color=None, method=mean_motion):
         """Plots state and osculating orbit in their plane.
@@ -592,6 +594,45 @@ class OrbitPlotter2D:
             image=ext[1:], image_filename=basename,
             show_link=False,  # Boilerplate
         )
+
+class _PlotlyOrbitPlotter:
+
+    def __init__(self, dim=2):
+        if dim==3:
+            self._layout = Layout(
+                autosize=True,
+                scene=dict(
+                xaxis=dict(
+                    title="x (km)",
+                ),
+                yaxis=dict(
+                    title="y (km)",
+                ),
+                zaxis=dict(
+                    title="z (km)",
+                ),
+                aspectmode="data",  # Important!
+                ),
+            )
+        else:
+            self._layout = Layout(
+                autosize=True,
+                xaxis=dict(
+                    title="x (km)",
+                    constrain="domain",
+                ),
+                yaxis=dict(
+                    title="y (km)",
+                    scaleanchor="x",
+                ),
+            )
+        self._data = []  # type: List[dict]
+        self._attractor = None
+        self._attractor_data = {}  # type: dict
+        self._attractor_radius = np.inf * u.km
+
+        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+        self._dim = dim
 
 
 def plot_solar_system(outer=True, epoch=None):
