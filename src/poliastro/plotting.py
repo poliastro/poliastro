@@ -81,7 +81,7 @@ class OrbitPlotter(object):
         self.num_points = num_points
         self._frame = None
         self._attractor = None
-        self._attractor_radius = None
+        self._attractor_radius = np.inf * u.km
         self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
 
     @property
@@ -158,14 +158,16 @@ class OrbitPlotter(object):
         return x, y
 
     def _redraw_attractor(self, min_radius=0 * u.km):
-        radius = max(self._attractor.R.to(u.km).value, min_radius.to(u.km).value)
+        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
         color = BODY_COLORS.get(self._attractor.name, "#999999")
-        self._attractor_radius = radius
 
         for attractor in self.ax.findobj(match=mpl.patches.Circle):
             attractor.remove()
 
-        self.ax.add_patch(mpl.patches.Circle((0, 0), radius, lw=0, color=color))
+        if radius < self._attractor_radius:
+            self._attractor_radius = radius
+
+        self.ax.add_patch(mpl.patches.Circle((0, 0), self._attractor_radius.value, lw=0, color=color))
 
     def plot(self, orbit, label=None, color=None, method=mean_motion):
         """Plots state and osculating orbit in their plane.
