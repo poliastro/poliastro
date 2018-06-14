@@ -104,6 +104,7 @@ class _Sun(_Body):
     symbol = u"\u2609"
     R = constants.R_sun
     J2 = constants.J2_sun
+    Wdivc = constants.Wdivc_sun
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):

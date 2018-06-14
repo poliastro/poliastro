@@ -133,3 +133,6 @@ H0_earth = Constant('H0_earth', 'Earth H0 atmospheric scale height', 8500, 'm', 
 
 rho0_earth = Constant('rho0_earth', 'Earth rho0 atmospheric density prefactor', 1.3, 'kg / (m3)', 1,
                       'de Pater and Lissauer 2010', system='si')
+
+Wdivc_sun = Constant('Wdivc_sun', 'total radiation power of Sun divided by the speed of light',
+                     1.0203759306204136e+14, 'kg km / (s2)', 1, 'Howard Curtis', system='si')

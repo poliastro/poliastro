@@ -1,4 +1,5 @@
 import pytest
+import functools
 import numpy as np
 
 from astropy.time import Time
@@ -7,7 +8,7 @@ from poliastro.twobody.rv import rv2coe
 from poliastro.ephem import build_ephem_interpolant
 from astropy import units as u
 from poliastro.util import norm
-from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, third_body
+from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, third_body, solar_pressure
 from poliastro.bodies import Earth, Moon, Sun
 from astropy.tests.helper import assert_quantity_allclose
 from poliastro.twobody import Orbit
@@ -153,7 +154,7 @@ def test_3rd_body_Curtis(test_params):
                   k_third=body.k.to(u.km**3 / u.s**2).value, third_body=body_r)
 
     incs, raans, argps = [], [], []
-    for ti, ri, vi in zip(np.linspace(0, tof, 400), r, v):
+    for ri, vi in zip(r, v):
         angles = Angle(rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)[2:5] * u.rad)  # inc, raan, argp
         angles = angles.wrap_at(180 * u.deg)
         incs.append(angles[0].value)
@@ -168,3 +169,57 @@ def test_3rd_body_Curtis(test_params):
                               (argp_f * u.rad).to(u.deg) - test_params['orbit'][4]],
                              [test_params['raan'], test_params['inc'], test_params['argp']],
                              rtol=1e-1)
+
+
+solar_pressure_checks = [{'t_days': 200, 'deltas_expected': [3e-3, -8e-3, -0.035, -80.0]},
+                         {'t_days': 400, 'deltas_expected': [-1.3e-3, 0.01, -0.07, 8.0]},
+                         {'t_days': 600, 'deltas_expected': [7e-3, 0.03, -0.10, -80.0]},
+                         {'t_days': 800, 'deltas_expected': [-7.5e-3, 0.02, -0.13, 1.7]},
+                         {'t_days': 1000, 'deltas_expected': [6e-3, 0.065, -0.165, -70.0]},
+                         {'t_days': 1095, 'deltas_expected': [0.0, 0.06, -0.165, -10.0]},
+                         ]
+
+
+def normalize_to_Curtis(t0, sun_r):
+    r = sun_r(t0)
+    return 149600000 * r / norm(r)
+
+
+def test_solar_pressure():
+    # based on example 12.9 from Howard Curtis
+    solar_system_ephemeris.set("jpl")
+
+    j_date = 2438400.5
+    tof = 1095
+    sun_r = build_ephem_interpolant(Sun, 365, (j_date, j_date + tof), rtol=1e-2)
+    epoch = Time(j_date, format='jd', scale='tdb')
+
+    a_ini = 10085.44 * u.km
+    ecc_ini = 0.025422 * u.one
+    inc_ini = 88.3924 * u.deg
+    raan_ini = 45.38124 * u.deg
+    argp_ini = 227.493 * u.deg
+    nu_ini = 343.4268 * u.deg
+    initial = Orbit.from_classical(Earth, a_ini, ecc_ini, inc_ini, raan_ini, argp_ini, nu_ini, epoch=epoch)
+    # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
+    sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
+
+    r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ad=solar_pressure,
+                  R_Earth=Earth.R.to(u.km).value, C_R=2.0, A=2e-4, m=100, Wdivc_s=Sun.Wdivc.value, sun=sun_normalized)
+
+    delta_as, delta_eccs, delta_incs, delta_raans, delta_argps, delta_hs = [], [], [], [], [], []
+    for ri, vi in zip(r, v):
+        orbit_params = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
+        delta_eccs.append(orbit_params[1] - ecc_ini.value)
+        delta_incs.append((orbit_params[2] * u.rad).to(u.deg).value - inc_ini.value)
+        delta_raans.append((orbit_params[3] * u.rad).to(u.deg).value - raan_ini.value)
+        delta_argps.append((orbit_params[4] * u.rad).to(u.deg).value - argp_ini.value)
+
+    # averaging over 5 last values in the way Curtis does
+    for check in solar_pressure_checks:
+        index = int(check['t_days'] / tof * 4000)
+        delta_ecc, delta_inc, delta_raan, delta_argp = np.mean(delta_eccs[index - 5:index]), \
+            np.mean(delta_incs[index - 5:index]), np.mean(delta_raans[index - 5:index]), \
+            np.mean(delta_argps[index - 5:index])
+        assert_quantity_allclose([delta_ecc, delta_inc, delta_raan, delta_argp],
+                                 check['deltas_expected'], rtol=1e-1, atol=1e-4)
