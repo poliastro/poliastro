@@ -179,6 +179,9 @@ solar_pressure_checks = [{'t_days': 200, 'deltas_expected': [3e-3, -8e-3, -0.035
                          {'t_days': 1095, 'deltas_expected': [0.0, 0.06, -0.165, -10.0]},
                          ]
 
+drag_force_orbit = [10085.44 * u.km, 0.025422 * u.one, 88.3924 * u.deg,
+                    45.38124 * u.deg, 227.493 * u.deg, 343.4268 * u.deg]
+
 
 def normalize_to_Curtis(t0, sun_r):
     r = sun_r(t0)
@@ -194,13 +197,7 @@ def test_solar_pressure():
     sun_r = build_ephem_interpolant(Sun, 365, (j_date, j_date + tof), rtol=1e-2)
     epoch = Time(j_date, format='jd', scale='tdb')
 
-    a_ini = 10085.44 * u.km
-    ecc_ini = 0.025422 * u.one
-    inc_ini = 88.3924 * u.deg
-    raan_ini = 45.38124 * u.deg
-    argp_ini = 227.493 * u.deg
-    nu_ini = 343.4268 * u.deg
-    initial = Orbit.from_classical(Earth, a_ini, ecc_ini, inc_ini, raan_ini, argp_ini, nu_ini, epoch=epoch)
+    initial = Orbit.from_classical(Earth, *drag_force_orbit, epoch=epoch)
     # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
     sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
@@ -210,10 +207,10 @@ def test_solar_pressure():
     delta_as, delta_eccs, delta_incs, delta_raans, delta_argps, delta_hs = [], [], [], [], [], []
     for ri, vi in zip(r, v):
         orbit_params = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
-        delta_eccs.append(orbit_params[1] - ecc_ini.value)
-        delta_incs.append((orbit_params[2] * u.rad).to(u.deg).value - inc_ini.value)
-        delta_raans.append((orbit_params[3] * u.rad).to(u.deg).value - raan_ini.value)
-        delta_argps.append((orbit_params[4] * u.rad).to(u.deg).value - argp_ini.value)
+        delta_eccs.append(orbit_params[1] - drag_force_orbit[1].value)
+        delta_incs.append((orbit_params[2] * u.rad).to(u.deg).value - drag_force_orbit[2].value)
+        delta_raans.append((orbit_params[3] * u.rad).to(u.deg).value - drag_force_orbit[3].value)
+        delta_argps.append((orbit_params[4] * u.rad).to(u.deg).value - drag_force_orbit[4].value)
 
     # averaging over 5 last values in the way Curtis does
     for check in solar_pressure_checks:
