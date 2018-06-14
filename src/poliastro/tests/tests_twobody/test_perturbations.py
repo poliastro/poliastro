@@ -179,9 +179,6 @@ solar_pressure_checks = [{'t_days': 200, 'deltas_expected': [3e-3, -8e-3, -0.035
                          {'t_days': 1095, 'deltas_expected': [0.0, 0.06, -0.165, -10.0]},
                          ]
 
-drag_force_orbit = [10085.44 * u.km, 0.025422 * u.one, 88.3924 * u.deg,
-                    45.38124 * u.deg, 227.493 * u.deg, 343.4268 * u.deg]
-
 
 def normalize_to_Curtis(t0, sun_r):
     r = sun_r(t0)
@@ -196,6 +193,8 @@ def test_solar_pressure():
     tof = 1095
     sun_r = build_ephem_interpolant(Sun, 365, (j_date, j_date + tof), rtol=1e-2)
     epoch = Time(j_date, format='jd', scale='tdb')
+    drag_force_orbit = [10085.44 * u.km, 0.025422 * u.one, 88.3924 * u.deg,
+                        45.38124 * u.deg, 227.493 * u.deg, 343.4268 * u.deg]
 
     initial = Orbit.from_classical(Earth, *drag_force_orbit, epoch=epoch)
     # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
