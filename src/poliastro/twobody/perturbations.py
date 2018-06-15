@@ -155,7 +155,7 @@ def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
 
     """
 
-    r_sun = star(t0)
+    r_star = star(t0)
     r_sat = state[:3]
     P_s = Wdivc_s / (norm(r_star) ** 2)
 
