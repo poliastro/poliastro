@@ -8,7 +8,7 @@ from poliastro.twobody.rv import rv2coe
 from poliastro.ephem import build_ephem_interpolant
 from astropy import units as u
 from poliastro.util import norm
-from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, third_body, solar_pressure
+from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, third_body, radiation_pressure
 from poliastro.bodies import Earth, Moon, Sun
 from astropy.tests.helper import assert_quantity_allclose
 from poliastro.twobody import Orbit
@@ -200,8 +200,8 @@ def test_solar_pressure():
     # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
     sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
-    r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ad=solar_pressure,
-                  R_Earth=Earth.R.to(u.km).value, C_R=2.0, A=2e-4, m=100, Wdivc_s=Sun.Wdivc.value, sun=sun_normalized)
+    r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ad=radiation_pressure,
+                  R=Earth.R.to(u.km).value, C_R=2.0, A=2e-4, m=100, Wdivc_s=Sun.Wdivc.value, star=sun_normalized)
 
     delta_as, delta_eccs, delta_incs, delta_raans, delta_argps, delta_hs = [], [], [], [], [], []
     for ri, vi in zip(r, v):
