@@ -3,6 +3,7 @@ import numpy as np
 from poliastro.util import norm
 from poliastro.twobody import Orbit
 import astropy.units as u
+from poliastro.jit import jit
 
 
 def J2_perturbation(t0, state, k, J2, R):
@@ -99,3 +100,66 @@ def third_body(t0, state, k, k_third, third_body):
     body_r = third_body(t0)
     delta_r = body_r - state[:3]
     return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
+
+
+@jit
+def shadow_function(r_sat, r_sun, R):
+    """Determines whether the satellite is in attractor's shadow,
+       uses algorithm 12.3 from Howard Curtis
+
+    Parameters
+    ----------
+    r_sat : numpy.ndarray
+        position of the satellite in the frame of attractor (km)
+    r_sun : numpy.ndarray
+        position of star in the frame of attractor (km)
+    R : float
+        radius of body (attractor) that creates shadow (km)
+    """
+
+    r_sat_norm = np.sqrt(np.sum(r_sat ** 2))
+    r_sun_norm = np.sqrt(np.sum(r_sun ** 2))
+
+    theta = np.arccos(np.dot(r_sat, r_sun) / r_sat_norm / r_sun_norm)
+    theta_1 = np.arccos(R / r_sat_norm)
+    theta_2 = np.arccos(R / r_sun_norm)
+
+    return theta < theta_1 + theta_2
+
+
+def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
+    """Calculates radiation pressure acceleration (km/s2)
+
+    Parameters
+    ----------
+    t0 : float
+        Current time (s)
+    state : numpy.ndarray
+        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+    k : float
+        gravitational constant, (km^3/s^2)
+    R : float
+        radius of the attractor
+    C_R: float
+        dimensionless radiation pressure coefficient, 1 < C_R < 2 ()
+    A: float
+        effective spacecraft area (km^2)
+    m: float
+        mass of the spacecraft (kg)
+    Wdivc_s : float
+        total star emitted power divided by the speed of light (W * s / km)
+    star: a callable object returning the position of star in attractor frame
+        star position
+    Notes
+    -----
+    This function provides the acceleration due to star light pressure. We follow
+    Howard Curtis, section 12.9
+
+    """
+
+    r_star = star(t0)
+    r_sat = state[:3]
+    P_s = Wdivc_s / (norm(r_star) ** 2)
+
+    nu = float(shadow_function(r_sat, r_star, R))
+    return -nu * P_s * (C_R * A / m) * r_star / norm(r_star)
