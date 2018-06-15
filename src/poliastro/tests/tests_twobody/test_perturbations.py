@@ -1,7 +1,6 @@
 import pytest
 import functools
 import numpy as np
-import cProfile
 
 from astropy.time import Time
 from poliastro.twobody.propagation import cowell
