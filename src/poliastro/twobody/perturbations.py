@@ -3,6 +3,7 @@ import numpy as np
 from poliastro.util import norm
 from poliastro.twobody import Orbit
 import astropy.units as u
+from poliastro.jit import jit
 
 
 def J2_perturbation(t0, state, k, J2, R):
@@ -101,6 +102,7 @@ def third_body(t0, state, k, k_third, third_body):
     return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
 
 
+@jit
 def shadow_function(r_sat, r_sun, R):
     """Determines whether the satellite is in attractor's shadow,
        uses algorithm 12.3 from Howard Curtis
@@ -115,8 +117,8 @@ def shadow_function(r_sat, r_sun, R):
         radius of body (attractor) that creates shadow (km)
     """
 
-    r_sat_norm = norm(r_sat)
-    r_sun_norm = norm(r_sun)
+    r_sat_norm = np.sqrt(np.sum(r_sat ** 2))
+    r_sun_norm = np.sqrt(np.sum(r_sun ** 2))
 
     theta = np.arccos(np.dot(r_sat, r_sun) / r_sat_norm / r_sun_norm)
     theta_1 = np.arccos(R / r_sat_norm)
