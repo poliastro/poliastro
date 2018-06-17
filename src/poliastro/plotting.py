@@ -65,7 +65,7 @@ class OrbitPlotter(object):
 
     """
 
-    def __init__(self, ax=None, num_points=150):
+    def __init__(self, ax=None, num_points=150, dark=False):
         """Constructor.
 
         Parameters
@@ -76,6 +76,7 @@ class OrbitPlotter(object):
             Number of points to use in plots, default to 150.
         """
         self.ax = ax
+        plt.style.use('dark_background') if dark else plt.style.use('default')
         if not self.ax:
             _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
