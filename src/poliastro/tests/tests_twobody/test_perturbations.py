@@ -142,7 +142,7 @@ sun_geo = {'body': Sun, 'tof': 720, 'raan': 25.0 * u.deg, 'argp': -22 * u.deg, '
 def test_3rd_body_Curtis(test_params):
     # based on example 12.11 from Howard Curtis
     body = test_params['body']
-    solar_system_ephemeris.set("jpl")
+    solar_system_ephemeris.set('de432s')
 
     j_date = 2454283.0
     tof = (test_params['tof'] * u.day).to(u.s).value
@@ -190,7 +190,7 @@ def normalize_to_Curtis(t0, sun_r):
 
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
-    solar_system_ephemeris.set("jpl")
+    solar_system_ephemeris.set('de432s')
 
     j_date = 2438400.5
     tof = 600
