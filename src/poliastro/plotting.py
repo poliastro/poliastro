@@ -76,9 +76,12 @@ class OrbitPlotter(object):
             Number of points to use in plots, default to 150.
         """
         self.ax = ax
-        plt.style.use('dark_background') if dark else plt.style.use('default')
         if not self.ax:
-            _, self.ax = plt.subplots(figsize=(6, 6))
+            if dark:
+                with plt.style.context('dark_background'):
+                    _, self.ax = plt.subplots(figsize=(6, 6))
+            else:
+                _, self.ax = plt.subplots(figsize=(6, 6))
         self.num_points = num_points
         self._frame = None
         self._attractor = None
