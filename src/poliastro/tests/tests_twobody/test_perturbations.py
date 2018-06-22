@@ -203,7 +203,6 @@ def test_solar_pressure():
     initial = Orbit.from_classical(Earth, *drag_force_orbit, epoch=epoch)
     # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
     sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
-
     ad = functools.partial(radiation_pressure, R=Earth.R.to(u.km).value, C_R=2.0, A=2e-4,
                            m=100, Wdivc_s=Sun.Wdivc.value, star=sun_normalized)
     r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ads=[ad])
