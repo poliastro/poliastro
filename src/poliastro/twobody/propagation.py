@@ -16,7 +16,7 @@ from poliastro.jit import jit
 from poliastro.stumpff import c2, c3
 
 
-def func_twobody(t0, u_, k, ad, ad_kwargs):
+def func_twobody(t0, u_, k, ads):
     """Differential equation for the initial value two body problem.
 
     This function follows Cowell's formulation.
@@ -29,12 +29,12 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard gravitational parameter.
-    ad : function(t0, u, k)
-        Non Keplerian acceleration (km/s2).
-    ad_kwargs : optional
-        perturbation parameters passed to ad
+    ads : list of functions(t0, u, k)
+        Non Keplerian accelerations (km/s2).
     """
-    ax, ay, az = ad(t0, u_, k, **ad_kwargs)
+    acc = np.zeros(3)
+    for ad in ads:
+        acc += ad(t0, u_, k)
 
     x, y, z, vx, vy, vz = u_
     r3 = (x**2 + y**2 + z**2)**1.5
@@ -43,22 +43,22 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
         vx,
         vy,
         vz,
-        -k * x / r3 + ax,
-        -k * y / r3 + ay,
-        -k * z / r3 + az
+        -k * x / r3 + acc[0],
+        -k * y / r3 + acc[1],
+        -k * z / r3 + acc[2]
     ])
     return du
 
 
-def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
+def cowell(orbit, tof, rtol=1e-11, *, ads=None):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
     ----------
     orbit : ~poliastro.twobody.orbit.Orbit
         the Orbit object to propagate.
-    ad : function(t0, u, k), optional
-         Non Keplerian acceleration (km/s2), default to None.
+    ads : list of functions(t0, u, k), optional
+         Non Keplerian accelerations (km/s2), default to None.
     tof : Multiple options
         Time to propagate, float (s),
         Times to propagate, array of float (s).
@@ -85,16 +85,16 @@ def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
     u0 = np.array([x, y, z, vx, vy, vz])
 
     # Set the non Keplerian acceleration
-    if ad is None:
-        ad = lambda t0, u_, k_: (0, 0, 0)
+    if ads is None:
+        ads = [lambda t0, u_, k_: (0, 0, 0)]
 
-    f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
+    f_with_ads = functools.partial(func_twobody, k=k, ads=ads)
 
     multiple_input = hasattr(tof, "__len__")
     if not multiple_input:
         tof = [tof]
 
-    result = solve_ivp(f_with_ad, (0, max(tof)), u0,
+    result = solve_ivp(f_with_ads, (0, max(tof)), u0,
                        rtol=rtol, atol=1e-12, method=DOP835,
                        dense_output=True)
     if not result.success:

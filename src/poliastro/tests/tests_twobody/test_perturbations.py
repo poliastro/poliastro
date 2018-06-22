@@ -24,7 +24,8 @@ def test_J2_propagation_Earth():
     orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
 
     tof = (48.0 * u.h).to(u.s).value
-    r, v = cowell(orbit, tof, ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
+    ad = functools.partial(J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
+    r, v = cowell(orbit, tof, ads=[ad])
 
     _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
     _, _, _, raan, argp, _ = rv2coe(k, r, v)
@@ -66,8 +67,8 @@ def test_atmospheric_drag():
     # assuming the atmospheric decay during tof is small,
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
-
-    r, v = cowell(orbit, tof, ad=atmospheric_drag, R=R, C_D=C_D, A=A, m=m, H0=H0, rho0=rho0)
+    ad = functools.partial(atmospheric_drag, R=R, C_D=C_D, A=A, m=m, H0=H0, rho0=rho0)
+    r, v = cowell(orbit, tof, ads=[ad])
 
     assert_quantity_allclose(norm(r) - norm(r0), dr_expected, rtol=1e-2)
 
@@ -86,7 +87,7 @@ def test_cowell_works_with_small_perturbations():
         norm_v = (v_vec * v_vec).sum() ** .5
         return 1e-5 * v_vec / norm_v
 
-    final = initial.propagate(3 * u.day, method=cowell, ad=accel)
+    final = initial.propagate(3 * u.day, method=cowell, ads=[accel])
 
     assert_quantity_allclose(final.r, r_expected)
     assert_quantity_allclose(final.v, v_expected)
@@ -103,7 +104,7 @@ def test_cowell_converges_with_small_perturbations():
         norm_v = (v_vec * v_vec).sum() ** .5
         return 0.0 * v_vec / norm_v
 
-    final = initial.propagate(initial.period, method=cowell, ad=accel)
+    final = initial.propagate(initial.period, method=cowell, ads=[accel])
     assert_quantity_allclose(final.r, initial.r)
     assert_quantity_allclose(final.v, initial.v)
 
@@ -150,8 +151,8 @@ def test_3rd_body_Curtis(test_params):
 
     epoch = Time(j_date, format='jd', scale='tdb')
     initial = Orbit.from_classical(Earth, *test_params['orbit'], epoch=epoch)
-    r, v = cowell(initial, np.linspace(0, tof, 400), rtol=1e-10, ad=third_body,
-                  k_third=body.k.to(u.km**3 / u.s**2).value, third_body=body_r)
+    ad = functools.partial(third_body, k_third=body.k.to(u.km**3 / u.s**2).value, third_body=body_r)
+    r, v = cowell(initial, np.linspace(0, tof, 400), rtol=1e-10, ads=[ad])
 
     incs, raans, argps = [], [], []
     for ri, vi in zip(r, v):
@@ -203,8 +204,9 @@ def test_solar_pressure():
     # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
     sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
-    r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ad=radiation_pressure,
-                  R=Earth.R.to(u.km).value, C_R=2.0, A=2e-4, m=100, Wdivc_s=Sun.Wdivc.value, star=sun_normalized)
+    ad = functools.partial(radiation_pressure, R=Earth.R.to(u.km).value, C_R=2.0, A=2e-4,
+                           m=100, Wdivc_s=Sun.Wdivc.value, star=sun_normalized)
+    r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ads=[ad])
 
     delta_as, delta_eccs, delta_incs, delta_raans, delta_argps, delta_hs = [], [], [], [], [], []
     for ri, vi in zip(r, v):
