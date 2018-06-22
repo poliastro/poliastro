@@ -192,7 +192,6 @@ def normalize_to_Curtis(t0, sun_r):
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
     solar_system_ephemeris.set('de432s')
-
     j_date = 2438400.5
     tof = 600
     sun_r = build_ephem_interpolant(Sun, 365, (j_date, j_date + tof), rtol=1e-2)
