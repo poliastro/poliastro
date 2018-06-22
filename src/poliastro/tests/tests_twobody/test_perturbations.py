@@ -192,8 +192,8 @@ def normalize_to_Curtis(t0, sun_r):
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
     solar_system_ephemeris.set('de432s')
-    j_date = 2438400.5
-    tof = 600
+
+    j_date, tof = 2438400.5, 600
     sun_r = build_ephem_interpolant(Sun, 365, (j_date, j_date + tof), rtol=1e-2)
     epoch = Time(j_date, format='jd', scale='tdb')
     drag_force_orbit = [10085.44 * u.km, 0.025422 * u.one, 88.3924 * u.deg,
@@ -202,6 +202,7 @@ def test_solar_pressure():
     initial = Orbit.from_classical(Earth, *drag_force_orbit, epoch=epoch)
     # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
     sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
+
     ad = functools.partial(radiation_pressure, R=Earth.R.to(u.km).value, C_R=2.0, A=2e-4,
                            m=100, Wdivc_s=Sun.Wdivc.value, star=sun_normalized)
     r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ads=[ad])
