@@ -74,6 +74,8 @@ class OrbitPlotter(object):
             Axes in which to plot. If not given, new ones will be created.
         num_points : int, optional
             Number of points to use in plots, default to 150.
+        dark : bool, optional
+            If set as True, plots the orbit in Dark mode.
         """
         self.ax = ax
         if not self.ax:
