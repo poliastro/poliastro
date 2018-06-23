@@ -279,9 +279,9 @@ class _BaseOrbitPlotter:
                 "shapes": []
             })
         self.dim = dim
-        self._data = []
+        self._data = []   # type: List[dict]
         self._attractor = None
-        self._attractor_data = {}
+        self._attractor_data = {}  # type: dict
         self._attractor_radius = np.inf * u.km
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
 
