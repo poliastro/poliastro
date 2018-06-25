@@ -246,39 +246,7 @@ class _BaseOrbitPlotter:
     Parent Class for the 2D and 3D OrbitPlotter Classes based on Plotly.
     """
 
-    def __init__(self, dim3=True):
-        if dim3:
-            self._layout = Layout(
-                autosize=True,
-                scene=dict(
-                    xaxis=dict(
-                        title="x (km)",
-                    ),
-                    yaxis=dict(
-                        title="y (km)",
-                    ),
-                    zaxis=dict(
-                        title="z (km)",
-                    ),
-                    aspectmode="data",  # Important!
-                ),
-            )
-        else:
-            self._layout = Layout(
-                autosize=True,
-                xaxis=dict(
-                    title="x (km)",
-                    constrain="domain",
-                ),
-                yaxis=dict(
-                    title="y (km)",
-                    scaleanchor="x",
-                ),
-            )
-            self._layout.update({
-                "shapes": []
-            })
-        self.dim = dim3
+    def __init__(self):
         self._data = []   # type: List[dict]
         self._attractor = None
         self._attractor_data = {}  # type: dict
@@ -431,12 +399,20 @@ class _BaseOrbitPlotter:
         if layout_kwargs:
             self._layout.update(layout_kwargs)
 
-    def show(self, **layout_kwargs):
+    def show(self, **layout_kwargs):\
+        """Shows the plot in the Notebook.
+        """
         self._prepare_plot(**layout_kwargs)
 
         iplot(self.figure)
 
     def savefig(self, filename, **layout_kwargs):
+        """Function for saving the plot locally.
+        Parameters
+        ----------
+        filename : string, format = "anyname.anyformat"
+                    anyformat can only be jpeg, png, svg, webp
+        """
         self._prepare_plot(**layout_kwargs)
 
         basename, ext = os.path.splitext(filename)
@@ -452,7 +428,22 @@ class OrbitPlotter3D(_BaseOrbitPlotter):
     """
 
     def __init__(self):
-        _BaseOrbitPlotter.__init__(self, dim3=True)
+        super.__init__(self, dim3=True)
+        self._layout = Layout(
+            autosize=True,
+            scene=dict(
+                xaxis=dict(
+                    title="x (km)",
+                ),
+                yaxis=dict(
+                    title="y (km)",
+                ),
+                zaxis=dict(
+                    title="z (km)",
+                ),
+                aspectmode="data",  # Important!
+            ),
+        )
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
@@ -488,7 +479,21 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
     """
 
     def __init__(self):
-        _BaseOrbitPlotter.__init__(self, dim3=False)
+        super.__init__(self)
+        self._layout = Layout(
+            autosize=True,
+            xaxis=dict(
+                title="x (km)",
+                constrain="domain",
+            ),
+            yaxis=dict(
+                title="y (km)",
+                scaleanchor="x",
+            ),
+        )
+        self._layout.update({
+            "shapes": []
+        })
 
 
 def plot_solar_system(outer=True, epoch=None):
