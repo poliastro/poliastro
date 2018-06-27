@@ -230,17 +230,6 @@ def _generate_sphere(radius, center, num=20):
     return xx, yy, zz
 
 
-def _plot_sphere(radius, color, name, center=[0, 0, 0] * u.km):
-    xx, yy, zz = _generate_sphere(radius, center)
-    sphere = Surface(
-        x=xx.to(u.km).value, y=yy.to(u.km).value, z=zz.to(u.km).value,
-        name=name,
-        colorscale=[[0, color], [1, color]],
-        cauto=False, cmin=1, cmax=1, showscale=False,  # Boilerplate
-    )
-    return sphere
-
-
 class _BaseOrbitPlotter:
     """
     Parent Class for the 2D and 3D OrbitPlotter Classes based on Plotly.
@@ -273,6 +262,17 @@ class _BaseOrbitPlotter:
 
         elif attractor is not self._attractor:
             raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
+        
+    def _redraw_attractor(self, min_radius=0 * u.km):
+        # Select a sensible value for the radius: realistic for low orbits,
+        # visible for high and very high orbits
+        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
+        if radius < self._attractor_radius:
+            # If the resulting radius is smaller than the current one, redraw it
+            shape = self._plot_sphere(radius, BODY_COLORS.get(self._attractor.name, "#999999"), self._attractor.name)
+            # Overwrite stored properties
+            self._attractor_radius = radius
+            self._attractor_data = shape
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
         """Plots a precomputed trajectory.
@@ -294,6 +294,30 @@ class _BaseOrbitPlotter:
             self._redraw_attractor(trajectory.norm().min() * 0.15)  # Arbitrary threshold
 
         self._plot_trajectory(trajectory, str(label), color, False)
+
+    def plot(self, orbit, *, label=None, color=None):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+        label : string, optional
+        color : string, optional
+        """
+        if color is None:
+            color = next(self._color_cycle)
+
+        self.set_attractor(orbit.attractor)
+        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
+
+        label = _generate_label(orbit, label)
+        _, trajectory = orbit.sample()
+
+        self._plot_trajectory(trajectory, label, color, True)
+        # Plot required 2D/3D shape in the position of the body
+        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
+        shape = self._plot_sphere(radius, color, label, center=orbit.r)
+        self._data.append(shape)
 
     def _prepare_plot(self, **layout_kwargs):
         # If there are no orbits, draw only the attractor
@@ -349,6 +373,16 @@ class OrbitPlotter3D(_BaseOrbitPlotter):
             ),
         )
 
+    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+        xx, yy, zz = _generate_sphere(radius, center)
+        sphere = Surface(
+            x=xx.to(u.km).value, y=yy.to(u.km).value, z=zz.to(u.km).value,
+            name=name,
+            colorscale=[[0, color], [1, color]],
+            cauto=False, cmin=1, cmax=1, showscale=False,  # Boilerplate
+        )
+        return sphere
+
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
         x = distance * np.cos(elev) * np.cos(azim)
@@ -365,17 +399,6 @@ class OrbitPlotter3D(_BaseOrbitPlotter):
             }
         })
 
-    def _redraw_attractor(self, min_radius=0 * u.km):
-        # Select a sensible value for the radius: realistic for low orbits,
-        # visible for high and very high orbits
-        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
-        if radius < self._attractor_radius:
-            # If the resulting radius is smaller than the current one, redraw it
-            shape = _plot_sphere(radius, BODY_COLORS.get(self._attractor.name, "#999999"), self._attractor.name)
-            # Overwrite stored properties
-            self._attractor_radius = radius
-            self._attractor_data = shape
-
     def _plot_trajectory(self, trajectory, label, color, dashed):
         trace = Scatter3d(
             x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value, z=trajectory.z.to(u.km).value,
@@ -388,32 +411,6 @@ class OrbitPlotter3D(_BaseOrbitPlotter):
             mode="lines",  # Boilerplate
         )
         self._data.append(trace)
-
-    def plot(self, orbit, *, label=None, color=None):
-        """Plots state and osculating orbit in their plane.
-
-        Parameters
-        ----------
-        orbit : ~poliastro.twobody.orbit.Orbit
-        label : string, optional
-        color : string, optional
-        """
-        if color is None:
-            color = next(self._color_cycle)
-
-        self.set_attractor(orbit.attractor)
-
-        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
-
-        label = _generate_label(orbit, label)
-        _, trajectory = orbit.sample()
-
-        self._plot_trajectory(trajectory, label, color, True)
-
-        # Plot required 2D/3D shape in the position of the body
-        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
-        shape = _plot_sphere(radius, color, label, center=orbit.r)
-        self._data.append(shape)
 
 
 def _generate_circle(radius, center, num=500):
@@ -449,7 +446,7 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
             "shapes": []
         })
 
-    def _plot_circle(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         xx, yy = _generate_circle(radius, center)
         x_center, y_center, z_center = center
         trace = Scatter(x=xx.to(u.km).value, y=yy.to(u.km).value, mode='markers', line=dict(color=color, width=5,
@@ -473,17 +470,6 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
         )
         return trace
 
-    def _redraw_attractor(self, min_radius=0 * u.km):
-        # Select a sensible value for the radius: realistic for low orbits,
-        # visible for high and very high orbits
-        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
-        if radius < self._attractor_radius:
-            # If the resulting radius is smaller than the current one, redraw it
-            shape = self._plot_circle(radius, BODY_COLORS.get(self._attractor.name, "#999999"), self._attractor.name)
-            # Overwrite stored properties
-            self._attractor_radius = radius
-            self._attractor_data = shape
-
     def _plot_trajectory(self, trajectory, label, color, dashed):
         trace = Scatter(
             x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value,
@@ -496,32 +482,6 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
             mode="lines",  # Boilerplate
         )
         self._data.append(trace)
-
-    def plot(self, orbit, *, label=None, color=None):
-        """Plots state and osculating orbit in their plane.
-
-        Parameters
-        ----------
-        orbit : ~poliastro.twobody.orbit.Orbit
-        label : string, optional
-        color : string, optional
-        """
-        if color is None:
-            color = next(self._color_cycle)
-
-        self.set_attractor(orbit.attractor)
-
-        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
-
-        label = _generate_label(orbit, label)
-        _, trajectory = orbit.sample()
-
-        self._plot_trajectory(trajectory, label, color, True)
-
-        # Plot required 2D/3D shape in the position of the body
-        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
-        shape = self._plot_circle(radius, color, label, center=orbit.r)
-        self._data.append(shape)
 
 
 def plot_solar_system(outer=True, epoch=None):
