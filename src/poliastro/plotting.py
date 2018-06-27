@@ -262,7 +262,7 @@ class _BaseOrbitPlotter:
 
         elif attractor is not self._attractor:
             raise NotImplementedError("Attractor has already been set to {}.".format(self._attractor.name))
-        
+
     def _redraw_attractor(self, min_radius=0 * u.km):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
