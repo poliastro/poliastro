@@ -142,7 +142,7 @@ def mean_motion(orbit, tof, **kwargs):
     # get the initial mean anomaly
     M0 = nu_to_M(nu0, ecc)
     # strong elliptic or strong hyperbolic orbits
-    if ecc > 1.0 + 1e-2 or ecc < 1.0 - 1e-2:
+    if np.abs(ecc - 1.0) > 1e-2:
         a = p / (1.0 - ecc ** 2)
         # given the initial mean anomaly, calculate mean anomaly
         # at the end, mean motion (n) equals sqrt(mu / |a^3|)
