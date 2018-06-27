@@ -141,8 +141,8 @@ def mean_motion(orbit, tof, **kwargs):
 
     # get the initial mean anomaly
     M0 = nu_to_M(nu0, ecc)
-    # elliptic or hyperbolic orbits
-    if not np.isclose(ecc, 1.0, rtol=1e-06):
+    # strong elliptic or strong hyperbolic orbits
+    if ecc > 1.0 + 1e-2 or ecc < 1.0 - 1e-2:
         a = p / (1.0 - ecc ** 2)
         # given the initial mean anomaly, calculate mean anomaly
         # at the end, mean motion (n) equals sqrt(mu / |a^3|)
@@ -150,20 +150,13 @@ def mean_motion(orbit, tof, **kwargs):
             M = M0 + tof * np.sqrt(k / np.abs(a ** 3)) * u.rad
             nu = M_to_nu(M, ecc)
 
-    # parabolic orbit
+    # near-parabolic orbit
     else:
-        q = p / 2.0
+        q = p * np.abs(1.0 - ecc) / np.abs(1.0 - ecc ** 2)
         # mean motion n = sqrt(mu / 2 q^3) for parabolic orbit
         with u.set_enabled_equivalencies(u.dimensionless_angles()):
-            M = M0 + tof * np.sqrt(k / (2.0 * q ** 3))
-
-        # using Barker's equation, which is solved analytically
-        # for parabolic orbit, get true anomaly
-        B = 3.0 * M / 2.0
-        A = (B + np.sqrt(1.0 + B ** 2)) ** (2.0 / 3.0)
-        D = 2.0 * A * B / (1.0 + A + A ** 2)
-
-        nu = 2.0 * np.arctan(D)
+            M = M0 + tof * np.sqrt(k / 2.0 / (q ** 3))
+            nu = M_to_nu(M, ecc)
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
         return coe2rv(k, p, ecc, inc, raan, argp, nu)
 

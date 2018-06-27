@@ -20,6 +20,21 @@ from poliastro.neos import dastcom5
 from poliastro.util import norm
 
 
+@pytest.mark.parametrize('ecc', [0.0, 0.5, 0.99, 0.995, 0.999, 0.9999, 1.00001, 1.0001, 1.001, 1.005, 1.01, 2.0])
+def test_mean_motion(ecc):
+    _a = 0.0 * u.rad
+    tof = 1.0 * u.min
+    if ecc < 1.0:
+        orbit = Orbit.from_classical(Earth, 10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad)
+    else:
+        orbit = Orbit.from_classical(Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad)
+    orbit_cowell = orbit.propagate(tof, method=cowell)
+    orbit_mean_motion = orbit.propagate(tof, method=mean_motion)
+
+    assert_quantity_allclose(orbit_cowell.r, orbit_mean_motion.r)
+    assert_quantity_allclose(orbit_cowell.v, orbit_mean_motion.v)
+
+
 @pytest.mark.parametrize('method', [kepler, mean_motion, cowell])
 def test_propagation(method):
     # Data from Vallado, example 2.4

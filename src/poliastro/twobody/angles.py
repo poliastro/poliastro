@@ -24,6 +24,126 @@ def _kepler_equation_prime_hyper(F, M, ecc):
     return ecc * np.cosh(F) - 1
 
 
+def _kepler_equation_parabolic(D, M, ecc):
+    return M_parabolic(ecc, D) - M
+
+
+def _kepler_equation_prime_parabolic(D, M, ecc):
+    return M_parabolic_prime(ecc, D)
+
+
+def M_parabolic(ecc, D, tolerance=1e-16):
+    """Computes the Kepler equation r.h.s. in near-parabolic regime
+
+    Parameters
+    ----------
+    D : float
+        Eccentric anomaly (rad).
+    ecc : float
+        Eccentricity,
+    tolerance : float (optional)
+        smallness of the last term in series
+    Returns
+    -------
+    M_parabolic : float
+        kepler equation r.h.s.
+
+    Note
+    -----
+    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
+    Davide Farnocchia et al
+    """
+    x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
+    small_term = False
+    S = 0.0
+    k = 0
+    while not small_term:
+        term = (ecc - 1.0 / (2.0 * k + 3.0)) * (x ** k)
+        small_term = np.abs(term) < tolerance
+        S += term
+        k += 1
+    return np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
+
+
+def M_parabolic_prime(ecc, D, tolerance=1e-16):
+    """Computes derivative of the Kepler equation r.h.s. in near-parabolic regime
+
+    Parameters
+    ----------
+    D : float
+        Eccentric anomaly (rad).
+    ecc : float
+        Eccentricity,
+    tolerance : float (optional)
+        smallness of the last term in series
+    Returns
+    -------
+    M_parabolic : float
+        derivative of kepler equation r.h.s.
+
+    Note
+    -----
+    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
+    Davide Farnocchia et al
+    """
+    x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
+    small_term = False
+    S_prime = 0.0
+    k = 0
+    while not small_term:
+        term = (ecc - 1.0 / (2.0 * k + 3.0)) * (2 * k + 3.0) * (x ** k)
+        small_term = np.abs(term) < tolerance
+        S_prime += term
+        k += 1
+    return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S_prime
+
+
+def D_to_nu(D, ecc):
+    """True anomaly from parabolic eccentric anomaly.
+
+    Parameters
+    ----------
+    D : float
+        Eccentric anomaly (rad).
+    ecc : float
+        Eccentricity.
+
+    Returns
+    -------
+    nu : float
+        True anomaly (rad).
+
+    Note
+    -----
+    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
+    Davide Farnocchia et al
+    """
+    return 2.0 * np.arctan(D)
+
+
+def nu_to_D(nu, ecc):
+    """Parabolic eccentric anomaly from true anomaly.
+
+    Parameters
+    ----------
+    nu : float
+        True anomaly (rad).
+    ecc : float
+        Eccentricity (>1).
+
+    Returns
+    -------
+    D : float
+        Hyperbolic eccentric anomaly.
+
+    Note
+    -----
+    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
+    Davide Farnocchia et al
+    """
+    return np.tan(nu / 2.0)
+
+
 def nu_to_E(nu, ecc):
     """Eccentric anomaly from true anomaly.
 
@@ -156,9 +276,34 @@ def M_to_F(M, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        F = optimize.newton(_kepler_equation_hyper, np.arcsinh(M / ecc), _kepler_equation_prime_hyper,
+        F = optimize.newton(_kepler_equation_hyper, np.arcsinh(M / (ecc)), _kepler_equation_prime_hyper,
                             args=(M, ecc), maxiter=100)
     return F
+
+
+def M_to_D(M, ecc):
+    """Parabolic eccentric anomaly from mean anomaly.
+
+    Parameters
+    ----------
+    M : float
+        Mean anomaly (rad).
+    ecc : float
+        Eccentricity (>1).
+
+    Returns
+    -------
+    D : float
+        Parabolic eccentric anomaly.
+
+    """
+    with u.set_enabled_equivalencies(u.dimensionless_angles()):
+        B = 3.0 * M / 2.0
+        A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
+        guess = 2 * A * B / (1 + A + A ** 2)
+        D = optimize.newton(_kepler_equation_parabolic, guess, _kepler_equation_prime_parabolic,
+                            args=(M, ecc), maxiter=100)
+    return D
 
 
 def E_to_M(E, ecc):
@@ -205,7 +350,28 @@ def F_to_M(F, ecc):
     return M
 
 
-def M_to_nu(M, ecc):
+def D_to_M(D, ecc):
+    """Mean anomaly from eccentric anomaly.
+
+    Parameters
+    ----------
+    D : float
+        Parabolic eccentric anomaly (rad).
+    ecc : float
+        Eccentricity.
+
+    Returns
+    -------
+    M : float
+        Mean anomaly (rad).
+
+    """
+    with u.set_enabled_equivalencies(u.dimensionless_angles()):
+        M = _kepler_equation_parabolic(D, 0.0 * u.rad, ecc)
+    return M
+
+
+def M_to_nu(M, ecc, delta=1e-2):
     """True anomaly from mean anomaly.
 
     .. versionadded:: 0.4.0
@@ -216,7 +382,8 @@ def M_to_nu(M, ecc):
         Mean anomaly (rad).
     ecc : float
         Eccentricity.
-
+    delta : float (optional)
+        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
     Returns
     -------
     nu : float
@@ -229,16 +396,19 @@ def M_to_nu(M, ecc):
     33.673284930211658
 
     """
-    if ecc > 1:
+    if ecc > 1 + delta:
         F = M_to_F(M, ecc)
         nu = F_to_nu(F, ecc)
-    else:
+    elif ecc < 1 - delta:
         E = M_to_E(M, ecc)
         nu = E_to_nu(E, ecc)
+    else:
+        D = M_to_D(M, ecc)
+        nu = D_to_nu(D, ecc)
     return nu
 
 
-def nu_to_M(nu, ecc):
+def nu_to_M(nu, ecc, delta=1e-2):
     """Mean anomaly from true anomaly.
 
     .. versionadded:: 0.4.0
@@ -256,12 +426,15 @@ def nu_to_M(nu, ecc):
         Mean anomaly (rad).
 
     """
-    if ecc > 1:
+    if ecc > 1 + delta:
         F = nu_to_F(nu, ecc)
         M = F_to_M(F, ecc)
-    else:
+    elif ecc < 1 - delta:
         E = nu_to_E(nu, ecc)
         M = E_to_M(E, ecc)
+    else:
+        D = nu_to_D(nu, ecc)
+        M = D_to_M(D, ecc)
     return M
 
 
