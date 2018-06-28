@@ -98,7 +98,7 @@ def test_savefig_calls_prepare_plot():
     m.plot(orbit=earth, label="Obj")
     pwd = os.getcwd()
     os.chdir(tempfile.gettempdir())
-    m.savefig(filename = "a.jpeg")
+    m.savefig(filename="a.jpeg")
     os.chdir(pwd)
 
     assert patched.call_count == 1
