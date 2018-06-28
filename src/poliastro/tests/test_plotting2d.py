@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 import tempfile
@@ -97,7 +95,7 @@ def test_savefig_calls_prepare_plot():
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Obj")
     with tempfile.NamedTemporaryFile() as fp:
-        m.savefig(filename=fp.name+".jpeg")
+        m.savefig(filename=fp.name + ".jpeg")
 
     assert patched.call_count == 1
     patched.assert_called_with()
