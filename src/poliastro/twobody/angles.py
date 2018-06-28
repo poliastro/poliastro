@@ -48,10 +48,11 @@ def M_parabolic(ecc, D, tolerance=1e-16):
     M_parabolic : float
         kepler equation r.h.s.
 
-    Note
+    Notes
     -----
-    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
-    Davide Farnocchia et al
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
     x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
     small_term = False
@@ -81,10 +82,11 @@ def M_parabolic_prime(ecc, D, tolerance=1e-16):
     M_parabolic : float
         derivative of kepler equation r.h.s.
 
-    Note
+    Notes
     -----
-    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
-    Davide Farnocchia et al
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
     x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
     small_term = False
@@ -113,10 +115,11 @@ def D_to_nu(D, ecc):
     nu : float
         True anomaly (rad).
 
-    Note
+    Notes
     -----
-    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
-    Davide Farnocchia et al
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
     return 2.0 * np.arctan(D)
 
@@ -136,10 +139,11 @@ def nu_to_D(nu, ecc):
     D : float
         Hyperbolic eccentric anomaly.
 
-    Note
+    Notes
     -----
-    Taken from the paper <<Robust resolution of Kepler’s equation in all eccentricity regimes>>,
-    Davide Farnocchia et al
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
     return np.tan(nu / 2.0)
 
@@ -276,7 +280,12 @@ def M_to_F(M, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        F = optimize.newton(_kepler_equation_hyper, np.arcsinh(M / (ecc)), _kepler_equation_prime_hyper,
+        if ecc < 10:
+            C = np.exp(1.0) * (ecc + 2 * M) / (ecc * np.exp(1) - 2)
+            guess = np.min([np.log(C), np.arcsinh(M / (ecc - 1.0))])
+        else:
+            guess = np.arcsinh(M / (ecc))
+        F = optimize.newton(_kepler_equation_hyper, guess, _kepler_equation_prime_hyper,
                             args=(M, ecc), maxiter=100)
     return F
 
