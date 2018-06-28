@@ -280,12 +280,7 @@ def M_to_F(M, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        if ecc < 10:
-            C = np.exp(1.0) * (ecc + 2 * M) / (ecc * np.exp(1) - 2)
-            guess = np.min([np.log(C), np.arcsinh(M / (ecc - 1.0))])
-        else:
-            guess = np.arcsinh(M / (ecc))
-        F = optimize.newton(_kepler_equation_hyper, guess, _kepler_equation_prime_hyper,
+        F = optimize.newton(_kepler_equation_hyper, np.arcsinh(M / ecc), _kepler_equation_prime_hyper,
                             args=(M, ecc), maxiter=100)
     return F
 
