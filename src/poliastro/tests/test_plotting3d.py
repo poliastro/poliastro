@@ -1,4 +1,8 @@
+import os
+
 import pytest
+
+import tempfile
 
 from unittest import mock
 
@@ -106,7 +110,8 @@ def test_savefig_calls_prepare_plot():
     m = OrbitPlotter3D()
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Object")
-    m.savefig(filename="a.jpeg")
+    with tempfile.NamedTemporaryFile() as fp:
+        m.savefig(filename=fp.name+".jpeg")
 
     assert patched.call_count == 1
     patched.assert_called_with()
