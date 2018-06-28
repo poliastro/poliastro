@@ -96,10 +96,8 @@ def test_savefig_calls_prepare_plot():
     m = OrbitPlotter2D()
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Obj")
-    pwd = os.getcwd()
-    os.chdir(tempfile.gettempdir())
-    m.savefig(filename="a.jpeg")
-    os.chdir(pwd)
+    with tempfile.NamedTemporaryFile() as fp:
+        m.savefig(filename=fp.name+".jpeg")
 
     assert patched.call_count == 1
     patched.assert_called_with()
