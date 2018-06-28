@@ -1,4 +1,8 @@
+import os
+
 import pytest
+
+import tempfile
 
 from astropy import units as u
 
@@ -92,7 +96,10 @@ def test_savefig_calls_prepare_plot():
     m = OrbitPlotter2D()
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Obj")
-    m.savefig(filename="a.jpeg")
+    pwd = os.getcwd()
+    os.chdir(tempfile.gettempdir())
+    m.savefig(filename = "a.jpeg")
+    os.chdir(pwd)
 
     assert patched.call_count == 1
     patched.assert_called_with()
