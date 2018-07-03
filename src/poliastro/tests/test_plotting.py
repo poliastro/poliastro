@@ -90,3 +90,10 @@ def test_plot_trajectory_sets_label():
     op.plot_trajectory(trajectory, label="Earth")
     legend = plt.gca().get_legend()
     assert legend.get_texts()[1].get_text() == "Earth"
+
+
+def test_dark_mode_plots_dark_plot():
+    op = OrbitPlotter(dark=True)
+    assert op.ax.get_facecolor() == (0.0, 0.0, 0.0, 1.0)
+    op = OrbitPlotter()
+    assert op.ax.get_facecolor() == (1.0, 1.0, 1.0, 1)
