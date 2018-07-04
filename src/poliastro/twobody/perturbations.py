@@ -20,13 +20,13 @@ def J2_perturbation(t0, state, k, J2, R):
     k : float
         gravitational constant, (km^3/s^2)
     J2: float
-        obliteness factor
+        oblateness factor
     R: float
         attractor radius
 
     Notes
     -----
-    The J2 accounts for the obliteness of the attractor. The formula is given in
+    The J2 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, (12.30)
 
     """
@@ -53,13 +53,13 @@ def J3_perturbation(t0, state, k, J3, R):
     k : float
         gravitational constant, (km^3/s^2)
     J3: float
-        obliteness factor
+        oblateness factor
     R: float
         attractor radius
 
     Notes
     -----
-    The J3 accounts for the obliteness of the attractor. The formula is given in
+    The J3 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, problem 12.8
 
     """

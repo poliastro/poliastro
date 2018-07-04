@@ -122,13 +122,13 @@ R_pluto = Constant('R_pluto', 'Pluto effective radius', 1.195e6, 'm', 5,
 R_moon = Constant('R_moon', 'Moon equatorial radius', 1.7374e6, 'm', 1,
                   'IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009', system='si')
 
-J2_sun = Constant('J2_sun', 'Sun J2 non-obliteness coefficient', 2.20e-7, '', 0.01e-7,
+J2_sun = Constant('J2_sun', 'Sun J2 non-oblateness coefficient', 2.20e-7, '', 0.01e-7,
                   'HAL archives', system='si')
 
-J2_earth = Constant('J2_earth', 'Earth J2 non-obliteness coefficient', 0.00108263, '', 1,
+J2_earth = Constant('J2_earth', 'Earth J2 non-oblateness coefficient', 0.00108263, '', 1,
                     'HAL archives', system='si')
 
-J3_earth = Constant('J3_earth', 'Earth J3 non-obliteness coefficient', -2.5326613168e-6, '', 1,
+J3_earth = Constant('J3_earth', 'Earth J3 non-oblateness coefficient', -2.5326613168e-6, '', 1,
                     'HAL archives', system='si')
 
 H0_earth = Constant('H0_earth', 'Earth H0 atmospheric scale height', 8500, 'm', 1,

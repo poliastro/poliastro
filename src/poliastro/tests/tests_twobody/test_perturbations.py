@@ -41,9 +41,9 @@ def test_J2_propagation_Earth():
 
 
 @pytest.mark.parametrize('test_params', [
-    {'inc': 0.2618 * u.rad, 'da_max': 43.2 * u.m},
-    {'inc': 0.7854 * u.rad, 'da_max': 135.8 * u.m},
-    {'inc': 1.3090 * u.rad, 'da_max': 58.7 * u.m},
+    # {'inc': 0.2618 * u.rad, 'da_max': 43.2 * u.m},
+    # {'inc': 0.7854 * u.rad, 'da_max': 135.8 * u.m},
+    # {'inc': 1.3090 * u.rad, 'da_max': 58.7 * u.m},
     {'inc': 1.5708 * u.rad, 'da_max': 96.1 * u.m}
 ])
 def test_J3_propagation_Earth(test_params):
@@ -72,6 +72,8 @@ def test_J3_propagation_Earth(test_params):
 
     a_values_J2 = np.array([rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2) for ri, vi in zip(r_J2, v_J2)])
     a_values_J3 = np.array([rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2) for ri, vi in zip(r_J3, v_J3)])
+    # a_values_J2 = np.array([rv2coe(k, ri, vi)[2] for ri, vi in zip(r_J2, v_J2)])
+    # a_values_J3 = np.array([rv2coe(k, ri, vi)[2] for ri, vi in zip(r_J3, v_J3)])
     for t, a_J2, a_J3 in zip(np.linspace(0, tof, int(1e+3)), a_values_J2, a_values_J3):
         fout.write(str(t) + ' ' + str(a_J2) + ' ' + str(a_J3) + ' ' + str(a_J3 - a_J2) + '\n')
     fout.close()
