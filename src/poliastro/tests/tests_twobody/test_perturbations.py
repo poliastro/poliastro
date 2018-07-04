@@ -63,11 +63,11 @@ def test_J3_propagation_Earth(test_params):
 
     tof = (10.0 * u.day).to(u.s).value
     r_J2, v_J2 = cowell(orbit, np.linspace(0, tof, int(1e+3)), ad=J2_perturbation,
-                        J2=Earth.J2.value, R=Earth.R.to(u.km).value, rtol=1e-10)
+                        J2=Earth.J2.value, R=Earth.R.to(u.km).value, rtol=1e-8)
     a_J2J3 = lambda t0, u_, k_: J2_perturbation(t0, u_, k_, J2=Earth.J2.value, R=Earth.R.to(u.km).value) + \
         J3_perturbation(t0, u_, k_, J3=Earth.J3.value, R=Earth.R.to(u.km).value)
 
-    r_J3, v_J3 = cowell(orbit, np.linspace(0, tof, int(1e+3)), ad=a_J2J3, rtol=1e-10)
+    r_J3, v_J3 = cowell(orbit, np.linspace(0, tof, int(1e+3)), ad=a_J2J3, rtol=1e-8)
 
     a_values_J2 = np.array([rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2) for ri, vi in zip(r_J2, v_J2)])
     a_values_J3 = np.array([rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2) for ri, vi in zip(r_J3, v_J3)])
@@ -171,15 +171,15 @@ moon_geo = {'body': Moon, 'tof': 60, 'raan': 6.0 * u.deg, 'argp': -11.0 * u.deg,
             'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
             'period': 28}
 
-sun_heo = {'body': Sun, 'tof': 720, 'raan': -0.31 * u.deg, 'argp': 0.84 * u.deg, 'inc': 0.23 * u.deg,
+sun_heo = {'body': Sun, 'tof': 200, 'raan': -0.10 * u.deg, 'argp': 0.2 * u.deg, 'inc': 0.1 * u.deg,
            'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
            'period': 365}
 
-sun_leo = {'body': Sun, 'tof': 720, 'raan': -17.0 * 1e-3 * u.deg, 'argp': 0.11 * u.deg, 'inc': -0.3 * 1e-4 * u.deg,
+sun_leo = {'body': Sun, 'tof': 200, 'raan': -6.0 * 1e-3 * u.deg, 'argp': 0.02 * u.deg, 'inc': -1.0 * 1e-4 * u.deg,
            'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
            'period': 365}
 
-sun_geo = {'body': Sun, 'tof': 720, 'raan': 25.0 * u.deg, 'argp': -22 * u.deg, 'inc': 0.125 * u.deg,
+sun_geo = {'body': Sun, 'tof': 200, 'raan': 8.7 * u.deg, 'argp': -5.5 * u.deg, 'inc': 5.5e-3 * u.deg,
            'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
            'period': 365}
 
@@ -187,7 +187,7 @@ sun_geo = {'body': Sun, 'tof': 720, 'raan': 25.0 * u.deg, 'argp': -22 * u.deg, '
 @pytest.mark.parametrize('test_params', [
     moon_heo, moon_geo, moon_leo,
     sun_heo, sun_geo,
-    pytest.param(sun_leo, marks=pytest.mark.skip(reason="here agreement required rtol=1e-10, too long for 720 days"))
+    pytest.param(sun_leo, marks=pytest.mark.skip(reason="here agreement required rtol=1e-10, too long for 200 days"))
 ])
 def test_3rd_body_Curtis(test_params):
     # based on example 12.11 from Howard Curtis
