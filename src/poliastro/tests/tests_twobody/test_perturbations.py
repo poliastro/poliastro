@@ -8,7 +8,8 @@ from poliastro.twobody.rv import rv2coe
 from poliastro.ephem import build_ephem_interpolant
 from astropy import units as u
 from poliastro.util import norm
-from poliastro.twobody.perturbations import J2_perturbation, atmospheric_drag, third_body, radiation_pressure
+from poliastro.twobody.perturbations import (J2_perturbation, atmospheric_drag,
+                                             third_body, radiation_pressure, J3_perturbation)
 from poliastro.bodies import Earth, Moon, Sun
 from astropy.tests.helper import assert_quantity_allclose
 from poliastro.twobody import Orbit
@@ -37,6 +38,46 @@ def test_J2_propagation_Earth():
 
     assert_quantity_allclose(raan_variation_rate, -0.172 * u.deg / u.h, rtol=1e-2)
     assert_quantity_allclose(argp_variation_rate, 0.282 * u.deg / u.h, rtol=1e-2)
+
+
+@pytest.mark.parametrize('test_params', [
+    {'inc': 0.2618 * u.rad, 'da_max': 43.2 * u.m},
+    {'inc': 0.7854 * u.rad, 'da_max': 135.8 * u.m},
+    {'inc': 1.3090 * u.rad, 'da_max': 58.7 * u.m},
+    {'inc': 1.5708 * u.rad, 'da_max': 96.1 * u.m}
+])
+def test_J3_propagation_Earth(test_params):
+    fout = open('/home/astronaut/Documents/data.txt', 'w')
+    # Nai-ming Qi, Qilong Sun, Yong Yang, (2018) "Effect of J3 perturbation on satellite position in LEO",
+    # Aircraft Engineering and  Aerospace Technology, Vol. 90 Issue: 1,
+    # pp.74-86, https://doi.org/10.1108/AEAT-03-2015-0092
+    a_ini = 8970.667 * u.km
+    ecc_ini = 0.25 * u.one
+    raan_ini = 1.047 * u.rad
+    nu_ini = 0.0 * u.rad
+    argp_ini = 1.0 * u.rad
+    inc_ini = test_params['inc']
+
+    k = Earth.k.to(u.km**3 / u.s**2).value
+
+    orbit = Orbit.from_classical(Earth, a_ini, ecc_ini, inc_ini, raan_ini, argp_ini, nu_ini)
+
+    tof = (10.0 * u.day).to(u.s).value
+    r_J2, v_J2 = cowell(orbit, np.linspace(0, tof, int(1e+3)), ad=J2_perturbation,
+                        J2=Earth.J2.value, R=Earth.R.to(u.km).value, rtol=1e-14)
+    a_J2J3 = lambda t0, u_, k_: J2_perturbation(t0, u_, k_, J2=Earth.J2.value, R=Earth.R.to(u.km).value) + \
+        J3_perturbation(t0, u_, k_, J3=Earth.J3.value, R=Earth.R.to(u.km).value)
+
+    r_J3, v_J3 = cowell(orbit, np.linspace(0, tof, int(1e+3)), ad=a_J2J3, rtol=1e-14)
+
+    a_values_J2 = np.array([rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2) for ri, vi in zip(r_J2, v_J2)])
+    a_values_J3 = np.array([rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2) for ri, vi in zip(r_J3, v_J3)])
+    for t, a_J2, a_J3 in zip(np.linspace(0, tof, int(1e+3)), a_values_J2, a_values_J3):
+        fout.write(str(t) + ' ' + str(a_J2) + ' ' + str(a_J3) + ' ' + str(a_J3 - a_J2) + '\n')
+    fout.close()
+    da_max = np.max(np.abs(a_values_J2 - a_values_J3))
+
+    assert_quantity_allclose(da_max * u.km, test_params['da_max'])
 
 
 def test_atmospheric_drag():
