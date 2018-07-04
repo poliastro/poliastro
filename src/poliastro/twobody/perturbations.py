@@ -4,6 +4,7 @@ from poliastro.util import norm
 from poliastro.twobody import Orbit
 import astropy.units as u
 from poliastro.jit import jit
+from warnings import warn
 
 
 def J2_perturbation(t0, state, k, J2, R):
@@ -63,6 +64,8 @@ def J3_perturbation(t0, state, k, J3, R):
     Howard Curtis, problem 12.8
 
     """
+    warn("This perturbation has not been fully validated, see \
+           https://github.com/poliastro/poliastro/pull/398")
     r_vec = state[:3]
     r = norm(r_vec)
 
