@@ -33,7 +33,7 @@ setup(
         "beautifulsoup4>=4.5.3",
         "requests",
         "pandas",
-        "plotly>=2.6.0,<3.0",
+        "plotly>=3.0,<4.*",
         "astroquery>=0.3.8",
     ],
     extras_require={
