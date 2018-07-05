@@ -4,6 +4,7 @@ from poliastro.util import norm
 from poliastro.twobody import Orbit
 import astropy.units as u
 from poliastro.jit import jit
+from warnings import warn
 
 
 def J2_perturbation(t0, state, k, J2, R):
@@ -20,13 +21,13 @@ def J2_perturbation(t0, state, k, J2, R):
     k : float
         gravitational constant, (km^3/s^2)
     J2: float
-        obliteness factor
+        oblateness factor
     R: float
         attractor radius
 
     Notes
     -----
-    The J2 accounts for the obliteness of the attractor. The formula is given in
+    The J2 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, (12.30)
 
     """
@@ -39,6 +40,42 @@ def J2_perturbation(t0, state, k, J2, R):
     a_y = 5.0 * r_vec[2] ** 2 / r ** 2 - 1
     a_z = 5.0 * r_vec[2] ** 2 / r ** 2 - 3
     return np.array([a_x, a_y, a_z]) * r_vec * factor
+
+
+def J3_perturbation(t0, state, k, J3, R):
+    """Calculates J3_perturbation acceleration (km/s2)
+
+    Parameters
+    ----------
+    t0 : float
+        Current time (s)
+    state : numpy.ndarray
+        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+    k : float
+        gravitational constant, (km^3/s^2)
+    J3: float
+        oblateness factor
+    R: float
+        attractor radius
+
+    Notes
+    -----
+    The J3 accounts for the oblateness of the attractor. The formula is given in
+    Howard Curtis, problem 12.8
+
+    """
+    warn("This perturbation has not been fully validated, see \
+           https://github.com/poliastro/poliastro/pull/398")
+    r_vec = state[:3]
+    r = norm(r_vec)
+
+    factor = (1.0 / 2.0) * k * J3 * (R ** 3) / (r ** 5)
+    cos_phi = r_vec[2] / r
+
+    a_x = 5.0 * r_vec[0] / r * (7.0 * cos_phi ** 3 - 3.0 * cos_phi)
+    a_y = 5.0 * r_vec[1] / r * (7.0 * cos_phi ** 3 - 3.0 * cos_phi)
+    a_z = 3.0 * (35.0 / 3.0 * cos_phi ** 4 - 10.0 * cos_phi ** 2 + 1)
+    return np.array([a_x, a_y, a_z]) * factor
 
 
 def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):

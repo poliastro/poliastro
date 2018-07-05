@@ -157,6 +157,7 @@ class _Earth(_Body):
     symbol = u"\u2641"
     R = constants.R_earth
     J2 = constants.J2_earth
+    J3 = constants.J3_earth
     H0 = constants.H0_earth
     rho0 = constants.rho0_earth
 
