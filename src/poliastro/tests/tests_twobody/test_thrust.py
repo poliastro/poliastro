@@ -8,7 +8,7 @@ from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
-from poliastro.twobody.thrust import edelbaum_ai, extra_quantities_edelbaum_ai
+from poliastro.twobody.thrust import edelbaum_ai
 
 
 @pytest.mark.parametrize("inc_0, expected_t_f, expected_delta_V, rtol", [
@@ -25,7 +25,7 @@ def test_leo_geo_time_and_delta_v(inc_0, expected_t_f, expected_delta_V, rtol):
     k = Earth.k.to(u.km**3 / u.s**2).value
     inc_0 = np.radians(inc_0)  # rad
 
-    delta_V, t_f = extra_quantities_edelbaum_ai(k, a_0, a_f, inc_0, inc_f, f)
+    _, delta_V, t_f = edelbaum_ai(k, a_0, a_f, inc_0, inc_f, f)
 
     assert_allclose(delta_V, expected_delta_V, rtol=rtol)
     assert_allclose((t_f * u.s).to(u.day).value, expected_t_f, rtol=rtol)
@@ -40,9 +40,8 @@ def test_leo_geo_numerical(inc_0):
     inc_f = 0.0  # rad
 
     k = Earth.k.to(u.km**3 / u.s**2).value
-    edelbaum_accel = edelbaum_ai(k, a_0, a_f, inc_0, inc_f, f)
 
-    _, t_f = extra_quantities_edelbaum_ai(k, a_0, a_f, inc_0, inc_f, f)
+    edelbaum_accel, _, t_f = edelbaum_ai(k, a_0, a_f, inc_0, inc_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.circular(Earth, a_0 * u.km - Earth.R, inc_0 * u.rad)
