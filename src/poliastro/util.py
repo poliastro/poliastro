@@ -5,8 +5,10 @@ import numpy as np
 
 from astropy.coordinates import matrix_utilities
 from astropy.time import Time
+from poliastro.jit import jit
 
 
+@jit
 def circular_velocity(k, a):
     """Compute circular velocity for a given body (k) and semimajor axis (a).
 
@@ -67,11 +69,12 @@ def transform(vector, angle, axis='z', unit=None):
     return rotate(vector, -angle, axis, unit)
 
 
+@jit
 def norm(vec):
     """Norm of a Quantity vector that respects units.
 
     """
-    return np.sqrt(vec.dot(vec))
+    return np.sqrt(np.sum(vec ** 2))
 
 
 def time_range(start, *, periods=50, spacing=None, end=None):

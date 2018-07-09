@@ -49,10 +49,10 @@ def test_leo_geo_numerical(inc_0):
 
     # Propagate orbit
 
-    r, v = cowell(s0, t_f, ad=edelbaum_accel, rtol=1e-8)
+    r, v = cowell(s0, t_f, ad=edelbaum_accel, rtol=1e-6)
 
     sf = Orbit.from_vectors(Earth, r * u.km, v * u.km / u.s, s0.epoch + t_f * u.s)
 
-    assert_allclose(sf.a.to(u.km).value, a_f, rtol=1e-5)
+    assert_allclose(sf.a.to(u.km).value, a_f, rtol=1e-3)
     assert_allclose(sf.ecc.value, 0.0, atol=1e-2)
-    assert_allclose(sf.inc.to(u.rad).value, inc_f, atol=1e-3)
+    assert_allclose(sf.inc.to(u.rad).value, inc_f, atol=2e-3)

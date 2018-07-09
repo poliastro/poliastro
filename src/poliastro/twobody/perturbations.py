@@ -5,8 +5,10 @@ from poliastro.twobody import Orbit
 import astropy.units as u
 from poliastro.jit import jit
 from warnings import warn
+from poliastro.jit import jit
 
 
+@jit
 def J2_perturbation(t0, state, k, J2, R):
     """Calculates J2_perturbation acceleration (km/s2)
 
@@ -42,6 +44,7 @@ def J2_perturbation(t0, state, k, J2, R):
     return np.array([a_x, a_y, a_z]) * r_vec * factor
 
 
+@jit
 def J3_perturbation(t0, state, k, J3, R):
     """Calculates J3_perturbation acceleration (km/s2)
 
@@ -64,8 +67,8 @@ def J3_perturbation(t0, state, k, J3, R):
     Howard Curtis, problem 12.8
 
     """
-    warn("This perturbation has not been fully validated, see \
-           https://github.com/poliastro/poliastro/pull/398")
+    # warn("This perturbation has not been fully validated, see \
+    #       https://github.com/poliastro/poliastro/pull/398")
     r_vec = state[:3]
     r = norm(r_vec)
 
@@ -78,6 +81,7 @@ def J3_perturbation(t0, state, k, J3, R):
     return np.array([a_x, a_y, a_z]) * factor
 
 
+@jit
 def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     """Calculates atmospheric drag acceleration (km/s2)
 
