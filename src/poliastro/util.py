@@ -8,7 +8,6 @@ from astropy.time import Time
 from poliastro.jit import jit
 
 
-@jit
 def circular_velocity(k, a):
     """Compute circular velocity for a given body (k) and semimajor axis (a).
 

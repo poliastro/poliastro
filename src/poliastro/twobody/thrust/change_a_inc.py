@@ -13,7 +13,6 @@ def beta_0(V_0, V_f, inc_0, inc_f):
     return np.arctan2(np.sin(np.pi / 2 * delta_i_f), V_0 / V_f - np.cos(np.pi / 2 * delta_i_f))
 
 
-@jit
 def compute_parameters(k, a_0, a_f, inc_0, inc_f):
     """Compute parameters of the model.
     """
@@ -40,7 +39,6 @@ def delta_V(V_0, beta_0, inc_0, inc_f):
     return V_0 * np.cos(beta_0) - V_0 * np.sin(beta_0) / np.tan(np.pi / 2 * delta_i_f + beta_0)
 
 
-@jit
 def extra_quantities(k, a_0, a_f, inc_0, inc_f, f):
     """Extra quantities given by the Edelbaum (a, i) model.
     """
