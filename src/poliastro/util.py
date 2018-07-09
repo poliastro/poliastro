@@ -74,6 +74,7 @@ def norm(vec):
     """
     return np.sqrt(vec.dot(vec))
 
+
 @jit
 def norm_3d(vec):
     """Norm of a Quantity vector that respects units.
