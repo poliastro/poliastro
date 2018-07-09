@@ -69,12 +69,16 @@ def transform(vector, angle, axis='z', unit=None):
     return rotate(vector, -angle, axis, unit)
 
 
-@jit
 def norm(vec):
     """Norm of a Quantity vector that respects units.
-
     """
-    return np.sqrt(np.sum(vec ** 2))
+    return np.sqrt(vec.dot(vec))
+
+@jit
+def norm_3d(vec):
+    """Norm of a Quantity vector that respects units.
+    """
+    return (vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]) ** 0.5
 
 
 def time_range(start, *, periods=50, spacing=None, end=None):
