@@ -1,7 +1,7 @@
 import numpy as np
 
 from poliastro.twobody.decorators import state_from_vector
-from poliastro.util import norm, circular_velocity
+from poliastro.util import norm_3d, circular_velocity
 from poliastro.jit import jit
 
 
@@ -88,8 +88,8 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
         # Change sign of beta with the out-of-plane velocity
         beta_ = beta(t0, V_0=V_0, f=f, beta_0=beta_0_) * np.sign(r[0] * (inc_f - inc_0))
 
-        t_ = v / norm(v)
-        w_ = np.cross(r, v) / norm(np.cross(r, v))
+        t_ = v / norm_3d(v)
+        w_ = np.cross(r, v) / norm_3d(np.cross(r, v))
         # n_ = np.cross(t_, w_)
         accel_v = f * (
             np.cos(beta_) * t_ +

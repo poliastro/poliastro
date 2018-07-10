@@ -8,7 +8,62 @@ from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
-from poliastro.twobody.thrust import change_a_inc
+from poliastro.twobody.thrust import change_a_inc, change_argp
+
+
+def test_soyuz_standard_gto_delta_v():
+    # Data from Soyuz Users Manual, issue 2 revision 0
+    r_a = (Earth.R + 35950 * u.km).to(u.km).value
+    r_p = (Earth.R + 250 * u.km).to(u.km).value
+
+    a = (r_a + r_p) / 2  # km
+    ecc = r_a / a - 1
+    argp_0 = (178 * u.deg).to(u.rad).value  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
+    f = 2.4e-7  # km / s2
+
+    k = Earth.k.to(u.km**3 / u.s**2).value
+
+    _, delta_V, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+
+    expected_t_f = 12.0  # days, approximate
+    expected_delta_V = 0.2489  # km / s
+
+    assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
+    assert_allclose(t_f / 86400, expected_t_f, rtol=1e-2)
+
+
+def test_soyuz_standard_gto_numerical():
+    # Data from Soyuz Users Manual, issue 2 revision 0
+    r_a = (Earth.R + 35950 * u.km).to(u.km).value
+    r_p = (Earth.R + 250 * u.km).to(u.km).value
+
+    a = (r_a + r_p) / 2  # km
+    ecc = r_a / a - 1
+    argp_0 = (178 * u.deg).to(u.rad).value  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
+    f = 2.4e-7  # km / s2
+
+    k = Earth.k.to(u.km**3 / u.s**2).value
+
+    argp_accel, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.from_classical(
+        Earth,
+        a * u.km, (r_a / a - 1) * u.one, 6 * u.deg,
+        188.5 * u.deg, 178 * u.deg, 0 * u.deg
+    )
+
+    # Propagate orbit
+    r, v = cowell(s0, t_f, ad=argp_accel, rtol=1e-8)
+
+    sf = Orbit.from_vectors(Earth,
+                            r * u.km,
+                            v * u.km / u.s,
+                            s0.epoch + t_f * u.s)
+
+    assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
 
 
 @pytest.mark.parametrize("inc_0, expected_t_f, expected_delta_V, rtol", [
