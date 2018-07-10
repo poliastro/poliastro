@@ -49,7 +49,7 @@ def test_leo_geo_numerical(inc_0):
 
     # Propagate orbit
 
-    r, v = cowell(s0, t_f, ad=edelbaum_accel, rtol=1e-6)
+    r, v = cowell(s0, t_f, ad=edelbaum_accel, rtol=1e-7)
 
     sf = Orbit.from_vectors(Earth, r * u.km, v * u.km / u.s, s0.epoch + t_f * u.s)
 
