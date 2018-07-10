@@ -63,6 +63,17 @@ jobs:
       - image: circleci/python:3.7
 
     steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install numpy --quiet
+            pip install . --quiet
+            pip install .[dev] --quiet
+
       - run:
           name: run tests
           command: |
