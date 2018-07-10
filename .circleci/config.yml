@@ -14,7 +14,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install pycodestyle mypy
+            pip install pycodestyle mypy --quiet
 
       - run:
           name: check PEP8
@@ -42,9 +42,9 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install numpy
-            pip install .
-            pip install .[dev]
+            pip install numpy --quiet
+            pip install . --quiet
+            pip install .[dev] --quiet
 
       - run:
           name: run tests
@@ -83,8 +83,8 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install numpy
-            pip install --editable .[dev]
+            pip install numpy --quiet
+            pip install --editable .[dev] --quiet
 
       - run:
           name: run coverage
@@ -96,7 +96,7 @@ jobs:
           name: publish coverage
           command: |
             . venv/bin/activate
-            pip install codecov
+            pip install codecov --quiet
             codecov
 
   docs:
@@ -114,7 +114,7 @@ jobs:
             sudo apt update && sudo apt install pandoc
             python3 -m venv venv
             . venv/bin/activate
-            pip install .[dev]
+            pip install .[dev] --quiet
 
       - run:
           name: build docs
