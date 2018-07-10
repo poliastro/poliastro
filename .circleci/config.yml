@@ -1,8 +1,100 @@
 version: 2
 jobs:
-  build:
+  quality:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.6
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install pycodestyle mypy
+
+      - run:
+          name: check PEP8
+          command: |
+            . venv/bin/activate
+            pycodestyle src/ setup.py --count
+
+      - run:
+          name: check MyPy
+          command: |
+            . venv/bin/activate
+            mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional src/
+
+  test_py35: &test-template  # See https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462/2
+    docker:
+      - image: circleci/python:3.5
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install numpy
+            pip install .
+            pip install .[dev]
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            pytest -vv  # Test against installed code
+
+  test_py36:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.6
+
+  test_py37:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.7
+
+  coverage:
+    docker:
+      - image: circleci/python:3.6
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install numpy
+            pip install --editable .[dev]
+
+      - run:
+          name: run coverage
+          command: |
+            . venv/bin/activate
+            NUMBA_DISABLE_JIT=1 pytest --cov  # Test against sources
+
+      - run:
+          name: publish coverage
+          command: |
+            . venv/bin/activate
+            pip install codecov
+            codecov
+
+  docs:
+    docker:
+      - image: circleci/python:3.6
 
     working_directory: ~/repo
 
@@ -26,3 +118,28 @@ jobs:
       - store_artifacts:
           path: docs-html
           destination: docs-html
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - quality
+      - test_py35:
+          requires:
+            - quality
+      - test_py36:
+          requires:
+            - quality
+      - test_py37:
+          requires:
+            - quality
+      - coverage:
+          requires:
+            - test_py35
+            - test_py36
+            - test_py37
+      - docs:
+          requires:
+            - test_py35
+            - test_py36
+            - test_py37
