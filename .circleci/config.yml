@@ -127,8 +127,7 @@ workflows:
             - quality
       - coverage:
           requires:
-            - test_py35
-            - test_py36
+            - quality
       - docs:
           requires:
             - test_py35
