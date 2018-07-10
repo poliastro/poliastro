@@ -50,7 +50,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest -vv  # Test against installed code
+            MPLBACKEND=Agg pytest -vv  # Test against installed code
 
   test_py36:
     <<: *test-template
@@ -67,7 +67,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest -vv || exit 0  # Allow failures
+            MPLBACKEND=Agg pytest -vv || exit 0  # Allow failures
 
   coverage:
     docker:
@@ -90,7 +90,7 @@ jobs:
           name: run coverage
           command: |
             . venv/bin/activate
-            NUMBA_DISABLE_JIT=1 pytest --cov  # Test against sources
+            MPLBACKEND=Agg NUMBA_DISABLE_JIT=1 pytest --cov  # Test against sources
 
       - run:
           name: publish coverage
