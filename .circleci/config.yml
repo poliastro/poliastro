@@ -57,29 +57,6 @@ jobs:
     docker:
       - image: circleci/python:3.6
 
-  test_py37:
-    <<: *test-template
-    docker:
-      - image: circleci/python:3.7
-
-    steps:
-      - checkout
-
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install numpy --quiet
-            pip install . --quiet
-            pip install .[dev] --quiet
-
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            MPLBACKEND=Agg pytest -vv || exit 0  # Allow failures
-
   coverage:
     docker:
       - image: circleci/python:3.6
@@ -146,9 +123,6 @@ workflows:
           requires:
             - quality
       - test_py36:
-          requires:
-            - quality
-      - test_py37:
           requires:
             - quality
       - coverage:
