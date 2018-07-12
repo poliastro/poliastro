@@ -11,6 +11,31 @@ from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import change_a_inc, change_argp, change_inc_ecc, change_ecc_quasioptimal
 
 
+@pytest.mark.parametrize("inc_0", [np.radians(28.5),
+                                   pytest.param(np.radians(90.0),
+                                   marks=pytest.mark.skip(reason="too long for now"))])
+def test_leo_geo_numerical(inc_0):
+    f = 3.5e-7  # km / s2
+
+    a_0 = 7000.0  # km
+    a_f = 42166.0  # km
+    inc_f = 0.0  # rad
+
+    k = Earth.k.to(u.km**3 / u.s**2).value
+
+    a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.circular(Earth, a_0 * u.km - Earth.R, inc_0 * u.rad)
+
+    # Propagate orbit
+    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-6)
+
+    assert_allclose(sf.a.to(u.km).value, a_f, rtol=1e-3)
+    assert_allclose(sf.ecc.value, 0.0, atol=1e-2)
+    assert_allclose(sf.inc.to(u.rad).value, inc_f, atol=2e-3)
+
+
 @pytest.mark.parametrize("ecc_0,ecc_f", [
     [0.0, 0.1245],  # Reverse-engineered from results
     [0.1245, 0.0]
@@ -179,26 +204,3 @@ def test_leo_geo_time_and_delta_v(inc_0, expected_t_f, expected_delta_V, rtol):
 
     assert_allclose(delta_V, expected_delta_V, rtol=rtol)
     assert_allclose((t_f * u.s).to(u.day).value, expected_t_f, rtol=rtol)
-
-
-@pytest.mark.parametrize("inc_0", [np.radians(28.5), np.radians(90.0)])
-def test_leo_geo_numerical(inc_0):
-    f = 3.5e-7  # km / s2
-
-    a_0 = 7000.0  # km
-    a_f = 42166.0  # km
-    inc_f = 0.0  # rad
-
-    k = Earth.k.to(u.km**3 / u.s**2).value
-
-    a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
-
-    # Retrieve r and v from initial orbit
-    s0 = Orbit.circular(Earth, a_0 * u.km - Earth.R, inc_0 * u.rad)
-
-    # Propagate orbit
-    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
-
-    assert_allclose(sf.a.to(u.km).value, a_f, rtol=1e-3)
-    assert_allclose(sf.ecc.value, 0.0, atol=1e-2)
-    assert_allclose(sf.inc.to(u.rad).value, inc_f, atol=2e-3)
