@@ -47,12 +47,7 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
     a_d, _, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 
     # Propagate orbit
-    r, v = cowell(s0, tof=t_f, ad=a_d, rtol=1e-8)
-
-    sf = Orbit.from_vectors(Earth,
-                            r * u.km,
-                            v * u.km / u.s,
-                            s0.epoch + t_f * u.s)
+    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
 
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-4, atol=1e-4)
 
@@ -64,7 +59,7 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
     [0.6, 16.0, 40.0, 1.7241],
     [0.8, 10.0, 16.304, 1.9799]
 ])
-def test_geo_cases_beta_and_delta_v(ecc_0, inc_f, expected_beta, expected_delta_V):
+def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_V):
     a = 42164  # km
     ecc_f = 0.0
     inc_0 = 0.0  # rad, baseline
@@ -110,12 +105,7 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
     a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
 
     # Propagate orbit
-    r, v = cowell(s0, tof=t_f, ad=a_d, rtol=1e-8)
-
-    sf = Orbit.from_vectors(Earth,
-                            r * u.km,
-                            v * u.km / u.s,
-                            s0.epoch + t_f * u.s)
+    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
 
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-2, atol=1e-2)
     assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
@@ -156,7 +146,7 @@ def test_soyuz_standard_gto_numerical():
 
     k = Earth.k.to(u.km**3 / u.s**2).value
 
-    argp_accel, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+    a_d, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(
@@ -166,12 +156,7 @@ def test_soyuz_standard_gto_numerical():
     )
 
     # Propagate orbit
-    r, v = cowell(s0, t_f, ad=argp_accel, rtol=1e-8)
-
-    sf = Orbit.from_vectors(Earth,
-                            r * u.km,
-                            v * u.km / u.s,
-                            s0.epoch + t_f * u.s)
+    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
 
     assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
 
@@ -206,17 +191,13 @@ def test_leo_geo_numerical(inc_0):
 
     k = Earth.k.to(u.km**3 / u.s**2).value
 
-    edelbaum_accel, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+    a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.circular(Earth, a_0 * u.km - Earth.R, inc_0 * u.rad)
-    r0, v0 = s0.rv()
 
     # Propagate orbit
-
-    r, v = cowell(s0, t_f, ad=edelbaum_accel, rtol=1e-7)
-
-    sf = Orbit.from_vectors(Earth, r * u.km, v * u.km / u.s, s0.epoch + t_f * u.s)
+    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
 
     assert_allclose(sf.a.to(u.km).value, a_f, rtol=1e-3)
     assert_allclose(sf.ecc.value, 0.0, atol=1e-2)

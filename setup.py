@@ -37,7 +37,7 @@ setup(
         "callhorizons",
     ],
     extras_require={
-        ':implementation_name=="cpython"': "numba>=0.25",
+        ':implementation_name=="cpython"': "numba>=0.39",
         'dev': [
             "coverage",
             "pytest-cov",

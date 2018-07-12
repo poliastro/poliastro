@@ -1,11 +1,10 @@
 from astropy.time import Time
 import numpy as np
-from poliastro.util import norm_3d
+from poliastro.util import norm_fast
 from poliastro.twobody import Orbit
 import astropy.units as u
 from poliastro.jit import jit
 from warnings import warn
-from poliastro.jit import jit
 
 
 @jit
@@ -34,7 +33,7 @@ def J2_perturbation(t0, state, k, J2, R):
 
     """
     r_vec = state[:3]
-    r = norm_3d(r_vec)
+    r = norm_fast(r_vec)
 
     factor = (3.0 / 2.0) * k * J2 * (R ** 2) / (r ** 5)
 
@@ -65,12 +64,11 @@ def J3_perturbation(t0, state, k, J3, R):
     -----
     The J3 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, problem 12.8
+    This perturbation has not been fully validated, see https://github.com/poliastro/poliastro/pull/398
 
     """
-    # warn("This perturbation has not been fully validated, see \
-    #       https://github.com/poliastro/poliastro/pull/398")
     r_vec = state[:3]
-    r = norm_3d(r_vec)
+    r = norm_fast(r_vec)
 
     factor = (1.0 / 2.0) * k * J3 * (R ** 3) / (r ** 5)
     cos_phi = r_vec[2] / r
@@ -113,10 +111,10 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     the atmospheric density model is rho(H) = rho0 x exp(-H / H0)
 
     """
-    H = norm_3d(state[:3])
+    H = norm_fast(state[:3])
 
     v_vec = state[3:]
-    v = norm_3d(v_vec)
+    v = norm_fast(v_vec)
     B = C_D * A / m
     rho = rho0 * np.exp(-(H - R) / H0)
 
@@ -140,7 +138,7 @@ def third_body(t0, state, k, k_third, third_body):
 
     body_r = third_body(t0)
     delta_r = body_r - state[:3]
-    return k_third * delta_r / norm_3d(delta_r) ** 3 - k_third * body_r / norm_3d(body_r) ** 3
+    return k_third * delta_r / norm_fast(delta_r) ** 3 - k_third * body_r / norm_fast(body_r) ** 3
 
 
 @jit
@@ -200,7 +198,7 @@ def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
 
     r_star = star(t0)
     r_sat = state[:3]
-    P_s = Wdivc_s / (norm_3d(r_star) ** 2)
+    P_s = Wdivc_s / (norm_fast(r_star) ** 2)
 
     nu = float(shadow_function(r_sat, r_star, R))
-    return -nu * P_s * (C_R * A / m) * r_star / norm_3d(r_star)
+    return -nu * P_s * (C_R * A / m) * r_star / norm_fast(r_star)

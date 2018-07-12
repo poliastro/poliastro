@@ -15,6 +15,9 @@ def circular_velocity(k, a):
     return np.sqrt(k / a)
 
 
+circular_velocity_fast = jit(circular_velocity)
+
+
 def rotate(vector, angle, axis='z', unit=None):
     """Rotates a vector around axis a right-handed positive angle.
 
@@ -74,11 +77,7 @@ def norm(vec):
     return np.sqrt(vec.dot(vec))
 
 
-@jit
-def norm_3d(vec):
-    """Norm of a Quantity vector that respects units.
-    """
-    return (vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]) ** 0.5
+norm_fast = jit(norm)
 
 
 def time_range(start, *, periods=50, spacing=None, end=None):

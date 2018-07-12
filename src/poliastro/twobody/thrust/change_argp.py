@@ -5,11 +5,12 @@ References
   Elliptical Orbit Transfers", 1997.
 * Pollard, J. E. "Evaluation of Low-Thrust Orbital Maneuvers", 1998.
 """
+
 import numpy as np
 
 from poliastro.twobody import rv
 from poliastro.twobody.decorators import state_from_vector
-from poliastro.util import norm_3d, circular_velocity
+from poliastro.util import norm_fast, circular_velocity_fast
 from poliastro.jit import jit
 
 
@@ -21,10 +22,11 @@ def delta_V(V, ecc, argp_0, argp_f, f, A):
     return delta_argp / (3 * np.sign(delta_argp) / 2 * np.sqrt(1 - ecc ** 2) / ecc / V + A / f)
 
 
+@jit
 def extra_quantities(k, a, ecc, argp_0, argp_f, f, A=0.0):
     """Extra quantities given by the model.
     """
-    V = circular_velocity(k, a)
+    V = circular_velocity_fast(k, a)
     delta_V_ = delta_V(V, ecc, argp_0, argp_f, f, A)
     t_f_ = delta_V_ / f
 
@@ -35,6 +37,7 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
     """Guidance law from the model.
     Thrust is aligned with an inertially fixed direction perpendicular to the
     semimajor axis of the orbit.
+
     Parameters
     ----------
     f : float
@@ -48,8 +51,8 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
 
         alpha_ = nu - np.pi / 2
 
-        r_ = r / norm_3d(r)
-        w_ = np.cross(r, v) / norm_3d(np.cross(r, v))
+        r_ = r / norm_fast(r)
+        w_ = np.cross(r, v) / norm_fast(np.cross(r, v))
         s_ = np.cross(w_, r_)
         accel_v = f * (
             np.cos(alpha_) * s_ +

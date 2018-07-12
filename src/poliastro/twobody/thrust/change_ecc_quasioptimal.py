@@ -4,10 +4,11 @@ References
 * Pollard, J. E. "Simplified Approach for Assessment of Low-Thrust
   Elliptical Orbit Transfers", 1997.
 """
+
 import numpy as np
 
 from poliastro.twobody.decorators import state_from_vector
-from poliastro.util import norm, circular_velocity
+from poliastro.util import norm_fast, circular_velocity_fast
 from poliastro.jit import jit
 import astropy.units as u
 
@@ -19,10 +20,11 @@ def delta_V(V_0, ecc_0, ecc_f):
     return 2 / 3 * V_0 * np.abs(np.arcsin(ecc_0) - np.arcsin(ecc_f))
 
 
+@jit
 def extra_quantities(k, a, ecc_0, ecc_f, f):
     """Extra quantities given by the model.
     """
-    V_0 = circular_velocity(k, a)
+    V_0 = circular_velocity_fast(k, a)
     delta_V_ = delta_V(V_0, ecc_0, ecc_f)
     t_f_ = delta_V_ / f
 
@@ -33,6 +35,7 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
     """Guidance law from the model.
     Thrust is aligned with an inertially fixed direction perpendicular to the
     semimajor axis of the orbit.
+
     Parameters
     ----------
     ss_0 : Orbit
@@ -49,9 +52,9 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
     if ecc_0 > 0.001:  # Arbitrary tolerance
         ref_vec = ss_0.e_vec / ecc_0
     else:
-        ref_vec = ss_0.r / norm(ss_0.r)
+        ref_vec = ss_0.r / norm_fast(ss_0.r)
 
-    h_unit = ss_0.h_vec / norm(ss_0.h_vec)
+    h_unit = ss_0.h_vec / norm_fast(ss_0.h_vec)
     thrust_unit = np.cross(h_unit, ref_vec) * np.sign(ecc_f - ecc_0)
 
     def a_d(t0, u_, k):

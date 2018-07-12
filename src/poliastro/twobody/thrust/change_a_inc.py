@@ -1,7 +1,7 @@
 import numpy as np
 
 from poliastro.twobody.decorators import state_from_vector
-from poliastro.util import norm_3d, circular_velocity
+from poliastro.util import norm_fast, circular_velocity_fast
 from poliastro.jit import jit
 
 
@@ -13,12 +13,13 @@ def beta_0(V_0, V_f, inc_0, inc_f):
     return np.arctan2(np.sin(np.pi / 2 * delta_i_f), V_0 / V_f - np.cos(np.pi / 2 * delta_i_f))
 
 
+@jit
 def compute_parameters(k, a_0, a_f, inc_0, inc_f):
     """Compute parameters of the model.
     """
     delta_inc = abs(inc_f - inc_0)
-    V_0 = circular_velocity(k, a_0)
-    V_f = circular_velocity(k, a_f)
+    V_0 = circular_velocity_fast(k, a_0)
+    V_f = circular_velocity_fast(k, a_f)
     beta_0_ = beta_0(V_0, V_f, inc_0, inc_f)
 
     return V_0, beta_0_, delta_inc
@@ -39,6 +40,7 @@ def delta_V(V_0, beta_0, inc_0, inc_f):
     return V_0 * np.cos(beta_0) - V_0 * np.sin(beta_0) / np.tan(np.pi / 2 * delta_i_f + beta_0)
 
 
+@jit
 def extra_quantities(k, a_0, a_f, inc_0, inc_f, f):
     """Extra quantities given by the Edelbaum (a, i) model.
     """
@@ -52,6 +54,7 @@ def extra_quantities(k, a_0, a_f, inc_0, inc_f, f):
 def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
     """Guidance law from the Edelbaum/Kéchichian theory, optimal transfer between circular inclined orbits
        (a_0, i_0) --> (a_f, i_f), ecc = 0.
+
     Parameters
     ----------
     k : float
@@ -88,8 +91,8 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
         # Change sign of beta with the out-of-plane velocity
         beta_ = beta(t0, V_0=V_0, f=f, beta_0=beta_0_) * np.sign(r[0] * (inc_f - inc_0))
 
-        t_ = v / norm_3d(v)
-        w_ = np.cross(r, v) / norm_3d(np.cross(r, v))
+        t_ = v / norm_fast(v)
+        w_ = np.cross(r, v) / norm_fast(np.cross(r, v))
         # n_ = np.cross(t_, w_)
         accel_v = f * (
             np.cos(beta_) * t_ +
