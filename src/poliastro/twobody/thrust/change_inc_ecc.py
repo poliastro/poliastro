@@ -56,8 +56,6 @@ def change_inc_ecc(ss_0, ecc_f, inc_f, f):
     f : float
         Magnitude of constant acceleration.
     """
-    k = ss_0.attractor.k.to(u.km**3 / u.s**2).value
-    a = ss_0.a.to(u.km).value
     # We fix the inertial direction at the beginning
     ecc_0 = ss_0.ecc.value
     if ecc_0 > 0.001:  # Arbitrary tolerance
@@ -86,5 +84,6 @@ def change_inc_ecc(ss_0, ecc_f, inc_f, f):
         )
         return accel_v
 
-    delta_V, beta_, t_f = extra_quantities(k, a, ecc_0, ecc_f, inc_0, inc_f, argp, f)
+    delta_V, beta_, t_f = extra_quantities(ss_0.attractor.k.to(u.km**3 / u.s**2).value, ss_0.a.to(u.km).value, 
+                                           ecc_0, ecc_f, inc_0, inc_f, argp, f)
     return a_d, delta_V, beta_, t_f
