@@ -5,6 +5,7 @@ import numpy as np
 
 from astropy.coordinates import matrix_utilities
 from astropy.time import Time
+from poliastro.jit import jit
 
 
 def circular_velocity(k, a):
@@ -12,6 +13,9 @@ def circular_velocity(k, a):
 
     """
     return np.sqrt(k / a)
+
+
+circular_velocity_fast = jit(circular_velocity)
 
 
 def rotate(vector, angle, axis='z', unit=None):
@@ -69,9 +73,11 @@ def transform(vector, angle, axis='z', unit=None):
 
 def norm(vec):
     """Norm of a Quantity vector that respects units.
-
     """
     return np.sqrt(vec.dot(vec))
+
+
+norm_fast = jit(norm)
 
 
 def time_range(start, *, periods=50, spacing=None, end=None):
