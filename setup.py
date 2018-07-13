@@ -34,7 +34,7 @@ setup(
         "requests",
         "pandas",
         "plotly>=2.6.0,<3.0",
-        "callhorizons",
+        "astroquery>=0.3.8",
     ],
     extras_require={
         ':implementation_name=="cpython"': "numba>=0.39",
