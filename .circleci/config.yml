@@ -99,7 +99,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            sudo apt update && sudo apt install pandoc
+            sudo apt update && sudo apt install pandoc texlive texlive-xetex texlive-fonts-extra texlive-latex-extra texlive-plain-extra dvipng
             python3 -m venv venv
             . venv/bin/activate
             pip install .[dev] --quiet

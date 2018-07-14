@@ -457,7 +457,7 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
         x_center, y_center, z_center = center
         trace = Scatter(x=xx.to(u.km).value, y=yy.to(u.km).value, mode='markers', line=dict(color=color, width=5,
                                                                                             dash='dash',), name=name)
-        self._layout["shapes"].append(
+        self._layout["shapes"] += (
             {
                 'type': 'circle',
                 'xref': 'x',
