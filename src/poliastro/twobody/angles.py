@@ -8,7 +8,7 @@ from poliastro.jit import jit
 
 
 @jit
-def newton(func, x0, fprime, args=(), tol=1.48e-08, maxiter=50):
+def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
     if tol <= 0:
         raise ValueError("tol too small (%g <= 0)" % tol)
     if maxiter < 1:
@@ -17,8 +17,15 @@ def newton(func, x0, fprime, args=(), tol=1.48e-08, maxiter=50):
     # so it still works if x0 is complex.
     p0 = 1.0 * x0
     for iter in range(maxiter):
-        fder = fprime(p0, *args)
-        fval = func(p0, *args)
+        if regime == 'parabolic':
+            fder = _kepler_equation_parabolic(p0, *args)
+            fval = _kepler_equation_prime_parabolic(p0, *args)
+        elif regime == 'hyperbolic':
+            fder = _kepler_equation_hyper(p0, *args)
+            fval = _kepler_equation_prime_hyper(p0, *args)
+        else:
+            fder = _kepler_equation(p0, *args)
+            fval = _kepler_equation_prime(p0, *args)
 
         newton_step = fval / fder
         p = p0 - newton_step
@@ -287,8 +294,7 @@ def M_to_E(M, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        E = newton(_kepler_equation, M, _kepler_equation_prime,
-                            args=(M, ecc))
+        E = newton('elliptic', M, args=(M, ecc))
     return E
 
 
@@ -309,8 +315,7 @@ def M_to_F(M, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        F = newton(_kepler_equation_hyper, np.arcsinh(M / ecc), _kepler_equation_prime_hyper,
-                            args=(M, ecc), maxiter=100)
+        F = newton('hyperbolic', np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
     return F
 
 
@@ -334,8 +339,7 @@ def M_to_D(M, ecc):
         B = 3.0 * M / 2.0
         A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
         guess = 2 * A * B / (1 + A + A ** 2)
-        D = newton(_kepler_equation_parabolic, guess, _kepler_equation_prime_parabolic,
-                            args=(M, ecc), maxiter=100)
+        D = newton('parabolic', guess, args=(M, ecc), maxiter=100)
     return D
 
 
