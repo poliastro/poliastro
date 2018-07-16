@@ -4,34 +4,62 @@
 import numpy as np
 
 from astropy import units as u
+from poliastro.jit import jit
 
-from scipy import optimize
+
+@jit
+def newton(func, x0, fprime, args=(), tol=1.48e-08, maxiter=50):
+    if tol <= 0:
+        raise ValueError("tol too small (%g <= 0)" % tol)
+    if maxiter < 1:
+        raise ValueError("maxiter must be greater than 0")
+    # Multiply by 1.0 to convert to floating point.  We don't use float(x0)
+    # so it still works if x0 is complex.
+    p0 = 1.0 * x0
+    for iter in range(maxiter):
+        fder = fprime(p0, *args)
+        fval = func(p0, *args)
+
+        newton_step = fval / fder
+        p = p0 - newton_step
+        if abs(p - p0) < tol:
+            return p
+        p0 = p
+    msg = "Failed to converge after %d iterations, value is %s" % (maxiter, p)
+    raise RuntimeError(msg)
 
 
+@jit
 def _kepler_equation(E, M, ecc):
     return E - ecc * np.sin(E) - M
 
 
+@jit
 def _kepler_equation_prime(E, M, ecc):
     return 1 - ecc * np.cos(E)
 
 
+@jit
 def _kepler_equation_hyper(F, M, ecc):
     return -F + ecc * np.sinh(F) - M
 
 
+@jit
 def _kepler_equation_prime_hyper(F, M, ecc):
     return ecc * np.cosh(F) - 1
 
 
+@jit
 def _kepler_equation_parabolic(D, M, ecc):
     return M_parabolic(ecc, D) - M
 
 
+@jit
 def _kepler_equation_prime_parabolic(D, M, ecc):
     return M_parabolic_prime(ecc, D)
 
 
+@jit
 def M_parabolic(ecc, D, tolerance=1e-16):
     """Computes the Kepler equation r.h.s. in near-parabolic regime
 
@@ -66,6 +94,7 @@ def M_parabolic(ecc, D, tolerance=1e-16):
     return np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
 
 
+@jit
 def M_parabolic_prime(ecc, D, tolerance=1e-16):
     """Computes derivative of the Kepler equation r.h.s. in near-parabolic regime
 
@@ -258,7 +287,7 @@ def M_to_E(M, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        E = optimize.newton(_kepler_equation, M, _kepler_equation_prime,
+        E = newton(_kepler_equation, M, _kepler_equation_prime,
                             args=(M, ecc))
     return E
 
@@ -280,7 +309,7 @@ def M_to_F(M, ecc):
 
     """
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        F = optimize.newton(_kepler_equation_hyper, np.arcsinh(M / ecc), _kepler_equation_prime_hyper,
+        F = newton(_kepler_equation_hyper, np.arcsinh(M / ecc), _kepler_equation_prime_hyper,
                             args=(M, ecc), maxiter=100)
     return F
 
@@ -305,7 +334,7 @@ def M_to_D(M, ecc):
         B = 3.0 * M / 2.0
         A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
         guess = 2 * A * B / (1 + A + A ** 2)
-        D = optimize.newton(_kepler_equation_parabolic, guess, _kepler_equation_prime_parabolic,
+        D = newton(_kepler_equation_parabolic, guess, _kepler_equation_prime_parabolic,
                             args=(M, ecc), maxiter=100)
     return D
 
