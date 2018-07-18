@@ -4,36 +4,7 @@
 import numpy as np
 
 from astropy import units as u
-from poliastro.jit import jit
-
-
-@jit
-def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
-    if tol <= 0:
-        raise ValueError("tol too small (%g <= 0)" % tol)
-    if maxiter < 1:
-        raise ValueError("maxiter must be greater than 0")
-    # Multiply by 1.0 to convert to floating point.  We don't use float(x0)
-    # so it still works if x0 is complex.
-    p0 = 1.0 * x0
-    for iter in range(maxiter):
-        if regime == 'parabolic':
-            fder = _kepler_equation_parabolic(p0, *args)
-            fval = _kepler_equation_prime_parabolic(p0, *args)
-        elif regime == 'hyperbolic':
-            fder = _kepler_equation_hyper(p0, *args)
-            fval = _kepler_equation_prime_hyper(p0, *args)
-        else:
-            fder = _kepler_equation(p0, *args)
-            fval = _kepler_equation_prime(p0, *args)
-
-        newton_step = fval / fder
-        p = p0 - newton_step
-        if abs(p - p0) < tol:
-            return p
-        p0 = p
-    msg = "Failed to converge after %d iterations, value is %s" % (maxiter, p)
-    raise RuntimeError(msg)
+from poliastro.jit import jit, accel_angles
 
 
 @jit
@@ -134,6 +105,27 @@ def M_parabolic_prime(ecc, D, tolerance=1e-16):
         S_prime += term
         k += 1
     return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S_prime
+
+
+@jit
+def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
+    p0 = 1.0 * x0
+    for iter in range(maxiter):
+        if regime == 'parabolic':
+            fval = _kepler_equation_parabolic(p0, *args)
+            fder = _kepler_equation_prime_parabolic(p0, *args)
+        elif regime == 'hyperbolic':
+            fval = _kepler_equation_hyper(p0, *args)
+            fder = _kepler_equation_prime_hyper(p0, *args)
+        else:
+            fval = _kepler_equation(p0, *args)
+            fder = _kepler_equation_prime(p0, *args)
+
+        newton_step = fval / fder
+        p = p0 - newton_step
+        if abs(p - p0) < tol:
+            return p
+        p0 = p
 
 
 def D_to_nu(D, ecc):
@@ -275,6 +267,7 @@ def F_to_nu(F, ecc):
     return nu
 
 
+@accel_angles
 def M_to_E(M, ecc):
     """Eccentric anomaly from mean anomaly.
 
@@ -293,11 +286,11 @@ def M_to_E(M, ecc):
         Eccentric anomaly.
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        E = newton('elliptic', M, args=(M, ecc))
+    E = newton('elliptic', M, args=(M, ecc))
     return E
 
 
+@accel_angles
 def M_to_F(M, ecc):
     """Hyperbolic eccentric anomaly from mean anomaly.
 
@@ -314,11 +307,11 @@ def M_to_F(M, ecc):
         Hyperbolic eccentric anomaly.
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        F = newton('hyperbolic', np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
+    F = newton('hyperbolic', np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
     return F
 
 
+@accel_angles
 def M_to_D(M, ecc):
     """Parabolic eccentric anomaly from mean anomaly.
 
@@ -335,14 +328,14 @@ def M_to_D(M, ecc):
         Parabolic eccentric anomaly.
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        B = 3.0 * M / 2.0
-        A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
-        guess = 2 * A * B / (1 + A + A ** 2)
-        D = newton('parabolic', guess, args=(M, ecc), maxiter=100)
+    B = 3.0 * M / 2.0
+    A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
+    guess = 2 * A * B / (1 + A + A ** 2)
+    D = newton('parabolic', guess, args=(M, ecc), maxiter=100)
     return D
 
 
+@accel_angles
 def E_to_M(E, ecc):
     """Mean anomaly from eccentric anomaly.
 
@@ -361,11 +354,11 @@ def E_to_M(E, ecc):
         Mean anomaly (rad).
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        M = _kepler_equation(E, 0.0 * u.rad, ecc)
+    M = _kepler_equation(E, 0.0, ecc)
     return M
 
 
+@accel_angles
 def F_to_M(F, ecc):
     """Mean anomaly from eccentric anomaly.
 
@@ -382,8 +375,7 @@ def F_to_M(F, ecc):
         Mean anomaly (rad).
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        M = _kepler_equation_hyper(F, 0.0 * u.rad, ecc)
+    M = _kepler_equation_hyper(F, 0.0, ecc)
     return M
 
 
