@@ -4,34 +4,40 @@
 import numpy as np
 
 from astropy import units as u
+from poliastro.jit import jit, accel_angles
 
-from scipy import optimize
 
-
+@jit
 def _kepler_equation(E, M, ecc):
     return E - ecc * np.sin(E) - M
 
 
+@jit
 def _kepler_equation_prime(E, M, ecc):
     return 1 - ecc * np.cos(E)
 
 
+@jit
 def _kepler_equation_hyper(F, M, ecc):
     return -F + ecc * np.sinh(F) - M
 
 
+@jit
 def _kepler_equation_prime_hyper(F, M, ecc):
     return ecc * np.cosh(F) - 1
 
 
+@jit
 def _kepler_equation_parabolic(D, M, ecc):
     return M_parabolic(ecc, D) - M
 
 
+@jit
 def _kepler_equation_prime_parabolic(D, M, ecc):
     return M_parabolic_prime(ecc, D)
 
 
+@jit
 def M_parabolic(ecc, D, tolerance=1e-16):
     """Computes the Kepler equation r.h.s. in near-parabolic regime
 
@@ -66,6 +72,7 @@ def M_parabolic(ecc, D, tolerance=1e-16):
     return np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
 
 
+@jit
 def M_parabolic_prime(ecc, D, tolerance=1e-16):
     """Computes derivative of the Kepler equation r.h.s. in near-parabolic regime
 
@@ -98,6 +105,28 @@ def M_parabolic_prime(ecc, D, tolerance=1e-16):
         S_prime += term
         k += 1
     return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S_prime
+
+
+@jit
+def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
+    p0 = 1.0 * x0
+    for iter in range(maxiter):
+        if regime == 'parabolic':
+            fval = _kepler_equation_parabolic(p0, *args)
+            fder = _kepler_equation_prime_parabolic(p0, *args)
+        elif regime == 'hyperbolic':
+            fval = _kepler_equation_hyper(p0, *args)
+            fder = _kepler_equation_prime_hyper(p0, *args)
+        else:
+            fval = _kepler_equation(p0, *args)
+            fder = _kepler_equation_prime(p0, *args)
+
+        newton_step = fval / fder
+        p = p0 - newton_step
+        if abs(p - p0) < tol:
+            return p
+        p0 = p
+    return None
 
 
 def D_to_nu(D, ecc):
@@ -239,6 +268,7 @@ def F_to_nu(F, ecc):
     return nu
 
 
+@accel_angles
 def M_to_E(M, ecc):
     """Eccentric anomaly from mean anomaly.
 
@@ -257,12 +287,11 @@ def M_to_E(M, ecc):
         Eccentric anomaly.
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        E = optimize.newton(_kepler_equation, M, _kepler_equation_prime,
-                            args=(M, ecc))
+    E = newton('elliptic', M, args=(M, ecc))
     return E
 
 
+@accel_angles
 def M_to_F(M, ecc):
     """Hyperbolic eccentric anomaly from mean anomaly.
 
@@ -279,12 +308,11 @@ def M_to_F(M, ecc):
         Hyperbolic eccentric anomaly.
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        F = optimize.newton(_kepler_equation_hyper, np.arcsinh(M / ecc), _kepler_equation_prime_hyper,
-                            args=(M, ecc), maxiter=100)
+    F = newton('hyperbolic', np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
     return F
 
 
+@accel_angles
 def M_to_D(M, ecc):
     """Parabolic eccentric anomaly from mean anomaly.
 
@@ -301,15 +329,14 @@ def M_to_D(M, ecc):
         Parabolic eccentric anomaly.
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        B = 3.0 * M / 2.0
-        A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
-        guess = 2 * A * B / (1 + A + A ** 2)
-        D = optimize.newton(_kepler_equation_parabolic, guess, _kepler_equation_prime_parabolic,
-                            args=(M, ecc), maxiter=100)
+    B = 3.0 * M / 2.0
+    A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
+    guess = 2 * A * B / (1 + A + A ** 2)
+    D = newton('parabolic', guess, args=(M, ecc), maxiter=100)
     return D
 
 
+@accel_angles
 def E_to_M(E, ecc):
     """Mean anomaly from eccentric anomaly.
 
@@ -328,11 +355,11 @@ def E_to_M(E, ecc):
         Mean anomaly (rad).
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        M = _kepler_equation(E, 0.0 * u.rad, ecc)
+    M = _kepler_equation(E, 0.0, ecc)
     return M
 
 
+@accel_angles
 def F_to_M(F, ecc):
     """Mean anomaly from eccentric anomaly.
 
@@ -349,8 +376,7 @@ def F_to_M(F, ecc):
         Mean anomaly (rad).
 
     """
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        M = _kepler_equation_hyper(F, 0.0 * u.rad, ecc)
+    M = _kepler_equation_hyper(F, 0.0, ecc)
     return M
 
 

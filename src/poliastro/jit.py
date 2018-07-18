@@ -6,6 +6,7 @@ decorator instead.
 """
 import warnings
 import inspect
+import astropy.units as u
 
 
 def ijit(first=None, *args, **kwargs):
@@ -30,3 +31,16 @@ except ImportError:
                   "algorithms will be slow. Consider installing numba to "
                   "boost performance.")
     jit = ijit
+
+
+def accel_angles(func):
+    func_fast = jit(func)
+
+    def wrapper(angle, ecc):
+        if hasattr(angle, "unit"):
+            angle = angle.to(u.rad).value
+        if hasattr(ecc, "unit"):
+            ecc = ecc.to(u.one).value
+        return func_fast(angle, ecc) * u.rad
+
+    return wrapper
