@@ -126,6 +126,7 @@ def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
         if abs(p - p0) < tol:
             return p
         p0 = p
+    return None
 
 
 def D_to_nu(D, ecc):
