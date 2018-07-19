@@ -4,7 +4,6 @@ import numpy as np
 
 from astropy import units as u
 from astropy import time
-from astropy.utils.data import conf
 
 from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, get_body_barycentric, \
     ICRS, GCRS, CartesianDifferential, solar_system_ephemeris
@@ -23,8 +22,6 @@ from ._base import BaseState
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
-
-conf.remote_timeout = 10000
 
 
 class TimeScaleWarning(UserWarning):
@@ -168,8 +165,6 @@ class Orbit(object):
             warn("Input time was converted to scale='tdb' with value "
                  "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
-        if body == Moon:
-            solar_system_ephemeris.set("jpl")
         r, v = get_body_barycentric_posvel(body.name, epoch)
         if body == Moon:
             moon_icrs = ICRS(x=r.x, y=r.y, z=r.z, v_x=v.x, v_y=v.y, v_z=v.z,
@@ -177,10 +172,8 @@ class Orbit(object):
                              )
             moon_gcrs = moon_icrs.transform_to(GCRS(obstime=epoch))
             moon_gcrs.representation = CartesianRepresentation
-            return cls.from_vectors(
-                body.parent, [moon_gcrs.x, moon_gcrs.y, moon_gcrs.z] * u.km,
-                [moon_gcrs.v_x, moon_gcrs.v_y, moon_gcrs.v_z] * (u.km / u.s), epoch=epoch
-            )
+            r = CartesianRepresentation([moon_gcrs.x, moon_gcrs.y, moon_gcrs.z])
+            v = CartesianRepresentation([moon_gcrs.v_x, moon_gcrs.v_y, moon_gcrs.v_z])
         return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
 
     @classmethod
