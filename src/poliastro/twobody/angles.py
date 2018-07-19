@@ -261,7 +261,7 @@ def D_to_M(D, ecc):
         Mean anomaly (rad).
 
     """
-    return D_to_M_fast(E.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    return D_to_M_fast(D.to(u.rad).value, ecc.to(u.one).value) * u.rad
 
 
 def M_to_nu(M, ecc, delta=1e-2):
