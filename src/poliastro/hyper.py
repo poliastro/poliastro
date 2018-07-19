@@ -3,7 +3,7 @@
 """
 import numpy as np
 
-from poliastro.jit import jit
+from poliastro.core.jit import jit
 
 
 @jit
