@@ -12,7 +12,7 @@ from poliastro.twobody.rv import rv2coe
 from poliastro.twobody.classical import coe2rv
 from poliastro.twobody.angles import nu_to_M, M_to_nu
 
-from poliastro.jit import jit
+from poliastro.core.jit import jit
 from poliastro.stumpff import c2, c3
 
 
@@ -140,23 +140,21 @@ def mean_motion(orbit, tof, **kwargs):
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
 
     # get the initial mean anomaly
-    M0 = nu_to_M(nu0, ecc)
+    M0 = nu_to_M(nu0 * u.rad, ecc * u.one)
     # strong elliptic or strong hyperbolic orbits
     if np.abs(ecc - 1.0) > 1e-2:
         a = p / (1.0 - ecc ** 2)
         # given the initial mean anomaly, calculate mean anomaly
         # at the end, mean motion (n) equals sqrt(mu / |a^3|)
-        with u.set_enabled_equivalencies(u.dimensionless_angles()):
-            M = M0 + tof * np.sqrt(k / np.abs(a ** 3)) * u.rad
-            nu = M_to_nu(M, ecc)
+        M = M0 + tof * np.sqrt(k / np.abs(a ** 3)) * u.rad
+        nu = M_to_nu(M, ecc * u.one)
 
     # near-parabolic orbit
     else:
         q = p * np.abs(1.0 - ecc) / np.abs(1.0 - ecc ** 2)
         # mean motion n = sqrt(mu / 2 q^3) for parabolic orbit
-        with u.set_enabled_equivalencies(u.dimensionless_angles()):
-            M = M0 + tof * np.sqrt(k / 2.0 / (q ** 3))
-            nu = M_to_nu(M, ecc)
+        M = M0 + tof * np.sqrt(k / 2.0 / (q ** 3)) * u.rad
+        nu = M_to_nu(M, ecc * u.one)
     with u.set_enabled_equivalencies(u.dimensionless_angles()):
         return coe2rv(k, p, ecc, inc, raan, argp, nu)
 

@@ -1,19 +1,130 @@
-"""Angles and anomalies.
-
-"""
+from poliastro.core.jit import jit
 import numpy as np
 
-from astropy import units as u
-from poliastro.core.angles import (D_to_nu as D_to_nu_fast, nu_to_D as nu_to_D_fast,
-                                   E_to_nu as E_to_nu_fast, nu_to_E as nu_to_E_fast,
-                                   F_to_nu as F_to_nu_fast, nu_to_F as nu_to_F_fast,
-                                   M_to_D as M_to_D_fast, D_to_M as D_to_M_fast,
-                                   M_to_E as M_to_E_fast, E_to_M as E_to_M_fast,
-                                   M_to_F as M_to_F_fast, F_to_M as F_to_M_fast,
-                                   fp_angle as fp_angle_fast,
-                                   M_to_nu as M_to_nu_fast, nu_to_M as nu_to_M_fast)
+
+@jit
+def _kepler_equation(E, M, ecc):
+    return E - ecc * np.sin(E) - M
 
 
+@jit
+def _kepler_equation_prime(E, M, ecc):
+    return 1 - ecc * np.cos(E)
+
+
+@jit
+def _kepler_equation_hyper(F, M, ecc):
+    return -F + ecc * np.sinh(F) - M
+
+
+@jit
+def _kepler_equation_prime_hyper(F, M, ecc):
+    return ecc * np.cosh(F) - 1
+
+
+@jit
+def _kepler_equation_parabolic(D, M, ecc):
+    return M_parabolic(ecc, D) - M
+
+
+@jit
+def _kepler_equation_prime_parabolic(D, M, ecc):
+    return M_parabolic_prime(ecc, D)
+
+
+@jit
+def M_parabolic(ecc, D, tolerance=1e-16):
+    """Computes the Kepler equation r.h.s. in near-parabolic regime
+
+    Parameters
+    ----------
+    D : float
+        Eccentric anomaly (rad).
+    ecc : float
+        Eccentricity,
+    tolerance : float (optional)
+        smallness of the last term in series
+    Returns
+    -------
+    M_parabolic : float
+        kepler equation r.h.s.
+
+    Notes
+    -----
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
+    """
+    x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
+    small_term = False
+    S = 0.0
+    k = 0
+    while not small_term:
+        term = (ecc - 1.0 / (2.0 * k + 3.0)) * (x ** k)
+        small_term = np.abs(term) < tolerance
+        S += term
+        k += 1
+    return np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
+
+
+@jit
+def M_parabolic_prime(ecc, D, tolerance=1e-16):
+    """Computes derivative of the Kepler equation r.h.s. in near-parabolic regime
+
+    Parameters
+    ----------
+    D : float
+        Eccentric anomaly (rad).
+    ecc : float
+        Eccentricity,
+    tolerance : float (optional)
+        smallness of the last term in series
+    Returns
+    -------
+    M_parabolic : float
+        derivative of kepler equation r.h.s.
+
+    Notes
+    -----
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
+    """
+    x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
+    small_term = False
+    S_prime = 0.0
+    k = 0
+    while not small_term:
+        term = (ecc - 1.0 / (2.0 * k + 3.0)) * (2 * k + 3.0) * (x ** k)
+        small_term = np.abs(term) < tolerance
+        S_prime += term
+        k += 1
+    return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S_prime
+
+
+@jit
+def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
+    p0 = 1.0 * x0
+    for iter in range(maxiter):
+        if regime == 'parabolic':
+            fval = _kepler_equation_parabolic(p0, *args)
+            fder = _kepler_equation_prime_parabolic(p0, *args)
+        elif regime == 'hyperbolic':
+            fval = _kepler_equation_hyper(p0, *args)
+            fder = _kepler_equation_prime_hyper(p0, *args)
+        else:
+            fval = _kepler_equation(p0, *args)
+            fder = _kepler_equation_prime(p0, *args)
+
+        newton_step = fval / fder
+        p = p0 - newton_step
+        if abs(p - p0) < tol:
+            return p
+        p0 = p
+    return None
+
+
+@jit
 def D_to_nu(D, ecc):
     """True anomaly from parabolic eccentric anomaly.
 
@@ -35,9 +146,10 @@ def D_to_nu(D, ecc):
     "Robust resolution of Kepler’s equation in all eccentricity regimes."
     Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
-    return D_to_nu_fast(D.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    return 2.0 * np.arctan(D)
 
 
+@jit
 def nu_to_D(nu, ecc):
     """Parabolic eccentric anomaly from true anomaly.
 
@@ -59,9 +171,10 @@ def nu_to_D(nu, ecc):
     "Robust resolution of Kepler’s equation in all eccentricity regimes."
     Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
-    return nu_to_D_fast(nu.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    return np.tan(nu / 2.0)
 
 
+@jit
 def nu_to_E(nu, ecc):
     """Eccentric anomaly from true anomaly.
 
@@ -80,9 +193,11 @@ def nu_to_E(nu, ecc):
         Eccentric anomaly.
 
     """
-    return nu_to_E_fast(nu.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    E = 2 * np.arctan(np.sqrt((1 - ecc) / (1 + ecc)) * np.tan(nu / 2))
+    return E
 
 
+@jit
 def nu_to_F(nu, ecc):
     """Hyperbolic eccentric anomaly from true anomaly.
 
@@ -103,9 +218,12 @@ def nu_to_F(nu, ecc):
     Taken from Curtis, H. (2013). *Orbital mechanics for engineering students*. 167
 
     """
-    return nu_to_F_fast(nu.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    F = np.log((np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2)) /
+               (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2)))
+    return F
 
 
+@jit
 def E_to_nu(E, ecc):
     """True anomaly from eccentric anomaly.
 
@@ -124,9 +242,11 @@ def E_to_nu(E, ecc):
         True anomaly (rad).
 
     """
-    return E_to_nu_fast(E.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    nu = 2 * np.arctan(np.sqrt((1 + ecc) / (1 - ecc)) * np.tan(E / 2))
+    return nu
 
 
+@jit
 def F_to_nu(F, ecc):
     """True anomaly from hyperbolic eccentric anomaly.
 
@@ -143,9 +263,12 @@ def F_to_nu(F, ecc):
         True anomaly (rad).
 
     """
-    return F_to_nu_fast(F.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    nu = 2 * np.arctan((np.exp(F) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1)) /
+                       (np.exp(F) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1)))
+    return nu
 
 
+@jit
 def M_to_E(M, ecc):
     """Eccentric anomaly from mean anomaly.
 
@@ -164,9 +287,11 @@ def M_to_E(M, ecc):
         Eccentric anomaly.
 
     """
-    return M_to_E_fast(M.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    E = newton('elliptic', M, args=(M, ecc))
+    return E
 
 
+@jit
 def M_to_F(M, ecc):
     """Hyperbolic eccentric anomaly from mean anomaly.
 
@@ -183,9 +308,11 @@ def M_to_F(M, ecc):
         Hyperbolic eccentric anomaly.
 
     """
-    return M_to_F_fast(M.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    F = newton('hyperbolic', np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
+    return F
 
 
+@jit
 def M_to_D(M, ecc):
     """Parabolic eccentric anomaly from mean anomaly.
 
@@ -202,9 +329,14 @@ def M_to_D(M, ecc):
         Parabolic eccentric anomaly.
 
     """
-    return M_to_D_fast(M.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    B = 3.0 * M / 2.0
+    A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
+    guess = 2 * A * B / (1 + A + A ** 2)
+    D = newton('parabolic', guess, args=(M, ecc), maxiter=100)
+    return D
 
 
+@jit
 def E_to_M(E, ecc):
     """Mean anomaly from eccentric anomaly.
 
@@ -223,9 +355,11 @@ def E_to_M(E, ecc):
         Mean anomaly (rad).
 
     """
-    return E_to_M_fast(E.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    M = _kepler_equation(E, 0.0, ecc)
+    return M
 
 
+@jit
 def F_to_M(F, ecc):
     """Mean anomaly from eccentric anomaly.
 
@@ -242,9 +376,11 @@ def F_to_M(F, ecc):
         Mean anomaly (rad).
 
     """
-    return F_to_M_fast(F.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    M = _kepler_equation_hyper(F, 0.0, ecc)
+    return M
 
 
+@jit
 def D_to_M(D, ecc):
     """Mean anomaly from eccentric anomaly.
 
@@ -261,9 +397,11 @@ def D_to_M(D, ecc):
         Mean anomaly (rad).
 
     """
-    return D_to_M_fast(E.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    M = _kepler_equation_parabolic(D, 0.0, ecc)
+    return M
 
 
+@jit
 def M_to_nu(M, ecc, delta=1e-2):
     """True anomaly from mean anomaly.
 
@@ -289,9 +427,19 @@ def M_to_nu(M, ecc, delta=1e-2):
     33.673284930211658
 
     """
-    return M_to_nu_fast(M.to(u.rad).value, ecc.to(u.one).value, delta) * u.rad
+    if ecc > 1 + delta:
+        F = M_to_F(M, ecc)
+        nu = F_to_nu(F, ecc)
+    elif ecc < 1 - delta:
+        E = M_to_E(M, ecc)
+        nu = E_to_nu(E, ecc)
+    else:
+        D = M_to_D(M, ecc)
+        nu = D_to_nu(D, ecc)
+    return nu
 
 
+@jit
 def nu_to_M(nu, ecc, delta=1e-2):
     """Mean anomaly from true anomaly.
 
@@ -310,9 +458,19 @@ def nu_to_M(nu, ecc, delta=1e-2):
         Mean anomaly (rad).
 
     """
-    return nu_to_M_fast(nu.to(u.rad).value, ecc.to(u.one).value, delta) * u.rad
+    if ecc > 1 + delta:
+        F = nu_to_F(nu, ecc)
+        M = F_to_M(F, ecc)
+    elif ecc < 1 - delta:
+        E = nu_to_E(nu, ecc)
+        M = E_to_M(E, ecc)
+    else:
+        D = nu_to_D(nu, ecc)
+        M = D_to_M(D, ecc)
+    return M
 
 
+@jit
 def fp_angle(nu, ecc):
     """Flight path angle.
 
@@ -330,4 +488,4 @@ def fp_angle(nu, ecc):
     Algorithm taken from Vallado 2007, pp. 113.
 
     """
-    return fp_angle_fast(nu.to(u.rad).value, ecc.to(u.one).value) * u.rad
+    return np.arctan2(ecc * np.sin(nu), 1 + ecc * np.cos(nu))

@@ -3,7 +3,6 @@ from copy import copy
 import numpy as np
 from poliastro import integrator_params
 from scipy.integrate._ivp.common import (warn_extraneous, validate_max_step, validate_tol, select_initial_step)
-from poliastro.jit import jit
 
 
 def validate_max_nsteps(max_nsteps):

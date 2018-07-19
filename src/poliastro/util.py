@@ -5,7 +5,7 @@ import numpy as np
 
 from astropy.coordinates import matrix_utilities
 from astropy.time import Time
-from poliastro.jit import jit
+from poliastro.core.jit import jit
 
 
 def circular_velocity(k, a):
