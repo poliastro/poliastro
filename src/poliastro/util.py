@@ -2,7 +2,6 @@
 
 """
 import numpy as np
-
 from astropy.coordinates import matrix_utilities
 from astropy.time import Time
 from poliastro.core.jit import jit

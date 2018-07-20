@@ -3,6 +3,7 @@ from numpy import sin, cos
 
 from poliastro.core.jit import jit
 
+
 @jit
 def rotate(vec, ax, angle):
     """Rotates the coordinate system around axis x, y or z a CCW angle.
