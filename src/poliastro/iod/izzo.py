@@ -6,7 +6,7 @@ from numpy import pi
 from astropy import units as u
 
 from poliastro.core.jit import jit
-from poliastro.util import norm
+from poliastro.core.util import norm, cross
 from poliastro.hyper import hyp2f1b
 
 
@@ -63,7 +63,7 @@ def _lambert(k, r1, r2, tof, M, numiter, rtol):
 
     # Versors
     i_r1, i_r2 = r1 / r1_norm, r2 / r2_norm
-    i_h = np.cross(i_r1, i_r2)
+    i_h = cross(i_r1, i_r2)
     i_h = i_h / norm(i_h)  # Fixed from paper
 
     # Geometry of the problem
@@ -73,7 +73,7 @@ def _lambert(k, r1, r2, tof, M, numiter, rtol):
         ll = -ll
         i_h = -i_h
 
-    i_t1, i_t2 = np.cross(i_h, i_r1), np.cross(i_h, i_r2)  # Fixed from paper
+    i_t1, i_t2 = cross(i_h, i_r1), cross(i_h, i_r2)  # Fixed from paper
 
     # Non dimensional time of flight
     T = np.sqrt(2 * k / s ** 3) * tof

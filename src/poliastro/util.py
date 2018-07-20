@@ -2,22 +2,28 @@
 
 """
 import numpy as np
-from astropy.coordinates import matrix_utilities
+
+from astropy import units as u
 from astropy.time import Time
-from poliastro.core.jit import jit
+
+from poliastro.core.util import (
+    circular_velocity as circular_velocity_fast,
+    norm as norm_fast,
+    rotate as rotate_fast
+)
+
+u.kms = u.km / u.s
+u.km3s2 = u.km ** 3 / u.s ** 2
 
 
 def circular_velocity(k, a):
     """Compute circular velocity for a given body (k) and semimajor axis (a).
 
     """
-    return np.sqrt(k / a)
+    return circular_velocity_fast(k.to(u.km3s2).value, a.to(u.km).value) * u.kms
 
 
-circular_velocity_fast = jit(circular_velocity)
-
-
-def rotate(vector, angle, axis='z', unit=None):
+def rotate(vector, angle, axis='z'):
     """Rotates a vector around axis a right-handed positive angle.
 
     This is just a convenience function around
@@ -25,23 +31,15 @@ def rotate(vector, angle, axis='z', unit=None):
 
     Parameters
     ----------
-    vector : array_like
+    vector : ~astropy.units.Quantity
         Dimension 3 vector.
-    angle : convertible to Angle
+    angle : ~astropy.units.Quantity
         Angle of rotation.
-    axis : str or 3-sequence
-        Either 'x','y', 'z', or a (x,y,z) specifying an axis to rotate
-        about. If 'x','y', or 'z', the rotation sense is
-        counterclockwise looking down the + axis (e.g. positive
-        rotations obey left-hand-rule).
-    unit : ~astropy.units.UnitBase, optional
-        If `angle` does not have associated units, they are in this
-        unit.  If neither are provided, it is assumed to be degrees.
+    axis : str, optional
+        Either 'x', 'y' or 'z'.
 
     Note
     -----
-    This is just a convenience function around
-    :py:func:`astropy.coordinates.matrix_utilities.rotation_matrix`.
     This performs a so-called *active* or *alibi* transformation: rotates the
     vector while the coordinate system remains unchanged. To do the opposite
     operation (*passive* or *alias* transformation) call the function as
@@ -53,11 +51,10 @@ def rotate(vector, angle, axis='z', unit=None):
     .. [1] http://en.wikipedia.org/wiki/Rotation_matrix#Ambiguities
 
     """
-    rot = np.asarray(matrix_utilities.rotation_matrix(-angle, axis, unit))
-    return np.dot(rot, vector)
+    return rotate_fast(vector.value, angle.to(u.rad).value, ['x', 'y', 'z'].index(axis)) * vector.unit
 
 
-def transform(vector, angle, axis='z', unit=None):
+def transform(vector, angle, axis='z'):
     """Rotates a coordinate system around axis a positive right-handed angle.
 
     Note
@@ -67,16 +64,19 @@ def transform(vector, angle, axis='z', unit=None):
     Refer to the documentation of :py:func:`rotate` for further information.
 
     """
-    return rotate(vector, -angle, axis, unit)
+    return rotate(vector, -angle, axis)
 
 
 def norm(vec):
     """Norm of a Quantity vector that respects units.
+
+    Parameters
+    ----------
+    vec : ~astropy.units.Quantity
+        Vector with units.
+
     """
-    return np.sqrt(vec.dot(vec))
-
-
-norm_fast = jit(norm)
+    return norm_fast(vec.value) * vec.unit
 
 
 def time_range(start, *, periods=50, spacing=None, end=None):

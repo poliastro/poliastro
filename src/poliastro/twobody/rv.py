@@ -5,23 +5,11 @@ import numpy as np
 from astropy import units as u
 
 from poliastro.core.jit import jit
-from poliastro.util import norm_fast as norm
+from poliastro.core.util import cross, norm
 
 from poliastro.twobody import classical
 
 from ._base import BaseState
-
-
-@jit
-def cross(a, b):
-    """Computes cross product between two vectors"""
-    # np.cross is not supported in numba nopython mode, see
-    # https://github.com/numba/numba/issues/2978
-    return np.array((
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0]
-    ))
 
 
 @jit

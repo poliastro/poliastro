@@ -48,12 +48,12 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     """
     r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
 
-    r_ijk = transform(r_pqw, 2, -argp)
-    r_ijk = transform(r_ijk, 0, -inc)
-    r_ijk = transform(r_ijk, 2, -raan)
-    v_ijk = transform(v_pqw, 2, -argp)
-    v_ijk = transform(v_ijk, 0, -inc)
-    v_ijk = transform(v_ijk, 2, -raan)
+    r_ijk = transform(r_pqw, -argp, 2)
+    r_ijk = transform(r_ijk, -inc, 0)
+    r_ijk = transform(r_ijk, -raan, 2)
+    v_ijk = transform(v_pqw, -argp, 2)
+    v_ijk = transform(v_ijk, -inc, 0)
+    v_ijk = transform(v_ijk, -raan, 2)
 
     return r_ijk, v_ijk
 
