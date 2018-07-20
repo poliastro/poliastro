@@ -4,7 +4,7 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.jit import jit
+from poliastro.core.jit import jit
 from poliastro.stumpff import c2, c3
 
 

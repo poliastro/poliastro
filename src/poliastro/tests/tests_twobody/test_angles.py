@@ -129,5 +129,6 @@ def test_flight_path_angle():
 @pytest.mark.parametrize("ecc", [3200 * u.one, 1.5 * u.one])
 def test_mean_to_true_hyperbolic_highecc(expected_nu, ecc):
     M = angles.nu_to_M(expected_nu, ecc)
+    print(M, ecc, M.value, ecc.value)
     nu = angles.M_to_nu(M, ecc)
     assert_quantity_allclose(nu, expected_nu, rtol=1e-4)

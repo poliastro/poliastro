@@ -9,7 +9,7 @@ import numpy as np
 
 from poliastro.twobody.decorators import state_from_vector
 from poliastro.util import norm_fast, circular_velocity_fast
-from poliastro.jit import jit
+from poliastro.core.jit import jit
 import astropy.units as u
 
 

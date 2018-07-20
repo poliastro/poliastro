@@ -3,7 +3,7 @@ import numpy as np
 from poliastro.util import norm_fast
 from poliastro.twobody import Orbit
 import astropy.units as u
-from poliastro.jit import jit
+from poliastro.core.jit import jit
 from warnings import warn
 
 

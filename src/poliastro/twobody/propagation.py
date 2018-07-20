@@ -10,9 +10,9 @@ from poliastro.integrators import DOP835
 from astropy import units as u
 from poliastro.twobody.rv import rv2coe
 from poliastro.twobody.classical import coe2rv
-from poliastro.twobody.angles import nu_to_M, M_to_nu
+from poliastro.core.angles import nu_to_M, M_to_nu
 
-from poliastro.jit import jit
+from poliastro.core.jit import jit
 from poliastro.stumpff import c2, c3
 
 
@@ -113,6 +113,15 @@ def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
 
 
 def mean_motion(orbit, tof, **kwargs):
+    k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
+    r0 = orbit.r.to(u.km).value
+    v0 = orbit.v.to(u.km / u.s).value
+
+    return _mean_motion(k, r0, v0, tof)
+
+
+@jit
+def _mean_motion(k, r0, v0, tof):
     r"""Propagates orbit using mean motion
 
     .. versionadded:: 0.9.0
@@ -132,10 +141,6 @@ def mean_motion(orbit, tof, **kwargs):
 
     """
 
-    k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
-    r0 = orbit.r.to(u.km).value
-    v0 = orbit.v.to(u.km / u.s).value
-
     # get the initial true anomaly and orbit parameters that are constant over time
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
 
@@ -146,19 +151,17 @@ def mean_motion(orbit, tof, **kwargs):
         a = p / (1.0 - ecc ** 2)
         # given the initial mean anomaly, calculate mean anomaly
         # at the end, mean motion (n) equals sqrt(mu / |a^3|)
-        with u.set_enabled_equivalencies(u.dimensionless_angles()):
-            M = M0 + tof * np.sqrt(k / np.abs(a ** 3)) * u.rad
-            nu = M_to_nu(M, ecc)
+        M = M0 + tof * np.sqrt(k / np.abs(a ** 3))
+        nu = M_to_nu(M, ecc)
 
     # near-parabolic orbit
     else:
         q = p * np.abs(1.0 - ecc) / np.abs(1.0 - ecc ** 2)
         # mean motion n = sqrt(mu / 2 q^3) for parabolic orbit
-        with u.set_enabled_equivalencies(u.dimensionless_angles()):
-            M = M0 + tof * np.sqrt(k / 2.0 / (q ** 3))
-            nu = M_to_nu(M, ecc)
-    with u.set_enabled_equivalencies(u.dimensionless_angles()):
-        return coe2rv(k, p, ecc, inc, raan, argp, nu)
+        M = M0 + tof * np.sqrt(k / 2.0 / (q ** 3))
+        nu = M_to_nu(M, ecc)
+
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 def kepler(orbit, tof, *, numiter=350, **kwargs):
