@@ -5,7 +5,8 @@ import numpy as np
 from astropy import units as u
 from astropy import time
 
-from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, get_body_barycentric
+from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, get_body_barycentric, \
+    ICRS, GCRS, CartesianDifferential, solar_system_ephemeris
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
@@ -14,6 +15,8 @@ from poliastro.twobody.propagation import propagate, mean_motion, cowell
 from poliastro.twobody import rv
 from poliastro.twobody import classical
 from poliastro.twobody import equinoctial
+
+from poliastro.bodies import Moon
 
 from ._base import BaseState
 
@@ -163,6 +166,14 @@ class Orbit(object):
                  "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
         r, v = get_body_barycentric_posvel(body.name, epoch)
+        if body == Moon:
+            moon_icrs = ICRS(x=r.x, y=r.y, z=r.z, v_x=v.x, v_y=v.y, v_z=v.z,
+                             representation=CartesianRepresentation, differential_type=CartesianDifferential
+                             )
+            moon_gcrs = moon_icrs.transform_to(GCRS(obstime=epoch))
+            moon_gcrs.representation = CartesianRepresentation
+            r = CartesianRepresentation([moon_gcrs.x, moon_gcrs.y, moon_gcrs.z])
+            v = CartesianRepresentation([moon_gcrs.v_x, moon_gcrs.v_y, moon_gcrs.v_z])
         return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
 
     @classmethod
