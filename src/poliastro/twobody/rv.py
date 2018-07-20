@@ -4,13 +4,27 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.util import norm
+from poliastro.core.jit import jit
+from poliastro.util import norm_fast as norm
 
 from poliastro.twobody import classical
 
 from ._base import BaseState
 
 
+@jit
+def cross(a, b):
+    """Computes cross product between two vectors"""
+    # np.cross is not supported in numba nopython mode, see
+    # https://github.com/numba/numba/issues/2978
+    return np.array((
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    ))
+
+
+@jit
 def rv2coe(k, r, v, tol=1e-8):
     """Converts from vectors to classical orbital elements.
 
@@ -26,8 +40,8 @@ def rv2coe(k, r, v, tol=1e-8):
         Tolerance for eccentricity and inclination checks, default to 1e-8.
 
     """
-    h = np.cross(r, v)
-    n = np.cross([0, 0, 1], h) / norm(h)
+    h = cross(r, v)
+    n = cross([0, 0, 1], h) / norm(h)
     e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
     ecc = norm(e)
     p = h.dot(h) / k
@@ -39,13 +53,13 @@ def rv2coe(k, r, v, tol=1e-8):
     if equatorial and not circular:
         raan = 0
         argp = np.arctan2(e[1], e[0]) % (2 * np.pi)  # Longitude of periapsis
-        nu = (np.arctan2(h.dot(np.cross(e, r)) / norm(h), r.dot(e)) %
+        nu = (np.arctan2(h.dot(cross(e, r)) / norm(h), r.dot(e)) %
               (2 * np.pi))
     elif not equatorial and circular:
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
         argp = 0
         # Argument of latitude
-        nu = (np.arctan2(r.dot(np.cross(h, n)) / norm(h), r.dot(n)) %
+        nu = (np.arctan2(r.dot(cross(h, n)) / norm(h), r.dot(n)) %
               (2 * np.pi))
     elif equatorial and circular:
         raan = 0
@@ -53,9 +67,9 @@ def rv2coe(k, r, v, tol=1e-8):
         nu = np.arctan2(r[1], r[0]) % (2 * np.pi)  # True longitude
     else:
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
-        argp = (np.arctan2(e.dot(np.cross(h, n)) / norm(h), e.dot(n)) %
+        argp = (np.arctan2(e.dot(cross(h, n)) / norm(h), e.dot(n)) %
                 (2 * np.pi))
-        nu = (np.arctan2(r.dot(np.cross(h, e)) / norm(h), r.dot(e))
+        nu = (np.arctan2(r.dot(cross(h, e)) / norm(h), r.dot(e))
               % (2 * np.pi))
 
     return p, ecc, inc, raan, argp, nu

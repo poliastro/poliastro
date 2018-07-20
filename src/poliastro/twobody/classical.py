@@ -5,7 +5,8 @@ import numpy as np
 from numpy import sin, cos, sqrt
 from astropy import units as u
 
-from poliastro.util import transform
+from poliastro.core.jit import jit
+from poliastro.core.util import transform
 
 from poliastro.twobody import rv
 from poliastro.twobody import equinoctial
@@ -13,6 +14,7 @@ from poliastro.twobody import equinoctial
 from ._base import BaseState
 
 
+@jit
 def rv_pqw(k, p, ecc, nu):
     """Returns r and v vectors in perifocal frame.
 
@@ -22,6 +24,7 @@ def rv_pqw(k, p, ecc, nu):
     return r_pqw, v_pqw
 
 
+@jit
 def coe2rv(k, p, ecc, inc, raan, argp, nu):
     """Converts from classical orbital elements to vectors.
 
@@ -45,12 +48,12 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     """
     r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
 
-    r_ijk = transform(r_pqw, -argp, 'z', u.rad)
-    r_ijk = transform(r_ijk, -inc, 'x', u.rad)
-    r_ijk = transform(r_ijk, -raan, 'z', u.rad)
-    v_ijk = transform(v_pqw, -argp, 'z', u.rad)
-    v_ijk = transform(v_ijk, -inc, 'x', u.rad)
-    v_ijk = transform(v_ijk, -raan, 'z', u.rad)
+    r_ijk = transform(r_pqw, 2, -argp)
+    r_ijk = transform(r_ijk, 0, -inc)
+    r_ijk = transform(r_ijk, 2, -raan)
+    v_ijk = transform(v_pqw, 2, -argp)
+    v_ijk = transform(v_ijk, 0, -inc)
+    v_ijk = transform(v_ijk, 2, -raan)
 
     return r_ijk, v_ijk
 
