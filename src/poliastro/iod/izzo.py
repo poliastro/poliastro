@@ -49,6 +49,7 @@ def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
         yield v0 * u.km / u.s, v * u.km / u.s
 
 
+@jit
 def _lambert(k, r1, r2, tof, M, numiter, rtol):
     # Check preconditions
     assert tof > 0
@@ -106,6 +107,7 @@ def _reconstruct(x, y, r1, r2, ll, gamma, rho, sigma):
     return [V_r1, V_r2, V_t1, V_t2]
 
 
+@jit
 def _find_xy(ll, T, M, numiter, rtol):
     """Computes all x, y for given number of revolutions.
 
@@ -114,7 +116,7 @@ def _find_xy(ll, T, M, numiter, rtol):
     assert abs(ll) < 1
     assert T > 0  # Mistake on original paper
 
-    M_max = int(np.floor(T / pi))
+    M_max = np.floor(T / pi)
     T_00 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # T_xM
 
     # Refine maximum number of revolutions if necessary
@@ -126,7 +128,7 @@ def _find_xy(ll, T, M, numiter, rtol):
     # Check if a feasible solution exist for the given number of revolutions
     # This departs from the original paper in that we do not compute all solutions
     if M > M_max:
-        raise ValueError("No feasible solution, try M <= {:d}".format(M_max))
+        raise ValueError("No feasible solution, try lower M")
 
     # Initial guess
     for x_0 in _initial_guess(T, ll, M):
