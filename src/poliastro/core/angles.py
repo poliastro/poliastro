@@ -1,5 +1,6 @@
-from poliastro.core.jit import jit
 import numpy as np
+
+from poliastro.core.jit import jit
 
 
 @jit
@@ -83,12 +84,12 @@ def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
 
 
 @jit
-def D_to_nu(D, ecc):
+def D_to_nu(D):
     return 2.0 * np.arctan(D)
 
 
 @jit
-def nu_to_D(nu, ecc):
+def nu_to_D(nu):
     return np.tan(nu / 2.0)
 
 
@@ -133,7 +134,7 @@ def M_to_F(M, ecc):
 @jit
 def M_to_D(M, ecc):
     B = 3.0 * M / 2.0
-    A = (B + (1.0 + B ** 2) ** (0.5)) ** (2.0 / 3.0)
+    A = (B + (1.0 + B ** 2) ** 0.5) ** (2.0 / 3.0)
     guess = 2 * A * B / (1 + A + A ** 2)
     D = newton('parabolic', guess, args=(M, ecc), maxiter=100)
     return D
@@ -167,7 +168,7 @@ def M_to_nu(M, ecc, delta=1e-2):
         nu = E_to_nu(E, ecc)
     else:
         D = M_to_D(M, ecc)
-        nu = D_to_nu(D, ecc)
+        nu = D_to_nu(D)
     return nu
 
 
@@ -180,7 +181,7 @@ def nu_to_M(nu, ecc, delta=1e-2):
         E = nu_to_E(nu, ecc)
         M = E_to_M(E, ecc)
     else:
-        D = nu_to_D(nu, ecc)
+        D = nu_to_D(nu)
         M = D_to_M(D, ecc)
     return M
 

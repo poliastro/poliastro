@@ -3,7 +3,6 @@
 This module complements :py:mod:`astropy.coordinates`.
 
 """
-
 from math import sin, cos, sqrt
 
 import numpy as np

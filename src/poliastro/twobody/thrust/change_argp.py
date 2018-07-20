@@ -1,11 +1,12 @@
 """Argument of perigee change, with formulas developed by Pollard.
+
 References
 ----------
 * Pollard, J. E. "Simplified Approach for Assessment of Low-Thrust
   Elliptical Orbit Transfers", 1997.
 * Pollard, J. E. "Evaluation of Low-Thrust Orbital Maneuvers", 1998.
-"""
 
+"""
 import numpy as np
 
 from poliastro.twobody import rv

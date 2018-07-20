@@ -1,10 +1,11 @@
 """Quasi optimal eccentricity-only change, with formulas developed by Pollard.
+
 References
 ----------
 * Pollard, J. E. "Simplified Approach for Assessment of Low-Thrust
   Elliptical Orbit Transfers", 1997.
-"""
 
+"""
 import numpy as np
 
 from poliastro.twobody.decorators import state_from_vector

@@ -25,9 +25,9 @@ J2 for the Sun was obtained from:
   from helioseismology, Redouane Mecheri et al)
 
 """
-
 from astropy.constants import Constant
 from astropy import time
+
 
 J2000 = time.Time('J2000', scale='tdb')
 

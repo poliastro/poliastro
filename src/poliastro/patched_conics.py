@@ -4,7 +4,6 @@ Contains methods to compute interplanetary trajectories approximating the three
 body problem with Patched Conics.
 
 """
-
 from astropy import units as u
 
 from poliastro.twobody import Orbit

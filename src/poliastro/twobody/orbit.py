@@ -5,8 +5,8 @@ import numpy as np
 from astropy import units as u
 from astropy import time
 
-from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, get_body_barycentric, \
-    ICRS, GCRS, CartesianDifferential, solar_system_ephemeris
+from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, \
+    ICRS, GCRS, CartesianDifferential
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu

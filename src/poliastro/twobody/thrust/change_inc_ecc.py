@@ -1,9 +1,10 @@
 """Simultaneous eccentricity and inclination changes.
+
 References
 ----------
 * Pollard, J. E. "Simplified Analysis of Low-Thrust Orbital Maneuvers", 2000.
-"""
 
+"""
 import numpy as np
 
 from astropy import units as u

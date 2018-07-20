@@ -1,3 +1,6 @@
+"""Function helpers.
+
+"""
 import numpy as np
 from numpy import sin, cos
 
@@ -15,6 +18,7 @@ def circular_velocity(k, a):
 @jit
 def rotate(vec, angle, axis):
     """Rotates the coordinate system around axis x, y or z a CCW angle.
+
     Parameters
     ----------
     vec : ndarray
@@ -31,9 +35,11 @@ def rotate(vec, angle, axis):
     operation (passive or alias transformation) call the function as
     `rotate(vec, ax, -angle)` or use the convenience function `transform`,
     see `[1]_`.
+
     References
     ----------
     .. [1] http://en.wikipedia.org/wiki/Rotation_matrix#Ambiguities
+
     """
     assert vec.shape == (3,)
 
@@ -61,10 +67,12 @@ def rotate(vec, angle, axis):
 @jit
 def transform(vec, angle, axis):
     """Rotates a coordinate system around axis a positive right-handed angle.
+
     Notes
     -----
     This is a convenience function, equivalent to `rotate(vec, ax, -angle)`.
     Refer to the documentation of that function for further information.
+
     """
     return rotate(vec, -angle, axis)
 
