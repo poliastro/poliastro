@@ -14,7 +14,7 @@ from poliastro.core.angles import (D_to_nu as D_to_nu_fast, nu_to_D as nu_to_D_f
                                    M_to_nu as M_to_nu_fast, nu_to_M as nu_to_M_fast)
 
 
-def D_to_nu(D, ecc):
+def D_to_nu(D):
     """True anomaly from parabolic eccentric anomaly.
 
     Parameters
@@ -35,10 +35,10 @@ def D_to_nu(D, ecc):
     "Robust resolution of Kepler’s equation in all eccentricity regimes."
     Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
-    return D_to_nu_fast(D.to(u.rad).value, ecc.value) * u.rad
+    return D_to_nu_fast(D.to(u.rad).value) * u.rad
 
 
-def nu_to_D(nu, ecc):
+def nu_to_D(nu):
     """Parabolic eccentric anomaly from true anomaly.
 
     Parameters
@@ -59,7 +59,7 @@ def nu_to_D(nu, ecc):
     "Robust resolution of Kepler’s equation in all eccentricity regimes."
     Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
-    return nu_to_D_fast(nu.to(u.rad).value, ecc.value) * u.rad
+    return nu_to_D_fast(nu.to(u.rad).value) * u.rad
 
 
 def nu_to_E(nu, ecc):

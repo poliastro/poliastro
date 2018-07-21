@@ -1,19 +1,23 @@
 import pytest
 import functools
+
 import numpy as np
 
-from astropy.time import Time
-from poliastro.twobody.propagation import cowell
-from poliastro.twobody.rv import rv2coe
-from poliastro.ephem import build_ephem_interpolant
-from astropy import units as u
-from poliastro.util import norm
-from poliastro.twobody.perturbations import (J2_perturbation, atmospheric_drag,
-                                             third_body, radiation_pressure, J3_perturbation)
-from poliastro.bodies import Earth, Moon, Sun
 from astropy.tests.helper import assert_quantity_allclose
+from astropy import units as u
+from astropy.time import Time
+from astropy.coordinates import Angle, solar_system_ephemeris
+
+from poliastro.twobody.propagation import cowell
+from poliastro.core.elements import rv2coe
+from poliastro.ephem import build_ephem_interpolant
+
+from poliastro.core.util import norm
+from poliastro.core.perturbations import (
+    J2_perturbation, J3_perturbation, atmospheric_drag, third_body, radiation_pressure
+)
+from poliastro.bodies import Earth, Moon, Sun
 from poliastro.twobody import Orbit
-from astropy.coordinates import ICRS, GCRS, Angle, solar_system_ephemeris
 
 
 def test_J2_propagation_Earth():

@@ -97,5 +97,5 @@ def test_raises_exception_for_non_feasible_solution(lambert):
 
     with pytest.raises(ValueError) as excinfo:
         next(lambert(k, r0, r, tof, M=1))
-    assert ("ValueError: No feasible solution, try M <= 0"
+    assert ("ValueError: No feasible solution, try lower M"
             in excinfo.exconly())

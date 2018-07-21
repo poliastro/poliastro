@@ -3,7 +3,6 @@
 This module complements :py:mod:`astropy.coordinates`.
 
 """
-
 from math import sin, cos, sqrt
 
 import numpy as np
@@ -12,7 +11,7 @@ import astropy.units as u
 from astropy.coordinates import get_body_barycentric_posvel, CartesianRepresentation, CartesianDifferential
 
 from poliastro.constants import J2000
-from poliastro.twobody.rv import rv2coe
+from poliastro.core.elements import rv2coe
 from poliastro.util import transform as transform_vector
 from poliastro.twobody.orbit import Orbit
 

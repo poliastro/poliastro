@@ -5,12 +5,13 @@ import numpy as np
 from astropy import units as u
 from astropy import time
 
-from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, get_body_barycentric, \
-    ICRS, GCRS, CartesianDifferential, solar_system_ephemeris
+from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, \
+    ICRS, GCRS, CartesianDifferential
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
 from poliastro.twobody.propagation import propagate, mean_motion, cowell
+from poliastro.core.elements import rv2coe
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -265,9 +266,9 @@ class Orbit(object):
 
         """
         if hasattr(value, "unit") and value.unit in ('rad', 'deg'):
-            p, ecc, inc, raan, argp, _ = rv.rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                                                   self.r.to(u.km).value,
-                                                   self.v.to(u.km / u.s).value)
+            p, ecc, inc, raan, argp, _ = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                                                self.r.to(u.km).value,
+                                                self.v.to(u.km / u.s).value)
 
             return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
                                        ecc * u.one, inc * u.rad, raan * u.rad,

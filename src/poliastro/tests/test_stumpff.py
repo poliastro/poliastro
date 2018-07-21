@@ -1,7 +1,7 @@
 from numpy import cos, sin, cosh, sinh
 from numpy.testing import assert_allclose, assert_equal
 
-from poliastro.stumpff import c2, c3
+from poliastro.core.stumpff import c2, c3
 
 
 def test_stumpff_functions_near_zero():

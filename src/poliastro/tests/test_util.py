@@ -21,15 +21,6 @@ def test_simple_circular_velocity():
     assert_quantity_allclose(V, expected_V)
 
 
-def test_rotate_unitless_vector():
-    vector = [1, 0, 0]
-    angle = 90 * u.deg
-    axis = 'z'
-    expected_vector = [0, 1, 0]
-    result = util.rotate(vector, angle, axis)
-    assert_allclose(result, expected_vector, atol=1e-16)
-
-
 def test_rotate_vector_with_units():
     vector = [1, 0, 0] * u.m
     angle = 90 * u.deg
@@ -37,15 +28,6 @@ def test_rotate_vector_with_units():
     expected_vector = [0, 0, -1] * u.m
     result = util.rotate(vector, angle, axis)
     assert_quantity_allclose(result, expected_vector, atol=1e-16 * u.m)
-
-
-def test_transform_unitless_vector():
-    vector = [0, 1, 0]
-    angle = 45 * u.deg
-    axis = 'z'
-    expected_vector = [np.sqrt(2) / 2, np.sqrt(2) / 2, 0]
-    result = util.transform(vector, angle, axis)
-    assert_allclose(result, expected_vector)
 
 
 def test_time_range_spacing_periods():

@@ -1,100 +1,13 @@
 """Functions to define orbits from classical orbital elements.
 
 """
-import numpy as np
-from numpy import sin, cos, sqrt
 from astropy import units as u
-
-from poliastro.core.jit import jit
-from poliastro.core.util import transform
 
 from poliastro.twobody import rv
 from poliastro.twobody import equinoctial
+from poliastro.core.elements import coe2rv, coe2mee
 
 from ._base import BaseState
-
-
-@jit
-def rv_pqw(k, p, ecc, nu):
-    """Returns r and v vectors in perifocal frame.
-
-    """
-    r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
-    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T
-    return r_pqw, v_pqw
-
-
-@jit
-def coe2rv(k, p, ecc, inc, raan, argp, nu):
-    """Converts from classical orbital elements to vectors.
-
-    Parameters
-    ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
-    p : float
-        Semi-latus rectum or parameter (km).
-    ecc : float
-        Eccentricity.
-    inc : float
-        Inclination (rad).
-    omega : float
-        Longitude of ascending node (rad).
-    argp : float
-        Argument of perigee (rad).
-    nu : float
-        True anomaly (rad).
-
-    """
-    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
-
-    r_ijk = transform(r_pqw, 2, -argp)
-    r_ijk = transform(r_ijk, 0, -inc)
-    r_ijk = transform(r_ijk, 2, -raan)
-    v_ijk = transform(v_pqw, 2, -argp)
-    v_ijk = transform(v_ijk, 0, -inc)
-    v_ijk = transform(v_ijk, 2, -raan)
-
-    return r_ijk, v_ijk
-
-
-def coe2mee(p, ecc, inc, raan, argp, nu):
-    """Converts from classical orbital elements to modified equinoctial
-    orbital elements.
-
-    The definition of the modified equinoctial orbital elements is taken from
-    [Walker, 1985].
-
-    Parameters
-    ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
-    p : float
-        Semi-latus rectum or parameter (km).
-    ecc : float
-        Eccentricity.
-    inc : float
-        Inclination (rad).
-    omega : float
-        Longitude of ascending node (rad).
-    argp : float
-        Argument of perigee (rad).
-    nu : float
-        True anomaly (rad).
-
-    Note
-    -----
-    The conversion equations are taken directly from the original paper.
-
-    """
-    lonper = raan + argp
-    f = ecc * np.cos(lonper)
-    g = ecc * np.sin(lonper)
-    # TODO: Check polar case (see [Walker, 1985])
-    h = np.tan(inc / 2) * np.cos(raan)
-    k = np.tan(inc / 2) * np.sin(raan)
-    L = lonper + nu
-    return p, f, g, h, k, L
 
 
 class ClassicalState(BaseState):

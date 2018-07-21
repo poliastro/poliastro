@@ -8,7 +8,7 @@ from astropy import units as u
 from astropy import time
 from astropy.tests.helper import assert_quantity_allclose
 
-from poliastro.twobody.rv import rv2coe
+from poliastro.core.elements import rv2coe
 from poliastro.constants import J2000
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit
@@ -126,7 +126,7 @@ def test_propagation_mean_motion_parabolic():
 
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
     orbit = orbit.propagate(36.0 * u.h, method=mean_motion)
-    assert_quantity_allclose(norm(orbit.r.to(u.km).value), 304700.0, rtol=1e-4)
+    assert_quantity_allclose(norm(orbit.r), 304700.0 * u.km, rtol=1e-4)
 
 
 def test_propagation_zero_time_returns_same_state():
