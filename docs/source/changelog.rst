@@ -1,6 +1,101 @@
 What's new
 ==========
 
+poliastro 0.10.0 - 2018-07-21
+-----------------------------
+
+This major release brings important changes from the code perspective
+(including a major change in the structure of the library),
+several performance improvements
+and a new infrastructure for running timing benchmarks,
+as well as some new features and bug fixes.
+
+Highlights
+..........
+
+* **Major change in the structure of poliastro codebase**: We separated the high level,
+  units safe functions from the low level, fast ones, with the subsequent improvement
+  in code quality. With this change we effectively communicate where "core" algorithms
+  should go, make easier for future contributors to add numerical functions, and
+  improved the overall quality of the library.
+* **Upgrade to new SciPy ODE solvers**: We wrote our own version of Dormand-Prince 8(5,3)
+  based on the new IVP framework in SciPy 1.0 to take advantage of event detection,
+  dense output and other fancy features. In particular,
+  the :py:meth:`~poliastro.twobody.orbit.Orbit.sample` method now uses dense output when available,
+  therefore removing the need to propagate the orbit repeatedly.
+* **New infrastructure for benchmarks**: We started publishing timing benchmarks results
+  using `Airspeed Velocity`_, a Python framework for writing, running, studying and
+  publishing benchmarks. Besides, we bought a dedicated machine to run them with
+  as much precision as we can.
+  Please `check them out <http://poliastro.github.io/poliastro-benchmarks>`_
+  and consider `adding new benchmarks`_ as well!
+* **Several performance improvements**: Now that we are tracking performance, we dedicated
+  some time during this release to fix some performance regressions that appeared in
+  propagation, improving the behavior near parabolic orbits, and accelerating (even more!)
+  the Izzo algorithm for the Lambert problem as well as some poliastro utilities.
+* **New Continuous Integration infrastructure**: We started to use CircleCI for the
+  Linux tests, the coverage measurements and the documentation builds. This service
+  has faster machines and better support for workflows, which significantly reduced
+  the build times and completely removed the timeouts that were affecting us in
+  Travis CI.
+* **Plotly backends now stable**: We fixed some outstanding issues with the 2D Plotly backend
+  so now it's no longer experimental. We also started refactoring some parts of the plotting module
+  and prepared the ground for the new interactive widgets that Plotly 3.0 brings.
+
+.. _`Airspeed Velocity`: https://asv.readthedocs.io/
+.. _`adding new benchmarks`: https://github.com/poliastro/poliastro-benchmarks/
+
+New features
+............
+
+* **New continuous thrust/low thrust guidance laws**: We brought some continuous thrust
+  guidance laws for orbital maneuvers that have analytical solution, such as orbit
+  raising combined with inclination change, eccentricity change and so forth. This is based on
+  the Master Thesis of Juan Luis Cano, "Study of analytical solutions for low-thrust trajectories",
+  which provided complete validation for all of these laws and which
+  `can be found on GitHub <https://github.com/juanlu001/pfc-uc3m>`_.
+* **More natural perturbations**: We finished adding the most common orbital perturbations,
+  namely Solar radiation pressure and J3 perturbation. We could not reach agreement with
+  the paper for the latter, so if you are considering using it please read the discussion
+  `in the original pull request <https://github.com/poliastro/poliastro/pull/398>`_ and
+  consider lending us a hand to validate it properly!
+* **New dark mode for matplotlib plots**: We added a :code:`dark` parameter to
+  :py:class:`~poliastro.plotting.OrbitPlotter` objects so the background is black.
+  Handy for astronomical purposes!
+
+Bugs fixed:
+...........
+
+Besides some installation issues due to the evolution of dependencies, these
+code bugs were fixed:
+
+* `Issue #345`_: Bodies had incorrect aspect ratio in OrbitPlotter2D
+* `Issue #369`_: Orbit objects cannot be unpickled
+* `Issue #382`_: Orbit.from_body_ephem returns wrong orbit for the Moon
+* `Issue #385`_: Sun Incorrectly plotted in plot_solar_system
+
+.. _`Issue #345`: https://github.com/poliastro/poliastro/issues/345
+.. _`Issue #382`: https://github.com/poliastro/poliastro/issues/382
+.. _`Issue #385`: https://github.com/poliastro/poliastro/issues/385
+
+Backward incompatible changes
+.............................
+
+* Now the :py:meth:`poliastro.twobody.Orbit.sample` method returns a tuple of (times, positions).
+* All the propagator methods changed their signature
+  and now accept :py:class:`~poliastro.twobody.Orbit` objects.
+
+Contributors
+............
+
+This is the complete list of the people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Nikita Astrakhantsev
+* Shreyas Bapat
+* jmerskine1+
+
 poliastro 0.9.1 - 2018-05-11
 ----------------------------
 
