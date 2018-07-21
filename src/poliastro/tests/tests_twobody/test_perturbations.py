@@ -13,8 +13,9 @@ from poliastro.core.elements import rv2coe
 from poliastro.ephem import build_ephem_interpolant
 
 from poliastro.util import norm
-from poliastro.twobody.perturbations import (J2_perturbation, atmospheric_drag,
-                                             third_body, radiation_pressure, J3_perturbation)
+from poliastro.core.perturbations import (
+    J2_perturbation, J3_perturbation, atmospheric_drag, third_body, radiation_pressure
+)
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.twobody import Orbit
 
