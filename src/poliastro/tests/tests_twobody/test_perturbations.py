@@ -12,7 +12,7 @@ from poliastro.twobody.propagation import cowell
 from poliastro.core.elements import rv2coe
 from poliastro.ephem import build_ephem_interpolant
 
-from poliastro.util import norm
+from poliastro.core.util import norm
 from poliastro.core.perturbations import (
     J2_perturbation, J3_perturbation, atmospheric_drag, third_body, radiation_pressure
 )
