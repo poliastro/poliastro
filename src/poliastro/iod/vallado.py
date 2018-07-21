@@ -5,7 +5,7 @@ import numpy as np
 from astropy import units as u
 
 from poliastro.core.jit import jit
-from poliastro.stumpff import c2, c3
+from poliastro.core.stumpff import c2, c3
 
 
 def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
