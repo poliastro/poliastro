@@ -8,28 +8,10 @@ References
 """
 import numpy as np
 
-from poliastro.twobody.decorators import state_from_vector
-from poliastro.util import norm_fast, circular_velocity_fast
-from poliastro.core.jit import jit
 import astropy.units as u
 
-
-@jit
-def delta_V(V_0, ecc_0, ecc_f):
-    """Compute required increment of velocity.
-    """
-    return 2 / 3 * V_0 * np.abs(np.arcsin(ecc_0) - np.arcsin(ecc_f))
-
-
-@jit
-def extra_quantities(k, a, ecc_0, ecc_f, f):
-    """Extra quantities given by the model.
-    """
-    V_0 = circular_velocity_fast(k, a)
-    delta_V_ = delta_V(V_0, ecc_0, ecc_f)
-    t_f_ = delta_V_ / f
-
-    return delta_V_, t_f_
+from poliastro.core.util import norm, cross
+from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
 
 
 def change_ecc_quasioptimal(ss_0, ecc_f, f):
@@ -53,10 +35,10 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
     if ecc_0 > 0.001:  # Arbitrary tolerance
         ref_vec = ss_0.e_vec / ecc_0
     else:
-        ref_vec = ss_0.r / norm_fast(ss_0.r)
+        ref_vec = ss_0.r / norm(ss_0.r)
 
-    h_unit = ss_0.h_vec / norm_fast(ss_0.h_vec)
-    thrust_unit = np.cross(h_unit, ref_vec) * np.sign(ecc_f - ecc_0)
+    h_unit = ss_0.h_vec / norm(ss_0.h_vec)
+    thrust_unit = cross(h_unit, ref_vec) * np.sign(ecc_f - ecc_0)
 
     def a_d(t0, u_, k):
         accel_v = f * thrust_unit
