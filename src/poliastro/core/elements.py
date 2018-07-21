@@ -1,8 +1,9 @@
 import numpy as np
 from numpy.core.umath import cos, sin, sqrt
 
-from poliastro.core.jit import jit
 from poliastro.core.util import transform, cross, norm
+
+from ._jit import jit
 
 
 @jit

@@ -4,7 +4,7 @@
 import numpy as np
 from numpy import sin, cos
 
-from poliastro.core.jit import jit
+from ._jit import jit
 
 
 @jit

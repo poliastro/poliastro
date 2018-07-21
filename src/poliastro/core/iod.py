@@ -1,10 +1,11 @@
 import numpy as np
 from numpy import pi
 
-from poliastro.core.jit import jit
 from poliastro.core.util import norm, cross
 from poliastro.core.hyper import hyp2f1b
 from poliastro.core.stumpff import c2, c3
+
+from ._jit import jit
 
 
 @jit

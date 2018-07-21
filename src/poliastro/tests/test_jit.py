@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from poliastro.core import jit
+from poliastro.core import _jit
 
 
 @contextmanager
@@ -19,11 +19,11 @@ def _fake_numba_import():
 
     fail_loader = FakeImportFailure(['numba'])
 
-    import poliastro.core.jit
-    from poliastro.core import jit
-    del poliastro.core.jit
-    del jit
-    del sys.modules['poliastro.core.jit']
+    import poliastro.core._jit
+    from poliastro.core import _jit
+    del poliastro.core._jit
+    del _jit
+    del sys.modules['poliastro.core._jit']
 
     del sys.modules['numba']
 
@@ -33,26 +33,26 @@ def _fake_numba_import():
 
     sys.meta_path.remove(fail_loader)
     import numba
-    from poliastro.core import jit
+    from poliastro.core import _jit
 
 
 def test_ijit_returns_same_function_without_args():
     def expected_foo():
         return True
-    foo = jit.ijit(expected_foo)
+    foo = _jit.ijit(expected_foo)
     assert foo is expected_foo
 
 
 def test_ijit_returns_same_function_with_args():
     def expected_foo():
         return True
-    foo = jit.ijit(1)(expected_foo)
+    foo = _jit.ijit(1)(expected_foo)
     assert foo is expected_foo
 
 
 def test_no_numba_emits_warning(recwarn):
     with _fake_numba_import():
-        from poliastro.core import jit
+        from poliastro.core import _jit
 
         assert len(recwarn) == 1
         w = recwarn.pop(UserWarning)

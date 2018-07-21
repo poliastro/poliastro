@@ -1,9 +1,10 @@
 import numpy as np
 
 from poliastro.core.angles import nu_to_M, M_to_nu
-from poliastro.core.jit import jit
 from poliastro.core.stumpff import c2, c3
 from poliastro.core.elements import coe2rv, rv2coe
+
+from ._jit import jit
 
 
 @jit
