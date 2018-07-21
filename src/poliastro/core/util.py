@@ -38,7 +38,7 @@ def rotate(vec, angle, axis):
 
     References
     ----------
-    .. [1] http://en.wikipedia.org/wiki/Rotation_matrix#Ambiguities
+    .. _[1]: http://en.wikipedia.org/wiki/Rotation_matrix#Ambiguities
 
     """
     assert vec.shape == (3,)
