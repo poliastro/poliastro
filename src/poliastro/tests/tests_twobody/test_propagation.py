@@ -8,7 +8,7 @@ from astropy import units as u
 from astropy import time
 from astropy.tests.helper import assert_quantity_allclose
 
-from poliastro.twobody.rv import rv2coe
+from poliastro.core.elements import rv2coe
 from poliastro.constants import J2000
 from poliastro.bodies import Sun, Earth
 from poliastro.twobody import Orbit

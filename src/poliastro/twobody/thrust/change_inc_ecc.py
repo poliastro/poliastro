@@ -9,7 +9,7 @@ import numpy as np
 
 from astropy import units as u
 
-from poliastro.twobody.rv import rv2coe
+from poliastro.core.elements import rv2coe
 from poliastro.core.util import norm, cross
 from poliastro.core.thrust.change_inc_ecc import beta, extra_quantities
 

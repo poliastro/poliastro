@@ -3,8 +3,7 @@ import numpy as np
 from poliastro.core.angles import nu_to_M, M_to_nu
 from poliastro.core.jit import jit
 from poliastro.core.stumpff import c2, c3
-from poliastro.twobody.classical import coe2rv
-from poliastro.twobody.rv import rv2coe
+from poliastro.core.elements import coe2rv, rv2coe
 
 
 @jit

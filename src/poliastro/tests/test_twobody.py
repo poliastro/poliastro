@@ -5,8 +5,7 @@ from astropy import units as u
 
 from poliastro.bodies import Earth
 
-from poliastro.twobody.rv import rv2coe
-from poliastro.twobody.classical import coe2rv, coe2mee
+from poliastro.core.elements import coe2rv, coe2mee, rv2coe
 from poliastro.twobody.equinoctial import mee2coe
 
 
