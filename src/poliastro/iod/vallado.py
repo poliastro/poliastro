@@ -4,8 +4,7 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.core.jit import jit
-from poliastro.core.stumpff import c2, c3
+from poliastro.core.iod import vallado as vallado_fast
 
 
 def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
@@ -47,69 +46,6 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     r_ = r.to(u.km).value
     tof_ = tof.to(u.s).value
 
-    v0, v = _lambert(k_, r0_, r_, tof_, short, numiter, rtol)
+    v0, v = vallado_fast(k_, r0_, r_, tof_, short, numiter, rtol)
 
     yield v0 * u.km / u.s, v * u.km / u.s
-
-
-@jit
-def _lambert(k, r0, r, tof, short, numiter, rtol):
-    if short:
-        t_m = +1
-    else:
-        t_m = -1
-
-    norm_r0 = np.dot(r0, r0)**.5
-    norm_r = np.dot(r, r)**.5
-    norm_r0_times_norm_r = norm_r0 * norm_r
-    norm_r0_plus_norm_r = norm_r0 + norm_r
-
-    cos_dnu = np.dot(r0, r) / norm_r0_times_norm_r
-
-    A = t_m * (norm_r * norm_r0 * (1 + cos_dnu))**.5
-
-    if A == 0.0:
-        raise RuntimeError("Cannot compute orbit, phase angle is 180 degrees")
-
-    psi = 0.0
-    psi_low = -4 * np.pi
-    psi_up = 4 * np.pi
-
-    count = 0
-
-    while count < numiter:
-        y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
-        if A > 0.0:
-            # Readjust xi_low until y > 0.0
-            # Translated directly from Vallado
-            while y < 0.0:
-                psi_low = psi
-                psi = (0.8 * (1.0 / c3(psi)) *
-                       (1.0 - norm_r0_times_norm_r * np.sqrt(c2(psi)) / A))
-                y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
-
-        xi = np.sqrt(y / c2(psi))
-        tof_new = (xi**3 * c3(psi) + A * np.sqrt(y)) / np.sqrt(k)
-
-        # Convergence check
-        if np.abs((tof_new - tof) / tof) < rtol:
-            break
-        count += 1
-        # Bisection check
-        condition = (tof_new <= tof)
-        psi_low = psi_low + (psi - psi_low) * condition
-        psi_up = psi_up + (psi - psi_up) * (not condition)
-
-        psi = (psi_up + psi_low) / 2
-    else:
-        raise RuntimeError("Maximum number of iterations reached")
-
-    f = 1 - y / norm_r0
-    g = A * np.sqrt(y / k)
-
-    gdot = 1 - y / norm_r
-
-    v0 = (r - f * r0) / g
-    v = (gdot * r - r0) / g
-
-    return v0, v
