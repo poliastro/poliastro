@@ -74,7 +74,7 @@ def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
     This method uses a Dormand & Prince method of order 8(5,3) available
     in the :py:class:`poliastro.integrators` module. If multiple tofs
     are provided, the method propagates to the maximum value and
-    calculates the orher values via dense output
+    calculates the other values via dense output
 
     """
     k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
