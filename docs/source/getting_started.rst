@@ -72,6 +72,23 @@ you find any, please open an issue in the `issue tracker`_.
 .. _`virtualenv`: http://pypi.python.org/pypi/virtualenv
 .. _`local installations`: http://stackoverflow.com/a/4325047/554319
 
+Using poliastro with latest JupyterLab
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For using poliastro on JupyterLab, you must have NodeJS and npm installed in your system.
+
+plotly 3.0 has provided an amazing support for JupyterLab and for using it properly,
+you must first install all the extensions required (two).
+
+plotly extension for JupyterLab (needs NodeJS and npm to be present locally):
+
+    $ jupyter labextension install @jupyterlab/plotly-extension
+
+and
+
+    $ jupyter labextension install @jupyter-widgets/jupyterlab-manager
+
+
 Testing
 -------
 
@@ -81,7 +98,7 @@ If installed correctly, the tests can be run using pytest::
   Running unit tests for poliastro
   [...]
   OK
-  $ 
+  $
 
 If for some reason any test fails, please report it in the `issue tracker`_.
 

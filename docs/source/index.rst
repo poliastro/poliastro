@@ -2,7 +2,7 @@ poliastro - Astrodynamics in Python
 ===================================
 
 .. image:: _static/logo_text.png
-   :width: 675px
+   :width: 90%
    :align: center
 
 **poliastro** is an open source (MIT) collection of Python functions useful
@@ -33,7 +33,7 @@ and `chat`_.
 
 .. figure:: _static/molniya.png
    :align: right
-   :figwidth: 300
+   :figwidth: 50%
    :alt: Molniya orbit
 
    Plot of a `Molniya orbit`_ around the Earth
@@ -56,12 +56,9 @@ the MIT license, hence allowing commercial use of the library.
 
 .. code-block:: python
 
-    import matplotlib.pyplot as plt
-    plt.ion()
-
     from poliastro.examples import molniya
     from poliastro.plotting import plot
-    
+
     plot(molniya)
 
 .. include:: success.rst

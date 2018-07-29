@@ -1,9 +1,9 @@
 @import url("alabaster.css");
 
-.body {
+body {
     min-width: 100px;
 }
 
-.div.body{
+div.body{
     min-width: 100px;
 }
