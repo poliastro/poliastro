@@ -281,7 +281,7 @@ class Orbit(object):
 
             return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
 
-    def sample(self, values=None, method=mean_motion):
+    def sample(self, values=None, method=mean_motion, dense_output=False):
         """Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
@@ -292,6 +292,13 @@ class Orbit(object):
             Number of interval points (default to 100),
             True anomaly values,
             Time values.
+
+        method : function, optional
+            Method used for propagation
+
+        dense_output : bool, optional
+            whether method returns dense output and has to be run just once,
+            or returns only final value and has to be run for each Time tick
 
         Returns
         -------
@@ -317,7 +324,7 @@ class Orbit(object):
 
         """
         if values is None:
-            return self.sample(100, method)
+            return self.sample(100, method, dense_output)
 
         elif isinstance(values, int):
             if self.ecc < 1:
@@ -337,17 +344,17 @@ class Orbit(object):
                 nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), abs(wrapped_nu))
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
 
-            return self.sample(nu_values, method)
+            return self.sample(nu_values, method, dense_output)
 
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
 
-        return values, self._sample(values, method)
+        return values, self._sample(values, method, dense_output)
 
-    def _sample(self, time_values, method=mean_motion):
+    def _sample(self, time_values, method=mean_motion, dense_output=False):
         # if use cowell, propagate to max_time and use other values as intermediate (dense output)
-        if method == cowell:
-            values, _ = cowell(self, (time_values - self.epoch).to(u.s).value)
+        if dense_output:
+            values, _ = method(self, (time_values - self.epoch).to(u.s).value)
             values = values * u.km
         else:
             values = np.zeros((len(time_values), 3)) * self.r.unit
