@@ -281,7 +281,7 @@ class Orbit(object):
 
             return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
 
-    def sample(self, values=None, method=mean_motion, dense_output=False):
+    def sample(self, values=None, method=mean_motion):
         """Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
@@ -295,10 +295,6 @@ class Orbit(object):
 
         method : function, optional
             Method used for propagation
-
-        dense_output : bool, optional
-            whether method returns dense output and has to be run just once,
-            or returns only final value and has to be run for each Time tick
 
         Returns
         -------
@@ -324,7 +320,7 @@ class Orbit(object):
 
         """
         if values is None:
-            return self.sample(100, method, dense_output)
+            return self.sample(100, method)
 
         elif isinstance(values, int):
             if self.ecc < 1:
@@ -344,24 +340,17 @@ class Orbit(object):
                 nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), abs(wrapped_nu))
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
 
-            return self.sample(nu_values, method, dense_output)
+            return self.sample(nu_values, method)
 
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
 
-        return values, self._sample(values, method, dense_output)
+        return values, self._sample(values, method)
 
-    def _sample(self, time_values, method=mean_motion, dense_output=False):
-        # if use cowell, propagate to max_time and use other values as intermediate (dense output)
-        if dense_output:
-            values, _ = method(self, (time_values - self.epoch).to(u.s).value)
-            values = values * u.km
-        else:
-            values = np.zeros((len(time_values), 3)) * self.r.unit
-            for ii, epoch in enumerate(time_values):
-                rr = self.propagate(epoch, method).r
-                values[ii] = rr
-        return CartesianRepresentation(values, xyz_axis=1)
+    def _sample(self, time_values, method=mean_motion):
+        values = method(self, (time_values - self.epoch).to(u.s).value)
+        rrs = values[0] * u.km
+        return CartesianRepresentation(rrs, xyz_axis=1)
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point

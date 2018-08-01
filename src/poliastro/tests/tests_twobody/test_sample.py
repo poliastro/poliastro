@@ -50,7 +50,7 @@ def test_sampling_cowell_dense_output_agrees_mean_motion():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     sample_times = Time([ss0.epoch + x * u.h for x in range(100)])
 
-    _, rr = ss0.sample(sample_times, cowell, dense_output=True)
+    _, rr = ss0.sample(sample_times, cowell)
     for i, sample_time in enumerate(sample_times):
         expected_ss = ss0.propagate(sample_time - ss0.epoch)
         assert_quantity_allclose(rr[i].get_xyz(), expected_ss.r)
@@ -121,7 +121,5 @@ def test_sample_big_orbits(method):
         [-9018878.6, -94116055, 22619059] * u.km,
         [-49.950923, -12.948431, -4.2925158] * u.km / u.s
     )
-
     times, positions = ss.sample(15, method=method)
-
     assert len(times) == len(positions) == 15
