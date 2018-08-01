@@ -111,15 +111,27 @@ def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
     return rrs, vvs
 
 
-def mean_motion(orbit, tof, **kwargs):
+def mean_motion(orbit, tofs, **kwargs):
     k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
     r0 = orbit.r.to(u.km).value
     v0 = orbit.v.to(u.km / u.s).value
 
-    return mean_motion_fast(k, r0, v0, tof)
+    if not hasattr(tofs, '__len__'):
+        return mean_motion_fast(k, r0, v0, tofs)
+
+    results = [mean_motion_fast(k, r0, v0, tof) for tof in tofs]
+    return [result[0] for result in results], [result[1] for result in results]
 
 
-def kepler(orbit, tof, *, numiter=350, **kwargs):
+def kepler(orbit, tofs, **kwargs):
+    if not hasattr(tofs, '__len__'):
+        return _kepler(orbit, tofs)
+    
+    results = [_kepler(orbit, tof) for tof in tofs]
+    return [result[0] for result in results], [result[1] for result in results]
+
+
+def _kepler(orbit, tof, *, numiter=350, **kwargs):
     """Propagates Keplerian orbit.
 
     Parameters
