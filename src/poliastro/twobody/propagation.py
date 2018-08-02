@@ -125,9 +125,9 @@ def mean_motion(orbit, tofs, **kwargs):
 
 def kepler(orbit, tofs, numiter=350, **kwargs):
     if not hasattr(tofs, '__len__'):
-        return _kepler(orbit, tofs, numiter)
+        return _kepler(orbit, tofs, numiter=numiter)
 
-    results = [_kepler(orbit, tof) for tof in tofs]
+    results = [_kepler(orbit, tof, numiter=numiter) for tof in tofs]
     return [result[0] for result in results], [result[1] for result in results]
 
 
