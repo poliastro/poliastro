@@ -179,7 +179,8 @@ sun_heo = {'body': Sun, 'tof': 200 * u.day, 'raan': -0.10 * u.deg, 'argp': 0.2 *
            'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
            'period': 365 * u.day}
 
-sun_leo = {'body': Sun, 'tof': 200 * u.day, 'raan': -6.0 * 1e-3 * u.deg, 'argp': 0.02 * u.deg, 'inc': -1.0 * 1e-4 * u.deg,
+sun_leo = {'body': Sun, 'tof': 200 * u.day, 'raan': -6.0 * 1e-3 * u.deg, 
+           'argp': 0.02 * u.deg, 'inc': -1.0 * 1e-4 * u.deg,
            'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
            'period': 365 * u.day}
 
