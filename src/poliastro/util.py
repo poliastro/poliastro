@@ -79,7 +79,7 @@ def norm(vec):
     return norm_fast(vec.value) * vec.unit
 
 
-def time_range(start, *, periods=50, spacing=None, end=None):
+def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=None):
     """Generates range of astronomical times.
 
     .. versionadded:: 0.8.0
@@ -99,13 +99,13 @@ def time_range(start, *, periods=50, spacing=None, end=None):
         Array of time values.
 
     """
-    start = Time(start)
+    start = Time(start, format=format, scale=scale)
 
     if spacing is not None and end is None:
         result = start + spacing * np.arange(0, periods)
 
     elif end is not None and spacing is None:
-        end = Time(end)
+        end = Time(end, format=format, scale=scale)
         result = start + (end - start) * np.linspace(0, 1, periods)
 
     else:

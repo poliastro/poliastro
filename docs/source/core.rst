@@ -34,6 +34,12 @@ poliastro.core.perturbations module
 .. automodule:: poliastro.core.perturbations
    :members:
 
+poliastro.core.thrust module
+***********************************
+
+.. automodule:: poliastro.core.thrust
+   :members:
+
 poliastro.core.propagation module
 *********************************
 

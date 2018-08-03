@@ -121,7 +121,5 @@ def test_sample_big_orbits(method):
         [-9018878.6, -94116055, 22619059] * u.km,
         [-49.950923, -12.948431, -4.2925158] * u.km / u.s
     )
-
     times, positions = ss.sample(15, method=method)
-
     assert len(times) == len(positions) == 15

@@ -162,30 +162,31 @@ def test_cowell_converges_with_small_perturbations():
     assert_quantity_allclose(final.v, initial.v)
 
 
-moon_heo = {'body': Moon, 'tof': 60, 'raan': -0.06 * u.deg, 'argp': 0.15 * u.deg, 'inc': 0.08 * u.deg,
+moon_heo = {'body': Moon, 'tof': 60 * u.day, 'raan': -0.06 * u.deg, 'argp': 0.15 * u.deg, 'inc': 0.08 * u.deg,
             'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
-            'period': 28}
+            'period': 28 * u.day}
 
-moon_leo = {'body': Moon, 'tof': 60, 'raan': -2.18 * 1e-4 * u.deg,
+moon_leo = {'body': Moon, 'tof': 60 * u.day, 'raan': -2.18 * 1e-4 * u.deg,
             'argp': 15.0 * 1e-3 * u.deg, 'inc': 6.0 * 1e-4 * u.deg,
             'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
-            'period': 28}
+            'period': 28 * u.day}
 
-moon_geo = {'body': Moon, 'tof': 60, 'raan': 6.0 * u.deg, 'argp': -11.0 * u.deg, 'inc': 6.5 * 1e-3 * u.deg,
+moon_geo = {'body': Moon, 'tof': 60 * u.day, 'raan': 6.0 * u.deg, 'argp': -11.0 * u.deg, 'inc': 6.5 * 1e-3 * u.deg,
             'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
-            'period': 28}
+            'period': 28 * u.day}
 
-sun_heo = {'body': Sun, 'tof': 200, 'raan': -0.10 * u.deg, 'argp': 0.2 * u.deg, 'inc': 0.1 * u.deg,
+sun_heo = {'body': Sun, 'tof': 200 * u.day, 'raan': -0.10 * u.deg, 'argp': 0.2 * u.deg, 'inc': 0.1 * u.deg,
            'orbit': [26553.4 * u.km, 0.741 * u.one, 63.4 * u.deg, 0.0 * u.deg, -10.12921 * u.deg, 0.0 * u.rad],
-           'period': 365}
+           'period': 365 * u.day}
 
-sun_leo = {'body': Sun, 'tof': 200, 'raan': -6.0 * 1e-3 * u.deg, 'argp': 0.02 * u.deg, 'inc': -1.0 * 1e-4 * u.deg,
+sun_leo = {'body': Sun, 'tof': 200 * u.day, 'raan': -6.0 * 1e-3 * u.deg,
+           'argp': 0.02 * u.deg, 'inc': -1.0 * 1e-4 * u.deg,
            'orbit': [6678.126 * u.km, 0.01 * u.one, 28.5 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
-           'period': 365}
+           'period': 365 * u.day}
 
-sun_geo = {'body': Sun, 'tof': 200, 'raan': 8.7 * u.deg, 'argp': -5.5 * u.deg, 'inc': 5.5e-3 * u.deg,
+sun_geo = {'body': Sun, 'tof': 200 * u.day, 'raan': 8.7 * u.deg, 'argp': -5.5 * u.deg, 'inc': 5.5e-3 * u.deg,
            'orbit': [42164.0 * u.km, 0.0001 * u.one, 1 * u.deg, 0.0 * u.deg, 0.0 * u.deg, 0.0 * u.rad],
-           'period': 365}
+           'period': 365 * u.day}
 
 
 @pytest.mark.parametrize('test_params', [
@@ -198,8 +199,8 @@ def test_3rd_body_Curtis(test_params):
     body = test_params['body']
     solar_system_ephemeris.set('de432s')
 
-    j_date = 2454283.0
-    tof = (test_params['tof'] * u.day).to(u.s).value
+    j_date = 2454283.0 * u.day
+    tof = (test_params['tof']).to(u.s).value
     body_r = build_ephem_interpolant(body, test_params['period'], (j_date, j_date + test_params['tof']), rtol=1e-2)
 
     epoch = Time(j_date, format='jd', scale='tdb')
@@ -246,9 +247,9 @@ def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
     solar_system_ephemeris.set('de432s')
 
-    j_date = 2438400.5
-    tof = 600
-    sun_r = build_ephem_interpolant(Sun, 365, (j_date, j_date + tof), rtol=1e-2)
+    j_date = 2438400.5 * u.day
+    tof = 600 * u.day
+    sun_r = build_ephem_interpolant(Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2)
     epoch = Time(j_date, format='jd', scale='tdb')
     drag_force_orbit = [10085.44 * u.km, 0.025422 * u.one, 88.3924 * u.deg,
                         45.38124 * u.deg, 227.493 * u.deg, 343.4268 * u.deg]
@@ -257,7 +258,7 @@ def test_solar_pressure():
     # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
     sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
-    r, v = cowell(initial, np.linspace(0, (tof * u.day).to(u.s).value, 4000), rtol=1e-8, ad=radiation_pressure,
+    r, v = cowell(initial, np.linspace(0, (tof).to(u.s).value, 4000), rtol=1e-8, ad=radiation_pressure,
                   R=Earth.R.to(u.km).value, C_R=2.0, A=2e-4, m=100, Wdivc_s=Sun.Wdivc.value, star=sun_normalized)
 
     delta_as, delta_eccs, delta_incs, delta_raans, delta_argps, delta_hs = [], [], [], [], [], []
@@ -270,7 +271,7 @@ def test_solar_pressure():
 
     # averaging over 5 last values in the way Curtis does
     for check in solar_pressure_checks:
-        index = int(check['t_days'] / tof * 4000)
+        index = int(1.0 * check['t_days'] / tof.to(u.day).value * 4000)
         delta_ecc, delta_inc, delta_raan, delta_argp = np.mean(delta_eccs[index - 5:index]), \
             np.mean(delta_incs[index - 5:index]), np.mean(delta_raans[index - 5:index]), \
             np.mean(delta_argps[index - 5:index])

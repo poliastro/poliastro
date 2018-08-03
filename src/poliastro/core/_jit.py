@@ -6,6 +6,7 @@ decorator instead.
 """
 import warnings
 import inspect
+import astropy.units as u
 
 
 def ijit(first=None, *args, **kwargs):

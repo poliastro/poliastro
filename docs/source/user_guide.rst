@@ -225,6 +225,38 @@ The J2 perturbation changes the orbit parameters (from Curtis example 12.2)::
 For more available perturbation options, see the
 :py:mod:`poliastro.twobody.perturbations` module.
 
+Studying artificial perturbations: thrust
+--------------------------------------------
+
+In addition to natural perturbations, poliastro also has
+built-in artificial perturbations (thrusts) aimed
+at intentional change of some orbital elements. 
+Let us simultaineously change eccentricy and inclination::
+
+    >>> from poliastro.twobody.thrust import change_inc_ecc
+    >>> from poliastro.twobody import Orbit
+    >>> from poliastro.bodies import Earth
+    >>> from poliastro.twobody.propagation import cowell
+    >>> from astropy import units as u
+    >>> from astropy.time import Time
+    >>> ecc_0, ecc_f = 0.4, 0.0
+    >>> a = 42164
+    >>> inc_0, inc_f = 0.0, (20.0 * u.deg).to(u.rad).value
+    >>> argp = 0.0
+    >>> f = 2.4e-7
+    >>> k = Earth.k.to(u.km**3 / u.s**2).value
+    >>> s0 = Orbit.from_classical(Earth, a * u.km, ecc_0 * u.one, inc_0 * u.deg, 0 * u.deg, argp * u.deg, 0 * u.deg, epoch=Time(0, format='jd', scale='tdb'))
+    >>> a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
+    >>> sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
+
+The thrust changes orbit parameters as desired (within errors)::
+
+    >>> sf.inc, sf.ecc
+    (<Quantity 0.34719734 rad>, <Quantity 0.00894513>)
+
+For more available perturbation options, see the
+:py:mod:`poliastro.twobody.thrust` module.
+
 Changing the orbit: :py:class:`~poliastro.maneuver.Maneuver` objects
 --------------------------------------------------------------------
 

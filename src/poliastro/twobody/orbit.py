@@ -293,6 +293,9 @@ class Orbit(object):
             True anomaly values,
             Time values.
 
+        method : function, optional
+            Method used for propagation
+
         Returns
         -------
         (Time, CartesianRepresentation)
@@ -345,16 +348,9 @@ class Orbit(object):
         return values, self._sample(values, method)
 
     def _sample(self, time_values, method=mean_motion):
-        # if use cowell, propagate to max_time and use other values as intermediate (dense output)
-        if method == cowell:
-            values, _ = cowell(self, (time_values - self.epoch).to(u.s).value)
-            values = values * u.km
-        else:
-            values = np.zeros((len(time_values), 3)) * self.r.unit
-            for ii, epoch in enumerate(time_values):
-                rr = self.propagate(epoch, method).r
-                values[ii] = rr
-        return CartesianRepresentation(values, xyz_axis=1)
+        values = method(self, (time_values - self.epoch).to(u.s).value)
+        rrs = values[0] * u.km
+        return CartesianRepresentation(rrs, xyz_axis=1)
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
