@@ -40,6 +40,7 @@ setup(
         ':implementation_name=="cpython"': "numba>=0.39",
         'dev': [
             "coverage",
+            "pytest<3.7",
             "pytest-cov",
             "pycodestyle",
             "sphinx",
