@@ -271,7 +271,7 @@ def test_solar_pressure():
 
     # averaging over 5 last values in the way Curtis does
     for check in solar_pressure_checks:
-        index = int(check['t_days'] / tof * 4000)
+        index = int(1.0 * check['t_days'] / tof.to(u.day).value * 4000)
         delta_ecc, delta_inc, delta_raan, delta_argp = np.mean(delta_eccs[index - 5:index]), \
             np.mean(delta_incs[index - 5:index]), np.mean(delta_raans[index - 5:index]), \
             np.mean(delta_argps[index - 5:index])
