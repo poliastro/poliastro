@@ -34,10 +34,9 @@ else:
     nbsphinx_timeout = 60
 
 
-# Paths relative to invoking conf.py - not this shared file
-html_static_path = [join("..", "_static")]
+# html_favicon = '_static/favicon.ico'
+# html_static_path = ["_static"]
 html_theme = "alabaster"
-html_favicon = 'favicon.ico'
 html_theme_options = {
     'logo': 'logo_trans.png',
     'logo_name': True,
