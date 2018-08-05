@@ -56,12 +56,9 @@ the MIT license, hence allowing commercial use of the library.
 
 .. code-block:: python
 
-    import matplotlib.pyplot as plt
-    plt.ion()
-
     from poliastro.examples import molniya
     from poliastro.plotting import plot
-    
+
     plot(molniya)
 
 .. include:: success.rst
