@@ -77,59 +77,6 @@ def lagrange_points(r12, m1, m2):
 
     return l
 
-# def lagrange_points(r12, m1, m2):
-#     """Computes the Lagrangian points proe
-
-#     Parameters
-#     ----------
-#     r12 : float
-#         Collinear distance
-#     m1 : float
-#         Mass of the main body
-#     m2 : float
-#         Mass of the secondary body
-
-#     Raises
-#     ------
-#     ValueError
-#         If the ratio $m_2 / (m_1 + m_2)$ is less than 0.5
-
-#     Returns
-#     -------
-#     array(float)
-#         Distance of the Lagrangian points to the center,
-#         projected on the collinear line
-#     """
-
-#     m = m2 / (m1 + m2)
-
-#     if m < 0.5:
-
-#         def eq_collinear(x):
-#             r = x - m - (1 - m) * x * (abs(x - 1) ** 3)
-#             r += m * (x - 1) * (abs(x)**3)
-#             return r
-
-#         l = np.zeros((5,))
-
-#         # L1 is situated between the two main bodies
-#         l[0] = brentq(eq_collinear, 0., 1.)
-
-#         # L2 is situated behind the secondary body (m2,r2)
-#         l[1] = brentq(eq_collinear, 1., 1e+7)
-
-#         # L3 is situated behind the main body (m1,r1)
-#         l[2] = brentq(eq_collinear, -1e+7, -0.)
-
-#         l[3] = l[4] = 0.5
-
-#         return l * r12
-
-#     else:
-#         raise ValueError(
-#             "m = {:.5f} must be < 0.5, m1 and m2 are ".format(m) +
-#             "too similar or are interchanged")
-
 
 def lagrange_points_vec(m1, r1_, m2, r2_, n_):
     """Function that calculates the five Lagrange points in the
