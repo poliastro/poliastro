@@ -1,11 +1,11 @@
 # coding: utf-8
 
 import numpy as np
-from scipy.optimize import brentq
+from scipy.optimize import root
 
 
 def lagrange_points(r12, m1, m2):
-    """Computes the Lagrangian points proe
+    """Computes the Lagrangian points...
 
     Parameters
     ----------
@@ -16,11 +16,6 @@ def lagrange_points(r12, m1, m2):
     m2 : float
         Mass of the secondary body
 
-    Raises
-    ------
-    ValueError
-        If the ratio $m_2 / (m_1 + m_2)$ is less than 0.5
-
     Returns
     -------
     array(float)
@@ -28,34 +23,112 @@ def lagrange_points(r12, m1, m2):
         projected on the collinear line
     """
 
-    m = m2 / (m1 + m2)
+    # TODO: recheck quintic equations
 
-    if m < 0.5:
+    rho = r12
 
-        def eq_collinear(x):
-            r = x - m - (1 - m) * x * (abs(x - 1) ** 3)
-            r += m * (x - 1) * (abs(x)**3)
-            return r
+    def eq_L1(rho2):
+        aux = 3 * rho**2 * rho2 - 3 * rho * rho2**2 + rho2**3
+        aux *= rho2**2
+        aux /= rho**3 - rho2**3
+        aux /= (rho - rho2)**2
+        aux -= m2 / m1
+        return aux
 
-        l = np.zeros((5,))
+    def eq_L2(rho2):
+        aux = 3 * rho**2 * rho2 + 3 * rho * rho2**2 + rho2**3
+        aux *= rho2**2
+        aux /= rho**3 - rho2**3
+        aux /= (rho + rho2)**2
+        aux -= m2 / m1
+        return aux
 
-        # L1 is situated between the two main bodies
-        l[0] = brentq(eq_collinear, 0., 1.)
+    def eq_L3(rho1):
+        aux = 3 * rho**2 * rho1 + 3 * rho * rho1**2 + rho1**3
+        aux *= rho1**2
+        aux /= rho**3 - rho1**3
+        aux /= (rho + rho1)**2
+        aux -= m1 / m2
+        return aux
 
-        # L2 is situated behind the secondary body (m2,r2)
-        l[1] = brentq(eq_collinear, 1., 1e+7)
+    l = np.zeros((5,))
 
-        # L3 is situated behind the main body (m1,r1)
-        l[2] = brentq(eq_collinear, -1e+7, -0.)
+    # TODO: check boundaries of brentq
 
-        l[3] = l[4] = 0.5
+    # L1
+    rho2 = root(eq_L1, 0)
+    rho1 = rho - rho2.x
+    l[0] = rho1
 
-        return l * r12
+    # L2
+    rho2 = root(eq_L2, 0)
+    rho1 = rho + rho2.x
+    l[1] = rho1
 
-    else:
-        raise ValueError(
-            "m = {:.5f} must be < 0.5, m1 and m2 are ".format(m) +
-            "too similar or are interchanged")
+    # L3
+    # TODO: check -1000 value
+    rho1 = root(eq_L3, -1000)
+    # rho2 = rho + rho1
+    l[2] = - rho1.x
+
+    l[3] = l[4] = 0.5 * r12
+
+    print(l)
+
+    return l
+
+# def lagrange_points(r12, m1, m2):
+#     """Computes the Lagrangian points proe
+
+#     Parameters
+#     ----------
+#     r12 : float
+#         Collinear distance
+#     m1 : float
+#         Mass of the main body
+#     m2 : float
+#         Mass of the secondary body
+
+#     Raises
+#     ------
+#     ValueError
+#         If the ratio $m_2 / (m_1 + m_2)$ is less than 0.5
+
+#     Returns
+#     -------
+#     array(float)
+#         Distance of the Lagrangian points to the center,
+#         projected on the collinear line
+#     """
+
+#     m = m2 / (m1 + m2)
+
+#     if m < 0.5:
+
+#         def eq_collinear(x):
+#             r = x - m - (1 - m) * x * (abs(x - 1) ** 3)
+#             r += m * (x - 1) * (abs(x)**3)
+#             return r
+
+#         l = np.zeros((5,))
+
+#         # L1 is situated between the two main bodies
+#         l[0] = brentq(eq_collinear, 0., 1.)
+
+#         # L2 is situated behind the secondary body (m2,r2)
+#         l[1] = brentq(eq_collinear, 1., 1e+7)
+
+#         # L3 is situated behind the main body (m1,r1)
+#         l[2] = brentq(eq_collinear, -1e+7, -0.)
+
+#         l[3] = l[4] = 0.5
+
+#         return l * r12
+
+#     else:
+#         raise ValueError(
+#             "m = {:.5f} must be < 0.5, m1 and m2 are ".format(m) +
+#             "too similar or are interchanged")
 
 
 def lagrange_points_vec(m1, r1_, m2, r2_, n_):
