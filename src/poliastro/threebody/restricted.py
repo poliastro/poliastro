@@ -135,7 +135,7 @@ def lagrange_points_vec(m1, r1_, m2, r2_, n_):
 
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
+    # import matplotlib.pyplot as plt
 
     # Earth
     r1 = np.array([0, 0, 0])
@@ -157,9 +157,9 @@ if __name__ == "__main__":
     x = np.array([r[0] for r in res])
     y = np.array([r[1] for r in res])
 
-    plt.figure()
-    plt.scatter(r1[0], r1[1], s=25, marker="o", label="Earth")
-    plt.scatter(r2[0], r2[1], s=25, marker="o", label="Moon")
-    plt.scatter(x, y, marker="x", label="L points")
-    plt.legend(loc="best")
-    plt.show()
+    # plt.figure()
+    # plt.scatter(r1[0], r1[1], s=25, marker="o", label="Earth")
+    # plt.scatter(r2[0], r2[1], s=25, marker="o", label="Moon")
+    # plt.scatter(x, y, marker="x", label="L points")
+    # plt.legend(loc="best")
+    # plt.show()
