@@ -21,6 +21,7 @@ Data references can be found in :py:mod:`~poliastro.constants`
 import math
 
 from astropy import units as u
+from astropy.constants import G
 from poliastro import constants
 
 
@@ -103,6 +104,7 @@ class _Sun(_Body):
     name = "Sun"
     symbol = u"\u2609"
     R = constants.R_sun
+    mass = k / G
     J2 = constants.J2_sun
     Wdivc = constants.Wdivc_sun
 
@@ -124,6 +126,7 @@ class _Mercury(_Body):
     name = "Mercury"
     symbol = u"\u263F"
     R = constants.R_mercury
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -140,6 +143,7 @@ class _Venus(_Body):
     name = "Venus"
     symbol = u"\u2640"
     R = constants.R_venus
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -156,6 +160,7 @@ class _Earth(_Body):
     name = "Earth"
     symbol = u"\u2641"
     R = constants.R_earth
+    mass = k / G
     J2 = constants.J2_earth
     J3 = constants.J3_earth
     H0 = constants.H0_earth
@@ -176,6 +181,7 @@ class _Mars(_Body):
     name = "Mars"
     symbol = u"\u2642"
     R = constants.R_mars
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -192,6 +198,7 @@ class _Jupiter(_Body):
     name = "Jupiter"
     symbol = u"\u2643"
     R = constants.R_jupiter
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -218,6 +225,7 @@ class _Saturn(_Body):
     name = "Saturn"
     symbol = u"\u2644"
     R = constants.R_saturn
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -234,6 +242,7 @@ class _Uranus(_Body):
     name = "Uranus"
     symbol = u"\u26E2"
     R = constants.R_uranus
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -250,6 +259,7 @@ class _Neptune(_Body):
     name = "Neptune"
     symbol = u"\u2646"
     R = constants.R_neptune
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -268,6 +278,7 @@ class _Pluto(_Body):
     name = "Pluto"
     symbol = u"\u2647"
     R = constants.R_pluto
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -296,6 +307,7 @@ class _Moon(_Body):
     name = "Moon"
     symbol = u"\u263E"
     R = constants.R_moon
+    mass = k / G
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
