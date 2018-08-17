@@ -15,7 +15,6 @@ def lagrange_points(r12, m1, m2):
     """Computes the Lagrangian points of RC3BP given the distance between two
     bodies and their masses.
 
-
     It uses the formulation found in Problem 8-5 of Battin, Richard H. 'An 
     introduction to the mathematics and methods of astrodynamics', AIAA, 1999.
 
@@ -83,6 +82,10 @@ def lagrange_points(r12, m1, m2):
     # TODO: add checks to the results returned by `root`
     # TODO: reassure that the initial values given to `root` are good for all cases
 
+    # L4, L5
+    # L4 and L5 are points in the plane of rotation which form an equilateral
+    # triangle with the two masses (Battin)
+    # (0.5 = cos(60 deg))
     l[3] = l[4] = 0.5 * rho
 
     return l * r12.unit
@@ -107,15 +110,16 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
 
     Returns
     -------
-    list[~astropy.units.Quantity]: 
+    list: 
         Position of the Lagrange points: [L1, L2, L3, L4, L5]
+        The positions are of type ~astropy.units.Quantity
     """
 
     # Check Body 1 is the main body
     assert m1 > m2, "Body 1 is not the main body: it has less mass that the 'secondary' body"
 
     # Define local reference system:
-    # Center: main body
+    # Center: main body, NOT the barycenter
     # x axis: points to the secondary body
     ux = r2 - r1
     r12 = norm(ux)
@@ -129,16 +133,24 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
     uy = cross(n, ux)
     uy = uy / norm(uy)
 
+    # position in x-axis
     x1, x2, x3, x4, x5 = lagrange_points(r12, m1, m2)
 
-    y45 = np.sqrt(3) / 2 * r12
+    # position in y axis
+    # L1, L2, L3 are located in the x-axis, so y123 = 0
 
-    # Convert L to original vectors r1 r2 base
+    # L4 and L5 are points in the plane of rotation which form an equilateral
+    # triangle with the two masses (Battin)
+    # sqrt(3)/2 = sin(60 deg)
+    y4 = np.sqrt(3) / 2 * r12
+    y5 = - y4
+
+    # Convert L points (x,y) to original vectors [r1 r2] base
     L1 = r1 + ux * x1
     L2 = r1 + ux * x2
     L3 = r1 + ux * x3
-    L4 = r1 + ux * x4 + uy * y45
-    L5 = r1 + ux * x5 - uy * y45
+    L4 = r1 + ux * x4 + uy * y4
+    L5 = r1 + ux * x5 + uy * y5
 
     return [L1, L2, L3, L4, L5]
 
@@ -149,15 +161,28 @@ if __name__ == "__main__":
     from astropy.constants import G
     from poliastro.constants import GM_earth, GM_moon
 
+    # ORIGIN = "barycenter"
+    ORIGIN = "main body"
+
+    # Distance Earth - Moon
+    r12 = 384400
+
     # Earth
-    r1 = np.array([0, 0, 0]) * u.km
     m1 = GM_earth / G
 
     # Moon
     m2 = GM_moon / G
-    d = 384400
-    r2 = np.array([d, 0, 0]) * u.km
 
+    if ORIGIN == "barycenter":
+        x1 = - r12 * m2 / (m1 + m2)
+        x2 = r12 + x1
+    elif ORIGIN == "main body":
+        x1 = 0
+        x2 = r12
+
+    r1 = np.array([x1, 0, 0]) * u.km
+    r2 = np.array([x2, 0, 0]) * u.km
+    
     # normal vector
     n = np.array([0., 0, 1]) * u.one
 
@@ -169,9 +194,10 @@ if __name__ == "__main__":
     x = [p[0] for p in lp]
     y = [p[1] for p in lp]
 
-    # figure
+    # Figure
     import matplotlib.pyplot as plt
     plt.figure()
+    plt.scatter(0, 0, marker="+", c="k", label="Origin")
     plt.scatter(r1[0], r1[1], s=100, marker="$" + u"\u2641" + "$",
                 label="Earth", c="k")
     plt.scatter(r2[0], r2[1], s=100, marker="$" + u"\u263E" + "$",
