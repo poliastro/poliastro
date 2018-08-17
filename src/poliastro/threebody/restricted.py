@@ -1,31 +1,43 @@
-# coding: utf-8
+"""Restricted Circular 3-Body Problem (RC3BP)
+
+    Includes the computation of the Lagrange points
+"""
+
 
 import numpy as np
+
 from scipy.optimize import root
+
+from poliastro.util import norm
 
 
 def lagrange_points(r12, m1, m2):
-    """Computes the Lagrangian points using the formulation
-    in Problem 8-5 of Battin, Richard H. 'An introduction to 
-    the mathematics and methods of astrodynamics'. AIAA, 1999.
+    """Computes the Lagrangian points of RC3BP given the distance between two
+    bodies and their masses.
+
+
+    It uses the formulation found in Problem 8-5 of Battin, Richard H. 'An 
+    introduction to the mathematics and methods of astrodynamics', AIAA, 1999.
 
     Parameters
     ----------
-    r12 : float
-        Collinear distance
-    m1 : float
+    r12 : ~astropy.units.Quantity
+        Distance between the two bodies
+    m1 : ~astropy.units.Quantity
         Mass of the main body
-    m2 : float
+    m2 : ~astropy.units.Quantity
         Mass of the secondary body
 
     Returns
     -------
-    array(float)
-        Distance of the Lagrangian points to the center,
-        projected on the collinear line
+    ~astropy.units.Quantity
+        Distance of the Lagrangian points to the main body,
+        projected on the axis main body - secondary body
     """
 
-    rho = r12
+    rho = r12.value
+    m1 = m1.value
+    m2 = m2.value
 
     def eq_L1(rho2):
         aux = 3 * rho**2 * rho2 - 3 * rho * rho2**2 + rho2**3
@@ -68,54 +80,54 @@ def lagrange_points(r12, m1, m2):
     # rho2 = rho + rho1
     l[2] = - rho1
 
-    # TODO: add checks to the results given by `root`
+    # TODO: add checks to the results returned by `root`
     # TODO: reassure that the initial values given to `root` are good for all cases
 
-    l[3] = l[4] = 0.5 * r12
+    l[3] = l[4] = 0.5 * rho
 
-    return l
+    return l * r12.unit
 
 
-def lagrange_points_vec(m1, r1_, m2, r2_, n_):
-    """Computes the five Lagrange points in the Restricted Circular 3 Body
-    Problem. Returns the radiovectors in the same vectorial base as r1 and 
-    r2 for the five Lagrangian points: L1, L2, L3, L4, L5
+def lagrange_points_vec(m1, r1, m2, r2, n):
+    """Computes the five Lagrange points in the RC3BP. Returns the positions
+    in the same vectorial base as `r1` and `r2` for the five Lagrangian points.
 
     Parameters
     ----------
-    m1 : float
-        Mass of the main body. This body is the one with the biggest mass
-    r1_ : array
-        Radiovector of the main body
-    m2 : float
-        Mass of the secondary body
-    r2_: array
-        Radiovector of the secondary body
-    n_ : array
-        Normal vector to the plane in which the two orbits of the main
-        and the secondary body are contained
+    m1 : ~astropy.units.Quantity
+        Mass of the main body. This body is the one with the biggest mass.
+    r1 : ~astropy.units.Quantity
+        Position of the main body.
+    m2 : ~astropy.units.Quantity
+        Mass of the secondary body.
+    r2 : ~astropy.units.Quantity
+        Position of the secondary body.
+    n : ~astropy.units.Quantity
+        Normal vector to the orbital plane.
 
     Returns
     -------
-    LP: list of all Lagrange points
+    list[~astropy.units.Quantity]: 
+        Position of the Lagrange points: [L1, L2, L3, L4, L5]
     """
 
-    r1 = np.asarray(r1_).reshape((3,))
-    r2 = np.asarray(r2_).reshape((3,))
-    n = np.asarray(n_).reshape((3,))
+    # Check Body 1 is the main body
+    assert m1 > m2, "Body 1 is not the main body: it has less mass that the 'secondary' body"
 
     # Define local reference system:
     # Center: main body
     # x axis: points to the secondary body
     ux = r2 - r1
-    r12 = np.linalg.norm(ux)
+    r12 = norm(ux)
+    ux = ux / r12
 
     # y axis: contained in the orbital plane, perpendicular to x axis
-    uy = np.cross(n, ux)
 
-    # Unitary vectors
-    ux = ux / r12
-    uy = uy / np.linalg.norm(uy)
+    def cross(x, y):
+        return np.cross(x, y) * x.unit * y.unit
+
+    uy = cross(n, ux)
+    uy = uy / norm(uy)
 
     x1, x2, x3, x4, x5 = lagrange_points(r12, m1, m2)
 
@@ -131,43 +143,46 @@ def lagrange_points_vec(m1, r1_, m2, r2_, n_):
     return [L1, L2, L3, L4, L5]
 
 
-def lagrange_points_from_body(body):
-    pass
-
-
 if __name__ == "__main__":
 
+    from astropy import units as u
+    from astropy.constants import G
+    from poliastro.constants import GM_earth, GM_moon
+
     # Earth
-    r1 = np.array([0, 0, 0])
-    m1 = 5.972e24
+    r1 = np.array([0, 0, 0]) * u.km
+    m1 = GM_earth / G
 
     # Moon
-    m2 = 7.348e22
+    m2 = GM_moon / G
     d = 384400
-    r2 = np.array([d, 0, 0])
+    r2 = np.array([d, 0, 0]) * u.km
 
-    n = np.array([0., 0, 1])
+    # normal vector
+    n = np.array([0., 0, 1]) * u.one
 
-    res = lagrange_points_vec(m1, r1, m2, r2, n)
-    res1 = np.array(res) / d
+    lp = lagrange_points_vec(m1, r1, m2, r2, n)
 
-    [print("{:+10.5e} , {:+10.5e} , {:+10.5e}".format(r[0], r[1], r[2]))
-     for r in res]
+    for p in lp:
+        print("{:+8.0f} {:+8.0f} {:+8.0f}".format(p[0], p[1], p[2]))
 
-    x = np.array([r[0] for r in res])
-    y = np.array([r[1] for r in res])
+    x = [p[0] for p in lp]
+    y = [p[1] for p in lp]
 
-    # import matplotlib.pyplot as plt
-    # plt.figure()
-    # plt.scatter(r1[0], r1[1], s=100, marker="$" + u"\u2641" + "$", label="Earth", c="k")
-    # plt.scatter(r2[0], r2[1], s=100, marker="$" + u"\u263E" + "$", label="Moon", c="k")
-    # # plt.scatter(x, y, marker="x", label="L points")
-    # for i in range(0, 5):
-    #     plt.scatter(x[i], y[i], marker="$L" + "{:d}$".format(i + 1), c="k", s=100)
-    # plt.legend(loc="best")
-    # plt.title("Earth-Moon Lagrangian points")
-    # plt.xlabel("[km]")
-    # plt.ylabel("[km]")
-    # plt.tight_layout()
-    # plt.show()
-    # plt.close('all')
+    # figure
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.scatter(r1[0], r1[1], s=100, marker="$" + u"\u2641" + "$",
+                label="Earth", c="k")
+    plt.scatter(r2[0], r2[1], s=100, marker="$" + u"\u263E" + "$",
+                label="Moon", c="k")
+    for i in range(0, 5):
+        plt.scatter(x[i], y[i], marker="$L" + "{:d}$".format(i + 1),
+                    c="k", s=100)
+    plt.legend(loc="best")
+    plt.title("Earth-Moon Lagrangian points")
+    plt.xlabel("[km]")
+    plt.ylabel("[km]")
+    plt.tight_layout()
+    plt.show()
+    plt.close('all')
