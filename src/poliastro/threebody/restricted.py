@@ -5,7 +5,9 @@ from scipy.optimize import root
 
 
 def lagrange_points(r12, m1, m2):
-    """Computes the Lagrangian points...
+    """Computes the Lagrangian points using the formulation
+    in Problem 8-5 of Battin, Richard H. 'An introduction to 
+    the mathematics and methods of astrodynamics'. AIAA, 1999.
 
     Parameters
     ----------
@@ -22,8 +24,6 @@ def lagrange_points(r12, m1, m2):
         Distance of the Lagrangian points to the center,
         projected on the collinear line
     """
-
-    # TODO: recheck quintic equations
 
     rho = r12
 
@@ -53,36 +53,33 @@ def lagrange_points(r12, m1, m2):
 
     l = np.zeros((5,))
 
-    # TODO: check boundaries of brentq
-
     # L1
-    rho2 = root(eq_L1, 0)
-    rho1 = rho - rho2.x
+    rho2 = root(eq_L1, 0).x
+    rho1 = rho - rho2
     l[0] = rho1
 
     # L2
-    rho2 = root(eq_L2, 0)
-    rho1 = rho + rho2.x
+    rho2 = root(eq_L2, 0).x
+    rho1 = rho + rho2
     l[1] = rho1
 
     # L3
-    # TODO: check -1000 value
-    rho1 = root(eq_L3, -1000)
+    rho1 = root(eq_L3, -1000).x
     # rho2 = rho + rho1
-    l[2] = - rho1.x
+    l[2] = - rho1
+
+    # TODO: add checks to the results given by `root`
+    # TODO: reassure that the initial values given to `root` are good for all cases
 
     l[3] = l[4] = 0.5 * r12
-
-    print(l)
 
     return l
 
 
 def lagrange_points_vec(m1, r1_, m2, r2_, n_):
-    """Function that calculates the five Lagrange points in the
-    Restricted Circular 3 Body Problem. Returns the radiovectors in the same
-    vectorial base as r1 and r2 for the five Lagrangian points:
-    L1, L2, L3, L4, L5
+    """Computes the five Lagrange points in the Restricted Circular 3 Body
+    Problem. Returns the radiovectors in the same vectorial base as r1 and 
+    r2 for the five Lagrangian points: L1, L2, L3, L4, L5
 
     Parameters
     ----------
@@ -122,7 +119,7 @@ def lagrange_points_vec(m1, r1_, m2, r2_, n_):
 
     x1, x2, x3, x4, x5 = lagrange_points(r12, m1, m2)
 
-    y45 = np.sqrt(3) / 2
+    y45 = np.sqrt(3) / 2 * r12
 
     # Convert L to original vectors r1 r2 base
     L1 = r1 + ux * x1
@@ -134,8 +131,11 @@ def lagrange_points_vec(m1, r1_, m2, r2_, n_):
     return [L1, L2, L3, L4, L5]
 
 
+def lagrange_points_from_body(body):
+    pass
+
+
 if __name__ == "__main__":
-    # import matplotlib.pyplot as plt
 
     # Earth
     r1 = np.array([0, 0, 0])
@@ -152,14 +152,22 @@ if __name__ == "__main__":
     res1 = np.array(res) / d
 
     [print("{:+10.5e} , {:+10.5e} , {:+10.5e}".format(r[0], r[1], r[2]))
-     for r in res1]
+     for r in res]
 
     x = np.array([r[0] for r in res])
     y = np.array([r[1] for r in res])
 
+    # import matplotlib.pyplot as plt
     # plt.figure()
-    # plt.scatter(r1[0], r1[1], s=25, marker="o", label="Earth")
-    # plt.scatter(r2[0], r2[1], s=25, marker="o", label="Moon")
-    # plt.scatter(x, y, marker="x", label="L points")
+    # plt.scatter(r1[0], r1[1], s=100, marker="$" + u"\u2641" + "$", label="Earth", c="k")
+    # plt.scatter(r2[0], r2[1], s=100, marker="$" + u"\u263E" + "$", label="Moon", c="k")
+    # # plt.scatter(x, y, marker="x", label="L points")
+    # for i in range(0, 5):
+    #     plt.scatter(x[i], y[i], marker="$L" + "{:d}$".format(i + 1), c="k", s=100)
     # plt.legend(loc="best")
+    # plt.title("Earth-Moon Lagrangian points")
+    # plt.xlabel("[km]")
+    # plt.ylabel("[km]")
+    # plt.tight_layout()
     # plt.show()
+    # plt.close('all')
