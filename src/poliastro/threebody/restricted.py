@@ -6,12 +6,66 @@
 
 import numpy as np
 
-from scipy.optimize import root
+from scipy.optimize import root, brentq
 
 from poliastro.util import norm
 
 
 def lagrange_points(r12, m1, m2):
+    """Computes the Lagrangian points of RC3BP given the distance between two
+    bodies and their masses.
+
+    It uses the formulation found in Eq. (2.204) of Curtis, Howard. 'Orbital 
+    mechanics for engineering students'. Elsevier, 3rd Edition.
+
+    Parameters
+    ----------
+    r12 : ~astropy.units.Quantity
+        Distance between the two bodies
+    m1 : ~astropy.units.Quantity
+        Mass of the main body
+    m2 : ~astropy.units.Quantity
+        Mass of the secondary body
+
+    Returns
+    -------
+    ~astropy.units.Quantity
+        Distance of the Lagrangian points to the main body,
+        projected on the axis main body - secondary body
+    """
+
+    pi2 = (m2 / (m1 + m2)).value
+
+    def eq_L123(xi):
+        aux = (1 - pi2) * (xi + pi2) / abs(xi + pi2)**3
+        aux += pi2 * (xi + pi2 - 1) / abs(xi + pi2 - 1)**3
+        aux -= xi
+        return aux
+
+    l = np.zeros((5,))
+
+    # L1
+    xi = root(eq_L123, 1 - 1.9*pi2).x
+    l[0] = xi + pi2
+
+    # L2
+    xi = brentq(eq_L123, 1, 1.5)
+    l[1] = xi + pi2
+
+    # L3
+    xi = brentq(eq_L123, -1.5, -1)
+    l[2] = xi + pi2
+
+    # L4, L5
+    # L4 and L5 are points in the plane of rotation which form an equilateral
+    # triangle with the two masses (Battin)
+    # (0.5 = cos(60 deg))
+    l[3] = l[4] = 0.5
+
+    return l * r12
+
+
+def lagrange_points_battin(r12, m1, m2):
     """Computes the Lagrangian points of RC3BP given the distance between two
     bodies and their masses.
 
@@ -182,7 +236,7 @@ if __name__ == "__main__":
 
     r1 = np.array([x1, 0, 0]) * u.km
     r2 = np.array([x2, 0, 0]) * u.km
-    
+
     # normal vector
     n = np.array([0., 0, 1]) * u.one
 
