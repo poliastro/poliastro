@@ -1,6 +1,7 @@
 """Restricted Circular 3-Body Problem (RC3BP)
 
-    Includes the computation of the Lagrange points
+    Includes the computation of:
+    * Lagrange points
 """
 
 
@@ -15,7 +16,7 @@ def lagrange_points(r12, m1, m2):
     """Computes the Lagrangian points of RC3BP given the distance between two
     bodies and their masses.
 
-    It uses the formulation found in Eq. (2.204) of Curtis, Howard. 'Orbital 
+    It uses the formulation found in Eq. (2.204) of Curtis, Howard. 'Orbital
     mechanics for engineering students'. Elsevier, 3rd Edition.
 
     Parameters
@@ -42,34 +43,34 @@ def lagrange_points(r12, m1, m2):
         aux -= xi
         return aux
 
-    l = np.zeros((5,))
+    lp = np.zeros((5,))
 
     # L1
-    xi = root(eq_L123, 1 - 1.9*pi2).x
-    l[0] = xi + pi2
+    xi = root(eq_L123, 1 - 1.9 * pi2).x
+    lp[0] = xi + pi2
 
     # L2
     xi = brentq(eq_L123, 1, 1.5)
-    l[1] = xi + pi2
+    lp[1] = xi + pi2
 
     # L3
     xi = brentq(eq_L123, -1.5, -1)
-    l[2] = xi + pi2
+    lp[2] = xi + pi2
 
     # L4, L5
     # L4 and L5 are points in the plane of rotation which form an equilateral
     # triangle with the two masses (Battin)
     # (0.5 = cos(60 deg))
-    l[3] = l[4] = 0.5
+    lp[3] = lp[4] = 0.5
 
-    return l * r12
+    return lp * r12
 
 
 def lagrange_points_battin(r12, m1, m2):
-    """Computes the Lagrangian points of RC3BP given the distance between two
-    bodies and their masses.
+    """Computes the Lagrangian points of the RC3BP given the distance between
+    two bodies and their masses.
 
-    It uses the formulation found in Problem 8-5 of Battin, Richard H. 'An 
+    It uses the formulation found in Problem 8-5 of Battin, Richard H. 'An
     introduction to the mathematics and methods of astrodynamics', AIAA, 1999.
 
     Parameters
@@ -116,22 +117,22 @@ def lagrange_points_battin(r12, m1, m2):
         aux -= m1 / m2
         return aux
 
-    l = np.zeros((5,))
+    lp = np.zeros((5,))
 
     # L1
     rho2 = root(eq_L1, 0).x
     rho1 = rho - rho2
-    l[0] = rho1
+    lp[0] = rho1
 
     # L2
     rho2 = root(eq_L2, 0).x
     rho1 = rho + rho2
-    l[1] = rho1
+    lp[1] = rho1
 
     # L3
     rho1 = root(eq_L3, -1000).x
     # rho2 = rho + rho1
-    l[2] = - rho1
+    lp[2] = - rho1
 
     # TODO: add checks to the results returned by `root`
     # TODO: reassure that the initial values given to `root` are good for all cases
@@ -140,14 +141,15 @@ def lagrange_points_battin(r12, m1, m2):
     # L4 and L5 are points in the plane of rotation which form an equilateral
     # triangle with the two masses (Battin)
     # (0.5 = cos(60 deg))
-    l[3] = l[4] = 0.5 * rho
+    lp[3] = lp[4] = 0.5 * rho
 
-    return l * r12.unit
+    return lp * r12.unit
 
 
 def lagrange_points_vec(m1, r1, m2, r2, n):
     """Computes the five Lagrange points in the RC3BP. Returns the positions
-    in the same vectorial base as `r1` and `r2` for the five Lagrangian points.
+    in the same frame of reference as `r1` and `r2` for the five Lagrangian
+    points.
 
     Parameters
     ----------
@@ -164,22 +166,22 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
 
     Returns
     -------
-    list: 
+    list:
         Position of the Lagrange points: [L1, L2, L3, L4, L5]
         The positions are of type ~astropy.units.Quantity
     """
 
     # Check Body 1 is the main body
-    assert m1 > m2, "Body 1 is not the main body: it has less mass that the 'secondary' body"
+    assert m1 > m2, "Body 1 is not the main body: it has less mass than the 'secondary' body"
 
-    # Define local reference system:
+    # Define local frame of reference:
     # Center: main body, NOT the barycenter
-    # x axis: points to the secondary body
+    # x-axis: points to the secondary body
     ux = r2 - r1
     r12 = norm(ux)
     ux = ux / r12
 
-    # y axis: contained in the orbital plane, perpendicular to x axis
+    # y-axis: contained in the orbital plane, perpendicular to x-axis
 
     def cross(x, y):
         return np.cross(x, y) * x.unit * y.unit
@@ -190,7 +192,7 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
     # position in x-axis
     x1, x2, x3, x4, x5 = lagrange_points(r12, m1, m2)
 
-    # position in y axis
+    # position in y-axis
     # L1, L2, L3 are located in the x-axis, so y123 = 0
 
     # L4 and L5 are points in the plane of rotation which form an equilateral
@@ -199,7 +201,7 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
     y4 = np.sqrt(3) / 2 * r12
     y5 = - y4
 
-    # Convert L points (x,y) to original vectors [r1 r2] base
+    # Convert L points coordinates (x,y) to original vectorial base [r1 r2]
     L1 = r1 + ux * x1
     L2 = r1 + ux * x2
     L3 = r1 + ux * x3
@@ -221,10 +223,10 @@ if __name__ == "__main__":
     # Distance Earth - Moon
     r12 = 384400
 
-    # Earth
+    # Earth (1)
     m1 = GM_earth / G
 
-    # Moon
+    # Moon (2)
     m2 = GM_moon / G
 
     if ORIGIN == "barycenter":
@@ -234,6 +236,7 @@ if __name__ == "__main__":
         x1 = 0
         x2 = r12
 
+    # Positions
     r1 = np.array([x1, 0, 0]) * u.km
     r2 = np.array([x2, 0, 0]) * u.km
 
