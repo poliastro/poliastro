@@ -31,9 +31,6 @@ from astropy import time
 
 J2000 = time.Time('J2000', scale='tdb')
 
-G = Constant('G', 'Gravitational Constant', 6.67428e-11, 'm3 / (kg * s2)', 0.00067e-11,
-             'IAU 2009 system of astronomical constants', system='si')
-
 GM_sun = Constant('GM_sun', 'Heliocentric gravitational constant', 1.32712442099e20, 'm3 / (s2)', 0.0000000001e20,
                   'IAU 2009 system of astronomical constants', system='si')
 
