@@ -7,7 +7,7 @@
 
 import numpy as np
 
-from scipy.optimize import root, brentq
+from scipy.optimize import brentq
 
 from poliastro.util import norm
 
@@ -46,7 +46,10 @@ def lagrange_points(r12, m1, m2):
     lp = np.zeros((5,))
 
     # L1
-    xi = root(eq_L123, 1 - 1.9 * pi2).x
+    tol = 1e-11  # `brentq` uses a xtol of 2e-12, so it should be covered
+    a = - pi2 + tol
+    b = 1 - pi2 - tol
+    xi = brentq(eq_L123, a, b)
     lp[0] = xi + pi2
 
     # L2
