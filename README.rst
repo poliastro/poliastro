@@ -14,10 +14,13 @@
 :Author: Juan Luis Cano Rodríguez |orcid|
 :Version: 0.11.dev0
 
-.. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square
+.. |circleci| image:: https://img.shields.io/circleci/project/poliastro/poliastro/master.svg?style=flat-square&logo=circleci
+   :target: https://circleci.com/gh/poliastro/poliastro
+
+.. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square&logo=travis
    :target: https://travis-ci.org/poliastro/poliastro
 
-.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square
+.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square&logo=appveyor
    :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
@@ -45,7 +48,7 @@
    :alt: Join the chat at https://gitter.im/poliastro/poliastro
    :target: https://gitter.im/poliastro/poliastro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
-|travisci| |appveyor| |codecov| |codeclimate|
+|circleci| |travisci| |appveyor| |codecov| |codeclimate|
 
 |docs| |license| |doi| |astropy| |mailing| |gitter|
 
@@ -108,12 +111,13 @@ poliastro requires the following Python packages:
 * SciPy, for root finding and numerical propagation
 
 poliastro is usually tested on Linux, Windows and OS X on Python
-3.5 and 3.6 against latest NumPy.
+3.5, 3.6 and 3.7 against latest NumPy.
 
 ==============  ============  ===================
 Platform        Site          Status
 ==============  ============  ===================
-Linux & OS X    Travis CI     |travisci|
+Linux           CircleCI      |circleci|
+OS X            Travis CI     |travisci|
 Windows x64     Appveyor      |appveyor|
 ==============  ============  ===================
 
