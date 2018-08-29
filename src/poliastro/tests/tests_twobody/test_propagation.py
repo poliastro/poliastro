@@ -186,9 +186,6 @@ def test_cowell_propagation_circle_to_circle():
     ss = Orbit.circular(Earth, 500 * u.km)
     tof = 20 * ss.period
 
-    r0, v0 = ss.rv()
-    k = ss.attractor.k
-
     r, v = cowell(ss,
                   tof.to(u.s).value,
                   ad=constant_accel)

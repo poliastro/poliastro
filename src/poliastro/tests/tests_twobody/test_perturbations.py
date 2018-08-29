@@ -261,7 +261,7 @@ def test_solar_pressure():
     r, v = cowell(initial, np.linspace(0, (tof).to(u.s).value, 4000), rtol=1e-8, ad=radiation_pressure,
                   R=Earth.R.to(u.km).value, C_R=2.0, A=2e-4, m=100, Wdivc_s=Sun.Wdivc.value, star=sun_normalized)
 
-    delta_as, delta_eccs, delta_incs, delta_raans, delta_argps, delta_hs = [], [], [], [], [], []
+    delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []
     for ri, vi in zip(r, v):
         orbit_params = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
         delta_eccs.append(orbit_params[1] - drag_force_orbit[1].value)

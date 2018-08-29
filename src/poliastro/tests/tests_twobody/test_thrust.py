@@ -44,8 +44,6 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
     a_0 = Earth.R.to(u.km).value + 900  # km
     f = 2.4e-7  # km / s2, assumed constant
 
-    k = Earth.k.to(u.km**3 / u.s**2).value
-
     expected_t_f = 29.697  # days, reverse-engineered
     expected_delta_V = 0.6158  # km / s, lower than actual result
     s0 = Orbit.from_classical(Earth, a_0 * u.km, ecc_0 * u.one,
@@ -63,8 +61,6 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
 def test_sso_disposal_numerical(ecc_0, ecc_f):
     a_0 = Earth.R.to(u.km).value + 900  # km
     f = 2.4e-7  # km / s2, assumed constant
-
-    k = Earth.k.to(u.km**3 / u.s**2).value
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(Earth, a_0 * u.km, ecc_0 * u.one,
@@ -91,8 +87,6 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     argp = 0.0  # rad, the method is efficient for 0 and 180
     f = 2.4e-7  # km / s2, unused
 
-    k = Earth.k.to(u.km**3 / u.s**2).value
-
     inc_f = np.radians(inc_f)
     expected_beta = np.radians(expected_beta)
 
@@ -118,8 +112,6 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
     inc_f = (20.0 * u.deg).to(u.rad).value  # rad
     argp = 0.0  # rad, the method is efficient for 0 and 180
     f = 2.4e-7  # km / s2
-
-    k = Earth.k.to(u.km**3 / u.s**2).value
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(

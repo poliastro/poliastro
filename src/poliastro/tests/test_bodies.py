@@ -17,7 +17,7 @@ def test_body_from_parameters_raises_valueerror_if_k_units_not_correct():
     _name = _symbol = ""
     _R = 0
     with pytest.raises(u.UnitsError) as excinfo:
-        moon = bodies.Body.from_parameters(None, wrong_k, _name, _symbol, _R)
+        bodies.Body.from_parameters(None, wrong_k, _name, _symbol, _R)
     assert ("UnitsError: Argument 'k' to function 'from_parameters' must be in units convertible to 'km3 / s2'."
             in excinfo.exconly())
 
@@ -54,13 +54,6 @@ def test_from_relative():
                                           name='TRAPPIST',
                                           symbol=None,
                                           R=0.114)  # Relative to the Sun
-
-    TRAPPIST1D = bodies.Body.from_relative(reference=bodies.Earth,
-                                           parent=TRAPPIST1,  # Orbits TRAPPIST1
-                                           k=0.5,
-                                           name='TRAPPIST1D',
-                                           symbol=None,
-                                           R=0.772)  # Relative to the Earth
 
     # check values properly calculated
     VALUECHECK = bodies.Body.from_relative(reference=bodies.Earth,
