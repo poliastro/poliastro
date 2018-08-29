@@ -21,6 +21,7 @@ from poliastro.twobody import classical
 from poliastro.twobody import equinoctial
 
 from poliastro.bodies import Moon
+from poliastro.frames import INERTIAL_FRAME_MAPPING
 
 from ._base import BaseState  # flake8: noqa
 
@@ -56,6 +57,7 @@ class Orbit(object):
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
+        self._frame = None
 
     @property
     def state(self):
@@ -66,6 +68,18 @@ class Orbit(object):
     def epoch(self):
         """Epoch of the orbit. """
         return self._epoch
+
+    @property
+    def frame(self):
+        """Reference frame of the orbit. """
+        if self._frame is None:
+            if self.attractor in INERTIAL_FRAME_MAPPING:
+                frame_class = INERTIAL_FRAME_MAPPING[self.attractor][0]
+                self._frame = frame_class(obstime=self.epoch)
+            else:
+                raise NotImplementedError("Frames for orbits around custom bodies are not yet supported")
+
+        return self._frame
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
@@ -180,7 +194,10 @@ class Orbit(object):
             moon_gcrs.representation = CartesianRepresentation
             r = CartesianRepresentation([moon_gcrs.x, moon_gcrs.y, moon_gcrs.z])
             v = CartesianRepresentation([moon_gcrs.v_x, moon_gcrs.v_y, moon_gcrs.v_z])
-        return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+
+        ss = cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+        ss._frame = ICRS()
+        return ss
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)

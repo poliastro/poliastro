@@ -10,7 +10,14 @@ from astropy import time
 from astropy.time import Time
 from astropy.coordinates import CartesianRepresentation
 
-from poliastro.bodies import Sun, Earth
+from poliastro.bodies import (
+    Body,
+    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
+)
+from poliastro.frames import (
+    ICRS,
+    HCRS, MercuryICRS, VenusICRS, GCRS, MarsICRS, JupiterICRS, SaturnICRS, UranusICRS, NeptuneICRS, PlutoICRS
+)
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
 from poliastro.constants import J2000
@@ -237,3 +244,50 @@ def test_orbit_is_pickable():
     assert_array_equal(ss.r, ss_result.r)
     assert_array_equal(ss.v, ss_result.v)
     assert ss_result.epoch == ss.epoch
+
+
+@pytest.mark.parametrize("attractor, expected_frame_class", [
+    (Sun, HCRS),
+    (Mercury, MercuryICRS),
+    (Venus, VenusICRS),
+    (Earth, GCRS),
+    (Mars, MarsICRS),
+    (Jupiter, JupiterICRS),
+    (Saturn, SaturnICRS),
+    (Uranus, UranusICRS),
+    (Neptune, NeptuneICRS),
+    (Pluto, PlutoICRS),
+])
+def test_orbit_has_proper_frame(attractor, expected_frame_class):
+    # Dummy data
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+    epoch = Time('2015-07-14 07:59', scale='tdb')
+
+    ss = Orbit.from_vectors(attractor, r, v, epoch)
+
+    assert ss.frame.__class__ == expected_frame_class
+    assert ss.frame.obstime == epoch
+
+
+def test_orbit_from_custom_body_raises_error_when_asked_frame():
+    attractor = Body(Sun, 1 * u.km ** 3 / u.s ** 2, "_DummyPlanet")
+
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+
+    ss = Orbit.from_vectors(attractor, r, v)
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        ss.frame
+    assert ("Frames for orbits around custom bodies are not yet supported"
+            in excinfo.exconly())
+
+
+@pytest.mark.parametrize("body", [
+    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+])
+def test_orbit_from_ephem_is_in_icrs_frame(body):
+    ss = Orbit.from_body_ephem(body)
+
+    assert ss.frame.__class__ == ICRS
