@@ -5,8 +5,11 @@ import numpy as np
 from astropy import units as u
 from astropy import time
 
-from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel, \
-    ICRS, GCRS, CartesianDifferential
+from astropy.coordinates import (
+    CartesianRepresentation, CartesianDifferential,
+    get_body_barycentric_posvel,
+    ICRS, GCRS
+)
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
@@ -166,7 +169,9 @@ class Orbit(object):
             warn("Input time was converted to scale='tdb' with value "
                  "{}. Use Time(..., scale='tdb') instead."
                  .format(epoch.tdb.value), TimeScaleWarning)
+
         r, v = get_body_barycentric_posvel(body.name, epoch)
+
         if body == Moon:
             moon_icrs = ICRS(x=r.x, y=r.y, z=r.z, v_x=v.x, v_y=v.y, v_z=v.z,
                              representation=CartesianRepresentation, differential_type=CartesianDifferential
