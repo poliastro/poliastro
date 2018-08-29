@@ -166,23 +166,12 @@ class DOP835(OdeSolver):
         f = self.f
         K = self.K
 
-        max_step = self.max_step
         rtol = self.rtol
         atol = self.atol
 
         min_step = 10 * np.abs(np.nextafter(t, self.direction * np.inf) - t)
 
-        if self.h_abs > max_step:
-            h_abs = max_step
-        elif self.h_abs < min_step:
-            h_abs = min_step
-        else:
-            h_abs = self.h_abs
-
-        order = self.order
-        step_accepted = False
-
-        while not step_accepted:
+        while True:
             if self.h_abs < min_step:
                 return False, self.TOO_SMALL_STEP
 
@@ -223,7 +212,6 @@ class DOP835(OdeSolver):
             h_new_abs = h_abs / dh_factor
 
             if err_E < 1.0:
-                step_accepted = True
                 self.factor_old = np.max([err_E, 1e-4])
                 self.n_accepted += 1
                 K[12] = self.fun(t + h, y_final)
