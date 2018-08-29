@@ -6,7 +6,7 @@ from itertools import cycle
 
 import numpy as np
 
-from typing import List, Tuple
+from typing import List, Tuple  # flake8: noqa
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt

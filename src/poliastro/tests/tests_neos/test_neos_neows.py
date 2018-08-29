@@ -45,7 +45,7 @@ def test_orbit_from_spk_id_raises_when_error(mock_get):
     resp.status_code = 404
     mock_get.return_value = resp
     with pytest.raises(requests.HTTPError):
-        ss = neows.orbit_from_spk_id('')
+        neows.orbit_from_spk_id('')
 
 
 @mock.patch('poliastro.neos.neows.requests.get')
@@ -55,7 +55,7 @@ def test_spk_id_from_name_raises_when_error(mock_get):
     resp.status_code = 404
     mock_get.return_value = resp
     with pytest.raises(requests.HTTPError):
-        ss = neows.spk_id_from_name('')
+        neows.spk_id_from_name('')
 
 
 @mock.patch('poliastro.neos.neows.requests.Response')

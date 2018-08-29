@@ -15,8 +15,6 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.examples import iss
 
-from poliastro.neos import dastcom5
-
 from poliastro.util import norm
 
 
@@ -187,9 +185,6 @@ def test_cowell_propagation_circle_to_circle():
 
     ss = Orbit.circular(Earth, 500 * u.km)
     tof = 20 * ss.period
-
-    r0, v0 = ss.rv()
-    k = ss.attractor.k
 
     r, v = cowell(ss,
                   tof.to(u.s).value,

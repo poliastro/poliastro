@@ -1,8 +1,6 @@
 """Angles and anomalies.
 
 """
-import numpy as np
-
 from astropy import units as u
 from poliastro.core.angles import (D_to_nu as D_to_nu_fast, nu_to_D as nu_to_D_fast,
                                    E_to_nu as E_to_nu_fast, nu_to_E as nu_to_E_fast,

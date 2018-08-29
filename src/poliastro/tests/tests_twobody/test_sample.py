@@ -1,6 +1,5 @@
 import pytest
 
-import timeit
 from astropy.tests.helper import assert_quantity_allclose
 from astropy import units as u
 from astropy.time import Time
@@ -8,7 +7,6 @@ from astropy.time import Time
 from poliastro.bodies import Earth, Sun
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import kepler, mean_motion, cowell
-import numpy as np
 
 from poliastro.util import norm
 

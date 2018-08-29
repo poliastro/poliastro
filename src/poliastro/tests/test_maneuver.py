@@ -15,7 +15,7 @@ def test_maneuver_raises_error_if_units_are_wrong():
     wrong_dt = 1.0
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     with pytest.raises(u.UnitsError) as excinfo:
-        man = Maneuver([wrong_dt, _v])
+        Maneuver([wrong_dt, _v])
     assert ("UnitsError: Argument 'dts' to function '_initialize' must be in units convertible to 's'."
             in excinfo.exconly())
 
@@ -24,7 +24,7 @@ def test_maneuver_raises_error_if_dvs_are_not_vectors():
     dt = 1 * u.s
     wrong_dv = 1 * u.km / u.s
     with pytest.raises(ValueError) as excinfo:
-        man = Maneuver((dt, wrong_dv))
+        Maneuver((dt, wrong_dv))
     assert ("ValueError: Delta-V must be three dimensions vectors"
             in excinfo.exconly())
 

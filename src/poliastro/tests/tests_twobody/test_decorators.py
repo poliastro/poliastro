@@ -1,7 +1,5 @@
 import inspect
 
-from astropy import units as u
-
 from poliastro.twobody.decorators import state_from_vector
 
 
