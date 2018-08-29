@@ -14,13 +14,13 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install pycodestyle mypy --quiet
+            pip install flake8 mypy --quiet
 
       - run:
-          name: check PEP8
+          name: check PEP8 and style errors
           command: |
             . venv/bin/activate
-            pycodestyle src/ setup.py --count
+            flake8 src/ setup.py --count
 
       - run:
           name: check MyPy
