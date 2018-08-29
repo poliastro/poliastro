@@ -1,1 +1,1 @@
-from poliastro.twobody.orbit import Orbit
+from poliastro.twobody.orbit import Orbit  # flake8: noqa

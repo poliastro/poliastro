@@ -50,7 +50,7 @@ def test_ijit_returns_same_function_with_args():
 
 def test_no_numba_emits_warning(recwarn):
     with _fake_numba_import():
-        from poliastro.core import _jit
+        from poliastro.core import _jit  # flake8: noqa
 
         assert len(recwarn) == 1
         w = recwarn.pop(UserWarning)
