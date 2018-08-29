@@ -15,8 +15,6 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.examples import iss
 
-from poliastro.neos import dastcom5
-
 from poliastro.util import norm
 
 

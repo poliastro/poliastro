@@ -10,7 +10,7 @@ from astropy.coordinates import CartesianRepresentation, get_body_barycentric_po
 
 from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
-from poliastro.twobody.propagation import propagate, mean_motion, cowell
+from poliastro.twobody.propagation import propagate, mean_motion
 from poliastro.core.elements import rv2coe
 
 from poliastro.twobody import rv

@@ -1,8 +1,5 @@
 import pytest
 
-import numpy as np
-from numpy.testing import assert_allclose
-
 from astropy import units as u
 from astropy.time import Time
 from astropy.tests.helper import assert_quantity_allclose

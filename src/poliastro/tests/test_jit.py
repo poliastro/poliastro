@@ -32,8 +32,6 @@ def _fake_numba_import():
     yield
 
     sys.meta_path.remove(fail_loader)
-    import numba
-    from poliastro.core import _jit
 
 
 def test_ijit_returns_same_function_without_args():

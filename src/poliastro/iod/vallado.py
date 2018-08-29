@@ -1,7 +1,6 @@
 """Initial orbit determination.
 
 """
-import numpy as np
 from astropy import units as u
 
 from poliastro.core.iod import vallado as vallado_fast

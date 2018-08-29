@@ -8,7 +8,7 @@ from astropy import units as u
 
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter3D
-from poliastro.bodies import Earth, Mars, Sun
+from poliastro.bodies import Earth, Sun
 from poliastro.twobody.orbit import Orbit
 
 

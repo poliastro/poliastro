@@ -2,8 +2,6 @@ import pytest
 
 import tempfile
 
-from astropy import units as u
-
 from unittest import mock
 
 from poliastro.examples import iss
