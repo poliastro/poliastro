@@ -19,7 +19,7 @@ from poliastro.twobody import equinoctial
 
 from poliastro.bodies import Moon
 
-from ._base import BaseState
+from ._base import BaseState  # flake8: noqa
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
