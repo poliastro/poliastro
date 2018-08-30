@@ -20,6 +20,7 @@ from poliastro.bodies import Earth, Moon, Sun
 from poliastro.twobody import Orbit
 
 
+@pytest.mark.slow
 def test_J2_propagation_Earth():
     # from Curtis example 12.2:
     r0 = np.array([-2384.46, 5729.01, 3050.46])  # km
@@ -44,6 +45,7 @@ def test_J2_propagation_Earth():
     assert_quantity_allclose(argp_variation_rate, 0.282 * u.deg / u.h, rtol=1e-2)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize('test_params', [
     {'inc': 0.2618 * u.rad, 'da_max': 43.2 * u.m, 'dinc_max': 3.411e-5, 'decc_max': 3.549e-5},
     {'inc': 0.7854 * u.rad, 'da_max': 135.8 * u.m, 'dinc_max': 2.751e-5, 'decc_max': 9.243e-5},
@@ -93,6 +95,7 @@ def test_J3_propagation_Earth(test_params):
         pytest.xfail('this assertion disagrees with the paper')
 
 
+@pytest.mark.slow
 def test_atmospheric_drag():
     # http://farside.ph.utexas.edu/teaching/celestial/Celestialhtml/node94.html#sair (10.148)
     # given the expression for \dot{r} / r, aproximate \Delta r \approx F_r * \Delta t
@@ -126,6 +129,7 @@ def test_atmospheric_drag():
     assert_quantity_allclose(norm(r) - norm(r0), dr_expected, rtol=1e-2)
 
 
+@pytest.mark.slow
 def test_cowell_works_with_small_perturbations():
     r0 = [-2384.46, 5729.01, 3050.46] * u.km
     v0 = [-7.36138, -2.98997, 1.64354] * u.km / u.s
@@ -146,6 +150,7 @@ def test_cowell_works_with_small_perturbations():
     assert_quantity_allclose(final.v, v_expected)
 
 
+@pytest.mark.slow
 def test_cowell_converges_with_small_perturbations():
     r0 = [-2384.46, 5729.01, 3050.46] * u.km
     v0 = [-7.36138, -2.98997, 1.64354] * u.km / u.s
@@ -189,6 +194,7 @@ sun_geo = {'body': Sun, 'tof': 200 * u.day, 'raan': 8.7 * u.deg, 'argp': -5.5 * 
            'period': 365 * u.day}
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize('test_params', [
     moon_heo, moon_geo, moon_leo,
     sun_heo, sun_geo,
@@ -243,6 +249,7 @@ def normalize_to_Curtis(t0, sun_r):
     return 149600000 * r / norm(r)
 
 
+@pytest.mark.slow
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
     solar_system_ephemeris.set('de432s')

@@ -11,6 +11,7 @@ from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import change_a_inc, change_argp, change_inc_ecc, change_ecc_quasioptimal
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("inc_0", [np.radians(28.5),
                                    pytest.param(np.radians(90.0),
                                    marks=pytest.mark.skip(reason="too long for now"))])
@@ -36,6 +37,7 @@ def test_leo_geo_numerical(inc_0):
     assert_allclose(sf.inc.to(u.rad).value, inc_f, atol=2e-3)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("ecc_0,ecc_f", [
     [0.0, 0.1245],  # Reverse-engineered from results
     [0.1245, 0.0]
@@ -54,6 +56,7 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
     assert_allclose(t_f / 86400, expected_t_f, rtol=1e-4)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("ecc_0,ecc_f", [
     [0.0, 0.1245],  # Reverse-engineered from results
     [0.1245, 0.0]
@@ -73,6 +76,7 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-4, atol=1e-4)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("ecc_0,inc_f,expected_beta,expected_delta_V", [
     [0.1, 20.0, 83.043, 1.6789],
     [0.2, 20.0, 76.087, 1.6890],
@@ -102,6 +106,7 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     assert_allclose(beta, expected_beta, rtol=1e-2)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("ecc_0,ecc_f", [
     [0.4, 0.0],
     [0.0, 0.4]
@@ -128,6 +133,7 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
     assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
 
 
+@pytest.mark.slow
 def test_soyuz_standard_gto_delta_v():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
@@ -150,6 +156,7 @@ def test_soyuz_standard_gto_delta_v():
     assert_allclose(t_f / 86400, expected_t_f, rtol=1e-2)
 
 
+@pytest.mark.slow
 def test_soyuz_standard_gto_numerical():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
@@ -178,6 +185,7 @@ def test_soyuz_standard_gto_numerical():
     assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("inc_0, expected_t_f, expected_delta_V, rtol", [
     [28.5, 191.26295, 5.78378, 1e-5],
     [90.0, 335.0, 10.13, 1e-3],
