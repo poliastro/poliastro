@@ -20,7 +20,7 @@ def test_sample_angle_zero_returns_same():
     nu_values = [0] * u.deg
     _, rr = ss0.sample(ss0.nu + nu_values)
 
-    assert_quantity_allclose(rr[0].get_xyz(), ss0.r)
+    assert_quantity_allclose(rr[0].data.xyz, ss0.r)
 
 
 @pytest.mark.parametrize("time_of_flight", [1 * u.min, 40 * u.min])
@@ -39,7 +39,7 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight, method
 
     _, rr = ss0.sample(sample_times, method)
 
-    assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r)
+    assert_quantity_allclose(rr[0].data.xyz, expected_ss.r)
 
 
 def test_sampling_cowell_dense_output_agrees_mean_motion():
@@ -51,7 +51,7 @@ def test_sampling_cowell_dense_output_agrees_mean_motion():
     _, rr = ss0.sample(sample_times, cowell)
     for i, sample_time in enumerate(sample_times):
         expected_ss = ss0.propagate(sample_time - ss0.epoch)
-        assert_quantity_allclose(rr[i].get_xyz(), expected_ss.r)
+        assert_quantity_allclose(rr[i].data.xyz, expected_ss.r)
 
 
 @pytest.mark.parametrize("time_of_flight", [6 * u.h, 2 * u.day])
@@ -71,7 +71,7 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight, method):
 
     _, rr = ss0.sample(sample_times, method)
 
-    assert_quantity_allclose(rr[0].get_xyz(), expected_ss.r)
+    assert_quantity_allclose(rr[0].data.xyz, expected_ss.r)
 
 
 def test_sample_nu_values():
@@ -87,8 +87,8 @@ def test_sample_nu_values():
     _, rr = ss0.sample(nu_values)
 
     assert len(rr) == len(nu_values)
-    assert_quantity_allclose(norm(rr[0].get_xyz()), expected_ss.r_p)
-    assert_quantity_allclose(norm(rr[-1].get_xyz()), expected_ss.r_a)
+    assert_quantity_allclose(norm(rr[0].data.xyz), expected_ss.r_p)
+    assert_quantity_allclose(norm(rr[-1].data.xyz), expected_ss.r_a)
 
 
 @pytest.mark.parametrize("num_points", [3, 5, 7, 9, 11, 101])

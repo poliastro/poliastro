@@ -320,9 +320,10 @@ class Orbit(object):
 
         Returns
         -------
-        (Time, CartesianRepresentation)
-            A tuple containing Time and Position vector in each
-            given value.
+        time: ~astropy.time.Time
+            Time values.
+        positions: ~astropy.coordinates.BaseCoordinateFrame
+            Array of x, y, z positions.
 
         Notes
         -----
@@ -371,8 +372,14 @@ class Orbit(object):
 
     def _sample(self, time_values, method=mean_motion):
         values = method(self, (time_values - self.epoch).to(u.s).value)
-        rrs = values[0] * u.km
-        return CartesianRepresentation(rrs, xyz_axis=1)
+
+        data = CartesianRepresentation(values[0] * u.km, xyz_axis=1)
+
+        # Use of a protected method instead of frame.realize_frame
+        # because the latter does not let the user choose the representation type
+        # in one line despite its parameter names, see
+        # https://github.com/astropy/astropy/issues/7784
+        return self.frame._replicate(data, representation_type='cartesian')
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point

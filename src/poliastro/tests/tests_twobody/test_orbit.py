@@ -8,7 +8,6 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from astropy import time
 from astropy.time import Time
-from astropy.coordinates import CartesianRepresentation
 
 from poliastro.bodies import (
     Body,
@@ -184,7 +183,7 @@ def test_sample_with_time_value():
 
     expected_r = [ss.r]
     _, positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.get_xyz().transpose()
+    r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
 
@@ -198,7 +197,7 @@ def test_sample_with_nu_value():
 
     expected_r = [ss.r]
     _, positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.get_xyz().transpose()
+    r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
 
@@ -212,7 +211,7 @@ def test_hyperbolic_nu_value_check():
 
     values, positions = ss.sample(100)
 
-    assert isinstance(positions, CartesianRepresentation)
+    assert isinstance(positions, HCRS)
     assert isinstance(values, Time)
     assert len(positions) == len(values) == 100
 
@@ -227,7 +226,7 @@ def test_hyperbolic_modulus_wrapped_nu():
 
     _, positions = ss.sample(num_values)
 
-    assert_quantity_allclose(positions[0].xyz, ss.r)
+    assert_quantity_allclose(positions[0].data.xyz, ss.r)
 
 
 def test_orbit_is_pickable():
