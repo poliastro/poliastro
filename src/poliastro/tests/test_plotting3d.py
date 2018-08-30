@@ -88,28 +88,26 @@ def test_plot_trajectory_plots_a_trajectory():
     assert frame._attractor == Sun
 
 
-def test_show_calls_prepare_plot():
-    patcher = mock.patch.object(OrbitPlotter3D, '_prepare_plot')
-    patched = patcher.start()
-
+@mock.patch("poliastro.plotting.iplot")
+@mock.patch.object(OrbitPlotter3D, '_prepare_plot')
+def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
     m = OrbitPlotter3D()
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Object")
     m.show()
 
-    assert patched.call_count == 1
-    patched.assert_called_with()
+    assert mock_iplot.call_count == 1
+    mock_prepare_plot.assert_called_once_with()
 
 
-def test_savefig_calls_prepare_plot():
-    patcher = mock.patch.object(OrbitPlotter3D, '_prepare_plot')
-    patched = patcher.start()
-
+@mock.patch("poliastro.plotting.export")
+@mock.patch.object(OrbitPlotter3D, '_prepare_plot')
+def test_savefig_calls_prepare_plot(mock_prepare_plot, mock_export):
     m = OrbitPlotter3D()
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Object")
     with tempfile.NamedTemporaryFile() as fp:
         m.savefig(filename=fp.name + ".jpeg")
 
-    assert patched.call_count == 1
-    patched.assert_called_with()
+    assert mock_export.call_count == 1
+    mock_prepare_plot.assert_called_once_with()
