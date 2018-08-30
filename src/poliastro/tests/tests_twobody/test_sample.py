@@ -104,13 +104,13 @@ def test_sample_num_points(num_points):
     _, rr = ss0.sample(num_points)
 
     assert len(rr) == num_points
-    # assert_quantity_allclose(rr[num_points // 2].get_xyz(), expected_ss.r)
+    # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
 
 
 @pytest.mark.parametrize('method', [
     mean_motion,
     cowell,
-    pytest.param(kepler, marks=pytest.mark.xfail),
+    kepler,
 ])
 def test_sample_big_orbits(method):
     # See https://github.com/poliastro/poliastro/issues/265
