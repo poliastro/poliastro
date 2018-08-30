@@ -303,6 +303,9 @@ class _BaseOrbitPlotter:
 
         self._plot_trajectory(trajectory, str(label), color, False)
 
+    def _plot_trajectory(self, trajectory, label, color, dashed):
+        raise NotImplementedError
+
     def plot(self, orbit, *, label=None, color=None):
         """Plots state and osculating orbit in their plane.
 
