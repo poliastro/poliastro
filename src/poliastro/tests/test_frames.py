@@ -18,6 +18,22 @@ from poliastro.frames import (
 
 
 @pytest.mark.parametrize("body, frame", [
+    (Mercury, MercuryICRS),
+    (Venus, VenusICRS),
+    (Mars, MarsICRS),
+    (Jupiter, JupiterICRS),
+    (Saturn, SaturnICRS),
+    (Uranus, UranusICRS),
+    (Neptune, NeptuneICRS),
+    (Pluto, PlutoICRS),
+])
+def test_planetary_frames_have_proper_string_representations(body, frame):
+    coords = frame()
+
+    assert body.name in repr(coords)
+
+
+@pytest.mark.parametrize("body, frame", [
     (Sun, HCRS),
     (Mercury, MercuryICRS),
     (Venus, VenusICRS),

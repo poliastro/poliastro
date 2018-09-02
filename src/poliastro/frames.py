@@ -82,67 +82,94 @@ _NEED_ORIGIN_HINT = ("The input {0} coordinates do not have length units. This "
                      "function in this case because there is an origin shift.")
 
 
-def _icrs_offset_from_body(body):
-    class _PlanetaryICRS(BaseRADecFrame):
-        obstime = TimeAttribute(default=DEFAULT_OBSTIME)
+class _PlanetaryICRS(BaseRADecFrame):
+    obstime = TimeAttribute(default=DEFAULT_OBSTIME)
 
-    @frame_transform_graph.transform(AffineTransform, _PlanetaryICRS, ICRS)
-    def hcrs_to_icrs(hcrs_coo, icrs_frame):
+    def __new__(cls, *args, **kwargs):
+        frame_transform_graph.transform(AffineTransform, cls, ICRS)(cls.to_icrs)
+        frame_transform_graph.transform(AffineTransform, ICRS, cls)(cls.from_icrs)
+        frame_transform_graph.transform(FunctionTransformWithFiniteDifference, cls, cls)(cls.self_transform)
+
+        return super().__new__(cls)
+
+    @staticmethod
+    def to_icrs(planet_coo, _):
         # this is just an origin translation so without a distance it cannot go ahead
-        if isinstance(hcrs_coo.data, UnitSphericalRepresentation):
-            raise u.UnitsError(_NEED_ORIGIN_HINT.format(hcrs_coo.__class__.__name__))
+        if isinstance(planet_coo.data, UnitSphericalRepresentation):
+            raise u.UnitsError(_NEED_ORIGIN_HINT.format(planet_coo.__class__.__name__))
 
-        if hcrs_coo.data.differentials:
+        if planet_coo.data.differentials:
             from astropy.coordinates.solar_system import get_body_barycentric_posvel
-            bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(body.name,
-                                                                     hcrs_coo.obstime)
+            bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(planet_coo.body.name,
+                                                                     planet_coo.obstime)
             bary_sun_pos = bary_sun_pos.with_differentials(bary_sun_vel)
 
         else:
             from astropy.coordinates.solar_system import get_body_barycentric
-            bary_sun_pos = get_body_barycentric(body.name, hcrs_coo.obstime)
+            bary_sun_pos = get_body_barycentric(planet_coo.body.name, planet_coo.obstime)
             bary_sun_vel = None
 
         return None, bary_sun_pos
 
-    @frame_transform_graph.transform(AffineTransform, ICRS, _PlanetaryICRS)
-    def icrs_to_hcrs(icrs_coo, hcrs_frame):
+    @staticmethod
+    def from_icrs(icrs_coo, planet_frame):
         # this is just an origin translation so without a distance it cannot go ahead
         if isinstance(icrs_coo.data, UnitSphericalRepresentation):
             raise u.UnitsError(_NEED_ORIGIN_HINT.format(icrs_coo.__class__.__name__))
 
         if icrs_coo.data.differentials:
             from astropy.coordinates.solar_system import get_body_barycentric_posvel
-            bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(body.name,
-                                                                     hcrs_frame.obstime)
+            bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(planet_frame.body.name,
+                                                                     planet_frame.obstime)
             bary_sun_pos = -bary_sun_pos.with_differentials(-bary_sun_vel)
 
         else:
             from astropy.coordinates.solar_system import get_body_barycentric
-            bary_sun_pos = -get_body_barycentric(body.name, hcrs_frame.obstime)
+            bary_sun_pos = -get_body_barycentric(planet_frame.body.name, planet_frame.obstime)
             bary_sun_vel = None
 
         return None, bary_sun_pos
 
-    @frame_transform_graph.transform(FunctionTransformWithFiniteDifference, _PlanetaryICRS, _PlanetaryICRS)
-    def hcrs_to_hcrs(from_coo, to_frame):
+    @staticmethod
+    def self_transform(from_coo, to_frame):
         if np.all(from_coo.obstime == to_frame.obstime):
             return to_frame.realize_frame(from_coo.data)
         else:
             # like CIRS, we do this self-transform via ICRS
             return from_coo.transform_to(ICRS).transform_to(to_frame)
 
-    return _PlanetaryICRS
+
+class MercuryICRS(_PlanetaryICRS):
+    body = Mercury
 
 
-MercuryICRS = _icrs_offset_from_body(Mercury)
-VenusICRS = _icrs_offset_from_body(Venus)
-MarsICRS = _icrs_offset_from_body(Mars)
-JupiterICRS = _icrs_offset_from_body(Jupiter)
-SaturnICRS = _icrs_offset_from_body(Saturn)
-UranusICRS = _icrs_offset_from_body(Uranus)
-NeptuneICRS = _icrs_offset_from_body(Neptune)
-PlutoICRS = _icrs_offset_from_body(Pluto)
+class VenusICRS(_PlanetaryICRS):
+    body = Venus
+
+
+class MarsICRS(_PlanetaryICRS):
+    body = Mars
+
+
+class JupiterICRS(_PlanetaryICRS):
+    body = Jupiter
+
+
+class SaturnICRS(_PlanetaryICRS):
+    body = Saturn
+
+
+class UranusICRS(_PlanetaryICRS):
+    body = Uranus
+
+
+class NeptuneICRS(_PlanetaryICRS):
+    body = Neptune
+
+
+class PlutoICRS(_PlanetaryICRS):
+    body = Pluto
+
 
 INERTIAL_FRAME_MAPPING = {
     Sun: (HCRS,),
