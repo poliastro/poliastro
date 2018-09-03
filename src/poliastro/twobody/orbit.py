@@ -26,7 +26,7 @@ from poliastro.frames import INERTIAL_FRAME_MAPPING
 from ._base import BaseState  # flake8: noqa
 
 
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
+ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body}"
 
 
 class TimeScaleWarning(UserWarning):
@@ -262,7 +262,8 @@ class Orbit(object):
 
         return ORBIT_FORMAT.format(
             r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
-            body=self.attractor
+            frame=self.frame.__class__.__name__,
+            body=self.attractor,
         )
 
     def __repr__(self):
