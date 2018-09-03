@@ -9,9 +9,10 @@ import numpy as np
 from astropy import _erfa
 from astropy import units as u
 from astropy.coordinates import (
-    get_body_barycentric, frame_transform_graph,
+    get_body_barycentric, get_body_barycentric_posvel, frame_transform_graph,
     BaseEclipticFrame, BaseRADecFrame,
-    ICRS, HCRS, GCRS,
+    CartesianDifferential,
+    ICRS, HCRS as _HCRS, GCRS,
     TimeAttribute,
     AffineTransform, FunctionTransformWithFiniteDifference,
     UnitSphericalRepresentation,
@@ -112,13 +113,11 @@ class _PlanetaryICRS(BaseRADecFrame):
             raise u.UnitsError(_NEED_ORIGIN_HINT.format(planet_coo.__class__.__name__))
 
         if planet_coo.data.differentials:
-            from astropy.coordinates.solar_system import get_body_barycentric_posvel
             bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(planet_coo.body.name,
                                                                      planet_coo.obstime)
-            bary_sun_pos = bary_sun_pos.with_differentials(bary_sun_vel)
+            bary_sun_pos = bary_sun_pos.with_differentials(bary_sun_vel.represent_as(CartesianDifferential))
 
         else:
-            from astropy.coordinates.solar_system import get_body_barycentric
             bary_sun_pos = get_body_barycentric(planet_coo.body.name, planet_coo.obstime)
             bary_sun_vel = None
 
@@ -131,13 +130,11 @@ class _PlanetaryICRS(BaseRADecFrame):
             raise u.UnitsError(_NEED_ORIGIN_HINT.format(icrs_coo.__class__.__name__))
 
         if icrs_coo.data.differentials:
-            from astropy.coordinates.solar_system import get_body_barycentric_posvel
             bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(planet_frame.body.name,
                                                                      planet_frame.obstime)
-            bary_sun_pos = -bary_sun_pos.with_differentials(-bary_sun_vel)
+            bary_sun_pos = -bary_sun_pos.with_differentials(-bary_sun_vel.represent_as(CartesianDifferential))
 
         else:
-            from astropy.coordinates.solar_system import get_body_barycentric
             bary_sun_pos = -get_body_barycentric(planet_frame.body.name, planet_frame.obstime)
             bary_sun_vel = None
 
@@ -150,6 +147,11 @@ class _PlanetaryICRS(BaseRADecFrame):
         else:
             # like CIRS, we do this self-transform via ICRS
             return from_coo.transform_to(ICRS).transform_to(to_frame)
+
+
+# Redefine HCRS, see https://github.com/astropy/astropy/issues/6835
+class HCRS(_PlanetaryICRS):
+    body = Sun
 
 
 class MercuryICRS(_PlanetaryICRS):
