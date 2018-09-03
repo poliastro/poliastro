@@ -16,4 +16,4 @@ Jupyter notebooks
    /examples/Using NEOS package.ipynb
    /examples/Visualizing the SpaceX Tesla Roadster trip to Mars.ipynb
    /examples/Natural and artificial perturbations.ipynb
-   /examples/styling.ipynb
+   /examples/Customising orbit plots.ipynb
