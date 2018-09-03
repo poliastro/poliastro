@@ -21,11 +21,12 @@ from poliastro.twobody import classical
 from poliastro.twobody import equinoctial
 
 from poliastro.bodies import Moon
+from poliastro.frames import INERTIAL_FRAME_MAPPING
 
 from ._base import BaseState  # flake8: noqa
 
 
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body}"
+ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body}"
 
 
 class TimeScaleWarning(UserWarning):
@@ -56,6 +57,7 @@ class Orbit(object):
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
+        self._frame = None
 
     @property
     def state(self):
@@ -66,6 +68,22 @@ class Orbit(object):
     def epoch(self):
         """Epoch of the orbit. """
         return self._epoch
+
+    @property
+    def frame(self):
+        """Reference frame of the orbit.
+
+        .. versionadded:: 0.11.0
+
+        """
+        if self._frame is None:
+            if self.attractor in INERTIAL_FRAME_MAPPING:
+                frame_class = INERTIAL_FRAME_MAPPING[self.attractor][0]
+                self._frame = frame_class(obstime=self.epoch)
+            else:
+                raise NotImplementedError("Frames for orbits around custom bodies are not yet supported")
+
+        return self._frame
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
@@ -180,7 +198,10 @@ class Orbit(object):
             moon_gcrs.representation = CartesianRepresentation
             r = CartesianRepresentation([moon_gcrs.x, moon_gcrs.y, moon_gcrs.z])
             v = CartesianRepresentation([moon_gcrs.v_x, moon_gcrs.v_y, moon_gcrs.v_z])
-        return cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+
+        ss = cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+        ss._frame = ICRS()
+        return ss
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
@@ -245,7 +266,8 @@ class Orbit(object):
 
         return ORBIT_FORMAT.format(
             r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
-            body=self.attractor
+            frame=self.frame.__class__.__name__,
+            body=self.attractor,
         )
 
     def __repr__(self):
@@ -303,9 +325,10 @@ class Orbit(object):
 
         Returns
         -------
-        (Time, CartesianRepresentation)
-            A tuple containing Time and Position vector in each
-            given value.
+        time: ~astropy.time.Time
+            Time values.
+        positions: ~astropy.coordinates.BaseCoordinateFrame
+            Array of x, y, z positions.
 
         Notes
         -----
@@ -354,8 +377,14 @@ class Orbit(object):
 
     def _sample(self, time_values, method=mean_motion):
         values = method(self, (time_values - self.epoch).to(u.s).value)
-        rrs = values[0] * u.km
-        return CartesianRepresentation(rrs, xyz_axis=1)
+
+        data = CartesianRepresentation(values[0] * u.km, xyz_axis=1)
+
+        # Use of a protected method instead of frame.realize_frame
+        # because the latter does not let the user choose the representation type
+        # in one line despite its parameter names, see
+        # https://github.com/astropy/astropy/issues/7784
+        return self.frame._replicate(data, representation_type='cartesian')
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point

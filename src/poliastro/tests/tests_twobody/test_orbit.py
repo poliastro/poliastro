@@ -8,9 +8,15 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from astropy import time
 from astropy.time import Time
-from astropy.coordinates import CartesianRepresentation
 
-from poliastro.bodies import Sun, Earth
+from poliastro.bodies import (
+    Body,
+    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
+)
+from poliastro.frames import (
+    ICRS,
+    HCRS, MercuryICRS, VenusICRS, GCRS, MarsICRS, JupiterICRS, SaturnICRS, UranusICRS, NeptuneICRS, PlutoICRS
+)
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
 from poliastro.constants import J2000
@@ -153,7 +159,7 @@ def test_pqw_for_circular_equatorial_orbit():
 
 def test_orbit_representation():
     ss = Orbit.circular(Earth, 600 * u.km, 20 * u.deg)
-    expected_str = "6978 x 6978 km x 20.0 deg orbit around Earth (\u2641)"
+    expected_str = "6978 x 6978 km x 20.0 deg (GCRS) orbit around Earth (\u2641)"
 
     assert str(ss) == repr(ss) == expected_str
 
@@ -177,7 +183,7 @@ def test_sample_with_time_value():
 
     expected_r = [ss.r]
     _, positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.get_xyz().transpose()
+    r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
 
@@ -191,7 +197,7 @@ def test_sample_with_nu_value():
 
     expected_r = [ss.r]
     _, positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.get_xyz().transpose()
+    r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
 
@@ -205,7 +211,7 @@ def test_hyperbolic_nu_value_check():
 
     values, positions = ss.sample(100)
 
-    assert isinstance(positions, CartesianRepresentation)
+    assert isinstance(positions, HCRS)
     assert isinstance(values, Time)
     assert len(positions) == len(values) == 100
 
@@ -220,7 +226,7 @@ def test_hyperbolic_modulus_wrapped_nu():
 
     _, positions = ss.sample(num_values)
 
-    assert_quantity_allclose(positions[0].xyz, ss.r)
+    assert_quantity_allclose(positions[0].data.xyz, ss.r)
 
 
 def test_orbit_is_pickable():
@@ -237,3 +243,50 @@ def test_orbit_is_pickable():
     assert_array_equal(ss.r, ss_result.r)
     assert_array_equal(ss.v, ss_result.v)
     assert ss_result.epoch == ss.epoch
+
+
+@pytest.mark.parametrize("attractor, expected_frame_class", [
+    (Sun, HCRS),
+    (Mercury, MercuryICRS),
+    (Venus, VenusICRS),
+    pytest.param(Earth, GCRS, marks=pytest.mark.xfail),  # See https://github.com/astropy/astropy/issues/7793
+    (Mars, MarsICRS),
+    (Jupiter, JupiterICRS),
+    (Saturn, SaturnICRS),
+    (Uranus, UranusICRS),
+    (Neptune, NeptuneICRS),
+    (Pluto, PlutoICRS),
+])
+def test_orbit_has_proper_frame(attractor, expected_frame_class):
+    # Dummy data
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+    epoch = Time('2015-07-14 07:59', scale='tdb')
+
+    ss = Orbit.from_vectors(attractor, r, v, epoch)
+
+    assert ss.frame.is_equivalent_frame(expected_frame_class(obstime=epoch))
+    assert ss.frame.obstime == epoch
+
+
+def test_orbit_from_custom_body_raises_error_when_asked_frame():
+    attractor = Body(Sun, 1 * u.km ** 3 / u.s ** 2, "_DummyPlanet")
+
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+
+    ss = Orbit.from_vectors(attractor, r, v)
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        ss.frame
+    assert ("Frames for orbits around custom bodies are not yet supported"
+            in excinfo.exconly())
+
+
+@pytest.mark.parametrize("body", [
+    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+])
+def test_orbit_from_ephem_is_in_icrs_frame(body):
+    ss = Orbit.from_body_ephem(body)
+
+    assert ss.frame.__class__ == ICRS

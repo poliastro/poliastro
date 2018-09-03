@@ -16,6 +16,7 @@ from plotly.offline import iplot, plot as export
 from plotly.graph_objs import Scatter3d, Surface, Layout, Scatter
 
 from astropy import units as u
+from astropy.coordinates import CartesianRepresentation
 
 from poliastro.util import norm
 from poliastro.bodies import (Earth, Jupiter, Mars, Mercury, Neptune, Saturn,
@@ -128,11 +129,12 @@ class OrbitPlotter(object):
 
         Parameters
         ----------
-        trajectory : ~astropy.coordinates.CartesianRepresentation
+        trajectory : ~astropy.coordinates.BaseRepresentation, ~astropy.coordinates.BaseCoordinateFrame
             Trajectory to plot.
+
         """
         lines = []
-        rr = trajectory.get_xyz().transpose()
+        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
         a, = self.ax.plot(x.to(u.km).value, y.to(u.km).value, '--', color=color, label=label)
         lines.append(a)
@@ -297,9 +299,12 @@ class _BaseOrbitPlotter:
             raise ValueError("An attractor must be set up first, please use "
                              "set_attractor(Major_Body).")
         else:
-            self._redraw_attractor(trajectory.norm().min() * 0.15)  # Arbitrary threshold
+            self._redraw_attractor(trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15)
 
         self._plot_trajectory(trajectory, str(label), color, False)
+
+    def _plot_trajectory(self, trajectory, label, color, dashed):
+        raise NotImplementedError
 
     def plot(self, orbit, *, label=None, color=None):
         """Plots state and osculating orbit in their plane.

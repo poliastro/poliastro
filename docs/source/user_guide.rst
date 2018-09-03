@@ -49,10 +49,10 @@ And that's it! Notice a couple of things:
   The list is automatically converted to a :py:mod:`astropy.units.Quantity`,
   which is actually a subclass of NumPy arrays.
 * If we display the orbit we just created, we get a string with the radius of
-  pericenter, radius of apocenter, inclination and attractor::
+  pericenter, radius of apocenter, inclination, reference frame and attractor::
 
     >>> ss
-    7283 x 10293 km x 153.2 deg orbit around Earth (♁)
+    7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁)
 
 * If no time is specified, then a default value is assigned::
 
@@ -61,11 +61,11 @@ And that's it! Notice a couple of things:
     >>> ss.epoch.iso
     '2000-01-01 12:00:00.000'
 
-* The *assumed* or *implicit* reference system is an **inertial reference system**.
-  For the case of the Solar System,
-  we can consider it to be the `International Celestial Reference System or ICRS`_.
-  The :py:attr:`Orbit.epoch` parameter does not affect the position of this reference system
-  and acts only as the reference date in which the orbit is defined.
+* The reference frame of the orbit will be one pseudo-inertial frame around the
+  attractor. You can retrieve it using the :py:attr:`~poliastro.twobody.orbit.Orbit.frame` property:
+
+    >>> ss.frame
+    <GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
 
 .. _`International Celestial Reference System or ICRS`: http://web.archive.org/web/20170920023932/http://aa.usno.navy.mil:80/faq/docs/ICRS_doc.php
 
@@ -165,7 +165,7 @@ performed with the ``propagate`` method of
 
     >>> from poliastro.examples import iss
     >>> iss
-    6772 x 6790 km x 51.6 deg orbit around Earth (♁)
+    6772 x 6790 km x 51.6 deg (GCRS) orbit around Earth (♁)
     >>> iss.epoch
     <Time object: scale='utc' format='iso' value=2013-03-18 12:00:00.000>
     >>> iss.nu.to(u.deg)
@@ -205,7 +205,7 @@ non Keplerian orbits, thanks to Cowell's method::
     ...     return 1e-5 * v_vec / norm_v
     ...
     >>> initial.propagate(3 * u.day, method=cowell, ad=accel)
-    18255 x 21848 km x 28.0 deg orbit around Earth (♁)
+    18255 x 21848 km x 28.0 deg (GCRS) orbit around Earth (♁)
 
 Some natural perturbations are available in poliastro to be used
 directly in this way. For instance,
@@ -289,7 +289,7 @@ time::
 
     >>> ss_i = Orbit.circular(Earth, alt=700 * u.km)
     >>> ss_i
-    7078 x 7078 km x 0.0 deg orbit around Earth (♁)
+    7078 x 7078 km x 0.0 deg (GCRS) orbit around Earth (♁)
     >>> hoh = Maneuver.hohmann(ss_i, 36000 * u.km)
     >>> hoh.get_total_cost()
     <Quantity 3.6173981270031357 km / s>
@@ -313,7 +313,7 @@ the method :py:meth:`~poliastro.twobody.orbit.Orbit.apply_maneuver`::
 
     >>> ss_f = ss_i.apply_maneuver(hoh)
     >>> ss_f
-    36000 x 36000 km x 0.0 deg orbit around Earth (♁)
+    36000 x 36000 km x 0.0 deg (GCRS) orbit around Earth (♁)
 
 More advanced plotting: :py:class:`~poliastro.plotting.OrbitPlotter` objects
 ----------------------------------------------------------------------------
@@ -368,7 +368,7 @@ And finally, retrieve the planet orbit::
 
     >>> from poliastro import ephem
     >>> Orbit.from_body_ephem(Earth, epoch)
-    1 x 1 AU x 23.4 deg orbit around Sun (☉)
+    1 x 1 AU x 23.4 deg (ICRS) orbit around Sun (☉)
 
 This does not require any external download. If on the other hand we want
 to use higher precision ephemerides, we can tell Astropy to do so::
