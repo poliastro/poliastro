@@ -4,7 +4,9 @@ import pytest
 import requests
 
 import astropy.units as u
+
 from poliastro.twobody.angles import nu_to_M
+from poliastro.frames import HeliocentricEclipticJ2000
 from poliastro.neos import neows
 
 
@@ -30,6 +32,7 @@ def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
     mock_get.return_value = mock_response
     ss = neows.orbit_from_spk_id('')
 
+    assert ss.frame.is_equivalent_frame(HeliocentricEclipticJ2000(obstime=ss.epoch))
     assert ss.ecc == mock_orbital_data['orbital_data']['eccentricity'] * u.one
     assert ss.a == mock_orbital_data['orbital_data']['semi_major_axis'] * u.AU
     assert ss.inc == mock_orbital_data['orbital_data']['inclination'] * u.deg

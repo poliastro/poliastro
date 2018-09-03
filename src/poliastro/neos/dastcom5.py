@@ -11,6 +11,7 @@ import pandas as pd
 import astropy.units as u
 from astropy.time import Time
 
+from poliastro.frames import HeliocentricEclipticJ2000
 from poliastro.twobody.orbit import Orbit
 from poliastro.bodies import Sun
 from poliastro.twobody.angles import M_to_nu
@@ -364,6 +365,7 @@ def orbit_from_record(record):
     epoch = Time(body_data['EPOCH'].item(), format='jd', scale='tdb')
 
     orbit = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch)
+    orbit._frame = HeliocentricEclipticJ2000(obstime=epoch)
     return orbit
 
 

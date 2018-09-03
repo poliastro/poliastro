@@ -172,7 +172,7 @@ class PlutoICRS(_PlanetaryICRS):
 
 
 INERTIAL_FRAME_MAPPING = {
-    Sun: (HCRS,),
+    Sun: (HCRS, HeliocentricEclipticJ2000,),
     Mercury: (MercuryICRS,),
     Venus: (VenusICRS,),
     Earth: (GCRS,),
