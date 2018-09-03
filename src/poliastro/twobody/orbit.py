@@ -71,7 +71,11 @@ class Orbit(object):
 
     @property
     def frame(self):
-        """Reference frame of the orbit. """
+        """Reference frame of the orbit.
+
+        .. versionadded:: 0.11.0
+
+        """
         if self._frame is None:
             if self.attractor in INERTIAL_FRAME_MAPPING:
                 frame_class = INERTIAL_FRAME_MAPPING[self.attractor][0]
