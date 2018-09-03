@@ -249,7 +249,7 @@ def test_orbit_is_pickable():
     (Sun, HCRS),
     (Mercury, MercuryICRS),
     (Venus, VenusICRS),
-    (Earth, GCRS),
+    pytest.param(Earth, GCRS, marks=pytest.mark.xfail),  # See https://github.com/astropy/astropy/issues/7793
     (Mars, MarsICRS),
     (Jupiter, JupiterICRS),
     (Saturn, SaturnICRS),
@@ -265,7 +265,7 @@ def test_orbit_has_proper_frame(attractor, expected_frame_class):
 
     ss = Orbit.from_vectors(attractor, r, v, epoch)
 
-    assert ss.frame.__class__ == expected_frame_class
+    assert ss.frame.is_equivalent_frame(expected_frame_class(obstime=epoch))
     assert ss.frame.obstime == epoch
 
 
