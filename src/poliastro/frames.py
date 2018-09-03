@@ -1,13 +1,15 @@
 """Coordinate frames definitions.
 
 """
+from typing import Dict, List  # flake8: noqa
+
 import numpy as np
 
 from astropy import _erfa
 from astropy import units as u
 from astropy.coordinates import (
     get_body_barycentric, frame_transform_graph,
-    BaseEclipticFrame, BaseRADecFrame,
+    BaseCoordinateFrame, BaseEclipticFrame, BaseRADecFrame,
     ICRS, HCRS, GCRS,
     TimeAttribute,
     AffineTransform, FunctionTransformWithFiniteDifference,
@@ -17,7 +19,10 @@ from astropy.coordinates.builtin_frames.utils import DEFAULT_OBSTIME, get_jd12
 from astropy.coordinates.matrix_utilities import rotation_matrix, matrix_transpose
 
 from poliastro.constants import J2000
-from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
+from poliastro.bodies import (
+    _Body,  # flake8: noqa
+    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
+)
 
 
 class HeliocentricEclipticJ2000(BaseEclipticFrame):
@@ -172,14 +177,14 @@ class PlutoICRS(_PlanetaryICRS):
 
 
 INERTIAL_FRAME_MAPPING = {
-    Sun: (HCRS, HeliocentricEclipticJ2000,),
-    Mercury: (MercuryICRS,),
-    Venus: (VenusICRS,),
-    Earth: (GCRS,),
-    Mars: (MarsICRS,),
-    Jupiter: (JupiterICRS,),
-    Saturn: (SaturnICRS,),
-    Uranus: (UranusICRS,),
-    Neptune: (NeptuneICRS,),
-    Pluto: (PlutoICRS,)
-}
+    Sun: [HCRS, HeliocentricEclipticJ2000],
+    Mercury: [MercuryICRS],
+    Venus: [VenusICRS],
+    Earth: [GCRS],
+    Mars: [MarsICRS],
+    Jupiter: [JupiterICRS],
+    Saturn: [SaturnICRS],
+    Uranus: [UranusICRS],
+    Neptune: [NeptuneICRS],
+    Pluto: [PlutoICRS],
+}  # type: Dict[_Body, List[BaseCoordinateFrame]]
