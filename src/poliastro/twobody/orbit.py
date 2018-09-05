@@ -20,8 +20,8 @@ from poliastro.twobody import rv
 from poliastro.twobody import classical
 from poliastro.twobody import equinoctial
 
-from poliastro.bodies import Moon
-from poliastro.frames import INERTIAL_FRAME_MAPPING
+from poliastro.bodies import Sun, Earth, Moon
+from poliastro.frames import get_frame, Planes
 
 from ._base import BaseState  # flake8: noqa
 
@@ -44,7 +44,7 @@ class Orbit(object):
 
     """
 
-    def __init__(self, state, epoch):
+    def __init__(self, state, epoch, plane):
         """Constructor.
 
         Parameters
@@ -57,6 +57,7 @@ class Orbit(object):
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
+        self._plane = plane
         self._frame = None
 
     @property
@@ -77,17 +78,13 @@ class Orbit(object):
 
         """
         if self._frame is None:
-            if self.attractor in INERTIAL_FRAME_MAPPING:
-                frame_class = INERTIAL_FRAME_MAPPING[self.attractor][0]
-                self._frame = frame_class(obstime=self.epoch)
-            else:
-                raise NotImplementedError("Frames for orbits around custom bodies are not yet supported")
+            self._frame = get_frame(self.attractor, self._plane, self.epoch)
 
         return self._frame
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
-    def from_vectors(cls, attractor, r, v, epoch=J2000):
+    def from_vectors(cls, attractor, r, v, epoch=J2000, plane=Planes.EARTH_EQUATOR):
         """Return `Orbit` from position and velocity vectors.
 
         Parameters
@@ -100,17 +97,19 @@ class Orbit(object):
             Velocity vector.
         epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
 
         """
         assert np.any(r.value), "Position vector must be non zero"
 
         ss = rv.RVState(
             attractor, r, v)
-        return cls(ss, epoch)
+        return cls(ss, epoch, plane)
 
     @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
-    def from_classical(cls, attractor, a, ecc, inc, raan, argp, nu, epoch=J2000):
+    def from_classical(cls, attractor, a, ecc, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR):
         """Return `Orbit` from classical orbital elements.
 
         Parameters
@@ -131,6 +130,8 @@ class Orbit(object):
             True anomaly.
         epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
 
         """
         if ecc == 1.0 * u.one:
@@ -144,11 +145,11 @@ class Orbit(object):
 
         ss = classical.ClassicalState(
             attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
-        return cls(ss, epoch)
+        return cls(ss, epoch, plane)
 
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
-    def from_equinoctial(cls, attractor, p, f, g, h, k, L, epoch=J2000):
+    def from_equinoctial(cls, attractor, p, f, g, h, k, L, epoch=J2000, plane=Planes.EARTH_EQUATOR):
         """Return `Orbit` from modified equinoctial elements.
 
         Parameters
@@ -169,17 +170,20 @@ class Orbit(object):
             True longitude.
         epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
 
         """
         ss = equinoctial.ModifiedEquinoctialState(
             attractor, p, f, g, h, k, L)
-        return cls(ss, epoch)
+        return cls(ss, epoch, plane)
 
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
         """Return osculating `Orbit` of a body at a given time.
 
         """
+        # TODO: https://github.com/poliastro/poliastro/issues/445
         if not epoch:
             epoch = time.Time.now().tdb
         elif epoch.scale != 'tdb':
@@ -191,22 +195,20 @@ class Orbit(object):
         r, v = get_body_barycentric_posvel(body.name, epoch)
 
         if body == Moon:
-            moon_icrs = ICRS(x=r.x, y=r.y, z=r.z, v_x=v.x, v_y=v.y, v_z=v.z,
-                             representation=CartesianRepresentation, differential_type=CartesianDifferential
-                             )
-            moon_gcrs = moon_icrs.transform_to(GCRS(obstime=epoch))
-            moon_gcrs.representation = CartesianRepresentation
-            r = CartesianRepresentation([moon_gcrs.x, moon_gcrs.y, moon_gcrs.z])
-            v = CartesianRepresentation([moon_gcrs.v_x, moon_gcrs.v_y, moon_gcrs.v_z])
+            # The attractor is in fact the Earth-Moon Barycenter
+            ss = cls.from_vectors(Earth, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
 
-        ss = cls.from_vectors(body.parent, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
-        ss._frame = ICRS()
+        else:
+            # The attractor is not really the Sun, but the Solar System Barycenter
+            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+            ss._frame = ICRS()  # Hack!
+
         return ss
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
     def circular(cls, attractor, alt,
-                 inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000):
+                 inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000, plane=Planes.EARTH_EQUATOR):
         """Return circular `Orbit`.
 
         Parameters
@@ -223,17 +225,19 @@ class Orbit(object):
             Argument of latitude, default to 0 deg.
         epoch: ~astropy.time.Time, optional
             Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
 
         """
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
 
-        return cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat, epoch)
+        return cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat, epoch, plane)
 
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
-    def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000):
+    def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR):
         """Return parabolic `Orbit`.
 
         Parameters
@@ -252,11 +256,13 @@ class Orbit(object):
             True anomaly.
         epoch: ~astropy.time.Time, optional
             Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
 
         """
         ss = classical.ClassicalState(
             attractor, p, 1.0 * u.one, inc, raan, argp, nu)
-        return cls(ss, epoch)
+        return cls(ss, epoch, plane)
 
     def __str__(self):
         if self.a > 1e7 * u.km:

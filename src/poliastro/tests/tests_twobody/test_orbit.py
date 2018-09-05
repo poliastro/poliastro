@@ -14,8 +14,10 @@ from poliastro.bodies import (
     Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
 )
 from poliastro.frames import (
+    Planes,
     ICRS,
-    HCRS, MercuryICRS, VenusICRS, GCRS, MarsICRS, JupiterICRS, SaturnICRS, UranusICRS, NeptuneICRS, PlutoICRS
+    HCRS, MercuryICRS, VenusICRS, GCRS, MarsICRS, JupiterICRS, SaturnICRS, UranusICRS, NeptuneICRS, PlutoICRS,
+    HeliocentricEclipticJ2000
 )
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
@@ -289,4 +291,13 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
 def test_orbit_from_ephem_is_in_icrs_frame(body):
     ss = Orbit.from_body_ephem(body)
 
-    assert ss.frame.__class__ == ICRS
+    assert ss.frame.is_equivalent_frame(ICRS())
+
+
+def test_orbit_accepts_ecliptic_plane():
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+
+    ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
+
+    assert ss.frame.is_equivalent_frame(HeliocentricEclipticJ2000(obstime=J2000))

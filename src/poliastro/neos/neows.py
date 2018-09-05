@@ -11,7 +11,7 @@ from astropy.time import Time
 
 from poliastro.twobody.orbit import Orbit
 from poliastro.bodies import Sun
-from poliastro.frames import HeliocentricEclipticJ2000
+from poliastro.frames import Planes
 from poliastro.twobody.angles import M_to_nu
 
 # Base URLs
@@ -56,8 +56,7 @@ def orbit_from_spk_id(spk_id, api_key='DEMO_KEY'):
     epoch = Time(float(orbital_data['epoch_osculation']), format='jd', scale='tdb')
 
     ss = Orbit.from_classical(attractor, a, ecc, inc,
-                              raan, argp, nu, epoch)
-    ss._frame = HeliocentricEclipticJ2000(obstime=epoch)
+                              raan, argp, nu, epoch, plane=Planes.EARTH_ECLIPTIC)
     return ss
 
 
