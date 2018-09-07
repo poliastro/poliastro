@@ -173,8 +173,8 @@ def test_sample_numpoints():
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-    times, positions = ss.sample(values=50)
-    assert len(positions) == len(times) == 50
+    positions = ss.sample(values=50)
+    assert len(positions) == 50
 
 
 def test_sample_with_time_value():
@@ -185,7 +185,7 @@ def test_sample_with_time_value():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
-    _, positions = ss.sample(values=ss.nu + [360] * u.deg)
+    positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
@@ -199,7 +199,7 @@ def test_sample_with_nu_value():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
-    _, positions = ss.sample(values=ss.nu + [360] * u.deg)
+    positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
@@ -212,11 +212,10 @@ def test_hyperbolic_nu_value_check():
 
     ss = Orbit.from_vectors(Sun, r, v, Time('2015-07-14 07:59', scale='tdb'))
 
-    values, positions = ss.sample(100)
+    positions = ss.sample(100)
 
     assert isinstance(positions, HCRS)
-    assert isinstance(values, Time)
-    assert len(positions) == len(values) == 100
+    assert len(positions) == 100
 
 
 def test_hyperbolic_modulus_wrapped_nu():
@@ -227,7 +226,7 @@ def test_hyperbolic_modulus_wrapped_nu():
     )
     num_values = 3
 
-    _, positions = ss.sample(num_values)
+    positions = ss.sample(num_values)
 
     assert_quantity_allclose(positions[0].data.xyz, ss.r)
 

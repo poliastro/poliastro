@@ -85,7 +85,7 @@ def test_plot_trajectory_sets_label():
     op = OrbitPlotter()
     earth = Orbit.from_body_ephem(Earth)
     mars = Orbit.from_body_ephem(Mars)
-    _, trajectory = earth.sample()
+    trajectory = earth.sample()
     op.plot(mars, label="Mars")
     op.plot_trajectory(trajectory, label="Earth")
     legend = plt.gca().get_legend()

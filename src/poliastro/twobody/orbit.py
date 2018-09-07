@@ -373,10 +373,8 @@ class Orbit(object):
 
         Returns
         -------
-        time: ~astropy.time.Time
-            Time values.
         positions: ~astropy.coordinates.BaseCoordinateFrame
-            Array of x, y, z positions.
+            Array of x, y, z positions, with proper times as the frame attributes if supported.
 
         Notes
         -----
@@ -421,18 +419,25 @@ class Orbit(object):
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
 
-        return values, self._sample(values, method)
+        return self._sample(values, method)
 
     def _sample(self, time_values, method=mean_motion):
-        values = method(self, (time_values - self.epoch).to(u.s).value)
+        positions = method(self, (time_values - self.epoch).to(u.s).value)
 
-        data = CartesianRepresentation(values[0] * u.km, xyz_axis=1)
+        data = CartesianRepresentation(positions[0] * u.km, xyz_axis=1)
+
+        # If the frame supports obstime, set the time values
+        kwargs = {}
+        if 'obstime' in self.frame.frame_attributes:
+            kwargs['obstime'] = time_values
+        else:
+            warn("Frame {} does not support 'obstime', time values were not returned".format(self.frame.__class__))
 
         # Use of a protected method instead of frame.realize_frame
         # because the latter does not let the user choose the representation type
         # in one line despite its parameter names, see
         # https://github.com/astropy/astropy/issues/7784
-        return self.frame._replicate(data, representation_type='cartesian')
+        return self.frame._replicate(data, representation_type='cartesian', **kwargs)
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point

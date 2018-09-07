@@ -65,7 +65,7 @@ def test_plot_trajectory_plots_a_trajectory():
     assert len(frame._data) == 0
 
     earth = Orbit.from_body_ephem(Earth)
-    _, trajectory = earth.sample()
+    trajectory = earth.sample()
     frame.set_attractor(Sun)
     frame.plot_trajectory(trajectory)
     assert len(frame._data) == 1
