@@ -222,6 +222,22 @@ _FRAME_MAPPING = {
 
 
 def get_frame(attractor, plane, obstime=J2000):
+    """Returns an appropriate reference frame from an attractor and a plane.
+
+    Available planes are Earth equator (parallel to GCRS) and Earth ecliptic.
+    The fundamental direction of both is the equinox of epoch (J2000).
+    An obstime is needed to properly locate the attractor.
+
+    Parameters
+    ----------
+    attractor : ~poliastro.bodies.Body
+        Body that serves as the center of the frame.
+    plane : ~poliastro.frames.Planes
+        Fundamental plane of the frame.
+    obstime : ~astropy.time.Time
+        Time of the frame.
+
+    """
     try:
         frames = _FRAME_MAPPING[attractor]
     except KeyError:
