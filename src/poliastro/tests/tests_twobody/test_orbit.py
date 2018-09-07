@@ -1,12 +1,13 @@
 import pytest
 
 import pickle
+
 from numpy.testing import assert_allclose, assert_array_equal
 
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.coordinates import CartesianRepresentation, CartesianDifferential
 
-from astropy import time
 from astropy.time import Time
 
 from poliastro.bodies import (
@@ -14,8 +15,10 @@ from poliastro.bodies import (
     Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
 )
 from poliastro.frames import (
+    Planes,
     ICRS,
-    HCRS, MercuryICRS, VenusICRS, GCRS, MarsICRS, JupiterICRS, SaturnICRS, UranusICRS, NeptuneICRS, PlutoICRS
+    HCRS, MercuryICRS, VenusICRS, GCRS, MarsICRS, JupiterICRS, SaturnICRS, UranusICRS, NeptuneICRS, PlutoICRS,
+    HeliocentricEclipticJ2000
 )
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
@@ -99,12 +102,12 @@ def test_orbit_from_ephem_with_no_epoch_is_today():
     # This is not that obvious http://stackoverflow.com/q/6407362/554319
     body = Earth
     ss = Orbit.from_body_ephem(body)
-    assert (time.Time.now() - ss.epoch).sec < 1
+    assert (Time.now() - ss.epoch).sec < 1
 
 
 def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     body = Earth
-    epoch = time.Time("2017-09-29 07:31:26", scale="utc")
+    epoch = Time("2017-09-29 07:31:26", scale="utc")
     expected_epoch_string = "2017-09-29 07:32:35.182"  # epoch.tdb.value
 
     Orbit.from_body_ephem(body, epoch)
@@ -170,8 +173,8 @@ def test_sample_numpoints():
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-    times, positions = ss.sample(values=50)
-    assert len(positions) == len(times) == 50
+    positions = ss.sample(values=50)
+    assert len(positions) == 50
 
 
 def test_sample_with_time_value():
@@ -182,7 +185,7 @@ def test_sample_with_time_value():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
-    _, positions = ss.sample(values=ss.nu + [360] * u.deg)
+    positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
@@ -196,7 +199,7 @@ def test_sample_with_nu_value():
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
-    _, positions = ss.sample(values=ss.nu + [360] * u.deg)
+    positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
 
     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
@@ -209,11 +212,10 @@ def test_hyperbolic_nu_value_check():
 
     ss = Orbit.from_vectors(Sun, r, v, Time('2015-07-14 07:59', scale='tdb'))
 
-    values, positions = ss.sample(100)
+    positions = ss.sample(100)
 
     assert isinstance(positions, HCRS)
-    assert isinstance(values, Time)
-    assert len(positions) == len(values) == 100
+    assert len(positions) == 100
 
 
 def test_hyperbolic_modulus_wrapped_nu():
@@ -224,7 +226,7 @@ def test_hyperbolic_modulus_wrapped_nu():
     )
     num_values = 3
 
-    _, positions = ss.sample(num_values)
+    positions = ss.sample(num_values)
 
     assert_quantity_allclose(positions[0].data.xyz, ss.r)
 
@@ -289,4 +291,30 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
 def test_orbit_from_ephem_is_in_icrs_frame(body):
     ss = Orbit.from_body_ephem(body)
 
-    assert ss.frame.__class__ == ICRS
+    assert ss.frame.is_equivalent_frame(ICRS())
+
+
+def test_orbit_accepts_ecliptic_plane():
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+
+    ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
+
+    assert ss.frame.is_equivalent_frame(HeliocentricEclipticJ2000(obstime=J2000))
+
+
+def test_orbit_represent_as_produces_correct_data():
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+
+    ss = Orbit.from_vectors(Sun, r, v)
+
+    expected_result = CartesianRepresentation(
+        *r, differentials=CartesianDifferential(*v)
+    )
+
+    result = ss.represent_as(CartesianRepresentation)
+
+    # We can't directly compare the objects, see https://github.com/astropy/astropy/issues/7793
+    assert (result.xyz == expected_result.xyz).all()
+    assert (result.differentials['s'].d_xyz == expected_result.differentials['s'].d_xyz).all()

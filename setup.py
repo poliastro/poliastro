@@ -45,6 +45,7 @@ setup(
             "pycodestyle",
             "sphinx",
             "sphinx_rtd_theme",
+            "nbconvert<5.4",
             "nbsphinx",
             "ipython>=5.0",
             "jupyter-client",

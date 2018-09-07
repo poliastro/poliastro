@@ -188,7 +188,7 @@ class OrbitPlotter(object):
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
-        _, positions = orbit.sample(self.num_points, method)
+        positions = orbit.sample(self.num_points, method)
 
         x0, y0 = self._project(orbit.r[None])
         # Plot current position
@@ -322,7 +322,7 @@ class _BaseOrbitPlotter:
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
 
         label = _generate_label(orbit, label)
-        _, trajectory = orbit.sample()
+        trajectory = orbit.sample()
 
         self._plot_trajectory(trajectory, label, color, True)
         # Plot required 2D/3D shape in the position of the body

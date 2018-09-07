@@ -18,7 +18,7 @@ def test_sample_angle_zero_returns_same():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
 
     nu_values = [0] * u.deg
-    _, rr = ss0.sample(ss0.nu + nu_values)
+    rr = ss0.sample(ss0.nu + nu_values)
 
     assert_quantity_allclose(rr[0].data.xyz, ss0.r)
 
@@ -37,7 +37,7 @@ def test_sample_one_point_equals_propagation_small_deltas(time_of_flight, method
 
     expected_ss = ss0.propagate(time_of_flight, method)
 
-    _, rr = ss0.sample(sample_times, method)
+    rr = ss0.sample(sample_times, method)
 
     assert_quantity_allclose(rr[0].data.xyz, expected_ss.r)
 
@@ -48,7 +48,7 @@ def test_sampling_cowell_dense_output_agrees_mean_motion():
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     sample_times = Time([ss0.epoch + x * u.h for x in range(100)])
 
-    _, rr = ss0.sample(sample_times, cowell)
+    rr = ss0.sample(sample_times, cowell)
     for i, sample_time in enumerate(sample_times):
         expected_ss = ss0.propagate(sample_time - ss0.epoch)
         assert_quantity_allclose(rr[i].data.xyz, expected_ss.r)
@@ -69,7 +69,7 @@ def test_sample_one_point_equals_propagation_big_deltas(time_of_flight, method):
 
     expected_ss = ss0.propagate(time_of_flight)
 
-    _, rr = ss0.sample(sample_times, method)
+    rr = ss0.sample(sample_times, method)
 
     assert_quantity_allclose(rr[0].data.xyz, expected_ss.r)
 
@@ -84,7 +84,7 @@ def test_sample_nu_values():
 
     expected_ss = ss0.propagate(ss0.period / 2)
 
-    _, rr = ss0.sample(nu_values)
+    rr = ss0.sample(nu_values)
 
     assert len(rr) == len(nu_values)
     assert_quantity_allclose(norm(rr[0].data.xyz), expected_ss.r_p)
@@ -101,7 +101,7 @@ def test_sample_num_points(num_points):
     # TODO: Test against the perigee and apogee
     # expected_ss = ss0.propagate(ss0.period / 2)
 
-    _, rr = ss0.sample(num_points)
+    rr = ss0.sample(num_points)
 
     assert len(rr) == num_points
     # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
@@ -119,5 +119,5 @@ def test_sample_big_orbits(method):
         [-9018878.6, -94116055, 22619059] * u.km,
         [-49.950923, -12.948431, -4.2925158] * u.km / u.s
     )
-    times, positions = ss.sample(15, method=method)
-    assert len(times) == len(positions) == 15
+    positions = ss.sample(15, method=method)
+    assert len(positions) == 15

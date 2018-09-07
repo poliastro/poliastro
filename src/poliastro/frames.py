@@ -1,6 +1,7 @@
 """Coordinate frames definitions.
 
 """
+from enum import Enum
 from typing import Dict, List  # flake8: noqa
 
 import numpy as np
@@ -8,13 +9,15 @@ import numpy as np
 from astropy import _erfa
 from astropy import units as u
 from astropy.coordinates import (
-    get_body_barycentric, frame_transform_graph,
-    BaseCoordinateFrame, BaseEclipticFrame, BaseRADecFrame,
-    ICRS, HCRS, GCRS,
+    get_body_barycentric, get_body_barycentric_posvel, frame_transform_graph,
+    BaseEclipticFrame, BaseRADecFrame,
+    CartesianDifferential,
+    ICRS, HCRS as _HCRS, GCRS,
     TimeAttribute,
     AffineTransform, FunctionTransformWithFiniteDifference,
     UnitSphericalRepresentation,
 )
+from astropy.coordinates.baseframe import FrameMeta  # flake8: noqa
 from astropy.coordinates.builtin_frames.utils import DEFAULT_OBSTIME, get_jd12
 from astropy.coordinates.matrix_utilities import rotation_matrix, matrix_transpose
 
@@ -23,6 +26,12 @@ from poliastro.bodies import (
     _Body,  # flake8: noqa
     Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
 )
+
+
+class Planes(Enum):
+    EARTH_EQUATOR = 'Earth mean Equator and Equinox of epoch (J2000.0)'
+    EARTH_ECLIPTIC = 'Earth mean Ecliptic and Equinox of epoch (J2000.0)'
+    # BODY_EQUATOR = 'Body mean Equator and node of date'  # TODO: Implement proper conversions
 
 
 class HeliocentricEclipticJ2000(BaseEclipticFrame):
@@ -104,13 +113,11 @@ class _PlanetaryICRS(BaseRADecFrame):
             raise u.UnitsError(_NEED_ORIGIN_HINT.format(planet_coo.__class__.__name__))
 
         if planet_coo.data.differentials:
-            from astropy.coordinates.solar_system import get_body_barycentric_posvel
             bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(planet_coo.body.name,
                                                                      planet_coo.obstime)
-            bary_sun_pos = bary_sun_pos.with_differentials(bary_sun_vel)
+            bary_sun_pos = bary_sun_pos.with_differentials(bary_sun_vel.represent_as(CartesianDifferential))
 
         else:
-            from astropy.coordinates.solar_system import get_body_barycentric
             bary_sun_pos = get_body_barycentric(planet_coo.body.name, planet_coo.obstime)
             bary_sun_vel = None
 
@@ -123,13 +130,11 @@ class _PlanetaryICRS(BaseRADecFrame):
             raise u.UnitsError(_NEED_ORIGIN_HINT.format(icrs_coo.__class__.__name__))
 
         if icrs_coo.data.differentials:
-            from astropy.coordinates.solar_system import get_body_barycentric_posvel
             bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(planet_frame.body.name,
                                                                      planet_frame.obstime)
-            bary_sun_pos = -bary_sun_pos.with_differentials(-bary_sun_vel)
+            bary_sun_pos = -bary_sun_pos.with_differentials(-bary_sun_vel.represent_as(CartesianDifferential))
 
         else:
-            from astropy.coordinates.solar_system import get_body_barycentric
             bary_sun_pos = -get_body_barycentric(planet_frame.body.name, planet_frame.obstime)
             bary_sun_vel = None
 
@@ -142,6 +147,11 @@ class _PlanetaryICRS(BaseRADecFrame):
         else:
             # like CIRS, we do this self-transform via ICRS
             return from_coo.transform_to(ICRS).transform_to(to_frame)
+
+
+# Redefine HCRS, see https://github.com/astropy/astropy/issues/6835
+class HCRS(_PlanetaryICRS):
+    body = Sun
 
 
 class MercuryICRS(_PlanetaryICRS):
@@ -176,15 +186,51 @@ class PlutoICRS(_PlanetaryICRS):
     body = Pluto
 
 
-INERTIAL_FRAME_MAPPING = {
-    Sun: [HCRS, HeliocentricEclipticJ2000],
-    Mercury: [MercuryICRS],
-    Venus: [VenusICRS],
-    Earth: [GCRS],
-    Mars: [MarsICRS],
-    Jupiter: [JupiterICRS],
-    Saturn: [SaturnICRS],
-    Uranus: [UranusICRS],
-    Neptune: [NeptuneICRS],
-    Pluto: [PlutoICRS],
-}  # type: Dict[_Body, List[BaseCoordinateFrame]]
+_FRAME_MAPPING = {
+    Sun: {
+        Planes.EARTH_EQUATOR: HCRS,
+        Planes.EARTH_ECLIPTIC: HeliocentricEclipticJ2000
+    },
+    Mercury: {
+        Planes.EARTH_EQUATOR: MercuryICRS
+    },
+    Venus: {
+        Planes.EARTH_EQUATOR: VenusICRS
+    },
+    Earth: {
+        Planes.EARTH_EQUATOR: GCRS,
+    },
+    Mars: {
+        Planes.EARTH_EQUATOR: MarsICRS
+    },
+    Jupiter: {
+        Planes.EARTH_EQUATOR: JupiterICRS
+    },
+    Saturn: {
+        Planes.EARTH_EQUATOR: SaturnICRS
+    },
+    Uranus: {
+        Planes.EARTH_EQUATOR: UranusICRS
+    },
+    Neptune: {
+        Planes.EARTH_EQUATOR: NeptuneICRS
+    },
+    Pluto: {
+        Planes.EARTH_EQUATOR: PlutoICRS
+    },
+}  # type: Dict[_Body, Dict[Planes, FrameMeta]]
+
+
+def get_frame(attractor, plane, obstime=J2000):
+    try:
+        frames = _FRAME_MAPPING[attractor]
+    except KeyError:
+        raise NotImplementedError("Frames for orbits around custom bodies are not yet supported")
+
+    try:
+        frame_class = frames[plane]
+    except KeyError:
+        raise NotImplementedError(
+            "A frame with plane {} around body {} is not yet implemented".format(plane, attractor))
+
+    return frame_class(obstime=obstime)
