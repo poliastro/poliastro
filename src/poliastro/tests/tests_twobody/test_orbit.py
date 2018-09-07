@@ -5,6 +5,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.coordinates import CartesianRepresentation, CartesianDifferential
 
 from astropy import time
 from astropy.time import Time
@@ -301,3 +302,20 @@ def test_orbit_accepts_ecliptic_plane():
     ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
 
     assert ss.frame.is_equivalent_frame(HeliocentricEclipticJ2000(obstime=J2000))
+
+
+def test_orbit_represent_as_produces_correct_data():
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+
+    ss = Orbit.from_vectors(Sun, r, v)
+
+    expected_result = CartesianRepresentation(
+        *r, differentials=CartesianDifferential(*v)
+    )
+
+    result = ss.represent_as(CartesianRepresentation)
+
+    # We can't directly compare the objects, see https://github.com/astropy/astropy/issues/7793
+    assert (result.xyz == expected_result.xyz).all()
+    assert (result.differentials['s'].d_xyz == expected_result.differentials['s'].d_xyz).all()

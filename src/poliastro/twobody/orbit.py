@@ -264,6 +264,48 @@ class Orbit(object):
             attractor, p, 1.0 * u.one, inc, raan, argp, nu)
         return cls(ss, epoch, plane)
 
+    def represent_as(self, representation):
+        """Converts the orbit to a specific representation.
+
+        .. versionadded:: 0.11.0
+
+        Parameters
+        ----------
+        representation : ~astropy.coordinates.BaseRepresentation
+            Representation object to use. It must be a class, not an instance.
+
+        Examples
+        --------
+        >>> from poliastro.examples import iss
+        >>> from astropy.coordinates import CartesianRepresentation
+        >>> iss.represent_as(CartesianRepresentation)
+        <CartesianRepresentation (x, y, z) in km
+            (859.07256, -4137.20368, 5295.56871)
+         (has differentials w.r.t.: 's')>
+        >>> iss.represent_as(CartesianRepresentation).xyz
+        <Quantity [  859.07256, -4137.20368,  5295.56871] km>
+        >>> iss.represent_as(CartesianRepresentation).differentials['s']
+        <CartesianDifferential (d_x, d_y, d_z) in km / s
+            (7.37289205, 2.08223573, 0.43999979)>
+        >>> iss.represent_as(CartesianRepresentation).differentials['s'].d_xyz
+        <Quantity [7.37289205, 2.08223573, 0.43999979] km / s>
+        >>> iss.represent_as(SphericalRepresentation)
+        <SphericalRepresentation (lon, lat, distance) in (rad, rad, km)
+            (4.91712525, 0.89732339, 6774.76995296)
+         (has differentials w.r.t.: 's')>
+
+        """
+        # As we do not know the differentials, we first convert to cartesian,
+        # then let the frame represent_as do the rest
+        # TODO: Perhaps this should be public API as well?
+        cartesian = CartesianRepresentation(
+            *self.r, differentials=CartesianDifferential(*self.v)
+        )
+        # See Orbit._sample for reasoning about the usage of a protected method
+        coords = self.frame._replicate(cartesian, representation_type='cartesian')
+
+        return coords.represent_as(representation)
+
     def __str__(self):
         if self.a > 1e7 * u.km:
             unit = u.au
