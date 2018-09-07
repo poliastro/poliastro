@@ -1,13 +1,13 @@
 import pytest
 
 import pickle
+
 from numpy.testing import assert_allclose, assert_array_equal
 
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.coordinates import CartesianRepresentation, CartesianDifferential
 
-from astropy import time
 from astropy.time import Time
 
 from poliastro.bodies import (
@@ -102,12 +102,12 @@ def test_orbit_from_ephem_with_no_epoch_is_today():
     # This is not that obvious http://stackoverflow.com/q/6407362/554319
     body = Earth
     ss = Orbit.from_body_ephem(body)
-    assert (time.Time.now() - ss.epoch).sec < 1
+    assert (Time.now() - ss.epoch).sec < 1
 
 
 def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     body = Earth
-    epoch = time.Time("2017-09-29 07:31:26", scale="utc")
+    epoch = Time("2017-09-29 07:31:26", scale="utc")
     expected_epoch_string = "2017-09-29 07:32:35.182"  # epoch.tdb.value
 
     Orbit.from_body_ephem(body, epoch)
