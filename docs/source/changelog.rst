@@ -81,9 +81,7 @@ code bugs were fixed:
 Backward incompatible changes
 .............................
 
-* Now the :py:meth:`poliastro.twobody.Orbit.sample` method returns a tuple of (times, positions).
-* All the propagator methods changed their signature
-  and now accept :py:class:`~poliastro.twobody.Orbit` objects.
+* Some functions have been moved to :py:mod`:poliastro.core`.
 
 Contributors
 ............
