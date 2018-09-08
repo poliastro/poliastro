@@ -201,11 +201,18 @@ class Orbit(object):
         r, v = get_body_barycentric_posvel(body.name, epoch)
 
         if body == Moon:
-            # The attractor is in fact the Earth-Moon Barycenter
-            ss = cls.from_vectors(Earth, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+            # TODO: The attractor is in fact the Earth-Moon Barycenter
+            icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
+            gcrs_cart = ICRS(icrs_cart).transform_to(GCRS(obstime=epoch)).represent_as(CartesianRepresentation)
+            ss = cls.from_vectors(
+                Earth,
+                gcrs_cart.xyz.to(u.km),
+                gcrs_cart.differentials['s'].d_xyz.to(u.km / u.day),
+                epoch
+            )
 
         else:
-            # The attractor is not really the Sun, but the Solar System Barycenter
+            # TODO: The attractor is not really the Sun, but the Solar System Barycenter
             ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
             ss._frame = ICRS()  # Hack!
 
