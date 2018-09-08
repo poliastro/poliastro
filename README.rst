@@ -14,7 +14,7 @@
 :Author: Juan Luis Cano Rodríguez |orcid|
 :Version: 0.11.dev0
 
-.. |circleci| image:: https://img.shields.io/circleci/project/poliastro/poliastro/master.svg?style=flat-square&logo=circleci
+.. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/master.svg?style=flat-square&logo=circleci
    :target: https://circleci.com/gh/poliastro/poliastro
 
 .. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square&logo=travis
