@@ -17,9 +17,10 @@ from poliastro.twobody.angles import M_to_nu
 # Base URLs
 NEOWS_URL = 'https://api.nasa.gov/neo/rest/v1/neo/'
 SBDB_URL = 'https://ssd.jpl.nasa.gov/sbdb.cgi'
+DEFAULT_API_KEY = 'DEMO_KEY'
 
 
-def orbit_from_spk_id(spk_id, api_key='DEMO_KEY'):
+def orbit_from_spk_id(spk_id, api_key=None):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a SPK-ID.
 
     Retrieve info from NASA NeoWS API, and therefore
@@ -38,7 +39,7 @@ def orbit_from_spk_id(spk_id, api_key='DEMO_KEY'):
         NEA orbit.
 
     """
-    payload = {'api_key': api_key}
+    payload = {'api_key': api_key or DEFAULT_API_KEY}
 
     response = requests.get(NEOWS_URL + spk_id, params=payload)
     response.raise_for_status()
@@ -111,7 +112,7 @@ def spk_id_from_name(name):
                      SBDB_URL + '?sstr=' + name + ' for more information.')
 
 
-def orbit_from_name(name, api_key='DEMO_KEY'):
+def orbit_from_name(name, api_key=None):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a name.
 
     Retrieve info from NASA NeoWS API, and therefore
