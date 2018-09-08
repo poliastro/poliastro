@@ -135,6 +135,21 @@ poliastro.maneuver module
     :members:
     :special-members: __init__
 
+poliastro.threebody package
+---------------------------
+
+poliastro.threebody.restricted module
+*************************************
+
+.. automodule:: poliastro.threebody.restricted
+   :members:
+
+poliastro.threebody.flybys module
+*********************************
+
+.. automodule:: poliastro.threebody.flybys
+  :members:
+
 poliastro.patched_conics module
 -------------------------------
 
