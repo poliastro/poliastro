@@ -1,6 +1,70 @@
 What's new
 ==========
 
+poliastro 0.11 - TBD
+--------------------
+
+.. warning::
+
+  This version has not been released yet!
+
+This short cycle release brought some new features related to the three body problem,
+as well as important changes related to how reference frames are handled in poliastro.
+
+Highlights
+..........
+
+* **Support for Python 3.7** has been added to the library, now that all the depdendencies
+  are easily available there. Currently supported versions of Python are 3.5, 3.6 and 3.7.
+
+New features
+............
+
+.. todo::
+
+  Change name from restricted to lagrange
+
+* **Lagrange points**: The new experimental module :py:mod:`poliastro.threebody.restricted`
+  contains functions to compute the Lagrange points in the circular restricted three body
+  problem (CR3BP). It has been validated only approximately, so use it at your own risk.
+* **Flybys**: New functions to compute the exit velocity and turn angle have been added to
+  the new module :py:mod:`poliastro.threebody.flybys`. The B-plane aim point can be specified
+  and the result will be returned in the correct reference frame. This feature was motivated
+  by the Parker Solar Probe mission, and you can read an example on `how to analyze parts of
+  its trajectory using poliastro`_.
+* **Reference frames**: We addded experimental support for reference frames in poliastro objects.
+  So far, the :py:class:`~poliastro.twobody.orbit.Orbit` objects were in some assumed reference
+  frame that could not be controlled, leading to some confusion by people that wanted some
+  specific coordinates. Now, **the reference frame is made out explicit**, and there is also
+  the possibility to make a limited set of transformations. This framework will be further
+  developed in the next release and transformations to arbitrary frames will be allowed.
+  Check out the :py:mod:`poliastro.frames` module for more information.
+
+.. _`how to analyze parts of its trajectory using poliastro`: http://docs.poliastro.space/en/latest/examples/Analyzing%20the%20Parker%20Solar%20Probe%20flybys.html
+
+Bugs fixed
+..........
+
+We did not fix any of the pending bugs during this release cycle.
+Do you want to help? https://github.com/poliastro/poliastro/issues?q=is%3Aopen+is%3Aissue+label%3Abug
+
+Backwards incompatible changes
+..............................
+
+* The :py:meth:`poliastro.twobody.Orbit.sample` method returns one single object again that
+  contains the positions and the corresponding times.
+
+Contributors
+............
+
+This is the complete list of the people that contributed to this release, with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Nikita Astrakhantsev
+* Shreyas Bapat
+* Daniel Lubián+
+* Wil Selwood+
+
 poliastro 0.10.0 - 2018-07-21
 -----------------------------
 
@@ -81,9 +145,7 @@ code bugs were fixed:
 Backward incompatible changes
 .............................
 
-* Now the :py:meth:`poliastro.twobody.Orbit.sample` method returns a tuple of (times, positions).
-* All the propagator methods changed their signature
-  and now accept :py:class:`~poliastro.twobody.Orbit` objects.
+* Some functions have been moved to :py:mod`:poliastro.core`.
 
 Contributors
 ............
