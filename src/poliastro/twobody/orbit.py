@@ -319,6 +319,34 @@ class Orbit(object):
 
         return coords.represent_as(representation)
 
+    def to_icrs(self):
+        """Creates a new Orbit object with its coordinates transformed to ICRS.
+
+        Notice that, strictly speaking, the center of ICRS is the Solar System Barycenter
+        and not the Sun, and therefore these orbits cannot be propagated in the context
+        of the two body problem. Therefore, this function exists merely for practical
+        purposes.
+
+        .. versionadded:: 0.11.0
+
+        """
+        coords = self.frame.realize_frame(
+            self.represent_as(CartesianRepresentation)
+        )
+        coords.representation_type = CartesianRepresentation
+
+        icrs_cart = coords.transform_to(ICRS).represent_as(CartesianRepresentation)
+
+        # TODO: The attractor is in fact the Solar System Barycenter
+        ss = self.from_vectors(
+            Sun,
+            r=icrs_cart.xyz,
+            v=icrs_cart.differentials['s'].d_xyz,
+            epoch=self.epoch
+        )
+        ss._frame = ICRS()  # Hack!
+        return ss
+
     def __str__(self):
         if self.a > 1e7 * u.km:
             unit = u.au
