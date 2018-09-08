@@ -318,3 +318,18 @@ def test_orbit_represent_as_produces_correct_data():
     # We can't directly compare the objects, see https://github.com/astropy/astropy/issues/7793
     assert (result.xyz == expected_result.xyz).all()
     assert (result.differentials['s'].d_xyz == expected_result.differentials['s'].d_xyz).all()
+
+
+@pytest.mark.parametrize("value", [1 * u.h, 10 * u.deg])
+def test_orbit_propagate_retains_plane(value):
+    r = [1E+09, -4E+09, -1E+09] * u.km
+    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+
+    ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
+
+    orig_frame = ss.frame
+
+    final_ss = ss.propagate(1 * u.h)
+    expected_frame = orig_frame.replicate_without_data(obstime=final_ss.epoch)
+
+    assert final_ss.frame.is_equivalent_frame(expected_frame)

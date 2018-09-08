@@ -71,6 +71,11 @@ class Orbit(object):
         return self._epoch
 
     @property
+    def plane(self):
+        """Fundamental plane of the frame. """
+        return self._plane
+
+    @property
     def frame(self):
         """Reference frame of the orbit.
 
@@ -347,7 +352,8 @@ class Orbit(object):
 
             return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
                                        ecc * u.one, inc * u.rad, raan * u.rad,
-                                       argp * u.rad, value)
+                                       argp * u.rad, value,
+                                       plane=self._plane)
         else:
             if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
                 time_of_flight = value - self.epoch
