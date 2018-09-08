@@ -161,8 +161,8 @@ def test_pqw_for_circular_equatorial_orbit():
 
 
 def test_orbit_representation():
-    ss = Orbit.circular(Earth, 600 * u.km, 20 * u.deg)
-    expected_str = "6978 x 6978 km x 20.0 deg (GCRS) orbit around Earth (\u2641)"
+    ss = Orbit.circular(Earth, 600 * u.km, 20 * u.deg, epoch=Time("2018-09-08 09:04:00", scale="tdb"))
+    expected_str = "6978 x 6978 km x 20.0 deg (GCRS) orbit around Earth (\u2641) at epoch 2018-09-08 09:04:00.000 (TDB)"
 
     assert str(ss) == repr(ss) == expected_str
 
