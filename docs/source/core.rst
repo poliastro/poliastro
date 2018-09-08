@@ -1,9 +1,6 @@
 Core API
 ========
 
-poliastro.core package
-----------------------
-
 poliastro.core.angles module
 ****************************
 
