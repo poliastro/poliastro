@@ -132,7 +132,8 @@ class _PlanetaryICRS(BaseRADecFrame):
         if icrs_coo.data.differentials:
             bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(planet_frame.body.name,
                                                                      planet_frame.obstime)
-            bary_sun_pos = -bary_sun_pos.with_differentials(-bary_sun_vel.represent_as(CartesianDifferential))
+            # Beware! Negation operation is not supported for differentials
+            bary_sun_pos = (-bary_sun_pos).with_differentials(-bary_sun_vel.represent_as(CartesianDifferential))
 
         else:
             bary_sun_pos = -get_body_barycentric(planet_frame.body.name, planet_frame.obstime)

@@ -56,8 +56,8 @@ def test_propagating_to_certain_nu_is_correct():
     a = 1.0 * u.AU
     ecc = 1.0 / 3.0 * u.one
     _a = 0.0 * u.rad
-    elliptic = Orbit.from_classical(Sun, a, ecc, _a, _a, _a, _a)
-    r_ini, _ = elliptic.rv()
+    nu = 10 * u.deg
+    elliptic = Orbit.from_classical(Sun, a, ecc, _a, _a, _a, nu)
 
     elliptic_at_perihelion = elliptic.propagate(0.0 * u.rad)
     r_per, _ = elliptic_at_perihelion.rv()
@@ -65,9 +65,12 @@ def test_propagating_to_certain_nu_is_correct():
     elliptic_at_aphelion = elliptic.propagate(np.pi * u.rad)
     r_ap, _ = elliptic_at_aphelion.rv()
 
-    assert_quantity_allclose(r_per, r_ini)
     assert_quantity_allclose(norm(r_per), a * (1.0 - ecc))
     assert_quantity_allclose(norm(r_ap), a * (1.0 + ecc))
+
+    # TODO: Test specific values
+    assert elliptic_at_perihelion.epoch > elliptic.epoch
+    assert elliptic_at_aphelion.epoch > elliptic.epoch
 
     # test 10 random true anomaly values
     for _ in range(10):

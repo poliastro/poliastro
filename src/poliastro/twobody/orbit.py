@@ -6,6 +6,7 @@ from astropy import units as u
 from astropy import time
 
 from astropy.coordinates import (
+    Angle,
     CartesianRepresentation, CartesianDifferential,
     get_body_barycentric_posvel,
     ICRS, GCRS
@@ -26,7 +27,7 @@ from poliastro.frames import get_frame, Planes
 from ._base import BaseState  # flake8: noqa
 
 
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body}"
+ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 
 
 class TimeScaleWarning(UserWarning):
@@ -69,6 +70,11 @@ class Orbit(object):
     def epoch(self):
         """Epoch of the orbit. """
         return self._epoch
+
+    @property
+    def plane(self):
+        """Fundamental plane of the frame. """
+        return self._plane
 
     @property
     def frame(self):
@@ -195,11 +201,18 @@ class Orbit(object):
         r, v = get_body_barycentric_posvel(body.name, epoch)
 
         if body == Moon:
-            # The attractor is in fact the Earth-Moon Barycenter
-            ss = cls.from_vectors(Earth, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+            # TODO: The attractor is in fact the Earth-Moon Barycenter
+            icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
+            gcrs_cart = ICRS(icrs_cart).transform_to(GCRS(obstime=epoch)).represent_as(CartesianRepresentation)
+            ss = cls.from_vectors(
+                Earth,
+                gcrs_cart.xyz.to(u.km),
+                gcrs_cart.differentials['s'].d_xyz.to(u.km / u.day),
+                epoch
+            )
 
         else:
-            # The attractor is not really the Sun, but the Solar System Barycenter
+            # TODO: The attractor is not really the Sun, but the Solar System Barycenter
             ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
             ss._frame = ICRS()  # Hack!
 
@@ -306,6 +319,34 @@ class Orbit(object):
 
         return coords.represent_as(representation)
 
+    def to_icrs(self):
+        """Creates a new Orbit object with its coordinates transformed to ICRS.
+
+        Notice that, strictly speaking, the center of ICRS is the Solar System Barycenter
+        and not the Sun, and therefore these orbits cannot be propagated in the context
+        of the two body problem. Therefore, this function exists merely for practical
+        purposes.
+
+        .. versionadded:: 0.11.0
+
+        """
+        coords = self.frame.realize_frame(
+            self.represent_as(CartesianRepresentation)
+        )
+        coords.representation_type = CartesianRepresentation
+
+        icrs_cart = coords.transform_to(ICRS).represent_as(CartesianRepresentation)
+
+        # TODO: The attractor is in fact the Solar System Barycenter
+        ss = self.from_vectors(
+            Sun,
+            r=icrs_cart.xyz,
+            v=icrs_cart.differentials['s'].d_xyz,
+            epoch=self.epoch
+        )
+        ss._frame = ICRS()  # Hack!
+        return ss
+
     def __str__(self):
         if self.a > 1e7 * u.km:
             unit = u.au
@@ -316,6 +357,7 @@ class Orbit(object):
             r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
             frame=self.frame.__class__.__name__,
             body=self.attractor,
+            epoch=self.epoch, scale=self.epoch.scale.upper(),
         )
 
     def __repr__(self):
@@ -330,8 +372,7 @@ class Orbit(object):
         Parameters
         ----------
         value : Multiple options
-            True anomaly values,
-            Time values.
+            True anomaly values or time values. If given an angle, it will always propagate forward.
         rtol : float, optional
             Relative tolerance for the propagation algorithm, default to 1e-10.
         method : function, optional
@@ -345,9 +386,15 @@ class Orbit(object):
                                                 self.r.to(u.km).value,
                                                 self.v.to(u.km / u.s).value)
 
+            # Compute time of flight for correct epoch
+            M = nu_to_M(self.nu, self.ecc)
+            new_M = nu_to_M(value, self.ecc)
+            time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
+
             return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
                                        ecc * u.one, inc * u.rad, raan * u.rad,
-                                       argp * u.rad, value)
+                                       argp * u.rad, value,
+                                       epoch=self.epoch + time_of_flight, plane=self._plane)
         else:
             if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
                 time_of_flight = value - self.epoch

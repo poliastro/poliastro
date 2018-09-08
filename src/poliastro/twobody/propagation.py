@@ -177,4 +177,4 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
 
     """
     r, v = method(orbit, time_of_flight.to(u.s).value, rtol=rtol, **kwargs)
-    return orbit.from_vectors(orbit.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight)
+    return orbit.from_vectors(orbit.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight, orbit.plane)
