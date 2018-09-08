@@ -6,6 +6,7 @@ from astropy import units as u
 from astropy import time
 
 from astropy.coordinates import (
+    Angle,
     CartesianRepresentation, CartesianDifferential,
     get_body_barycentric_posvel,
     ICRS, GCRS
@@ -335,8 +336,7 @@ class Orbit(object):
         Parameters
         ----------
         value : Multiple options
-            True anomaly values,
-            Time values.
+            True anomaly values or time values. If given an angle, it will always propagate forward.
         rtol : float, optional
             Relative tolerance for the propagation algorithm, default to 1e-10.
         method : function, optional
@@ -350,10 +350,15 @@ class Orbit(object):
                                                 self.r.to(u.km).value,
                                                 self.v.to(u.km / u.s).value)
 
+            # Compute time of flight for correct epoch
+            M = nu_to_M(self.nu, self.ecc)
+            new_M = nu_to_M(value, self.ecc)
+            time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
+
             return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
                                        ecc * u.one, inc * u.rad, raan * u.rad,
                                        argp * u.rad, value,
-                                       plane=self._plane)
+                                       epoch=self.epoch + time_of_flight, plane=self._plane)
         else:
             if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
                 time_of_flight = value - self.epoch
