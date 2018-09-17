@@ -290,7 +290,7 @@ class Orbit(object):
         Examples
         --------
         >>> from poliastro.examples import iss
-        >>> from astropy.coordinates import CartesianRepresentation
+        >>> from astropy.coordinates import CartesianRepresentation, SphericalRepresentation
         >>> iss.represent_as(CartesianRepresentation)
         <CartesianRepresentation (x, y, z) in km
             (859.07256, -4137.20368, 5295.56871)
@@ -433,11 +433,16 @@ class Orbit(object):
         --------
         >>> from astropy import units as u
         >>> from poliastro.examples import iss
-        >>> iss.sample()
-        >>> iss.sample(10)
-        >>> iss.sample([0, 180] * u.deg)
-        >>> iss.sample([0, 10, 20] * u.minute)
-        >>> iss.sample([iss.epoch + iss.period / 2])
+        >>> iss.sample()  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample(10)  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample([0, 180] * u.deg)  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample([0, 10, 20] * u.minute)  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample([iss.epoch + iss.period / 2])  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
 
         """
         if values is None:
