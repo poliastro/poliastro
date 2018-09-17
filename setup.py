@@ -41,7 +41,7 @@ setup(
         'dev': [
             "coverage",
             "pytest",
-            "pytest-cov",
+            "pytest-cov<2.6.0",
             "pycodestyle",
             "sphinx",
             "sphinx_rtd_theme",
