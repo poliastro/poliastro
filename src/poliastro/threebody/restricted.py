@@ -134,8 +134,94 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
     return [L1, L2, L3, L4, L5]
 
 
-if __name__ == "__main__":
+def lagrange_points_from_body(body):
+    """Computes the five Lagrange points given a `Body`.
 
+    Parameters
+    ----------
+    body : Body
+        Orbiting body. 
+        Example: For Earth-Moon, pass Moon, because the attractor body is already known.
+
+    Returns
+    -------
+    list
+        Position of the Lagrange points: [L1, L2, L3, L4, L5]
+        The positions are of type ~astropy.units.Quantity
+    """
+    from poliastro.twobody import Orbit
+    from astropy import units as u
+
+    body_orbit = Orbit.from_body_ephem(body)
+    body_orbit_parent_r = np.zeros(3) * u.km  # origin in main body
+
+    return lagrange_points_vec(m1=body.parent.mass,
+                               r1=body_orbit_parent_r,
+                               m2=body.mass,
+                               r2=body_orbit.r,
+                               n=body_orbit.h_vec)
+
+
+def test_sun_earth():
+    from astropy import units as u
+    from astropy.constants import G, au
+    from poliastro.constants import GM_earth, GM_sun
+
+    # ORIGIN = "barycenter"
+    ORIGIN = "main body"
+
+    # Distance Sun - Earth
+    r12 = au.to(u.km).value
+
+    # Sun (1)
+    m1 = GM_sun / G
+
+    # Earth (2)
+    m2 = GM_earth / G
+
+    if ORIGIN == "barycenter":
+        x1 = - r12 * m2 / (m1 + m2)
+        x2 = r12 + x1
+    elif ORIGIN == "main body":
+        x1 = 0.
+        x2 = r12
+
+    # Positions
+    r1 = np.array([x1, 0, 0]) * u.km
+    r2 = np.array([x2, 0, 0]) * u.km
+
+    # normal vector
+    n = np.array([0., 0, 1]) * u.one
+
+    lp = lagrange_points_vec(m1, r1, m2, r2, n)
+
+    for p in lp:
+        print("{:+8.0f} {:+8.0f} {:+8.0f}".format(p[0], p[1], p[2]))
+
+    x = [p[0] for p in lp]
+    y = [p[1] for p in lp]
+
+    # Figure
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.scatter(0, 0, marker="+", c="k", label="Origin")
+    plt.scatter(r1[0], r1[1], s=100, marker="$" + u"\u2609" + "$",
+                label="Sun", c="k")
+    plt.scatter(r2[0], r2[1], s=100, marker="$" + u"\u2641" + "$",
+                label="Earth", c="k")
+    for i in range(0, 5):
+        plt.scatter(x[i], y[i], marker="$L" + "{:d}$".format(i + 1),
+                    c="k", s=100)
+    plt.legend(loc="best")
+    plt.title("Sun-Earth Lagrangian points")
+    plt.xlabel("[km]")
+    plt.ylabel("[km]")
+    plt.tight_layout()
+    plt.show()
+    plt.close('all')
+
+
+def test_earth_moon():
     from astropy import units as u
     from astropy.constants import G
     from poliastro.constants import GM_earth, GM_moon
