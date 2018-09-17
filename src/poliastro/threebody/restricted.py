@@ -6,6 +6,8 @@
 
 import numpy as np
 
+from astropy import units as u
+
 from scipy.optimize import brentq
 
 from poliastro.util import norm
