@@ -74,9 +74,9 @@ def lagrange_points(r12, m1, m2):
                   m2=u.kg, r2=u.km,
                   n=u.one)
 def lagrange_points_vec(m1, r1, m2, r2, n):
-    """Computes the five Lagrange points in the CR3BP. 
+    """Computes the five Lagrange points in the CR3BP.
 
-    Returns the positions in the same frame of reference as `r1` and `r2` 
+    Returns the positions in the same frame of reference as `r1` and `r2`
     for the five Lagrangian points.
 
     Parameters
