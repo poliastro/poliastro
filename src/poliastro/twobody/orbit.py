@@ -16,6 +16,7 @@ from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
 from poliastro.twobody.propagation import propagate, mean_motion
 from poliastro.core.elements import rv2coe
+from poliastro.core.angles import nu_to_M as nu_to_M_fast
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -493,8 +494,9 @@ class Orbit(object):
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
-        M_vals = np.array([nu_to_M(nu_val, self.ecc).value -
-                           nu_to_M(self.nu, self.ecc).value for nu_val in nu_vals]) * u.rad
+        ecc = self.ecc.value
+        nu = self.nu.to(u.rad).value
+        M_vals = [nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc) for nu_val in nu_vals.to(u.rad).value] * u.rad
         time_values = self.epoch + (M_vals / self.n).decompose()
         return time_values
 
