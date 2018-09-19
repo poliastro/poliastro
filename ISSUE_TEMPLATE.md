@@ -8,11 +8,29 @@
 
 `conda info -a`
 
-`python -c "import poliastro.testing; poliastro.testing.test()"`
+`conda list`
+
+<!--- Paste your output of this command after the colon of "Paste your output here:" -->
+
+```
+# Paste your output here:
+
+```
 
 `pip freeze | grep astropy`
 
 `pip freeze | grep poliastro`
+
+<!--- If this Issue is a feature request, please ignore the next command.-->
+<!--- Please make sure you have installed "pytest" in your machine for this command.-->
+
+`python -c "import poliastro.testing; poliastro.testing.test()"`
+
+<!--- Paste your output of this command after the colon of "Paste your output here:" -->
+```
+# Paste your output here:
+
+```
 
 🎯 **Goal**
 <!--- Why is this change important to you? How would you use it? -->
