@@ -43,10 +43,9 @@ def test_planetary_frames_have_proper_string_representations(body, frame):
     (Saturn, SaturnICRS),
     (Uranus, UranusICRS),
     (Neptune, NeptuneICRS),
-    (Pluto, PlutoICRS),
 ])
 def test_planetary_icrs_frame_is_just_translation(body, frame):
-    with solar_system_ephemeris.set("de432s"):
+    with solar_system_ephemeris.set("builtin"):
         epoch = J2000
         vector = CartesianRepresentation(x=100 * u.km, y=100 * u.km, z=100 * u.km)
         vector_result = frame(vector, obstime=epoch).transform_to(ICRS).represent_as(CartesianRepresentation)
@@ -66,10 +65,9 @@ def test_planetary_icrs_frame_is_just_translation(body, frame):
     (Saturn, SaturnICRS),
     (Uranus, UranusICRS),
     (Neptune, NeptuneICRS),
-    (Pluto, PlutoICRS),
 ])
 def test_icrs_body_position_to_planetary_frame_yields_zeros(body, frame):
-    with solar_system_ephemeris.set("de432s"):
+    with solar_system_ephemeris.set("builtin"):
         epoch = J2000
         vector = get_body_barycentric(body.name, epoch)
 
