@@ -8,7 +8,13 @@ poliastro - Astrodynamics in Python
 **poliastro** is an open source (MIT) collection of Python functions useful
 in Astrodynamics and Orbital Mechanics, focusing on interplanetary applications.
 It provides a simple and intuitive API and handles physical quantities with
-units. Some of its awesome features are:
+units.
+
+View `source code`_ of poliastro!
+
+.. _`source code`: https://github.com/poliastro/poliastro
+
+Some of its awesome features are:
 
 * Analytical and numerical orbit propagation
 * Conversion between position and velocity vectors and classical orbital
@@ -50,6 +56,10 @@ browser using binder, a cloud Jupyter notebook server:
 .. _`source code`: https://github.com/poliastro/poliastro
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 .. _`wiki`: https://github.com/poliastro/poliastro/wiki/
+
+See `benchmarks`_ for the performance analysis of poliastro.
+
+.. _`benchmarks`: https://blog.poliastro.space/poliastro-benchmarks/
 
 poliastro works on recent versions of Python and is released under
 the MIT license, hence allowing commercial use of the library.
