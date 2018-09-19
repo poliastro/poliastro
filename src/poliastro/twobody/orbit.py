@@ -472,17 +472,24 @@ class Orbit(object):
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
 
+        elif isinstance(values, time.Time):
+            values = values - self.epoch
+
+        elif isinstance(values, list):
+            # A list of Times is assumed
+            values = [(value - self.epoch).sec for value in values] * u.s
+
         return self._sample(values, method)
 
     def _sample(self, time_values, method=mean_motion):
-        positions = method(self, (time_values - self.epoch).to(u.s).value)
+        positions = method(self, time_values.to(u.s).value)
 
         data = CartesianRepresentation(positions[0] * u.km, xyz_axis=1)
 
         # If the frame supports obstime, set the time values
         kwargs = {}
         if 'obstime' in self.frame.frame_attributes:
-            kwargs['obstime'] = time_values
+            kwargs['obstime'] = self.epoch + time_values
         else:
             warn("Frame {} does not support 'obstime', time values were not returned".format(self.frame.__class__))
 
@@ -497,7 +504,7 @@ class Orbit(object):
         ecc = self.ecc.value
         nu = self.nu.to(u.rad).value
         M_vals = [nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc) for nu_val in nu_vals.to(u.rad).value] * u.rad
-        time_values = self.epoch + (M_vals / self.n).decompose()
+        time_values = (M_vals / self.n).decompose()
         return time_values
 
     def apply_maneuver(self, maneuver, intermediate=False):
