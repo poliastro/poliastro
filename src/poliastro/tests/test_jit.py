@@ -25,7 +25,8 @@ def _fake_numba_import():
     del _jit
     del sys.modules['poliastro.core._jit']
 
-    del sys.modules['numba']
+    if 'numba' in sys.modules:
+        del sys.modules['numba']
 
     sys.meta_path.insert(0, fail_loader)
 

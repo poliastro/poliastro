@@ -16,6 +16,7 @@ from poliastro.constants import J2000
 from poliastro.twobody.angles import nu_to_M, E_to_nu
 from poliastro.twobody.propagation import propagate, mean_motion
 from poliastro.core.elements import rv2coe
+from poliastro.core.angles import nu_to_M as nu_to_M_fast
 
 from poliastro.twobody import rv
 from poliastro.twobody import classical
@@ -290,7 +291,7 @@ class Orbit(object):
         Examples
         --------
         >>> from poliastro.examples import iss
-        >>> from astropy.coordinates import CartesianRepresentation
+        >>> from astropy.coordinates import CartesianRepresentation, SphericalRepresentation
         >>> iss.represent_as(CartesianRepresentation)
         <CartesianRepresentation (x, y, z) in km
             (859.07256, -4137.20368, 5295.56871)
@@ -433,11 +434,16 @@ class Orbit(object):
         --------
         >>> from astropy import units as u
         >>> from poliastro.examples import iss
-        >>> iss.sample()
-        >>> iss.sample(10)
-        >>> iss.sample([0, 180] * u.deg)
-        >>> iss.sample([0, 10, 20] * u.minute)
-        >>> iss.sample([iss.epoch + iss.period / 2])
+        >>> iss.sample()  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample(10)  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample([0, 180] * u.deg)  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample([0, 10, 20] * u.minute)  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
+        >>> iss.sample([iss.epoch + iss.period / 2])  # doctest: +ELLIPSIS
+        <GCRS Coordinate ...>
 
         """
         if values is None:
@@ -466,17 +472,24 @@ class Orbit(object):
         elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
             values = self._generate_time_values(values)
 
+        elif isinstance(values, time.Time):
+            values = values - self.epoch
+
+        elif isinstance(values, list):
+            # A list of Times is assumed
+            values = [(value - self.epoch).sec for value in values] * u.s
+
         return self._sample(values, method)
 
     def _sample(self, time_values, method=mean_motion):
-        positions = method(self, (time_values - self.epoch).to(u.s).value)
+        positions = method(self, time_values.to(u.s).value)
 
         data = CartesianRepresentation(positions[0] * u.km, xyz_axis=1)
 
         # If the frame supports obstime, set the time values
         kwargs = {}
         if 'obstime' in self.frame.frame_attributes:
-            kwargs['obstime'] = time_values
+            kwargs['obstime'] = self.epoch + time_values
         else:
             warn("Frame {} does not support 'obstime', time values were not returned".format(self.frame.__class__))
 
@@ -488,9 +501,10 @@ class Orbit(object):
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
-        M_vals = np.array([nu_to_M(nu_val, self.ecc).value -
-                           nu_to_M(self.nu, self.ecc).value for nu_val in nu_vals]) * u.rad
-        time_values = self.epoch + (M_vals / self.n).decompose()
+        ecc = self.ecc.value
+        nu = self.nu.to(u.rad).value
+        M_vals = [nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc) for nu_val in nu_vals.to(u.rad).value] * u.rad
+        time_values = (M_vals / self.n).decompose()
         return time_values
 
     def apply_maneuver(self, maneuver, intermediate=False):
