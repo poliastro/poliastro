@@ -1,12 +1,8 @@
 What's new
 ==========
 
-poliastro 0.11 - TBD
---------------------
-
-.. warning::
-
-  This version has not been released yet!
+poliastro 0.11.0 - 2018-09-21
+-----------------------------
 
 This short cycle release brought some new features related to the three body problem,
 as well as important changes related to how reference frames are handled in poliastro.
@@ -19,10 +15,6 @@ Highlights
 
 New features
 ............
-
-.. todo::
-
-  Change name from restricted to lagrange
 
 * **Lagrange points**: The new experimental module :py:mod:`poliastro.threebody.restricted`
   contains functions to compute the Lagrange points in the circular restricted three body
@@ -45,8 +37,12 @@ New features
 Bugs fixed
 ..........
 
-We did not fix any of the pending bugs during this release cycle.
-Do you want to help? https://github.com/poliastro/poliastro/issues?q=is%3Aopen+is%3Aissue+label%3Abug
+* `Issue #450`_: Angles function of safe API have wrong docstrings
+
+.. _`Issue #450`: https://github.com/poliastro/poliastro/issues/450
+
+Do you want to help with the remaining ones? Check the current list here!
+https://github.com/poliastro/poliastro/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 Backwards incompatible changes
 ..............................
