@@ -203,7 +203,7 @@ sun_geo = {'body': Sun, 'tof': 200 * u.day, 'raan': 8.7 * u.deg, 'argp': -5.5 * 
 def test_3rd_body_Curtis(test_params):
     # based on example 12.11 from Howard Curtis
     body = test_params['body']
-    with solar_system_ephemeris.set('de432s'):
+    with solar_system_ephemeris.set('builtin'):
         j_date = 2454283.0 * u.day
         tof = (test_params['tof']).to(u.s).value
         body_r = build_ephem_interpolant(body, test_params['period'], (j_date, j_date + test_params['tof']), rtol=1e-2)
@@ -251,7 +251,7 @@ def normalize_to_Curtis(t0, sun_r):
 @pytest.mark.slow
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
-    with solar_system_ephemeris.set('de432s'):
+    with solar_system_ephemeris.set('builtin'):
         j_date = 2438400.5 * u.day
         tof = 600 * u.day
         sun_r = build_ephem_interpolant(Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2)

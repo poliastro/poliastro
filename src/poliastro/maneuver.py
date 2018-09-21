@@ -18,9 +18,9 @@ class Maneuver(object):
     >>> man = Maneuver((0 * u.s, [1, 0, 0] * u.km / u.s),
     ... (10 * u.s, [1, 0, 0] * u.km / u.s))
     >>> man[0]
-    (<Quantity 0 s>, <Quantity [1,0,0] km / s>)
+    (<Quantity 0. s>, <Quantity [1., 0., 0.] km / s>)
     >>> man.impulses[1]
-    (<Quantity 10 s>, <Quantity [1,0,0] km / s>)
+    (<Quantity 10. s>, <Quantity [1., 0., 0.] km / s>)
 
     """
     def __init__(self, *impulses):

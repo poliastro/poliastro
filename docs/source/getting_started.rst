@@ -72,6 +72,22 @@ you find any, please open an issue in the `issue tracker`_.
 .. _`virtualenv`: http://pypi.python.org/pypi/virtualenv
 .. _`local installations`: http://stackoverflow.com/a/4325047/554319
 
+Using poliastro on JupyterLab
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ After the release of plotly 3.0, plotting orbits using poliastro is easier than ever.
+
+ You have to install 2 (two) extensions of JupyterLab to make your experience smooth.
+
+   $ jupyter labextension install @jupyter-widgets/jupyterlab-manager
+
+   $ jupyter labextension install @jupyterlab/plotly-extension
+
+ And as the documentation of JupyterLab Extensions states:
+
+    "In order to install JupyterLab extensions, you need to have Node.js version 4 or later installed."
+
+
 Testing
 -------
 

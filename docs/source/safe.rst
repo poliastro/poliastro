@@ -49,6 +49,21 @@ poliastro.twobody.rv module
 .. automodule:: poliastro.twobody.rv
    :members:
 
+poliastro.twobody.thrust package
+********************************
+
+.. automodule:: poliastro.twobody.thrust.change_a_inc
+   :members:
+
+.. automodule:: poliastro.twobody.thrust.change_argp
+   :members:
+
+.. automodule:: poliastro.twobody.thrust.change_ecc_quasioptimal
+   :members:
+
+.. automodule:: poliastro.twobody.thrust.change_inc_ecc
+   :members:
+
 poliastro.iod package
 ---------------------
 

@@ -1,21 +1,24 @@
-"""Restricted Circular 3-Body Problem (RC3BP)
+"""Circular Restricted 3-Body Problem (CR3BP)
 
-    Includes the computation of:
-    * Lagrange points
+    Includes the computation of Lagrange points
 """
 
 
 import numpy as np
+
+from astropy import units as u
 
 from scipy.optimize import brentq
 
 from poliastro.util import norm
 
 
+@u.quantity_input(r12=u.km, m1=u.kg, m2=u.kg)
 def lagrange_points(r12, m1, m2):
-    """Computes the Lagrangian points of RC3BP given the distance between two
-    bodies and their masses.
+    """Computes the Lagrangian points of CR3BP.
 
+    Computes the Lagrangian points of CR3BP given the distance between two
+    bodies and their masses.
     It uses the formulation found in Eq. (2.204) of Curtis, Howard. 'Orbital
     mechanics for engineering students'. Elsevier, 3rd Edition.
 
@@ -69,10 +72,14 @@ def lagrange_points(r12, m1, m2):
     return lp * r12
 
 
+@u.quantity_input(m1=u.kg, r1=u.km,
+                  m2=u.kg, r2=u.km,
+                  n=u.one)
 def lagrange_points_vec(m1, r1, m2, r2, n):
-    """Computes the five Lagrange points in the RC3BP. Returns the positions
-    in the same frame of reference as `r1` and `r2` for the five Lagrangian
-    points.
+    """Computes the five Lagrange points in the CR3BP.
+
+    Returns the positions in the same frame of reference as `r1` and `r2`
+    for the five Lagrangian points.
 
     Parameters
     ----------
@@ -86,7 +93,6 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
         Position of the secondary body.
     n : ~astropy.units.Quantity
         Normal vector to the orbital plane.
-
     Returns
     -------
     list:
@@ -132,63 +138,3 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
     L5 = r1 + ux * x5 + uy * y5
 
     return [L1, L2, L3, L4, L5]
-
-
-if __name__ == "__main__":
-
-    from astropy import units as u
-    from astropy.constants import G
-    from poliastro.constants import GM_earth, GM_moon
-
-    # ORIGIN = "barycenter"
-    ORIGIN = "main body"
-
-    # Distance Earth - Moon
-    r12 = 384400
-
-    # Earth (1)
-    m1 = GM_earth / G
-
-    # Moon (2)
-    m2 = GM_moon / G
-
-    if ORIGIN == "barycenter":
-        x1 = - r12 * m2 / (m1 + m2)
-        x2 = r12 + x1
-    elif ORIGIN == "main body":
-        x1 = 0
-        x2 = r12
-
-    # Positions
-    r1 = np.array([x1, 0, 0]) * u.km
-    r2 = np.array([x2, 0, 0]) * u.km
-
-    # normal vector
-    n = np.array([0., 0, 1]) * u.one
-
-    lp = lagrange_points_vec(m1, r1, m2, r2, n)
-
-    for p in lp:
-        print("{:+8.0f} {:+8.0f} {:+8.0f}".format(p[0], p[1], p[2]))
-
-    x = [p[0] for p in lp]
-    y = [p[1] for p in lp]
-
-    # Figure
-    import matplotlib.pyplot as plt
-    plt.figure()
-    plt.scatter(0, 0, marker="+", c="k", label="Origin")
-    plt.scatter(r1[0], r1[1], s=100, marker="$" + u"\u2641" + "$",
-                label="Earth", c="k")
-    plt.scatter(r2[0], r2[1], s=100, marker="$" + u"\u263E" + "$",
-                label="Moon", c="k")
-    for i in range(0, 5):
-        plt.scatter(x[i], y[i], marker="$L" + "{:d}$".format(i + 1),
-                    c="k", s=100)
-    plt.legend(loc="best")
-    plt.title("Earth-Moon Lagrangian points")
-    plt.xlabel("[km]")
-    plt.ylabel("[km]")
-    plt.tight_layout()
-    plt.show()
-    plt.close('all')

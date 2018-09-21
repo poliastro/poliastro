@@ -16,7 +16,7 @@ setup(
     description="Python package for Orbital Mechanics",
     author="Juan Luis Cano",
     author_email="hello@juanlu.space",
-    url="http://blog.poliastro.space/",
+    url="https://blog.poliastro.space/",
     download_url="https://github.com/poliastro/poliastro",
     license="MIT",
     keywords=[
@@ -41,7 +41,7 @@ setup(
         'dev': [
             "coverage",
             "pytest",
-            "pytest-cov",
+            "pytest-cov<2.6.0",
             "pycodestyle",
             "sphinx",
             "sphinx_rtd_theme",

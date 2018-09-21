@@ -31,10 +31,19 @@ poliastro.core.perturbations module
 .. automodule:: poliastro.core.perturbations
    :members:
 
-poliastro.core.thrust module
-***********************************
+poliastro.core.thrust package
+*****************************
 
-.. automodule:: poliastro.core.thrust
+.. automodule:: poliastro.core.thrust.change_a_inc
+   :members:
+
+.. automodule:: poliastro.core.thrust.change_argp
+   :members:
+
+.. automodule:: poliastro.core.thrust.change_ecc_quasioptimal
+   :members:
+
+.. automodule:: poliastro.core.thrust.change_inc_ecc
    :members:
 
 poliastro.core.propagation module
