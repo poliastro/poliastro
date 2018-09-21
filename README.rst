@@ -30,7 +30,7 @@
    :target: https://codeclimate.com/github/poliastro/poliastro/maintainability
 
 .. |docs| image:: https://img.shields.io/badge/docs-v0.11b1-brightgreen.svg?style=flat-square
-   :target: http://docs.poliastro.space/en/v0.11b1/?badge=v0.11b1
+   :target: https://docs.poliastro.space/en/v0.11b1/?badge=v0.11b1
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/0.11.x/COPYING
@@ -76,9 +76,9 @@ Documentation
 Complete documentation, including a user guide and an API reference, can be read on
 the wonderful `Read the Docs`_.
 
-http://docs.poliastro.space/en/v0.11b1/
+https://docs.poliastro.space/en/v0.11b1/
 
-.. _`Read the Docs`: http://readthedocs.io/
+.. _`Read the Docs`: https://readthedocs.org/
 
 Examples
 ========
@@ -131,7 +131,7 @@ install poliastro using `conda <http://conda.io>`_::
 
 Please check out the `documentation for alternative installation methods`_.
 
-.. _`documentation for alternative installation methods`: http://docs.poliastro.space/en/v0.11b1/getting_started.html#alternative-installation-methods
+.. _`documentation for alternative installation methods`: https://docs.poliastro.space/en/v0.11b1/getting_started.html#alternative-installation-methods
 
 Testing
 =======
@@ -222,7 +222,7 @@ poliastro is focused on interplanetary applications. This has two consequences:
 * It leaves out certain features that would be too Earth-specific, such as
   TLE reading, SGP4 propagation, groundtrack plotting and others.
 
-.. _`Related software`: http://docs.poliastro.space/en/v0.11b1/about.html#related-software
+.. _`Related software`: https://docs.poliastro.space/en/v0.11b1/about.html#related-software
 
 What's the future of the project?
 ---------------------------------
