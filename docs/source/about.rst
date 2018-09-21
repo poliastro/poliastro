@@ -73,8 +73,8 @@ served as inspiration:
 
 .. _astropy: http://www.astropy.org/
 .. _Skyfield: http://rhodesmill.org/skyfield/
-.. _Plyades: http://plyades.readthedocs.org/en/latest/
-.. _orbital: http://pythonhosted.org/OrbitalPy/
+.. _Plyades: https://plyades.readthedocs.io/
+.. _orbital: https://pythonhosted.org/OrbitalPy/
 .. _orekit-python-wrapper: https://www.orekit.org/forge/projects/orekit-python-wrapper/wiki
 .. _beyond: https://github.com/galactics/beyond/
 .. _SpiceyPy: https://github.com/andrewannex/SpiceyPy
