@@ -211,7 +211,7 @@ Some natural perturbations are available in poliastro to be used
 directly in this way. For instance,
 let us examine the effect of J2 perturbation::
 
-    >>> from poliastro.twobody.perturbations import J2_perturbation
+    >>> from poliastro.core.perturbations import J2_perturbation
     >>> tof = (48.0 * u.h).to(u.s)
     >>> final = initial.propagate(tof, method=cowell, ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
 
