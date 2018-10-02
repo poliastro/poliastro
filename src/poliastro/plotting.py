@@ -118,7 +118,7 @@ class OrbitPlotter(object):
     def _redraw(self):
         for artist in self.ax.lines + self.ax.collections:
             artist.remove()
-        self._attractor_radius = None
+        self._attractor = None
         for orbit, label in self._orbits:
             self.plot(orbit, label)
         self.ax.relim()
