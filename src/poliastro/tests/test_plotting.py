@@ -97,3 +97,9 @@ def test_dark_mode_plots_dark_plot():
     assert op.ax.get_facecolor() == (0.0, 0.0, 0.0, 1.0)
     op = OrbitPlotter()
     assert op.ax.get_facecolor() == (1.0, 1.0, 1.0, 1)
+
+
+def test_redraw_makes_attractor_none():
+    op = plot_solar_system()
+    op._redraw()
+    assert op._attractor_radius is not None
