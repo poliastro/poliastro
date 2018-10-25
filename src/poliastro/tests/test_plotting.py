@@ -100,10 +100,6 @@ def test_dark_mode_plots_dark_plot():
 
 
 def test_redraw_makes_attractor_none():
-    op = plot_solar_system(outer=False)
-    try:
-        op._redraw()
-        x = True
-    except TypeError:
-        x = False
-    assert(x)
+    op = plot_solar_system()
+    op._redraw()
+    assert op._attractor_radius is not None
