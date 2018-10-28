@@ -10,7 +10,9 @@ from poliastro.bodies import Earth, Mars, Jupiter
 
 from poliastro.twobody.orbit import Orbit
 
-from poliastro.plotting import OrbitPlotter, plot_solar_system
+from poliastro.plotting.static import OrbitPlotter
+from poliastro.plotting.interactive import OrbitPlotter2D
+from poliastro.plotting.common import plot_solar_system
 
 
 def test_orbitplotter_has_axes():
@@ -78,7 +80,7 @@ def test_color():
 ])
 def test_plot_solar_system(outer, expected):
     assert len(plot_solar_system(outer).orbits) == expected
-    assert isinstance(plot_solar_system(), OrbitPlotter)
+    assert isinstance(plot_solar_system(), OrbitPlotter2D)
 
 
 def test_plot_trajectory_sets_label():

@@ -72,7 +72,7 @@ def test_plot_trajectory_plots_a_trajectory():
     assert frame._attractor == Sun
 
 
-@mock.patch("poliastro.plotting.iplot")
+@mock.patch("poliastro.plotting.interactive.iplot")
 @mock.patch.object(OrbitPlotter2D, '_prepare_plot')
 def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
     m = OrbitPlotter2D()
@@ -84,7 +84,7 @@ def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
     mock_prepare_plot.assert_called_once_with()
 
 
-@mock.patch("poliastro.plotting.export")
+@mock.patch("poliastro.plotting.interactive.export")
 @mock.patch.object(OrbitPlotter2D, '_prepare_plot')
 def test_savefig_calls_prepare_plot(mock_prepare_plot, mock_export):
     m = OrbitPlotter2D()
