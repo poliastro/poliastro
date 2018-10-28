@@ -26,22 +26,11 @@ We will ask you for your installation details in the following sections.
 
 🖥 **Please paste the output of following commands**
 
-<!--- If you are using conda, we need to know your complete list of packages -->
+<!--- If you are using conda, we need to know some extra information -->
 
-* `conda info -a`
-* `conda list`
-
-<!--- Paste your output of this command after the colon of "Paste your output here:" -->
-<details>
-  
-```bash
-# Paste your output here:
-
-```
-</details>
-
-* `pip freeze | grep astropy`
-* `pip freeze | grep poliastro`
+* `conda info -a` (only if you have conda)
+* `conda list` (only if you have conda)
+* `pip freeze`
 
 <!--- Paste your output of this command after the colon of "Paste your output here:" -->
 <details>
