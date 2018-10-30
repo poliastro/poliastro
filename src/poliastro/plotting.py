@@ -89,7 +89,7 @@ class OrbitPlotter(object):
         self._frame = None
         self._attractor = None
         self._attractor_radius = np.inf * u.km
-        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str]]
+        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str, str]]
 
     @property
     def orbits(self):
@@ -119,8 +119,8 @@ class OrbitPlotter(object):
         for artist in self.ax.lines + self.ax.collections:
             artist.remove()
         self._attractor = None
-        for orbit, label in self._orbits:
-            self.plot(orbit, label)
+        for orbit, label, color in self._orbits:
+            self.plot(orbit, label, color)
         self.ax.relim()
         self.ax.autoscale()
 
@@ -183,9 +183,6 @@ class OrbitPlotter(object):
         if not self._frame:
             self.set_frame(*orbit.pqw())
 
-        if (orbit, label) not in self._orbits:
-            self._orbits.append((orbit, label))
-
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
         positions = orbit.sample(self.num_points, method)
@@ -194,6 +191,9 @@ class OrbitPlotter(object):
         # Plot current position
         l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
+
+        if (orbit, label, l.get_color()) not in self._orbits:
+            self._orbits.append((orbit, label, l.get_color()))
 
         lines = self.plot_trajectory(trajectory=positions, color=l.get_color())
         lines.append(l)

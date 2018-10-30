@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from poliastro.examples import iss
 
-from poliastro.bodies import Earth, Mars
+from poliastro.bodies import Earth, Mars, Jupiter
 
 from poliastro.twobody.orbit import Orbit
 
@@ -103,3 +103,13 @@ def test_redraw_makes_attractor_none():
     op = plot_solar_system()
     op._redraw()
     assert op._attractor_radius is not None
+
+
+def test_set_frame_plots_same_colors():
+    op = plot_solar_system()
+    jupiter = Orbit.from_body_ephem(Jupiter)
+    op.plot(jupiter)
+    colors1 = [orb[2] for orb in op._orbits]
+    op.set_frame(*jupiter.pqw())
+    colors2 = [orb[2] for orb in op._orbits]
+    assert colors1 == colors2
