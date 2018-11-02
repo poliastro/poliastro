@@ -25,7 +25,8 @@ def plot(state, label=None, color=None, plotter=OrbitPlotter2D):
 
     """
     op = plotter()
-    return op.plot(state, label=label, color=color)
+    op.plot(state, label=label, color=color)
+    return op
 
 
 def plot3d(orbit, *, label=None, color=None):
