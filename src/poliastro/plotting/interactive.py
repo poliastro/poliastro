@@ -123,6 +123,9 @@ class _BaseOrbitPlotter:
 
         self._plot_trajectory(trajectory, str(label), color, False)
 
+    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+        return self._plot_sphere(radius, color, name, center)
+
     def _plot_trajectory(self, trajectory, label, color, dashed):
         raise NotImplementedError
 
@@ -147,7 +150,7 @@ class _BaseOrbitPlotter:
         self._plot_trajectory(trajectory, label, color, True)
         # Plot required 2D/3D shape in the position of the body
         radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
-        shape = self._plot_sphere(radius, color, label, center=orbit.r)
+        shape = self._plot_point(radius, color, label, center=orbit.r)
         self._data.append(shape)
 
     def _prepare_plot(self, **layout_kwargs):
@@ -268,6 +271,13 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
         })
         self._frame = None
 
+    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+        x_center, y_center = self._project(center[None])  # Indexing trick to add one extra dimension
+
+        trace = Scatter(x=x_center.to(u.km).value, y=y_center.to(u.km).value, mode='markers',
+                        marker=dict(size=10, color=color), name=name)
+        return trace
+
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(center[None])  # Indexing trick to add one extra dimension
 
@@ -284,13 +294,17 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
             'line': {
                 'color': color,
             },
+        }
 
-        )
-        return trace
+        self._layout["shapes"] += (trace,)
+        return {}  # This stores {} in self._data already
 
     def _plot_trajectory(self, trajectory, label, color, dashed):
+        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
+        x, y = self._project(rr)
+
         trace = Scatter(
-            x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value,
+            x=x.to(u.km).value, y=y.to(u.km).value,
             name=label,
             line=dict(
                 color=color,
