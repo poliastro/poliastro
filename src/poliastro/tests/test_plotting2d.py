@@ -1,12 +1,14 @@
 import pytest
 
+import astropy.units as u
+
 import tempfile
 
 from unittest import mock
 
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter2D
-from poliastro.bodies import Earth, Mars, Sun
+from poliastro.bodies import Earth, Mars, Sun, Jupiter
 from poliastro.twobody.orbit import Orbit
 
 
@@ -95,3 +97,33 @@ def test_savefig_calls_prepare_plot(mock_prepare_plot, mock_export):
 
     assert mock_export.call_count == 1
     mock_prepare_plot.assert_called_once_with()
+
+
+def test_set_frame():
+    op = OrbitPlotter2D()
+    p = [1, 0, 0] * u.one
+    q = [0, 1, 0] * u.one
+    w = [0, 0, 1] * u.one
+    op.set_frame(p, q, w)
+
+    assert op._frame == (p, q, w)
+
+
+def test_redraw_makes_attractor_none():
+    op = OrbitPlotter2D()
+    earth = Orbit.from_body_ephem(Earth)
+    op.plot(earth)
+    op._redraw()
+    assert op._attractor_radius is not None
+
+
+def test_set_frame_plots_same_colors():
+    earth = Orbit.from_body_ephem(Earth)
+    jupiter = Orbit.from_body_ephem(Jupiter)
+    op = OrbitPlotter2D()
+    op.plot(earth)
+    op.plot(jupiter)
+    colors1 = [orb[2] for orb in op._orbits]
+    op.set_frame(*jupiter.pqw())
+    colors2 = [orb[2] for orb in op._orbits]
+    assert colors1 == colors2
