@@ -1,13 +1,11 @@
 """ Plotting utilities.
 
 """
-from typing import List, Tuple  # flake8: noqa
-
 from poliastro.bodies import (Earth, Jupiter, Mars, Mercury, Neptune, Saturn,
                               Uranus, Venus)
 from poliastro.twobody.orbit import Orbit
 
-from .interactive import OrbitPlotter2D, OrbitPlotter3D
+from .interactive import OrbitPlotter2D
 
 
 BODY_COLORS = {
