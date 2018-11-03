@@ -136,7 +136,7 @@ class _BaseOrbitPlotter:
 
         self._plot_trajectory(trajectory, label, color, True)
         # Plot required 2D/3D shape in the position of the body
-        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
+        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5)  # Arbitrary thresholds
         shape = self._plot_point(radius, color, label, center=orbit.r)
         self._data.append(shape)
 
