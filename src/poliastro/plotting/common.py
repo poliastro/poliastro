@@ -38,7 +38,6 @@ def plot_solar_system(outer=True, epoch=None, plotter=OrbitPlotter2D):
         op.plot(orb, label=str(body))
 
     # Sets frame to the orbit of the Earth by default
-    # FIXME: https://github.com/poliastro/poliastro/issues/316
     op.set_frame(*Orbit.from_body_ephem(Earth, epoch).pqw())
 
     return op
