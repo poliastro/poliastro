@@ -113,9 +113,6 @@ class _BaseOrbitPlotter:
 
         self._plot_trajectory(trajectory, str(label), color, False)
 
-    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
-        return self._plot_sphere(radius, color, name, center)
-
     def _plot_trajectory(self, trajectory, label, color, dashed):
         raise NotImplementedError
 
@@ -196,6 +193,12 @@ class OrbitPlotter3D(_BaseOrbitPlotter):
                 aspectmode="data",  # Important!
             ),
         )
+
+    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+        # We use _plot_sphere here because it's not easy to specify the size of a marker
+        # in data units instead of pixels, see
+        # https://stackoverflow.com/q/47086547
+        return self._plot_sphere(radius, color, name, center)
 
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         xx, yy, zz = _generate_sphere(radius, center)
