@@ -186,7 +186,7 @@ class OrbitPlotter(object):
         x0, y0 = self._project(orbit.r[None])
         # Plot current position
         line, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
-                          'o', mew=0, color=color)
+                             'o', mew=0, color=color)
 
         lines = self.plot_trajectory(trajectory=positions, color=line.get_color())
         lines.append(line)
