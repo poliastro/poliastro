@@ -34,16 +34,6 @@ def _generate_label(orbit, label):
     return label_
 
 
-def _generate_circle(radius, center, num=500):
-    u1 = np.linspace(0, 2 * np.pi, num)
-    x_center, y_center, z_center = center
-
-    xx = x_center + radius * np.cos(u1)
-    yy = y_center + radius * np.sin(u1)
-
-    return xx, yy
-
-
 def _generate_sphere(radius, center, num=20):
     u1 = np.linspace(0, 2 * np.pi, num)
     v1 = u1.copy()
