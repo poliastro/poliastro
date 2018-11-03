@@ -140,7 +140,7 @@ class OrbitPlotter(object):
         lines.append(a)
         if label:
             a.set_label(label)
-            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+            self.ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), title="Names and epochs")
 
         return lines
 
@@ -206,7 +206,7 @@ class OrbitPlotter(object):
                 self.ax.figure.set_size_inches(size)
             label = _generate_label(orbit, label)
             l.set_label(label)
-            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+            self.ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), title="Names and epochs")
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
