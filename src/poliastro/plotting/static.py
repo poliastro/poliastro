@@ -203,3 +203,13 @@ class OrbitPlotter(object):
         self.ax.set_aspect(1)
 
         return lines
+
+
+def plot(state, label=None, color=None):
+    """Plots an :py:class:`~poliastro.twobody.orbit.Orbit` in 2D.
+
+    For more advanced tuning, use the :py:class:`OrbitPlotter` class.
+
+    """
+    op = OrbitPlotter()
+    return op.plot(state, label=label, color=color)

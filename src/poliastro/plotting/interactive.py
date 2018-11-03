@@ -303,3 +303,26 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
             mode="lines",  # Boilerplate
         )
         self._data.append(trace)
+
+
+def plot(state, label=None, color=None, plotter=OrbitPlotter2D):
+    """Quickly plots an :py:class:`~poliastro.twobody.orbit.Orbit`.
+
+    For more advanced tuning, use the :py:class:`OrbitPlotter2D` class
+    and similar ones.
+
+    """
+    op = plotter()
+    op.plot(state, label=label, color=color)
+    op.show()
+
+    return op
+
+
+def plot3d(orbit, *, label=None, color=None):
+    """Plots an :py:class:`~poliastro.twobody.orbit.Orbit` in 3D.
+
+    For more advanced tuning, use the :py:class:`OrbitPlotter3D` class.
+
+    """
+    return plot(orbit, label=label, color=color, plotter=OrbitPlotter3D)

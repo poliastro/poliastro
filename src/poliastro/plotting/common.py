@@ -17,27 +17,6 @@ BODY_COLORS = {
 }
 
 
-def plot(state, label=None, color=None, plotter=OrbitPlotter2D):
-    """Quickly plots an :py:class:`~poliastro.twobody.orbit.Orbit`.
-
-    For more advanced tuning, use the :py:class:`OrbitPlotter2D` class
-    and similar ones.
-
-    """
-    op = plotter()
-    op.plot(state, label=label, color=color)
-    return op
-
-
-def plot3d(orbit, *, label=None, color=None):
-    """Plots an :py:class:`~poliastro.twobody.orbit.Orbit` in 3D.
-
-    For more advanced tuning, use the :py:class:`OrbitPlotter3D` class.
-
-    """
-    return plot(orbit, label=label, color=color, plotter=OrbitPlotter3D)
-
-
 def plot_solar_system(outer=True, epoch=None, plotter=OrbitPlotter2D):
     """
     Plots the whole solar system in one single call.
