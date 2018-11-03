@@ -266,26 +266,23 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
         self._layout.update({
             "shapes": []
         })
+        self._frame = None
 
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
-        xx, yy = _generate_circle(radius, center)
-        x_center, y_center, z_center = center
-        trace = Scatter(x=xx.to(u.km).value, y=yy.to(u.km).value, mode='markers', line=dict(color=color, width=5,
-                                                                                            dash='dash',), name=name)
-        self._layout["shapes"] += (
-            {
-                'type': 'circle',
-                'xref': 'x',
-                'yref': 'y',
-                'x0': (x_center - radius).to(u.km).value,
-                'y0': (y_center - radius).to(u.km).value,
-                'x1': (x_center + radius).to(u.km).value,
-                'y1': (y_center + radius).to(u.km).value,
-                'opacity': 1,
-                'fillcolor': color,
-                'line': {
-                    'color': color,
-                },
+        x_center, y_center = self._project(center[None])  # Indexing trick to add one extra dimension
+
+        trace = {
+            'type': 'circle',
+            'xref': 'x',
+            'yref': 'y',
+            'x0': (x_center[0] - radius).to(u.km).value,
+            'y0': (y_center[0] - radius).to(u.km).value,
+            'x1': (x_center[0] + radius).to(u.km).value,
+            'y1': (y_center[0] + radius).to(u.km).value,
+            'opacity': 1,
+            'fillcolor': color,
+            'line': {
+                'color': color,
             },
 
         )
@@ -303,6 +300,38 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
             mode="lines",  # Boilerplate
         )
         self._data.append(trace)
+
+    def _project(self, rr):
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
+        return x, y
+
+    def set_frame(self, p_vec, q_vec, w_vec):
+        """Sets perifocal frame.
+
+        Raises
+        ------
+        ValueError
+            If the vectors are not a set of mutually orthogonal unit vectors.
+        """
+        if self._frame and self._data:
+            raise NotImplementedError("OrbitPlotter2D does not support reprojecting yet")
+
+        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
+            raise ValueError("Vectors must be unit.")
+        elif not np.allclose([p_vec.dot(q_vec),
+                              q_vec.dot(w_vec),
+                              w_vec.dot(p_vec)], 0):
+            raise ValueError("Vectors must be mutually orthogonal.")
+        else:
+            self._frame = p_vec, q_vec, w_vec
+
+    def plot(self, orbit, *, label=None, color=None):
+        if not self._frame:
+            self.set_frame(*orbit.pqw())
+
+        super().plot(orbit, label=label, color=color)
 
 
 def plot(state, label=None, color=None, plotter=OrbitPlotter2D):
