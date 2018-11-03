@@ -12,6 +12,7 @@ from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 
 from poliastro.util import norm
+from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import mean_motion
 
 
