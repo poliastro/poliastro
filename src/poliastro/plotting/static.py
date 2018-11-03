@@ -85,6 +85,10 @@ class OrbitPlotter(object):
     def orbits(self):
         return self._orbits
 
+    def _set_legend(self, line, label):
+        line.set_label(label)
+        self.ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), title="Names and epochs")
+
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.
 
@@ -126,11 +130,10 @@ class OrbitPlotter(object):
         lines = []
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
-        a, = self.ax.plot(x.to(u.km).value, y.to(u.km).value, '--', color=color, label=label)
-        lines.append(a)
+        line, = self.ax.plot(x.to(u.km).value, y.to(u.km).value, '--', color=color, label=label)
+        lines.append(line)
         if label:
-            a.set_label(label)
-            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+            self._set_legend(line, label)
 
         return lines
 
@@ -182,11 +185,11 @@ class OrbitPlotter(object):
 
         x0, y0 = self._project(orbit.r[None])
         # Plot current position
-        l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
+        line, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value,
                           'o', mew=0, color=color)
 
-        lines = self.plot_trajectory(trajectory=positions, color=l.get_color())
-        lines.append(l)
+        lines = self.plot_trajectory(trajectory=positions, color=line.get_color())
+        lines.append(line)
 
         if label:
             # This will apply the label to either the point or the osculating
@@ -195,8 +198,7 @@ class OrbitPlotter(object):
                 size = self.ax.figure.get_size_inches() + [8, 0]
                 self.ax.figure.set_size_inches(size)
             label = _generate_label(orbit, label)
-            l.set_label(label)
-            self.ax.legend(bbox_to_anchor=(1.05, 1), title="Names and epochs")
+            self._set_legend(line, label)
 
         self.ax.set_xlabel("$x$ (km)")
         self.ax.set_ylabel("$y$ (km)")
