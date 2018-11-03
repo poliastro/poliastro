@@ -249,6 +249,7 @@ class _BaseOrbitPlotter:
         self._attractor_data = {}  # type: dict
         self._attractor_radius = np.inf * u.km
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str, str]]
 
     @property
     def figure(self):
@@ -318,6 +319,9 @@ class _BaseOrbitPlotter:
         if color is None:
             color = next(self._color_cycle)
 
+        if (orbit, label, color) not in self._orbits:
+            self._orbits.append((orbit, label, color))
+
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
 
@@ -326,7 +330,7 @@ class _BaseOrbitPlotter:
 
         self._plot_trajectory(trajectory, label, color, True)
         # Plot required 2D/3D shape in the position of the body
-        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3)  # Arbitrary thresholds
+        radius = min(self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.2)  # Arbitrary thresholds
         shape = self._plot_sphere(radius, color, label, center=orbit.r)
         self._data.append(shape)
 
@@ -442,6 +446,7 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
 
     def __init__(self):
         super().__init__()
+        self._frame = None
         self._layout = Layout(
             autosize=True,
             xaxis=dict(
@@ -457,9 +462,44 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
             "shapes": []
         })
 
+    def _project(self, rr):
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
+        return x, y
+
+    def set_frame(self, p_vec, q_vec, w_vec):
+        """Sets perifocal frame.
+
+        Raises
+        ------
+        ValueError
+            If the vectors are not a set of mutually orthogonal unit vectors.
+        """
+        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
+            raise ValueError("Vectors must be unit.")
+        elif not np.allclose([p_vec.dot(q_vec),
+                              q_vec.dot(w_vec),
+                              w_vec.dot(p_vec)], 0):
+            raise ValueError("Vectors must be mutually orthogonal.")
+        else:
+            self._frame = p_vec, q_vec, w_vec
+
+        if self._data:
+            self._redraw()
+
+    def _redraw(self):
+        self._data.clear()
+        self._layout["shapes"] = ()
+        self._attractor = None
+        for orbit, label, color in self._orbits:
+            self.plot(orbit=orbit, label=label, color=color)
+
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+        x_center, y_center = self._project(center[None])
+        z_center = center[2]
+        center = [x_center, y_center, z_center]
         xx, yy = _generate_circle(radius, center)
-        x_center, y_center, z_center = center
         trace = Scatter(x=xx.to(u.km).value, y=yy.to(u.km).value, mode='markers', line=dict(color=color, width=5,
                                                                                             dash='dash',), name=name)
         self._layout["shapes"] += (
@@ -482,8 +522,10 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
         return trace
 
     def _plot_trajectory(self, trajectory, label, color, dashed):
+        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
+        x, y = self._project(rr)
         trace = Scatter(
-            x=trajectory.x.to(u.km).value, y=trajectory.y.to(u.km).value,
+            x=x.to(u.km).value, y=y.to(u.km).value,
             name=label,
             line=dict(
                 color=color,
@@ -493,6 +535,11 @@ class OrbitPlotter2D(_BaseOrbitPlotter):
             mode="lines",  # Boilerplate
         )
         self._data.append(trace)
+
+    def plot(self, orbit, *, label=None, color=None):
+        if self._frame is None:
+            self.set_frame(*orbit.pqw())
+        super(OrbitPlotter2D, self).plot(orbit=orbit, label=label, color=color)
 
 
 def plot_solar_system(outer=True, epoch=None):
