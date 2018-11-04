@@ -47,10 +47,20 @@
 .. |gitter| image:: https://badges.gitter.im/poliastro/poliastro.svg
    :alt: Join the chat at https://gitter.im/poliastro/poliastro
    :target: https://gitter.im/poliastro/poliastro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+   
+.. |ocbackers| image:: https://opencollective.com/poliastro/backers/badge.svg
+    :alt: Backers on Open Collective
+    :target: #backers
+
+.. |ocsponsors| image:: https://opencollective.com/poliastro/sponsors/badge.svg
+    :alt: Sponsors on Open Collective
+    :target: #sponsors
+
+
 
 |circleci| |travisci| |appveyor| |codecov| |codeclimate|
 
-|docs| |license| |doi| |astropy| |mailing| |gitter|
+|docs| |license| |doi| |astropy| |mailing| |gitter| |ocbackers| |ocsponsors|
 
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
@@ -165,6 +175,38 @@ poliastro is a community project, hence all contributions are more than
 welcome! For more information, head to `CONTRIBUTING.rst`_.
 
 .. _`CONTRIBUTING.rst`: https://github.com/poliastro/poliastro/blob/master/CONTRIBUTING.rst
+
+Credits
++++++++
+
+Contributors
+------------
+
+This project exists thanks to all the people who contribute! 
+
+.. image:: https://opencollective.com/poliastro/contributors.svg?width=890&button=false
+
+Backers
+-------
+
+Thank you to all our backers! `Become a backer`__.
+
+.. image:: https://opencollective.com/poliastro/backers.svg?width=890
+    :target: https://opencollective.com/poliastro#backers
+
+__ Backer_
+.. _Backer: https://opencollective.com/poliastro#backer
+
+Sponsors
+--------
+
+Support us by becoming a sponsor. Your logo will show up here with a link to your website. `Become a sponsor`__.
+
+.. image:: https://opencollective.com/poliastro/sponsor/0/avatar.svg
+    :target: https://opencollective.com/poliastro/sponsor/0/website
+
+__ Sponsor_
+.. _Sponsor: https://opencollective.com/poliastro#sponsor
 
 Support
 =======
