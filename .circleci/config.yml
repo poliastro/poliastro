@@ -108,6 +108,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install .[dev] --quiet
+            pip install https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
 
       - run:
           name: build docs
