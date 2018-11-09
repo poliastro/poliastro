@@ -1,3 +1,6 @@
+.. raw:: html
+   :file: embed/molniya.html
+
 poliastro - Astrodynamics in Python
 ===================================
 
@@ -9,10 +12,6 @@ poliastro - Astrodynamics in Python
 in Astrodynamics and Orbital Mechanics, focusing on interplanetary applications.
 It provides a simple and intuitive API and handles physical quantities with
 units.
-
-View `source code`_ of poliastro!
-
-.. _`source code`: https://github.com/poliastro/poliastro
 
 Some of its awesome features are:
 
@@ -28,6 +27,23 @@ Some of its awesome features are:
 
 And more to come!
 
+.. code-block:: python
+
+    from poliastro.examples import molniya
+    from poliastro.plotting import plot
+
+    plot(molniya)
+
+.. raw:: html
+
+   <script type="application/vnd.jupyter.widget-view+json">
+   {
+       "version_major": 2,
+       "version_minor": 0,
+       "model_id": "2bcbb46c1a954ff38967102d72e06b3d"
+   }
+   </script>
+
 poliastro is developed by an open, international community. Release
 announcements and general discussion take place on our `mailing list`_
 and `chat`_.
@@ -36,15 +52,6 @@ and `chat`_.
 .. _`chat`: https://riot.im/app/#/room/#poliastro:matrix.org
 
 .. include:: form.rst
-
-.. figure:: _static/molniya.png
-   :align: right
-   :figwidth: 300
-   :alt: Molniya orbit
-
-   Plot of a `Molniya orbit`_ around the Earth
-   (\\(a = 26600\\,\\mathrm{km}, e = 0.75,
-   i = 63.4 \\mathrm{{}^{\\circ}} \\)).
 
 The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
 contributions and feedback are more than welcome. You can test poliastro in your
@@ -57,22 +64,8 @@ browser using binder, a cloud Jupyter notebook server:
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 .. _`wiki`: https://github.com/poliastro/poliastro/wiki/
 
-See `benchmarks`_ for the performance analysis of poliastro.
-
-.. _`benchmarks`: https://blog.poliastro.space/poliastro-benchmarks/
-
 poliastro works on recent versions of Python and is released under
 the MIT license, hence allowing commercial use of the library.
-
-.. code-block:: python
-
-    import matplotlib.pyplot as plt
-    plt.ion()
-
-    from poliastro.examples import molniya
-    from poliastro.plotting import plot
-    
-    plot(molniya)
 
 .. include:: success.rst
 
