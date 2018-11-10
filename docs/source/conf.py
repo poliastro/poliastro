@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx.ext.mathjax', #New module for matrix visualization
 ]
 
 # Custom configuration

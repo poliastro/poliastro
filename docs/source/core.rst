@@ -1,6 +1,11 @@
 Core API
 ========
 
+Introduction
+------------
+
+The poliastro.core includes a set of modules with several functions to compute conversions between orbital parameters.
+
 poliastro.core.angles module
 ****************************
 
@@ -46,20 +51,31 @@ poliastro.core.thrust package
 .. automodule:: poliastro.core.thrust.change_inc_ecc
    :members:
 
+
+
+Propagation Module
+------------------
 poliastro.core.propagation module
 *********************************
-
 .. automodule:: poliastro.core.propagation
    :members:
 
+
+Stumpff Module
+--------------
 poliastro.core.stumpff module
 *****************************
-
 .. automodule:: poliastro.core.stumpff
     :members:
 
-poliastro.core.util module
-**************************
 
+
+
+Util Module
+-----------
+poliastro.core.util module
+*****************************
 .. automodule:: poliastro.core.util
     :members:
+
+
