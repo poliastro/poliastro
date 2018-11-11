@@ -15,18 +15,17 @@ from ._jit import jit
 def rv_pqw(k, p, ecc, nu):
     r"""Returns r and v vectors in perifocal frame.
 
-    
     .. math::
 
         \vec{r} = \frac{h^2}{\mu}\frac{1}{1 + e\cos(\theta)}\begin{bmatrix}
-        \cos(\theta)\vec{i}\\ 
-        \sin(\theta)\vec{j}\\ 
+        \cos(\theta)\vec{i}\\
+        \sin(\theta)\vec{j}\\
         0\vec{k}
-        \end{bmatrix} \\\\\\ 
+        \end{bmatrix} \\\\\\
 
         \vec{v} = \frac{h^2}{\mu}\begin{bmatrix}
-        -\sin(\theta)\vec{i}\\ 
-        (e+\cos(\theta))\vec{j}\\ 
+        -\sin(\theta)\vec{i}\\
+        (e+\cos(\theta))\vec{j}\\
         0\vec{k}
         \end{bmatrix}
 
@@ -65,11 +64,11 @@ def rv_pqw(k, p, ecc, nu):
     >>> #Printing the results
     r = [-5312706.25105345  9201877.15251336    0] [m]
     v = [-5753.30180931 -1328.66813933  0] [m]/[s]
-    
+
     Note
     ----
 
-    These formulas can be checked at Curtis 3rd. Edition, page 110. Also the example proposed is 2.11 
+    These formulas can be checked at Curtis 3rd. Edition, page 110. Also the example proposed is 2.11
     of Curtis 3rd Edition book.
     """
     r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
@@ -180,7 +179,7 @@ def rv2coe(k, r, v, tol=1e-8):
         Velocity vector (km / s)
     tol : float, optional
         Tolerance for eccentricity and inclination checks, default to 1e-8
-    
+
     Returns
     -------
 
@@ -221,7 +220,7 @@ def rv2coe(k, r, v, tol=1e-8):
     raan: 255.27928533439618 [deg]
     argp: 20.068139973005387 [deg]
     nu: 28.445804984192094 [deg]
-    
+
 
     Note
     ----
