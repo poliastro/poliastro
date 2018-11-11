@@ -12,12 +12,6 @@ poliastro.core.angles module
 .. automodule:: poliastro.core.angles
    :members:
 
-poliastro.core.elements module
-******************************
-
-.. automodule:: poliastro.core.elements
-   :members:
-
 poliastro.core.hyper module
 ***************************
 
@@ -53,12 +47,22 @@ poliastro.core.thrust package
 
 
 
+Elements Module
+---------------
+poliastro.core.elements modules
+*******************************
+.. automodule:: poliastro.core.elements
+   :members:
+
+
+
 Propagation Module
 ------------------
 poliastro.core.propagation module
 *********************************
 .. automodule:: poliastro.core.propagation
    :members:
+
 
 
 Stumpff Module
