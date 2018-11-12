@@ -18,15 +18,15 @@ def rv_pqw(k, p, ecc, nu):
     .. math::
 
         \vec{r} = \frac{h^2}{\mu}\frac{1}{1 + e\cos(\theta)}\begin{bmatrix}
-        \cos(\theta)\vec{i}\\
-        \sin(\theta)\vec{j}\\
-        0\vec{k}
+        \cos(\theta)\\
+        \sin(\theta)\\
+        0
         \end{bmatrix} \\\\\\
 
         \vec{v} = \frac{h^2}{\mu}\begin{bmatrix}
-        -\sin(\theta)\vec{i}\\
-        (e+\cos(\theta))\vec{j}\\
-        0\vec{k}
+        -\sin(\theta)\\
+        e+\cos(\theta)\\
+        0
         \end{bmatrix}
 
     Parameters
