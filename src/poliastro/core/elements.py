@@ -210,7 +210,7 @@ def rv2coe(k, r, v, tol=1e-8):
     >>> print("inc:", np.rad2deg(inc), "[deg]")
     >>> print("raan:", np.rad2deg(raan), "[deg]")
     >>> print("argp:", np.rad2deg(argp), "[deg]")
-    >>> print("nu:", np.rad2deg(nu), "[deg]")    
+    >>> print("nu:", np.rad2deg(nu), "[deg]")
     >>> # Printing the results
     p: 8530474.36396927 [m]
     ecc: 0.1712111819541691
