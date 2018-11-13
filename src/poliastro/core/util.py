@@ -113,7 +113,8 @@ def norm(vec):
 
     Examples
     --------
-    >>> from poliastro.core.util import norm>>> from astropy import units as u
+    >>> from poliastro.core.util import norm
+    >>> from astropy import units as u
     >>> vec = [1, 1, 1] * u.m
     >>> norm(vec)
     1.7320508075688772

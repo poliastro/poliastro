@@ -200,24 +200,25 @@ def rv2coe(k, r, v, tol=1e-8):
     --------
     >>> from poliastro.core.elements import rv2coe
     >>> from poliastro.constants import GM_earth
+    >>> from astropy import units as u
     >>> import numpy as np
-    >>> k = GM_earth #Earth gravitational parameter
-    >>> r = np.array([-6045e3, -3490e3, 2500e3]) #Values in [m]
-    >>> v = np.array([-3.457e3, 6.618e3, 2.533e3]) #Values in [m/s]
+    >>> k = GM_earth.to(u.km**3 / u.s**2) #Earth gravitational parameter
+    >>> r = [-6045, -3490, 2500] * u.km
+    >>> v = [-3.457, 6.618, 2.533] * u.km / u.s
     >>> p, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
-    >>> print("p:", p, "[m]")
+    >>> print("p:", p, "[km]")
+    p: 8530.47436396927 [km]
     >>> print("ecc:", ecc)
+    ecc: 0.17121118195416898
     >>> print("inc:", np.rad2deg(inc), "[deg]")
-    >>> print("raan:", np.rad2deg(raan), "[deg]")
-    >>> print("argp:", np.rad2deg(argp), "[deg]")
-    >>> print("nu:", np.rad2deg(nu), "[deg]")
-    >>> # Printing the results
-    p: 8530474.36396927 [m]
-    ecc: 0.1712111819541691
     inc: 153.2492285182475 [deg]
+    >>> print("raan:", np.rad2deg(raan), "[deg]")
     raan: 255.27928533439618 [deg]
-    argp: 20.068139973005387 [deg]
-    nu: 28.445804984192094 [deg]
+    >>> print("argp:", np.rad2deg(argp), "[deg]")
+    argp: 20.068139973005362 [deg]
+    >>> print("nu:", np.rad2deg(nu), "[deg]")
+    nu: 28.445804984192108 [deg]
+
 
     Note
     ----
