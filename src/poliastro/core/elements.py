@@ -205,14 +205,12 @@ def rv2coe(k, r, v, tol=1e-8):
     >>> r = np.array([-6045e3, -3490e3, 2500e3]) #Values in [m]
     >>> v = np.array([-3.457e3, 6.618e3, 2.533e3]) #Values in [m/s]
     >>> p, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
-
     >>> print("p:", p, "[m]")
     >>> print("ecc:", ecc)
     >>> print("inc:", np.rad2deg(inc), "[deg]")
     >>> print("raan:", np.rad2deg(raan), "[deg]")
     >>> print("argp:", np.rad2deg(argp), "[deg]")
-    >>> print("nu:", np.rad2deg(nu), "[deg]")
-
+    >>> print("nu:", np.rad2deg(nu), "[deg]")    
     >>> # Printing the results
     p: 8530474.36396927 [m]
     ecc: 0.1712111819541691
@@ -220,7 +218,6 @@ def rv2coe(k, r, v, tol=1e-8):
     raan: 255.27928533439618 [deg]
     argp: 20.068139973005387 [deg]
     nu: 28.445804984192094 [deg]
-
 
     Note
     ----
