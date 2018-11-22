@@ -32,23 +32,23 @@ BODY_COLORS = {
 }
 
 
-def plot(state, label=None, color=None):
+def plot(state, label=None, color=None, dark=False):
     """Plots an :py:class:`~poliastro.twobody.orbit.Orbit` in 2D.
 
     For more advanced tuning, use the :py:class:`OrbitPlotter` class.
 
     """
-    op = OrbitPlotter()
+    op = OrbitPlotter(dark=dark)
     return op.plot(state, label=label, color=color)
 
 
-def plot3d(orbit, *, label=None, color=None):
+def plot3d(orbit, *, label=None, color=None, dark=False):
     """Plots an :py:class:`~poliastro.twobody.orbit.Orbit` in 3D.
 
     For more advanced tuning, use the :py:class:`OrbitPlotter3D` class.
 
     """
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter3D(dark=dark)
     frame.plot(orbit, label=label, color=color)
     frame.show()
 
@@ -366,7 +366,7 @@ class OrbitPlotter3D(_BaseOrbitPlotter):
     """OrbitPlotter3D class.
     """
 
-    def __init__(self):
+    def __init__(self, dark=False):
         super().__init__()
         self._layout = Layout(
             autosize=True,
@@ -383,6 +383,8 @@ class OrbitPlotter3D(_BaseOrbitPlotter):
                 aspectmode="data",  # Important!
             ),
         )
+        if dark:
+            self._layout.template = 'plotly_dark'
 
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         xx, yy, zz = _generate_sphere(radius, center)
