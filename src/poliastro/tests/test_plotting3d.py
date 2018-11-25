@@ -88,6 +88,12 @@ def test_plot_trajectory_plots_a_trajectory():
     assert frame._attractor == Sun
 
 
+def test_dark_theme():
+    frame = OrbitPlotter3D(dark=True)
+    print(frame._layout.template.layout)
+    assert frame._layout.template.layout.plot_bgcolor == 'rgb(17,17,17)'
+
+
 @mock.patch("poliastro.plotting.iplot")
 @mock.patch.object(OrbitPlotter3D, '_prepare_plot')
 def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
@@ -111,3 +117,4 @@ def test_savefig_calls_prepare_plot(mock_prepare_plot, mock_export):
 
     assert mock_export.call_count == 1
     mock_prepare_plot.assert_called_once_with()
+
