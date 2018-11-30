@@ -1,0 +1,39 @@
+# AppVeyor.com is a Continuous Integration service to build and run tests under
+# Windows
+# File shamelessly inspired by Astropy
+
+version: 0.12.dev0-{build}
+
+branches:
+  only:
+    - master
+    - 0.3.x
+    - 0.4.x
+    - 0.5.x
+    - 0.6.x
+    - 0.7.x
+    - 0.8.x
+    - 0.9.x
+    - 0.10.x
+    - 0.11.x
+
+matrix:
+  fast_finish: true
+
+install:
+  - "set PYTHON_BIN=C:\\Python36-x64\\python.exe"
+  - "set PIP_BIN=C:\\Python36-x64\\Scripts\\pip.exe"
+
+  # Check that we have the expected version of Python
+  - "%PYTHON_BIN% --version"
+
+  # Install dependencies
+  - "choco install pandoc"
+
+  - "%PIP_BIN% install numpy"
+  - "%PIP_BIN% install .[dev]"  # Test installation correctness
+
+build: off
+
+test_script:
+  - "%PYTHON_BIN% -m pytest -vv"  # Test against installed code

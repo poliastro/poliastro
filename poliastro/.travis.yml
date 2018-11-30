@@ -1,0 +1,39 @@
+# The only current way of using OS X virtual machines in Travis CI
+# is setting up a generic environment
+# This is not a problem because Python will be installed through conda
+
+language: generic
+os: osx
+
+branches:
+  only:
+    - master
+    - 0.3.x
+    - 0.4.x
+    - 0.5.x
+    - 0.6.x
+    - 0.7.x
+    - 0.8.x
+    - 0.9.x
+    - 0.10.x
+    - 0.11.x
+
+env:
+  global:
+    - MPLBACKEND="Agg"
+
+before_install:
+  - HOMEBREW_NO_AUTO_UPDATE=1 brew install python3
+  - python3 -m venv venv
+  - source venv/bin/activate
+  - python3 -m pip install --upgrade pip
+
+install:
+  - pip install numpy  # Required
+  - pip install .  # Test installation correctness
+  - pip install .[dev]  # Test development dependencies
+
+script:
+  - pytest -vv  # Test against installed code
+
+sudo: false

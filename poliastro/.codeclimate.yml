@@ -1,0 +1,14 @@
+version: "2"
+plugins:
+  duplication:
+    enabled: false
+  fixme:
+    enabled: true
+  radon:
+    enabled: true
+checks:
+  argument-count:
+    config:
+      threshold: 9
+exclude_patterns:
+  - "docs/source"

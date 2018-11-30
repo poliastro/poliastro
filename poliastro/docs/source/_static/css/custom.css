@@ -1,0 +1,17 @@
+@import url("theme.css");
+
+.rst-content .figure .caption {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9em;
+    padding: 0 10px 5px;
+}
+
+.rst-content .align-center {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.rst-content .rubric {
+    font-weight: bold;
+}
