@@ -9,9 +9,11 @@ from poliastro.plotting import OrbitPlotter2D
 from poliastro.bodies import Earth, Mars, Sun
 from poliastro.twobody.orbit import Orbit
 
+
 @pytest.fixture(scope="module")
 def op():
     return OrbitPlotter2D()
+
 
 def test_get_figure_has_expected_properties(op):
     figure = op.figure
@@ -85,7 +87,7 @@ def test_savefig_calls_prepare_plot(op, mock_prepare_plot, mock_export):
     earth = Orbit.from_body_ephem(Earth)
     op.plot(orbit=earth, label="Obj")
     with tempfile.NamedTemporaryFile() as fp:
-        m.savefig(filename=fp.name + ".jpeg")
+        op.savefig(filename=fp.name + ".jpeg")
 
     assert mock_export.call_count == 1
     mock_prepare_plot.assert_called_once_with()
