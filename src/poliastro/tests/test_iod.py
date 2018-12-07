@@ -99,3 +99,16 @@ def test_raises_exception_for_non_feasible_solution(lambert):
         next(lambert(k, r0, r, tof, M=1))
     assert ("ValueError: No feasible solution, try lower M"
             in excinfo.exconly())
+
+
+@pytest.mark.parametrize("lambert", [izzo.lambert])
+def test_collinear_vectors_input(lambert):
+    k = Earth.k
+    r0 = [22592.145603, -1599.915239, -19783.950506] * u.km
+    r = [22592.145603, -1599.915239, -19783.950506] * u.km
+    tof = 5 * u.h
+
+    with pytest.raises(ValueError) as excinfo:
+        next(lambert(k, r0, r, tof, M=0))
+    assert ("ValueError: Lambert solution cannot be computed for collinear vectors"
+            in excinfo.exconly())
