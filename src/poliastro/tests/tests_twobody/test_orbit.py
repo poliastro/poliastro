@@ -12,7 +12,7 @@ from astropy.time import Time
 
 from poliastro.bodies import (
     Body,
-    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto,
+    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Moon,
 )
 from poliastro.frames import (
     Planes,
@@ -163,6 +163,16 @@ def test_pqw_for_circular_equatorial_orbit():
 def test_orbit_representation():
     ss = Orbit.circular(Earth, 600 * u.km, 20 * u.deg, epoch=Time("2018-09-08 09:04:00", scale="tdb"))
     expected_str = "6978 x 6978 km x 20.0 deg (GCRS) orbit around Earth (\u2641) at epoch 2018-09-08 09:04:00.000 (TDB)"
+
+    assert str(ss) == repr(ss) == expected_str
+
+
+def test_orbit_no_frame_representation():
+    date_launch = Time('2011-11-26 15:02', scale='utc')
+    r = [61445.76498656, 24827.93010168, 0.] * u.km
+    v = [-0.42581645, -0.18867869, 0.] * u.km / u.s
+    ss = Orbit.from_vectors(Moon, r, v, date_launch)
+    expected_str = "106 x -142299 km x 180.0 deg orbit around Moon (\u263E) at epoch 2011-11-26 15:02:00.000 (UTC)"
 
     assert str(ss) == repr(ss) == expected_str
 
