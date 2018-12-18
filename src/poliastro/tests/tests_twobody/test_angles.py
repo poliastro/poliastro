@@ -6,23 +6,19 @@ from astropy.tests.helper import assert_quantity_allclose
 import pytest
 from poliastro.twobody import angles
 
-
-@pytest.fixture(scope="module")
-def data():
-    # Data from Schlesinger & Udick, 1912
-    data = [
-        # ecc, M (deg), nu (deg)
-        (0.0, 0.0, 0.0),
-        (0.05, 10.0, 11.06),
-        (0.06, 30.0, 33.67),
-        (0.04, 120.0, 123.87),
-        (0.14, 65.0, 80.50),
-        (0.19, 21.0, 30.94),
-        (0.35, 65.0, 105.71),
-        (0.48, 180.0, 180.0),
-        (0.75, 125.0, 167.57)
-    ]
-    return data
+# Data from Schlesinger & Udick, 1912
+ANGLES_DATA = [
+    # ecc, M (deg), nu (deg)
+    (0.0, 0.0, 0.0),
+    (0.05, 10.0, 11.06),
+    (0.06, 30.0, 33.67),
+    (0.04, 120.0, 123.87),
+    (0.14, 65.0, 80.50),
+    (0.19, 21.0, 30.94),
+    (0.35, 65.0, 105.71),
+    (0.48, 180.0, 180.0),
+    (0.75, 125.0, 167.57)
+]
 
 
 def test_true_to_eccentric():
@@ -58,8 +54,8 @@ def test_true_to_eccentric_hyperbolic():
     assert_quantity_allclose(F, expected_F, rtol=1e-4)
 
 
-def test_mean_to_true(data):
-    for row in data:
+def test_mean_to_true():
+    for row in ANGLES_DATA:
         ecc, M, expected_nu = row
         ecc = ecc * u.one
         M = M * u.deg
@@ -70,8 +66,8 @@ def test_mean_to_true(data):
         assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
 
 
-def test_true_to_mean(data):
-    for row in data:
+def test_true_to_mean():
+    for row in ANGLES_DATA:
         ecc, expected_M, nu = row
         ecc = ecc * u.one
         expected_M = expected_M * u.deg

@@ -9,7 +9,7 @@ from poliastro.core.elements import coe2rv, coe2mee, rv2coe
 from poliastro.twobody.equinoctial import mee2coe
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def expected_res():
     p = 11067.790  # u.km
     ecc = 0.83285  # u.one
