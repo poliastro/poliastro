@@ -1,4 +1,4 @@
-""" This module contains a set of functions that can be used
+"""This module contains a set of functions that can be used
     to convert between different elements that define the orbit
     of a body.
     """
@@ -17,6 +17,7 @@ def rv_pqw(k, p, ecc, nu):
 
     .. math::
 
+        
         \vec{r} = \frac{h^2}{\mu}\frac{1}{1 + e\cos(\theta)}\begin{bmatrix}
         \cos(\theta)\\
         \sin(\theta)\\
@@ -125,14 +126,15 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     components are singular for an orbital inclination of 180 degrees.
 
     .. math::
-
-        p = a(1-e^2) \\
-        f = e\cos(\omega + \Omega) \\
-        g = e\sin(\omega + \Omega) \\
-        h = \tan(\frac{i}{2})\cos(\Omega) \\
-        k = \tan(\frac{i}{2})\sin(\Omega) \\
-        L = \Omega + \omega + \theta \\
-
+        \begin{align}
+        p &= a(1-e^2) \\
+        f &= e\cos(\omega + \Omega) \\
+        g &= e\sin(\omega + \Omega) \\
+        h &= \tan(\frac{i}{2})\cos(\Omega) \\
+        k &= \tan(\frac{i}{2})\sin(\Omega) \\
+        L &= \Omega + \omega + \theta \\
+        \end{align}
+    
     Parameters
     ----------
     k : float
@@ -167,7 +169,49 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
 
 @jit
 def rv2coe(k, r, v, tol=1e-8):
-    """Converts from vectors to classical orbital elements.
+    r"""Converts from vectors to classical orbital elements.
+
+    1. First the angular momentum is computed:
+        .. math::
+            \vec{h} = \vec{r} \times \vec{v}
+
+    2. With it the eccentricity can be solved:
+        .. math::
+            \begin{align} 
+            \vec{e} &= \frac{1}{\mu}\left [ \left ( v^{2} - \frac{\mu}{r}\right ) \vec{r}  - (\vec{r} \cdot \vec{v})\vec{v} \right ] \\
+            e &= \sqrt{\vec{e}\cdot\vec{e}} \\
+            \end{align}
+    
+    3. The node vector line is solved:
+        .. math::
+            \begin{align}
+            \vec{N} &= \vec{k} \times \vec{h} \\
+            N &= \sqrt{\vec{N}\cdot\vec{N}}
+            \end{align}
+
+    4. The rigth ascension node is computed:
+        .. math::
+            \Omega = \left\{ \begin{array}{lcc}
+             cos^{-1}{\left ( \frac{N_{x}}{N} \right )} &   if  & N_{y} \geq  0 \\
+             \\ 360^{o} -cos^{-1}{\left ( \frac{N_{x}}{N} \right )} &  if & N_{y} < 0 \\
+             \end{array}
+            \right.
+
+    5. The argument of perigee:
+        .. math::
+            \omega  = \left\{ \begin{array}{lcc}
+             cos^{-1}{\left ( \frac{\vec{N}\vec{e}}{Ne} \right )} &   if  & e_{z} \geq  0 \\
+             \\ 360^{o} -cos^{-1}{\left ( \frac{\vec{N}\vec{e}}{Ne} \right )} &  if & e_{z} < 0 \\
+             \end{array}
+            \right.
+
+    6. And finally the true anomaly:
+        .. math::
+            \nu  = \left\{ \begin{array}{lcc}
+             cos^{-1}{\left ( \frac{\vec{e}\vec{r}}{er} \right )} &   if  & v_{r} \geq  0 \\
+             \\ 360^{o} -cos^{-1}{\left ( \frac{\vec{e}\vec{r}}{er} \right )} &  if & v_{r} < 0 \\
+             \end{array}
+            \right.
 
     Parameters
     ----------

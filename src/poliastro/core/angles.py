@@ -90,22 +90,112 @@ def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
 
 @jit
 def D_to_nu(D):
+    r"""True anomaly from parabolic eccentric anomaly.
+
+    .. math::
+
+        \nu = 2 \cdot \arctan{(D)}
+
+    Parameters
+    ----------
+    D : ~astropy.units.Quantity
+        Eccentric anomaly.
+
+    Returns
+    -------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+
+    Note
+    ----
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celes
+    """
+
     return 2.0 * np.arctan(D)
 
 
 @jit
 def nu_to_D(nu):
+    r"""Parabolic eccentric anomaly from true anomaly.
+
+    .. math::
+        D = \tan{\frac{\nu}{2}}
+
+    Parameters
+    ----------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+
+    Returns
+    -------
+    D : ~astropy.units.Quantity
+        Hyperbolic eccentric anomaly.
+
+    Note
+    ----
+    Taken from Farnocchia, Davide, Davide Bracali Cioci, and Andrea Milani.
+    "Robust resolution of Kepler’s equation in all eccentricity regimes."
+    Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
+    """
     return np.tan(nu / 2.0)
 
 
 @jit
 def nu_to_E(nu, ecc):
+    r"""Eccentric anomaly from true anomaly.
+
+    .. versionadded:: 0.4.0
+
+    .. math::
+        E = 2\arctan{\sqrt{\frac{1-e}{1+e}}\tan{\frac{\nu}{2}}}
+
+    Parameters
+    ----------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+
+    Returns
+    -------
+    E : ~astropy.units.Quantity
+        Eccentric anomaly.
+
+    Note
+    ----
+    This is equation 3.13b in Curtis, page 151.
+    """
+
     E = 2 * np.arctan(np.sqrt((1 - ecc) / (1 + ecc)) * np.tan(nu / 2))
     return E
 
 
 @jit
 def nu_to_F(nu, ecc):
+    r"""Hyperbolic eccentric anomaly from true anomaly.
+
+    .. math::
+        F = ln{\left ( \frac{\sin{(\nu)}\sqrt{e^{2}-1} + \cos{\nu} + e}{1+e\cos{(\nu)}} \right )}
+
+    Parameters
+    ----------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity (>1).
+
+    Returns
+    -------
+    F : ~astropy.units.Quantity
+        Hyperbolic eccentric anomaly.
+
+    Note
+    -----
+    Taken from Curtis, H. (2013). *Orbital mechanics for engineering students*. 167
+
+    """
     F = np.log(
         (np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2))
         / (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2))
@@ -115,12 +205,52 @@ def nu_to_F(nu, ecc):
 
 @jit
 def E_to_nu(E, ecc):
+    r"""True anomaly from eccentric anomaly.
+
+    .. versionadded:: 0.4.0
+
+    .. math::
+        \nu = 2\arctan{\left ( \sqrt{\frac{1+e}{1-e}}\tan{\frac{E}{2}} \right )}
+
+    Parameters
+    ----------
+    E : ~astropy.units.Quantity
+        Eccentric anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+
+    Returns
+    -------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+
+    Note
+    ----
+    This expression is solved from equation 3.13a of Curtis by
+    simply solving for true anomaly.
+
+    """
     nu = 2 * np.arctan(np.sqrt((1 + ecc) / (1 - ecc)) * np.tan(E / 2))
     return nu
 
 
 @jit
 def F_to_nu(F, ecc):
+    """True anomaly from hyperbolic eccentric anomaly.
+
+    Parameters
+    ----------
+    F : ~astropy.units.Quantity
+        Hyperbolic eccentric anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity (>1).
+
+    Returns
+    -------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+
+    """
     nu = 2 * np.arctan(
         (np.exp(F) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1))
         / (np.exp(F) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1))
@@ -130,18 +260,65 @@ def F_to_nu(F, ecc):
 
 @jit
 def M_to_E(M, ecc):
+    """Eccentric anomaly from mean anomaly.
+
+    .. versionadded:: 0.4.0
+
+    Parameters
+    ----------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+
+    Returns
+    -------
+    E : ~astropy.units.Quantity
+        Eccentric anomaly.
+
+    """
     E = newton("elliptic", M, args=(M, ecc))
     return E
 
 
 @jit
 def M_to_F(M, ecc):
+    """Hyperbolic eccentric anomaly from mean anomaly.
+
+    Parameters
+    ----------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity (>1).
+
+    Returns
+    -------
+    F : ~astropy.units.Quantity
+        Hyperbolic eccentric anomaly.
+
+    """
     F = newton("hyperbolic", np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
     return F
 
 
 @jit
 def M_to_D(M, ecc):
+    """Parabolic eccentric anomaly from mean anomaly.
+
+    Parameters
+    ----------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity (>1).
+
+    Returns
+    -------
+    D : ~astropy.units.Quantity
+        Parabolic eccentric anomaly.
+
+    """
     B = 3.0 * M / 2.0
     A = (B + (1.0 + B ** 2) ** 0.5) ** (2.0 / 3.0)
     guess = 2 * A * B / (1 + A + A ** 2)
@@ -151,24 +328,94 @@ def M_to_D(M, ecc):
 
 @jit
 def E_to_M(E, ecc):
+    """Mean anomaly from eccentric anomaly.
+
+    .. versionadded:: 0.4.0
+
+    Parameters
+    ----------
+    E : ~astropy.units.Quantity
+        Eccentric anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+
+    Returns
+    -------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+
+    """
     M = _kepler_equation(E, 0.0, ecc)
     return M
 
 
 @jit
 def F_to_M(F, ecc):
+    """Mean anomaly from eccentric anomaly.
+
+    Parameters
+    ----------
+    F : ~astropy.units.Quantity
+        Hyperbolic eccentric anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity (>1).
+
+    Returns
+    -------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+
+    """
     M = _kepler_equation_hyper(F, 0.0, ecc)
     return M
 
 
 @jit
 def D_to_M(D, ecc):
+    """Mean anomaly from eccentric anomaly.
+
+    Parameters
+    ----------
+    D : ~astropy.units.Quantity
+        Parabolic eccentric anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+
+    Returns
+    -------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+
+    """
     M = _kepler_equation_parabolic(D, 0.0, ecc)
     return M
 
 
 @jit
 def M_to_nu(M, ecc, delta=1e-2):
+    """True anomaly from mean anomaly.
+
+    .. versionadded:: 0.4.0
+
+    Parameters
+    ----------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+    delta : float (optional)
+        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
+    Returns
+    -------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+
+    Examples
+    --------
+    >>> M_to_nu(30.0 * u.deg, 0.06 * u.one)
+    <Quantity 33.67328493 deg>
+
+    """
     if ecc > 1 + delta:
         F = M_to_F(M, ecc)
         nu = F_to_nu(F, ecc)
@@ -183,6 +430,25 @@ def M_to_nu(M, ecc, delta=1e-2):
 
 @jit
 def nu_to_M(nu, ecc, delta=1e-2):
+    """Mean anomaly from true anomaly.
+
+    .. versionadded:: 0.4.0
+
+    Parameters
+    ----------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+    delta : float (optional)
+        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
+
+    Returns
+    -------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+
+    """
     if ecc > 1 + delta:
         F = nu_to_F(nu, ecc)
         M = F_to_M(F, ecc)
@@ -197,4 +463,25 @@ def nu_to_M(nu, ecc, delta=1e-2):
 
 @jit
 def fp_angle(nu, ecc):
+    r"""Returns the flight path angle.
+
+    .. math::
+        \gamma = \arctan{\frac{e\sin{\theta}}{1 + e\cos{\theta}}}
+
+    Parameters
+    ----------
+    nu: ~astropy.units.Quantity
+        True anomaly
+    ecc: ~astropy.units.Quantity
+        Eccentricity
+
+    Returns
+    fp_angle: ~astropy.units.Quantity
+        Flight path angle
+
+    Note
+    -----
+    Algorithm taken from Vallado 2007, pp. 113.
+
+    """
     return np.arctan2(ecc * np.sin(nu), 1 + ecc * np.cos(nu))

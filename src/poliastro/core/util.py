@@ -1,8 +1,3 @@
-"""The util module contains a set of interesting functions,
-   most of them related to vector computations such us change
-   of basis, computing the norm and others.
-
-"""
 import numpy as np
 from numpy import cos, sin
 
@@ -36,8 +31,8 @@ def rotate(vec, angle, axis):
     .. math::
 
         R(\theta) = \begin{bmatrix}
-            cos(\theta) & -sin(\theta) \\
-            sin(\theta) & cos(\theta)
+            \cos(\theta) & -\sin(\theta) \\
+            \sin(\theta) & \cos(\theta)
             \end{bmatrix}
 
     Parameters
