@@ -40,21 +40,33 @@ from poliastro.frames import (
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
 
+RV_DUMMY = [
+    [1E+09, -4E+09, -1E+09] * u.km,
+    [5E+00, -1E+01, -4E+00] * u.km / u.s
+]
 
-def test_default_time_for_new_state():
+HYPERBOLIC_DUMMY_RV = [
+    [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km,
+    [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
+]
+
+@pytest.fixture()
+def orb_para():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
+    return [_d,_,_a,_body]
+
+def test_default_time_for_new_state(orb_para):
+    [_d,_,_a,_body] = orb_para
     expected_epoch = J2000
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     assert ss.epoch == expected_epoch
 
 
-def test_state_raises_unitserror_if_elements_units_are_wrong():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
+def test_state_raises_unitserror_if_elements_units_are_wrong(orb_para):
+    [_d, _, _a, _body] = orb_para
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         Orbit.from_classical(Sun, _d, _, _a, _a, _a, wrong_angle)
@@ -75,11 +87,10 @@ def test_state_raises_unitserror_if_rv_units_are_wrong():
     )
 
 
-def test_parabolic_elements_fail_early():
+def test_parabolic_elements_fail_early(orb_para):
     attractor = Earth
     ecc = 1.0 * u.one
-    _d = 1.0 * u.AU  # Unused distance
-    _a = 1.0 * u.deg  # Unused angle
+    [_d, _, _a, _body] = orb_para
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
     assert (
@@ -88,12 +99,9 @@ def test_parabolic_elements_fail_early():
     )
 
 
-def test_bad_inclination_raises_exception():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
+def test_bad_inclination_raises_exception(orb_para):
+    [_d, _, _a, _body] = orb_para
     bad_inc = 200 * u.deg
-    _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, _d, _, bad_inc, _a, _a, _a)
     assert (
@@ -101,21 +109,16 @@ def test_bad_inclination_raises_exception():
     )
 
 
-def test_bad_hyperbolic_raises_exception():
-    bad_a = 1.0 * u.AU
-    ecc = 1.5 * u.one
-    _a = 1.0 * u.deg  # Unused angle
+def test_bad_hyperbolic_raises_exception(orb_para):
+    [_d, _, _a, _body] = orb_para
     _inc = 100 * u.deg  # Unused inclination
-    _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
     assert "Hyperbolic orbits have negative semimajor axis" in excinfo.exconly()
 
 
-def test_apply_maneuver_changes_epoch():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
+def test_apply_maneuver_changes_epoch(orb_para):
+    [_d, _, _a, _body] = orb_para
     ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
     dt = 1 * u.h
     dv = [0, 0, 0] * u.km / u.s
