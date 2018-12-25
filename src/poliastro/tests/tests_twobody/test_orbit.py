@@ -40,15 +40,13 @@ from poliastro.frames import (
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
 
-RV_DUMMY = [
-    [1E+09, -4E+09, -1E+09] * u.km,
-    [5E+00, -1E+01, -4E+00] * u.km / u.s
-]
 
-HYPERBOLIC_DUMMY_RV = [
-    [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km,
-    [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
-]
+@pytest.fixture()
+def hyperbolic_orbit():
+    r = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km,
+    v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
+    return r, v
+
 
 @pytest.fixture()
 def orb_para():
@@ -56,10 +54,11 @@ def orb_para():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
-    return [_d,_,_a,_body]
+    return [_d, _, _a, _body]
+
 
 def test_default_time_for_new_state(orb_para):
-    [_d,_,_a,_body] = orb_para
+    [_d, _, _a, _body] = orb_para
     expected_epoch = J2000
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     assert ss.epoch == expected_epoch
@@ -110,8 +109,10 @@ def test_bad_inclination_raises_exception(orb_para):
 
 
 def test_bad_hyperbolic_raises_exception(orb_para):
-    [_d, _, _a, _body] = orb_para
+    bad_a = 1.0 * u.AU
+    ecc = 1.5 * u.one
     _inc = 100 * u.deg  # Unused inclination
+    [_d, _, _a, _body] = orb_para
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
     assert "Hyperbolic orbits have negative semimajor axis" in excinfo.exconly()
@@ -160,19 +161,17 @@ def test_geosync_has_proper_period():
     assert_quantity_allclose(ss.period, expected_period, rtol=1e-4)
 
 
-def test_parabolic_has_proper_eccentricity():
+def test_parabolic_has_proper_eccentricity(orb_para):
     attractor = Earth
-    _d = 1.0 * u.AU  # Unused distance
-    _a = 1.0 * u.deg  # Unused angle
+    [_d, _, _a, _body] = orb_para
     expected_ecc = 1.0 * u.one
     ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
     assert_allclose(ss.ecc, expected_ecc)
 
 
-def test_parabolic_has_zero_energy():
+def test_parabolic_has_zero_energy(orb_para):
     attractor = Earth
-    _d = 1.0 * u.AU  # Unused distance
-    _a = 1.0 * u.deg  # Unused angle
+    [_d, _, _a, _body] = orb_para
     ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
     assert_allclose(ss.energy.value, 0.0, atol=1e-16)
 
@@ -212,16 +211,14 @@ def test_sample_numpoints():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
+
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     positions = ss.sample(values=50)
     assert len(positions) == 50
 
 
-def test_sample_with_time_value():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
+def test_sample_with_time_value(orb_para):
+    [_d, _, _a, _body] = orb_para
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
@@ -231,11 +228,8 @@ def test_sample_with_time_value():
     assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
 
 
-def test_sample_with_nu_value():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
+def test_sample_with_nu_value(orb_para):
+    [_d, _, _a, _body] = orb_para
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
 
     expected_r = [ss.r]
@@ -350,8 +344,8 @@ def test_orbit_from_ephem_is_in_icrs_frame(body):
 
 
 def test_orbit_accepts_ecliptic_plane():
-    r = [1e09, -4e09, -1e09] * u.km
-    v = [5e00, -1e01, -4e00] * u.km / u.s
+    r = [1e+09, -4e+09, -1e+09] * u.km
+    v = [5e+00, -1e+01, -4e+00] * u.km / u.s
 
     ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
 
