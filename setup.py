@@ -44,7 +44,7 @@ setup(
             "pytest-cov<2.6.0",
             "pycodestyle",
             "sphinx",
-            # "sphinx_rtd_theme",  # Use https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
+            # "sphinx_rtd_theme",  # Use https://github.com/rtfd/sphinx_rtd_theme/archive/a42c4d74fec660835393a4c9b1e7cb9e654ccc90.zip
             "nbconvert<5.4",
             "nbsphinx",
             "ipython>=5.0",
