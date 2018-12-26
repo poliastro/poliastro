@@ -44,7 +44,7 @@ setup(
     extras_require={
         ':implementation_name=="cpython"': "numba>=0.39",
         "dev": [
-            "black",
+            "black ; python_version>='3.6'",
             "coverage",
             "isort",
             "pytest",
