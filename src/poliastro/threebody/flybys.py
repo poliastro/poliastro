@@ -1,12 +1,12 @@
 import numpy as np
-
 from astropy import units as u
 
 from poliastro.util import norm
 
 
 @u.quantity_input(
-    v_spacecraft=u.km / u.s, v_body=u.km / u.s,
+    v_spacecraft=u.km / u.s,
+    v_body=u.km / u.s,
     k=u.km ** 3 / u.s ** 2,
     r_p=u.km,
     theta=u.deg,

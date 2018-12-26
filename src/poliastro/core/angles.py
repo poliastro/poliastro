@@ -44,7 +44,9 @@ def M_parabolic(ecc, D, tolerance=1e-16):
         small_term = np.abs(term) < tolerance
         S += term
         k += 1
-    return np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
+    return (
+        np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
+    )
 
 
 @jit
@@ -58,17 +60,20 @@ def M_parabolic_prime(ecc, D, tolerance=1e-16):
         small_term = np.abs(term) < tolerance
         S_prime += term
         k += 1
-    return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S_prime
+    return (
+        np.sqrt(2.0 / (1.0 + ecc))
+        + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S_prime
+    )
 
 
 @jit
 def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
     p0 = 1.0 * x0
     for iter in range(maxiter):
-        if regime == 'parabolic':
+        if regime == "parabolic":
             fval = _kepler_equation_parabolic(p0, *args)
             fder = _kepler_equation_prime_parabolic(p0, *args)
-        elif regime == 'hyperbolic':
+        elif regime == "hyperbolic":
             fval = _kepler_equation_hyper(p0, *args)
             fder = _kepler_equation_prime_hyper(p0, *args)
         else:
@@ -101,8 +106,10 @@ def nu_to_E(nu, ecc):
 
 @jit
 def nu_to_F(nu, ecc):
-    F = np.log((np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2)) /
-               (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2)))
+    F = np.log(
+        (np.sqrt(ecc + 1) + np.sqrt(ecc - 1) * np.tan(nu / 2))
+        / (np.sqrt(ecc + 1) - np.sqrt(ecc - 1) * np.tan(nu / 2))
+    )
     return F
 
 
@@ -114,20 +121,22 @@ def E_to_nu(E, ecc):
 
 @jit
 def F_to_nu(F, ecc):
-    nu = 2 * np.arctan((np.exp(F) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1)) /
-                       (np.exp(F) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1)))
+    nu = 2 * np.arctan(
+        (np.exp(F) * np.sqrt(ecc + 1) - np.sqrt(ecc + 1))
+        / (np.exp(F) * np.sqrt(ecc - 1) + np.sqrt(ecc - 1))
+    )
     return nu
 
 
 @jit
 def M_to_E(M, ecc):
-    E = newton('elliptic', M, args=(M, ecc))
+    E = newton("elliptic", M, args=(M, ecc))
     return E
 
 
 @jit
 def M_to_F(M, ecc):
-    F = newton('hyperbolic', np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
+    F = newton("hyperbolic", np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
     return F
 
 
@@ -136,7 +145,7 @@ def M_to_D(M, ecc):
     B = 3.0 * M / 2.0
     A = (B + (1.0 + B ** 2) ** 0.5) ** (2.0 / 3.0)
     guess = 2 * A * B / (1 + A + A ** 2)
-    D = newton('parabolic', guess, args=(M, ecc), maxiter=100)
+    D = newton("parabolic", guess, args=(M, ecc), maxiter=100)
     return D
 
 

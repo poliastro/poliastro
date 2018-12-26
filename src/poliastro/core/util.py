@@ -2,7 +2,7 @@
 
 """
 import numpy as np
-from numpy import sin, cos
+from numpy import cos, sin
 
 from ._jit import jit
 
@@ -53,10 +53,7 @@ def rotate(vec, angle, axis):
     else:
         raise ValueError("Invalid axis: must be one of 'x', 'y' or 'z'")
 
-    rot[sl, sl] = np.array((
-        (cos(angle), -sin(angle)),
-        (sin(angle), cos(angle))
-    ))
+    rot[sl, sl] = np.array(((cos(angle), -sin(angle)), (sin(angle), cos(angle))))
     if axis == 1:
         rot = rot.T
 
@@ -91,8 +88,10 @@ def cross(a, b):
     """Computes cross product between two vectors"""
     # np.cross is not supported in numba nopython mode, see
     # https://github.com/numba/numba/issues/2978
-    return np.array((
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0]
-    ))
+    return np.array(
+        (
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+        )
+    )

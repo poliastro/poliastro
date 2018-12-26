@@ -1,7 +1,11 @@
 import numpy as np
 
-from poliastro.core.util import norm, cross
-from poliastro.core.thrust.change_a_inc import extra_quantities, beta, compute_parameters
+from poliastro.core.thrust.change_a_inc import (
+    beta,
+    compute_parameters,
+    extra_quantities,
+)
+from poliastro.core.util import cross, norm
 
 
 def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
@@ -47,10 +51,7 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
         t_ = v / norm(v)
         w_ = cross(r, v) / norm(cross(r, v))
         # n_ = cross(t_, w_)
-        accel_v = f * (
-            np.cos(beta_) * t_ +
-            np.sin(beta_) * w_
-        )
+        accel_v = f * (np.cos(beta_) * t_ + np.sin(beta_) * w_)
         return accel_v
 
     delta_V, t_f = extra_quantities(k, a_0, a_f, inc_0, inc_f, f)

@@ -1,11 +1,10 @@
-import pytest
 import numpy as np
+import pytest
+from astropy import units as u
 from numpy.testing import assert_allclose
 
-from astropy import units as u
-
 from poliastro.bodies import Earth
-from poliastro.core.elements import coe2rv, coe2mee, rv2coe
+from poliastro.core.elements import coe2mee, coe2rv, rv2coe
 from poliastro.twobody.equinoctial import mee2coe
 
 
@@ -22,7 +21,7 @@ def expected_res():
 
 
 def test_convert_between_coe_and_rv_is_transitive(expected_res):
-    k = Earth.k.to(u.km**3 / u.s**2).value  # u.km**3 / u.s**2
+    k = Earth.k.to(u.km ** 3 / u.s ** 2).value  # u.km**3 / u.s**2
     res = rv2coe(k, *coe2rv(k, *expected_res))
     assert_allclose(res, expected_res)
 

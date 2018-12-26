@@ -1,16 +1,11 @@
+import astropy.units as u
+import matplotlib.pyplot as plt
 import pytest
 
-import astropy.units as u
-
-import matplotlib.pyplot as plt
-
+from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.examples import iss
-
-from poliastro.bodies import Earth, Mars, Jupiter
-
-from poliastro.twobody.orbit import Orbit
-
 from poliastro.plotting import OrbitPlotter, plot_solar_system
+from poliastro.twobody.orbit import Orbit
 
 
 def test_orbitplotter_has_axes():
@@ -51,11 +46,11 @@ def test_number_of_lines_for_osculating_orbit():
 def test_legend():
     op = OrbitPlotter()
     ss = iss
-    op.plot(ss, label='ISS')
+    op.plot(ss, label="ISS")
     legend = plt.gca().get_legend()
 
-    ss.epoch.out_subfmt = 'date_hm'
-    label = '{} ({})'.format(ss.epoch.iso, 'ISS')
+    ss.epoch.out_subfmt = "date_hm"
+    label = "{} ({})".format(ss.epoch.iso, "ISS")
 
     assert legend.get_texts()[0].get_text() == label
 
@@ -64,7 +59,7 @@ def test_color():
     op = OrbitPlotter()
     ss = iss
     c = "#FF0000"
-    op.plot(ss, label='ISS', color=c)
+    op.plot(ss, label="ISS", color=c)
     ax = plt.gca()
 
     assert ax.get_legend().get_lines()[0].get_c() == c
@@ -72,10 +67,7 @@ def test_color():
         assert element.get_c() == c
 
 
-@pytest.mark.parametrize("outer,expected", [
-    (True, 8),
-    (False, 4),
-])
+@pytest.mark.parametrize("outer,expected", [(True, 8), (False, 4)])
 def test_plot_solar_system(outer, expected):
     assert len(plot_solar_system(outer).orbits) == expected
     assert isinstance(plot_solar_system(), OrbitPlotter)

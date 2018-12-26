@@ -1,5 +1,4 @@
 import pytest
-
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
@@ -18,8 +17,10 @@ def test_body_from_parameters_raises_valueerror_if_k_units_not_correct():
     _R = 0
     with pytest.raises(u.UnitsError) as excinfo:
         bodies.Body.from_parameters(None, wrong_k, _name, _symbol, _R)
-    assert ("UnitsError: Argument 'k' to function 'from_parameters' must be in units convertible to 'km3 / s2'."
-            in excinfo.exconly())
+    assert (
+        "UnitsError: Argument 'k' to function 'from_parameters' must be in units convertible to 'km3 / s2'."
+        in excinfo.exconly()
+    )
 
 
 def test_body_printing_has_name_and_symbol():
@@ -43,24 +44,28 @@ def test_body_kwargs():
     k = 1.41e10 * u.m ** 3 / u.s ** 2
     pallas2 = bodies.Body(None, k, name, symbol)
     assert pallas2.kwargs == {}
-    pallas2 = bodies.Body(None, k, name, symbol, custom='data')
-    assert 'custom' in pallas2.kwargs
+    pallas2 = bodies.Body(None, k, name, symbol, custom="data")
+    assert "custom" in pallas2.kwargs
 
 
 def test_from_relative():
-    TRAPPIST1 = bodies.Body.from_relative(reference=bodies.Sun,
-                                          parent=None,
-                                          k=0.08,  # Relative to the Sun
-                                          name='TRAPPIST',
-                                          symbol=None,
-                                          R=0.114)  # Relative to the Sun
+    TRAPPIST1 = bodies.Body.from_relative(
+        reference=bodies.Sun,
+        parent=None,
+        k=0.08,  # Relative to the Sun
+        name="TRAPPIST",
+        symbol=None,
+        R=0.114,
+    )  # Relative to the Sun
 
     # check values properly calculated
-    VALUECHECK = bodies.Body.from_relative(reference=bodies.Earth,
-                                           parent=TRAPPIST1,
-                                           k=1,
-                                           name='VALUECHECK',
-                                           symbol=None,
-                                           R=1)
+    VALUECHECK = bodies.Body.from_relative(
+        reference=bodies.Earth,
+        parent=TRAPPIST1,
+        k=1,
+        name="VALUECHECK",
+        symbol=None,
+        R=1,
+    )
     assert bodies.Earth.k == VALUECHECK.k
     assert bodies.Earth.R == VALUECHECK.R

@@ -1,6 +1,5 @@
-import pytest
-
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose
 from scipy import special
 

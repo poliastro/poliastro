@@ -1,8 +1,9 @@
 """Stumpff functions.
 
 """
-import numpy as np
 from math import gamma
+
+import numpy as np
 
 from ._jit import jit
 

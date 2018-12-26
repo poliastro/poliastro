@@ -1,14 +1,12 @@
-import pytest
-
 import tempfile
-
 from unittest import mock
 
+import pytest
 from astropy import units as u
 
+from poliastro.bodies import Earth, Sun
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter3D
-from poliastro.bodies import Earth, Sun
 from poliastro.twobody.orbit import Orbit
 
 
@@ -62,8 +60,10 @@ def test_plot_trajectory_without_attractor_raises_error():
 
     with pytest.raises(ValueError) as excinfo:
         frame.plot_trajectory({})
-    assert ("An attractor must be set up first, please use "
-            "set_attractor(Major_Body)." in excinfo.exconly())
+    assert (
+        "An attractor must be set up first, please use "
+        "set_attractor(Major_Body)." in excinfo.exconly()
+    )
 
 
 def test_set_view():
@@ -90,11 +90,11 @@ def test_plot_trajectory_plots_a_trajectory():
 
 def test_dark_theme():
     frame = OrbitPlotter3D(dark=True)
-    assert frame._layout.template.layout.plot_bgcolor == 'rgb(17,17,17)'
+    assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
 
 
 @mock.patch("poliastro.plotting.iplot")
-@mock.patch.object(OrbitPlotter3D, '_prepare_plot')
+@mock.patch.object(OrbitPlotter3D, "_prepare_plot")
 def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
     m = OrbitPlotter3D()
     earth = Orbit.from_body_ephem(Earth)
@@ -106,7 +106,7 @@ def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
 
 
 @mock.patch("poliastro.plotting.export")
-@mock.patch.object(OrbitPlotter3D, '_prepare_plot')
+@mock.patch.object(OrbitPlotter3D, "_prepare_plot")
 def test_savefig_calls_prepare_plot(mock_prepare_plot, mock_export):
     m = OrbitPlotter3D()
     earth = Orbit.from_body_ephem(Earth)

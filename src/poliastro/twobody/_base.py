@@ -1,5 +1,4 @@
 import numpy as np
-
 from astropy import units as u
 
 from poliastro.util import norm
@@ -9,6 +8,7 @@ class BaseState(object):
     """Base State class, meant to be subclassed.
 
     """
+
     def __init__(self, attractor):
         """Constructor.
 
@@ -38,7 +38,7 @@ class BaseState(object):
     @property
     def a(self):
         """Semilatus rectum. """
-        return self.p / (1 - self.ecc**2)
+        return self.p / (1 - self.ecc ** 2)
 
     @property
     def p(self):
@@ -118,8 +118,7 @@ class BaseState(object):
     @property
     def energy(self):
         """Specific energy. """
-        return (self.v.dot(self.v) / 2 -
-                self.attractor.k / np.sqrt(self.r.dot(self.r)))
+        return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
 
     @property
     def e_vec(self):
@@ -132,8 +131,7 @@ class BaseState(object):
     @property
     def h_vec(self):
         """Specific angular momentum vector. """
-        h_vec = np.cross(self.r.to(u.km).value,
-                         self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        h_vec = np.cross(self.r.to(u.km).value, self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
     @property
@@ -149,8 +147,12 @@ class BaseState(object):
     def coe(self):
         """Classical orbital elements. """
         return (
-            self.a, self.ecc,
-            self.inc.to(u.deg), self.raan.to(u.deg), self.argp.to(u.deg), self.nu.to(u.deg)
+            self.a,
+            self.ecc,
+            self.inc.to(u.deg),
+            self.raan.to(u.deg),
+            self.argp.to(u.deg),
+            self.nu.to(u.deg),
         )
 
     def pqw(self):

@@ -6,12 +6,11 @@ References
   Elliptical Orbit Transfers", 1997.
 
 """
+import astropy.units as u
 import numpy as np
 
-import astropy.units as u
-
-from poliastro.core.util import norm, cross
 from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
+from poliastro.core.util import cross, norm
 
 
 def change_ecc_quasioptimal(ss_0, ecc_f, f):
@@ -29,7 +28,7 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
         Magnitude of constant acceleration
     """
     # We fix the inertial direction at the beginning
-    k = ss_0.attractor.k.to(u.km**3 / u.s**2).value
+    k = ss_0.attractor.k.to(u.km ** 3 / u.s ** 2).value
     a = ss_0.a.to(u.km).value
     ecc_0 = ss_0.ecc.value
     if ecc_0 > 0.001:  # Arbitrary tolerance

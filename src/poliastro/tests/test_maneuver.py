@@ -1,14 +1,12 @@
-import pytest
-
 import numpy as np
-from numpy.testing import assert_allclose
-
+import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth
-from poliastro.twobody import Orbit
 from poliastro.maneuver import Maneuver
+from poliastro.twobody import Orbit
 
 
 def test_maneuver_raises_error_if_units_are_wrong():
@@ -16,8 +14,10 @@ def test_maneuver_raises_error_if_units_are_wrong():
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     with pytest.raises(u.UnitsError) as excinfo:
         Maneuver([wrong_dt, _v])
-    assert ("UnitsError: Argument 'dts' to function '_initialize' must be in units convertible to 's'."
-            in excinfo.exconly())
+    assert (
+        "UnitsError: Argument 'dts' to function '_initialize' must be in units convertible to 's'."
+        in excinfo.exconly()
+    )
 
 
 def test_maneuver_raises_error_if_dvs_are_not_vectors():
@@ -25,8 +25,7 @@ def test_maneuver_raises_error_if_dvs_are_not_vectors():
     wrong_dv = 1 * u.km / u.s
     with pytest.raises(ValueError) as excinfo:
         Maneuver((dt, wrong_dv))
-    assert ("ValueError: Delta-V must be three dimensions vectors"
-            in excinfo.exconly())
+    assert "ValueError: Delta-V must be three dimensions vectors" in excinfo.exconly()
 
 
 def test_maneuver_total_time():
@@ -54,7 +53,9 @@ def test_hohmann_maneuver():
 
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
 
-    assert_quantity_allclose(ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-14 * u.one)
+    assert_quantity_allclose(
+        ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-14 * u.one
+    )
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
     assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-5)
 
