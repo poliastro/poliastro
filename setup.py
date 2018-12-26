@@ -39,6 +39,7 @@ setup(
     extras_require={
         ':implementation_name=="cpython"': "numba>=0.39",
         'dev': [
+            "black",
             "coverage",
             "pytest",
             "pytest-cov<2.6.0",
