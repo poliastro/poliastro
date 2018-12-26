@@ -45,7 +45,7 @@ jobs:
             pip install numpy --quiet
             pip install . --quiet
             pip install .[dev] --quiet
-            pip install https://github.com/rtfd/sphinx_rtd_theme/archive/a42c4d74fec660835393a4c9b1e7cb9e654ccc90.zip
+            pip install https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
 
       - run:
           name: run tests
@@ -109,7 +109,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install .[dev] --quiet
-            pip install https://github.com/rtfd/sphinx_rtd_theme/archive/a42c4d74fec660835393a4c9b1e7cb9e654ccc90.zip
+            pip install https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
 
       - run:
           name: build docs

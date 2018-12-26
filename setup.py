@@ -44,7 +44,7 @@ setup(
             "pytest-cov<2.6.0",
             "pycodestyle",
             "sphinx",
-            # "sphinx_rtd_theme",  # Use https://github.com/rtfd/sphinx_rtd_theme/tree/a42c4d74
+            # "sphinx_rtd_theme",  # Use https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
             "nbsphinx",
             "ipython>=5.0",
             "jupyter-client",
