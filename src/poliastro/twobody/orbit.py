@@ -29,6 +29,8 @@ from ._base import BaseState  # flake8: noqa
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
+# String representation for orbits around bodies without predefined reference frame
+ORBIT_NO_FRAME_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 
 
 class TimeScaleWarning(UserWarning):
@@ -354,12 +356,18 @@ class Orbit(object):
         else:
             unit = u.km
 
-        return ORBIT_FORMAT.format(
-            r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
-            frame=self.frame.__class__.__name__,
-            body=self.attractor,
-            epoch=self.epoch, scale=self.epoch.scale.upper(),
-        )
+        try:
+            return ORBIT_FORMAT.format(
+                r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
+                frame=self.frame.__class__.__name__,
+                body=self.attractor,
+                epoch=self.epoch, scale=self.epoch.scale.upper(),)
+        except NotImplementedError:
+                return ORBIT_NO_FRAME_FORMAT.format(
+                    r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
+                    body=self.attractor,
+                    epoch=self.epoch, scale=self.epoch.scale.upper(),
+                )
 
     def __repr__(self):
         return self.__str__()

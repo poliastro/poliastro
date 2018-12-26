@@ -77,6 +77,10 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     assert tof > 0
     assert k > 0
 
+    # Check collinearity of r1 and r2
+    if np.all(cross(r1, r2) == 0):
+        raise ValueError("Lambert solution cannot be computed for collinear vectors")
+
     # Chord
     c = r2 - r1
     c_norm, r1_norm, r2_norm = norm(c), norm(r1), norm(r2)
@@ -90,7 +94,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     i_h = i_h / norm(i_h)  # Fixed from paper
 
     # Geometry of the problem
-    ll = np.sqrt(1 - c_norm / s)
+    ll = np.sqrt(1 - min(1.0, c_norm / s))
 
     if i_h[2] < 0:
         ll = -ll
