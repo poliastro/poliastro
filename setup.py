@@ -36,13 +36,13 @@ setup(
         "jplephem",
         "scipy",
         "beautifulsoup4>=4.5.3",
+        "numba>=0.39 ; implementation_name=='cpython'",
         "requests",
         "pandas",
         "plotly>=3.0,<4.*",
         "astroquery>=0.3.8",
     ],
     extras_require={
-        ':implementation_name=="cpython"': "numba>=0.39",
         "dev": [
             "black ; python_version>='3.6'",
             "coverage",
