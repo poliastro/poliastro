@@ -1,6 +1,40 @@
 What's new
 ==========
 
+poliastro 0.11.1 - 2018-12-27
+-----------------------------
+
+This release fixes some bugs found in 0.11.0 and prepares the ground for bigger
+API and code changes.
+
+Bugs fixed
+..........
+
+* `Issue #281`_: Plotly graphs not showing in documentation
+* `Issue #469`_: :code:`OrbitPlotter.set_frame` error
+* `Issue #476`_: Error when representing orbits with no reference frame
+* `Issue #482`_: Non deterministic legend layout
+* `Issue #492`_: Better error for collinear orbits in Lambert and corner case arithmetic
+
+.. _`Issue #281`: https://github.com/poliastro/poliastro/issues/281
+.. _`Issue #469`: https://github.com/poliastro/poliastro/issues/469
+.. _`Issue #476`: https://github.com/poliastro/poliastro/issues/476
+.. _`Issue #482`: https://github.com/poliastro/poliastro/issues/482
+.. _`Issue #492`: https://github.com/poliastro/poliastro/issues/492
+
+Do you want to help with the remaining ones? Check the current list here!
+https://github.com/poliastro/poliastro/issues?q=is%3Aopen+is%3Aissue+label%3Abug
+
+Contributors
+............
+
+This is the complete list of the people that contributed to this release, with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Shreyas Bapat
+* Ole Streicher+
+* Antoniya Karpova+
+
 poliastro 0.11.0 - 2018-09-21
 -----------------------------
 
