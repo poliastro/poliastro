@@ -41,6 +41,7 @@ setup(
         'dev': [
             "black",
             "coverage",
+            "isort",
             "pytest",
             "pytest-cov<2.6.0",
             "pycodestyle",

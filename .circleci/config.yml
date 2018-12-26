@@ -14,12 +14,13 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install black mypy --quiet
+            pip install black isort mypy --quiet
 
       - run:
           name: check Black style
           command: |
             . venv/bin/activate
+            isort -c setup.py src/
             black src/ setup.py --check
 
       - run:
