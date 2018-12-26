@@ -43,8 +43,12 @@ from poliastro.twobody.orbit import TimeScaleWarning
 
 @pytest.fixture()
 def hyperbolic_orbit():
-    r = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km,
-    v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
+    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
+    v = (
+        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00] *
+        u.km /
+        u.s
+    )
     return r, v
 
 
@@ -206,11 +210,8 @@ def test_orbit_no_frame_representation():
     assert str(ss) == repr(ss) == expected_str
 
 
-def test_sample_numpoints():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
+def test_sample_numpoints(orb_para):
+    [_d, _, _a, _body] = orb_para
 
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     positions = ss.sample(values=50)
@@ -239,14 +240,8 @@ def test_sample_with_nu_value(orb_para):
     assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
 
 
-def test_hyperbolic_nu_value_check():
-    # A custom hyperbolic orbit
-    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
-    v = (
-        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
-        * u.km
-        / u.s
-    )
+def test_hyperbolic_nu_value_check(hyperbolic_orbit):
+    r, v = hyperbolic_orbit
 
     ss = Orbit.from_vectors(Sun, r, v, Time("2015-07-14 07:59", scale="tdb"))
 
@@ -269,14 +264,8 @@ def test_hyperbolic_modulus_wrapped_nu():
     assert_quantity_allclose(positions[0].data.xyz, ss.r)
 
 
-def test_orbit_is_pickable():
-    # A custom hyperbolic orbit
-    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
-    v = (
-        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
-        * u.km
-        / u.s
-    )
+def test_orbit_is_pickable(hyperbolic_orbit):
+    r, v = hyperbolic_orbit
     epoch = Time("2015-07-14 07:59", scale="tdb")
 
     ss = Orbit.from_vectors(Sun, r, v, epoch)
