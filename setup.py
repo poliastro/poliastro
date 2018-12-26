@@ -57,7 +57,7 @@ setup(
             "jupyter-client",
             "ipykernel",
             "ipywidgets",
-        ],
+        ]
     },
     packages=find_packages("src"),
     package_dir={"": "src"},
