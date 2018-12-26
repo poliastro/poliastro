@@ -1,36 +1,32 @@
 from warnings import warn
 
 import numpy as np
-
-from astropy import units as u
-from astropy import time
-
+from astropy import time, units as u
 from astropy.coordinates import (
+    GCRS,
+    ICRS,
     Angle,
-    CartesianRepresentation, CartesianDifferential,
+    CartesianDifferential,
+    CartesianRepresentation,
     get_body_barycentric_posvel,
-    ICRS, GCRS
 )
 
+from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
-from poliastro.twobody.angles import nu_to_M, E_to_nu
-from poliastro.twobody.propagation import propagate, mean_motion
-from poliastro.core.elements import rv2coe
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
-
-from poliastro.twobody import rv
-from poliastro.twobody import classical
-from poliastro.twobody import equinoctial
-
-from poliastro.bodies import Sun, Earth, Moon
-from poliastro.frames import get_frame, Planes
+from poliastro.core.elements import rv2coe
+from poliastro.frames import Planes, get_frame
+from poliastro.twobody import classical, equinoctial, rv
+from poliastro.twobody.angles import E_to_nu, nu_to_M
+from poliastro.twobody.propagation import mean_motion, propagate
 
 from ._base import BaseState  # flake8: noqa
 
-
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined reference frame
-ORBIT_NO_FRAME_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
+ORBIT_NO_FRAME_FORMAT = (
+    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
+)
 
 
 class TimeScaleWarning(UserWarning):
@@ -112,13 +108,23 @@ class Orbit(object):
         """
         assert np.any(r.value), "Position vector must be non zero"
 
-        ss = rv.RVState(
-            attractor, r, v)
+        ss = rv.RVState(attractor, r, v)
         return cls(ss, epoch, plane)
 
     @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
-    def from_classical(cls, attractor, a, ecc, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR):
+    def from_classical(
+        cls,
+        attractor,
+        a,
+        ecc,
+        inc,
+        raan,
+        argp,
+        nu,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
+    ):
         """Return `Orbit` from classical orbital elements.
 
         Parameters
@@ -153,12 +159,15 @@ class Orbit(object):
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         ss = classical.ClassicalState(
-            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
+            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu
+        )
         return cls(ss, epoch, plane)
 
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
-    def from_equinoctial(cls, attractor, p, f, g, h, k, L, epoch=J2000, plane=Planes.EARTH_EQUATOR):
+    def from_equinoctial(
+        cls, attractor, p, f, g, h, k, L, epoch=J2000, plane=Planes.EARTH_EQUATOR
+    ):
         """Return `Orbit` from modified equinoctial elements.
 
         Parameters
@@ -183,8 +192,7 @@ class Orbit(object):
             Fundamental plane of the frame.
 
         """
-        ss = equinoctial.ModifiedEquinoctialState(
-            attractor, p, f, g, h, k, L)
+        ss = equinoctial.ModifiedEquinoctialState(attractor, p, f, g, h, k, L)
         return cls(ss, epoch, plane)
 
     @classmethod
@@ -195,23 +203,29 @@ class Orbit(object):
         # TODO: https://github.com/poliastro/poliastro/issues/445
         if not epoch:
             epoch = time.Time.now().tdb
-        elif epoch.scale != 'tdb':
+        elif epoch.scale != "tdb":
             epoch = epoch.tdb
-            warn("Input time was converted to scale='tdb' with value "
-                 "{}. Use Time(..., scale='tdb') instead."
-                 .format(epoch.tdb.value), TimeScaleWarning)
+            warn(
+                "Input time was converted to scale='tdb' with value "
+                "{}. Use Time(..., scale='tdb') instead.".format(epoch.tdb.value),
+                TimeScaleWarning,
+            )
 
         r, v = get_body_barycentric_posvel(body.name, epoch)
 
         if body == Moon:
             # TODO: The attractor is in fact the Earth-Moon Barycenter
             icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
-            gcrs_cart = ICRS(icrs_cart).transform_to(GCRS(obstime=epoch)).represent_as(CartesianRepresentation)
+            gcrs_cart = (
+                ICRS(icrs_cart)
+                .transform_to(GCRS(obstime=epoch))
+                .represent_as(CartesianRepresentation)
+            )
             ss = cls.from_vectors(
                 Earth,
                 gcrs_cart.xyz.to(u.km),
-                gcrs_cart.differentials['s'].d_xyz.to(u.km / u.day),
-                epoch
+                gcrs_cart.differentials["s"].d_xyz.to(u.km / u.day),
+                epoch,
             )
 
         else:
@@ -223,8 +237,16 @@ class Orbit(object):
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
-    def circular(cls, attractor, alt,
-                 inc=0 * u.deg, raan=0 * u.deg, arglat=0 * u.deg, epoch=J2000, plane=Planes.EARTH_EQUATOR):
+    def circular(
+        cls,
+        attractor,
+        alt,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        arglat=0 * u.deg,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
+    ):
         """Return circular `Orbit`.
 
         Parameters
@@ -249,11 +271,15 @@ class Orbit(object):
         ecc = 0 * u.one
         argp = 0 * u.deg
 
-        return cls.from_classical(attractor, a, ecc, inc, raan, argp, arglat, epoch, plane)
+        return cls.from_classical(
+            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+        )
 
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
-    def parabolic(cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR):
+    def parabolic(
+        cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR
+    ):
         """Return parabolic `Orbit`.
 
         Parameters
@@ -276,8 +302,7 @@ class Orbit(object):
             Fundamental plane of the frame.
 
         """
-        ss = classical.ClassicalState(
-            attractor, p, 1.0 * u.one, inc, raan, argp, nu)
+        ss = classical.ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu)
         return cls(ss, epoch, plane)
 
     def represent_as(self, representation):
@@ -318,7 +343,7 @@ class Orbit(object):
             *self.r, differentials=CartesianDifferential(*self.v)
         )
         # See Orbit._sample for reasoning about the usage of a protected method
-        coords = self.frame._replicate(cartesian, representation_type='cartesian')
+        coords = self.frame._replicate(cartesian, representation_type="cartesian")
 
         return coords.represent_as(representation)
 
@@ -333,19 +358,14 @@ class Orbit(object):
         .. versionadded:: 0.11.0
 
         """
-        coords = self.frame.realize_frame(
-            self.represent_as(CartesianRepresentation)
-        )
+        coords = self.frame.realize_frame(self.represent_as(CartesianRepresentation))
         coords.representation_type = CartesianRepresentation
 
         icrs_cart = coords.transform_to(ICRS).represent_as(CartesianRepresentation)
 
         # TODO: The attractor is in fact the Solar System Barycenter
         ss = self.from_vectors(
-            Sun,
-            r=icrs_cart.xyz,
-            v=icrs_cart.differentials['s'].d_xyz,
-            epoch=self.epoch
+            Sun, r=icrs_cart.xyz, v=icrs_cart.differentials["s"].d_xyz, epoch=self.epoch
         )
         ss._frame = ICRS()  # Hack!
         return ss
@@ -358,16 +378,23 @@ class Orbit(object):
 
         try:
             return ORBIT_FORMAT.format(
-                r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
+                r_p=self.r_p.to(unit).value,
+                r_a=self.r_a.to(unit),
+                inc=self.inc.to(u.deg),
                 frame=self.frame.__class__.__name__,
                 body=self.attractor,
-                epoch=self.epoch, scale=self.epoch.scale.upper(),)
+                epoch=self.epoch,
+                scale=self.epoch.scale.upper(),
+            )
         except NotImplementedError:
-                return ORBIT_NO_FRAME_FORMAT.format(
-                    r_p=self.r_p.to(unit).value, r_a=self.r_a.to(unit), inc=self.inc.to(u.deg),
-                    body=self.attractor,
-                    epoch=self.epoch, scale=self.epoch.scale.upper(),
-                )
+            return ORBIT_NO_FRAME_FORMAT.format(
+                r_p=self.r_p.to(unit).value,
+                r_a=self.r_a.to(unit),
+                inc=self.inc.to(u.deg),
+                body=self.attractor,
+                epoch=self.epoch,
+                scale=self.epoch.scale.upper(),
+            )
 
     def __repr__(self):
         return self.__str__()
@@ -390,20 +417,29 @@ class Orbit(object):
             parameters used in perturbation models
 
         """
-        if hasattr(value, "unit") and value.unit in ('rad', 'deg'):
-            p, ecc, inc, raan, argp, _ = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                                                self.r.to(u.km).value,
-                                                self.v.to(u.km / u.s).value)
+        if hasattr(value, "unit") and value.unit in ("rad", "deg"):
+            p, ecc, inc, raan, argp, _ = rv2coe(
+                self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+                self.r.to(u.km).value,
+                self.v.to(u.km / u.s).value,
+            )
 
             # Compute time of flight for correct epoch
             M = nu_to_M(self.nu, self.ecc)
             new_M = nu_to_M(value, self.ecc)
             time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
 
-            return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
-                                       ecc * u.one, inc * u.rad, raan * u.rad,
-                                       argp * u.rad, value,
-                                       epoch=self.epoch + time_of_flight, plane=self._plane)
+            return self.from_classical(
+                self.attractor,
+                p / (1.0 - ecc ** 2) * u.km,
+                ecc * u.one,
+                inc * u.rad,
+                raan * u.rad,
+                argp * u.rad,
+                value,
+                epoch=self.epoch + time_of_flight,
+                plane=self._plane,
+            )
         else:
             if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
                 time_of_flight = value - self.epoch
@@ -472,12 +508,12 @@ class Orbit(object):
                 # the arc cosine, which is in the range [0, 180)
                 # Start from -nu_limit
                 wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
-                nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), abs(wrapped_nu))
+                nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu))
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
 
             return self.sample(nu_values, method)
 
-        elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
+        elif hasattr(values, "unit") and values.unit in ("rad", "deg"):
             values = self._generate_time_values(values)
 
         elif isinstance(values, time.Time):
@@ -496,22 +532,29 @@ class Orbit(object):
 
         # If the frame supports obstime, set the time values
         kwargs = {}
-        if 'obstime' in self.frame.frame_attributes:
-            kwargs['obstime'] = self.epoch + time_values
+        if "obstime" in self.frame.frame_attributes:
+            kwargs["obstime"] = self.epoch + time_values
         else:
-            warn("Frame {} does not support 'obstime', time values were not returned".format(self.frame.__class__))
+            warn(
+                "Frame {} does not support 'obstime', time values were not returned".format(
+                    self.frame.__class__
+                )
+            )
 
         # Use of a protected method instead of frame.realize_frame
         # because the latter does not let the user choose the representation type
         # in one line despite its parameter names, see
         # https://github.com/astropy/astropy/issues/7784
-        return self.frame._replicate(data, representation_type='cartesian', **kwargs)
+        return self.frame._replicate(data, representation_type="cartesian", **kwargs)
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
         ecc = self.ecc.value
         nu = self.nu.to(u.rad).value
-        M_vals = [nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc) for nu_val in nu_vals.to(u.rad).value] * u.rad
+        M_vals = [
+            nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc)
+            for nu_val in nu_vals.to(u.rad).value
+        ] * u.rad
         time_values = (M_vals / self.n).decompose()
         return time_values
 
@@ -547,6 +590,7 @@ class Orbit(object):
     # Delegated properties (syntactic sugar)
     def __getattr__(self, item):
         if hasattr(self.state, item):
+
             def delegated_(self_):
                 return getattr(self_.state, item)
 
@@ -558,7 +602,9 @@ class Orbit(object):
             delegated = property(delegated_)
 
         else:
-            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__, item))
+            raise AttributeError(
+                "'{}' object has no attribute '{}'".format(self.__class__, item)
+            )
 
         # Bind the attribute
         setattr(self.__class__, item, delegated)

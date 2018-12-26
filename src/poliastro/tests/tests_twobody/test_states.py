@@ -1,12 +1,10 @@
-from numpy.testing import assert_allclose
-
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from numpy.testing import assert_allclose
 
-from poliastro.bodies import Sun, Earth
-
-from poliastro.twobody.rv import RVState
+from poliastro.bodies import Earth, Sun
 from poliastro.twobody.classical import ClassicalState
+from poliastro.twobody.rv import RVState
 
 
 def test_state_has_attractor_given_in_constructor():
@@ -59,10 +57,8 @@ def test_perigee_and_apogee():
     ecc = expected_r_a / a - 1
     _a = 1.0 * u.deg  # Unused angle
     ss = ClassicalState(Earth, a * (1 - ecc ** 2), ecc, _a, _a, _a, _a)
-    assert_allclose(ss.r_a.to(u.km).value,
-                    expected_r_a.to(u.km).value)
-    assert_allclose(ss.r_p.to(u.km).value,
-                    expected_r_p.to(u.km).value)
+    assert_allclose(ss.r_a.to(u.km).value, expected_r_a.to(u.km).value)
+    assert_allclose(ss.r_p.to(u.km).value, expected_r_p.to(u.km).value)
 
 
 def test_convert_from_rv_to_coe():

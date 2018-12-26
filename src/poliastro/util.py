@@ -2,14 +2,13 @@
 
 """
 import numpy as np
-
 from astropy import units as u
 from astropy.time import Time
 
 from poliastro.core.util import (
     circular_velocity as circular_velocity_fast,
     norm as norm_fast,
-    rotate as rotate_fast
+    rotate as rotate_fast,
 )
 
 u.kms = u.km / u.s
@@ -23,7 +22,7 @@ def circular_velocity(k, a):
     return circular_velocity_fast(k.to(u.km3s2).value, a.to(u.km).value) * u.kms
 
 
-def rotate(vector, angle, axis='z'):
+def rotate(vector, angle, axis="z"):
     """Rotates a vector around axis a right-handed positive angle.
 
     This is just a convenience function around
@@ -51,10 +50,13 @@ def rotate(vector, angle, axis='z'):
     .. [1] http://en.wikipedia.org/wiki/Rotation_matrix#Ambiguities
 
     """
-    return rotate_fast(vector.value, angle.to(u.rad).value, ['x', 'y', 'z'].index(axis)) * vector.unit
+    return (
+        rotate_fast(vector.value, angle.to(u.rad).value, ["x", "y", "z"].index(axis))
+        * vector.unit
+    )
 
 
-def transform(vector, angle, axis='z'):
+def transform(vector, angle, axis="z"):
     """Rotates a coordinate system around axis a positive right-handed angle.
 
     Note

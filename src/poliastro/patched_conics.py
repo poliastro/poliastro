@@ -6,8 +6,8 @@ body problem with Patched Conics.
 """
 from astropy import units as u
 
-from poliastro.twobody import Orbit
 from poliastro.constants import J2000
+from poliastro.twobody import Orbit
 
 
 @u.quantity_input(a=u.m)
@@ -38,7 +38,8 @@ def compute_soi(body, a=None):
                 """To compute the semimajor axis for Moon and Pluto use the JPL ephemeris:
 
 >>> from astropy.coordinates import solar_system_ephemeris
->>> solar_system_ephemeris.set("jpl")""")
+>>> solar_system_ephemeris.set("jpl")"""
+            )
 
     r_SOI = a * (body.k / body.parent.k) ** (2 / 5)
 

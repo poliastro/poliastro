@@ -1,10 +1,8 @@
 import pytest
-
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth
-
 from poliastro.iod import izzo, vallado
 
 
@@ -97,8 +95,7 @@ def test_raises_exception_for_non_feasible_solution(lambert):
 
     with pytest.raises(ValueError) as excinfo:
         next(lambert(k, r0, r, tof, M=1))
-    assert ("ValueError: No feasible solution, try lower M"
-            in excinfo.exconly())
+    assert "ValueError: No feasible solution, try lower M" in excinfo.exconly()
 
 
 @pytest.mark.parametrize("lambert", [izzo.lambert])
@@ -110,5 +107,7 @@ def test_collinear_vectors_input(lambert):
 
     with pytest.raises(ValueError) as excinfo:
         next(lambert(k, r0, r, tof, M=0))
-    assert ("ValueError: Lambert solution cannot be computed for collinear vectors"
-            in excinfo.exconly())
+    assert (
+        "ValueError: Lambert solution cannot be computed for collinear vectors"
+        in excinfo.exconly()
+    )

@@ -10,7 +10,9 @@ def delta_V(V, ecc, argp_0, argp_f, f, A):
     """Compute required increment of velocity.
     """
     delta_argp = argp_f - argp_0
-    return delta_argp / (3 * np.sign(delta_argp) / 2 * np.sqrt(1 - ecc ** 2) / ecc / V + A / f)
+    return delta_argp / (
+        3 * np.sign(delta_argp) / 2 * np.sqrt(1 - ecc ** 2) / ecc / V + A / f
+    )
 
 
 @jit

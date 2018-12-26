@@ -22,8 +22,8 @@ def mee2coe(p, f, g, h, k, L):
     arguments.
 
     """
-    ecc = np.sqrt(f**2 + g**2)
-    inc = 2 * np.arctan(np.sqrt(h**2 + k**2))
+    ecc = np.sqrt(f ** 2 + g ** 2)
+    inc = 2 * np.arctan(np.sqrt(h ** 2 + k ** 2))
     lonper = np.arctan2(g, f)
     raan = np.arctan2(k, h) % (2 * np.pi)
     argp = (lonper - raan) % (2 * np.pi)
@@ -66,12 +66,14 @@ class ModifiedEquinoctialState(BaseState):
         return self._L
 
     def to_classical(self):
-        p, ecc, inc, raan, argp, nu = mee2coe(self.p.to(u.km).value,
-                                              self.f.to(u.rad).value,
-                                              self.g.to(u.rad).value,
-                                              self.h.to(u.rad).value,
-                                              self.k.to(u.rad).value,
-                                              self.L.to(u.rad).value)
+        p, ecc, inc, raan, argp, nu = mee2coe(
+            self.p.to(u.km).value,
+            self.f.to(u.rad).value,
+            self.g.to(u.rad).value,
+            self.h.to(u.rad).value,
+            self.k.to(u.rad).value,
+            self.L.to(u.rad).value,
+        )
 
         return classical.ClassicalState(
             self.attractor,
@@ -80,4 +82,5 @@ class ModifiedEquinoctialState(BaseState):
             inc * u.rad,
             raan * u.rad,
             argp * u.rad,
-            nu * u.rad)
+            nu * u.rad,
+        )

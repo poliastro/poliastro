@@ -1,8 +1,8 @@
 import numpy as np
 
-from poliastro.core.angles import nu_to_M, M_to_nu
-from poliastro.core.stumpff import c2, c3
+from poliastro.core.angles import M_to_nu, nu_to_M
 from poliastro.core.elements import coe2rv, rv2coe
+from poliastro.core.stumpff import c2, c3
 
 from ._jit import jit
 
@@ -55,8 +55,8 @@ def mean_motion(k, r0, v0, tof):
 def kepler(k, r0, v0, tof, numiter):
     # Cache some results
     dot_r0v0 = np.dot(r0, v0)
-    norm_r0 = np.dot(r0, r0) ** .5
-    sqrt_mu = k**.5
+    norm_r0 = np.dot(r0, r0) ** 0.5
+    sqrt_mu = k ** 0.5
     alpha = -np.dot(v0, v0) / k + 2 / norm_r0
 
     # First guess
@@ -65,10 +65,17 @@ def kepler(k, r0, v0, tof, numiter):
         xi_new = sqrt_mu * tof * alpha
     elif alpha < 0:
         # Hyperbolic orbit
-        xi_new = (np.sign(tof) * (-1 / alpha)**.5 *
-                  np.log((-2 * k * alpha * tof) /
-                  (dot_r0v0 + np.sign(tof) *
-                   np.sqrt(-k / alpha) * (1 - norm_r0 * alpha))))
+        xi_new = (
+            np.sign(tof)
+            * (-1 / alpha) ** 0.5
+            * np.log(
+                (-2 * k * alpha * tof)
+                / (
+                    dot_r0v0
+                    + np.sign(tof) * np.sqrt(-k / alpha) * (1 - norm_r0 * alpha)
+                )
+            )
+        )
     else:
         # Parabolic orbit
         # (Conservative initial guess)
@@ -81,12 +88,21 @@ def kepler(k, r0, v0, tof, numiter):
         psi = xi * xi * alpha
         c2_psi = c2(psi)
         c3_psi = c3(psi)
-        norm_r = (xi * xi * c2_psi +
-                  dot_r0v0 / sqrt_mu * xi * (1 - psi * c3_psi) +
-                  norm_r0 * (1 - psi * c2_psi))
-        xi_new = xi + (sqrt_mu * tof - xi * xi * xi * c3_psi -
-                       dot_r0v0 / sqrt_mu * xi * xi * c2_psi -
-                       norm_r0 * xi * (1 - psi * c3_psi)) / norm_r
+        norm_r = (
+            xi * xi * c2_psi
+            + dot_r0v0 / sqrt_mu * xi * (1 - psi * c3_psi)
+            + norm_r0 * (1 - psi * c2_psi)
+        )
+        xi_new = (
+            xi
+            + (
+                sqrt_mu * tof
+                - xi * xi * xi * c3_psi
+                - dot_r0v0 / sqrt_mu * xi * xi * c2_psi
+                - norm_r0 * xi * (1 - psi * c3_psi)
+            )
+            / norm_r
+        )
         if abs(xi_new - xi) < 1e-7:
             break
         else:
@@ -95,10 +111,10 @@ def kepler(k, r0, v0, tof, numiter):
         raise RuntimeError("Maximum number of iterations reached")
 
     # Compute Lagrange coefficients
-    f = 1 - xi**2 / norm_r0 * c2_psi
-    g = tof - xi**3 / sqrt_mu * c3_psi
+    f = 1 - xi ** 2 / norm_r0 * c2_psi
+    g = tof - xi ** 3 / sqrt_mu * c3_psi
 
-    gdot = 1 - xi**2 / norm_r * c2_psi
+    gdot = 1 - xi ** 2 / norm_r * c2_psi
     fdot = sqrt_mu / (norm_r * norm_r0) * xi * (psi * c3_psi - 1)
 
     return f, g, fdot, gdot

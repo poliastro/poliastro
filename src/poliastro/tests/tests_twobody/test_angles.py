@@ -1,9 +1,8 @@
 import numpy as np
-
+import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-import pytest
 from poliastro.twobody import angles
 
 # Data from Schlesinger & Udick, 1912
@@ -17,7 +16,7 @@ ANGLES_DATA = [
     (0.19, 21.0, 30.94),
     (0.35, 65.0, 105.71),
     (0.48, 180.0, 180.0),
-    (0.75, 125.0, 167.57)
+    (0.75, 125.0, 167.57),
 ]
 
 
@@ -29,7 +28,7 @@ def test_true_to_eccentric():
         (0.05, 10.52321, 11.05994),
         (0.10, 54.67466, 59.49810),
         (0.35, 142.27123, 153.32411),
-        (0.61, 161.87359, 171.02189)
+        (0.61, 161.87359, 171.02189),
     ]
     for row in data:
         ecc, expected_E, nu = row
@@ -113,7 +112,9 @@ def test_flight_path_angle():
     assert_quantity_allclose(gamma, expected_gamma, rtol=1e-3)
 
 
-@pytest.mark.parametrize("expected_nu", np.linspace(-1 / 3.0, 1 / 3.0, num=100) * np.pi * u.rad)
+@pytest.mark.parametrize(
+    "expected_nu", np.linspace(-1 / 3.0, 1 / 3.0, num=100) * np.pi * u.rad
+)
 @pytest.mark.parametrize("ecc", [3200 * u.one, 1.5 * u.one])
 def test_mean_to_true_hyperbolic_highecc(expected_nu, ecc):
     M = angles.nu_to_M(expected_nu, ecc)

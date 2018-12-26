@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
-from setuptools import setup, find_packages
 
+from setuptools import find_packages, setup
 
 # https://packaging.python.org/guides/single-sourcing-package-version/
 version = {}
@@ -12,7 +12,7 @@ with open(os.path.join("src", "poliastro", "__init__.py")) as fp:
 # http://blog.ionelmc.ro/2014/05/25/python-packaging/
 setup(
     name="poliastro",
-    version=version['__version__'],
+    version=version["__version__"],
     description="Python package for Orbital Mechanics",
     author="Juan Luis Cano",
     author_email="hello@juanlu.space",
@@ -20,8 +20,13 @@ setup(
     download_url="https://github.com/poliastro/poliastro",
     license="MIT",
     keywords=[
-        "aero", "aerospace", "engineering",
-        "astrodynamics", "orbits", "kepler", "orbital mechanics"
+        "aero",
+        "aerospace",
+        "engineering",
+        "astrodynamics",
+        "orbits",
+        "kepler",
+        "orbital mechanics",
     ],
     python_requires=">=3.5",
     install_requires=[
@@ -38,7 +43,7 @@ setup(
     ],
     extras_require={
         ':implementation_name=="cpython"': "numba>=0.39",
-        'dev': [
+        "dev": [
             "black",
             "coverage",
             "isort",
@@ -52,15 +57,11 @@ setup(
             "jupyter-client",
             "ipykernel",
             "ipywidgets",
-        ]
+        ],
     },
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
-    entry_points={
-        'console_scripts': [
-            'poliastro = poliastro.cli:main'
-        ]
-    },
+    packages=find_packages("src"),
+    package_dir={"": "src"},
+    entry_points={"console_scripts": ["poliastro = poliastro.cli:main"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Education",
@@ -77,7 +78,7 @@ setup(
         "Topic :: Scientific/Engineering :: Physics",
         "Topic :: Scientific/Engineering :: Astronomy",
     ],
-    long_description=open('README.rst', encoding='utf-8').read(),
+    long_description=open("README.rst", encoding="utf-8").read(),
     include_package_data=True,
     zip_safe=False,
 )

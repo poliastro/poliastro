@@ -3,8 +3,8 @@
 """
 from astropy import units as u
 
-from poliastro.twobody import classical
 from poliastro.core.elements import rv2coe
+from poliastro.twobody import classical
 
 from ._base import BaseState
 
@@ -13,6 +13,7 @@ class RVState(BaseState):
     """State defined by its position and velocity vectors.
 
     """
+
     def __init__(self, attractor, r, v):
         super().__init__(attractor)
         self._r = r
@@ -38,10 +39,11 @@ class RVState(BaseState):
         """Converts to classical orbital elements representation.
 
         """
-        (p, ecc, inc, raan, argp, nu
-         ) = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                    self.r.to(u.km).value,
-                    self.v.to(u.km / u.s).value)
+        (p, ecc, inc, raan, argp, nu) = rv2coe(
+            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+            self.r.to(u.km).value,
+            self.v.to(u.km / u.s).value,
+        )
 
         return classical.ClassicalState(
             self.attractor,
@@ -50,4 +52,5 @@ class RVState(BaseState):
             inc * u.rad,
             raan * u.rad,
             argp * u.rad,
-            nu * u.rad)
+            nu * u.rad,
+        )

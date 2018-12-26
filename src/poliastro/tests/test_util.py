@@ -1,8 +1,7 @@
 import pytest
-
 from astropy import units as u
-from astropy.time import Time
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.time import Time
 
 from poliastro import util
 
@@ -21,7 +20,7 @@ def test_simple_circular_velocity():
 def test_rotate_vector_with_units():
     vector = [1, 0, 0] * u.m
     angle = 90 * u.deg
-    axis = 'y'
+    axis = "y"
     expected_vector = [0, 0, -1] * u.m
     result = util.rotate(vector, angle, axis)
     assert_quantity_allclose(result, expected_vector, atol=1e-16 * u.m)
@@ -51,7 +50,9 @@ def test_time_range_spacing_periods():
 def test_time_range_requires_keyword_arguments():
     with pytest.raises(TypeError) as excinfo:
         util.time_range(0, 0)
-    assert "TypeError: time_range() takes 1 positional argument but" in excinfo.exconly()
+    assert (
+        "TypeError: time_range() takes 1 positional argument but" in excinfo.exconly()
+    )
 
 
 def test_time_range_raises_error_wrong_arguments():

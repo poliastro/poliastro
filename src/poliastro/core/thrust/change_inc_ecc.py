@@ -11,8 +11,22 @@ def beta(ecc_0, ecc_f, inc_0, inc_f, argp):
     # due to the natural drift and because e may approach zero.
     # However, [the equation] still gives a good estimate of the desired
     # thrust angle."
-    return np.arctan(abs(3 * np.pi * (inc_f - inc_0) / (4 * np.cos(argp) * (ecc_0 - ecc_f + np.log(
-        (1 + ecc_f) * (-1 + ecc_0) / ((1 + ecc_0) * (-1 + ecc_f)))))))
+    return np.arctan(
+        abs(
+            3
+            * np.pi
+            * (inc_f - inc_0)
+            / (
+                4
+                * np.cos(argp)
+                * (
+                    ecc_0
+                    - ecc_f
+                    + np.log((1 + ecc_f) * (-1 + ecc_0) / ((1 + ecc_0) * (-1 + ecc_f)))
+                )
+            )
+        )
+    )
 
 
 @jit

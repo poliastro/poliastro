@@ -1,28 +1,44 @@
-import pytest
-
 import pickle
 
-from numpy.testing import assert_allclose, assert_array_equal
-
+import pytest
 from astropy import units as u
+from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
-from astropy.coordinates import CartesianRepresentation, CartesianDifferential
-
 from astropy.time import Time
+from numpy.testing import assert_allclose, assert_array_equal
 
 from poliastro.bodies import (
     Body,
-    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Moon,
+    Earth,
+    Jupiter,
+    Mars,
+    Mercury,
+    Moon,
+    Neptune,
+    Pluto,
+    Saturn,
+    Sun,
+    Uranus,
+    Venus,
 )
+from poliastro.constants import J2000
 from poliastro.frames import (
-    Planes,
+    GCRS,
+    HCRS,
     ICRS,
-    HCRS, MercuryICRS, VenusICRS, GCRS, MarsICRS, JupiterICRS, SaturnICRS, UranusICRS, NeptuneICRS, PlutoICRS,
-    HeliocentricEclipticJ2000
+    HeliocentricEclipticJ2000,
+    JupiterICRS,
+    MarsICRS,
+    MercuryICRS,
+    NeptuneICRS,
+    Planes,
+    PlutoICRS,
+    SaturnICRS,
+    UranusICRS,
+    VenusICRS,
 )
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
-from poliastro.constants import J2000
 
 
 def test_default_time_for_new_state():
@@ -42,8 +58,10 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         Orbit.from_classical(Sun, _d, _, _a, _a, _a, wrong_angle)
-    assert ("UnitsError: Argument 'nu' to function 'from_classical' must be in units convertible to 'rad'."
-            in excinfo.exconly())
+    assert (
+        "UnitsError: Argument 'nu' to function 'from_classical' must be in units convertible to 'rad'."
+        in excinfo.exconly()
+    )
 
 
 def test_state_raises_unitserror_if_rv_units_are_wrong():
@@ -51,8 +69,10 @@ def test_state_raises_unitserror_if_rv_units_are_wrong():
     wrong_v = [0.0, 1.0e-6, 0.0] * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         Orbit.from_vectors(Sun, _d, wrong_v)
-    assert ("UnitsError: Argument 'v' to function 'from_vectors' must be in units convertible to 'm / s'."
-            in excinfo.exconly())
+    assert (
+        "UnitsError: Argument 'v' to function 'from_vectors' must be in units convertible to 'm / s'."
+        in excinfo.exconly()
+    )
 
 
 def test_parabolic_elements_fail_early():
@@ -62,7 +82,10 @@ def test_parabolic_elements_fail_early():
     _a = 1.0 * u.deg  # Unused angle
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
-    assert ("ValueError: For parabolic orbits use Orbit.parabolic instead" in excinfo.exconly())
+    assert (
+        "ValueError: For parabolic orbits use Orbit.parabolic instead"
+        in excinfo.exconly()
+    )
 
 
 def test_bad_inclination_raises_exception():
@@ -73,7 +96,9 @@ def test_bad_inclination_raises_exception():
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, _d, _, bad_inc, _a, _a, _a)
-    assert ("ValueError: Inclination must be between 0 and 180 degrees" in excinfo.exconly())
+    assert (
+        "ValueError: Inclination must be between 0 and 180 degrees" in excinfo.exconly()
+    )
 
 
 def test_bad_hyperbolic_raises_exception():
@@ -84,7 +109,7 @@ def test_bad_hyperbolic_raises_exception():
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
-    assert ("Hyperbolic orbits have negative semimajor axis" in excinfo.exconly())
+    assert "Hyperbolic orbits have negative semimajor axis" in excinfo.exconly()
 
 
 def test_apply_maneuver_changes_epoch():
@@ -161,16 +186,18 @@ def test_pqw_for_circular_equatorial_orbit():
 
 
 def test_orbit_representation():
-    ss = Orbit.circular(Earth, 600 * u.km, 20 * u.deg, epoch=Time("2018-09-08 09:04:00", scale="tdb"))
+    ss = Orbit.circular(
+        Earth, 600 * u.km, 20 * u.deg, epoch=Time("2018-09-08 09:04:00", scale="tdb")
+    )
     expected_str = "6978 x 6978 km x 20.0 deg (GCRS) orbit around Earth (\u2641) at epoch 2018-09-08 09:04:00.000 (TDB)"
 
     assert str(ss) == repr(ss) == expected_str
 
 
 def test_orbit_no_frame_representation():
-    date_launch = Time('2011-11-26 15:02', scale='utc')
-    r = [61445.76498656, 24827.93010168, 0.] * u.km
-    v = [-0.42581645, -0.18867869, 0.] * u.km / u.s
+    date_launch = Time("2011-11-26 15:02", scale="utc")
+    r = [61445.76498656, 24827.93010168, 0.0] * u.km
+    v = [-0.42581645, -0.18867869, 0.0] * u.km / u.s
     ss = Orbit.from_vectors(Moon, r, v, date_launch)
     expected_str = "106 x -142299 km x 180.0 deg orbit around Moon (\u263E) at epoch 2011-11-26 15:02:00.000 (UTC)"
 
@@ -198,7 +225,7 @@ def test_sample_with_time_value():
     positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
 
-    assert_quantity_allclose(r, expected_r, rtol=1.e-7)
+    assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
 
 
 def test_sample_with_nu_value():
@@ -212,15 +239,19 @@ def test_sample_with_nu_value():
     positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
 
-    assert_quantity_allclose(r, expected_r, rtol=1.e-7)
+    assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
 
 
 def test_hyperbolic_nu_value_check():
     # A custom hyperbolic orbit
-    r = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km
-    v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
+    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
+    v = (
+        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
+        * u.km
+        / u.s
+    )
 
-    ss = Orbit.from_vectors(Sun, r, v, Time('2015-07-14 07:59', scale='tdb'))
+    ss = Orbit.from_vectors(Sun, r, v, Time("2015-07-14 07:59", scale="tdb"))
 
     positions = ss.sample(100)
 
@@ -231,7 +262,7 @@ def test_hyperbolic_nu_value_check():
 def test_hyperbolic_modulus_wrapped_nu():
     ss = Orbit.from_vectors(
         Sun,
-        [-9.77441841e+07, 1.01000539e+08, 4.37584668e+07] * u.km,
+        [-9.77441841e07, 1.01000539e08, 4.37584668e07] * u.km,
         [23.75936985, -43.09599568, -8.7084724] * u.km / u.s,
     )
     num_values = 3
@@ -243,9 +274,13 @@ def test_hyperbolic_modulus_wrapped_nu():
 
 def test_orbit_is_pickable():
     # A custom hyperbolic orbit
-    r = [1.197659243752796E+09, -4.443716685978071E+09, -1.747610548576734E+09] * u.km
-    v = [5.540549267188614E+00, -1.251544669134140E+01, -4.848892572767733E+00] * u.km / u.s
-    epoch = Time('2015-07-14 07:59', scale='tdb')
+    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
+    v = (
+        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
+        * u.km
+        / u.s
+    )
+    epoch = Time("2015-07-14 07:59", scale="tdb")
 
     ss = Orbit.from_vectors(Sun, r, v, epoch)
 
@@ -257,23 +292,28 @@ def test_orbit_is_pickable():
     assert ss_result.epoch == ss.epoch
 
 
-@pytest.mark.parametrize("attractor, expected_frame_class", [
-    (Sun, HCRS),
-    (Mercury, MercuryICRS),
-    (Venus, VenusICRS),
-    pytest.param(Earth, GCRS, marks=pytest.mark.xfail),  # See https://github.com/astropy/astropy/issues/7793
-    (Mars, MarsICRS),
-    (Jupiter, JupiterICRS),
-    (Saturn, SaturnICRS),
-    (Uranus, UranusICRS),
-    (Neptune, NeptuneICRS),
-    (Pluto, PlutoICRS),
-])
+@pytest.mark.parametrize(
+    "attractor, expected_frame_class",
+    [
+        (Sun, HCRS),
+        (Mercury, MercuryICRS),
+        (Venus, VenusICRS),
+        pytest.param(
+            Earth, GCRS, marks=pytest.mark.xfail
+        ),  # See https://github.com/astropy/astropy/issues/7793
+        (Mars, MarsICRS),
+        (Jupiter, JupiterICRS),
+        (Saturn, SaturnICRS),
+        (Uranus, UranusICRS),
+        (Neptune, NeptuneICRS),
+        (Pluto, PlutoICRS),
+    ],
+)
 def test_orbit_has_proper_frame(attractor, expected_frame_class):
     # Dummy data
-    r = [1E+09, -4E+09, -1E+09] * u.km
-    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
-    epoch = Time('2015-07-14 07:59', scale='tdb')
+    r = [1e09, -4e09, -1e09] * u.km
+    v = [5e00, -1e01, -4e00] * u.km / u.s
+    epoch = Time("2015-07-14 07:59", scale="tdb")
 
     ss = Orbit.from_vectors(attractor, r, v, epoch)
 
@@ -284,20 +324,22 @@ def test_orbit_has_proper_frame(attractor, expected_frame_class):
 def test_orbit_from_custom_body_raises_error_when_asked_frame():
     attractor = Body(Sun, 1 * u.km ** 3 / u.s ** 2, "_DummyPlanet")
 
-    r = [1E+09, -4E+09, -1E+09] * u.km
-    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+    r = [1e09, -4e09, -1e09] * u.km
+    v = [5e00, -1e01, -4e00] * u.km / u.s
 
     ss = Orbit.from_vectors(attractor, r, v)
 
     with pytest.raises(NotImplementedError) as excinfo:
         ss.frame
-    assert ("Frames for orbits around custom bodies are not yet supported"
-            in excinfo.exconly())
+    assert (
+        "Frames for orbits around custom bodies are not yet supported"
+        in excinfo.exconly()
+    )
 
 
-@pytest.mark.parametrize("body", [
-    Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
-])
+@pytest.mark.parametrize(
+    "body", [Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune]
+)
 def test_orbit_from_ephem_is_in_icrs_frame(body):
     ss = Orbit.from_body_ephem(body)
 
@@ -305,8 +347,8 @@ def test_orbit_from_ephem_is_in_icrs_frame(body):
 
 
 def test_orbit_accepts_ecliptic_plane():
-    r = [1E+09, -4E+09, -1E+09] * u.km
-    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+    r = [1e09, -4e09, -1e09] * u.km
+    v = [5e00, -1e01, -4e00] * u.km / u.s
 
     ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
 
@@ -314,8 +356,8 @@ def test_orbit_accepts_ecliptic_plane():
 
 
 def test_orbit_represent_as_produces_correct_data():
-    r = [1E+09, -4E+09, -1E+09] * u.km
-    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+    r = [1e09, -4e09, -1e09] * u.km
+    v = [5e00, -1e01, -4e00] * u.km / u.s
 
     ss = Orbit.from_vectors(Sun, r, v)
 
@@ -327,13 +369,15 @@ def test_orbit_represent_as_produces_correct_data():
 
     # We can't directly compare the objects, see https://github.com/astropy/astropy/issues/7793
     assert (result.xyz == expected_result.xyz).all()
-    assert (result.differentials['s'].d_xyz == expected_result.differentials['s'].d_xyz).all()
+    assert (
+        result.differentials["s"].d_xyz == expected_result.differentials["s"].d_xyz
+    ).all()
 
 
 @pytest.mark.parametrize("value", [1 * u.h, 10 * u.deg])
 def test_orbit_propagate_retains_plane(value):
-    r = [1E+09, -4E+09, -1E+09] * u.km
-    v = [5E+00, -1E+01, -4E+00] * u.km / u.s
+    r = [1e09, -4e09, -1e09] * u.km
+    v = [5e00, -1e01, -4e00] * u.km / u.s
 
     ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
 

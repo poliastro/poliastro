@@ -2,14 +2,24 @@
 
 """
 from astropy import units as u
-from poliastro.core.angles import (D_to_nu as D_to_nu_fast, nu_to_D as nu_to_D_fast,
-                                   E_to_nu as E_to_nu_fast, nu_to_E as nu_to_E_fast,
-                                   F_to_nu as F_to_nu_fast, nu_to_F as nu_to_F_fast,
-                                   M_to_D as M_to_D_fast, D_to_M as D_to_M_fast,
-                                   M_to_E as M_to_E_fast, E_to_M as E_to_M_fast,
-                                   M_to_F as M_to_F_fast, F_to_M as F_to_M_fast,
-                                   fp_angle as fp_angle_fast,
-                                   M_to_nu as M_to_nu_fast, nu_to_M as nu_to_M_fast)
+
+from poliastro.core.angles import (
+    D_to_M as D_to_M_fast,
+    D_to_nu as D_to_nu_fast,
+    E_to_M as E_to_M_fast,
+    E_to_nu as E_to_nu_fast,
+    F_to_M as F_to_M_fast,
+    F_to_nu as F_to_nu_fast,
+    M_to_D as M_to_D_fast,
+    M_to_E as M_to_E_fast,
+    M_to_F as M_to_F_fast,
+    M_to_nu as M_to_nu_fast,
+    fp_angle as fp_angle_fast,
+    nu_to_D as nu_to_D_fast,
+    nu_to_E as nu_to_E_fast,
+    nu_to_F as nu_to_F_fast,
+    nu_to_M as nu_to_M_fast,
+)
 
 
 @u.quantity_input(D=u.rad)

@@ -1,9 +1,9 @@
 import numpy as np
 from numpy import pi
 
-from poliastro.core.util import norm, cross
 from poliastro.core.hyper import hyp2f1b
 from poliastro.core.stumpff import c2, c3
+from poliastro.core.util import cross, norm
 
 from ._jit import jit
 
@@ -15,14 +15,14 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     else:
         t_m = -1
 
-    norm_r0 = np.dot(r0, r0)**.5
-    norm_r = np.dot(r, r)**.5
+    norm_r0 = np.dot(r0, r0) ** 0.5
+    norm_r = np.dot(r, r) ** 0.5
     norm_r0_times_norm_r = norm_r0 * norm_r
     norm_r0_plus_norm_r = norm_r0 + norm_r
 
     cos_dnu = np.dot(r0, r) / norm_r0_times_norm_r
 
-    A = t_m * (norm_r * norm_r0 * (1 + cos_dnu))**.5
+    A = t_m * (norm_r * norm_r0 * (1 + cos_dnu)) ** 0.5
 
     if A == 0.0:
         raise RuntimeError("Cannot compute orbit, phase angle is 180 degrees")
@@ -34,25 +34,28 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     count = 0
 
     while count < numiter:
-        y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
+        y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi) ** 0.5
         if A > 0.0:
             # Readjust xi_low until y > 0.0
             # Translated directly from Vallado
             while y < 0.0:
                 psi_low = psi
-                psi = (0.8 * (1.0 / c3(psi)) *
-                       (1.0 - norm_r0_times_norm_r * np.sqrt(c2(psi)) / A))
-                y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi)**.5
+                psi = (
+                    0.8
+                    * (1.0 / c3(psi))
+                    * (1.0 - norm_r0_times_norm_r * np.sqrt(c2(psi)) / A)
+                )
+                y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi) ** 0.5
 
         xi = np.sqrt(y / c2(psi))
-        tof_new = (xi**3 * c3(psi) + A * np.sqrt(y)) / np.sqrt(k)
+        tof_new = (xi ** 3 * c3(psi) + A * np.sqrt(y)) / np.sqrt(k)
 
         # Convergence check
         if np.abs((tof_new - tof) / tof) < rtol:
             break
         count += 1
         # Bisection check
-        condition = (tof_new <= tof)
+        condition = tof_new <= tof
         psi_low = psi_low + (psi - psi_low) * condition
         psi_up = psi_up + (psi - psi_up) * (not condition)
 
@@ -86,7 +89,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     c_norm, r1_norm, r2_norm = norm(c), norm(r1), norm(r2)
 
     # Semiperimeter
-    s = (r1_norm + r2_norm + c_norm) * .5
+    s = (r1_norm + r2_norm + c_norm) * 0.5
 
     # Versors
     i_r1, i_r2 = r1 / r1_norm, r2 / r2_norm
@@ -114,8 +117,9 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     sigma = np.sqrt(1 - rho ** 2)
 
     for x, y in xy:
-        V_r1, V_r2, V_t1, V_t2 = _reconstruct(x, y, r1_norm, r2_norm, ll,
-                                              gamma, rho, sigma)
+        V_r1, V_r2, V_t1, V_t2 = _reconstruct(
+            x, y, r1_norm, r2_norm, ll, gamma, rho, sigma
+        )
         v1 = V_r1 * i_r1 + V_t1 * i_t1
         v2 = V_r2 * i_r2 + V_t2 * i_t2
         yield v1, v2
@@ -201,14 +205,15 @@ def _tof_equation(x, y, T0, ll, M):
     """
     if M == 0 and np.sqrt(0.6) < x < np.sqrt(1.4):
         eta = y - ll * x
-        S_1 = (1 - ll - x * eta) * .5
+        S_1 = (1 - ll - x * eta) * 0.5
         Q = 4 / 3 * hyp2f1b(S_1)
-        T_ = (eta ** 3 * Q + 4 * ll * eta) * .5
+        T_ = (eta ** 3 * Q + 4 * ll * eta) * 0.5
     else:
         psi = _compute_psi(x, y, ll)
-        T_ = np.divide(np.divide(psi + M * pi,
-                                 np.sqrt(np.abs(1 - x ** 2))) - x + ll * y,
-                       (1 - x ** 2))
+        T_ = np.divide(
+            np.divide(psi + M * pi, np.sqrt(np.abs(1 - x ** 2))) - x + ll * y,
+            (1 - x ** 2),
+        )
 
     return T_ - T0
 
@@ -226,7 +231,9 @@ def _tof_equation_p2(x, y, T, dT, ll):
 
 @jit
 def _tof_equation_p3(x, y, _, dT, ddT, ll):
-    return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (1 - x ** 2)
+    return (7 * x * ddT + 8 * dT - 6 * (1 - ll ** 2) * ll ** 5 * x / y ** 5) / (
+        1 - x ** 2
+    )
 
 
 @jit
@@ -273,8 +280,12 @@ def _initial_guess(T, ll, M):
         return [x_0]
     else:
         # Multiple revolution
-        x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (((M * pi + pi) / (8 * T)) ** (2 / 3) + 1)
-        x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (((8 * T) / (M * pi)) ** (2 / 3) + 1)
+        x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (
+            ((M * pi + pi) / (8 * T)) ** (2 / 3) + 1
+        )
+        x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (
+            ((8 * T) / (M * pi)) ** (2 / 3) + 1
+        )
 
         return [x_0l, x_0r]
 
@@ -326,8 +337,10 @@ def _householder(p0, T0, ll, M, tol, maxiter):
         fder3 = _tof_equation_p3(p0, y, T, fder, fder2, ll)
 
         # Householder step (quartic)
-        p = p0 - fval * ((fder ** 2 - fval * fder2 / 2) /
-                         (fder * (fder ** 2 - fval * fder2) + fder3 * fval ** 2 / 6))
+        p = p0 - fval * (
+            (fder ** 2 - fval * fder2 / 2)
+            / (fder * (fder ** 2 - fval * fder2) + fder3 * fval ** 2 / 6)
+        )
 
         if abs(p - p0) < tol:
             return p

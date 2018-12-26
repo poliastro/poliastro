@@ -1,18 +1,17 @@
 """Propagation algorithms
 
 """
-import numpy as np
 import functools
 
+import numpy as np
+from astropy import units as u
 from scipy.integrate import solve_ivp
 
 from poliastro.core.propagation import (
+    kepler as kepler_fast,
     mean_motion as mean_motion_fast,
-    kepler as kepler_fast
 )
 from poliastro.integrators import DOP835
-
-from astropy import units as u
 
 
 def func_twobody(t0, u_, k, ad, ad_kwargs):
@@ -36,16 +35,9 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
     ax, ay, az = ad(t0, u_, k, **ad_kwargs)
 
     x, y, z, vx, vy, vz = u_
-    r3 = (x**2 + y**2 + z**2)**1.5
+    r3 = (x ** 2 + y ** 2 + z ** 2) ** 1.5
 
-    du = np.array([
-        vx,
-        vy,
-        vz,
-        -k * x / r3 + ax,
-        -k * y / r3 + ay,
-        -k * z / r3 + az
-    ])
+    du = np.array([vx, vy, vz, -k * x / r3 + ax, -k * y / r3 + ay, -k * z / r3 + az])
     return du
 
 
@@ -93,9 +85,15 @@ def cowell(orbit, tof, rtol=1e-11, *, ad=None, **ad_kwargs):
     if not multiple_input:
         tof = [tof]
 
-    result = solve_ivp(f_with_ad, (0, max(tof)), u0,
-                       rtol=rtol, atol=1e-12, method=DOP835,
-                       dense_output=True)
+    result = solve_ivp(
+        f_with_ad,
+        (0, max(tof)),
+        u0,
+        rtol=rtol,
+        atol=1e-12,
+        method=DOP835,
+        dense_output=True,
+    )
     if not result.success:
         raise RuntimeError("Integration failed")
 
@@ -116,7 +114,7 @@ def mean_motion(orbit, tofs, **kwargs):
     r0 = orbit.r.to(u.km).value
     v0 = orbit.v.to(u.km / u.s).value
 
-    if not hasattr(tofs, '__len__'):
+    if not hasattr(tofs, "__len__"):
         return mean_motion_fast(k, r0, v0, tofs)
 
     results = [mean_motion_fast(k, r0, v0, tof) for tof in tofs]
@@ -124,7 +122,7 @@ def mean_motion(orbit, tofs, **kwargs):
 
 
 def kepler(orbit, tofs, numiter=350, **kwargs):
-    if not hasattr(tofs, '__len__'):
+    if not hasattr(tofs, "__len__"):
         return _kepler(orbit, tofs, numiter=numiter)
 
     results = [_kepler(orbit, tof, numiter=numiter) for tof in tofs]
@@ -177,4 +175,10 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
 
     """
     r, v = method(orbit, time_of_flight.to(u.s).value, rtol=rtol, **kwargs)
-    return orbit.from_vectors(orbit.attractor, r * u.km, v * u.km / u.s, orbit.epoch + time_of_flight, orbit.plane)
+    return orbit.from_vectors(
+        orbit.attractor,
+        r * u.km,
+        v * u.km / u.s,
+        orbit.epoch + time_of_flight,
+        orbit.plane,
+    )
