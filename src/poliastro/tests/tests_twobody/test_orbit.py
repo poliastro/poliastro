@@ -45,9 +45,9 @@ from poliastro.twobody.orbit import TimeScaleWarning
 def hyperbolic_orbit():
     r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
     v = (
-        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00] *
-        u.km /
-        u.s
+        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
+        * u.km
+        / u.s
     )
     return r, v
 
@@ -333,8 +333,8 @@ def test_orbit_from_ephem_is_in_icrs_frame(body):
 
 
 def test_orbit_accepts_ecliptic_plane():
-    r = [1e+09, -4e+09, -1e+09] * u.km
-    v = [5e+00, -1e+01, -4e+00] * u.km / u.s
+    r = [1e09, -4e09, -1e09] * u.km
+    v = [5e00, -1e01, -4e00] * u.km / u.s
 
     ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
 
