@@ -52,24 +52,20 @@ def hyperbolic_orbit():
     return r, v
 
 
-@pytest.fixture()
-def orb_para():
+def test_default_time_for_new_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
-    return [_d, _, _a, _body]
-
-
-def test_default_time_for_new_state(orb_para):
-    [_d, _, _a, _body] = orb_para
     expected_epoch = J2000
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     assert ss.epoch == expected_epoch
 
 
-def test_state_raises_unitserror_if_elements_units_are_wrong(orb_para):
-    [_d, _, _a, _body] = orb_para
+def test_state_raises_unitserror_if_elements_units_are_wrong():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         Orbit.from_classical(Sun, _d, _, _a, _a, _a, wrong_angle)
@@ -90,10 +86,11 @@ def test_state_raises_unitserror_if_rv_units_are_wrong():
     )
 
 
-def test_parabolic_elements_fail_early(orb_para):
+def test_parabolic_elements_fail_early():
     attractor = Earth
     ecc = 1.0 * u.one
-    [_d, _, _a, _body] = orb_para
+    _d = 1.0 * u.AU  # Unused distance
+    _a = 1.0 * u.deg  # Unused angle
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(attractor, _d, ecc, _a, _a, _a, _a)
     assert (
@@ -102,8 +99,11 @@ def test_parabolic_elements_fail_early(orb_para):
     )
 
 
-def test_bad_inclination_raises_exception(orb_para):
-    [_d, _, _a, _body] = orb_para
+def test_bad_inclination_raises_exception():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
     bad_inc = 200 * u.deg
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, _d, _, bad_inc, _a, _a, _a)
@@ -112,18 +112,21 @@ def test_bad_inclination_raises_exception(orb_para):
     )
 
 
-def test_bad_hyperbolic_raises_exception(orb_para):
+def test_bad_hyperbolic_raises_exception():
     bad_a = 1.0 * u.AU
     ecc = 1.5 * u.one
     _inc = 100 * u.deg  # Unused inclination
-    [_d, _, _a, _body] = orb_para
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
     assert "Hyperbolic orbits have negative semimajor axis" in excinfo.exconly()
 
 
-def test_apply_maneuver_changes_epoch(orb_para):
-    [_d, _, _a, _body] = orb_para
+def test_apply_maneuver_changes_epoch():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
     dt = 1 * u.h
     dv = [0, 0, 0] * u.km / u.s
@@ -165,17 +168,19 @@ def test_geosync_has_proper_period():
     assert_quantity_allclose(ss.period, expected_period, rtol=1e-4)
 
 
-def test_parabolic_has_proper_eccentricity(orb_para):
+def test_parabolic_has_proper_eccentricity():
     attractor = Earth
-    [_d, _, _a, _body] = orb_para
+    _d = 1.0 * u.AU  # Unused distance
+    _a = 1.0 * u.deg  # Unused angle
     expected_ecc = 1.0 * u.one
     ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
     assert_allclose(ss.ecc, expected_ecc)
 
 
-def test_parabolic_has_zero_energy(orb_para):
+def test_parabolic_has_zero_energy():
     attractor = Earth
-    [_d, _, _a, _body] = orb_para
+    _d = 1.0 * u.AU  # Unused distance
+    _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.parabolic(attractor, _d, _a, _a, _a, _a)
     assert_allclose(ss.energy.value, 0.0, atol=1e-16)
 
@@ -210,18 +215,22 @@ def test_orbit_no_frame_representation():
     assert str(ss) == repr(ss) == expected_str
 
 
-def test_sample_numpoints(orb_para):
-    [_d, _, _a, _body] = orb_para
-
+def test_sample_numpoints():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
     positions = ss.sample(values=50)
     assert len(positions) == 50
 
 
-def test_sample_with_time_value(orb_para):
-    [_d, _, _a, _body] = orb_para
+def test_sample_with_time_value():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-
     expected_r = [ss.r]
     positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
@@ -229,10 +238,12 @@ def test_sample_with_time_value(orb_para):
     assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
 
 
-def test_sample_with_nu_value(orb_para):
-    [_d, _, _a, _body] = orb_para
+def test_sample_with_nu_value():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-
     expected_r = [ss.r]
     positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
