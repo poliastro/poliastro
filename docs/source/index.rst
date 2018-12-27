@@ -84,7 +84,7 @@ Contents
 --------
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
 
     about
     getting_started
@@ -95,7 +95,6 @@ Contents
     changelog
     references
     
-
 
 .. note::
     Older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for

@@ -4,7 +4,7 @@ High level API
 The modules included are listed below:
 
 .. toctree::
-    :maxdepth: 5
+    :maxdepth: 2
 
     twobody/twobody_index
     iod/iod_index

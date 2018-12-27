@@ -1,16 +1,16 @@
 Util module
 ===========
 
-The :py:mod:`poliastro.core.util` contains the following functions:
-
 .. graphviz::
 
    digraph {
-      "core.util" -> "circular_velocity", "rotate", "transform", "norm", "cross" ;
+      "poliastro.core.util" -> "circular_velocity", "rotate", "transform", "norm", "cross" ;
    }
 
 \
 \
+The :py:mod:`poliastro.core.util` module contains, mainly, a set of functions realted to vectorial
+computations.
 
 .. automodule:: poliastro.core.util
     :members:
