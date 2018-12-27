@@ -165,10 +165,10 @@ poliastro.threebody.flybys module
 .. automodule:: poliastro.threebody.flybys
   :members:
 
-poliastro.patched_conics module
--------------------------------
+poliastro.threebody.patched_conics module
+*****************************************
 
-.. automodule:: poliastro.patched_conics
+.. automodule:: poliastro.threebody.patched_conics
     :members:
 
 poliastro.plotting module

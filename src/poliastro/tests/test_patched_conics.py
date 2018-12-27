@@ -16,7 +16,7 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.patched_conics import compute_soi
+from poliastro.threebody.patched_conics import compute_soi
 
 
 def test_compute_soi():
