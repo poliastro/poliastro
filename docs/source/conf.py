@@ -20,6 +20,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
+sys.path.append('../src/')
 
 # -- General configuration ------------------------------------------------
 
@@ -38,6 +39,7 @@ extensions = [
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.mathjax', #New module for matrix visualization
+    'sphinx.ext.graphviz', # For creating the diagrams
 ]
 
 # Custom configuration

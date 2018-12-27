@@ -84,30 +84,14 @@ Contents
 --------
 
 .. toctree::
-    :caption: --- The Poliastro Project ---
-    :maxdepth: 2
+    :maxdepth: 3
 
     about
     getting_started
-
-.. toctree::
-    :caption: --- How to use Poliastro ---
-    :maxdepth: 2
-
     user_guide
     jupyter
-
-.. toctree::
-    :caption: --- API Reference ---
-    :maxdepth: 2
-
     api/safe/safe_index
     api/core/core_index
-
-.. toctree::
-    :caption: --- Poliastro Evolution ---
-    :maxdepth: 2
-
     changelog
     references
     
