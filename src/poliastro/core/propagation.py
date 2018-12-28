@@ -146,8 +146,10 @@ def kepler(k, r0, v0, tof, numiter):
             * (-1 / alpha) ** 0.5
             * np.log(
                 (-2 * k * alpha * tof)
-                        / (dot_r0v0 + np.sign(tof) *
-                          np.sqrt(-k / alpha) * (1 - norm_r0 * alpha))
+                / (
+                    dot_r0v0
+                    + np.sign(tof) * np.sqrt(-k / alpha) * (1 - norm_r0 * alpha)
+                )
             )
         )
     else:
