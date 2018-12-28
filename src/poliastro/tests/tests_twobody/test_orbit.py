@@ -41,6 +41,17 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
 
 
+@pytest.fixture()
+def hyperbolic_orbit():
+    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
+    v = (
+        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
+        * u.km
+        / u.s
+    )
+    return r, v
+
+
 def test_default_time_for_new_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -92,8 +103,8 @@ def test_bad_inclination_raises_exception():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    bad_inc = 200 * u.deg
     _body = Sun  # Unused body
+    bad_inc = 200 * u.deg
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, _d, _, bad_inc, _a, _a, _a)
     assert (
@@ -104,8 +115,8 @@ def test_bad_inclination_raises_exception():
 def test_bad_hyperbolic_raises_exception():
     bad_a = 1.0 * u.AU
     ecc = 1.5 * u.one
-    _a = 1.0 * u.deg  # Unused angle
     _inc = 100 * u.deg  # Unused inclination
+    _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(_body, bad_a, ecc, _inc, _a, _a, _a)
@@ -220,7 +231,6 @@ def test_sample_with_time_value():
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-
     expected_r = [ss.r]
     positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
@@ -234,7 +244,6 @@ def test_sample_with_nu_value():
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-
     expected_r = [ss.r]
     positions = ss.sample(values=ss.nu + [360] * u.deg)
     r = positions.data.xyz.transpose()
@@ -242,14 +251,8 @@ def test_sample_with_nu_value():
     assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
 
 
-def test_hyperbolic_nu_value_check():
-    # A custom hyperbolic orbit
-    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
-    v = (
-        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
-        * u.km
-        / u.s
-    )
+def test_hyperbolic_nu_value_check(hyperbolic_orbit):
+    r, v = hyperbolic_orbit
 
     ss = Orbit.from_vectors(Sun, r, v, Time("2015-07-14 07:59", scale="tdb"))
 
@@ -272,14 +275,8 @@ def test_hyperbolic_modulus_wrapped_nu():
     assert_quantity_allclose(positions[0].data.xyz, ss.r)
 
 
-def test_orbit_is_pickable():
-    # A custom hyperbolic orbit
-    r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
-    v = (
-        [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
-        * u.km
-        / u.s
-    )
+def test_orbit_is_pickable(hyperbolic_orbit):
+    r, v = hyperbolic_orbit
     epoch = Time("2015-07-14 07:59", scale="tdb")
 
     ss = Orbit.from_vectors(Sun, r, v, epoch)
