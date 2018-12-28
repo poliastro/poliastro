@@ -1,22 +1,32 @@
 High level API
 ==============
 
-The modules included are listed below:
+The :py:mod:`poliastro.twobody` is on of the main modules of :py:mod:`poliastro` since enables
+the user in a very intuitive way to create, propagate and apply maneuvers to an orbit due to its
+OOP nature.
+
+
+.. graphviz:: 
+    
+    digraph {
+        "poliastro" -> "twobody", "threebody", "bodies", "neos", "iod", "constants", "coordinates", "examples", "frames",
+                       "maneuver"
+
+    }
 
 .. toctree::
+    :hidden:
     :maxdepth: 2
 
     twobody/twobody_index
-    iod/iod_index
-    neos/neos_index
+    threebody/threebody_index
     bodies
+    neos/neos_index
+    iod/iod_index    
     constants
     coordinates
-    cli
     examples
     frames
     maneuver
-    threebody/threebody_index
-    patched_conics
     plotting
     util

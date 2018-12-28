@@ -19,4 +19,4 @@ functions that enable to solve the Lambert problem.
 
 
 .. automodule:: poliastro.core.iod
-    :members:
+   :members:
