@@ -10,6 +10,14 @@ from ._jit import jit
 def hyp2f1b(x):
     """Hypergeometric function 2F1(3, 1, 5/2, x), see [Battin].
 
+    .. todo::
+        Add more information about this function
+
+    Note
+    ----
+    More information about hypergeometric function can be checked at 
+    https://en.wikipedia.org/wiki/Hypergeometric_function
+
     """
     if x >= 1.0:
         return np.inf

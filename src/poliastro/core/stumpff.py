@@ -1,6 +1,3 @@
-"""Stumpff functions.
-
-"""
 from math import gamma
 
 import numpy as np

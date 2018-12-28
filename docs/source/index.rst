@@ -84,15 +84,17 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   about
-   getting_started
-   user_guide
-   jupyter
-   references
-   api
-   changelog
+    about
+    getting_started
+    user_guide
+    jupyter
+    api/safe/safe_index
+    api/core/core_index
+    changelog
+    references
+    
 
 .. note::
     Older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for

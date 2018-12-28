@@ -9,19 +9,31 @@ from ._jit import jit
 
 @jit
 def mean_motion(k, r0, v0, tof):
-    r"""Propagates orbit using mean motion
+    r"""Propagates orbit using mean motion. This algorithm depends on the geometric shape of the
+    orbit.
+
+    For the case of the strong elliptic or strong hyperbolic orbits:
+
+    ..  math::
+
+        M = M_{0} + \frac{\mu^{2}}{h^{3}}\left ( 1 -e^{2}\right )^{\frac{3}{2}}t
 
     .. versionadded:: 0.9.0
 
+
     Parameters
     ----------
-    orbit : ~poliastro.twobody.orbit.Orbit
-        the Orbit object to propagate.
+    k : float
+        Standar Gravitational parameter
+    r0 : ~astropy.units.Quantity
+        Initial position vector wrt attractor center.
+    v0 : ~astropy.units.Quantity
+        Initial velocity vector.
     tof : float
         Time of flight (s).
 
-    Notes
-    -----
+    Note
+    ----
     This method takes initial :math:`\vec{r}, \vec{v}`, calculates classical orbit parameters,
     increases mean anomaly and performs inverse transformation to get final :math:`\vec{r}, \vec{v}`
     The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9
@@ -53,6 +65,70 @@ def mean_motion(k, r0, v0, tof):
 
 @jit
 def kepler(k, r0, v0, tof, numiter):
+    r"""Solves Kepler's Equation by applying a Newton-Raphson method.
+
+    If the position of a body along its orbit wants to be computed
+    for an specific time, it can be solved by terms of the Kepler's Equation:
+
+    .. math::
+        E = M + e\sin{E}
+
+    In this case, the equation is written in terms of the Universal Anomaly:
+
+    .. math::
+
+        \sqrt{\mu}\Delta t = \frac{r_{o}v_{o}}{\sqrt{\mu}}\chi^{2}C(\alpha \chi^{2}) + (1 - \alpha r_{o})\chi^{3}S(\alpha \chi^{2}) + r_{0}\chi
+
+    This equation is solved for the universal anomaly by applying a Newton-Raphson numerical method.
+    Once it is solved, the Lagrange coefficients are returned:
+
+    .. math::
+
+        \begin{align}
+            f &= 1 \frac{\chi^{2}}{r_{o}}C(\alpha \chi^{2}) \\
+            g &= \Delta t - \frac{1}{\sqrt{\mu}}\chi^{3}S(\alpha \chi^{2}) \\
+            \dot{f} &= \frac{\sqrt{\mu}}{rr_{o}}(\alpha \chi^{3}S(\alpha \chi^{2}) - \chi) \\
+            \dot{g} &= 1 - \frac{\chi^{2}}{r}C(\alpha \chi^{2}) \\
+        \end{align}
+
+    Lagrange coefficients can be related then with the position and velocity vectors:
+
+    .. math::
+        \begin{align}
+            \vec{r} &= f\vec{r_{o}} + g\vec{v_{o}} \\
+            \vec{v} &= \dot{f}\vec{r_{o}} + \dot{g}\vec{v_{o}} \\
+        \end{align}
+
+    Parameters
+    ----------
+
+    k: float
+        Standard gravitational parameter
+    r0: ~numpy.array
+        Initial position vector
+    v0: ~numpy.array
+        Initial velocity vector
+    numiter: int
+        Number of iterations
+
+    Returns
+    -------
+    f: float
+        First Lagrange coefficient
+    g: float
+        Second Lagrange coefficient
+    fdot: float
+        Derivative of the first coefficient
+    gdot: float
+        Derivative of the second coefficient
+
+
+    Note
+    ----
+    The theoretical procedure is explained in section 3.7 of Curtis in really
+    deep detail. For analytical example, check in the same book for example 3.6.
+    """
+
     # Cache some results
     dot_r0v0 = np.dot(r0, v0)
     norm_r0 = np.dot(r0, r0) ** 0.5

@@ -10,6 +10,93 @@ from ._jit import jit
 
 @jit
 def vallado(k, r0, r, tof, short, numiter, rtol):
+    r"""Solves the Lambert's problem.
+
+    The algorithm returns the initial velocity vector and the final one, these are
+    computed by the following expresions:
+
+    .. math::
+      
+        \vec{v_{o}} &= \frac{1}{g}(\vec{r} - f\vec{r_{0}}) \\
+        \vec{v} &= \frac{1}{g}(\dot{g}\vec{r} - \vec{r_{0}})
+        
+
+    Therefore, the lagrange coefficients need to be computed. For the case of
+    Lamber's problem, they can be expresed by terms of the initial and final vector:
+
+    .. math::
+
+        \begin{align}
+            f = 1 -\frac{y}{r_{o}} \\
+            g = A\sqrt{\frac{y}{\mu}} \\
+            \dot{g} = 1 - \frac{y}{r} \\
+        \end{align}
+    
+    Where y(z) is a function that depends on the :py:mod:`poliastro.core.stumpff` coefficients:
+
+    .. math::
+
+        y = r_{o} + r + A\frac{zS(z)-1}{\sqrt{C(z)}} \\
+        A = \sin{(\Delta \nu)}\sqrt{\frac{rr_{o}}{1 - \cos{(\Delta \nu)}}}
+
+    The value of z to evaluate the stump functions is solved by applying a Numerical method to
+    the following equation:
+
+    .. math::
+
+        z_{i+1} = z_{i} - \frac{F(z_{i})}{F{}'(z_{i})}
+
+    Function F(z)  to the expression:
+
+    .. math::
+
+        F(z) = \left [\frac{y(z)}{C(z)}  \right ]^{\frac{3}{2}}S(z) + A\sqrt{y(z)} - \sqrt{\mu}\Delta t
+
+    Parameters
+    ----------
+    k: float
+        Gravitational Parameter
+    r0: ~np.array
+        Initial position vector
+    r: ~np.array
+        Final position vector
+    tof: ~float
+        Time of flight
+    numiter: int
+        Number of iterations to
+    rtol: int
+        Number of revolutions
+
+    Returns
+    -------
+    v0: ~np.array
+        Initial velocity vector
+    v: ~np.array
+        Final velocity vector
+
+    Examples
+    --------
+
+    >>> from poliastro.core.iod import vallado
+    >>> from astropy import units as u
+    >>> import numpy as np
+    >>> from poliastro.bodies import Earth
+    >>> k = Earth.k.to(u.km**3 / u.s**2)
+    >>> r1 = np.array([5000, 10000, 2100])*u.km #Initial position vector
+    >>> r2 = np.array([-14600, 2500, 7000])*u.km #Final position vector
+    >>> tof = 3600*u.s #Time of fligh
+    >>> v1, v2 = vallado(k.value, r1.value, r2.value, tof.value, short=True, numiter=35, rtol=1e-8)
+    >>> v1 = v1*u.km / u.s
+    >>> v2 = v2*u.km / u.s
+    >>> print(v1, v2)
+    [-5.99249499  1.92536673  3.24563805] km / s [-3.31245847 -4.196619   -0.38528907] km / s
+    
+    Note
+    ----
+    This procedure can be found in section 5.3 of Curtis, with all the
+    theoretical description of the problem. Analytical example can be found
+    in the same book under name Example 5.2.
+    """
     if short:
         t_m = +1
     else:
@@ -76,6 +163,35 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
 
 @jit
 def izzo(k, r1, r2, tof, M, numiter, rtol):
+    """ Aplies izzo algorithm to solve Lambert's problem.
+
+    Parameters
+    ----------
+    k: float
+        Gravitational Constant
+    r1: ~numpy.array 
+        Initial position vector
+    r2: ~numpy.array
+        Final position vector
+    tof: float
+        Time of flight between both positions
+    M: int
+        Number of revolutions
+    numiter: int
+        Numbert of iterations
+    rotl: float
+        Error tolerance
+    
+    Returns
+    -------
+
+    v1: ~numpy.array
+        Initial velocity vector
+    v2: ~numpy.array
+        FInal velocity vector
+
+    """
+
     # Check preconditions
     assert tof > 0
     assert k > 0
