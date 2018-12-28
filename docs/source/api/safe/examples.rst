@@ -1,4 +1,4 @@
-Examples Module
+Examples module
 ===============
 
 .. automodule:: poliastro.examples

@@ -1,4 +1,4 @@
-Plotting Module
+Plotting module
 ===============
 
 .. automodule:: poliastro.plotting

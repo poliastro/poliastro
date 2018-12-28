@@ -22,7 +22,7 @@ OOP nature.
     threebody/threebody_index
     bodies
     neos/neos_index
-    iod/iod_index    
+    iod/iod_index
     constants
     coordinates
     examples

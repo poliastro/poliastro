@@ -1,4 +1,4 @@
-Maneuver Module
+Maneuver module
 ===============
 
 .. automodule:: poliastro.maneuver

@@ -1,4 +1,4 @@
-Frames Module
+Frames module
 =============
 
 .. automodule:: poliastro.frames
