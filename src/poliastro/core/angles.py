@@ -412,6 +412,7 @@ def M_to_nu(M, ecc, delta=1e-2):
 
     Examples
     --------
+    >>> import astropy.units as u
     >>> M_to_nu(30.0 * u.deg, 0.06 * u.one)
     <Quantity 33.67328493 deg>
 
