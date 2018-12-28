@@ -1,8 +1,3 @@
-"""The Stumpff functions, developed by Karl Stumpff,
-    are used for analyzing orbits using the universal variable
-    formulation.
-
-"""
 from math import gamma
 
 import numpy as np

@@ -165,8 +165,31 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
 def izzo(k, r1, r2, tof, M, numiter, rtol):
     """ Aplies izzo algorithm to solve Lambert's problem.
 
-    .. todo::
-        A docstring needs to be added
+    Parameters
+    ----------
+    k: float
+        Gravitational Constant
+    r1: ~numpy.array 
+        Initial position vector
+    r2: ~numpy.array
+        Final position vector
+    tof: float
+        Time of flight between both positions
+    M: int
+        Number of revolutions
+    numiter: int
+        Numbert of iterations
+    rotl: float
+        Error tolerance
+    
+    Returns
+    -------
+
+    v1: ~numpy.array
+        Initial velocity vector
+    v2: ~numpy.array
+        FInal velocity vector
+
     """
 
     # Check preconditions
