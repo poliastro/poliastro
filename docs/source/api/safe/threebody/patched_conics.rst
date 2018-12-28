@@ -1,5 +1,5 @@
 Patched Conics Module
 =====================
 
-.. automodule:: poliastro.patched_conics
+.. automodule:: poliastro.threebody.patched_conics
     :members:
