@@ -446,7 +446,11 @@ class Orbit(object):
             else:
                 time_of_flight = time.TimeDelta(value)
 
-            return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+            # Check that time of fligh value is not zero
+            if not time_of_flight.value == 0:
+                return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+            else:
+                return self
 
     def sample(self, values=None, method=mean_motion):
         """Samples an orbit to some specified time values.
