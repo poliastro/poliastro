@@ -384,3 +384,12 @@ def test_orbit_propagate_retains_plane(value):
     expected_frame = orig_frame.replicate_without_data(obstime=final_ss.epoch)
 
     assert final_ss.frame.is_equivalent_frame(expected_frame)
+
+
+def test_from_horizons_raise_valueerror():
+    with pytest.raises(ValueError) as exep:
+        ss = Orbit.from_horizons(name="Dummy")
+    assert (
+        "ValueError: Unknown target (Dummy). Maybe try different id_type?"
+        in exep.exconly()
+    )
