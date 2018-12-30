@@ -252,8 +252,10 @@ class Orbit(object):
         raan = obj["Omega"][0] * u.deg
         argp = obj["w"][0] * u.deg
         nu = obj["nu"][0] * u.deg
-        ss = classical.ClassicalState(Sun, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
-        return cls(ss, epoch.tdb, plane)
+        ss = cls.from_classical(
+            Sun, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+        )
+        return ss
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
