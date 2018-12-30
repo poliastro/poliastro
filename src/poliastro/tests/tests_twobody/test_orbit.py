@@ -413,3 +413,9 @@ def test_orbits_are_same():
     assert ss.pqw()[0].value.all() == ss1.pqw()[0].value.all()
     assert ss.r_a == ss1.r_a
     assert ss.a == ss1.a
+
+
+def test_plane_is_set_in_horizons():
+    plane = Planes.EARTH_ECLIPTIC
+    ss = Orbit.from_horizons(name="Ceres", plane=plane)
+    assert ss.plane == plane
