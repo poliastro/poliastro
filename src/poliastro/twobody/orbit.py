@@ -242,9 +242,9 @@ class Orbit(object):
         if not epoch:
             epoch = time.Time.now()
         if plane == Planes.EARTH_EQUATOR:
-            refplane = 'earth'
+            refplane = "earth"
         elif plane == Planes.EARTH_ECLIPTIC:
-            refplane = 'ecliptic'
+            refplane = "ecliptic"
         obj = Horizons(id=name, epochs=epoch.jd).elements(refplane=refplane)
         a = obj["a"][0] * u.au
         ecc = obj["e"][0] * u.one
