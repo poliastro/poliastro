@@ -384,3 +384,13 @@ def test_orbit_propagate_retains_plane(value):
     expected_frame = orig_frame.replicate_without_data(obstime=final_ss.epoch)
 
     assert final_ss.frame.is_equivalent_frame(expected_frame)
+
+def test_tof_zero_value_returns_same_orbit():
+    r = [1e09, -4e09, -1e09] * u.km
+    v = [5e00, -1e01, -4e00] * u.km / u.s
+
+    ss = Orbit.from_vectors(Earth, r, v)
+    expected_orbit = ss
+
+    assert expected_orbit == ss.propagate(0 * u.h)
+
