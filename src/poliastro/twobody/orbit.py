@@ -234,14 +234,18 @@ class Orbit(object):
         return ss
 
     @classmethod
-    def from_horizons(cls, name, epoch=None, plane=Planes.EARTH_EQUATOR):
+    def from_horizons(
+        cls, name, epoch=None, plane=Planes.EARTH_EQUATOR, id_type="smallbody"
+    ):
         if not epoch:
             epoch = time.Time.now()
         if plane == Planes.EARTH_EQUATOR:
             refplane = "earth"
         elif plane == Planes.EARTH_ECLIPTIC:
             refplane = "ecliptic"
-        obj = Horizons(id=name, epochs=epoch.jd).elements(refplane=refplane)
+        obj = Horizons(id=name, epochs=epoch.jd, id_type=id_type).elements(
+            refplane=refplane
+        )
         a = obj["a"][0] * u.au
         ecc = obj["e"][0] * u.one
         inc = obj["incl"][0] * u.deg
