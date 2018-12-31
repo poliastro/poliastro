@@ -11,6 +11,8 @@ from astropy.coordinates import (
     get_body_barycentric_posvel,
 )
 
+from astroquery.jplhorizons import Horizons
+
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
@@ -233,6 +235,26 @@ class Orbit(object):
             ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
             ss._frame = ICRS()  # Hack!
 
+        return ss
+
+    @classmethod
+    def from_horizons(cls, name, epoch=None, plane=Planes.EARTH_EQUATOR):
+        if not epoch:
+            epoch = time.Time.now()
+        if plane == Planes.EARTH_EQUATOR:
+            refplane = "earth"
+        elif plane == Planes.EARTH_ECLIPTIC:
+            refplane = "ecliptic"
+        obj = Horizons(id=name, epochs=epoch.jd).elements(refplane=refplane)
+        a = obj["a"][0] * u.au
+        ecc = obj["e"][0] * u.one
+        inc = obj["incl"][0] * u.deg
+        raan = obj["Omega"][0] * u.deg
+        argp = obj["w"][0] * u.deg
+        nu = obj["nu"][0] * u.deg
+        ss = cls.from_classical(
+            Sun, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+        )
         return ss
 
     @classmethod

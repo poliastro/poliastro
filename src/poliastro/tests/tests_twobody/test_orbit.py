@@ -384,3 +384,38 @@ def test_orbit_propagate_retains_plane(value):
     expected_frame = orig_frame.replicate_without_data(obstime=final_ss.epoch)
 
     assert final_ss.frame.is_equivalent_frame(expected_frame)
+
+
+def test_from_horizons_raise_valueerror():
+    with pytest.raises(ValueError) as exep:
+        ss = Orbit.from_horizons(name="Dummy")
+    assert (
+        "ValueError: Unknown target (Dummy). Maybe try different id_type?"
+        in exep.exconly()
+    )
+
+
+def test_orbits_are_same():
+    epoch = Time("2018-07-23")
+    # Orbit Parameters of Ceres
+    # Taken from https://ssd.jpl.nasa.gov/horizons.cgi
+    ss = Orbit.from_classical(
+        Sun,
+        2.767107584017257 * u.au,
+        0.07554802949294502 * u.one,
+        27.18502520750381 * u.deg,
+        23.36913256044832 * u.deg,
+        132.2919806192451 * u.deg,
+        21.28958091587153 * u.deg,
+        epoch,
+    )
+    ss1 = Orbit.from_horizons(name="Ceres", epoch=epoch)
+    assert ss.pqw()[0].value.all() == ss1.pqw()[0].value.all()
+    assert ss.r_a == ss1.r_a
+    assert ss.a == ss1.a
+
+
+def test_plane_is_set_in_horizons():
+    plane = Planes.EARTH_ECLIPTIC
+    ss = Orbit.from_horizons(name="Ceres", plane=plane)
+    assert ss.plane == plane
