@@ -448,7 +448,9 @@ class Orbit(object):
 
             # Check that time of fligh value is not zero
             if not time_of_flight.value == 0:
-                return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+                return propagate(
+                    self, time_of_flight, method=method, rtol=rtol, **kwargs
+                )
             else:
                 return self
 
