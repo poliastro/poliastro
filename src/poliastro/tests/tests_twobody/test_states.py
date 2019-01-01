@@ -3,8 +3,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth, Sun
-from poliastro.twobody.classical import ClassicalState
-from poliastro.twobody.rv import RVState
+from poliastro.twobody._states import ClassicalState, RVState
 
 
 def test_state_has_attractor_given_in_constructor():
