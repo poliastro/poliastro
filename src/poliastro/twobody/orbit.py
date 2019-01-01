@@ -10,17 +10,17 @@ from astropy.coordinates import (
     CartesianRepresentation,
     get_body_barycentric_posvel,
 )
+from astroquery.jplhorizons import Horizons
 
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
-from poliastro.twobody import classical, equinoctial, rv
 from poliastro.twobody.angles import E_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
 
-from ._base import BaseState  # flake8: noqa
+from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined reference frame
@@ -108,7 +108,7 @@ class Orbit(object):
         """
         assert np.any(r.value), "Position vector must be non zero"
 
-        ss = rv.RVState(attractor, r, v)
+        ss = RVState(attractor, r, v)
         return cls(ss, epoch, plane)
 
     @classmethod
@@ -158,9 +158,7 @@ class Orbit(object):
         if ecc > 1 and a > 0:
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
-        ss = classical.ClassicalState(
-            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu
-        )
+        ss = ClassicalState(attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
         return cls(ss, epoch, plane)
 
     @classmethod
@@ -192,7 +190,7 @@ class Orbit(object):
             Fundamental plane of the frame.
 
         """
-        ss = equinoctial.ModifiedEquinoctialState(attractor, p, f, g, h, k, L)
+        ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L)
         return cls(ss, epoch, plane)
 
     @classmethod
@@ -233,6 +231,30 @@ class Orbit(object):
             ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
             ss._frame = ICRS()  # Hack!
 
+        return ss
+
+    @classmethod
+    def from_horizons(
+        cls, name, epoch=None, plane=Planes.EARTH_EQUATOR, id_type="smallbody"
+    ):
+        if not epoch:
+            epoch = time.Time.now()
+        if plane == Planes.EARTH_EQUATOR:
+            refplane = "earth"
+        elif plane == Planes.EARTH_ECLIPTIC:
+            refplane = "ecliptic"
+        obj = Horizons(id=name, epochs=epoch.jd, id_type=id_type).elements(
+            refplane=refplane
+        )
+        a = obj["a"][0] * u.au
+        ecc = obj["e"][0] * u.one
+        inc = obj["incl"][0] * u.deg
+        raan = obj["Omega"][0] * u.deg
+        argp = obj["w"][0] * u.deg
+        nu = obj["nu"][0] * u.deg
+        ss = cls.from_classical(
+            Sun, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+        )
         return ss
 
     @classmethod
@@ -302,7 +324,7 @@ class Orbit(object):
             Fundamental plane of the frame.
 
         """
-        ss = classical.ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu)
+        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu)
         return cls(ss, epoch, plane)
 
     def represent_as(self, representation):
@@ -446,13 +468,7 @@ class Orbit(object):
             else:
                 time_of_flight = time.TimeDelta(value)
 
-            # Check that time of fligh value is not zero
-            if not time_of_flight.value == 0:
-                return propagate(
-                    self, time_of_flight, method=method, rtol=rtol, **kwargs
-                )
-            else:
-                return self
+            return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
 
     def sample(self, values=None, method=mean_motion):
         """Samples an orbit to some specified time values.
