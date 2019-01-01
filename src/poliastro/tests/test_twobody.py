@@ -4,8 +4,7 @@ from astropy import units as u
 from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth
-from poliastro.core.elements import coe2mee, coe2rv, rv2coe
-from poliastro.twobody.equinoctial import mee2coe
+from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
 
 
 @pytest.fixture()

@@ -1,34 +1,12 @@
 """Functions to define orbits from modified equinoctial orbital elements.
 
 """
-import numpy as np
 from astropy import units as u
 
+from poliastro.core.elements import mee2coe
 from poliastro.twobody import classical
 
 from ._base import BaseState
-
-
-def mee2coe(p, f, g, h, k, L):
-    """Converts from modified equinoctial orbital elements to classical
-    orbital elements.
-
-    The definition of the modified equinoctial orbital elements is taken from
-    [Walker, 1985].
-
-    Note
-    -----
-    The conversion is always safe because arctan2 works also for 0, 0
-    arguments.
-
-    """
-    ecc = np.sqrt(f ** 2 + g ** 2)
-    inc = 2 * np.arctan(np.sqrt(h ** 2 + k ** 2))
-    lonper = np.arctan2(g, f)
-    raan = np.arctan2(k, h) % (2 * np.pi)
-    argp = (lonper - raan) % (2 * np.pi)
-    nu = (L - lonper) % (2 * np.pi)
-    return p, ecc, inc, raan, argp, nu
 
 
 class ModifiedEquinoctialState(BaseState):
