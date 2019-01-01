@@ -8,9 +8,6 @@ The :py:mod:`poliastro.twobody` is one of the most important modules since it in
     :maxdepth: 1
 
     angles
-    classical
     decorators
-    equinoctial
     orbit
     propagation
-    rv
