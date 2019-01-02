@@ -1,3 +1,4 @@
+import numpy as np
 import pickle
 
 import pytest
@@ -419,3 +420,63 @@ def test_plane_is_set_in_horizons():
     plane = Planes.EARTH_ECLIPTIC
     ss = Orbit.from_horizons(name="Ceres", plane=plane)
     assert ss.plane == plane
+
+
+def test_earth_geostationary_creation_from_angular_velocity():
+    ss = Orbit.geostationary(
+        attractor=Earth, angular_velocity=(2 * np.pi / 23.9345) * u.rad / u.hour
+    )
+    assert_quantity_allclose(ss.a, 42164205 * u.m, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, 23.9345 * u.hour, rtol=1.0e-7)
+
+
+def test_mars_geostationary_creation_from_angular_velocity():
+    ss = Orbit.geostationary(
+        attractor=Mars, angular_velocity=(2 * np.pi / 24.6228) * u.rad / u.hour
+    )
+    assert_quantity_allclose(ss.a, 20427595 * u.m, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, 24.6228 * u.hour, rtol=1.0e-7)
+
+
+def test_earth_geostationary_creation_from_period():
+    ss = Orbit.geostationary(attractor=Earth, period=23.9345 * u.hour)
+    assert_quantity_allclose(ss.a, 42164205 * u.m, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, 23.9345 * u.hour, rtol=1.0e-7)
+
+
+def test_mars_geostationary_creation_from_period():
+    ss = Orbit.geostationary(attractor=Mars, period=24.6228 * u.hour)
+    assert_quantity_allclose(ss.a, 20427595 * u.m, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, 24.6228 * u.hour, rtol=1.0e-7)
+
+
+def test_earth_geostationary_creation_with_Hill_radius():
+    ss = Orbit.geostationary(
+        attractor=Earth, period=23.9345 * u.hour, hill_radius=0.01 * u.AU
+    )
+    assert_quantity_allclose(ss.a, 42164205 * u.m, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, 23.9345 * u.hour, rtol=1.0e-7)
+
+
+def test_mars_geostationary_creation_with_Hill_radius():
+    ss = Orbit.geostationary(
+        attractor=Mars, period=24.6228 * u.hour, hill_radius=1000000 * u.km
+    )
+    assert_quantity_allclose(ss.a, 20427595 * u.m, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, 24.6228 * u.hour, rtol=1.0e-7)
+
+
+def test_earth_geostationary_orbit_representation():
+    ss = Orbit.geostationary(
+        attractor=Earth, angular_velocity=(2 * np.pi / 23.9345) * u.rad / u.hour
+    )
+    expect_str = "42164 x 42164 km x 0.0 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)"
+    assert str(ss) == repr(ss) == expect_str
+
+
+def test_mars_geostationary_orbit_representation():
+    ss = Orbit.geostationary(
+        attractor=Mars, angular_velocity=(2 * np.pi / 24.6228) * u.rad / u.hour
+    )
+    expect_str = "20428 x 20428 km x 0.0 deg (MarsICRS) orbit around Mars (♂) at epoch J2000.000 (TT)"
+    assert str(ss) == repr(ss) == expect_str
