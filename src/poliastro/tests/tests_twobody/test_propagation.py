@@ -170,6 +170,8 @@ def test_propagation_hyperbolic_zero_time_returns_same_state():
     assert_allclose(r.value, r0.value)
     assert_allclose(v.value, v0.value)
 
+
+def test_apply_zero_maneuver_returns_equal_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
