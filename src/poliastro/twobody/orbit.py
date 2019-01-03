@@ -298,6 +298,50 @@ class Orbit(object):
         )
 
     @classmethod
+    @u.quantity_input(angular_velocity=u.rad / u.s, period=u.s, hill_radius=u.m)
+    def geostationary(
+        cls, attractor, angular_velocity=None, period=None, hill_radius=None
+    ):
+        """Return the geostationary orbit for the given attractor and its rotational speed.
+
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        angular_velocity : ~astropy.units.Quantity
+            Rotational angular velocity of the attractor.
+        period : ~astropy.units.Quantity
+            Attractor's rotational period, ignored if angular_velocity is passed.
+        hill_radius : ~astropy.units.Quantity
+            Radius of Hill sphere of the attractor (optional). Hill sphere radius(in
+            contrast with Laplace's SOI) is used here to validate the stability of the
+            geostationary orbit, that is to make sure that the orbital radius required
+            for the geostationary orbit is not outside of the gravitational sphere of
+            influence of the attractor.
+            Hill SOI of parent(if exists) of the attractor is ignored if hill_radius is not provided.
+        """
+
+        if angular_velocity is None and period is None:
+            raise ValueError(
+                "At least one among angular_velocity or period must be passed"
+            )
+
+        if angular_velocity is None:
+            angular_velocity = 2 * np.pi / period
+
+        # Find out geostationary radius using r = cube_root(GM/(angular velocity)^2)
+        with u.set_enabled_equivalencies(u.dimensionless_angles()):
+            geo_radius = np.cbrt(attractor.k / np.square(angular_velocity.to(1 / u.s)))
+
+        if hill_radius is not None and geo_radius > hill_radius:
+            raise ValueError(
+                "Geostationary orbit for the given parameters doesn't exist"
+            )
+
+        altitude = geo_radius - attractor.R
+        return cls.circular(attractor, altitude)
+
+    @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def parabolic(
         cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR
