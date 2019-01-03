@@ -149,6 +149,19 @@ def test_propagation_zero_time_returns_same_state():
     assert_allclose(r.value, r0.value)
     assert_allclose(v.value, v0.value)
 
+def test_propagation_hyperbolic_zero_time_returns_same_state():
+    ss0 = Orbit.from_classical(
+            Earth, -27112.5464 * u.km, 1.25 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg
+        )
+    r0, v0 = ss0.rv()
+    tof = 0 * u.s
+
+    ss1 = ss0.propagate(tof)
+
+    r, v = ss1.rv()
+
+    assert_allclose(r.value, r0.value)
+    assert_allclose(v.value, v0.value)
 
 def test_apply_zero_maneuver_returns_equal_state():
     _d = 1.0 * u.AU  # Unused distance
