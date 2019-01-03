@@ -313,8 +313,12 @@ class Orbit(object):
         period : ~astropy.units.Quantity
             Attractor's rotational period, ignored if angular_velocity is passed.
         hill_radius : ~astropy.units.Quantity
-            Radius of Hill sphere of the attractor (optional). Gravitational sphere of
-            influence of parent body is ignored if hill_radius is not provided.
+            Radius of Hill sphere of the attractor (optional). Hill sphere radius(in
+            contrast with Laplace's SOI) is used here to validate the stability of the
+            geostationary orbit, that is to make sure that the orbital radius required
+            for the geostationary orbit is not outside of the gravitational sphere of
+            influence of the attractor.
+            Hill SOI of parent(if exists) of the attractor is ignored if hill_radius is not provided.
         """
 
         if angular_velocity is None and period is None:
@@ -330,7 +334,7 @@ class Orbit(object):
             geo_radius = np.cbrt(attractor.k / np.square(angular_velocity.to(1 / u.s)))
 
         if hill_radius is not None and geo_radius > hill_radius:
-            raise RuntimeError(
+            raise ValueError(
                 "Geostationary orbit for the given parameters doesn't exist"
             )
 

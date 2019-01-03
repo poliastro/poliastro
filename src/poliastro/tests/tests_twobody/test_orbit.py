@@ -422,61 +422,82 @@ def test_plane_is_set_in_horizons():
     assert ss.plane == plane
 
 
-def test_earth_geostationary_creation_from_angular_velocity():
+@pytest.mark.parametrize(
+    "attractor,angular_velocity,expected_a,expected_period",
+    [
+        (
+            Earth,
+            (2 * np.pi / 23.9345) * u.rad / u.hour,
+            42164205 * u.m,
+            23.9345 * u.hour,
+        ),
+        (
+            Mars,
+            (2 * np.pi / 24.6228) * u.rad / u.hour,
+            20427595 * u.m,
+            24.6228 * u.hour,
+        ),
+    ],
+)
+def test_geostationary_creation_from_angular_velocity(
+    attractor, angular_velocity, expected_a, expected_period
+):
+    ss = Orbit.geostationary(attractor=attractor, angular_velocity=angular_velocity)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-7)
+
+
+@pytest.mark.parametrize(
+    "attractor,period,expected_a",
+    [
+        (Earth, 23.9345 * u.hour, 42164205 * u.m),
+        (Mars, 24.6228 * u.hour, 20427595 * u.m),
+    ],
+)
+def test_geostationary_creation_from_period(attractor, period, expected_a):
+    ss = Orbit.geostationary(attractor=attractor, period=period)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, period, rtol=1.0e-7)
+
+
+@pytest.mark.parametrize(
+    "attractor,period,hill_radius,expected_a",
+    [
+        (Earth, 23.9345 * u.hour, 0.01 * u.AU, 42164205 * u.m),
+        (Mars, 24.6228 * u.hour, 1000000 * u.km, 20427595 * u.m),
+    ],
+)
+def test_geostationary_creation_with_Hill_radius(
+    attractor, period, hill_radius, expected_a
+):
     ss = Orbit.geostationary(
-        attractor=Earth, angular_velocity=(2 * np.pi / 23.9345) * u.rad / u.hour
+        attractor=attractor, period=period, hill_radius=hill_radius
     )
-    assert_quantity_allclose(ss.a, 42164205 * u.m, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, 23.9345 * u.hour, rtol=1.0e-7)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, period, rtol=1.0e-7)
 
 
-def test_mars_geostationary_creation_from_angular_velocity():
-    ss = Orbit.geostationary(
-        attractor=Mars, angular_velocity=(2 * np.pi / 24.6228) * u.rad / u.hour
+@pytest.mark.parametrize("attractor", [Earth, Mars])
+def test_geostationary_input(attractor):
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.geostationary(attractor=attractor)
+
+    assert (
+        "ValueError: At least one among angular_velocity or period must be passed"
+        in excinfo.exconly()
     )
-    assert_quantity_allclose(ss.a, 20427595 * u.m, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, 24.6228 * u.hour, rtol=1.0e-7)
 
 
-def test_earth_geostationary_creation_from_period():
-    ss = Orbit.geostationary(attractor=Earth, period=23.9345 * u.hour)
-    assert_quantity_allclose(ss.a, 42164205 * u.m, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, 23.9345 * u.hour, rtol=1.0e-7)
+@pytest.mark.parametrize(
+    "attractor,period,hill_radius", [(Venus, 243.025 * u.day, 1000000 * u.km)]
+)
+def test_geostationary_non_existence_condition(attractor, period, hill_radius):
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.geostationary(
+            attractor=attractor, period=period, hill_radius=hill_radius
+        )
 
-
-def test_mars_geostationary_creation_from_period():
-    ss = Orbit.geostationary(attractor=Mars, period=24.6228 * u.hour)
-    assert_quantity_allclose(ss.a, 20427595 * u.m, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, 24.6228 * u.hour, rtol=1.0e-7)
-
-
-def test_earth_geostationary_creation_with_Hill_radius():
-    ss = Orbit.geostationary(
-        attractor=Earth, period=23.9345 * u.hour, hill_radius=0.01 * u.AU
+    assert (
+        "Geostationary orbit for the given parameters doesn't exist"
+        in excinfo.exconly()
     )
-    assert_quantity_allclose(ss.a, 42164205 * u.m, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, 23.9345 * u.hour, rtol=1.0e-7)
-
-
-def test_mars_geostationary_creation_with_Hill_radius():
-    ss = Orbit.geostationary(
-        attractor=Mars, period=24.6228 * u.hour, hill_radius=1000000 * u.km
-    )
-    assert_quantity_allclose(ss.a, 20427595 * u.m, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, 24.6228 * u.hour, rtol=1.0e-7)
-
-
-def test_earth_geostationary_orbit_representation():
-    ss = Orbit.geostationary(
-        attractor=Earth, angular_velocity=(2 * np.pi / 23.9345) * u.rad / u.hour
-    )
-    expect_str = "42164 x 42164 km x 0.0 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)"
-    assert str(ss) == repr(ss) == expect_str
-
-
-def test_mars_geostationary_orbit_representation():
-    ss = Orbit.geostationary(
-        attractor=Mars, angular_velocity=(2 * np.pi / 24.6228) * u.rad / u.hour
-    )
-    expect_str = "20428 x 20428 km x 0.0 deg (MarsICRS) orbit around Mars (♂) at epoch J2000.000 (TT)"
-    assert str(ss) == repr(ss) == expect_str
