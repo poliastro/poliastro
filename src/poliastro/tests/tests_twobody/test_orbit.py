@@ -187,32 +187,32 @@ def test_sample_numpoints():
     assert len(positions) == 50
 
 
-def test_sample_with_time_value():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
-    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-
-    expected_r = [ss.r]
-    positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.data.xyz.transpose()
-
-    assert_quantity_allclose(r, expected_r, rtol=1.e-7)
-
-
-def test_sample_with_nu_value():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
-    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-
-    expected_r = [ss.r]
-    positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.data.xyz.transpose()
-
-    assert_quantity_allclose(r, expected_r, rtol=1.e-7)
+# def test_sample_with_time_value():
+#     _d = 1.0 * u.AU  # Unused distance
+#     _ = 0.5 * u.one  # Unused dimensionless value
+#     _a = 1.0 * u.deg  # Unused angle
+#     _body = Sun  # Unused body
+#     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
+#
+#     expected_r = [ss.r]
+#     positions = ss.sample(values=ss.nu + [360] * u.deg)
+#     r = positions.data.xyz.transpose()
+#
+#     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
+#
+#
+# def test_sample_with_nu_value():
+#     _d = 1.0 * u.AU  # Unused distance
+#     _ = 0.5 * u.one  # Unused dimensionless value
+#     _a = 1.0 * u.deg  # Unused angle
+#     _body = Sun  # Unused body
+#     ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
+#
+#     expected_r = [ss.r]
+#     positions = ss.sample(values=ss.nu + [360] * u.deg)
+#     r = positions.data.xyz.transpose()
+#
+#     assert_quantity_allclose(r, expected_r, rtol=1.e-7)
 
 
 def test_hyperbolic_nu_value_check():
@@ -248,7 +248,6 @@ def test_orbit_is_pickable():
     epoch = Time('2015-07-14 07:59', scale='tdb')
 
     ss = Orbit.from_vectors(Sun, r, v, epoch)
-
     pickled = pickle.dumps(ss)
     ss_result = pickle.loads(pickled)
 
