@@ -19,6 +19,7 @@ class BaseOrbitPlotter:
 
     def __init__(self, figure=None):
         self._figure = figure or FigureWidget()
+        self._layout = None
 
         self._trajectories = []
 
@@ -65,6 +66,7 @@ class BaseOrbitPlotter:
             or [0 * u.m]
         )
         radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
+        # TODO: Remove previously plotted sphere?
         self._plot_sphere(
             radius,
             BODY_COLORS.get(self._attractor.name, "#999999"),
