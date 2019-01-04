@@ -12,10 +12,11 @@ from ._base import BaseOrbitPlotter
 
 class OrbitPlotter3D(BaseOrbitPlotter):
     """OrbitPlotter3D class.
+
     """
 
-    def __init__(self, dark=False):
-        super().__init__()
+    def __init__(self, figure=None, dark=False):
+        super().__init__(figure)
         self._layout = Layout(
             autosize=True,
             scene=dict(
@@ -41,7 +42,18 @@ class OrbitPlotter3D(BaseOrbitPlotter):
             cmax=1,
             showscale=False,  # Boilerplate
         )
-        return sphere
+        self._figure.add_trace(sphere)
+
+    def _plot_trajectory(self, trajectory, label, color, dashed):
+        trace = Scatter3d(
+            x=trajectory.x.to(u.km).value,
+            y=trajectory.y.to(u.km).value,
+            z=trajectory.z.to(u.km).value,
+            name=label,
+            line=dict(color=color, width=5, dash="dash" if dashed else "solid"),
+            mode="lines",  # Boilerplate
+        )
+        self._figure.add_trace(trace)
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
@@ -63,16 +75,7 @@ class OrbitPlotter3D(BaseOrbitPlotter):
             }
         )
 
-    def _plot_trajectory(self, trajectory, label, color, dashed):
-        trace = Scatter3d(
-            x=trajectory.x.to(u.km).value,
-            y=trajectory.y.to(u.km).value,
-            z=trajectory.z.to(u.km).value,
-            name=label,
-            line=dict(color=color, width=5, dash="dash" if dashed else "solid"),
-            mode="lines",  # Boilerplate
-        )
-        self._data.append(trace)
+        return self.figure
 
 
 class OrbitPlotter2D(BaseOrbitPlotter):
