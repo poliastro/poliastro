@@ -1,7 +1,7 @@
 import astropy.units as u
 import matplotlib.pyplot as plt
 
-from poliastro.bodies import Earth, Mars
+from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.examples import iss
 from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody.orbit import Orbit
@@ -82,3 +82,21 @@ def test_dark_mode_plots_dark_plot():
     assert op.ax.get_facecolor() == (0.0, 0.0, 0.0, 1.0)
     op = StaticOrbitPlotter()
     assert op.ax.get_facecolor() == (1.0, 1.0, 1.0, 1)
+
+
+def test_redraw_makes_attractor_none():
+    # TODO: Review
+    op = StaticOrbitPlotter()
+    op._redraw()
+    assert op._attractor_radius is not None
+
+
+def test_set_frame_plots_same_colors():
+    # TODO: Review
+    op = StaticOrbitPlotter()
+    jupiter = Orbit.from_body_ephem(Jupiter)
+    op.plot(jupiter)
+    colors1 = [orb[2] for orb in op.trajectories]
+    op.set_frame(*jupiter.pqw())
+    colors2 = [orb[2] for orb in op.trajectories]
+    assert colors1 == colors2
