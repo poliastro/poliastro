@@ -2,43 +2,38 @@ import tempfile
 from unittest import mock
 
 import pytest
-from astropy import units as u
 
-from poliastro.bodies import Earth, Sun
+from poliastro.bodies import Earth, Mars, Sun
 from poliastro.examples import iss
-from poliastro.plotting import OrbitPlotter3D
+from poliastro.plotting import OrbitPlotter2D
 from poliastro.twobody.orbit import Orbit
 
 
 def test_get_figure_has_expected_properties():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter2D()
     figure = frame.figure
 
     assert figure["data"] == [{}]
     assert figure["layout"]["autosize"] is True
-    assert "xaxis" in figure["layout"]["scene"]
-    assert "yaxis" in figure["layout"]["scene"]
-    assert "zaxis" in figure["layout"]["scene"]
-    assert "aspectmode" in figure["layout"]["scene"]
+    assert "xaxis" in figure["layout"]
+    assert "yaxis" in figure["layout"]
 
 
 def test_set_different_attractor_raises_error():
-    body1 = mock.MagicMock()
-    body1.name = "1"
+    body1 = Earth
 
-    body2 = mock.MagicMock()
-    body2.name = "2"
+    body2 = Mars
 
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter2D()
     frame.set_attractor(body1)
 
     with pytest.raises(NotImplementedError) as excinfo:
         frame.set_attractor(body2)
-    assert "Attractor has already been set to 1." in excinfo.exconly()
+    assert "Attractor has already been set to Earth." in excinfo.exconly()
 
 
 def test_plot_sets_attractor():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter2D()
     assert frame._attractor is None
     assert frame._attractor_data == {}
 
@@ -48,7 +43,7 @@ def test_plot_sets_attractor():
 
 
 def test_plot_appends_data():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter2D()
     assert len(frame._data) == 0
 
     frame.plot(iss)
@@ -56,7 +51,7 @@ def test_plot_appends_data():
 
 
 def test_plot_trajectory_without_attractor_raises_error():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter2D()
 
     with pytest.raises(ValueError) as excinfo:
         frame.plot_trajectory({})
@@ -66,18 +61,8 @@ def test_plot_trajectory_without_attractor_raises_error():
     )
 
 
-def test_set_view():
-    frame = OrbitPlotter3D()
-    frame.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
-
-    eye = frame.figure["layout"]["scene"]["camera"]["eye"]
-    assert eye["x"] == 1
-    assert eye["y"] == 0
-    assert eye["z"] == 0
-
-
 def test_plot_trajectory_plots_a_trajectory():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter2D()
     assert len(frame._data) == 0
 
     earth = Orbit.from_body_ephem(Earth)
@@ -88,15 +73,10 @@ def test_plot_trajectory_plots_a_trajectory():
     assert frame._attractor == Sun
 
 
-def test_dark_theme():
-    frame = OrbitPlotter3D(dark=True)
-    assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
-
-
-@mock.patch("poliastro.plotting.iplot")
-@mock.patch.object(OrbitPlotter3D, "_prepare_plot")
+@mock.patch("poliastro.plotting._base.iplot")
+@mock.patch.object(OrbitPlotter2D, "_prepare_plot")
 def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
-    m = OrbitPlotter3D()
+    m = OrbitPlotter2D()
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Object")
     m.show()
@@ -105,10 +85,10 @@ def test_show_calls_prepare_plot(mock_prepare_plot, mock_iplot):
     mock_prepare_plot.assert_called_once_with()
 
 
-@mock.patch("poliastro.plotting.export")
-@mock.patch.object(OrbitPlotter3D, "_prepare_plot")
+@mock.patch("poliastro.plotting._base.export")
+@mock.patch.object(OrbitPlotter2D, "_prepare_plot")
 def test_savefig_calls_prepare_plot(mock_prepare_plot, mock_export):
-    m = OrbitPlotter3D()
+    m = OrbitPlotter2D()
     earth = Orbit.from_body_ephem(Earth)
     m.plot(orbit=earth, label="Object")
     with tempfile.NamedTemporaryFile() as fp:
