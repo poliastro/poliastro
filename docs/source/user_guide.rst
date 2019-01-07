@@ -148,7 +148,7 @@ To see a complete list of properties, check out the
 
   Due to limitations in the internal design of poliastro,
   most orbital properties are not documented.
-  Please subscribe to `this issue <https://github.com/poliastro/poliastro/issues/435>`_
+  Please subscribe to `this GitHub issue <https://github.com/poliastro/poliastro/issues/435>`_
   to receive updates about it in your inbox.
 
 Moving forward in time: propagation
