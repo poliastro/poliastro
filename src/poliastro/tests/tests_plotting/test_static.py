@@ -100,3 +100,19 @@ def test_set_frame_plots_same_colors():
     op.set_frame(*jupiter.pqw())
     colors2 = [orb[2] for orb in op.trajectories]
     assert colors1 == colors2
+
+
+def test_redraw_keeps_trajectories():
+    # See https://github.com/poliastro/poliastro/issues/518
+    op = StaticOrbitPlotter()
+    earth = Orbit.from_body_ephem(Earth)
+    mars = Orbit.from_body_ephem(Mars)
+    trajectory = earth.sample()
+    op.plot(mars, label="Mars")
+    op.plot_trajectory(trajectory, label="Earth")
+
+    assert len(op.trajectories) == 2
+
+    op.set_frame(*mars.pqw())
+
+    assert len(op.trajectories) == 2

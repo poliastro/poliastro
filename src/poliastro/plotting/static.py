@@ -1,3 +1,5 @@
+from typing import List
+
 import matplotlib as mpl
 import numpy as np
 from astropy import units as u
@@ -7,6 +9,8 @@ from matplotlib import pyplot as plt
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.twobody.propagation import mean_motion
 from poliastro.util import norm
+
+from ._base import Trajectory
 
 
 class StaticOrbitPlotter:
@@ -43,11 +47,11 @@ class StaticOrbitPlotter:
         self._frame = None
         self._attractor = None
         self._attractor_radius = np.inf * u.km
-        self._orbits = list(tuple())  # type: List[Tuple[Orbit, str, str]]
+        self._trajectories = []  # type: List[Trajectory]
 
     @property
-    def orbits(self):
-        return self._orbits
+    def trajectories(self):
+        return self._trajectories
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.
@@ -64,17 +68,25 @@ class StaticOrbitPlotter:
         else:
             self._frame = p_vec, q_vec, w_vec
 
-        if self._orbits:
+        if self._trajectories:
             self._redraw()
 
     def _redraw(self):
         for artist in self.ax.lines + self.ax.collections:
             artist.remove()
-        self._attractor = None
-        for orbit, label, color in self._orbits:
-            self.plot(orbit, label, color)
+
+        for trajectory, state, label, color in self._trajectories:
+            self._plot(trajectory, state, label, color)
+
         self.ax.relim()
         self.ax.autoscale()
+
+    def _plot_trajectory(self, trajectory, color=None):
+        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
+        x, y = self._project(rr)
+        lines = self.ax.plot(x.to(u.km).value, y.to(u.km).value, "--", color=color)
+
+        return lines
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
         """Plots a precomputed trajectory.
@@ -83,20 +95,23 @@ class StaticOrbitPlotter:
         ----------
         trajectory : ~astropy.coordinates.BaseRepresentation, ~astropy.coordinates.BaseCoordinateFrame
             Trajectory to plot.
+        label : str, optional
+            Label.
+        color : str, optional
+            Color string.
 
         """
-        lines = []
-        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
-        x, y = self._project(rr)
-        a, = self.ax.plot(
-            x.to(u.km).value, y.to(u.km).value, "--", color=color, label=label
-        )
-        lines.append(a)
+        lines = self._plot_trajectory(trajectory, color)
+
         if label:
-            a.set_label(label)
+            lines[0].set_label(label)
             self.ax.legend(
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
+
+        self._trajectories.append(
+            Trajectory(trajectory, None, label, lines[0].get_color())
+        )
 
         return lines
 
@@ -137,6 +152,40 @@ class StaticOrbitPlotter:
             mpl.patches.Circle((0, 0), self._attractor_radius.value, lw=0, color=color)
         )
 
+    def _plot(self, trajectory, state=None, label=None, color=None):
+        lines = self._plot_trajectory(trajectory, color)
+
+        if state is not None:
+            x0, y0 = self._project(state[None])
+
+            # Plot current position
+            l, = self.ax.plot(
+                x0.to(u.km).value,
+                y0.to(u.km).value,
+                "o",
+                mew=0,
+                color=lines[0].get_color(),
+            )
+            lines.append(l)
+
+        if label:
+            if not self.ax.get_legend():
+                size = self.ax.figure.get_size_inches() + [8, 0]
+                self.ax.figure.set_size_inches(size)
+
+            # This will apply the label to either the point or the osculating
+            # orbit depending on the last plotted line
+            lines[-1].set_label(label)
+            self.ax.legend(
+                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
+            )
+
+        self.ax.set_xlabel("$x$ (km)")
+        self.ax.set_ylabel("$y$ (km)")
+        self.ax.set_aspect(1)
+
+        return lines
+
     def plot(self, orbit, label=None, color=None, method=mean_motion):
         """Plots state and osculating orbit in their plane.
         """
@@ -147,30 +196,13 @@ class StaticOrbitPlotter:
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
         positions = orbit.sample(self.num_points, method)
 
-        x0, y0 = self._project(orbit.r[None])
-        # Plot current position
-        l, = self.ax.plot(x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=color)
-
-        if (orbit, label, l.get_color()) not in self._orbits:
-            self._orbits.append((orbit, label, l.get_color()))
-
-        lines = self.plot_trajectory(trajectory=positions, color=l.get_color())
-        lines.append(l)
-
         if label:
-            # This will apply the label to either the point or the osculating
-            # orbit depending on the last plotted line, as they share variable
-            if not self.ax.get_legend():
-                size = self.ax.figure.get_size_inches() + [8, 0]
-                self.ax.figure.set_size_inches(size)
             label = generate_label(orbit, label)
-            l.set_label(label)
-            self.ax.legend(
-                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
-            )
 
-        self.ax.set_xlabel("$x$ (km)")
-        self.ax.set_ylabel("$y$ (km)")
-        self.ax.set_aspect(1)
+        lines = self._plot(positions, orbit.r, label, color)
+
+        self._trajectories.append(
+            Trajectory(positions, orbit.r, label, lines[0].get_color())
+        )
 
         return lines
