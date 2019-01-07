@@ -7,6 +7,7 @@ Jupyter notebooks
    /examples/Analyzing the Parker Solar Probe flybys.ipynb
    /examples/Catch that asteroid!.ipynb
    /examples/Comparing Hohmann and bielliptic transfers.ipynb
+   /examples/Customising static orbit plots.ipynb
    /examples/Exploring the New Horizons launch.ipynb
    /examples/Going to Mars with Python using poliastro.ipynb
    /examples/Going to Jupiter with Python using Jupyter and poliastro.ipynb
@@ -17,4 +18,3 @@ Jupyter notebooks
    /examples/Using NEOS package.ipynb
    /examples/Visualizing the SpaceX Tesla Roadster trip to Mars.ipynb
    /examples/Natural and artificial perturbations.ipynb
-   /examples/Customising orbit plots.ipynb

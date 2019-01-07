@@ -1,6 +1,6 @@
-import numpy as np
 import pickle
 
+import numpy as np
 import pytest
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
@@ -387,15 +387,17 @@ def test_orbit_propagate_retains_plane(value):
     assert final_ss.frame.is_equivalent_frame(expected_frame)
 
 
+@pytest.mark.remote_data
 def test_from_horizons_raise_valueerror():
     with pytest.raises(ValueError) as exep:
-        ss = Orbit.from_horizons(name="Dummy")
+        Orbit.from_horizons(name="Dummy")
     assert (
         "ValueError: Unknown target (Dummy). Maybe try different id_type?"
         in exep.exconly()
     )
 
 
+@pytest.mark.remote_data
 def test_orbits_are_same():
     epoch = Time("2018-07-23")
     # Orbit Parameters of Ceres
@@ -416,6 +418,7 @@ def test_orbits_are_same():
     assert ss.a == ss1.a
 
 
+@pytest.mark.remote_data
 def test_plane_is_set_in_horizons():
     plane = Planes.EARTH_ECLIPTIC
     ss = Orbit.from_horizons(name="Ceres", plane=plane)

@@ -10,12 +10,13 @@ poliastro requires the following Python packages:
 * Astropy, for physical units and time handling
 * numba (optional), for accelerating the code
 * jplephem, for the planetary ephemerides using SPICE kernels
-* matplotlib, for orbit plotting
-* scipy, for root finding and numerical propagation
+* Plotly, for interactive orbit plotting
+* matplotlib, for static orbit plotting
+* SciPy, for root finding and numerical propagation
 * pytest, for running the tests from the package
 
 poliastro is usually tested on Linux, Windows and OS X on Python
-3.5 and 3.6 against latest NumPy.
+3.5, 3.6 and 3.7 against latest NumPy.
 
 Installation
 ------------
@@ -75,17 +76,16 @@ you find any, please open an issue in the `issue tracker`_.
 Using poliastro on JupyterLab
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- After the release of plotly 3.0, plotting orbits using poliastro is easier than ever.
+After the release of Plotly 3.0, plotting orbits using poliastro is easier than ever.
 
- You have to install 2 (two) extensions of JupyterLab to make your experience smooth.
+You have to install two extensions of JupyterLab to make your experience smooth::
 
-   $ jupyter labextension install @jupyter-widgets/jupyterlab-manager
+  $ jupyter labextension install @jupyter-widgets/jupyterlab-manager
+  $ jupyter labextension install @jupyterlab/plotly-extension
 
-   $ jupyter labextension install @jupyterlab/plotly-extension
+And as the documentation of JupyterLab Extensions states:
 
- And as the documentation of JupyterLab Extensions states:
-
-    "In order to install JupyterLab extensions, you need to have Node.js version 4 or later installed."
+  "In order to install JupyterLab extensions, you need to have Node.js version 4 or later installed."
 
 
 Testing
