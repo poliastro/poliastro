@@ -62,7 +62,7 @@ def test_plot_appends_data(plotter_class):
     assert len(frame.trajectories) == 0
 
     frame.plot(iss)
-    assert len(frame.trajectories) == 1 + 1
+    assert len(frame.trajectories) == 1
 
 
 @pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])

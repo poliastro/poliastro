@@ -54,6 +54,8 @@ class OrbitPlotter3D(BaseOrbitPlotter):
         )
         self._figure.add_trace(sphere)
 
+        return sphere
+
     def _plot_trajectory(self, trajectory, label, color, dashed):
         trace = Scatter3d(
             x=trajectory.x.to(u.km).value,
@@ -64,6 +66,8 @@ class OrbitPlotter3D(BaseOrbitPlotter):
             mode="lines",  # Boilerplate
         )
         self._figure.add_trace(trace)
+
+        return trace
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
@@ -118,11 +122,20 @@ class OrbitPlotter2D(BaseOrbitPlotter):
         return x, y
 
     def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
-        x_center, y_center = self._project(center[None])  # Indexing trick to add one extra dimension
+        x_center, y_center = self._project(
+            center[None]
+        )  # Indexing trick to add one extra dimension
 
-        trace = Scatter(x=x_center.to(u.km).value, y=y_center.to(u.km).value, mode='markers',
-                        marker=dict(size=10, color=color), name=name)
+        trace = Scatter(
+            x=x_center.to(u.km).value,
+            y=y_center.to(u.km).value,
+            mode="markers",
+            marker=dict(size=10, color=color),
+            name=name,
+        )
         self._figure.add_trace(trace)
+
+        return trace
 
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
@@ -144,6 +157,8 @@ class OrbitPlotter2D(BaseOrbitPlotter):
 
         self._layout.shapes += (shape,)
 
+        return shape
+
     def _plot_trajectory(self, trajectory, label, color, dashed):
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
@@ -157,6 +172,8 @@ class OrbitPlotter2D(BaseOrbitPlotter):
             mode="lines",  # Boilerplate
         )
         self._figure.add_trace(trace)
+
+        return trace
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.

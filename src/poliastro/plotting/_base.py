@@ -67,7 +67,7 @@ class BaseOrbitPlotter:
         min_radius = min(
             [
                 trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
-                for trajectory in self._trajectories
+                for trajectory, _, _, _ in self._trajectories
             ]
             or [0 * u.m]
         )
@@ -106,7 +106,11 @@ class BaseOrbitPlotter:
                 "set_attractor(Major_Body)."
             )
         else:
-            self._plot_trajectory(trajectory, str(label), color, False)
+            trace = self._plot_trajectory(trajectory, str(label), color, False)
+
+            self._trajectories.append(
+                Trajectory(trajectory, None, label, trace.line.color)
+            )
 
         return self.figure
 
@@ -131,13 +135,17 @@ class BaseOrbitPlotter:
         label = generate_label(orbit, label)
         trajectory = orbit.sample()
 
-        self._plot_trajectory(trajectory, label, color, True)
+        trace = self._plot_trajectory(trajectory, label, color, True)
 
         # Plot required 2D/3D shape in the position of the body
         radius = min(
             self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5
         )  # Arbitrary thresholds
         self._plot_point(radius, color, label, center=orbit.r)
+
+        self._trajectories.append(
+            Trajectory(trajectory, orbit.r, label, trace.line.color)
+        )
 
         return self.figure
 
