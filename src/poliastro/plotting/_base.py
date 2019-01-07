@@ -106,6 +106,9 @@ class BaseOrbitPlotter:
                 "set_attractor(Major_Body)."
             )
         else:
+            if color is None:
+                color = next(self._color_cycle)
+
             trace = self._plot_trajectory(trajectory, str(label), color, False)
 
             self._trajectories.append(
