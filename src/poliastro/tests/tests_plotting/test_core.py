@@ -13,7 +13,7 @@ from poliastro.twobody.orbit import Orbit
 @pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
 def test_get_figure_has_expected_properties(plotter_class):
     frame = plotter_class()
-    figure = frame.figure
+    figure = frame.show()
 
     assert figure.data == ()
     assert figure.layout.autosize is True
@@ -23,7 +23,7 @@ def test_get_figure_has_expected_properties(plotter_class):
 
 def test_get_3d_figure_has_expected_properties():
     frame = OrbitPlotter3D()
-    figure = frame.figure
+    figure = frame.show()
 
     assert figure.data == ()
     assert figure.layout.autosize is True
@@ -144,8 +144,9 @@ def test_savefig_calls_prepare_plot(mock_export, plotter_class):
 def test_set_view():
     frame = OrbitPlotter3D()
     frame.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
+    figure = frame.show()
 
-    eye = frame.figure["layout"]["scene"]["camera"]["eye"]
+    eye = figure["layout"]["scene"]["camera"]["eye"]
     assert eye["x"] == 1
     assert eye["y"] == 0
     assert eye["z"] == 0

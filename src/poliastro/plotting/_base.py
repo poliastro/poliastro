@@ -35,10 +35,6 @@ class BaseOrbitPlotter:
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
 
     @property
-    def figure(self):
-        return self._figure
-
-    @property
     def trajectories(self):
         return self._trajectories
 
@@ -168,7 +164,7 @@ class BaseOrbitPlotter:
 
         """
         self._prepare_plot()
-        return self.figure
+        return self._figure
 
     def savefig(self, filename):
         """Function for saving the plot locally.
@@ -181,7 +177,7 @@ class BaseOrbitPlotter:
         """
         basename, ext = os.path.splitext(filename)
         export(
-            self.figure,
+            self.show(),
             image=ext[1:],
             image_filename=basename,
             show_link=False,  # Boilerplate
