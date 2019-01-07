@@ -139,17 +139,21 @@ class BaseOrbitPlotter:
 
         trace = self._plot_trajectory(trajectory, label, color, True)
 
+        self._trajectories.append(
+            Trajectory(trajectory, orbit.r, label, trace.line.color)
+        )
+
+        # Redraw the attractor now to compute the attractor radius
+        self._redraw_attractor()
+
         # Plot required 2D/3D shape in the position of the body
         radius = min(
             self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5
         )  # Arbitrary thresholds
         self._plot_point(radius, color, label, center=orbit.r)
 
-        self._trajectories.append(
-            Trajectory(trajectory, orbit.r, label, trace.line.color)
-        )
-
-        return self.show()
+        self._figure.layout.update(self._layout)
+        return self._figure
 
     def _prepare_plot(self):
         if self._attractor is not None:
