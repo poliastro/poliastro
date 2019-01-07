@@ -126,8 +126,11 @@ class BaseOrbitPlotter:
         Parameters
         ----------
         orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
         label : string, optional
+            Label of the orbit.
         color : string, optional
+            Color of the line and the position.
 
         """
         if color is None:

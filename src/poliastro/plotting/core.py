@@ -197,6 +197,18 @@ class OrbitPlotter2D(BaseOrbitPlotter):
             self._frame = p_vec, q_vec, w_vec
 
     def plot(self, orbit, *, label=None, color=None):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
+        label : string, optional
+            Label of the orbit.
+        color : string, optional
+            Color of the line and the position.
+
+        """
         if not self._frame:
             self.set_frame(*orbit.pqw())
 
