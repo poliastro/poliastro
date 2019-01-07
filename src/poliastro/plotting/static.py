@@ -119,6 +119,9 @@ class StaticOrbitPlotter:
                 "or plot(orbit)."
             )
 
+        self._redraw_attractor(
+            trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
+        )  # Arbitrary threshold
         lines = self._plot_trajectory(trajectory, color)
 
         if label:
