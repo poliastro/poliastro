@@ -33,6 +33,12 @@ class OrbitPlotter3D(BaseOrbitPlotter):
         if dark:
             self._layout.template = "plotly_dark"
 
+    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+        # We use _plot_sphere here because it's not easy to specify the size of a marker
+        # in data units instead of pixels, see
+        # https://stackoverflow.com/q/47086547
+        return self._plot_sphere(radius, color, name, center)
+
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         xx, yy, zz = generate_sphere(radius, center)
         sphere = Surface(
@@ -111,22 +117,17 @@ class OrbitPlotter2D(BaseOrbitPlotter):
         y = rr_proj.dot(frame[1])
         return x, y
 
+    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+        x_center, y_center = self._project(center[None])  # Indexing trick to add one extra dimension
+
+        trace = Scatter(x=x_center.to(u.km).value, y=y_center.to(u.km).value, mode='markers',
+                        marker=dict(size=10, color=color), name=name)
+        self._figure.add_trace(trace)
+
     def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
-        xx, yy = generate_circle(radius, center)
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
-
-        # TODO: Review
-        trace = Scatter(
-            x=xx.to(u.km).value,
-            y=yy.to(u.km).value,
-            mode="markers",
-            line=dict(color=color, width=5, dash="dash"),
-            name=name,
-            hoverinfo="none",  # TODO: Review
-            showlegend=False,
-        )
 
         shape = {
             "type": "circle",
@@ -142,7 +143,6 @@ class OrbitPlotter2D(BaseOrbitPlotter):
         }
 
         self._layout.shapes += (shape,)
-        self._figure.add_trace(trace)
 
     def _plot_trajectory(self, trajectory, label, color, dashed):
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()

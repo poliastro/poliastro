@@ -81,6 +81,9 @@ class BaseOrbitPlotter:
 
         self._attractor_radius = radius
 
+    def _plot_point(self, radius, color, name, center=None):
+        raise NotImplementedError
+
     def _plot_sphere(self, radius, color, name, center=None):
         raise NotImplementedError
 
@@ -132,9 +135,9 @@ class BaseOrbitPlotter:
 
         # Plot required 2D/3D shape in the position of the body
         radius = min(
-            self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.3
+            self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5
         )  # Arbitrary thresholds
-        self._plot_sphere(radius, color, label, center=orbit.r)
+        self._plot_point(radius, color, label, center=orbit.r)
 
         return self.figure
 

@@ -175,6 +175,8 @@ class StaticOrbitPlotter:
 
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line
+            # NOTE: What about generating both labels,
+            # indicating that one is the osculating orbit?
             lines[-1].set_label(label)
             self.ax.legend(
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
