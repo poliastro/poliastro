@@ -16,16 +16,10 @@ First of all, we have to import the relevant modules and classes:
 
 .. code-block:: python
 
-    import numpy as np
-    import matplotlib.pyplot as plt
-    plt.ion()  # To immediately show plots
-
     from astropy import units as u
 
     from poliastro.bodies import Earth, Mars, Sun
     from poliastro.twobody import Orbit
-
-    plt.style.use("seaborn")  # Recommended
 
 From position and velocity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,11 +78,10 @@ Intermezzo: quick visualization of the orbit
    :figwidth: 350
    :alt: Plot of the orbit
 
-If we're working on interactive mode (for example, using the wonderful IPython
-notebook) we can immediately plot the current state::
+If we're working on interactive mode (for example, using the wonderful Jupyter
+notebook) we can immediately plot the current orbit::
 
-    from poliastro.plotting import plot
-    plot(ss)
+    ss.plot()
 
 This plot is made in the so called *perifocal frame*, which means:
 
@@ -102,14 +95,13 @@ the instantaneous Keplerian orbit at that point. This is relevant in the
 context of perturbations, when the object shall deviate from its Keplerian
 orbit.
 
-.. warning::
 
-  Be aware that, outside the Jupyter notebook (i.e. a normal Python interpreter
-  or program) you might need to call :code:`plt.show()` after the plotting
-  commands or :code:`plt.ion()` before them or they won't show. Check out the
-  `Matplotlib FAQ`_ for more information.
+.. note::
 
-.. _`Matplotlib FAQ`: http://matplotlib.org/faq/usage_faq.html#non-interactive-example
+  This visualization uses Plotly under the hood and works best in a Jupyter notebook.
+  To use the old interface based on matplotlib,
+  which might be more useful for batch jobs and publication-quality plots,
+  check out the :py:class:`poliastro.plotting.static.StaticOrbitPlotter`.
 
 From classical orbital elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -142,17 +134,22 @@ In this case, we'd use the method
     ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
 Notice that whether we create a ``Orbit`` from \\(r\\) and \\(v\\) or from
-elements we can access many mathematical properties individually using the
-:py:attr:`~poliastro.twobody.orbit.Orbit.state` property of
-:py:class:`~poliastro.twobody.orbit.Orbit` objects::
+elements we can access many mathematical properties of the orbit::
 
-    >>> ss.state.period.to(u.day)
+    >>> ss.period.to(u.day)
     <Quantity 686.9713888628166 d>
-    >>> ss.state.v
+    >>> ss.v
     <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
 
 To see a complete list of properties, check out the
 :py:class:`poliastro.twobody.orbit.Orbit` class on the API reference.
+
+.. warning::
+
+  Due to limitations in the internal design of poliastro,
+  most orbital properties are not documented.
+  Please subscribe to `this issue <https://github.com/poliastro/poliastro/issues/435>`_
+  to receive updates about it in your inbox.
 
 Moving forward in time: propagation
 -----------------------------------
@@ -332,7 +329,7 @@ easily visualize in two dimensions:
 
     from poliastro.plotting import OrbitPlotter
     
-    op = OrbitPlotter()
+    op = OrbitPlotter2D()
     ss_a, ss_f = ss_i.apply_maneuver(hoh, intermediate=True)
     op.plot(ss_i, label="Initial orbit")
     op.plot(ss_a, label="Transfer orbit")
@@ -435,6 +432,7 @@ And these are the results::
 
 Working with NEOs
 -----------------
+
 `NEOs (Near Earth Objects)`_ are asteroids and comets whose orbits are near to earth (obvious, isn't it?).
 More correctly, their perihelion (closest approach to the Sun) is less than 1.3 astronomical units (≈ 200 * 10\ :sup:`6` km).
 Currently, they are being an important subject of study for scientists around the world, due to their status as the relatively
