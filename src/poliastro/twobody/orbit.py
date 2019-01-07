@@ -244,6 +244,7 @@ class Orbit(object):
             refplane = "earth"
         elif plane == Planes.EARTH_ECLIPTIC:
             refplane = "ecliptic"
+
         obj = Horizons(id=name, epochs=epoch.jd, id_type=id_type).elements(
             refplane=refplane
         )

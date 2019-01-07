@@ -8,7 +8,7 @@ from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from plotly.graph_objs import Layout, Scatter, Scatter3d, Surface
 
-from poliastro.plotting.util import generate_circle, generate_sphere
+from poliastro.plotting.util import generate_sphere
 from poliastro.util import norm
 
 from ._base import BaseOrbitPlotter
