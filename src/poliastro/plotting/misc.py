@@ -1,3 +1,5 @@
+from typing import Union
+
 from poliastro.bodies import (
     Earth,
     Jupiter,
@@ -22,24 +24,24 @@ def plot_solar_system(outer=True, epoch=None, use_3d=False):
     ------------
     outer : bool, optional
         Whether to print the outer Solar System, default to True.
-    epoch: ~astropy.time.Time, optional
+    epoch : ~astropy.time.Time, optional
         Epoch value of the plot, default to J2000.
+    use_3d : bool, optional
+        Produce 3D plot, default to False.
+
     """
     bodies = [Mercury, Venus, Earth, Mars]
     if outer:
         bodies.extend([Jupiter, Saturn, Uranus, Neptune])
 
     if use_3d:
-        op = OrbitPlotter3D()
+        op = OrbitPlotter3D()  # type: Union[OrbitPlotter3D, OrbitPlotter2D]
     else:
         op = OrbitPlotter2D()
+        op.set_frame(*Orbit.from_body_ephem(Earth, epoch).pqw())  # type: ignore
 
     for body in bodies:
         orb = Orbit.from_body_ephem(body, epoch)
         op.plot(orb, label=str(body))
-
-    # Sets frame to the orbit of the Earth by default
-    # TODO: Wait until https://github.com/poliastro/poliastro/issues/316
-    # op.set_frame(*Orbit.from_body_ephem(Earth, epoch).pqw())
 
     return op
