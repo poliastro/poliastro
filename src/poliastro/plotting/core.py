@@ -89,7 +89,7 @@ class OrbitPlotter3D(BaseOrbitPlotter):
             }
         )
 
-        return self.figure
+        return self.show()
 
 
 class OrbitPlotter2D(BaseOrbitPlotter):

@@ -36,12 +36,19 @@ class BaseOrbitPlotter:
 
     @property
     def figure(self):
-        self._prepare_plot()
         return self._figure
 
     @property
     def trajectories(self):
         return self._trajectories
+
+    def _set_attractor(self, attractor):
+        if self._attractor is None:
+            self._attractor = attractor
+        elif attractor is not self._attractor:
+            raise NotImplementedError(
+                "Attractor has already been set to {}.".format(self._attractor.name)
+            )
 
     def set_attractor(self, attractor):
         """Sets plotting attractor.
@@ -52,14 +59,7 @@ class BaseOrbitPlotter:
             Central body.
 
         """
-        if self._attractor is None:
-            self._attractor = attractor
-        elif attractor is not self._attractor:
-            raise NotImplementedError(
-                "Attractor has already been set to {}.".format(self._attractor.name)
-            )
-
-        return self.figure
+        self._set_attractor(attractor)
 
     def _redraw_attractor(self):
         # Select a sensible value for the radius: realistic for low orbits,
@@ -115,7 +115,7 @@ class BaseOrbitPlotter:
                 Trajectory(trajectory, None, label, trace.line.color)
             )
 
-        return self.figure
+        return self.show()
 
     def _plot_trajectory(self, trajectory, label, color, dashed):
         raise NotImplementedError
@@ -133,7 +133,7 @@ class BaseOrbitPlotter:
         if color is None:
             color = next(self._color_cycle)
 
-        self.set_attractor(orbit.attractor)
+        self._set_attractor(orbit.attractor)
 
         label = generate_label(orbit, label)
         trajectory = orbit.sample()
@@ -150,7 +150,7 @@ class BaseOrbitPlotter:
             Trajectory(trajectory, orbit.r, label, trace.line.color)
         )
 
-        return self.figure
+        return self.show()
 
     def _prepare_plot(self):
         if self._attractor is not None:
@@ -161,9 +161,10 @@ class BaseOrbitPlotter:
     def show(self):
         """Shows the plot in the Notebook.
 
-        Equivalent to just returning the underlying figure.
+        Updates the layout and returns the underlying figure.
 
         """
+        self._prepare_plot()
         return self.figure
 
     def savefig(self, filename):
