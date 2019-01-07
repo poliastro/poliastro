@@ -110,15 +110,9 @@ class OrbitPlotter2D(BaseOrbitPlotter):
         self._frame = None
 
     def _project(self, rr):
-        if self._frame is None:
-            warnings.warn("Frame has not been set, using identity")
-            frame = [[1, 0, 0] * u.one, [0, 1, 0] * u.one, [0, 0, 1] * u.one]
-        else:
-            frame = self._frame
-
-        rr_proj = rr - rr.dot(frame[2])[:, None] * frame[2]
-        x = rr_proj.dot(frame[0])
-        y = rr_proj.dot(frame[1])
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
         return x, y
 
     def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
@@ -160,6 +154,12 @@ class OrbitPlotter2D(BaseOrbitPlotter):
         return shape
 
     def _plot_trajectory(self, trajectory, label, color, dashed):
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_frame(*orbit.pqw()) or plot(orbit)."
+            )
+
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
 

@@ -112,6 +112,13 @@ class StaticOrbitPlotter:
             Color string.
 
         """
+        if self._attractor is None or self._frame is None:
+            raise ValueError(
+                "An attractor and a frame must be set up first, please use "
+                "set_attractor(Major_Body) and set_frame(*orbit.pqw()) "
+                "or plot(orbit)."
+            )
+
         lines = self._plot_trajectory(trajectory, color)
 
         if label:

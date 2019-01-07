@@ -103,7 +103,7 @@ class BaseOrbitPlotter:
         if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
-                "set_attractor(Major_Body)."
+                "set_attractor(Major_Body) or plot(orbit)."
             )
         else:
             if color is None:

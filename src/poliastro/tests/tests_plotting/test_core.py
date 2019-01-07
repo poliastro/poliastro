@@ -73,18 +73,43 @@ def test_plot_trajectory_without_attractor_raises_error(plotter_class):
         frame.plot_trajectory({})
     assert (
         "An attractor must be set up first, please use "
-        "set_attractor(Major_Body)." in excinfo.exconly()
+        "set_attractor(Major_Body) or plot(orbit)." in excinfo.exconly()
     )
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
-def test_plot_trajectory_plots_a_trajectory(plotter_class):
-    frame = plotter_class()
+def test_plot_2d_trajectory_without_frame_raises_error():
+    frame = OrbitPlotter2D()
+
+    with pytest.raises(ValueError) as excinfo:
+        frame.set_attractor(Sun)
+        frame.plot_trajectory({})
+    assert (
+        "A frame must be set up first, please use "
+        "set_frame(*orbit.pqw()) or plot(orbit)." in excinfo.exconly()
+    )
+
+
+def test_plot_3d_trajectory_plots_a_trajectory():
+    frame = OrbitPlotter3D()
     assert len(frame.trajectories) == 0
 
     earth = Orbit.from_body_ephem(Earth)
     trajectory = earth.sample()
     frame.set_attractor(Sun)
+    frame.plot_trajectory(trajectory)
+
+    assert len(frame.trajectories) == 1
+    assert frame._attractor == Sun
+
+
+def test_plot_2d_trajectory_plots_a_trajectory():
+    frame = OrbitPlotter2D()
+    assert len(frame.trajectories) == 0
+
+    earth = Orbit.from_body_ephem(Earth)
+    trajectory = earth.sample()
+    frame.set_attractor(Sun)
+    frame.set_frame(*earth.pqw())
     frame.plot_trajectory(trajectory)
 
     assert len(frame.trajectories) == 1
