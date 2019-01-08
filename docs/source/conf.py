@@ -20,6 +20,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
+#sys.path.append('../src/')
 
 # -- General configuration ------------------------------------------------
 
@@ -37,6 +38,8 @@ extensions = [
     'sphinx.ext.intersphinx',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx.ext.mathjax', #New module for matrix visualization
+    'sphinx.ext.graphviz', # For creating the diagrams
 ]
 
 # Custom configuration
@@ -59,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'poliastro'
-copyright = u'2013-2018, Juan Luis Cano Rodríguez and the poliastro development team'
+copyright = u'2013-2019, Juan Luis Cano Rodríguez and the poliastro development team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -118,6 +121,15 @@ intersphinx_mapping = {
 }
 
 #Nbsphinx configuration
+# See https://github.com/jupyter/nbconvert/issues/878#issuecomment-419655951
+# Should not be needed after nbconvert 5.5 is out
+nbsphinx_kernel_name = "python3"
+
+def setup(app):
+    # https://docs.readthedocs.io/en/latest/guides/adding-custom-css.html
+    # https://www.sphinx-doc.org/en/master/extdev/appapi.html#sphinx.application.Sphinx.add_js_file
+    app.add_js_file('https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js')
+
 if os.environ.get('READTHEDOCS') == 'True':
     nbsphinx_execute = 'never'
 else:

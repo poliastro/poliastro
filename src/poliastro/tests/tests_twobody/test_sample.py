@@ -1,13 +1,11 @@
 import pytest
-
-from astropy.tests.helper import assert_quantity_allclose
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
 from poliastro.bodies import Earth, Sun
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import kepler, mean_motion, cowell
-
+from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.util import norm
 
 
@@ -27,17 +25,13 @@ def test_sample_num_points(num_points):
     # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
 
 
-# @pytest.mark.parametrize('method', [
-#     mean_motion,
-#     cowell,
-#     kepler,
-# ])
 def test_sample_big_orbits():
+
     # See https://github.com/poliastro/poliastro/issues/265
     ss = Orbit.from_vectors(
         Sun,
         [-9018878.6, -94116055, 22619059] * u.km,
-        [-49.950923, -12.948431, -4.2925158] * u.km / u.s
+        [-49.950923, -12.948431, -4.2925158] * u.km / u.s,
     )
     positions = ss.sample(15)
     assert len(positions) == 15

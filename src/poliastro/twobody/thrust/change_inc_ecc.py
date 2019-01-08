@@ -6,12 +6,11 @@ References
 
 """
 import numpy as np
-
 from astropy import units as u
 
 from poliastro.core.elements import rv2coe
-from poliastro.core.util import norm, cross
 from poliastro.core.thrust.change_inc_ecc import beta, extra_quantities
+from poliastro.core.util import cross, norm
 
 
 def change_inc_ecc(ss_0, ecc_f, inc_f, f):
@@ -50,15 +49,22 @@ def change_inc_ecc(ss_0, ecc_f, inc_f, f):
         r = u_[:3]
         v = u_[3:]
         nu = rv2coe(k, r, v)[-1]
-        beta_ = beta_0_ * np.sign(np.cos(nu))  # The sign of ß reverses at minor axis crossings
+        beta_ = beta_0_ * np.sign(
+            np.cos(nu)
+        )  # The sign of ß reverses at minor axis crossings
 
         w_ = cross(r, v) / norm(cross(r, v))
-        accel_v = f * (
-            np.cos(beta_) * thrust_unit +
-            np.sin(beta_) * w_
-        )
+        accel_v = f * (np.cos(beta_) * thrust_unit + np.sin(beta_) * w_)
         return accel_v
 
-    delta_V, beta_, t_f = extra_quantities(ss_0.attractor.k.to(u.km ** 3 / u.s ** 2).value, ss_0.a.to(u.km).value,
-                                           ecc_0, ecc_f, inc_0, inc_f, argp, f)
+    delta_V, beta_, t_f = extra_quantities(
+        ss_0.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+        ss_0.a.to(u.km).value,
+        ecc_0,
+        ecc_f,
+        inc_0,
+        inc_f,
+        argp,
+        f,
+    )
     return a_d, delta_V, beta_, t_f

@@ -2,7 +2,6 @@
 
 """
 import numpy as np
-
 from astropy import units as u
 
 from poliastro.util import norm
@@ -23,6 +22,7 @@ class Maneuver(object):
     (<Quantity 10. s>, <Quantity [1., 0., 0.] km / s>)
 
     """
+
     def __init__(self, *impulses):
         r"""Constructor.
 
@@ -91,8 +91,9 @@ class Maneuver(object):
         R = r_f / r_i
         Rs = r_b / r_i
         dv_a = ((np.sqrt(2 * Rs / (1 + Rs)) - 1) * v_i).decompose()
-        dv_b = (-np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) -
-                np.sqrt(1 / (1 + Rs))) * v_i).decompose()
+        dv_b = (
+            -np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) - np.sqrt(1 / (1 + Rs))) * v_i
+        ).decompose()
         dv_c = (-(np.sqrt(2 * Rs / (R + Rs)) - 1) / np.sqrt(R) * v_i).decompose()
         t_trans1 = (np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)).decompose()
         t_trans2 = (np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)).decompose()

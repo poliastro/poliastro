@@ -66,13 +66,8 @@ the MIT license, hence allowing commercial use of the library.
 
 .. code-block:: python
 
-    import matplotlib.pyplot as plt
-    plt.ion()
-
     from poliastro.examples import molniya
-    from poliastro.plotting import plot
-    
-    plot(molniya)
+    molniya.plot()
 
 .. include:: success.rst
 
@@ -84,15 +79,17 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   about
-   getting_started
-   user_guide
-   jupyter
-   references
-   api
-   changelog
+    about
+    getting_started
+    user_guide
+    jupyter
+    api/safe/safe_index
+    api/core/core_index
+    changelog
+    references
+
 
 .. note::
     Older versions of poliastro relied on some Fortran subroutines written by David A. Vallado for

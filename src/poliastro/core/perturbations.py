@@ -7,7 +7,11 @@ from ._jit import jit
 
 @jit
 def J2_perturbation(t0, state, k, J2, R):
-    """Calculates J2_perturbation acceleration (km/s2)
+    r"""Calculates J2_perturbation acceleration (km/s2)
+
+    .. math::
+
+        \vec{p} = \frac{3}{2}\frac{J_{2}\mu R^{2}}{r^{4}}\left [\frac{x}{r}\left ( 5\frac{z^{2}}{r^{2}}-1 \right )\vec{i} + \frac{y}{r}\left ( 5\frac{z^{2}}{r^{2}}-1 \right )\vec{j} + \frac{z}{r}\left ( 5\frac{z^{2}}{r^{2}}-3 \right )\vec{k}\right]
 
     .. versionadded:: 0.9.0
 
@@ -24,8 +28,8 @@ def J2_perturbation(t0, state, k, J2, R):
     R: float
         attractor radius
 
-    Notes
-    -----
+    Note
+    ----
     The J2 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, (12.30)
 
@@ -43,7 +47,7 @@ def J2_perturbation(t0, state, k, J2, R):
 
 @jit
 def J3_perturbation(t0, state, k, J3, R):
-    """Calculates J3_perturbation acceleration (km/s2)
+    r"""Calculates J3_perturbation acceleration (km/s2)
 
     Parameters
     ----------
@@ -58,8 +62,8 @@ def J3_perturbation(t0, state, k, J3, R):
     R: float
         attractor radius
 
-    Notes
-    -----
+    Note
+    ----
     The J3 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, problem 12.8
     This perturbation has not been fully validated, see https://github.com/poliastro/poliastro/pull/398
@@ -79,7 +83,12 @@ def J3_perturbation(t0, state, k, J3, R):
 
 @jit
 def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
-    """Calculates atmospheric drag acceleration (km/s2)
+    r"""Calculates atmospheric drag acceleration (km/s2)
+
+    .. math::
+
+        \vec{p} = -\frac{1}{2}\rho v_{rel}\left ( \frac{C_{d}A}{m} \right )\vec{v_{rel}}
+
 
     .. versionadded:: 0.9.0
 
@@ -102,8 +111,8 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     rho0: float
         the exponent density pre-factor, (kg / m^3)
 
-    Notes
-    -----
+    Note
+    ----
     This function provides the acceleration due to atmospheric drag. We follow
     Howard Curtis, section 12.4
     the atmospheric density model is rho(H) = rho0 x exp(-H / H0)
@@ -121,8 +130,7 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
 
 @jit
 def shadow_function(r_sat, r_sun, R):
-    """Determines whether the satellite is in attractor's shadow,
-       uses algorithm 12.3 from Howard Curtis
+    r"""Determines whether the satellite is in attractor's shadow, uses algorithm 12.3 from Howard Curtis
 
     Parameters
     ----------
@@ -132,6 +140,7 @@ def shadow_function(r_sat, r_sun, R):
         position of star in the frame of attractor (km)
     R : float
         radius of body (attractor) that creates shadow (km)
+
     """
 
     r_sat_norm = np.sqrt(np.sum(r_sat ** 2))
@@ -145,7 +154,11 @@ def shadow_function(r_sat, r_sun, R):
 
 
 def third_body(t0, state, k, k_third, third_body):
-    """Calculates 3rd body acceleration (km/s2)
+    r"""Calculates 3rd body acceleration (km/s2)
+
+    .. math::
+
+        \vec{p} = \mu_{m}\left ( \frac{\vec{r_{m/s}}}{r_{m/s}^3} - \frac{\vec{r_{m}}}{r_{m}^3} \right )
 
     Parameters
     ----------
@@ -157,6 +170,12 @@ def third_body(t0, state, k, k_third, third_body):
         gravitational constant, (km^3/s^2)
     third_body: a callable object returning the position of 3rd body
         third body that causes the perturbation
+    
+    Note
+    ----
+    This formula is taken from Howard Curtis, section 12.10. As an example, a third body could be
+    the gravity from the Moon acting on a small satellite.
+
     """
 
     body_r = third_body(t0)
@@ -165,7 +184,11 @@ def third_body(t0, state, k, k_third, third_body):
 
 
 def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
-    """Calculates radiation pressure acceleration (km/s2)
+    r"""Calculates radiation pressure acceleration (km/s2)
+
+    .. math::
+
+        \vec{p} = -\nu \frac{S}{c} \left ( \frac{C_{r}A}{m} \right )\frac{\vec{r}}{r}
 
     Parameters
     ----------
@@ -187,8 +210,9 @@ def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
         total star emitted power divided by the speed of light (W * s / km)
     star: a callable object returning the position of star in attractor frame
         star position
-    Notes
-    -----
+    
+    Note
+    ----
     This function provides the acceleration due to star light pressure. We follow
     Howard Curtis, section 12.9
 

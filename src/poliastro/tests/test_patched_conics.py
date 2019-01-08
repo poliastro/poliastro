@@ -1,14 +1,22 @@
 import pytest
-
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import (
-    Sun, Mercury, Venus, Earth, Moon, Mars,
-    Jupiter, Saturn, Uranus, Neptune, Pluto,
-    Body
+    Body,
+    Earth,
+    Jupiter,
+    Mars,
+    Mercury,
+    Moon,
+    Neptune,
+    Pluto,
+    Saturn,
+    Sun,
+    Uranus,
+    Venus,
 )
-from poliastro.patched_conics import compute_soi
+from poliastro.threebody.patched_conics import compute_soi
 
 
 def test_compute_soi():
@@ -44,7 +52,10 @@ def test_compute_soi():
 def test_compute_missing_body_soi_raises_error(missing_body):
     with pytest.raises(RuntimeError) as excinfo:
         compute_soi(missing_body)
-    assert "To compute the semimajor axis for Moon and Pluto use the JPL ephemeris" in excinfo.exconly()
+    assert (
+        "To compute the semimajor axis for Moon and Pluto use the JPL ephemeris"
+        in excinfo.exconly()
+    )
 
 
 def test_compute_soi_given_a():

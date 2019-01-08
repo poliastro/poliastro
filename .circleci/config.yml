@@ -14,13 +14,14 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install flake8 mypy --quiet
+            pip install black isort mypy --quiet
 
       - run:
-          name: check PEP8 and style errors
+          name: check Black style
           command: |
             . venv/bin/activate
-            flake8 src/ setup.py --count
+            isort -c setup.py src/
+            black src/ setup.py --check
 
       - run:
           name: check MyPy
@@ -105,7 +106,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            sudo apt update && sudo apt install --no-install-recommends pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng
+            sudo apt update && sudo apt install --no-install-recommends pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz
             python3 -m venv venv
             . venv/bin/activate
             pip install .[dev] --quiet

@@ -10,8 +10,8 @@ References
 import numpy as np
 
 from poliastro.core.elements import rv2coe
-from poliastro.core.util import norm, cross
 from poliastro.core.thrust.change_argp import extra_quantities
+from poliastro.core.util import cross, norm
 
 
 def change_argp(k, a, ecc, argp_0, argp_f, f):
@@ -35,10 +35,7 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
         r_ = r / norm(r)
         w_ = cross(r, v) / norm(cross(r, v))
         s_ = cross(w_, r_)
-        accel_v = f * (
-            np.cos(alpha_) * s_ +
-            np.sin(alpha_) * r_
-        )
+        accel_v = f * (np.cos(alpha_) * s_ + np.sin(alpha_) * r_)
         return accel_v
 
     delta_V, t_f = extra_quantities(k, a, ecc, argp_0, argp_f, f, A=0.0)
