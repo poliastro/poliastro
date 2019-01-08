@@ -375,12 +375,11 @@ class Orbit(object):
     def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
         """Propagates an orbit.
 
-        If value is true anomaly, propagate orbit to this anomaly and return the result.
-        Otherwise, if time is provided, propagate this `Orbit` some `time` and return the result.
+        Propagate this `Orbit` some `time` and return the result.
 
         Parameters
         ----------
-        value : Multiple options
+        value : ~astropy.time.Time|~astropy.time.TimeDelta
             Time values.
         rtol : float, optional
             Relative tolerance for the propagation algorithm, default to 1e-10.
@@ -390,21 +389,6 @@ class Orbit(object):
             parameters used in perturbation models
 
         """
-        # if hasattr(value, "unit") and value.unit in ('rad', 'deg'):
-        #     p, ecc, inc, raan, argp, _ = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-        #                                         self.r.to(u.km).value,
-        #                                         self.v.to(u.km / u.s).value)
-        #
-        #     # Compute time of flight for correct epoch
-        #     M = nu_to_M(self.nu, self.ecc)
-        #     new_M = nu_to_M(value, self.ecc)
-        #     time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
-        #
-        #     return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
-        #                                ecc * u.one, inc * u.rad, raan * u.rad,
-        #                                argp * u.rad, value,
-        #                                epoch=self.epoch + time_of_flight, plane=self._plane)
-        # else:
         if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
             time_of_flight = value - self.epoch
         else:
@@ -412,23 +396,15 @@ class Orbit(object):
 
         return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
 
-    def propagate_to_anomaly(self, value, method=mean_motion, rtol=1e-10, **kwargs):
+    def propagate_to_anomaly(self, value):
         """Propagates an orbit.
 
-                If value is true anomaly, propagate orbit to this anomaly and return the result.
-                Otherwise, if time is provided, propagate this `Orbit` some `time` and return the result.
+        If value is true anomaly, propagate orbit to this anomaly and return the result.
 
-                Parameters
-                ----------
-                value : int re
-                    True anomaly values or time values. If given an angle, it will always propagate forward.
-                rtol : float, optional
-                    Relative tolerance for the propagation algorithm, default to 1e-10.
-                method : function, optional
-                    Method used for propagation
-                **kwargs
-                    parameters used in perturbation models
-
+        Parameters
+        ----------
+        value : ~astropy.units.Quantity
+            True anomaly values.
         """
         p, ecc, inc, raan, argp, _ = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
                                             self.r.to(u.km).value,
@@ -439,25 +415,17 @@ class Orbit(object):
         new_M = nu_to_M(value, self.ecc)
         time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
 
-        return self.from_classical(self.attractor, p / (1.0 - ecc ** 2) * u.km,
-                                   ecc * u.one, inc * u.rad, raan * u.rad,
-                                   argp * u.rad, value,
-                                   epoch=self.epoch + time_of_flight, plane=self._plane)
+        return self.propagate(time_of_flight)
 
-    def sample(self, values=None, method=mean_motion):
+    def sample(self, values=None):
         """Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
 
         Parameters
         ----------
-        values : Multiple options
+        values : int
             Number of interval points (default to 100),
-            True anomaly values,
-            Time values.
-
-        method : function, optional
-            Method used for propagation
 
         Returns
         -------
@@ -481,9 +449,9 @@ class Orbit(object):
 
         """
         if values is None:
-            return self.sample(100, method)
+            return self.sample(100)
 
-        elif isinstance(values, int):
+        else:
             if self.ecc < 1:
                 # first sample eccentric anomaly, then transform into true anomaly
                 # why sampling eccentric anomaly uniformly to minimize error in the apocenter, see
@@ -491,8 +459,7 @@ class Orbit(object):
                 # Start from pericenter
                 E_values = np.linspace(0, 2 * np.pi, values) * u.rad
                 nu_values = E_to_nu(E_values, self.ecc)
-                # return self.sample(nu_values, method)
-                time_of_flight = self._generate_time_values(nu_values)
+                time = self._generate_time_values(nu_values)
             else:
                 # Select a sensible limiting value for non-closed orbits
                 # This corresponds to max(r = 3p, r = self.r)
@@ -502,32 +469,13 @@ class Orbit(object):
                 wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
                 nu_limit = max(np.arccos(-(1 - 1 / 3.) / self.ecc), abs(wrapped_nu))
                 nu_values = np.linspace(-nu_limit, nu_limit, values)
-                time_of_flight = self._generate_time_values(nu_values)
+                time = self._generate_time_values(nu_values)
 
-            #return self.sample(nu_values, method)
-            #pos = [self.propagate(t).r.value for t in time_of_flight]
-            #print(pos)
-            #positions = method(self, time_of_flight.to(u.s).value)
-            #print(positions[0])
-            return self._sample(time_of_flight, method)
+            return self._sample(time)
 
-        # elif hasattr(values, "unit") and values.unit in ('rad', 'deg'):
-        #     values = self._generate_time_values(values)
-        #
-        # elif isinstance(values, time.Time):
-        #     values = values - self.epoch
-        #
-        # elif isinstance(values, list):
-        #     # A list of Times is assumed
-        #     values = [(value - self.epoch).sec for value in values] * u.s
+    def _sample(self, time_values):
+        positions = [self.propagate(time).r.value for time in time_values]
 
-        # return self._sample(values, method)
-
-    def _sample(self, time_values, method=mean_motion):
-        #positions = method(self, time_values.to(u.s).value)
-        positions = [self.propagate(t).r.value for t in time_values]
-
-        # data = CartesianRepresentation(positions[0] * u.km, xyz_axis=1)
         data = CartesianRepresentation(positions * u.km, xyz_axis=1)
 
         # If the frame supports obstime, set the time values
@@ -542,7 +490,6 @@ class Orbit(object):
         # in one line despite its parameter names, see
         # https://github.com/astropy/astropy/issues/7784
         return self.frame._replicate(data, representation_type='cartesian', **kwargs)
-
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point

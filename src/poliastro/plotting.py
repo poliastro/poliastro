@@ -177,7 +177,7 @@ class OrbitPlotter(object):
 
         self.ax.add_patch(mpl.patches.Circle((0, 0), self._attractor_radius.value, lw=0, color=color))
 
-    def plot(self, orbit, label=None, color=None, method=mean_motion):
+    def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
         """
         if not self._frame:
@@ -185,7 +185,7 @@ class OrbitPlotter(object):
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary Threshhold
-        positions = orbit.sample(self.num_points, method)
+        positions = orbit.sample(self.num_points)
 
         x0, y0 = self._project(orbit.r[None])
         # Plot current position
