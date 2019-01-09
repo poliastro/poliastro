@@ -501,9 +501,11 @@ class Orbit(object):
         value : ~astropy.units.Quantity
             True anomaly values.
         """
-        p, ecc, inc, raan, argp, _ = rv2coe(self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                                            self.r.to(u.km).value,
-                                            self.v.to(u.km / u.s).value)
+        p, ecc, inc, raan, argp, _ = rv2coe(
+            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+            self.r.to(u.km).value,
+            self.v.to(u.km / u.s).value,
+        )
 
         # Compute time of flight for correct epoch
         M = nu_to_M(self.nu, self.ecc)
