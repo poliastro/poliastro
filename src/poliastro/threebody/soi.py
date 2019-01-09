@@ -56,6 +56,8 @@ def hill_radius(body, a=None, e=None):
            Astronomical body which the SOI's radius is computed for.
     a : float, optional
         Semimajor axis of the body's orbit, default to None (will be computed from ephemerides).
+    e : float, optional
+        Eccentricity of the body's orbit, default to None (will be computed from ephemerides).
 
     Returns
     -------
