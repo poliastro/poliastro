@@ -1,7 +1,6 @@
-"""Patched Conics computations
+"""Sphere of Influence
 
-Contains methods to compute interplanetary trajectories approximating the three
-body problem with Patched Conics.
+Contains methods to compute radius of sphere of influence.
 
 """
 from astropy import units as u
@@ -47,7 +46,7 @@ def laplace_radius(body, a=None):
 
 
 @u.quantity_input(a=u.m, e=u.one)
-def hill_radius(body, a=None, e=None):
+def hill_radius(body, a=None, e=0 * u.one):
     """Approximated radius of the Laplace Sphere of Influence (SOI) for a body.
 
     Parameters
@@ -57,7 +56,7 @@ def hill_radius(body, a=None, e=None):
     a : float, optional
         Semimajor axis of the body's orbit, default to None (will be computed from ephemerides).
     e : float, optional
-        Eccentricity of the body's orbit, default to None (will be computed from ephemerides).
+        Eccentricity of the body's orbit, default to 0 (will be computed from ephemerides).
 
     Returns
     -------
@@ -65,28 +64,17 @@ def hill_radius(body, a=None, e=None):
         Approximated radius of the Sphere of Influence (SOI) [m]
 
     """
-    # Compute semimajor axis at epoch J2000 for the body if it was not
+    # Compute semimajor and eccentricity axis at epoch J2000 for the body if it was not
     # introduced by the user
-    if a is None:
+    if (a is None) or (e is 0):
         try:
-            a = Orbit.from_body_ephem(body, J2000).a
+            ss = Orbit.from_body_ephem(body, J2000)
+            a = a or ss.a
+            e = e or ss.ecc
 
         except KeyError:
             raise RuntimeError(
-                """To compute the semimajor axis for Moon and Pluto use the JPL ephemeris:
-
->>> from astropy.coordinates import solar_system_ephemeris
->>> solar_system_ephemeris.set("jpl")"""
-            )
-
-    # Compute eccentricity at epoch J2000 for the body if it was not
-    if e is None:
-        try:
-            e = Orbit.from_body_ephem(body, J2000).ecc
-
-        except KeyError:
-            raise RuntimeError(
-                """To compute the eccentricity for Moon and Pluto use the JPL ephemeris:
+                """To compute the semimajor axis or eccentricity for Moon and Pluto use the JPL ephemeris:
 
 >>> from astropy.coordinates import solar_system_ephemeris
 >>> solar_system_ephemeris.set("jpl")"""

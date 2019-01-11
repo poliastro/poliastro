@@ -1,5 +1,5 @@
-Patched Conics Module
-=====================
+Sphere of Influence Module
+==========================
 
 .. automodule:: poliastro.threebody.soi
     :members:
