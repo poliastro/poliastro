@@ -72,15 +72,15 @@ def hill_radius(body, a=None, e=0):
     if a is None:
         try:
             a = Orbit.from_body_ephem(body, J2000).a
-
+            e = Orbit.from_body_ephem(body, J2000).e
         except KeyError:
             raise RuntimeError(
-                """To compute the semimajor axis for Moon and Pluto use the JPL ephemeris:
+                """To compute the semimajor axis and eccentricty for Moon and Pluto use the JPL ephemeris:
 
 >>> from astropy.coordinates import solar_system_ephemeris
 >>> solar_system_ephemeris.set("jpl")"""
             )
 
-    r_HR = a * (body.k / 3 * body.parent.k) ** (1 / 3)
+    r_HR = a * (1 - e) * (body.k / 3 * body.parent.k) ** (1 / 3)
 
     return r_HR.decompose()
