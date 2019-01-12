@@ -44,8 +44,10 @@ def laplace_radius(body, a=None):
     r_SOI = a * (body.k / body.parent.k) ** (2 / 5)
 
     return r_SOI.decompose()
-
-
+"""
+The laplace radius is focused on finding the body that should be used as the origin when we seek to model the behaviour of the third body in the system. 
+The hill radius is focused on finding the radius around a body within which a third body will remain in a stable orbit
+"""
 @u.quantity_input()
 def hill_radius(body, a=None, e=0):
     """Calculates the approximate radius of the Hill sphere of a body.
