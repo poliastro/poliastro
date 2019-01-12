@@ -16,7 +16,7 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.threebody.patched_conics import laplace_radius
+from poliastro.threebody.soi import laplace_radius
 
 
 def test_laplace_radius():
