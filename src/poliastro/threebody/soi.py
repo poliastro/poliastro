@@ -11,7 +11,7 @@ from poliastro.twobody import Orbit
 
 
 @u.quantity_input(a=u.m)
-def compute_soi(body, a=None):
+def laplace_radius(body, a=None):
     """Approximated radius of the Laplace Sphere of Influence (SOI) for a body.
 
     Parameters

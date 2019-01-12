@@ -16,10 +16,10 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.threebody.patched_conics import compute_soi
+from poliastro.threebody.patched_conics import laplace_radius
 
 
-def test_compute_soi():
+def test_laplace_radius():
     # Data from Table A.2., Curtis "Orbital Mechanics for Engineering Students"
     data = [
         # body, SOI radius (m)
@@ -43,7 +43,7 @@ def test_compute_soi():
         else:
             continue
 
-        r_SOI = compute_soi(body)
+        r_SOI = laplace_radius(body)
 
         assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
 
@@ -51,16 +51,16 @@ def test_compute_soi():
 @pytest.mark.parametrize("missing_body", [Moon, Pluto])
 def test_compute_missing_body_soi_raises_error(missing_body):
     with pytest.raises(RuntimeError) as excinfo:
-        compute_soi(missing_body)
+        laplace_radius(missing_body)
     assert (
         "To compute the semimajor axis for Moon and Pluto use the JPL ephemeris"
         in excinfo.exconly()
     )
 
 
-def test_compute_soi_given_a():
+def test_laplace_radius_given_a():
     parent = Body(None, 1 * u.km ** 3 / u.s ** 2, "Parent")
     body = Body(parent, 1 * u.km ** 3 / u.s ** 2, "Body")
-    r_SOI = compute_soi(body, 1 * u.km)
+    r_SOI = laplace_radius(body, 1 * u.km)
 
     assert r_SOI == 1 * u.km
