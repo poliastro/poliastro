@@ -48,20 +48,21 @@ def test_laplace_radius():
         assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
 
 
-"""def test_hill_radius():
-    # Data from Table A.2., Curtis "Orbital Mechanics for Engineering Students"
+def test_hill_radius():
+    # Data from Table 6 of "Gravitational Spheres of the Major Planets, Moon and Sun" by Chebotarev, G.A.
+    # The data from this journal doesn't take into account the eccentricties of the orbits
     data = [
         # body, SOI radius (m)
         (Sun, None),
-        (Mercury, 1.12e8),
-        (Venus, 6.16e8),
-        (Earth, 9.25e8),
+        (Mercury, 0.221e9),
+        (Venus, 1.008e9),
+        (Earth, 1.497e9),
         # (Moon, 6.61e7),
-        (Mars, 5.77e8),
-        (Jupiter, 4.82e10),
-        (Saturn, 5.48e10),
-        (Uranus, 5.18e10),
-        (Neptune, 8.66e10),
+        (Mars, 1.083e9),
+        (Jupiter, 5.191e10),
+        (Saturn, 6.415e10),
+        (Uranus, 6.956e10),
+        (Neptune, 1.1524e11),
         # (Pluto, 3.08e9)
     ]
     for row in data:
@@ -74,8 +75,7 @@ def test_laplace_radius():
 
         r_HR = hill_radius(body)
 
-        assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
-"""
+        assert_quantity_allclose(r_HR, expected_r_HR, rtol=1e-1)
 
 
 @pytest.mark.parametrize("missing_body", [Moon, Pluto])
