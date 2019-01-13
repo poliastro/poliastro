@@ -16,7 +16,7 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.threebody.soi import laplace_radius
+from poliastro.threebody.soi import laplace_radius, hill_radius
 
 
 def test_laplace_radius():
@@ -100,5 +100,4 @@ def test_hill_radius_given_a():
     parent = Body(None, 1 * u.km ** 3 / u.s ** 2, "Parent")
     body = Body(parent, 1 * u.km ** 3 / u.s ** 2, "Body")
     r_HR = hill_radius(body, 1 * u.km)
-
-    assert r_HR == ((1 / 3) * u.km) ** (1 / 3)
+    assert r_HR == ((1 / 3) ** (1 / 3)) * u.km
