@@ -9,9 +9,10 @@ surrounding objects such as moons, despite the presence of the much more massive
 patched conic approximation, used in estimating the trajectories of bodies moving between the neighbourhoods
 of different masses using a two body approximation, ellipses and hyperbolae, the laplace radius is taken as
 the boundary where the trajectory switches which mass field it is influenced by.
- The result is:
- .. math::
-        a * \frac{m}{M}^{\frac{2}{5}}
+The result is:
+
+.. math::
+    a * \frac{m}{M}^{\frac{2}{5}}
 
 Hill Radius: In the three body problem, if that third object stays within an extremely complex boundary called
 the Roche lobe, the orbit of that third object about the smaller body will be stable for at least some amount
@@ -20,8 +21,9 @@ to define a sphere that approximated the Roche lobe. This is still intractable; 
 fifth order polynomial that cannot be solved in terms of the elementary functions. Hill further simplified things
 by realizing that a simple cubic equation yields a very good approximation of that intractable fifth order equation.
 The result is:
- .. math::
-        a * \frac{m}{3*M}^{\frac{1}{3}}
+
+.. math::
+    a * \frac{m}{3*M}^{\frac{1}{3}}
 """
 from astropy import units as u
 
