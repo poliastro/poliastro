@@ -44,11 +44,15 @@ def laplace_radius(body, a=None):
     r_SOI = a * (body.k / body.parent.k) ** (2 / 5)
 
     return r_SOI.decompose()
+
+
 """
 The laplace radius is focused on finding the body that should be used as the origin when we seek to model the behaviour of the third body in the system. 
 The hill radius is focused on finding the radius around a body within which a third body will remain in a stable orbit
 """
-@u.quantity_input()
+
+
+@u.quantity_input(a=u.m)
 def hill_radius(body, a=None, e=0):
     """Calculates the approximate radius of the Hill sphere of a body.
 
@@ -72,7 +76,7 @@ def hill_radius(body, a=None, e=0):
     if a is None:
         try:
             a = Orbit.from_body_ephem(body, J2000).a
-            e = Orbit.from_body_ephem(body, J2000).e
+            e = Orbit.from_body_ephem(body, J2000).ecc
         except KeyError:
             raise RuntimeError(
                 """To compute the semimajor axis and eccentricty for Moon and Pluto use the JPL ephemeris:
@@ -81,6 +85,6 @@ def hill_radius(body, a=None, e=0):
 >>> solar_system_ephemeris.set("jpl")"""
             )
 
-    r_HR = a * (1 - e) * (body.k / 3 * body.parent.k) ** (1 / 3)
+    r_HR = a * (1 - e) * (body.k / (3 * body.parent.k)) ** (1 / 3)
 
     return r_HR.decompose()
