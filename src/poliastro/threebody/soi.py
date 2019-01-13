@@ -86,7 +86,7 @@ def hill_radius(body, a=None, e=0 * u.one):
     """
     # Compute semimajor and eccentricity axis at epoch J2000 for the body if it was not
     # introduced by the user
-    if a is None or e==0:
+    if a is None or e == 0:
         try:
             ss = Orbit.from_body_ephem(body, J2000)
             a = a or ss.a
