@@ -47,8 +47,13 @@ def laplace_radius(body, a=None):
 
 
 """
-The laplace radius is focused on finding the body that should be used as the origin when we seek to model the behaviour of the third body in the system. 
+The laplace radius is focused on finding the body that should be used as the origin when we seek to model the behaviour of the third body in the system.
+Laplace radius is computed by the formula:
+a\times(\frac{mass_{body}}{mass_{parent}})^{2/5}, where a is the semi-major axis
+
 The hill radius is focused on finding the radius around a body within which a third body will remain in a stable orbit
+Hill radius is computed by the formula:
+a\times(1-e)\times \sqrt[3]{(\frac{mass_{body}}{3\times mass_{parent}})}, where a is the semi-major axis and e is the eccentricity
 """
 
 
