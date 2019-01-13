@@ -76,7 +76,7 @@ def hill_radius(body, a=None, e=0):
     if a is None:
         try:
             a = Orbit.from_body_ephem(body, J2000).a
-            e = Orbit.from_body_ephem(body, J2000).ecc
+            # e = Orbit.from_body_ephem(body, J2000).ecc
         except KeyError:
             raise RuntimeError(
                 """To compute the semimajor axis and eccentricty for Moon and Pluto use the JPL ephemeris:
