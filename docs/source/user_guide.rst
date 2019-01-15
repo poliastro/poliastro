@@ -86,8 +86,8 @@ notebook) we can immediately plot the current orbit::
 This plot is made in the so called *perifocal frame*, which means:
 
 * we're visualizing the plane of the orbit itself,
-* the \\(x\\) axis points to the pericenter, and
-* the \\(y\\) axis is turned \\(90 \\mathrm{^\\circ}\\) in the
+* the :math:`(x)` axis points to the pericenter, and
+* the :math:`(y)` axis is turned :math:`90 \mathrm{^\circ}` in the
   direction of the orbit.
 
 The dotted line represents the *osculating orbit*:
@@ -111,12 +111,12 @@ six parameters called orbital elements. Although there are several of
 these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
 
-* Semimajor axis \\(a\\).
-* Eccentricity \\(e\\).
-* Inclination \\(i\\).
-* Right ascension of the ascending node \\(\\Omega\\).
-* Argument of pericenter \\(\\omega\\).
-* True anomaly \\(\\nu\\).
+* Semimajor axis :math:`(a)`.
+* Eccentricity :math:`(e)`.
+* Inclination :math:`(i)`.
+* Right ascension of the ascending node :math:`(\Omega)`.
+* Argument of pericenter :math:`(\omega)`.
+* True anomaly :math:`(\nu)`.
 
 In this case, we'd use the method
 :py:meth:`~poliastro.twobody.orbit.Orbit.from_classical`:
@@ -133,7 +133,7 @@ In this case, we'd use the method
     
     ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
-Notice that whether we create a ``Orbit`` from \\(r\\) and \\(v\\) or from
+Notice that whether we create a ``Orbit`` from :math:`(r)` and :math:`(v)` or from
 elements we can access many mathematical properties of the orbit::
 
     >>> ss.period.to(u.day)
@@ -261,8 +261,8 @@ poliastro helps us define several in-plane and general out-of-plane
 maneuvers with the :py:class:`~poliastro.maneuver.Maneuver` class inside the
 :py:mod:`poliastro.maneuver` module.
 
-Each ``Maneuver`` consists on a list of impulses \\(\\Delta v_i\\)
-(changes in velocity) each one applied at a certain instant \\(t_i\\). The
+Each ``Maneuver`` consists on a list of impulses :math:`\Delta v_i`
+(changes in velocity) each one applied at a certain instant :math:`t_i`. The
 simplest maneuver is a single change of velocity without delay: you can
 recreate it either using the :py:meth:`~poliastro.maneuver.Maneuver.impulse`
 method or instantiating it directly.
@@ -281,7 +281,7 @@ maneuvers, notably :py:meth:`~poliastro.maneuver.Maneuver.hohmann` and
 :py:meth:`~poliastro.maneuver.Maneuver.bielliptic` for `Hohmann`_ and
 `bielliptic`_ transfers respectively. Both return the corresponding
 ``Maneuver`` object, which in turn you can use to calculate the total cost
-in terms of velocity change (\\(\\sum \|\\Delta v_i|\\)) and the transfer
+in terms of velocity change :math:`\sum |\Delta v_i|` and the transfer
 time::
 
     >>> ss_i = Orbit.circular(Earth, alt=700 * u.km)
