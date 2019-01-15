@@ -10,8 +10,8 @@ from poliastro.util import norm
 class Maneuver(object):
     r"""Class to represent a Maneuver.
 
-    Each ``Maneuver`` consists on a list of impulses \\(\\Delta v_i\\)
-    (changes in velocity) each one applied at a certain instant \\(t_i\\).
+    Each ``Maneuver`` consists on a list of impulses :math:`\Delta v_i`
+    (changes in velocity) each one applied at a certain instant :math:`t_i`.
     You can access them directly indexing the ``Maneuver`` object itself.
 
     >>> man = Maneuver((0 * u.s, [1, 0, 0] * u.km / u.s),
