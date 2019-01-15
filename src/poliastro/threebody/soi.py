@@ -12,7 +12,7 @@ the boundary where the trajectory switches which mass field it is influenced by.
 The result is:
 
 .. math::
-    a * \frac{m}{M}^{\frac{2}{5}}
+    a\\times(\\frac{m}{M}^{\\frac{2}{5}})
 
 Hill Radius: In the three body problem, if that third object stays within an extremely complex boundary called
 the Roche lobe, the orbit of that third object about the smaller body will be stable for at least some amount
@@ -23,7 +23,8 @@ by realizing that a simple cubic equation yields a very good approximation of th
 The result is:
 
 .. math::
-    a * \frac{m}{3*M}^{\frac{1}{3}}
+    a\\times(\\frac{m}{3\\times(M)}^{\\frac{1}{3}})
+
 """
 from astropy import units as u
 
