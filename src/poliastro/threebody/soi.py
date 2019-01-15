@@ -23,7 +23,7 @@ by realizing that a simple cubic equation yields a very good approximation of th
 The result is:
 
 .. math::
-    a\\times(\\frac{m}{3\\times(M)})^{\\frac{1}{3}}
+    a\\times(\\frac{m}{3\\times M})^{\\frac{1}{3}}
 
 """
 from astropy import units as u
