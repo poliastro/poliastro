@@ -4,6 +4,8 @@
 
 MANIFEST
 
+checking/
+
 *.py[cod]
 *.so
 
