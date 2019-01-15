@@ -8,4 +8,4 @@ The :py:mod:`poliastro.threebody` contains a set of modules related to this phys
 
     flybys
     restricted
-    patched_conics
+    soi
