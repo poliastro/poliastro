@@ -70,7 +70,7 @@ def laplace_radius(body, a=None):
 
 @u.quantity_input(a=u.m, e=u.one)
 def hill_radius(body, a=None, e=0 * u.one):
-    """Approximated radius of the Laplace Sphere of Influence (SOI) for a body.
+    """Approximated radius of the Hill Sphere of Influence (SOI) for a body.
 
     Parameters
     ----------

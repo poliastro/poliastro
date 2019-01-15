@@ -238,6 +238,21 @@ class Orbit(object):
     def from_horizons(
         cls, name, epoch=None, plane=Planes.EARTH_EQUATOR, id_type="smallbody"
     ):
+        """Return osculating `Orbit` of a body using JPLHorizons module of Astroquery.
+
+        Parameters
+        ----------
+        name : string
+            Name of the body to query for.
+        epoch : ~astropy.time.Time, optional
+            Epoch, default to None.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
+        id_type : string, optional
+            Use "smallbody" for Asteroids and Comets, and "majorbody"
+            for Planets and Satellites.
+
+        """
         if not epoch:
             epoch = time.Time.now()
         if plane == Planes.EARTH_EQUATOR:
