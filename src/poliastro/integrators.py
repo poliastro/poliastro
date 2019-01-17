@@ -511,3 +511,109 @@ class DOP835DenseOutput(DenseOutput):
         s = (t_eval - self.t_old) / self.h
         coeffs = get_coeffs(s)
         return np.dot(self.interpolation.T, coeffs)
+
+
+class Verner78(OdeSolver):
+   """ This is the class for Verner78 solver.
+   """
+
+    def __init__(
+            self,
+            fun,
+            t0,
+            y0,
+            t_bound,
+            max_step=np.inf,
+            rtol=1e-7,
+            atol=1e-12,
+            safety_factor=0.9,
+            min_step_change=0.333,
+            max_step_change=6.0,
+            beta_stabilizer=0.00,
+            max_nsteps=100000,
+            vectorized=False,
+            **extraneous
+        ):
+         
+            warn_extraneous(extraneous)
+            super().__init__(fun, t0, y0, t_bound, vectorized, support_complex=True)
+            self.y_old = None
+            self.max_step = validate_max_step(max_step)
+            self.beta_stabilizer = validate_beta_stabilizer(beta_stabilizer)
+            self.max_nsteps = validate_max_nsteps(max_nsteps)
+            self.safety_factor = validate_safety_factor(safety_factor)
+            self.rtol, self.atol = validate_tol(rtol, atol, self.n)
+            self.min_step_change = min_step_change
+            self.max_step_change = max_step_change
+            self.order = 8
+
+            self.f = self.fun(self.t, self.y)
+            self.h_abs = select_initial_step(
+                self.fun,
+                self.t,
+                self.y,
+                self.f,
+                self.direction,
+                self.order,
+                self.rtol,
+                self.atol,
+            )
+            self.nfev += 2
+
+            self.n_steps = 0
+            self.n_accepted = 0
+            self.n_rejected = 0
+            self.factor_old = 1e-4  # Lund-stabilization factor
+            self.K = np.zeros((16, self.n))
+            self.interpolation = np.zeros((8, self.n))
+
+    def _step_impl(self): 
+    
+        # Setting up initial point
+        t = self.t 
+        y = self.y 
+        h = self.max_step 
+        FLAG = True
+
+        while FLAG:
+            # We start computing the k coefficients
+            k1=h*f(y);   
+            k2=h*f(t+h/6,y+k1/6);   
+            k3=h*f(t+4*h/15,y+4*k1/75+16*k2/75);   
+            k4=h*f(t+2*h/3,y+5*k1/6-8*k2/3+5*k3/2);   
+            k5=h*f(t+5*h/6,y-165*k1/64+55*k2/6-425*k3/64+85*k4/96);   
+            k6=h*f(t+h,y+12*k1/5-8*k2+4015*k3/612-11*k4/36+88*k5/255);   
+            k7=h*f(t+h/15,y-8263*k1/15000+124*k2/75-643*k3/680-81*k4/250+2484*k5/10625);   
+            k8=h*f(t+h,y+3501*k1/1720-300*k2/43+297275*k3/52632-319*k4/2322+24068*k5/84065+3850*k7/26703);   
+       
+            # We compute the error obtained: |y_i+1 - y_i| 
+            y_delta=(3.0/40-13.0/160)*k1+(875.0/2244-2375.0/5984)*k3+(23.0/72-5.0/16)*k4+(264.0/1955-12.0/85)*k5+(-3.0/44)*k6+125.0/11592*k7+43.0/616*k8;   
+     
+            R = np.abs(y_delta)/h
+
+            if R < self.rtol:
+                # This means we can accept this computation
+                t += h
+                y += 13*k1/160+2375*k3/5984+5*k4/16+12*k5/85+3*k6/44;
+                return True, "Step is valid"   
+            
+            delta = 0.84 * (self.rtol/R) ** 0.25
+
+            # We compute the new stepsize h
+            if delta <= 0.1:
+                h *= 0.1
+            elif delta >= 4:
+                h *= 4
+            else:
+                h *= delta
+
+            if h > self.max_step:
+                h = self.max_step 
+
+            # Check conditions for FLAG loop
+            if t >= b:
+                return False, "Exceed upper bound"
+            elif t + h > b:
+                h = b - t
+            elif h < self.min_step_change:
+                return False, "Step is less than minimum" 
