@@ -517,55 +517,39 @@ class Verner78(OdeSolver):
    """ This is the class for Verner78 solver.
    """
 
-    def __init__(
-            self,
-            fun,
-            t0,
-            y0,
-            t_bound,
-            max_step=np.inf,
-            rtol=1e-7,
-            atol=1e-12,
-            safety_factor=0.9,
-            min_step_change=0.333,
-            max_step_change=6.0,
-            beta_stabilizer=0.00,
-            max_nsteps=100000,
-            vectorized=False,
-            **extraneous
-        ):
+    def __init__(self, fun, t0, y0, t_bound, max_step=np.inf, rtol=1e-7, atol=1e-12, safety_factor=0.9, min_step_change=0.333, max_step_change=6.0, beta_stabilizer=0.00, max_nsteps=100000, vectorized=False, **extraneous):
          
-            warn_extraneous(extraneous)
-            super().__init__(fun, t0, y0, t_bound, vectorized, support_complex=True)
-            self.y_old = None
-            self.max_step = validate_max_step(max_step)
-            self.beta_stabilizer = validate_beta_stabilizer(beta_stabilizer)
-            self.max_nsteps = validate_max_nsteps(max_nsteps)
-            self.safety_factor = validate_safety_factor(safety_factor)
-            self.rtol, self.atol = validate_tol(rtol, atol, self.n)
-            self.min_step_change = min_step_change
-            self.max_step_change = max_step_change
-            self.order = 8
+        warn_extraneous(extraneous)
+        super().__init__(fun, t0, y0, t_bound, vectorized, support_complex=True)
+        self.y_old = None
+        self.max_step = validate_max_step(max_step)
+        self.beta_stabilizer = validate_beta_stabilizer(beta_stabilizer)
+        self.max_nsteps = validate_max_nsteps(max_nsteps)
+        self.safety_factor = validate_safety_factor(safety_factor)
+        self.rtol, self.atol = validate_tol(rtol, atol, self.n)
+        self.min_step_change = min_step_change
+        self.max_step_change = max_step_change
+        self.order = 8
 
-            self.f = self.fun(self.t, self.y)
-            self.h_abs = select_initial_step(
-                self.fun,
-                self.t,
-                self.y,
-                self.f,
-                self.direction,
-                self.order,
-                self.rtol,
-                self.atol,
-            )
-            self.nfev += 2
+        self.f = self.fun(self.t, self.y)
+        self.h_abs = select_initial_step(
+            self.fun,
+            self.t,
+            self.y,
+            self.f,
+            self.direction,
+            self.order,
+            self.rtol,
+            self.atol,
+        )
+        self.nfev += 2
 
-            self.n_steps = 0
-            self.n_accepted = 0
-            self.n_rejected = 0
-            self.factor_old = 1e-4  # Lund-stabilization factor
-            self.K = np.zeros((16, self.n))
-            self.interpolation = np.zeros((8, self.n))
+        self.n_steps = 0
+        self.n_accepted = 0
+        self.n_rejected = 0
+        self.factor_old = 1e-4  # Lund-stabilization factor
+        self.K = np.zeros((16, self.n))
+        self.interpolation = np.zeros((8, self.n))
 
     def _step_impl(self): 
     
