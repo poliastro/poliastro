@@ -9,7 +9,7 @@ OOP nature.
 .. graphviz:: 
     
     digraph {
-        "poliastro" -> "twobody", "threebody", "bodies", "neos", "iod", "constants", "coordinates", "examples", "frames",
+        "poliastro" -> "twobody", "threebody", "bodies", "neos", "plotting", "iod", "constants", "coordinates", "examples", "frames",
                        "maneuver"
 
     }
@@ -22,6 +22,7 @@ OOP nature.
     threebody/threebody_index
     bodies
     neos/neos_index
+    plotting/plotting_index
     iod/iod_index
     constants
     coordinates
