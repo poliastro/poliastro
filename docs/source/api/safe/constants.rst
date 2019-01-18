@@ -1,4 +1,4 @@
-Constants Module
+Constants module
 ================
 
 .. automodule:: poliastro.constants

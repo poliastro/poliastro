@@ -1,4 +1,4 @@
-Bodies Module
+Bodies module
 =============
 
 .. automodule:: poliastro.bodies
