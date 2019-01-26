@@ -64,7 +64,13 @@ targetting_vec = np.vectorize(
 
 
 def porkchop(
-    departure_body, target_body, launch_span, arrival_span, ax=None, time_lines=True
+    departure_body,
+    target_body,
+    launch_span,
+    arrival_span,
+    ax=None,
+    time_lines=True,
+    max_c3=45.0 * u.km ** 2 / u.s ** 2,
 ):
     """Plots porkchop between two bodies.
 
@@ -114,7 +120,7 @@ def porkchop(
     else:
         fig = ax.figure
 
-    c3_levels = np.linspace(0, 45, 30)
+    c3_levels = np.linspace(0, max_c3.to(u.km ** 2 / u.s ** 2).value, 30)
 
     c = ax.contourf(
         [D.to_datetime() for D in launch_span],
