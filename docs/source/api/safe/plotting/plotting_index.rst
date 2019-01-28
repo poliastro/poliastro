@@ -8,7 +8,7 @@ submodules:
 .. graphviz::
 
    digraph {
-      "poliastro.plotting" -> "core", "misc", "static", "util";
+      "poliastro.plotting" -> "core", "misc", "porkchop", "static", "util";
    }
 
 
@@ -19,5 +19,6 @@ submodules:
 
     core
     misc
+    porkchop
     static
     util
