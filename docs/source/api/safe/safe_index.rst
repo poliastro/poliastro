@@ -29,5 +29,4 @@ OOP nature.
     examples
     frames
     maneuver
-    plotting
     util
