@@ -4,6 +4,7 @@ from unittest import mock
 import astropy.units as u
 import pytest
 import requests
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.frames import HeliocentricEclipticJ2000
 from poliastro.neos import neows
@@ -43,9 +44,10 @@ def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
         ss.argp
         == float(mock_orbital_data["orbital_data"]["perihelion_argument"]) * u.deg
     )
-    assert (
-        nu_to_M(ss.nu, ss.ecc)
-        == float(mock_orbital_data["orbital_data"]["mean_anomaly"]) * u.deg
+    assert_quantity_allclose(
+        nu_to_M(ss.nu, ss.ecc),
+        float(mock_orbital_data["orbital_data"]["mean_anomaly"]) * u.deg,
+        rtol=1e-8,
     )
 
 
