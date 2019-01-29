@@ -20,6 +20,7 @@ from poliastro.frames import Planes, get_frame
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.twobody.angles import E_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
+from poliastro.util import norm
 
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
@@ -62,9 +63,9 @@ class Orbit(object):
         self._frame = None
 
     @property
-    def state(self):
-        """Position and velocity or orbital elements. """
-        return self._state
+    def attractor(self):
+        """Main attractor. """
+        return self._state.attractor
 
     @property
     def epoch(self):
@@ -87,6 +88,121 @@ class Orbit(object):
             self._frame = get_frame(self.attractor, self._plane, self.epoch)
 
         return self._frame
+
+    @property
+    def r(self):
+        """Position vector. """
+        return self._state.to_vectors().r
+
+    @property
+    def v(self):
+        """Velocity vector. """
+        return self._state.to_vectors().v
+
+    @property
+    def a(self):
+        """Semilatus rectum. """
+        return self.p / (1 - self.ecc ** 2)
+
+    @property
+    def p(self):
+        """Semimajor axis. """
+        return self._state.to_classical().p
+
+    @property
+    def r_p(self):
+        """Radius of pericenter. """
+        return self.a * (1 - self.ecc)
+
+    @property
+    def r_a(self):
+        """Radius of apocenter. """
+        return self.a * (1 + self.ecc)
+
+    @property
+    def ecc(self):
+        """Eccentricity. """
+        return self._state.to_classical().ecc
+
+    @property
+    def inc(self):
+        """Inclination. """
+        return self._state.to_classical().inc
+
+    @property
+    def raan(self):
+        """Right ascension of the ascending node. """
+        return self._state.to_classical().raan
+
+    @property
+    def argp(self):
+        """Argument of the perigee. """
+        return self._state.to_classical().argp
+
+    @property
+    def nu(self):
+        """True anomaly. """
+        return self._state.to_classical().nu
+
+    @property
+    def f(self):
+        """Second modified equinoctial element. """
+        return self._state.to_equinoctial().f
+
+    @property
+    def g(self):
+        """Third modified equinoctial element. """
+        return self._state.to_equinoctial().g
+
+    @property
+    def h(self):
+        """Fourth modified equinoctial element. """
+        return self._state.to_equinoctial().h
+
+    @property
+    def k(self):
+        """Fifth modified equinoctial element. """
+        return self._state.to_equinoctial().k
+
+    @property
+    def L(self):
+        """True longitude. """
+        return self.raan + self.argp + self.nu
+
+    @property
+    def period(self):
+        """Period of the orbit. """
+        return 2 * np.pi * u.rad / self.n
+
+    @property
+    def n(self):
+        """Mean motion. """
+        return (np.sqrt(self.attractor.k / abs(self.a ** 3)) * u.rad).decompose()
+
+    @property
+    def energy(self):
+        """Specific energy. """
+        return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
+
+    @property
+    def e_vec(self):
+        """Eccentricity vector. """
+        r, v = self.rv()
+        k = self.attractor.k
+        e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
+        return e_vec.decompose()
+
+    @property
+    def h_vec(self):
+        """Specific angular momentum vector. """
+        h_vec = np.cross(self.r.to(u.km).value, self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        return h_vec
+
+    @property
+    def arglat(self):
+        """Argument of latitude. """
+        arglat = (self.argp + self.nu) % (360 * u.deg)
+        return arglat
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
@@ -453,6 +569,35 @@ class Orbit(object):
         ss._frame = ICRS()  # Hack!
         return ss
 
+    def rv(self):
+        """Position and velocity vectors. """
+        return self.r, self.v
+
+    def classical(self):
+        """Classical orbital elements. """
+        return (
+            self.a,
+            self.ecc,
+            self.inc.to(u.deg),
+            self.raan.to(u.deg),
+            self.argp.to(u.deg),
+            self.nu.to(u.deg),
+        )
+
+    def pqw(self):
+        """Perifocal frame (PQW) vectors. """
+        if self.ecc < 1e-8:
+            if abs(self.inc.to(u.rad).value) > 1e-8:
+                node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
+                p_vec = node / norm(node)  # Circular inclined
+            else:
+                p_vec = [1, 0, 0] * u.one  # Circular equatorial
+        else:
+            p_vec = self.e_vec / self.ecc
+        w_vec = self.h_vec / norm(self.h_vec)
+        q_vec = np.cross(w_vec, p_vec) * u.one
+        return p_vec, q_vec, w_vec
+
     def __str__(self):
         if self.a > 1e7 * u.km:
             unit = u.au
@@ -685,35 +830,3 @@ class Orbit(object):
             return OrbitPlotter3D().plot(self, label=label)
         else:
             return OrbitPlotter2D().plot(self, label=label)
-
-    # Delegated properties (syntactic sugar)
-    def __getattr__(self, item):
-        if hasattr(self.state, item):
-
-            def delegated_(self_):
-                return getattr(self_.state, item)
-
-            # Use class docstring to properly translate properties, see
-            # https://stackoverflow.com/a/38118315/554319
-            delegated_.__doc__ = getattr(self.state.__class__, item).__doc__
-
-            # Transform to a property
-            delegated = property(delegated_)
-
-        else:
-            raise AttributeError(
-                "'{}' object has no attribute '{}'".format(self.__class__, item)
-            )
-
-        # Bind the attribute
-        setattr(self.__class__, item, delegated)
-
-        # Return the newly bound attribute
-        return getattr(self, item)
-
-    def __getstate__(self):
-        return self.state, self.epoch
-
-    def __setstate__(self, state):
-        self._state = state[0]
-        self._epoch = state[1]
