@@ -28,7 +28,7 @@ The result is:
 """
 from astropy import units as u
 
-from poliastro.constants import J2000
+from poliastro.constants import J2000_TDB
 from poliastro.twobody import Orbit
 
 
@@ -53,7 +53,7 @@ def laplace_radius(body, a=None):
     # introduced by the user
     if a is None:
         try:
-            a = Orbit.from_body_ephem(body, J2000).a
+            a = Orbit.from_body_ephem(body, J2000_TDB).a
 
         except KeyError:
             raise RuntimeError(
@@ -91,7 +91,7 @@ def hill_radius(body, a=None, e=0 * u.one):
     # introduced by the user
     if a is None or e == 0:
         try:
-            ss = Orbit.from_body_ephem(body, J2000)
+            ss = Orbit.from_body_ephem(body, J2000_TDB)
             a = a or ss.a
             e = e or ss.ecc
 
