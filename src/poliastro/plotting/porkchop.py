@@ -2,19 +2,14 @@
 This is the script for porkchop plotting
 """
 
-from poliastro.bodies import Sun
-from poliastro.util import norm
-from poliastro.iod import lambert
-from poliastro.util import time_range
-
-
-from astropy import units as u
-from astropy.time import Time
-from astropy import coordinates as coord
-
 import matplotlib.pyplot as plt
-
 import numpy as np
+from astropy import coordinates as coord, units as u
+from astropy.time import Time
+
+from poliastro.bodies import Sun
+from poliastro.iod import lambert
+from poliastro.util import norm, time_range
 
 
 def _targetting(departure_body, target_body, t_launch, t_arrival):

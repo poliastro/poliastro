@@ -16,7 +16,7 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.threebody.soi import laplace_radius, hill_radius
+from poliastro.threebody.soi import hill_radius, laplace_radius
 
 
 @pytest.mark.parametrize(
