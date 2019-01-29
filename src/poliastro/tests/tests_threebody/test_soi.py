@@ -77,7 +77,7 @@ def test_hill_radius(body, expected_r_SOI):
     if expected_r_SOI is not None:
         expected_r_SOI = expected_r_SOI * u.m
 
-    r_SOI = hill_radius(body)
+    r_SOI = hill_radius(body, e=0 * u.one)
 
     assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
 
