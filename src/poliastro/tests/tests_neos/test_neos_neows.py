@@ -4,6 +4,7 @@ from unittest import mock
 import astropy.units as u
 import pytest
 import requests
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.frames import HeliocentricEclipticJ2000
 from poliastro.neos import neows
@@ -32,16 +33,21 @@ def test_orbit_from_spk_id_has_proper_values(mock_get, mock_response):
     ss = neows.orbit_from_spk_id("")
 
     assert ss.frame.is_equivalent_frame(HeliocentricEclipticJ2000(obstime=ss.epoch))
-    assert ss.ecc == mock_orbital_data["orbital_data"]["eccentricity"] * u.one
-    assert ss.a == mock_orbital_data["orbital_data"]["semi_major_axis"] * u.AU
-    assert ss.inc == mock_orbital_data["orbital_data"]["inclination"] * u.deg
+    assert ss.ecc == float(mock_orbital_data["orbital_data"]["eccentricity"]) * u.one
+    assert ss.a == float(mock_orbital_data["orbital_data"]["semi_major_axis"]) * u.AU
+    assert ss.inc == float(mock_orbital_data["orbital_data"]["inclination"]) * u.deg
     assert (
-        ss.raan == mock_orbital_data["orbital_data"]["ascending_node_longitude"] * u.deg
+        ss.raan
+        == float(mock_orbital_data["orbital_data"]["ascending_node_longitude"]) * u.deg
     )
-    assert ss.argp == mock_orbital_data["orbital_data"]["perihelion_argument"] * u.deg
     assert (
-        nu_to_M(ss.nu, ss.ecc)
-        == mock_orbital_data["orbital_data"]["mean_anomaly"] * u.deg
+        ss.argp
+        == float(mock_orbital_data["orbital_data"]["perihelion_argument"]) * u.deg
+    )
+    assert_quantity_allclose(
+        nu_to_M(ss.nu, ss.ecc),
+        float(mock_orbital_data["orbital_data"]["mean_anomaly"]) * u.deg,
+        rtol=1e-8,
     )
 
 

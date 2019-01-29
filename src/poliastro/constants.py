@@ -29,7 +29,9 @@ from astropy import time
 from astropy.constants import Constant
 
 # See for example USNO Circular 179
-J2000 = time.Time("J2000", scale="tt")
+J2000_TT = time.Time("J2000", scale="tt")
+J2000_TDB = time.Time("J2000", scale="tdb")
+J2000 = J2000_TT
 
 GM_sun = Constant(
     "GM_sun",

@@ -64,14 +64,12 @@ def rotate(vec, angle, axis):
         sl = slice(1, 3, 1)
     elif axis == 1:
         sl = slice(0, 3, 2)
+        angle = -angle
     elif axis == 2:
         sl = slice(0, 2, 1)
     else:
         raise ValueError("Invalid axis: must be one of 'x', 'y' or 'z'")
-
     rot[sl, sl] = np.array(((cos(angle), -sin(angle)), (sin(angle), cos(angle))))
-    if axis == 1:
-        rot = rot.T
 
     # np.dot() arguments must all have the same dtype
     return np.dot(rot, vec.astype(rot.dtype))

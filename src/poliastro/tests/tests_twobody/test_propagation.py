@@ -278,6 +278,7 @@ def test_propagate_long_times_keeps_geometry(method):
     )
 
 
+@pytest.mark.filterwarnings("ignore::astropy._erfa.core.ErfaWarning")
 def test_long_propagations_kepler_agrees_mean_motion():
     tof = 100 * u.year
     r_mm, v_mm = iss.propagate(tof, method=mean_motion).rv()

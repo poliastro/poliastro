@@ -28,7 +28,7 @@ The result is:
 """
 from astropy import units as u
 
-from poliastro.constants import J2000
+from poliastro.constants import J2000_TDB
 from poliastro.twobody import Orbit
 
 
@@ -53,7 +53,7 @@ def laplace_radius(body, a=None):
     # introduced by the user
     if a is None:
         try:
-            a = Orbit.from_body_ephem(body, J2000).a
+            a = Orbit.from_body_ephem(body, J2000_TDB).a
 
         except KeyError:
             raise RuntimeError(
@@ -69,7 +69,7 @@ def laplace_radius(body, a=None):
 
 
 @u.quantity_input(a=u.m, e=u.one)
-def hill_radius(body, a=None, e=0 * u.one):
+def hill_radius(body, a=None, e=None):
     """Approximated radius of the Hill Sphere of Influence (SOI) for a body.
 
     Parameters
@@ -89,11 +89,11 @@ def hill_radius(body, a=None, e=0 * u.one):
     """
     # Compute semimajor and eccentricity axis at epoch J2000 for the body if it was not
     # introduced by the user
-    if a is None or e == 0:
+    if a is None or e is None:
         try:
-            ss = Orbit.from_body_ephem(body, J2000)
-            a = a or ss.a
-            e = e or ss.ecc
+            ss = Orbit.from_body_ephem(body, J2000_TDB)
+            a = a if a is not None else ss.a
+            e = e if e is not None else ss.ecc
 
         except KeyError:
             raise RuntimeError(

@@ -47,7 +47,7 @@ setup(
             "black ; python_version>='3.6'",
             "coverage",
             "isort",
-            "pytest",
+            "pytest>=3.2",
             "pytest-cov<2.6.0",
             "pycodestyle",
             "sphinx",
