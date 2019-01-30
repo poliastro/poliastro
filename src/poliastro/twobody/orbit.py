@@ -9,7 +9,6 @@ from astropy.coordinates import (
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric_posvel,
-    SkyCoord,
 )
 from astroquery.jplhorizons import Horizons
 
@@ -230,7 +229,7 @@ class Orbit(object):
         return cls(ss, epoch, plane)
 
     @classmethod
-    def from_skycoord(cls, attractor, coord):
+    def from_coord(cls, attractor, coord):
         """Creates an `Orbit` from an attractor and astropy `SkyCoord` instance.
         This method accepts `SkyCoord` in any reference frame unlike `Orbit.from_vector`
         which can accept inputs in only inertial reference frame centred at attractor.
@@ -246,9 +245,6 @@ class Orbit(object):
 
 
         """
-        if not isinstance(coord, SkyCoord):
-            raise ValueError("coord can only be an instance of SkyCoord class")
-
         if "s" not in coord.cartesian.differentials:
             raise ValueError(
                 "SkyCoord instance passed as coord doesn't have a differential with respect to time"

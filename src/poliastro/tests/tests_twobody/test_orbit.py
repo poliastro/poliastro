@@ -3,7 +3,12 @@ import pickle
 import numpy as np
 import pytest
 from astropy import units as u
-from astropy.coordinates import CartesianDifferential, CartesianRepresentation, SkyCoord
+from astropy.coordinates import (
+    ITRS,
+    CartesianDifferential,
+    CartesianRepresentation,
+    SkyCoord,
+)
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.testing import assert_allclose, assert_array_equal
@@ -37,6 +42,7 @@ from poliastro.frames import (
     SaturnICRS,
     UranusICRS,
     VenusICRS,
+    get_frame,
 )
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
@@ -594,35 +600,66 @@ def test_pqw_returns_dimensionless():
     assert w.unit == u.one
 
 
-def test_orbit_from_skycoord_inputs():
-
+def test_from_coord_fails_if_no_time_differential():
     pos = [30000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos)
 
-    # Method fails if coordinate is not passed as SkyCoord instance
-    with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.from_skycoord(Earth, cartrep)
-    assert (
-        "ValueError: coord can only be an instance of SkyCoord class"
-        in excinfo.exconly()
-    )
     # Method fails if SkyCoord instance doesn't contain a differential with respect to time
     with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.from_skycoord(Earth, SkyCoord(cartrep))
+        ss = Orbit.from_coord(Earth, SkyCoord(cartrep))
     assert (
         "ValueError: SkyCoord instance passed as coord doesn't have a differential with respect to time"
         in excinfo.exconly()
     )
 
 
-def test_frame_of_orbit_from_skycoord():
-    pos = [30000, 0, 0] * u.km
-    cartrep = CartesianRepresentation(*pos)
-
-    vel = [2, 0, 0] * u.km / u.s
+@pytest.mark.parametrize(
+    "attractor", [Earth, Jupiter, Mars, Mercury, Neptune, Saturn, Sun, Uranus, Venus]
+)
+def test_orbit_creation_using_skycoord(attractor):
+    vel = [0, 2, 0] * u.km / u.s
     cartdiff = CartesianDifferential(*vel)
 
-    coord_with_diff = SkyCoord(cartrep.with_differentials(cartdiff), frame="icrs")
-    o = Orbit.from_skycoord(Earth, coord_with_diff)
+    pos = [30000, 0, 0] * u.km
+    cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
 
-    assert isinstance(o.frame, GCRS)
+    coord = SkyCoord(cartrep, frame="icrs")
+    o = Orbit.from_coord(attractor, coord)
+
+    inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
+
+    coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
+    pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
+    vol__transformed_to_irf = coord_transformed_to_irf.cartesian.differentials[
+        "s"
+    ].d_xyz
+
+    assert (o.r == pos_transformed_to_irf).all()
+    assert (o.v == vol__transformed_to_irf).all()
+
+
+@pytest.mark.parametrize(
+    "attractor", [Earth, Jupiter, Mars, Mercury, Neptune, Saturn, Sun, Uranus, Venus]
+)
+@pytest.mark.parametrize("frame", [ITRS, GCRS])
+def test_orbit_creation_using_frame_obj(attractor, frame):
+    vel = [0, 2, 0] * u.km / u.s
+    cartdiff = CartesianDifferential(*vel)
+
+    pos = [30000, 0, 0] * u.km
+    cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
+
+    coord = frame(cartrep, obstime=J2000)
+    o = Orbit.from_coord(attractor, coord)
+
+    inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
+
+    coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
+
+    pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
+    vol__transformed_to_irf = coord_transformed_to_irf.cartesian.differentials[
+        "s"
+    ].d_xyz
+
+    assert (o.r == pos_transformed_to_irf).all()
+    assert (o.v == vol__transformed_to_irf).all()
