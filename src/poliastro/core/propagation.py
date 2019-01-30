@@ -7,6 +7,34 @@ from poliastro.core.stumpff import c2, c3
 from ._jit import jit
 
 
+def func_twobody(t0, u_, k, ad, ad_kwargs):
+    """Differential equation for the initial value two body problem.
+
+    This function follows Cowell's formulation.
+
+    Parameters
+    ----------
+    t0 : float
+        Time.
+    u_ : ~numpy.ndarray
+        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+    k : float
+        Standard gravitational parameter.
+    ad : function(t0, u, k)
+        Non Keplerian acceleration (km/s2).
+    ad_kwargs : optional
+        perturbation parameters passed to ad.
+
+    """
+    ax, ay, az = ad(t0, u_, k, **ad_kwargs)
+
+    x, y, z, vx, vy, vz = u_
+    r3 = (x ** 2 + y ** 2 + z ** 2) ** 1.5
+
+    du = np.array([vx, vy, vz, -k * x / r3 + ax, -k * y / r3 + ay, -k * z / r3 + az])
+    return du
+
+
 @jit
 def mean_motion(k, r0, v0, tof):
     r"""Propagates orbit using mean motion. This algorithm depends on the geometric shape of the

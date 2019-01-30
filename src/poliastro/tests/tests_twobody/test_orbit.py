@@ -40,6 +40,7 @@ from poliastro.frames import (
 )
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
+from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 
 @pytest.fixture()
@@ -226,30 +227,32 @@ def test_sample_numpoints():
     assert len(positions) == 50
 
 
-def test_sample_with_time_value():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
-    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-    expected_r = [ss.r]
-    positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.data.xyz.transpose()
+@pytest.mark.parametrize("num_points", [3, 5, 7, 9, 11, 101])
+def test_sample_num_points(num_points):
+    # Data from Vallado, example 2.4
+    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    ss0 = Orbit.from_vectors(Earth, r0, v0)
 
-    assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
+    # TODO: Test against the perigee and apogee
+    # expected_ss = ss0.propagate(ss0.period / 2)
+
+    rr = ss0.sample(num_points)
+
+    assert len(rr) == num_points
+    # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
 
 
-def test_sample_with_nu_value():
-    _d = 1.0 * u.AU  # Unused distance
-    _ = 0.5 * u.one  # Unused dimensionless value
-    _a = 1.0 * u.deg  # Unused angle
-    _body = Sun  # Unused body
-    ss = Orbit.from_classical(_body, _d, _, _a, _a, _a, _a)
-    expected_r = [ss.r]
-    positions = ss.sample(values=ss.nu + [360] * u.deg)
-    r = positions.data.xyz.transpose()
-
-    assert_quantity_allclose(r, expected_r, rtol=1.0e-7)
+@pytest.mark.parametrize("method", [mean_motion, cowell, kepler])
+def test_sample_big_orbits(method):
+    # See https://github.com/poliastro/poliastro/issues/265
+    ss = Orbit.from_vectors(
+        Sun,
+        [-9018878.6, -94116055, 22619059] * u.km,
+        [-49.950923, -12.948431, -4.2925158] * u.km / u.s,
+    )
+    positions = ss.sample(15, method=method)
+    assert len(positions) == 15
 
 
 def test_hyperbolic_nu_value_check(hyperbolic_orbit):
