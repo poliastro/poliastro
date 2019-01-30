@@ -606,7 +606,7 @@ def test_from_coord_fails_if_no_time_differential():
 
     # Method fails if SkyCoord instance doesn't contain a differential with respect to time
     with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.from_coord(Earth, SkyCoord(cartrep))
+        ss = Orbit.from_coords(Earth, SkyCoord(cartrep))
     assert (
         "ValueError: SkyCoord instance passed as coord doesn't have a differential with respect to time"
         in excinfo.exconly()
@@ -624,18 +624,16 @@ def test_orbit_creation_using_skycoord(attractor):
     cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
 
     coord = SkyCoord(cartrep, frame="icrs")
-    o = Orbit.from_coord(attractor, coord)
+    o = Orbit.from_coords(attractor, coord)
 
     inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
 
     coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
     pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
-    vol__transformed_to_irf = coord_transformed_to_irf.cartesian.differentials[
-        "s"
-    ].d_xyz
+    vel_transformed_to_irf = coord_transformed_to_irf.cartesian.differentials["s"].d_xyz
 
     assert (o.r == pos_transformed_to_irf).all()
-    assert (o.v == vol__transformed_to_irf).all()
+    assert (o.v == vel_transformed_to_irf).all()
 
 
 @pytest.mark.parametrize(
@@ -650,16 +648,14 @@ def test_orbit_creation_using_frame_obj(attractor, frame):
     cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
 
     coord = frame(cartrep, obstime=J2000)
-    o = Orbit.from_coord(attractor, coord)
+    o = Orbit.from_coords(attractor, coord)
 
     inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
 
     coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
 
     pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
-    vol__transformed_to_irf = coord_transformed_to_irf.cartesian.differentials[
-        "s"
-    ].d_xyz
+    vel_transformed_to_irf = coord_transformed_to_irf.cartesian.differentials["s"].d_xyz
 
     assert (o.r == pos_transformed_to_irf).all()
-    assert (o.v == vol__transformed_to_irf).all()
+    assert (o.v == vel_transformed_to_irf).all()
