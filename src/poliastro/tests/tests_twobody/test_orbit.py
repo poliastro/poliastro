@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import pytest
 from astropy import units as u
-from astropy.coordinates import CartesianDifferential, CartesianRepresentation
+from astropy.coordinates import CartesianDifferential, CartesianRepresentation, SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.testing import assert_allclose, assert_array_equal
@@ -592,3 +592,37 @@ def test_pqw_returns_dimensionless():
     assert p.unit == u.one
     assert q.unit == u.one
     assert w.unit == u.one
+
+
+def test_orbit_from_skycoord_inputs():
+
+    pos = [30000, 0, 0] * u.km
+    cartrep = CartesianRepresentation(*pos)
+
+    # Method fails if coordinate is not passed as SkyCoord instance
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_skycoord(Earth, cartrep)
+    assert (
+        "ValueError: coord can only be an instance of SkyCoord class"
+        in excinfo.exconly()
+    )
+    # Method fails if SkyCoord instance doesn't contain a differential with respect to time
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_skycoord(Earth, SkyCoord(cartrep))
+    assert (
+        "ValueError: SkyCoord instance passed as coord doesn't have a differential with respect to time"
+        in excinfo.exconly()
+    )
+
+
+def test_frame_of_orbit_from_skycoord():
+    pos = [30000, 0, 0] * u.km
+    cartrep = CartesianRepresentation(*pos)
+
+    vel = [2, 0, 0] * u.km / u.s
+    cartdiff = CartesianDifferential(*vel)
+
+    coord_with_diff = SkyCoord(cartrep.with_differentials(cartdiff), frame="icrs")
+    o = Orbit.from_skycoord(Earth, coord_with_diff)
+
+    assert isinstance(o.frame, GCRS)

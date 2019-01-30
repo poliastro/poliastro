@@ -9,6 +9,7 @@ from astropy.coordinates import (
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric_posvel,
+    SkyCoord,
 )
 from astroquery.jplhorizons import Horizons
 
@@ -227,6 +228,41 @@ class Orbit(object):
 
         ss = RVState(attractor, r, v)
         return cls(ss, epoch, plane)
+
+    @classmethod
+    def from_skycoord(cls, attractor, coord):
+        """Creates an `Orbit` from an attractor and astropy `SkyCoord` instance.
+        This method accepts `SkyCoord` in any reference frame unlike `Orbit.from_vector`
+        which can accept inputs in only inertial reference frame centred at attractor.
+        Also note that the frame information is lost after creation of the orbit and
+        only the inertial reference frame at body centre will be used for all purposes.
+        Parameters
+        ----------
+        attractor: Body
+            Main attractor
+        coord: astropy.coordinates.SkyCoord
+            Position and velocity vectors in any reference frame. Note that `SkyCoord` must have
+            a representation and its differential with respect to time.
+
+
+        """
+        if not isinstance(coord, SkyCoord):
+            raise ValueError("coord can only be an instance of SkyCoord class")
+
+        if "s" not in coord.cartesian.differentials:
+            raise ValueError(
+                "SkyCoord instance passed as coord doesn't have a differential with respect to time"
+            )
+
+        # Get an inertial reference frame parallel to ICRS and centered at attractor
+        inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
+
+        coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
+
+        pos = coord_in_irf.cartesian.xyz
+        vol = coord_in_irf.cartesian.differentials["s"].d_xyz
+
+        return cls.from_vectors(attractor, pos, vol)
 
     @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
