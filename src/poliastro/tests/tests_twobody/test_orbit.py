@@ -604,11 +604,11 @@ def test_from_coord_fails_if_no_time_differential():
     pos = [30000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos)
 
-    # Method fails if SkyCoord instance doesn't contain a differential with respect to time
+    # Method fails if coordinate instance doesn't contain a differential with respect to time
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_coords(Earth, SkyCoord(cartrep))
     assert (
-        "ValueError: SkyCoord instance passed as coord doesn't have a differential with respect to time"
+        "ValueError: Coordinate instance doesn't have a differential with respect to time"
         in excinfo.exconly()
     )
 
@@ -657,5 +657,35 @@ def test_orbit_creation_using_frame_obj(attractor, frame):
     pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
     vel_transformed_to_irf = coord_transformed_to_irf.cartesian.differentials["s"].d_xyz
 
-    assert (o.r == pos_transformed_to_irf).all()
-    assert (o.v == vel_transformed_to_irf).all()
+    assert_quantity_allclose(o.r, pos_transformed_to_irf, atol=1e-5 * u.km)
+    assert_quantity_allclose(o.v, vel_transformed_to_irf, atol=1e-5 * u.km / u.s)
+
+
+def test_from_coord_fails_for_multiple_positions():
+    cartdiff = CartesianDifferential(
+        [[0, 1, 0], [-0.1, 0.9, 0]] * u.km / u.s, xyz_axis=1
+    )
+    cartrep = CartesianRepresentation(
+        [[1, 0, 0], [0.9, 0.1, 0]] * u.km, differentials=cartdiff, xyz_axis=1
+    )
+    coords = GCRS(cartrep, representation_type=CartesianRepresentation, obstime=J2000)
+
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_coords(Earth, coords)
+    assert (
+        "ValueError: Coordinate instance must represents exactly 1 position, found: 2"
+        in excinfo.exconly()
+    )
+
+
+def test_from_coord_if_coord_is_not_of_shape_zero():
+    pos = [0, 1, 0]
+    vel = [1, 0, 0]
+    cartdiff = CartesianDifferential([vel] * u.km / u.s, xyz_axis=1)
+    cartrep = CartesianRepresentation([pos] * u.km, differentials=cartdiff, xyz_axis=1)
+    coords = GCRS(cartrep, representation_type=CartesianRepresentation, obstime=J2000)
+
+    ss = Orbit.from_coords(Earth, coords)
+
+    assert_quantity_allclose(ss.r, pos * u.km, rtol=1e-5)
+    assert_quantity_allclose(ss.v, vel * u.km / u.s, rtol=1e-5)

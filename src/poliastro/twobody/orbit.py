@@ -242,20 +242,31 @@ class Orbit(object):
         ----------
         attractor: Body
             Main attractor
-        coord: astropy.coordinates.SkyCoord
-            Position and velocity vectors in any reference frame. Note that `SkyCoord` must have
+        coord: astropy.coordinates.SkyCoord or BaseCoordinateFrame 
+            Position and velocity vectors in any reference frame. Note that coord must have
             a representation and its differential with respect to time.
 
         """
         if "s" not in coord.cartesian.differentials:
             raise ValueError(
-                "SkyCoord instance passed as coord doesn't have a differential with respect to time"
+                "Coordinate instance doesn't have a differential with respect to time"
             )
+        if coord.size != 1:
+            raise ValueError(
+                "Coordinate instance must represents exactly 1 position, found: %d"
+                % coord.size
+            )
+
+        # Reshape coordinate to 0 dimension if it is not already dimensionless.
+        coord = coord.reshape(())
 
         # Get an inertial reference frame parallel to ICRS and centered at attractor
         inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
 
-        coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
+        if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
+            coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
+        else:
+            coord_in_irf = coord
 
         pos = coord_in_irf.cartesian.xyz
         vel = coord_in_irf.cartesian.differentials["s"].d_xyz
