@@ -20,7 +20,7 @@ jobs:
           name: check Black style
           command: |
             . venv/bin/activate
-            isort -c setup.py src/
+            isort -c -rc setup.py src/ -p poliastro -sd THIRDPARTY  # This avoids installing poliastro
             black src/ setup.py --check
 
       - run:

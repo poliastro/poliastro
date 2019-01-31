@@ -27,20 +27,27 @@ def test_J2_propagation_Earth():
     # from Curtis example 12.2:
     r0 = np.array([-2384.46, 5729.01, 3050.46])  # km
     v0 = np.array([-7.36138, -2.98997, 1.64354])  # km/s
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
     orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
 
-    tof = (48.0 * u.h).to(u.s).value
-    r, v = cowell(
-        orbit, tof, ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value
+    tofs = [48.0] * u.h
+    rr, vv = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        ad=J2_perturbation,
+        J2=Earth.J2.value,
+        R=Earth.R.to(u.km).value,
     )
 
-    _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
-    _, _, _, raan, argp, _ = rv2coe(k, r, v)
+    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
-    raan_variation_rate = (raan - raan0) / tof
-    argp_variation_rate = (argp - argp0) / tof
+    _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
+    _, _, _, raan, argp, _ = rv2coe(k, rr[0].to(u.km).value, vv[0].to(u.km / u.s).value)
+
+    raan_variation_rate = (raan - raan0) / tofs[0].to(u.s).value
+    argp_variation_rate = (argp - argp0) / tofs[0].to(u.s).value
 
     raan_variation_rate = (raan_variation_rate * u.rad / u.s).to(u.deg / u.h)
     argp_variation_rate = (argp_variation_rate * u.rad / u.s).to(u.deg / u.h)
@@ -96,41 +103,64 @@ def test_J3_propagation_Earth(test_params):
         Earth, a_ini, ecc_ini, inc_ini, raan_ini, argp_ini, nu_ini
     )
 
-    tof = (10.0 * u.day).to(u.s).value
+    tofs = np.linspace(0, 10.0 * u.day, 1000)
     r_J2, v_J2 = cowell(
-        orbit,
-        np.linspace(0, tof, int(1e3)),
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
         ad=J2_perturbation,
         J2=Earth.J2.value,
         R=Earth.R.to(u.km).value,
         rtol=1e-8,
     )
+
     a_J2J3 = lambda t0, u_, k_: J2_perturbation(
         t0, u_, k_, J2=Earth.J2.value, R=Earth.R.to(u.km).value
     ) + J3_perturbation(t0, u_, k_, J3=Earth.J3.value, R=Earth.R.to(u.km).value)
 
-    r_J3, v_J3 = cowell(orbit, np.linspace(0, tof, int(1e3)), ad=a_J2J3, rtol=1e-8)
+    r_J3, v_J3 = cowell(Earth.k, orbit.r, orbit.v, tofs, ad=a_J2J3, rtol=1e-8)
 
     a_values_J2 = np.array(
         [
             rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2)
-            for ri, vi in zip(r_J2, v_J2)
+            for ri, vi in zip(r_J2.to(u.km).value, v_J2.to(u.km / u.s).value)
         ]
     )
     a_values_J3 = np.array(
         [
             rv2coe(k, ri, vi)[0] / (1.0 - rv2coe(k, ri, vi)[1] ** 2)
-            for ri, vi in zip(r_J3, v_J3)
+            for ri, vi in zip(r_J3.to(u.km).value, v_J3.to(u.km / u.s).value)
         ]
     )
     da_max = np.max(np.abs(a_values_J2 - a_values_J3))
 
-    ecc_values_J2 = np.array([rv2coe(k, ri, vi)[1] for ri, vi in zip(r_J2, v_J2)])
-    ecc_values_J3 = np.array([rv2coe(k, ri, vi)[1] for ri, vi in zip(r_J3, v_J3)])
+    ecc_values_J2 = np.array(
+        [
+            rv2coe(k, ri, vi)[1]
+            for ri, vi in zip(r_J2.to(u.km).value, v_J2.to(u.km / u.s).value)
+        ]
+    )
+    ecc_values_J3 = np.array(
+        [
+            rv2coe(k, ri, vi)[1]
+            for ri, vi in zip(r_J3.to(u.km).value, v_J3.to(u.km / u.s).value)
+        ]
+    )
     decc_max = np.max(np.abs(ecc_values_J2 - ecc_values_J3))
 
-    inc_values_J2 = np.array([rv2coe(k, ri, vi)[2] for ri, vi in zip(r_J2, v_J2)])
-    inc_values_J3 = np.array([rv2coe(k, ri, vi)[2] for ri, vi in zip(r_J3, v_J3)])
+    inc_values_J2 = np.array(
+        [
+            rv2coe(k, ri, vi)[2]
+            for ri, vi in zip(r_J2.to(u.km).value, v_J2.to(u.km / u.s).value)
+        ]
+    )
+    inc_values_J3 = np.array(
+        [
+            rv2coe(k, ri, vi)[2]
+            for ri, vi in zip(r_J3.to(u.km).value, v_J3.to(u.km / u.s).value)
+        ]
+    )
     dinc_max = np.max(np.abs(inc_values_J2 - inc_values_J3))
 
     assert_quantity_allclose(dinc_max, test_params["dinc_max"], rtol=1e-1, atol=1e-7)
@@ -170,11 +200,23 @@ def test_atmospheric_drag():
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
 
-    r, v = cowell(
-        orbit, tof, ad=atmospheric_drag, R=R, C_D=C_D, A=A, m=m, H0=H0, rho0=rho0
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        ad=atmospheric_drag,
+        R=R,
+        C_D=C_D,
+        A=A,
+        m=m,
+        H0=H0,
+        rho0=rho0,
     )
 
-    assert_quantity_allclose(norm(r) - norm(r0), dr_expected, rtol=1e-2)
+    assert_quantity_allclose(
+        norm(rr[0].to(u.km).value) - norm(r0), dr_expected, rtol=1e-2
+    )
 
 
 @pytest.mark.slow
@@ -219,6 +261,7 @@ def test_cowell_converges_with_small_perturbations():
         return 0.0 * v_vec / norm_v
 
     final = initial.propagate(initial.period, method=cowell, ad=accel)
+
     assert_quantity_allclose(final.r, initial.r)
     assert_quantity_allclose(final.v, initial.v)
 
@@ -358,9 +401,11 @@ def test_3rd_body_Curtis(test_params):
 
         epoch = Time(j_date, format="jd", scale="tdb")
         initial = Orbit.from_classical(Earth, *test_params["orbit"], epoch=epoch)
-        r, v = cowell(
-            initial,
-            np.linspace(0, tof, 400),
+        rr, vv = cowell(
+            Earth.k,
+            initial.r,
+            initial.v,
+            np.linspace(0, tof, 400) * u.s,
             rtol=1e-10,
             ad=third_body,
             k_third=body.k.to(u.km ** 3 / u.s ** 2).value,
@@ -368,7 +413,7 @@ def test_3rd_body_Curtis(test_params):
         )
 
         incs, raans, argps = [], [], []
-        for ri, vi in zip(r, v):
+        for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
             angles = Angle(
                 rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)[2:5] * u.rad
             )  # inc, raan, argp
@@ -436,9 +481,11 @@ def test_solar_pressure():
         # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
         sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
-        r, v = cowell(
-            initial,
-            np.linspace(0, (tof).to(u.s).value, 4000),
+        rr, vv = cowell(
+            Earth.k,
+            initial.r,
+            initial.v,
+            np.linspace(0, (tof).to(u.s).value, 4000) * u.s,
             rtol=1e-8,
             ad=radiation_pressure,
             R=Earth.R.to(u.km).value,
@@ -450,7 +497,7 @@ def test_solar_pressure():
         )
 
         delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []
-        for ri, vi in zip(r, v):
+        for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
             orbit_params = rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)
             delta_eccs.append(orbit_params[1] - drag_force_orbit[1].value)
             delta_incs.append(

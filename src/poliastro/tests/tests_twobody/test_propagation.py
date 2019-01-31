@@ -62,10 +62,10 @@ def test_propagating_to_certain_nu_is_correct():
     nu = 10 * u.deg
     elliptic = Orbit.from_classical(Sun, a, ecc, _a, _a, _a, nu)
 
-    elliptic_at_perihelion = elliptic.propagate(0.0 * u.rad)
+    elliptic_at_perihelion = elliptic.propagate_to_anomaly(0.0 * u.rad)
     r_per, _ = elliptic_at_perihelion.rv()
 
-    elliptic_at_aphelion = elliptic.propagate(np.pi * u.rad)
+    elliptic_at_aphelion = elliptic.propagate_to_anomaly(np.pi * u.rad)
     r_ap, _ = elliptic_at_aphelion.rv()
 
     assert_quantity_allclose(norm(r_per), a * (1.0 - ecc))
@@ -78,7 +78,7 @@ def test_propagating_to_certain_nu_is_correct():
     # test 10 random true anomaly values
     for _ in range(10):
         nu = np.random.uniform(low=0.0, high=2 * np.pi)
-        elliptic = elliptic.propagate(nu * u.rad)
+        elliptic = elliptic.propagate_to_anomaly(nu * u.rad)
         r, _ = elliptic.rv()
         assert_quantity_allclose(norm(r), a * (1.0 - ecc ** 2) / (1 + ecc * np.cos(nu)))
 
@@ -186,19 +186,19 @@ def test_apply_zero_maneuver_returns_equal_state():
 def test_cowell_propagation_with_zero_acceleration_equals_kepler():
     # Data from Vallado, example 2.4
 
-    r0 = np.array([1131.340, -2282.343, 6672.423])  # km
-    v0 = np.array([-5.64305, 4.30333, 2.42879])  # km/s
-    tof = 40 * 60.0  # s
+    r0 = np.array([1131.340, -2282.343, 6672.423]) * u.km
+    v0 = np.array([-5.64305, 4.30333, 2.42879]) * u.km / u.s
+    tofs = [40 * 60.0] * u.s
 
-    orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
+    orbit = Orbit.from_vectors(Earth, r0, v0)
 
-    expected_r = np.array([-4219.7527, 4363.0292, -3958.7666])
-    expected_v = np.array([3.689866, -1.916735, -6.112511])
+    expected_r = np.array([-4219.7527, 4363.0292, -3958.7666]) * u.km
+    expected_v = np.array([3.689866, -1.916735, -6.112511]) * u.km / u.s
 
-    r, v = cowell(orbit, tof, ad=None)
+    r, v = cowell(Earth.k, orbit.r, orbit.v, tofs, ad=None)
 
-    assert_allclose(r, expected_r, rtol=1e-5)
-    assert_allclose(v, expected_v, rtol=1e-4)
+    assert_quantity_allclose(r[0], expected_r, rtol=1e-5)
+    assert_quantity_allclose(v[0], expected_v, rtol=1e-4)
 
 
 def test_cowell_propagation_circle_to_circle():
@@ -211,18 +211,18 @@ def test_cowell_propagation_circle_to_circle():
         return accel * v / norm_v
 
     ss = Orbit.circular(Earth, 500 * u.km)
-    tof = 20 * ss.period
+    tofs = [20] * ss.period
 
-    r, v = cowell(ss, tof.to(u.s).value, ad=constant_accel)
+    r, v = cowell(Earth.k, ss.r, ss.v, tofs, ad=constant_accel)
 
-    ss_final = Orbit.from_vectors(Earth, r * u.km, v * u.km / u.s)
+    ss_final = Orbit.from_vectors(Earth, r[0], v[0])
 
     da_a0 = (ss_final.a - ss.a) / ss.a
     dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
     assert_quantity_allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 
     dv = abs(norm(ss_final.v) - norm(ss.v))
-    accel_dt = accel * u.km / u.s ** 2 * tof
+    accel_dt = accel * u.km / u.s ** 2 * tofs[0]
     assert_quantity_allclose(dv, accel_dt, rtol=1e-2)
 
 

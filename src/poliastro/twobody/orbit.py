@@ -628,15 +628,15 @@ class Orbit(object):
         return self.__str__()
 
     def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
-        """Propagates an orbit.
+        """Propagates an orbit a specified time.
 
         If value is true anomaly, propagate orbit to this anomaly and return the result.
         Otherwise, if time is provided, propagate this `Orbit` some `time` and return the result.
 
         Parameters
         ----------
-        value : Multiple options
-            True anomaly values or time values. If given an angle, it will always propagate forward.
+        value : ~astropy.units.Quantity, ~astropy.time.Time, ~astropy.time.TimeDelta
+            Scalar time to propagate.
         rtol : float, optional
             Relative tolerance for the propagation algorithm, default to 1e-10.
         method : function, optional
@@ -644,49 +644,76 @@ class Orbit(object):
         **kwargs
             parameters used in perturbation models
 
+        Returns
+        -------
+        Orbit
+            New orbit after propagation.
+
         """
-        if hasattr(value, "unit") and value.unit in ("rad", "deg"):
-            p, ecc, inc, raan, argp, _ = rv2coe(
-                self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                self.r.to(u.km).value,
-                self.v.to(u.km / u.s).value,
-            )
-
-            # Compute time of flight for correct epoch
-            M = nu_to_M(self.nu, self.ecc)
-            new_M = nu_to_M(value, self.ecc)
-            time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
-
-            return self.from_classical(
-                self.attractor,
-                p / (1.0 - ecc ** 2) * u.km,
-                ecc * u.one,
-                inc * u.rad,
-                raan * u.rad,
-                argp * u.rad,
-                value,
-                epoch=self.epoch + time_of_flight,
-                plane=self._plane,
-            )
+        if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
+            time_of_flight = value - self.epoch
         else:
-            if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
-                time_of_flight = value - self.epoch
-            else:
-                time_of_flight = time.TimeDelta(value)
+            time_of_flight = value
 
-            return propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+        # TODO: Create a from_coordinates method
+        result = propagate(
+            self, time_of_flight.to(u.s), method=method, rtol=rtol, **kwargs
+        )[0]
+        return self.from_vectors(
+            self.attractor,
+            result.cartesian.xyz,
+            result.cartesian.differentials["s"].d_xyz,
+            epoch=result.obstime[0],
+            plane=self.plane,
+        )
 
-    def sample(self, values=None, method=mean_motion):
+    @u.quantity_input(value=u.rad)
+    def propagate_to_anomaly(self, value):
+        """Propagates an orbit to a specific true anomaly.
+
+        Parameters
+        ----------
+        value : ~astropy.units.Quantity
+
+        Returns
+        -------
+        Orbit
+            Resulting orbit after propagation.
+
+        """
+        # TODO: Avoid repeating logic with mean_motion?
+        p, ecc, inc, raan, argp, _ = rv2coe(
+            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
+            self.r.to(u.km).value,
+            self.v.to(u.km / u.s).value,
+        )
+
+        # Compute time of flight for correct epoch
+        M = nu_to_M(self.nu, self.ecc)
+        new_M = nu_to_M(value, self.ecc)
+        time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
+
+        return self.from_classical(
+            self.attractor,
+            p / (1.0 - ecc ** 2) * u.km,
+            ecc * u.one,
+            inc * u.rad,
+            raan * u.rad,
+            argp * u.rad,
+            value,
+            epoch=self.epoch + time_of_flight,
+            plane=self.plane,
+        )
+
+    def sample(self, values=100, method=mean_motion):
         """Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
 
         Parameters
         ----------
-        values : Multiple options
-            Number of interval points (default to 100),
-            True anomaly values,
-            Time values.
+        values : int
+            Number of interval points (default to 100).
 
         method : function, optional
             Method used for propagation
@@ -710,70 +737,27 @@ class Orbit(object):
         <GCRS Coordinate ...>
         >>> iss.sample(10)  # doctest: +ELLIPSIS
         <GCRS Coordinate ...>
-        >>> iss.sample([0, 180] * u.deg)  # doctest: +ELLIPSIS
-        <GCRS Coordinate ...>
-        >>> iss.sample([0, 10, 20] * u.minute)  # doctest: +ELLIPSIS
-        <GCRS Coordinate ...>
-        >>> iss.sample([iss.epoch + iss.period / 2])  # doctest: +ELLIPSIS
-        <GCRS Coordinate ...>
 
         """
-        if values is None:
-            return self.sample(100, method)
-
-        elif isinstance(values, int):
-            if self.ecc < 1:
-                # first sample eccentric anomaly, then transform into true anomaly
-                # why sampling eccentric anomaly uniformly to minimize error in the apocenter, see
-                # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
-                # Start from pericenter
-                E_values = np.linspace(0, 2 * np.pi, values) * u.rad
-                nu_values = E_to_nu(E_values, self.ecc)
-            else:
-                # Select a sensible limiting value for non-closed orbits
-                # This corresponds to max(r = 3p, r = self.r)
-                # We have to wrap nu in [-180, 180) to compare it with the output of
-                # the arc cosine, which is in the range [0, 180)
-                # Start from -nu_limit
-                wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
-                nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu))
-                nu_values = np.linspace(-nu_limit, nu_limit, values)
-
-            return self.sample(nu_values, method)
-
-        elif hasattr(values, "unit") and values.unit in ("rad", "deg"):
-            values = self._generate_time_values(values)
-
-        elif isinstance(values, time.Time):
-            values = values - self.epoch
-
-        elif isinstance(values, list):
-            # A list of Times is assumed
-            values = [(value - self.epoch).sec for value in values] * u.s
-
-        return self._sample(values, method)
-
-    def _sample(self, time_values, method=mean_motion):
-        positions = method(self, time_values.to(u.s).value)
-
-        data = CartesianRepresentation(positions[0] * u.km, xyz_axis=1)
-
-        # If the frame supports obstime, set the time values
-        kwargs = {}
-        if "obstime" in self.frame.frame_attributes:
-            kwargs["obstime"] = self.epoch + time_values
+        if self.ecc < 1:
+            # first sample eccentric anomaly, then transform into true anomaly
+            # why sampling eccentric anomaly uniformly to minimize error in the apocenter, see
+            # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
+            # Start from pericenter
+            E_values = np.linspace(0, 2 * np.pi, values) * u.rad
+            nu_values = E_to_nu(E_values, self.ecc)
         else:
-            warn(
-                "Frame {} does not support 'obstime', time values were not returned".format(
-                    self.frame.__class__
-                )
-            )
+            # Select a sensible limiting value for non-closed orbits
+            # This corresponds to max(r = 3p, r = self.r)
+            # We have to wrap nu in [-180, 180) to compare it with the output of
+            # the arc cosine, which is in the range [0, 180)
+            # Start from -nu_limit
+            wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
+            nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu))
+            nu_values = np.linspace(-nu_limit, nu_limit, values)
 
-        # Use of a protected method instead of frame.realize_frame
-        # because the latter does not let the user choose the representation type
-        # in one line despite its parameter names, see
-        # https://github.com/astropy/astropy/issues/7784
-        return self.frame._replicate(data, representation_type="cartesian", **kwargs)
+        time_values = self._generate_time_values(nu_values)
+        return propagate(self, time_values, method=method)
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
