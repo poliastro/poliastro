@@ -3,7 +3,12 @@ import pickle
 import numpy as np
 import pytest
 from astropy import units as u
-from astropy.coordinates import CartesianDifferential, CartesianRepresentation
+from astropy.coordinates import (
+    ITRS,
+    CartesianDifferential,
+    CartesianRepresentation,
+    SkyCoord,
+)
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.testing import assert_allclose, assert_array_equal
@@ -22,7 +27,7 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.constants import J2000
+from poliastro.constants import J2000, J2000_TDB
 from poliastro.frames import (
     GCRS,
     HCRS,
@@ -37,6 +42,7 @@ from poliastro.frames import (
     SaturnICRS,
     UranusICRS,
     VenusICRS,
+    get_frame,
 )
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import TimeScaleWarning
@@ -592,3 +598,100 @@ def test_pqw_returns_dimensionless():
     assert p.unit == u.one
     assert q.unit == u.one
     assert w.unit == u.one
+
+
+def test_from_coord_fails_if_no_time_differential():
+    pos = [30000, 0, 0] * u.km
+    cartrep = CartesianRepresentation(*pos)
+
+    # Method fails if coordinate instance doesn't contain a differential with respect to time
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_coords(Earth, SkyCoord(cartrep))
+    assert (
+        "ValueError: Coordinate instance doesn't have a differential with respect to time"
+        in excinfo.exconly()
+    )
+
+
+@pytest.mark.parametrize(
+    "attractor", [Earth, Jupiter, Mars, Mercury, Neptune, Saturn, Sun, Uranus, Venus]
+)
+def test_orbit_creation_using_skycoord(attractor):
+    vel = [0, 2, 0] * u.km / u.s
+    cartdiff = CartesianDifferential(*vel)
+
+    pos = [30000, 0, 0] * u.km
+    cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
+
+    coord = SkyCoord(cartrep, frame="icrs")
+    o = Orbit.from_coords(attractor, coord)
+
+    inertial_frame_at_body_centre = get_frame(
+        attractor, Planes.EARTH_EQUATOR, obstime=coord.obstime
+    )
+
+    coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
+    pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
+    vel_transformed_to_irf = coord_transformed_to_irf.cartesian.differentials["s"].d_xyz
+
+    assert (o.r == pos_transformed_to_irf).all()
+    assert (o.v == vel_transformed_to_irf).all()
+
+
+@pytest.mark.parametrize(
+    "attractor", [Earth, Jupiter, Mars, Mercury, Neptune, Saturn, Sun, Uranus, Venus]
+)
+@pytest.mark.parametrize("frame", [ITRS, GCRS])
+@pytest.mark.parametrize("obstime", [J2000, J2000_TDB])
+def test_orbit_creation_using_frame_obj(attractor, frame, obstime):
+    vel = [0, 2, 0] * u.km / u.s
+    cartdiff = CartesianDifferential(*vel)
+
+    pos = [30000, 0, 0] * u.km
+    cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
+
+    coord = frame(cartrep, obstime=obstime)
+    o = Orbit.from_coords(attractor, coord)
+
+    inertial_frame_at_body_centre = get_frame(
+        attractor, Planes.EARTH_EQUATOR, obstime=coord.obstime
+    )
+
+    coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
+
+    pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
+    vel_transformed_to_irf = coord_transformed_to_irf.cartesian.differentials["s"].d_xyz
+
+    assert_quantity_allclose(o.r, pos_transformed_to_irf, atol=1e-5 * u.km)
+    assert_quantity_allclose(o.v, vel_transformed_to_irf, atol=1e-5 * u.km / u.s)
+
+
+@pytest.mark.parametrize("obstime", [J2000, J2000_TDB])
+def test_from_coord_fails_for_multiple_positions(obstime):
+    cartdiff = CartesianDifferential(
+        [[0, 1, 0], [-0.1, 0.9, 0]] * u.km / u.s, xyz_axis=1
+    )
+    cartrep = CartesianRepresentation(
+        [[1, 0, 0], [0.9, 0.1, 0]] * u.km, differentials=cartdiff, xyz_axis=1
+    )
+    coords = GCRS(cartrep, representation_type=CartesianRepresentation, obstime=obstime)
+
+    with pytest.raises(ValueError) as excinfo:
+        ss = Orbit.from_coords(Earth, coords)
+    assert (
+        "ValueError: Coordinate instance must represents exactly 1 position, found: 2"
+        in excinfo.exconly()
+    )
+
+
+def test_from_coord_if_coord_is_not_of_shape_zero():
+    pos = [0, 1, 0]
+    vel = [1, 0, 0]
+    cartdiff = CartesianDifferential([vel] * u.km / u.s, xyz_axis=1)
+    cartrep = CartesianRepresentation([pos] * u.km, differentials=cartdiff, xyz_axis=1)
+    coords = GCRS(cartrep, representation_type=CartesianRepresentation, obstime=J2000)
+
+    ss = Orbit.from_coords(Earth, coords)
+
+    assert_quantity_allclose(ss.r, pos * u.km, rtol=1e-5)
+    assert_quantity_allclose(ss.v, vel * u.km / u.s, rtol=1e-5)

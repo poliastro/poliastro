@@ -229,6 +229,53 @@ class Orbit(object):
         return cls(ss, epoch, plane)
 
     @classmethod
+    def from_coords(cls, attractor, coord):
+        """Creates an `Orbit` from an attractor and astropy `SkyCoord`
+        or `BaseCoordinateFrame` instance. This method accepts position
+        and velocity in any reference frame unlike `Orbit.from_vector`
+        which can accept inputs in only inertial reference frame centred
+        at attractor. Also note that the frame information is lost after
+        creation of the orbit and only the inertial reference frame at
+        body centre will be used for all purposes.
+
+        Parameters
+        ----------
+        attractor: Body
+            Main attractor
+        coord: astropy.coordinates.SkyCoord or BaseCoordinateFrame 
+            Position and velocity vectors in any reference frame. Note that coord must have
+            a representation and its differential with respect to time.
+
+        """
+        if "s" not in coord.cartesian.differentials:
+            raise ValueError(
+                "Coordinate instance doesn't have a differential with respect to time"
+            )
+        if coord.size != 1:
+            raise ValueError(
+                "Coordinate instance must represents exactly 1 position, found: %d"
+                % coord.size
+            )
+
+        # Reshape coordinate to 0 dimension if it is not already dimensionless.
+        coord = coord.reshape(())
+
+        # Get an inertial reference frame parallel to ICRS and centered at attractor
+        inertial_frame_at_body_centre = get_frame(
+            attractor, Planes.EARTH_EQUATOR, coord.obstime
+        )
+
+        if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
+            coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
+        else:
+            coord_in_irf = coord
+
+        pos = coord_in_irf.cartesian.xyz
+        vel = coord_in_irf.cartesian.differentials["s"].d_xyz
+
+        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime)
+
+    @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def from_classical(
         cls,
