@@ -27,7 +27,7 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.constants import J2000
+from poliastro.constants import J2000, J2000_TDB
 from poliastro.frames import (
     GCRS,
     HCRS,
@@ -626,7 +626,9 @@ def test_orbit_creation_using_skycoord(attractor):
     coord = SkyCoord(cartrep, frame="icrs")
     o = Orbit.from_coords(attractor, coord)
 
-    inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
+    inertial_frame_at_body_centre = get_frame(
+        attractor, Planes.EARTH_EQUATOR, obstime=coord.obstime
+    )
 
     coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
     pos_transformed_to_irf = coord_transformed_to_irf.cartesian.xyz
@@ -640,17 +642,20 @@ def test_orbit_creation_using_skycoord(attractor):
     "attractor", [Earth, Jupiter, Mars, Mercury, Neptune, Saturn, Sun, Uranus, Venus]
 )
 @pytest.mark.parametrize("frame", [ITRS, GCRS])
-def test_orbit_creation_using_frame_obj(attractor, frame):
+@pytest.mark.parametrize("obstime", [J2000, J2000_TDB])
+def test_orbit_creation_using_frame_obj(attractor, frame, obstime):
     vel = [0, 2, 0] * u.km / u.s
     cartdiff = CartesianDifferential(*vel)
 
     pos = [30000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
 
-    coord = frame(cartrep, obstime=J2000)
+    coord = frame(cartrep, obstime=obstime)
     o = Orbit.from_coords(attractor, coord)
 
-    inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
+    inertial_frame_at_body_centre = get_frame(
+        attractor, Planes.EARTH_EQUATOR, obstime=coord.obstime
+    )
 
     coord_transformed_to_irf = coord.transform_to(inertial_frame_at_body_centre)
 
@@ -661,14 +666,15 @@ def test_orbit_creation_using_frame_obj(attractor, frame):
     assert_quantity_allclose(o.v, vel_transformed_to_irf, atol=1e-5 * u.km / u.s)
 
 
-def test_from_coord_fails_for_multiple_positions():
+@pytest.mark.parametrize("obstime", [J2000, J2000_TDB])
+def test_from_coord_fails_for_multiple_positions(obstime):
     cartdiff = CartesianDifferential(
         [[0, 1, 0], [-0.1, 0.9, 0]] * u.km / u.s, xyz_axis=1
     )
     cartrep = CartesianRepresentation(
         [[1, 0, 0], [0.9, 0.1, 0]] * u.km, differentials=cartdiff, xyz_axis=1
     )
-    coords = GCRS(cartrep, representation_type=CartesianRepresentation, obstime=J2000)
+    coords = GCRS(cartrep, representation_type=CartesianRepresentation, obstime=obstime)
 
     with pytest.raises(ValueError) as excinfo:
         ss = Orbit.from_coords(Earth, coords)

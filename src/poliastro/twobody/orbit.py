@@ -261,7 +261,9 @@ class Orbit(object):
         coord = coord.reshape(())
 
         # Get an inertial reference frame parallel to ICRS and centered at attractor
-        inertial_frame_at_body_centre = get_frame(attractor, Planes.EARTH_EQUATOR)
+        inertial_frame_at_body_centre = get_frame(
+            attractor, Planes.EARTH_EQUATOR, coord.obstime
+        )
 
         if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
             coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
@@ -271,7 +273,7 @@ class Orbit(object):
         pos = coord_in_irf.cartesian.xyz
         vel = coord_in_irf.cartesian.differentials["s"].d_xyz
 
-        return cls.from_vectors(attractor, pos, vel)
+        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime)
 
     @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
