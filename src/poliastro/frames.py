@@ -237,7 +237,7 @@ class GeocentricSolarEcliptic(BaseEclipticFrame):
     FunctionTransformWithFiniteDifference,
     GCRS,
     GeocentricSolarEcliptic,
-    finite_difference_frameattr_name="equinox",
+    finite_difference_frameattr_name="obstime",
 )
 def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
     # first get us to a 0 pos/vel GCRS at the target equinox
