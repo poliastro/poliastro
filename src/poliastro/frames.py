@@ -220,6 +220,46 @@ class PlutoICRS(_PlanetaryICRS):
     body = Pluto
 
 
+class GeocentricSolarEcliptic(BaseEclipticFrame):
+    """
+    This system has its X axis towards the Sun and its Z axis perpendicular to
+    the plane of the Earth's orbit around the Sun (positive North). This system
+    is fixed with respect to the Earth-Sun line. It is convenient for specifying
+    magnetospheric boundaries. It has also been widely adopted as the system for
+    representing vector quantities in space physics databases.
+
+    """
+
+    obstime = TimeAttribute(default=DEFAULT_OBSTIME)
+
+
+@frame_transform_graph.transform(
+    FunctionTransformWithFiniteDifference,
+    GCRS,
+    GeocentricSolarEcliptic,
+    finite_difference_frameattr_name="equinox",
+)
+def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
+    # first get us to a 0 pos/vel GCRS at the target equinox
+    gcrs_coo2 = gcrs_coo.transform_to(GCRS(obstime=to_frame.obstime))
+
+    rmat = _ecliptic_rotation_matrix()
+    newrepr = gcrs_coo2.cartesian.transform(rmat)
+    return to_frame.realize_frame(newrepr)
+
+
+@frame_transform_graph.transform(
+    FunctionTransformWithFiniteDifference, GeocentricSolarEcliptic, GCRS
+)
+def geosolarecliptic_to_gcrs(from_coo, gcrs_frame):
+    rmat = _ecliptic_rotation_matrix()
+    newrepr = from_coo.cartesian.transform(matrix_transpose(rmat))
+    gcrs = GCRS(newrepr, obstime=from_coo.obstime)
+
+    # now do any needed offsets (no-op if same obstime and 0 pos/vel)
+    return gcrs.transform_to(gcrs_frame)
+
+
 _FRAME_MAPPING = {
     Sun: {Planes.EARTH_EQUATOR: HCRS, Planes.EARTH_ECLIPTIC: HeliocentricEclipticJ2000},
     Mercury: {Planes.EARTH_EQUATOR: MercuryICRS},
