@@ -78,15 +78,19 @@ Using poliastro on JupyterLab
 
 After the release of Plotly 3.0, plotting orbits using poliastro is easier than ever.
 
-You have to install two extensions of JupyterLab to make your experience smooth::
+You have to install three extensions of JupyterLab to make your experience smooth::
 
-  $ jupyter labextension install @jupyter-widgets/jupyterlab-manager
-  $ jupyter labextension install @jupyterlab/plotly-extension
+  $ jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.38
+  $ jupyter labextension install plotlywidget@0.7.0
+  $ jupyter labextension install @jupyterlab/plotly-extension@0.18.1
 
 And as the documentation of JupyterLab Extensions states:
 
   "In order to install JupyterLab extensions, you need to have Node.js version 4 or later installed."
 
+If you face any further issues, you can refer to this `installation guide by plotly`_.
+
+.. _`installation guide by plotly`: https://github.com/plotly/plotly.py/blob/master/README.md#jupyterlab-support-python-35
 
 Testing
 -------
@@ -97,7 +101,7 @@ If installed correctly, the tests can be run using pytest::
   Running unit tests for poliastro
   [...]
   OK
-  $ 
+  $
 
 If for some reason any test fails, please report it in the `issue tracker`_.
 
