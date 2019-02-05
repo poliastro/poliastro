@@ -163,12 +163,10 @@ def nu_to_E(nu, ecc):
     E : ~astropy.units.Quantity
         Eccentric anomaly.
 
-    Note
-    ----
-    This is equation 3.13b in Curtis, page 151.
     """
 
-    E = 2 * np.arctan(np.sqrt((1 - ecc) / (1 + ecc)) * np.tan(nu / 2))
+    beta = ecc / (1 + np.sqrt(1 - (ecc ** 2)))
+    E = nu - 2 * np.arctan(beta * np.sin(nu) / (1 + beta * np.cos(nu)))
     return E
 
 
@@ -224,13 +222,9 @@ def E_to_nu(E, ecc):
     nu : ~astropy.units.Quantity
         True anomaly.
 
-    Note
-    ----
-    This expression is solved from equation 3.13a of Curtis by
-    simply solving for true anomaly.
-
     """
-    nu = 2 * np.arctan(np.sqrt((1 + ecc) / (1 - ecc)) * np.tan(E / 2))
+    beta = ecc / (1 + np.sqrt((1 - ecc) * (1 + ecc)))
+    nu = E + 2 * np.arctan(beta * np.sin(E) / (1 - beta * np.cos(E)))
     return nu
 
 
