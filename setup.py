@@ -39,7 +39,7 @@ setup(
         "numba>=0.39 ; implementation_name=='cpython'",
         "requests",
         "pandas",
-        "plotly>=3.0,<4.*",
+        "plotly>=3.6,<4.*",
         "astroquery>=0.3.8",
     ],
     extras_require={
