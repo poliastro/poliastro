@@ -121,3 +121,20 @@ def test_mean_to_true_hyperbolic_highecc(expected_nu, ecc):
     print(M, ecc, M.value, ecc.value)
     nu = angles.M_to_nu(M, ecc)
     assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
+
+
+@pytest.mark.parametrize("E", np.linspace(-1, 1, num=10) * np.pi * u.rad)
+@pytest.mark.parametrize("ecc", np.linspace(0.1, 0.9, num=10) * u.one)
+def test_eccentric_to_true_range(E, ecc):
+    nu = angles.E_to_nu(E, ecc)
+    E1 = angles.nu_to_E(nu, ecc)
+    assert_quantity_allclose(E1, E, rtol=1e-8)
+
+
+@pytest.mark.parametrize("E", np.linspace(0, 2, num=10) * np.pi * u.rad)
+@pytest.mark.parametrize("ecc", np.linspace(0.1, 0.9, num=10) * u.one)
+def test_eccentric_to_true_range2pi(E, ecc):
+    nu = angles.E_to_nu(E, ecc)
+    print(E.value, ecc.value, nu.value)
+    E1 = angles.nu_to_E(nu, ecc)
+    assert_quantity_allclose(E1, E, rtol=1e-8)
