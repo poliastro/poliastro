@@ -6,6 +6,7 @@
 import numpy as np
 from numpy.core.umath import cos, sin, sqrt
 
+from poliastro.core.angles import E_to_nu, F_to_nu
 from poliastro.core.util import cross, norm, transform
 
 from ._jit import jit
@@ -330,20 +331,34 @@ def rv2coe(k, r, v, tol=1e-8):
     if equatorial and not circular:
         raan = 0
         argp = np.arctan2(e[1], e[0]) % (2 * np.pi)  # Longitude of periapsis
-        nu = np.arctan2(h.dot(cross(e, r)) / norm(h), r.dot(e)) % (2 * np.pi)
+        nu = np.arctan2(h.dot(cross(e, r)) / norm(h), r.dot(e))
     elif not equatorial and circular:
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
         argp = 0
         # Argument of latitude
-        nu = np.arctan2(r.dot(cross(h, n)) / norm(h), r.dot(n)) % (2 * np.pi)
+        nu = np.arctan2(r.dot(cross(h, n)) / norm(h), r.dot(n))
     elif equatorial and circular:
         raan = 0
         argp = 0
         nu = np.arctan2(r[1], r[0]) % (2 * np.pi)  # True longitude
     else:
+        a = p / (1 - (ecc ** 2))
+        ka = k * a
+        if ecc < 1:
+            e_se = r.dot(v) / sqrt(ka)
+            e_ce = norm(r) * (norm(v) ** 2) / k - 1
+            nu = E_to_nu(np.arctan2(e_se, e_ce), ecc)
+        else:
+            e_sh = r.dot(v) / sqrt(-ka)
+            e_ch = norm(r) * (norm(v) ** 2) / k - 1
+            nu = F_to_nu(np.arctan2(e_sh, e_ch), ecc)
+
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
-        argp = np.arctan2(e.dot(cross(h, n)) / norm(h), e.dot(n)) % (2 * np.pi)
-        nu = np.arctan2(r.dot(cross(h, e)) / norm(h), r.dot(e)) % (2 * np.pi)
+        px = r.dot(n)
+        py = r.dot(cross(h, n)) / h.dot(h)
+        argp = np.arctan2(py, px) % (2 * np.pi)
+
+    nu = (nu + np.pi) % (2 * np.pi) - np.pi
 
     return p, ecc, inc, raan, argp, nu
 
