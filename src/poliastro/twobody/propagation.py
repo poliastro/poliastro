@@ -5,9 +5,8 @@ import functools
 from warnings import warn
 
 import numpy as np
-from astropy import units as u
+from astropy import time, units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
-from astropy import time
 from scipy.integrate import solve_ivp
 
 from poliastro.core.propagation import (

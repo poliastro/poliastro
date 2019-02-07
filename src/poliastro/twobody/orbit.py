@@ -229,9 +229,11 @@ class Orbit(object):
         return cls(ss, epoch, plane)
 
     @classmethod
-    def from_coords(cls, attractor, coord):
+    def from_coords(cls, attractor, coord, plane=Planes.EARTH_EQUATOR):
         """Creates an `Orbit` from an attractor and astropy `SkyCoord`
-        or `BaseCoordinateFrame` instance. This method accepts position
+        or `BaseCoordinateFrame` instance.
+
+        This method accepts position
         and velocity in any reference frame unlike `Orbit.from_vector`
         which can accept inputs in only inertial reference frame centred
         at attractor. Also note that the frame information is lost after
@@ -245,6 +247,8 @@ class Orbit(object):
         coord: astropy.coordinates.SkyCoord or BaseCoordinateFrame 
             Position and velocity vectors in any reference frame. Note that coord must have
             a representation and its differential with respect to time.
+        plane : ~poliastro.frames.Planes, optional
+            Final orbit plane, default to Earth Equator.
 
         """
         if "s" not in coord.cartesian.differentials:
@@ -261,9 +265,7 @@ class Orbit(object):
         coord = coord.reshape(())
 
         # Get an inertial reference frame parallel to ICRS and centered at attractor
-        inertial_frame_at_body_centre = get_frame(
-            attractor, Planes.EARTH_EQUATOR, coord.obstime
-        )
+        inertial_frame_at_body_centre = get_frame(attractor, plane, coord.obstime)
 
         if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
             coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
@@ -273,7 +275,7 @@ class Orbit(object):
         pos = coord_in_irf.cartesian.xyz
         vel = coord_in_irf.cartesian.differentials["s"].d_xyz
 
-        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime)
+        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime, plane=plane)
 
     @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
@@ -588,7 +590,7 @@ class Orbit(object):
         cartesian = CartesianRepresentation(
             *self.r, differentials=CartesianDifferential(*self.v)
         )
-        # See Orbit._sample for reasoning about the usage of a protected method
+        # See the propagate function for reasoning about the usage of a protected method
         coords = self.frame._replicate(cartesian, representation_type="cartesian")
 
         return coords.represent_as(representation)
@@ -705,13 +707,14 @@ class Orbit(object):
 
         # TODO: Create a from_coordinates method
         coords = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)[0]
-        return self.from_vectors(
-            self.attractor,
-            coords.cartesian.xyz,
-            coords.cartesian.differentials["s"].d_xyz,
-            epoch=coords.obstime[0],
-            plane=self.plane,
+
+        # Even after indexing the result of propagate,
+        # the frame obstime might have an array of times
+        # See the propagate function for reasoning about the usage of a protected method
+        coords = coords._replicate(
+            coords.data, representation_type="cartesian", obstime=coords.obstime[0]
         )
+        return self.from_coords(self.attractor, coords, plane=self.plane)
 
     @u.quantity_input(value=u.rad)
     def propagate_to_anomaly(self, value):
