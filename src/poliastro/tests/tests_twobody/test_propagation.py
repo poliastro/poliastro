@@ -9,6 +9,7 @@ from poliastro.bodies import Earth, Sun
 from poliastro.constants import J2000
 from poliastro.core.elements import rv2coe
 from poliastro.examples import iss
+from poliastro.frames import Planes
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.util import norm
@@ -314,3 +315,15 @@ def test_long_propagation_preserves_orbit_elements(method):
     )[:-1]
     print(params_ini, params_final)
     assert_quantity_allclose(params_ini, params_final)
+
+
+def test_propagation_sets_proper_epoch():
+    expected_epoch = time.Time("2017-09-01 12:05:50", scale="tdb")
+
+    r = [-2.76132873e08, -1.71570015e08, -1.09377634e08] * u.km
+    v = [13.17478674, -9.82584125, -1.48126639] * u.km / u.s
+    florence = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
+
+    propagated = florence.propagate(expected_epoch)
+
+    assert propagated.epoch == expected_epoch

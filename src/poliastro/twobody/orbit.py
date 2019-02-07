@@ -700,17 +700,16 @@ class Orbit(object):
         if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
             time_of_flight = value - self.epoch
         else:
-            time_of_flight = value
+            # Works for both Quantity and TimeDelta objects
+            time_of_flight = time.TimeDelta(value)
 
         # TODO: Create a from_coordinates method
-        result = propagate(
-            self, time_of_flight.to(u.s), method=method, rtol=rtol, **kwargs
-        )[0]
+        coords = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)[0]
         return self.from_vectors(
             self.attractor,
-            result.cartesian.xyz,
-            result.cartesian.differentials["s"].d_xyz,
-            epoch=result.obstime[0],
+            coords.cartesian.xyz,
+            coords.cartesian.differentials["s"].d_xyz,
+            epoch=coords.obstime[0],
             plane=self.plane,
         )
 
@@ -804,16 +803,18 @@ class Orbit(object):
             nu_values = np.linspace(-nu_limit, nu_limit, values)
 
         time_values = self._generate_time_values(nu_values)
-        return propagate(self, time_values, method=method)
+        return propagate(self, time.TimeDelta(time_values), method=method)
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
         ecc = self.ecc.value
         nu = self.nu.to(u.rad).value
+
         M_vals = [
             nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc)
             for nu_val in nu_vals.to(u.rad).value
         ] * u.rad
+
         time_values = (M_vals / self.n).decompose()
         return time_values
 
