@@ -229,9 +229,11 @@ class Orbit(object):
         return cls(ss, epoch, plane)
 
     @classmethod
-    def from_coords(cls, attractor, coord):
+    def from_coords(cls, attractor, coord, plane=Planes.EARTH_EQUATOR):
         """Creates an `Orbit` from an attractor and astropy `SkyCoord`
-        or `BaseCoordinateFrame` instance. This method accepts position
+        or `BaseCoordinateFrame` instance.
+
+        This method accepts position
         and velocity in any reference frame unlike `Orbit.from_vector`
         which can accept inputs in only inertial reference frame centred
         at attractor. Also note that the frame information is lost after
@@ -245,6 +247,8 @@ class Orbit(object):
         coord: astropy.coordinates.SkyCoord or BaseCoordinateFrame 
             Position and velocity vectors in any reference frame. Note that coord must have
             a representation and its differential with respect to time.
+        plane : ~poliastro.frames.Planes, optional
+            Final orbit plane, default to Earth Equator.
 
         """
         if "s" not in coord.cartesian.differentials:
@@ -261,9 +265,7 @@ class Orbit(object):
         coord = coord.reshape(())
 
         # Get an inertial reference frame parallel to ICRS and centered at attractor
-        inertial_frame_at_body_centre = get_frame(
-            attractor, Planes.EARTH_EQUATOR, coord.obstime
-        )
+        inertial_frame_at_body_centre = get_frame(attractor, plane, coord.obstime)
 
         if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
             coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
@@ -273,7 +275,7 @@ class Orbit(object):
         pos = coord_in_irf.cartesian.xyz
         vel = coord_in_irf.cartesian.differentials["s"].d_xyz
 
-        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime)
+        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime, plane=plane)
 
     @classmethod
     @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
@@ -588,7 +590,7 @@ class Orbit(object):
         cartesian = CartesianRepresentation(
             *self.r, differentials=CartesianDifferential(*self.v)
         )
-        # See Orbit._sample for reasoning about the usage of a protected method
+        # See the propagate function for reasoning about the usage of a protected method
         coords = self.frame._replicate(cartesian, representation_type="cartesian")
 
         return coords.represent_as(representation)
@@ -700,19 +702,19 @@ class Orbit(object):
         if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
             time_of_flight = value - self.epoch
         else:
-            time_of_flight = value
+            # Works for both Quantity and TimeDelta objects
+            time_of_flight = time.TimeDelta(value)
 
         # TODO: Create a from_coordinates method
-        result = propagate(
-            self, time_of_flight.to(u.s), method=method, rtol=rtol, **kwargs
-        )[0]
-        return self.from_vectors(
-            self.attractor,
-            result.cartesian.xyz,
-            result.cartesian.differentials["s"].d_xyz,
-            epoch=result.obstime[0],
-            plane=self.plane,
+        coords = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)[0]
+
+        # Even after indexing the result of propagate,
+        # the frame obstime might have an array of times
+        # See the propagate function for reasoning about the usage of a protected method
+        coords = coords._replicate(
+            coords.data, representation_type="cartesian", obstime=coords.obstime[0]
         )
+        return self.from_coords(self.attractor, coords, plane=self.plane)
 
     @u.quantity_input(value=u.rad)
     def propagate_to_anomaly(self, value):
@@ -752,8 +754,40 @@ class Orbit(object):
             plane=self.plane,
         )
 
-    def sample(self, values=100, method=mean_motion):
-        """Samples an orbit to some specified time values.
+    def _sample_closed(self, values, limits=None):
+        if limits is None:
+            limits = np.array([0, 2 * np.pi]) * u.rad
+
+        # First sample eccentric anomaly, then transform into true anomaly
+        # to minimize error in the apocenter, see
+        # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
+        # Start from pericenter
+        E_values = np.linspace(*limits, values)
+        nu_values = E_to_nu(E_values, self.ecc)
+        return nu_values
+
+    def _sample_open(self, values, limits=None):
+        if limits is None:
+            # Select a sensible limiting value for non-closed orbits
+            # This corresponds to max(r = 3p, r = self.r)
+            # We have to wrap nu in [-180, 180) to compare it with the output of
+            # the arc cosine, which is in the range [0, 180)
+            # Start from -nu_limit
+            wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
+            nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu)).to(
+                u.rad
+            )
+            limits = np.array([-nu_limit.value, nu_limit.value]) * u.rad
+        else:
+            # If there limits were provided, clip them anyhow just in case
+            nu_limit = np.arccos(1 / self.ecc)
+            limits = limits.clip(-nu_limit, nu_limit)
+
+        nu_values = np.linspace(*limits, values)
+        return nu_values
+
+    def sample(self, values=100, *, limits=None, method=mean_motion):
+        r"""Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
 
@@ -761,7 +795,12 @@ class Orbit(object):
         ----------
         values : int
             Number of interval points (default to 100).
-
+        limits : ndarray, optional
+            Anomaly limits to sample the orbit.
+            For elliptic orbits the default will be :math:`E \in \left[0, 2 \pi \right]`,
+            and for hyperbolic orbits it will be :math:`\nu \in \left[-\nu_c, \nu_c \right]`,
+            where :math:`\nu_c` is either the current true anomaly
+            or a value that corresponds to :math:`r = 3p`.
         method : function, optional
             Method used for propagation
 
@@ -787,33 +826,23 @@ class Orbit(object):
 
         """
         if self.ecc < 1:
-            # first sample eccentric anomaly, then transform into true anomaly
-            # why sampling eccentric anomaly uniformly to minimize error in the apocenter, see
-            # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
-            # Start from pericenter
-            E_values = np.linspace(0, 2 * np.pi, values) * u.rad
-            nu_values = E_to_nu(E_values, self.ecc)
+            nu_values = self._sample_closed(values, limits)
         else:
-            # Select a sensible limiting value for non-closed orbits
-            # This corresponds to max(r = 3p, r = self.r)
-            # We have to wrap nu in [-180, 180) to compare it with the output of
-            # the arc cosine, which is in the range [0, 180)
-            # Start from -nu_limit
-            wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
-            nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu))
-            nu_values = np.linspace(-nu_limit, nu_limit, values)
+            nu_values = self._sample_open(values, limits)
 
         time_values = self._generate_time_values(nu_values)
-        return propagate(self, time_values, method=method)
+        return propagate(self, time.TimeDelta(time_values), method=method)
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
         ecc = self.ecc.value
         nu = self.nu.to(u.rad).value
+
         M_vals = [
             nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc)
             for nu_val in nu_vals.to(u.rad).value
         ] * u.rad
+
         time_values = (M_vals / self.n).decompose()
         return time_values
 

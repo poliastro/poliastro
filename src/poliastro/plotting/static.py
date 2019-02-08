@@ -217,7 +217,7 @@ class StaticOrbitPlotter:
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
-        positions = orbit.sample(self.num_points, method)
+        positions = orbit.sample(self.num_points, method=method)
 
         if label:
             label = generate_label(orbit, label)

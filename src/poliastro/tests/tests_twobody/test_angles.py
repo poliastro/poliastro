@@ -2,7 +2,10 @@ import numpy as np
 import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from numpy.testing import assert_allclose
 
+from poliastro.bodies import Earth
+from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
 from poliastro.twobody import angles
 
 # Data from Schlesinger & Udick, 1912
@@ -18,6 +21,18 @@ ANGLES_DATA = [
     (0.48, 180.0, 180.0),
     (0.75, 125.0, 167.57),
 ]
+
+
+@pytest.fixture()
+def classical():
+    p = 11067.790  # u.km
+    ecc = 0.83285  # u.one
+    inc = np.deg2rad(87.87)  # u.rad
+    raan = np.deg2rad(227.89)  # u.rad
+    argp = np.deg2rad(53.38)  # u.rad
+    nu = np.deg2rad(92.335)  # u.rad
+    expected_res = (p, ecc, inc, raan, argp, nu)
+    return expected_res
 
 
 def test_true_to_eccentric():
@@ -138,3 +153,14 @@ def test_eccentric_to_true_range2pi(E, ecc):
     print(E.value, ecc.value, nu.value)
     E1 = angles.nu_to_E(nu, ecc)
     assert_quantity_allclose(E1, E, rtol=1e-8)
+
+
+def test_convert_between_coe_and_rv_is_transitive(classical):
+    k = Earth.k.to(u.km ** 3 / u.s ** 2).value  # u.km**3 / u.s**2
+    res = rv2coe(k, *coe2rv(k, *classical))
+    assert_allclose(res, classical)
+
+
+def test_convert_between_coe_and_mee_is_transitive(classical):
+    res = mee2coe(*coe2mee(*classical))
+    assert_allclose(res, classical)

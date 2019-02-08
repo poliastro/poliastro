@@ -638,6 +638,7 @@ def test_orbit_creation_using_skycoord(attractor):
     assert (o.v == vel_transformed_to_irf).all()
 
 
+@pytest.mark.remote_data
 @pytest.mark.parametrize(
     "attractor", [Earth, Jupiter, Mars, Mercury, Neptune, Saturn, Sun, Uranus, Venus]
 )
