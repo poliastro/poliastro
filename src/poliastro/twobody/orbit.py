@@ -754,8 +754,40 @@ class Orbit(object):
             plane=self.plane,
         )
 
-    def sample(self, values=100, method=mean_motion):
-        """Samples an orbit to some specified time values.
+    def _sample_closed(self, values, limits=None):
+        if limits is None:
+            limits = np.array([0, 2 * np.pi]) * u.rad
+
+        # First sample eccentric anomaly, then transform into true anomaly
+        # to minimize error in the apocenter, see
+        # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
+        # Start from pericenter
+        E_values = np.linspace(*limits, values)
+        nu_values = E_to_nu(E_values, self.ecc)
+        return nu_values
+
+    def _sample_open(self, values, limits=None):
+        if limits is None:
+            # Select a sensible limiting value for non-closed orbits
+            # This corresponds to max(r = 3p, r = self.r)
+            # We have to wrap nu in [-180, 180) to compare it with the output of
+            # the arc cosine, which is in the range [0, 180)
+            # Start from -nu_limit
+            wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
+            nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu)).to(
+                u.rad
+            )
+            limits = np.array([-nu_limit.value, nu_limit.value]) * u.rad
+        else:
+            # If there limits were provided, clip them anyhow just in case
+            nu_limit = np.arccos(1 / self.ecc)
+            limits = limits.clip(-nu_limit, nu_limit)
+
+        nu_values = np.linspace(*limits, values)
+        return nu_values
+
+    def sample(self, values=100, *, limits=None, method=mean_motion):
+        r"""Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
 
@@ -763,7 +795,12 @@ class Orbit(object):
         ----------
         values : int
             Number of interval points (default to 100).
-
+        limits : ndarray, optional
+            Anomaly limits to sample the orbit.
+            For elliptic orbits the default will be :math:`E \in \left[0, 2 \pi \right]`,
+            and for hyperbolic orbits it will be :math:`\nu \in \left[-\nu_c, \nu_c \right]`,
+            where :math:`\nu_c` is either the current true anomaly
+            or a value that corresponds to :math:`r = 3p`.
         method : function, optional
             Method used for propagation
 
@@ -789,21 +826,9 @@ class Orbit(object):
 
         """
         if self.ecc < 1:
-            # first sample eccentric anomaly, then transform into true anomaly
-            # why sampling eccentric anomaly uniformly to minimize error in the apocenter, see
-            # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
-            # Start from pericenter
-            E_values = np.linspace(0, 2 * np.pi, values) * u.rad
-            nu_values = E_to_nu(E_values, self.ecc)
+            nu_values = self._sample_closed(values, limits)
         else:
-            # Select a sensible limiting value for non-closed orbits
-            # This corresponds to max(r = 3p, r = self.r)
-            # We have to wrap nu in [-180, 180) to compare it with the output of
-            # the arc cosine, which is in the range [0, 180)
-            # Start from -nu_limit
-            wrapped_nu = self.nu if self.nu < 180 * u.deg else self.nu - 360 * u.deg
-            nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu))
-            nu_values = np.linspace(-nu_limit, nu_limit, values)
+            nu_values = self._sample_open(values, limits)
 
         time_values = self._generate_time_values(nu_values)
         return propagate(self, time.TimeDelta(time_values), method=method)
