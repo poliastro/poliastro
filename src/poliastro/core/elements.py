@@ -344,7 +344,7 @@ def rv2coe(k, r, v, tol=1e-8):
     else:
         a = p / (1 - (ecc ** 2))
         ka = k * a
-        if ecc < 1:
+        if a > 0:
             e_se = r.dot(v) / sqrt(ka)
             e_ce = norm(r) * (norm(v) ** 2) / k - 1
             nu = E_to_nu(np.arctan2(e_se, e_ce), ecc)
@@ -356,7 +356,7 @@ def rv2coe(k, r, v, tol=1e-8):
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
         px = r.dot(n)
         py = r.dot(cross(h, n)) / h.dot(h)
-        argp = np.arctan2(py, px) % (2 * np.pi)
+        argp = (np.arctan2(py, px) - nu) % (2 * np.pi)
 
     nu = (nu + np.pi) % (2 * np.pi) - np.pi
 
