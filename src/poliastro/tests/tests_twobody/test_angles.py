@@ -35,6 +35,58 @@ def classical():
     return expected_res
 
 
+@pytest.fixture()
+def circular():
+    k = 3.9860047e14
+    p = 24464560.0
+    ecc = 0.0
+    inc = 0.122138
+    raan = 1.00681
+    argp = 0.0
+    nu = 0.048363
+    expected_res = (p, ecc, inc, raan, argp, nu)
+    return k, expected_res
+
+
+@pytest.fixture()
+def hyperbolic():
+    k = 3.9860047e14
+    p = 4.884856334147761e7
+    ecc = 1.7311
+    inc = 0.122138
+    raan = 1.00681
+    argp = 3.10686
+    nu = 0.12741601769795755
+    expected_res = (p, ecc, inc, raan, argp, nu)
+    return k, expected_res
+
+
+@pytest.fixture()
+def equatorial():
+    k = 3.9860047e14
+    p = 1.13880762905224e7
+    ecc = 0.7311
+    inc = 0.0
+    raan = 0.0
+    argp = 3.10686
+    nu = 0.44369564302687126
+    expected_res = (p, ecc, inc, raan, argp, nu)
+    return k, expected_res
+
+
+@pytest.fixture()
+def circular_equatorial():
+    k = 3.9860047e14
+    p = 1.13880762905224e7
+    ecc = 0.0
+    inc = 0.0
+    raan = 0.0
+    argp = 0.0
+    nu = 0.44369564302687126
+    expected_res = (p, ecc, inc, raan, argp, nu)
+    return k, expected_res
+
+
 def test_true_to_eccentric():
     # Data from NASA-TR-R-158
     data = [
@@ -164,3 +216,27 @@ def test_convert_between_coe_and_rv_is_transitive(classical):
 def test_convert_between_coe_and_mee_is_transitive(classical):
     res = mee2coe(*coe2mee(*classical))
     assert_allclose(res, classical)
+
+
+def test_convert_coe_and_rv_circular(circular):
+    k, expected_res = circular
+    res = rv2coe(k, *coe2rv(k, *expected_res))
+    assert_allclose(res, expected_res, atol=1e-8)
+
+
+def test_convert_coe_and_rv_hyperbolic(hyperbolic):
+    k, expected_res = hyperbolic
+    res = rv2coe(k, *coe2rv(k, *expected_res))
+    assert_allclose(res, expected_res, atol=1e-8)
+
+
+def test_convert_coe_and_rv_equatorial(equatorial):
+    k, expected_res = equatorial
+    res = rv2coe(k, *coe2rv(k, *expected_res))
+    assert_allclose(res, expected_res, atol=1e-8)
+
+
+def test_convert_coe_and_rv_circular_equatorial(circular_equatorial):
+    k, expected_res = circular_equatorial
+    res = rv2coe(k, *coe2rv(k, *expected_res))
+    assert_allclose(res, expected_res, atol=1e-8)
