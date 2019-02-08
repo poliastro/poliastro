@@ -1,6 +1,67 @@
 What's new
 ==========
 
+poliastro 0.12 - Unreleased
+---------------------------
+
+This major release [...]
+
+Highlights
+..........
+
+* New defaults for plotting!
+* Revamped sampling and propagation
+* Better integration with reference frames
+* Refactor orbit objects, remove Orbit.state
+
+New features
+............
+
+* Hill radius
+* from_horizons, geostationary, from_coords
+* Orbit.propagate_to_anomaly
+* Orbit.plot
+* Dark theme for Plotly plots
+
+Bugs fixed
+..........
+
+* Collinear Lambert problem
+* Something with NEOWS?
+* Some bugs with OrbitPlotter2D
+* Representation of orbits with no frame
+* Complete documentation of Orbit properties
+
+Backwards incompatible changes
+..............................
+
+* OrbitPlotter -> StaticOrbitPlotter
+* SOI?
+* Orbit.sample, Orbit.propagate, twobody.propagation.propagate,
+  all propagators
+
+Other updates
+.............
+
+* We now follow the Black style guide
+* The API docs are now more organized
+* JupyterLab documentation
+
+Contributors
+............
+
+This is the complete list of the people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Shreyas Bapat
+* Jorge Martínez+
+* Hrishikesh Goyal+
+* Sahil Orionis+
+* Helge Eichhorn+
+* Antonina Geryak
+* Aditya Vikram+
+
 poliastro 0.11.1 - 2018-12-27
 -----------------------------
 
