@@ -339,7 +339,7 @@ def orbit_from_name(name):
     orbits = []
     for record in records:
         orbits.append(orbit_from_record(record))
-    return orbits
+    return orbits[0]
 
 
 def orbit_from_record(record):
