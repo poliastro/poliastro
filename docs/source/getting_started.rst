@@ -42,7 +42,7 @@ If you don't want to use conda you can `install poliastro from PyPI`_
 using pip::
 
   $ pip install numpy  # Run this one first for pip 9 and older!
-  $ pip install poliastro
+  $ pip install poliastro[jupyter] pytest
 
 Finally, you can also install the latest development version of poliastro
 `directly from GitHub`_::
@@ -88,9 +88,9 @@ And as the documentation of JupyterLab Extensions states:
 
   "In order to install JupyterLab extensions, you need to have Node.js version 4 or later installed."
 
-If you face any further issues, you can refer to this `installation guide by plotly`_.
+If you face any further issues, you can refer to the `installation guide by Plotly`_.
 
-.. _`installation guide by plotly`: https://github.com/plotly/plotly.py/blob/master/README.md#jupyterlab-support-python-35
+.. _`installation guide by Plotly`: https://github.com/plotly/plotly.py/blob/master/README.md#jupyterlab-support-python-35
 
 Testing
 -------
@@ -98,9 +98,12 @@ Testing
 If installed correctly, the tests can be run using pytest::
 
   $ python -c "import poliastro.testing; poliastro.testing.test()"
-  Running unit tests for poliastro
+  ===================================== test session starts =====================================
+  platform linux -- Python 3.7.1, pytest-4.2.0, py-1.7.0, pluggy-0.8.1
+  rootdir: /home/juanlu/.miniconda36/envs/_test37/lib/python3.7/site-packages/poliastro, inifile:
+  collected 747 items
   [...]
-  OK
+  ========= 738 passed, 3 skipped, 5 xfailed, 1 xpassed, 13 warnings in 392.12 seconds ==========
   $
 
 If for some reason any test fails, please report it in the `issue tracker`_.
