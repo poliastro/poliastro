@@ -98,9 +98,12 @@ Testing
 If installed correctly, the tests can be run using pytest::
 
   $ python -c "import poliastro.testing; poliastro.testing.test()"
-  Running unit tests for poliastro
+  ===================================== test session starts =====================================
+  platform linux -- Python 3.7.1, pytest-4.2.0, py-1.7.0, pluggy-0.8.1
+  rootdir: /home/juanlu/.miniconda36/envs/_test37/lib/python3.7/site-packages/poliastro, inifile:
+  collected 747 items
   [...]
-  OK
+  ========= 738 passed, 3 skipped, 5 xfailed, 1 xpassed, 13 warnings in 392.12 seconds ==========
   $
 
 If for some reason any test fails, please report it in the `issue tracker`_.
