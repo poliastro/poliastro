@@ -32,7 +32,7 @@ setup(
     install_requires=[
         "numpy",
         "astropy>=3.0,<4.*",
-        "matplotlib<3.0.1",
+        "matplotlib>=2.0,!=3.0.1",
         "jplephem",
         "scipy",
         "beautifulsoup4>=4.5.3",
