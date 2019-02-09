@@ -43,6 +43,7 @@ setup(
         "astroquery>=0.3.8",
     ],
     extras_require={
+        "jupyter": ["notebook", "ipywidgets>=7.0"],
         "dev": [
             "black ; python_version>='3.6'",
             "coverage",
@@ -56,8 +57,8 @@ setup(
             "ipython>=5.0",
             "jupyter-client",
             "ipykernel",
-            "ipywidgets",
-        ]
+            "ipywidgets>=7.0",
+        ],
     },
     packages=find_packages("src"),
     package_dir={"": "src"},
