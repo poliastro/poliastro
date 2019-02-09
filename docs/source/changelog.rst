@@ -1,6 +1,148 @@
 What's new
 ==========
 
+poliastro 0.12 - Unreleased
+---------------------------
+
+This major release brings lots of new features, several breaking changes
+that improve the overall consistency of the library, and a stronger bet
+on Plotly as the default plotting backend, as well as the usual bug fixes.
+This has been the biggest release in terms of contributors so far and
+we feel we are reaching a tipping point, which makes us extremely proud
+and also busier!
+
+Highlights
+..........
+
+* **New defaults for plotting**: We are now switching to Plotly for the default
+  plotting backend as it has better interactive capabilities in the notebook,
+  while keeping the matplotlib backend for publication-quality, 2D static plots.
+  There might be some rough edges in the installation or in trying to keep the
+  aspect ratio still, so we ask for user feedback.
+* **Reorganization of propagation capabilities**: We made some changes to the propagation
+  APIs to be more coherent and flexible and simpler to understand for new contributors.
+  We removed some features from :py:meth:`~poliastro.twobody.orbit.Orbit.sample` to
+  keep it simpler while moving some of them to
+  :py:meth:`poliastro.twobody.propagation.propagate`, and we splitted
+  :py:meth:`~poliastro.twobody.orbit.Orbit.propagate` by adding
+  :py:meth:`~poliastro.twobody.orbit.Orbit.propagate_to_anomaly`. At the cost of
+  some breakage, we think this is a positive change that will make the library
+  more maintainable in the future and reduce the number of bugs.
+* **Better integration with reference frames**: We took one step further in our
+  endeavor to integrate better with Astropy reference frames by adding a
+  :py:meth:`~poliastro.twobody.orbit.Orbit.from_coords` method that accepts
+  any frame, be it inertial or not.
+* **Refactor of Orbit objects**: The :py:class:`~poliastro.twobody.orbit.Orbit`
+  was designed a long time ago and some design choices prevented all its
+  orbital properties to appear in the documentation, while also making people
+  think that they had to use an internal property. After a simple refactor
+  this is no longer the case, and the code is still fast while being
+  much simpler to understand. Did you know that you can compute the
+  *semilatus rectum*, the modified equinoctial elements, the eccentricity vector
+  or the mean motion of an :py:class:`~poliastro.twobody.orbit.Orbit`?
+  Now there are no excuses!
+
+New features
+............
+
+* **New orbit creation methods**: We can create an
+  :py:class:`~poliastro.twobody.orbit.Orbit` directly from JPL HORIZONS data using
+  :py:meth:`~poliastro.twobody.orbit.Orbit.from_horizons`, from Astropy
+  :code:`SkyCoord` and :code:`BaseCoordinateFrame` objects using
+  :py:meth:`~poliastro.twobody.orbit.Orbit.from_coords`, and Geostationary orbits
+  around an attractor using :py:meth:`~poliastro.twobody.orbit.Orbit.geostationary`.
+  We plan to keep adding more in the coming releases.
+* **New propagation methods**: We now have more specific methods for certain
+  tasks, like :py:meth:`~poliastro.twobody.orbit.Orbit.propagate_to_anomaly` to
+  propagate an :py:class:`~poliastro.twobody.orbit.Orbit` to a certain anomaly,
+  and we can specify the anomaly limits when using
+  :py:meth:`~poliastro.twobody.orbit.Orbit.sample`.
+* **New simple plotting method**: We added a
+  :py:meth:`~poliastro.twobody.orbit.Orbit.plot` to quickly plot an
+  :py:class:`~poliastro.twobody.orbit.Orbit` without additional imports, in 2D or 3D.
+* **Dark theme for Plotly plots**: It is now possible to create Plotly plots
+  with a dark background, perfect for recreating our Solar System!
+* **Computation of the Hill radius**: To complement the existing Laplace
+  sphere of influence (or just Sphere of Influence) available with
+  :py:meth:`poliastro.threebody.soi.laplace_radius`, we added the Hill radius
+  as well with the function :py:meth:`poliastro.threebody.soi.hill_radius`.
+* **Porkchop plots**: By popular demand, we can now produce *gorgeous*
+  `Porkchop plots`_ to analyze launch opportunities between origin and
+  destination bodies by using :py:meth:`poliastro.plotting.porkchop.porkchop`.
+  We plan to expand its capabilities by being able to target any body of
+  the Solar System. Stay tuned!
+
+.. image:: _static/porkchop.png
+   :width: 675px
+   :align: center
+
+.. _`Porkchop plots`: https://en.wikipedia.org/wiki/Porkchop_plot
+
+Bugs fixed
+..........
+
+* `Issue #435`_: :py:class:`~poliastro.twobody.orbit.Orbit` properties were not
+  discoverable
+* `Issue #469`_: Better error for collinear points in Lambert problem
+* `Issue #476`_: Representation of orbits with no frame
+* `Issue #477`_: Propagator crashed when propagating a hyperbolic orbit 0 seconds
+* `Issue #480`_: :py:class:`~poliastro.plotting.OrbitPlotter2D` did not have
+  a :py:meth:`~poliastro.plotting.OrbitPlotter2D.set_frame` method
+* `Issue #483`_: :py:class:`~poliastro.plotting.OrbitPlotter2D`OrbitPlotter2D`
+  results were not correct
+* `Issue #518`_: Trajectories were not redrawn when the frame was changed
+
+.. _`Issue #435`: https://github.com/poliastro/poliastro/issues/435
+.. _`Issue #469`: https://github.com/poliastro/poliastro/issues/469
+.. _`Issue #476`: https://github.com/poliastro/poliastro/issues/476
+.. _`Issue #477`: https://github.com/poliastro/poliastro/issues/477
+.. _`Issue #480`: https://github.com/poliastro/poliastro/issues/480
+.. _`Issue #483`: https://github.com/poliastro/poliastro/issues/483
+.. _`Issue #518`: https://github.com/poliastro/poliastro/issues/518
+
+Backwards incompatible changes
+..............................
+
+* The old :code:`OrbitPlotter` has been renamed to
+  :py:class:`poliastro.plotting.static.StaticOrbitPlotter`, please adjust
+  your imports accordingly.
+* :py:meth:`~poliastro.twobody.orbit.Orbit.propagate`,
+  :py:meth:`~poliastro.twobody.orbit.Orbit.sample`,
+  :py:meth:`poliastro.twobody.propagation.propagate` and all propagators in
+  :py:mod:`poliastro.twobody.propagation` now have different signatures,
+  and the first two lost some functionality. Check out the notebooks
+  and their respective documentation.
+* The :py:mod:`poliastro.threebody` has been reorganized and some functions
+  moved there.
+
+Other updates
+.............
+
+* We now follow the `Black`_ style guide 😎
+* The API docs are now more organized and should be easier to browse and
+  understand.
+* We are working towards documenting how to use poliastro in JupyterLab,
+  please tell us about anything we may have missed.
+* poliastro will be presented at the `fifth PyCon Namibia`_ 🇳🇦
+
+.. _`Black`: https://black.readthedocs.io/
+.. _`fifth PyCon Namibia`: https://na.pycon.org/speakers/
+
+Contributors
+............
+
+This is the complete list of the people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Shreyas Bapat
+* Jorge Martínez+
+* Hrishikesh Goyal+
+* Sahil Orionis+
+* Helge Eichhorn+
+* Antonina Geryak
+* Aditya Vikram+
+
 poliastro 0.11.1 - 2018-12-27
 -----------------------------
 
