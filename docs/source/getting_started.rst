@@ -88,9 +88,9 @@ And as the documentation of JupyterLab Extensions states:
 
   "In order to install JupyterLab extensions, you need to have Node.js version 4 or later installed."
 
-If you face any further issues, you can refer to this `installation guide by plotly`_.
+If you face any further issues, you can refer to the `installation guide by Plotly`_.
 
-.. _`installation guide by plotly`: https://github.com/plotly/plotly.py/blob/master/README.md#jupyterlab-support-python-35
+.. _`installation guide by Plotly`: https://github.com/plotly/plotly.py/blob/master/README.md#jupyterlab-support-python-35
 
 Testing
 -------
