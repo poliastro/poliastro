@@ -34,7 +34,7 @@ setup(
         "astropy>=3.0,<4.*",
         "matplotlib>=2.0,!=3.0.1",
         "jplephem",
-        "scipy",
+        "scipy>=1.0",
         "beautifulsoup4>=4.5.3",
         "numba>=0.39 ; implementation_name=='cpython'",
         "requests",
