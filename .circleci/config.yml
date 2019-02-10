@@ -14,21 +14,13 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install black isort flake8 mypy --quiet
+            pip install tox --quiet
 
       - run:
-          name: check Black style
+          name: check quality
           command: |
             . venv/bin/activate
-            isort -c -rc setup.py src/ -p poliastro -sd THIRDPARTY  # This avoids installing poliastro
-            black src/ setup.py --check
-            flake8 src/ setup.py
-
-      - run:
-          name: check MyPy
-          command: |
-            . venv/bin/activate
-            mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional src/
+            tox -e check
 
   test_py35: &test-template  # See https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462/2
     docker:
