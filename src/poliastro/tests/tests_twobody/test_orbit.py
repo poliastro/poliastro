@@ -317,9 +317,7 @@ def test_orbit_is_pickable(hyperbolic):
         (Sun, HCRS),
         (Mercury, MercuryICRS),
         (Venus, VenusICRS),
-        pytest.param(
-            Earth, GCRS, marks=pytest.mark.xfail
-        ),  # See https://github.com/astropy/astropy/issues/7793
+        (Earth, GCRS),
         (Mars, MarsICRS),
         (Jupiter, JupiterICRS),
         (Saturn, SaturnICRS),
