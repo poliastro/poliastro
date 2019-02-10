@@ -114,3 +114,18 @@ def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=
         raise ValueError("Either 'end' or 'spacing' must be specified")
 
     return result
+
+
+@u.quantity_input(ecc=u.one)
+def hyp_nu_limit(ecc, r_max_ratio=np.inf):
+    """Limit true anomaly for hyperbolic orbits.
+
+    Parameters
+    ----------
+    ecc : ~astropy.units.Quantity
+        Eccentricity, should be larger than 1.
+    r_max_ratio : float, optional
+        Value of :math:`r_{\text{max}} / p` for this angle, default to infinity.
+
+    """
+    return np.arccos(-(1 - 1 / r_max_ratio) / ecc)

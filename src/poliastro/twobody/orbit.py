@@ -20,7 +20,7 @@ from poliastro.frames import Planes, get_frame
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.twobody.angles import E_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
-from poliastro.util import norm
+from poliastro.util import hyp_nu_limit, norm
 
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
@@ -32,6 +32,10 @@ ORBIT_NO_FRAME_FORMAT = (
 
 
 class TimeScaleWarning(UserWarning):
+    pass
+
+
+class OrbitSamplingWarning(UserWarning):
     pass
 
 
@@ -754,9 +758,11 @@ class Orbit(object):
             plane=self.plane,
         )
 
-    def _sample_closed(self, values, limits=None):
-        if limits is None:
-            limits = np.array([0, 2 * np.pi]) * u.rad
+    def _sample_closed(self, values, min_anomaly, max_anomaly):
+        limits = [
+            min_anomaly.to(u.rad).value if min_anomaly is not None else 0,
+            max_anomaly.to(u.rad).value if max_anomaly is not None else 2 * np.pi,
+        ] * u.rad
 
         # First sample eccentric anomaly, then transform into true anomaly
         # to minimize error in the apocenter, see
@@ -766,27 +772,33 @@ class Orbit(object):
         nu_values = E_to_nu(E_values, self.ecc)
         return nu_values
 
-    def _sample_open(self, values, limits=None):
-        if limits is None:
-            # Select a sensible limiting value for non-closed orbits
-            # This corresponds to max(r = 3p, r = self.r)
-            # We have to wrap nu in [-180, 180) to compare it with the output of
-            # the arc cosine, which is in the range [0, 180)
-            # Start from -nu_limit
-            wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
-            nu_limit = max(np.arccos(-(1 - 1 / 3.0) / self.ecc), abs(wrapped_nu)).to(
-                u.rad
-            )
-            limits = np.array([-nu_limit.value, nu_limit.value]) * u.rad
-        else:
-            # If there limits were provided, clip them anyhow just in case
-            nu_limit = np.arccos(1 / self.ecc)
-            limits = limits.clip(-nu_limit, nu_limit)
+    def _sample_open(self, values, min_anomaly, max_anomaly):
+        # Select a sensible limiting value for non-closed orbits
+        # This corresponds to max(r = 3p, r = self.r)
+        # We have to wrap nu in [-180, 180) to compare it with the output of
+        # the arc cosine, which is in the range [0, 180)
+        # Start from -nu_limit
+        wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
+        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to(u.rad).value
+
+        limits = [
+            min_anomaly.to(u.rad).value if min_anomaly is not None else -nu_limit,
+            max_anomaly.to(u.rad).value if max_anomaly is not None else nu_limit,
+        ] * u.rad  # type: u.Quantity
+
+        # Now we check that none of the provided values
+        # is outside of the hyperbolic range
+        nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
+        if not Angle(limits).is_within_bounds(-nu_max, nu_max):
+            warn("anomaly outside range, clipping", OrbitSamplingWarning)
+            limits = limits.clip(-nu_max, nu_max)
 
         nu_values = np.linspace(*limits, values)
         return nu_values
 
-    def sample(self, values=100, *, limits=None, method=mean_motion):
+    def sample(
+        self, values=100, *, min_anomaly=None, max_anomaly=None, method=mean_motion
+    ):
         r"""Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
@@ -795,7 +807,7 @@ class Orbit(object):
         ----------
         values : int
             Number of interval points (default to 100).
-        limits : ndarray, optional
+        min_anomaly, max_anomaly : ~astropy.units.Quantity, optional
             Anomaly limits to sample the orbit.
             For elliptic orbits the default will be :math:`E \in \left[0, 2 \pi \right]`,
             and for hyperbolic orbits it will be :math:`\nu \in \left[-\nu_c, \nu_c \right]`,
@@ -826,9 +838,9 @@ class Orbit(object):
 
         """
         if self.ecc < 1:
-            nu_values = self._sample_closed(values, limits)
+            nu_values = self._sample_closed(values, min_anomaly, max_anomaly)
         else:
-            nu_values = self._sample_open(values, limits)
+            nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
         time_values = self._generate_time_values(nu_values)
         return propagate(self, time.TimeDelta(time_values), method=method)
