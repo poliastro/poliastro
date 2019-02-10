@@ -2,7 +2,7 @@ version: 2
 jobs:
   quality:
     docker:
-      - image: circleci/python:3.6
+      - image: python:3.6
 
     working_directory: ~/repo
 
@@ -12,14 +12,11 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install tox --quiet
+            python3 -m pip install tox --quiet
 
       - run:
           name: check quality
           command: |
-            . venv/bin/activate
             tox -e check
 
   test_py35: &test-template  # See https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462/2
