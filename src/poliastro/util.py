@@ -118,7 +118,7 @@ def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=
 
 @u.quantity_input(ecc=u.one)
 def hyp_nu_limit(ecc, r_max_ratio=np.inf):
-    """Limit true anomaly for hyperbolic orbits.
+    r"""Limit true anomaly for hyperbolic orbits.
 
     Parameters
     ----------
