@@ -14,7 +14,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install black isort mypy --quiet
+            pip install black isort flake8 mypy --quiet
 
       - run:
           name: check Black style
@@ -22,6 +22,7 @@ jobs:
             . venv/bin/activate
             isort -c -rc setup.py src/ -p poliastro -sd THIRDPARTY  # This avoids installing poliastro
             black src/ setup.py --check
+            flake8 src/ setup.py
 
       - run:
           name: check MyPy
