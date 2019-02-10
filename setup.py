@@ -31,7 +31,7 @@ setup(
     python_requires=">=3.5",
     install_requires=[
         "numpy",
-        "astropy>=3.0,<4.*",
+        "astropy>=3.1,<4.*",
         "matplotlib>=2.0,!=3.0.1",
         "jplephem",
         "scipy>=1.0",
