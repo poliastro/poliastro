@@ -1,6 +1,6 @@
 from astropy import units as u
 
-from poliastro.bodies import Earth, Sun
+from poliastro.bodies import Sun
 from poliastro.twobody._states import ClassicalState, RVState
 
 

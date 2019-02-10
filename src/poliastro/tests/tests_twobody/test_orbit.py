@@ -492,7 +492,7 @@ def test_geostationary_creation_with_Hill_radius(
 @pytest.mark.parametrize("attractor", [Earth, Mars])
 def test_geostationary_input(attractor):
     with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.geostationary(attractor=attractor)
+        Orbit.geostationary(attractor=attractor)
 
     assert (
         "ValueError: At least one among angular_velocity or period must be passed"
@@ -505,9 +505,7 @@ def test_geostationary_input(attractor):
 )
 def test_geostationary_non_existence_condition(attractor, period, hill_radius):
     with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.geostationary(
-            attractor=attractor, period=period, hill_radius=hill_radius
-        )
+        Orbit.geostationary(attractor=attractor, period=period, hill_radius=hill_radius)
 
     assert (
         "Geostationary orbit for the given parameters doesn't exist"
@@ -606,7 +604,7 @@ def test_from_coord_fails_if_no_time_differential():
 
     # Method fails if coordinate instance doesn't contain a differential with respect to time
     with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.from_coords(Earth, SkyCoord(cartrep))
+        Orbit.from_coords(Earth, SkyCoord(cartrep))
     assert (
         "ValueError: Coordinate instance doesn't have a differential with respect to time"
         in excinfo.exconly()
@@ -678,7 +676,7 @@ def test_from_coord_fails_for_multiple_positions(obstime):
     coords = GCRS(cartrep, representation_type=CartesianRepresentation, obstime=obstime)
 
     with pytest.raises(ValueError) as excinfo:
-        ss = Orbit.from_coords(Earth, coords)
+        Orbit.from_coords(Earth, coords)
     assert (
         "ValueError: Coordinate instance must represents exactly 1 position, found: 2"
         in excinfo.exconly()

@@ -170,7 +170,7 @@ def third_body(t0, state, k, k_third, third_body):
         gravitational constant, (km^3/s^2)
     third_body: a callable object returning the position of 3rd body
         third body that causes the perturbation
-    
+
     Note
     ----
     This formula is taken from Howard Curtis, section 12.10. As an example, a third body could be
@@ -210,7 +210,7 @@ def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
         total star emitted power divided by the speed of light (W * s / km)
     star: a callable object returning the position of star in attractor frame
         star position
-    
+
     Note
     ----
     This function provides the acceleration due to star light pressure. We follow

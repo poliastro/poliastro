@@ -1,1 +1,3 @@
-from poliastro.twobody.orbit import Orbit  # flake8: noqa
+from .orbit import Orbit
+
+__all__ = ["Orbit"]

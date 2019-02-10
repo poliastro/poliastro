@@ -244,7 +244,7 @@ class Orbit(object):
         ----------
         attractor: Body
             Main attractor
-        coord: astropy.coordinates.SkyCoord or BaseCoordinateFrame 
+        coord: astropy.coordinates.SkyCoord or BaseCoordinateFrame
             Position and velocity vectors in any reference frame. Note that coord must have
             a representation and its differential with respect to time.
         plane : ~poliastro.frames.Planes, optional

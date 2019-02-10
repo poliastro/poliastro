@@ -64,7 +64,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
 
     # Set the non Keplerian acceleration
     if ad is None:
-        ad = lambda t0, u_, k_: (0, 0, 0)
+
+        def ad(t0, u_, k_):
+            return 0, 0, 0
 
     f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
 

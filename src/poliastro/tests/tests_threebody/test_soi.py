@@ -12,7 +12,6 @@ from poliastro.bodies import (
     Neptune,
     Pluto,
     Saturn,
-    Sun,
     Uranus,
     Venus,
 )

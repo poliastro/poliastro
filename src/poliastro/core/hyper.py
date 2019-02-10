@@ -15,7 +15,7 @@ def hyp2f1b(x):
 
     Note
     ----
-    More information about hypergeometric function can be checked at 
+    More information about hypergeometric function can be checked at
     https://en.wikipedia.org/wiki/Hypergeometric_function
 
     """

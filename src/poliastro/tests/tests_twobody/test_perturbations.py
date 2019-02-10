@@ -115,9 +115,10 @@ def test_J3_propagation_Earth(test_params):
         rtol=1e-8,
     )
 
-    a_J2J3 = lambda t0, u_, k_: J2_perturbation(
-        t0, u_, k_, J2=Earth.J2.value, R=Earth.R.to(u.km).value
-    ) + J3_perturbation(t0, u_, k_, J3=Earth.J3.value, R=Earth.R.to(u.km).value)
+    def a_J2J3(t0, u_, k_):
+        j2 = J2_perturbation(t0, u_, k_, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
+        j3 = J3_perturbation(t0, u_, k_, J3=Earth.J3.value, R=Earth.R.to(u.km).value)
+        return j2 + j3
 
     r_J3, v_J3 = cowell(Earth.k, orbit.r, orbit.v, tofs, ad=a_J2J3, rtol=1e-8)
 
@@ -167,7 +168,7 @@ def test_J3_propagation_Earth(test_params):
     assert_quantity_allclose(decc_max, test_params["decc_max"], rtol=1e-1, atol=1e-7)
     try:
         assert_quantity_allclose(da_max * u.km, test_params["da_max"])
-    except AssertionError as exc:
+    except AssertionError:
         pytest.xfail("this assertion disagrees with the paper")
 
 
