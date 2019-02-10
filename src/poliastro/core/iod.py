@@ -16,10 +16,9 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     computed by the following expresions:
 
     .. math::
-      
+
         \vec{v_{o}} &= \frac{1}{g}(\vec{r} - f\vec{r_{0}}) \\
         \vec{v} &= \frac{1}{g}(\dot{g}\vec{r} - \vec{r_{0}})
-        
 
     Therefore, the lagrange coefficients need to be computed. For the case of
     Lamber's problem, they can be expresed by terms of the initial and final vector:
@@ -31,7 +30,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
             g = A\sqrt{\frac{y}{\mu}} \\
             \dot{g} = 1 - \frac{y}{r} \\
         \end{align}
-    
+
     Where y(z) is a function that depends on the :py:mod:`poliastro.core.stumpff` coefficients:
 
     .. math::
@@ -90,12 +89,13 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     >>> v2 = v2*u.km / u.s
     >>> print(v1, v2)
     [-5.99249499  1.92536673  3.24563805] km / s [-3.31245847 -4.196619   -0.38528907] km / s
-    
+
     Note
     ----
     This procedure can be found in section 5.3 of Curtis, with all the
     theoretical description of the problem. Analytical example can be found
     in the same book under name Example 5.2.
+
     """
     if short:
         t_m = +1
@@ -169,7 +169,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     ----------
     k: float
         Gravitational Constant
-    r1: ~numpy.array 
+    r1: ~numpy.array
         Initial position vector
     r2: ~numpy.array
         Final position vector
@@ -179,9 +179,9 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
         Number of revolutions
     numiter: int
         Numbert of iterations
-    rotl: float
+    rtol: float
         Error tolerance
-    
+
     Returns
     -------
 

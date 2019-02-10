@@ -1,2 +1,4 @@
 # Select default algorithm
-from poliastro.iod.izzo import lambert  # flake8: noqa
+from .izzo import lambert
+
+__all__ = ["lambert"]

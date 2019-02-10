@@ -17,7 +17,6 @@ def rv_pqw(k, p, ecc, nu):
 
     .. math::
 
-        
         \vec{r} = \frac{h^2}{\mu}\frac{1}{1 + e\cos(\theta)}\begin{bmatrix}
         \cos(\theta)\\
         \sin(\theta)\\
@@ -134,7 +133,7 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
         k &= \tan(\frac{i}{2})\sin(\Omega) \\
         L &= \Omega + \omega + \theta \\
         \end{align}
-    
+
     Parameters
     ----------
     k : float
@@ -177,11 +176,11 @@ def rv2coe(k, r, v, tol=1e-8):
 
     2. With it the eccentricity can be solved:
         .. math::
-            \begin{align} 
+            \begin{align}
             \vec{e} &= \frac{1}{\mu}\left [ \left ( v^{2} - \frac{\mu}{r}\right ) \vec{r}  - (\vec{r} \cdot \vec{v})\vec{v} \right ] \\
             e &= \sqrt{\vec{e}\cdot\vec{e}} \\
             \end{align}
-    
+
     3. The node vector line is solved:
         .. math::
             \begin{align}

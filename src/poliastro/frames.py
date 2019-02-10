@@ -2,13 +2,12 @@
 
 """
 from enum import Enum
-from typing import Dict, List  # flake8: noqa
+from typing import Dict
 
 import numpy as np
 from astropy import _erfa, units as u
 from astropy.coordinates import (
     GCRS,
-    HCRS as _HCRS,
     ICRS,
     AffineTransform,
     BaseEclipticFrame,
@@ -21,11 +20,10 @@ from astropy.coordinates import (
     get_body_barycentric,
     get_body_barycentric_posvel,
 )
-from astropy.coordinates.baseframe import FrameMeta  # flake8: noqa
+from astropy.coordinates.baseframe import FrameMeta
 from astropy.coordinates.builtin_frames.utils import DEFAULT_OBSTIME, get_jd12
 from astropy.coordinates.matrix_utilities import matrix_transpose, rotation_matrix
 
-from poliastro.bodies import _Body  # flake8: noqa
 from poliastro.bodies import (
     Earth,
     Jupiter,
@@ -37,6 +35,7 @@ from poliastro.bodies import (
     Sun,
     Uranus,
     Venus,
+    _Body,
 )
 from poliastro.constants import J2000
 

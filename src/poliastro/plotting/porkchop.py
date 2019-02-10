@@ -5,16 +5,15 @@ This is the script for porkchop plotting
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy import coordinates as coord, units as u
-from astropy.time import Time
 
 from poliastro.bodies import Sun
 from poliastro.iod import lambert
-from poliastro.util import norm, time_range
+from poliastro.util import norm
 
 
 def _targetting(departure_body, target_body, t_launch, t_arrival):
-    """
-    This function returns the increment in departure and arrival velocities.
+    """This function returns the increment in departure and arrival velocities.
+
     """
 
     # Compute departure and arrival positions
@@ -81,7 +80,7 @@ def porkchop(
         Time span for arrival
     ax: matplotlib.axes.Axes:
         For custom figures
-    
+
     Returns
     -------
     c3_launch: np.ndarray
@@ -124,7 +123,7 @@ def porkchop(
         c3_levels,
     )
 
-    l = ax.contour(
+    line = ax.contour(
         [D.to_datetime() for D in launch_span],
         [A.to_datetime() for A in arrival_span],
         c3_launch,
@@ -135,7 +134,7 @@ def porkchop(
 
     cbar = fig.colorbar(c)
     cbar.set_label("km2 / s2")
-    ax.clabel(l, inline=1, fmt="%1.1f", colors="k", fontsize=10)
+    ax.clabel(line, inline=1, fmt="%1.1f", colors="k", fontsize=10)
 
     if time_lines:
 
