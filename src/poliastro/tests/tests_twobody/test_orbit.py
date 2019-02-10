@@ -50,14 +50,15 @@ from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 
 @pytest.fixture()
-def hyperbolic_orbit():
+def hyperbolic():
     r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
     v = (
         [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
         * u.km
         / u.s
     )
-    return r, v
+    epoch = Time("2015-07-14 07:59", scale="tdb")
+    return Orbit.from_vectors(Sun, r, v, epoch)
 
 
 def test_default_time_for_new_state():
@@ -261,12 +262,8 @@ def test_sample_big_orbits(method):
     assert len(positions) == 15
 
 
-def test_hyperbolic_nu_value_check(hyperbolic_orbit):
-    r, v = hyperbolic_orbit
-
-    ss = Orbit.from_vectors(Sun, r, v, Time("2015-07-14 07:59", scale="tdb"))
-
-    positions = ss.sample(100)
+def test_hyperbolic_nu_value_check(hyperbolic):
+    positions = hyperbolic.sample(100)
 
     assert isinstance(positions, HCRS)
     assert len(positions) == 100
