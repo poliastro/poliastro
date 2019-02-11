@@ -11,6 +11,7 @@ from astropy.coordinates import (
     get_body_barycentric_posvel,
 )
 from astroquery.jplhorizons import Horizons
+from astroquery.jplsbdb import SBDB
 
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
@@ -441,6 +442,40 @@ class Orbit(object):
         ss = cls.from_classical(
             Sun, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
         )
+        return ss
+    
+    @classmethod
+    def from_sbdb(cls, body_name, **kargs):
+        """Return osculating `Orbit` by using `SBDB` from Astroquery.
+        
+        Parameters
+        ----------
+        body_name: string
+            Name of the body to make the request.
+        
+        Returns
+        -------
+        ss: poliastro.twobody.orbit.Orbit
+            Orbit corresponding to body_name
+
+        Examples
+        --------
+        >>> from poliastro.twobody.orbit import Orbit
+        >>> apophis_orbit = Orbit.from_sbdb('apophis')
+        """
+
+        body = SBDB.query(body_name, full_precision=True, **kargs)
+        
+        a = body['orbit']['elements']['a'].to(u.km) * u.km 
+        ecc = float(body['orbit']['elements']['e']) * u.one 
+        inc = body['orbit']['elements']['i'].to(u.deg) * u.deg
+        raan = body['orbit']['elements']['om'].to(u.deg) * u.deg
+        argp = body['orbit']['elements']['w'].to(u.deg) * u.deg
+        nu = body['orbit']['elements']['ma'].to(u.deg) * u.deg
+        epoch = time.Time(body['orbit']['epoch'].to(u.d), format='jd')
+        
+        ss = cls.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch=epoch)
+
         return ss
 
     @classmethod
