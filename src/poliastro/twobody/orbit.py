@@ -474,7 +474,7 @@ class Orbit(object):
         nu = body['orbit']['elements']['ma'].to(u.deg) * u.deg
         epoch = time.Time(body['orbit']['epoch'].to(u.d), format='jd')
         
-        ss = cls.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch=epoch)
+        ss = cls.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch=epoch, plane=Planes.EARTH_EQUATOR)
 
         return ss
 
