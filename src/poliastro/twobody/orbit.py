@@ -443,9 +443,9 @@ class Orbit(object):
             Sun, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
         )
         return ss
-    
+
     @classmethod
-    def from_sbdb(cls, body_name, **kargs):
+    def from_sbdb(cls, name, **kargs):
         """Return osculating `Orbit` by using `SBDB` from Astroquery.
         
         Parameters
@@ -464,17 +464,27 @@ class Orbit(object):
         >>> apophis_orbit = Orbit.from_sbdb('apophis')
         """
 
-        body = SBDB.query(body_name, full_precision=True, **kargs)
-        
-        a = body['orbit']['elements']['a'].to(u.km) * u.km 
-        ecc = float(body['orbit']['elements']['e']) * u.one 
-        inc = body['orbit']['elements']['i'].to(u.deg) * u.deg
-        raan = body['orbit']['elements']['om'].to(u.deg) * u.deg
-        argp = body['orbit']['elements']['w'].to(u.deg) * u.deg
-        nu = body['orbit']['elements']['ma'].to(u.deg) * u.deg
-        epoch = time.Time(body['orbit']['epoch'].to(u.d), format='jd')
-        
-        ss = cls.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch=epoch, plane=Planes.EARTH_EQUATOR)
+        obj = SBDB.query(name, full_precision=True, **kargs)
+
+        a = obj["orbit"]["elements"]["a"].to(u.km) * u.km
+        ecc = float(obj["orbit"]["elements"]["e"]) * u.one
+        inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
+        raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
+        argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
+        nu = obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg
+        epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
+
+        ss = cls.from_classical(
+            Sun,
+            a,
+            ecc,
+            inc,
+            raan,
+            argp,
+            nu,
+            epoch=epoch.tdb,
+            plane=Planes.EARTH_ECLIPTIC,
+        )
 
         return ss
 
