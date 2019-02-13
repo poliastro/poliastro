@@ -447,12 +447,12 @@ class Orbit(object):
     @classmethod
     def from_sbdb(cls, name, **kargs):
         """Return osculating `Orbit` by using `SBDB` from Astroquery.
-        
+
         Parameters
         ----------
         body_name: string
             Name of the body to make the request.
-        
+
         Returns
         -------
         ss: poliastro.twobody.orbit.Orbit
