@@ -466,7 +466,7 @@ class Orbit(object):
 
         obj = SBDB.query(name, full_precision=True, **kargs)
 
-        a = obj["orbit"]["elements"]["a"].to(u.km) * u.km
+        a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
         ecc = float(obj["orbit"]["elements"]["e"]) * u.one
         inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
         raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
