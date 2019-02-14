@@ -180,7 +180,22 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     argp : float
         Argument of perigee (rad).
     nu : float
-        True anomaly (rad).
+       True anomaly (rad).
+
+    Returns
+    -------
+    p: float
+        Semi-latus rectum or parameter
+    f: float
+        Equinoctial parameter f
+    g: float
+        Equinoctial parameter g
+    h: float
+        Equinoctial parameter h
+    k: float
+        Equinoctial parameter k
+    L: float
+        Longitude
 
     Note
     -----
@@ -334,11 +349,52 @@ def rv2coe(k, r, v, tol=1e-8):
 
 @jit
 def mee2coe(p, f, g, h, k, L):
-    """Converts from modified equinoctial orbital elements to classical
+    r"""Converts from modified equinoctial orbital elements to classical
     orbital elements.
 
     The definition of the modified equinoctial orbital elements is taken from
     [Walker, 1985].
+    
+    .. math::
+        
+        \begin{align}
+            p &= a(1 - e^{2})\\ 
+            e &= \sqrt{f^{2} + g^{2}}\\
+            i &= 2\arctan{(\sqrt{h^{2} + k^{2}})}\\
+            raan &= atan2(k, h) \pmod{2\pi}\\
+            argp &= (atan2(g, f) - raan) \pmod{2\pi}\\
+            nu &= (L - atan2(g, f)) \pmod{2\pi}\\   
+        \end{align}
+
+    Parameters
+    ----------
+    p: float
+        Semi-latus rectum
+    f: float
+        Equinoctial parameter p
+    g: float
+        Equinoctial parameter g
+    h: float
+        Equinoctial parameter h
+    k: float
+        Equinoctial parameter k
+    L: float
+        Longitude
+    
+    Returns
+    -------
+    p: float
+        Semi-latus rectum
+    ecc: float
+        Eccentricity of the orbit
+    inc: float
+        Inclination of the orbit
+    raan: float
+        RAAN of orbit
+    argp: float
+        Argument of the periapsis
+    nu: float
+        True anomaly
 
     Note
     -----
