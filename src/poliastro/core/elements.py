@@ -80,10 +80,9 @@ def rv_pqw(k, p, ecc, nu):
 def coe2rv(k, p, ecc, inc, raan, argp, nu):
     r"""Converts from classical orbital to state vectors.
 
-        1. Classical orbital elements are converted into position and velocity
-           vectors by `rv_pqw` algorithm.
-        2. A rotation matrix is applied to position and velocity vectors to
-           get them expressed in terms of an IJK basis.
+    Classical orbital elements are converted into position and velocity
+    vectors by `rv_pqw` algorithm. A rotation matrix is applied to position
+    and velocity vectors to get them expressed in terms of an IJK basis.
 
         .. math::
             \begin{align}    
@@ -93,7 +92,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
                                    = \left [ \frac{IJK}{PQW} \right ]\vec{v}_{PQW}\\
             \end{align}
         
-        Previous rotations (3-1-3) can be expressed in terms of a single rotation matrix:
+    Previous rotations (3-1-3) can be expressed in terms of a single rotation matrix:
 
         .. math::
             \left [ \frac{IJK}{PQW} \right ]
