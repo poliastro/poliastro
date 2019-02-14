@@ -68,8 +68,8 @@ def rv_pqw(k, p, ecc, nu):
     Note
     ----
 
-    These formulas can be checked at Curtis 3rd. Edition, page 110. Also the example proposed is 2.11
-    of Curtis 3rd Edition book.
+    These formulas can be checked at Curtis 3rd. Edition, page 110. Also the
+    example proposed is 2.11 of Curtis 3rd Edition book.
     """
     r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
     v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T
@@ -78,7 +78,33 @@ def rv_pqw(k, p, ecc, nu):
 
 @jit
 def coe2rv(k, p, ecc, inc, raan, argp, nu):
-    """Converts from classical orbital elements to vectors.
+    r"""Converts from classical orbital to state vectors.
+
+        1. Classical orbital elements are converted into position and velocity
+           vectors by `rv_pqw` algorithm.
+        2. A rotation matrix is applied to position and velocity vectors to
+           get them expressed in terms of an IJK basis.
+
+        .. math::
+            \begin{align}    
+                \vec{r}_{IJK} &= [ROT3(-\Omega)][ROT1(-i)][ROT3(-\omega)]\vec{r}_{PQW}
+                                   = \left [ \frac{IJK}{PQW} \right ]\vec{r}_{PQW}\\
+                \vec{v}_{IJK} &= [ROT3(-\Omega)][ROT1(-i)][ROT3(-\omega)]\vec{v}_{PQW}
+                                   = \left [ \frac{IJK}{PQW} \right ]\vec{v}_{PQW}\\
+            \end{align}
+        
+        Previous rotations (3-1-3) can be expressed in terms of a single rotation matrix:
+
+        .. math::
+            \left [ \frac{IJK}{PQW} \right ]
+        
+        .. math::
+            \begin{bmatrix}
+            \cos(\Omega)\cos(\omega) - \sin(\Omega)\sin(\omega)\cos(i) & -\cos(\Omega)\sin(\omega) - \sin(\Omega)\cos(\omega)\cos(i) & \sin(\Omega)\sin(i)\\ 
+            \sin(\Omega)\cos(\omega) + \cos(\Omega)\sin(\omega)\cos(i) & -\sin(\Omega)\sin(\omega) + \cos(\Omega)\cos(\omega)\cos(i) & -\cos(\Omega)\sin(i)\\ 
+            \sin(\omega)\sin(i) & \cos(\omega)\sin(i) & \cos(i)
+            \end{bmatrix}
+
 
     Parameters
     ----------
@@ -96,7 +122,13 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
         Argument of perigee (rad).
     nu : float
         True anomaly (rad).
-
+    
+    Returns
+    -------
+    r_ijk: np.array
+        Position vector in basis ijk
+    v_ijk: np.array
+        Velocity vector in basis ijk
     """
     r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
 
