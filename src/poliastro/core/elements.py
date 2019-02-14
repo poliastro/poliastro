@@ -85,22 +85,22 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     and velocity vectors to get them expressed in terms of an IJK basis.
 
         .. math::
-            \begin{align}    
+            \begin{align}
                 \vec{r}_{IJK} &= [ROT3(-\Omega)][ROT1(-i)][ROT3(-\omega)]\vec{r}_{PQW}
                                    = \left [ \frac{IJK}{PQW} \right ]\vec{r}_{PQW}\\
                 \vec{v}_{IJK} &= [ROT3(-\Omega)][ROT1(-i)][ROT3(-\omega)]\vec{v}_{PQW}
                                    = \left [ \frac{IJK}{PQW} \right ]\vec{v}_{PQW}\\
             \end{align}
-        
+
     Previous rotations (3-1-3) can be expressed in terms of a single rotation matrix:
 
         .. math::
             \left [ \frac{IJK}{PQW} \right ]
-        
+
         .. math::
             \begin{bmatrix}
-            \cos(\Omega)\cos(\omega) - \sin(\Omega)\sin(\omega)\cos(i) & -\cos(\Omega)\sin(\omega) - \sin(\Omega)\cos(\omega)\cos(i) & \sin(\Omega)\sin(i)\\ 
-            \sin(\Omega)\cos(\omega) + \cos(\Omega)\sin(\omega)\cos(i) & -\sin(\Omega)\sin(\omega) + \cos(\Omega)\cos(\omega)\cos(i) & -\cos(\Omega)\sin(i)\\ 
+            \cos(\Omega)\cos(\omega) - \sin(\Omega)\sin(\omega)\cos(i) & -\cos(\Omega)\sin(\omega) - \sin(\Omega)\cos(\omega)\cos(i) & \sin(\Omega)\sin(i)\\
+            \sin(\Omega)\cos(\omega) + \cos(\Omega)\sin(\omega)\cos(i) & -\sin(\Omega)\sin(\omega) + \cos(\Omega)\cos(\omega)\cos(i) & -\cos(\Omega)\sin(i)\\
             \sin(\omega)\sin(i) & \cos(\omega)\sin(i) & \cos(i)
             \end{bmatrix}
 
@@ -121,7 +121,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
         Argument of perigee (rad).
     nu : float
         True anomaly (rad).
-    
+
     Returns
     -------
     r_ijk: np.array
@@ -354,16 +354,16 @@ def mee2coe(p, f, g, h, k, L):
 
     The definition of the modified equinoctial orbital elements is taken from
     [Walker, 1985].
-    
+
     .. math::
-        
+
         \begin{align}
-            p &= a(1 - e^{2})\\ 
+            p &= a(1 - e^{2})\\
             e &= \sqrt{f^{2} + g^{2}}\\
             i &= 2\arctan{(\sqrt{h^{2} + k^{2}})}\\
             raan &= atan2(k, h) \pmod{2\pi}\\
             argp &= (atan2(g, f) - raan) \pmod{2\pi}\\
-            nu &= (L - atan2(g, f)) \pmod{2\pi}\\   
+            nu &= (L - atan2(g, f)) \pmod{2\pi}\\
         \end{align}
 
     Parameters
@@ -380,7 +380,7 @@ def mee2coe(p, f, g, h, k, L):
         Equinoctial parameter k
     L: float
         Longitude
-    
+
     Returns
     -------
     p: float
