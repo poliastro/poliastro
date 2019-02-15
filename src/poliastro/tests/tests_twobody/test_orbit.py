@@ -47,7 +47,7 @@ from poliastro.frames import (
 from poliastro.twobody import Orbit
 from poliastro.twobody.orbit import OrbitSamplingWarning, TimeScaleWarning
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
-
+from poliastro.twobody.angles import M_to_nu
 
 @pytest.fixture()
 def hyperbolic():
@@ -709,6 +709,8 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 def test_from_sbdb():
 
     # Dictionary with structure: 'Obejct': [a, e, i, raan, argp, nu, epoch]
+    # Notice JPL provides Mean anomaly, a conversion is needed to obtain nu
+
     SBDB_DATA = {
         "Ceres": (
             2.769165146349478 * u.AU,
@@ -716,7 +718,8 @@ def test_from_sbdb():
             10.59406732590292 * u.deg,
             80.30553084093981 * u.deg,
             73.59769486239257 * u.deg,
-            77.37209773768207 * u.deg,
+            M_to_nu(77.37209773768207 * u.deg,
+                    .07600902762923671 * u.one),
         )
     }
 

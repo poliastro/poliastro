@@ -19,7 +19,7 @@ from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
-from poliastro.twobody.angles import E_to_nu, nu_to_M
+from poliastro.twobody.angles import E_to_nu, nu_to_M, M_to_nu
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import hyp_nu_limit, norm
 
@@ -471,7 +471,11 @@ class Orbit(object):
         inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
         raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
         argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
-        nu = obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg
+        
+        # Since JPL provides Mean Anomaly (M) we need to make
+        # the conversion to the true anomaly (\nu)
+        nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
+        
         epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
         ss = cls.from_classical(
