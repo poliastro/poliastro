@@ -26,7 +26,8 @@ from poliastro.util import hyp_nu_limit, norm
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
-# String representation for orbits around bodies without predefined reference frame
+# String representation for orbits around bodies without predefined
+# reference frame
 ORBIT_NO_FRAME_FORMAT = (
     "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 )
@@ -269,7 +270,8 @@ class Orbit(object):
         # Reshape coordinate to 0 dimension if it is not already dimensionless.
         coord = coord.reshape(())
 
-        # Get an inertial reference frame parallel to ICRS and centered at attractor
+        # Get an inertial reference frame parallel to ICRS and centered at
+        # attractor
         inertial_frame_at_body_centre = get_frame(attractor, plane, coord.obstime)
 
         if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
@@ -398,7 +400,8 @@ class Orbit(object):
             )
 
         else:
-            # TODO: The attractor is not really the Sun, but the Solar System Barycenter
+            # TODO: The attractor is not really the Sun, but the Solar System
+            # Barycenter
             ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
             ss._frame = ICRS()  # Hack!
 
@@ -471,11 +474,11 @@ class Orbit(object):
         inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
         raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
         argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
-        
+
         # Since JPL provides Mean Anomaly (M) we need to make
         # the conversion to the true anomaly (\nu)
         nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
-        
+
         epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
         ss = cls.from_classical(
@@ -564,7 +567,8 @@ class Orbit(object):
         if angular_velocity is None:
             angular_velocity = 2 * np.pi / period
 
-        # Find out geostationary radius using r = cube_root(GM/(angular velocity)^2)
+        # Find out geostationary radius using r = cube_root(GM/(angular
+        # velocity)^2)
         with u.set_enabled_equivalencies(u.dimensionless_angles()):
             geo_radius = np.cbrt(attractor.k / np.square(angular_velocity.to(1 / u.s)))
 
@@ -643,7 +647,8 @@ class Orbit(object):
         cartesian = CartesianRepresentation(
             *self.r, differentials=CartesianDifferential(*self.v)
         )
-        # See the propagate function for reasoning about the usage of a protected method
+        # See the propagate function for reasoning about the usage of a
+        # protected method
         coords = self.frame._replicate(cartesian, representation_type="cartesian")
 
         return coords.represent_as(representation)
@@ -763,7 +768,8 @@ class Orbit(object):
 
         # Even after indexing the result of propagate,
         # the frame obstime might have an array of times
-        # See the propagate function for reasoning about the usage of a protected method
+        # See the propagate function for reasoning about the usage of a
+        # protected method
         coords = coords._replicate(
             coords.data, representation_type="cartesian", obstime=coords.obstime[0]
         )

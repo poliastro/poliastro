@@ -49,6 +49,7 @@ from poliastro.twobody.orbit import OrbitSamplingWarning, TimeScaleWarning
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.twobody.angles import M_to_nu
 
+
 @pytest.fixture()
 def hyperbolic():
     r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
@@ -384,7 +385,8 @@ def test_orbit_represent_as_produces_correct_data():
 
     result = ss.represent_as(CartesianRepresentation)
 
-    # We can't directly compare the objects, see https://github.com/astropy/astropy/issues/7793
+    # We can't directly compare the objects, see
+    # https://github.com/astropy/astropy/issues/7793
     assert (result.xyz == expected_result.xyz).all()
     assert (
         result.differentials["s"].d_xyz == expected_result.differentials["s"].d_xyz
@@ -612,7 +614,8 @@ def test_from_coord_fails_if_no_time_differential():
     pos = [30000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos)
 
-    # Method fails if coordinate instance doesn't contain a differential with respect to time
+    # Method fails if coordinate instance doesn't contain a differential with
+    # respect to time
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_coords(Earth, SkyCoord(cartrep))
     assert (
@@ -718,8 +721,7 @@ def test_from_sbdb():
             10.59406732590292 * u.deg,
             80.30553084093981 * u.deg,
             73.59769486239257 * u.deg,
-            M_to_nu(77.37209773768207 * u.deg,
-                    .07600902762923671 * u.one),
+            M_to_nu(77.37209773768207 * u.deg, 0.07600902762923671 * u.one),
         )
     }
 
