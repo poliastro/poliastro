@@ -44,10 +44,9 @@ from poliastro.frames import (
     VenusICRS,
     get_frame,
 )
-from poliastro.twobody import Orbit
-from poliastro.twobody.orbit import OrbitSamplingWarning, TimeScaleWarning
-from poliastro.twobody.propagation import cowell, kepler, mean_motion
 from poliastro.twobody.angles import M_to_nu
+from poliastro.twobody.orbit import Orbit, OrbitSamplingWarning, TimeScaleWarning
+from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 
 @pytest.fixture()
