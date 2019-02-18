@@ -44,13 +44,13 @@
 .. |mailing| image:: https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square
    :target: https://groups.io/g/poliastro-dev
 
-.. |gitter| image:: https://badges.gitter.im/poliastro/poliastro.svg
-   :alt: Join the chat at https://gitter.im/poliastro/poliastro
-   :target: https://gitter.im/poliastro/poliastro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+.. |matrix| image:: https://img.shields.io/matrix/poliastro:matrix.org.svg?style=flat
+   :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
+   :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 
 |circleci| |travisci| |appveyor| |codecov| |codeclimate|
 
-|docs| |license| |doi| |astropy| |mailing| |gitter|
+|docs| |license| |doi| |astropy| |mailing| |matrix|
 
 poliastro is an open source pure Python package dedicated to problems arising in Astrodynamics and
 Orbital Mechanics, such as orbit propagation, solution of the Lambert's
