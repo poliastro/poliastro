@@ -44,8 +44,8 @@ from poliastro.frames import (
     VenusICRS,
     get_frame,
 )
-from poliastro.twobody import Orbit
-from poliastro.twobody.orbit import OrbitSamplingWarning, TimeScaleWarning
+from poliastro.twobody.angles import M_to_nu
+from poliastro.twobody.orbit import Orbit, OrbitSamplingWarning, TimeScaleWarning
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 
@@ -384,7 +384,8 @@ def test_orbit_represent_as_produces_correct_data():
 
     result = ss.represent_as(CartesianRepresentation)
 
-    # We can't directly compare the objects, see https://github.com/astropy/astropy/issues/7793
+    # We can't directly compare the objects, see
+    # https://github.com/astropy/astropy/issues/7793
     assert (result.xyz == expected_result.xyz).all()
     assert (
         result.differentials["s"].d_xyz == expected_result.differentials["s"].d_xyz
@@ -612,7 +613,8 @@ def test_from_coord_fails_if_no_time_differential():
     pos = [30000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos)
 
-    # Method fails if coordinate instance doesn't contain a differential with respect to time
+    # Method fails if coordinate instance doesn't contain a differential with
+    # respect to time
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_coords(Earth, SkyCoord(cartrep))
     assert (
@@ -704,3 +706,27 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 
     assert_quantity_allclose(ss.r, pos * u.km, rtol=1e-5)
     assert_quantity_allclose(ss.v, vel * u.km / u.s, rtol=1e-5)
+
+
+def test_from_sbdb():
+
+    # Dictionary with structure: 'Object': [a, e, i, raan, argp, nu, epoch]
+    # Notice JPL provides Mean anomaly, a conversion is needed to obtain nu
+
+    SBDB_DATA = {
+        "Ceres": (
+            2.769165146349478 * u.AU,
+            0.07600902762923671 * u.one,
+            10.59406732590292 * u.deg,
+            80.30553084093981 * u.deg,
+            73.59769486239257 * u.deg,
+            M_to_nu(77.37209773768207 * u.deg, 0.07600902762923671 * u.one),
+        )
+    }
+
+    for target_name in SBDB_DATA.keys():
+
+        ss_target = Orbit.from_sbdb(target_name)
+        ss_classical = ss_target.classical()
+
+        assert ss_classical == SBDB_DATA[target_name]
