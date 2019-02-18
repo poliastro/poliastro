@@ -62,7 +62,7 @@ It is released under the MIT license.
 
     from poliastro.examples import molniya
     from poliastro.plotting import plot
-    
+
     plot(molniya)
 
 .. image:: https://github.com/poliastro/poliastro/raw/master/docs/source/examples/molniya.png
@@ -147,7 +147,7 @@ If installed correctly, the tests can be run using pytest::
   collected 747 items
   [...]
   ========= 738 passed, 3 skipped, 5 xfailed, 1 xpassed, 13 warnings in 392.12 seconds ==========
-  $ 
+  $
 
 Problems
 ========
