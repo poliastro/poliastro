@@ -44,7 +44,7 @@
 .. |mailing| image:: https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square
    :target: https://groups.io/g/poliastro-dev
 
-.. |matrix| image:: https://img.shields.io/matrix/poliastro:matrix.org.svg?style=flat
+.. |matrix| image:: https://img.shields.io/matrix/poliastro:matrix.org.svg?style=flat-square
    :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
    :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 
