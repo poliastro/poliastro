@@ -711,7 +711,7 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 
 def test_from_sbdb():
 
-    # Dictionary with structure: 'Obejct': [a, e, i, raan, argp, nu, epoch]
+    # Dictionary with structure: 'Object': [a, e, i, raan, argp, nu, epoch]
     # Notice JPL provides Mean anomaly, a conversion is needed to obtain nu
 
     SBDB_DATA = {
