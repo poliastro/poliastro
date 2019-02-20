@@ -23,20 +23,16 @@ class Maneuver(object):
 
     """
 
-    def __init__(self, *impulses):
+    def __init__(self, *args):
         r"""Constructor.
 
         Parameters
         ----------
         impulses : list
             List of pairs (delta_time, delta_velocity)
-
-        Notes
-        -----
-        TODO: Fix docstring, \*args convention
-
         """
-        self.impulses = impulses
+        
+        self.impulses = args
         # HACK: Change API or validation code
         _dts, _dvs = zip(*impulses)
         self._dts, self._dvs = self._initialize(
@@ -59,30 +55,83 @@ class Maneuver(object):
     @classmethod
     def impulse(cls, dv):
         """Single impulse at current time.
-
+        
+        Parameters
+        ----------
+        dv: np.array
+            Velocity components of the impulse.
         """
+
         return cls((0 * u.s, dv))
 
     @classmethod
     def hohmann(cls, orbit_i, r_f):
-        """Compute a Hohmann transfer between two circular orbits.
+        r"""Compute a Hohmann transfer between two circular orbits.
 
+        By defining the relationship between orbit radius:
+
+        .. math::
+            R = \frac{r_{f}}{r_{i}}
+
+        The Hohmann maneuver velocities can be expressed as:
+        
+        .. math::
+            \begin{align}
+                \Delta v_{a} &= v_{i}\left ( \sqrt{\frac{2R}{1+R}} - 1\right )\\
+                \Delta v_{b} &= \frac{v_{i}}{\sqrt{R}}\left (\sqrt{\frac{2R}{1+R}} - 1 \right )\\
+            \end{align}
+        
+        The time that takes to compelte the maneuver can be computed as:
+
+        .. math::
+            \tau_{trans} = \pi \sqrt{\frac{(r{i} + r{f})^{3}}{8\mu}}
+        
+        Parameters
+        ----------
+        orbit_i: poliastro.twobody.orbit.Orbit
+            Initial orbit
+        r_f: astropy.unit.Quantity
+            Final altitude of the orbit
         """
-        # TODO: Check if circular?
-        r_i = orbit_i.a
-        v_i = orbit_i.v
-        k = orbit_i.attractor.k
-        R = r_f / r_i
-        dv_a = ((np.sqrt(2 * R / (1 + R)) - 1) * v_i).decompose()
-        dv_b = (-(1 - np.sqrt(2 / (1 + R))) / np.sqrt(R) * v_i).decompose()
-        t_trans = (np.pi * np.sqrt((r_i * (1 + R) / 2) ** 3 / k)).decompose()
-        return cls((0 * u.s, dv_a), (t_trans, dv_b))
+        
+        if orbit_i.ecc == 0:
+
+            r_i = orbit_i.a
+            v_i = orbit_i.v
+            k = orbit_i.attractor.k
+            R = r_f / r_i
+            dv_a = ((np.sqrt(2 * R / (1 + R)) - 1) * v_i).decompose()
+            dv_b = (-(1 - np.sqrt(2 / (1 + R))) / np.sqrt(R) * v_i).decompose()
+            t_trans = (np.pi * np.sqrt((r_i * (1 + R) / 2) ** 3 / k)).decompose()
+            
+            return cls((0 * u.s, dv_a), (t_trans, dv_b))
+    
+        else:
+            raise ValueError("Hohmann can only be applied to circular orbits (ecc == 0)")
 
     @classmethod
     def bielliptic(cls, orbit_i, r_b, r_f):
-        """Compute a bielliptic transfer between two circular orbits.
+        r"""Compute a bielliptic transfer between two circular orbits.
+        
+        .. math::
+            \begin{align}
+                \Delta v_{a} &= v_{i}\left ( \sqrt{\frac{2R{s}}{1+R{s}}} - 1\right )\\
+                \Delta v_{b} &= -v_{i}\sqrt{\frac{2}{R_{s}}}\left ( \sqrt{\frac{1}{1 + \frac{R_{s}}{R}}} - \sqrt{\frac{1}{1+R_{s}}} \right )\\
+                \Delta v_{c} &= \frac{v_{i}}{\sqrt{R}}\left ( 1 - \sqrt{\frac{2R_{s}}{R+R_{s}}} \right )\\
+            \end{align}
+        
+        The time of flight for this maneuver is the addition of the time needed for both transition orbits, following the same formula as
+        Hohmann.
 
-        """
+        Parameters
+        ----------
+        orbit_i: poliastro.twobody.orbit.Orbit
+            Initial orbit
+        r_b: astropy.unit.Quantity
+            Altitude of the intermediate orbit
+        r_f: astropy.unit.Quantity
+            Final altitude of the orbit
+        """ 
         r_i = orbit_i.a
         v_i = orbit_i.v
         k = orbit_i.attractor.k
