@@ -31,10 +31,10 @@ class Maneuver(object):
         impulses : list
             List of pairs (delta_time, delta_velocity)
         """
-        
+
         self.impulses = args
         # HACK: Change API or validation code
-        _dts, _dvs = zip(*impulses)
+        _dts, _dvs = zip(*args)
         self._dts, self._dvs = self._initialize(
             [(_dt * u.one).value for _dt in _dts] * (_dts[0] * u.one).unit,
             [(_dv * u.one).value for _dv in _dvs] * (_dvs[0] * u.one).unit,
@@ -55,7 +55,7 @@ class Maneuver(object):
     @classmethod
     def impulse(cls, dv):
         """Single impulse at current time.
-        
+
         Parameters
         ----------
         dv: np.array
@@ -74,18 +74,18 @@ class Maneuver(object):
             R = \frac{r_{f}}{r_{i}}
 
         The Hohmann maneuver velocities can be expressed as:
-        
+
         .. math::
             \begin{align}
                 \Delta v_{a} &= v_{i}\left ( \sqrt{\frac{2R}{1+R}} - 1\right )\\
-                \Delta v_{b} &= \frac{v_{i}}{\sqrt{R}}\left (\sqrt{\frac{2R}{1+R}} - 1 \right )\\
+                \Delta v_{b} &= \frac{v_{i}}{\sqrt{R}}\left (\sqrt{\frac{2}{1+R}} - 1 \right )\\
             \end{align}
-        
+
         The time that takes to compelte the maneuver can be computed as:
 
         .. math::
             \tau_{trans} = \pi \sqrt{\frac{(r{i} + r{f})^{3}}{8\mu}}
-        
+
         Parameters
         ----------
         orbit_i: poliastro.twobody.orbit.Orbit
@@ -93,7 +93,7 @@ class Maneuver(object):
         r_f: astropy.unit.Quantity
             Final altitude of the orbit
         """
-        
+
         if orbit_i.ecc == 0:
 
             r_i = orbit_i.a
@@ -103,25 +103,45 @@ class Maneuver(object):
             dv_a = ((np.sqrt(2 * R / (1 + R)) - 1) * v_i).decompose()
             dv_b = (-(1 - np.sqrt(2 / (1 + R))) / np.sqrt(R) * v_i).decompose()
             t_trans = (np.pi * np.sqrt((r_i * (1 + R) / 2) ** 3 / k)).decompose()
-            
+
             return cls((0 * u.s, dv_a), (t_trans, dv_b))
-    
+
         else:
-            raise ValueError("Hohmann can only be applied to circular orbits (ecc == 0)")
+            raise ValueError(
+                "Hohmann can only be applied to circular orbits (ecc == 0)"
+            )
 
     @classmethod
     def bielliptic(cls, orbit_i, r_b, r_f):
         r"""Compute a bielliptic transfer between two circular orbits.
         
+        The bielliptic maneuver employs two Hohmann transfers, therefore two
+        intermediate orbits are stablished. We define the different radius
+        relationships as follows:
+
+        .. math::
+            \begin{align}
+                R &= \frac{r_{f}}{r_{i}}\\
+                R_{s} &= \frac{r_{b}}{r_{i}}\\
+            \end{align}
+
+        The increments in the velocity are:
+
         .. math::
             \begin{align}
                 \Delta v_{a} &= v_{i}\left ( \sqrt{\frac{2R{s}}{1+R{s}}} - 1\right )\\
-                \Delta v_{b} &= -v_{i}\sqrt{\frac{2}{R_{s}}}\left ( \sqrt{\frac{1}{1 + \frac{R_{s}}{R}}} - \sqrt{\frac{1}{1+R_{s}}} \right )\\
+                \Delta v_{b} &= v_{i}\sqrt{\frac{2}{R_{s}}}\left (\sqrt{\frac{1}{1+R_{s}}} -  \sqrt{\frac{1}{1 + \frac{R_{s}}{R}}} \right )\\
                 \Delta v_{c} &= \frac{v_{i}}{\sqrt{R}}\left ( 1 - \sqrt{\frac{2R_{s}}{R+R_{s}}} \right )\\
             \end{align}
-        
+
         The time of flight for this maneuver is the addition of the time needed for both transition orbits, following the same formula as
-        Hohmann.
+        Hohmann:
+
+        .. math::
+            \begin{align}
+                \tau_{trans_{a}} &= \pi \sqrt{\frac{(r_{i}(1 + R_{s}))^{3}}{8\mu}}\\
+                \tau_{trans_{b}} &= \pi \sqrt{\frac{(r_{i}(R + R_{s}))^{3}}{8\mu}}\\
+            \end{align}
 
         Parameters
         ----------
@@ -131,17 +151,17 @@ class Maneuver(object):
             Altitude of the intermediate orbit
         r_f: astropy.unit.Quantity
             Final altitude of the orbit
-        """ 
+        """
         r_i = orbit_i.a
         v_i = orbit_i.v
         k = orbit_i.attractor.k
         R = r_f / r_i
         Rs = r_b / r_i
         dv_a = ((np.sqrt(2 * Rs / (1 + Rs)) - 1) * v_i).decompose()
-        dv_b = (
-            -np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) - np.sqrt(1 / (1 + Rs))) * v_i
-        ).decompose()
-        dv_c = (-(np.sqrt(2 * Rs / (R + Rs)) - 1) / np.sqrt(R) * v_i).decompose()
+        dv_b = (-np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) -
+                                    np.sqrt(1 / (1 + Rs))) * v_i ).decompose()
+        dv_c = (-(np.sqrt(2 * Rs / (R + Rs)) - 1)
+                / np.sqrt(R) * v_i).decompose()
         t_trans1 = (np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)).decompose()
         t_trans2 = (np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)).decompose()
         return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
