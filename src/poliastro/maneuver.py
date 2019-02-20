@@ -114,7 +114,7 @@ class Maneuver(object):
     @classmethod
     def bielliptic(cls, orbit_i, r_b, r_f):
         r"""Compute a bielliptic transfer between two circular orbits.
-        
+
         The bielliptic maneuver employs two Hohmann transfers, therefore two
         intermediate orbits are stablished. We define the different radius
         relationships as follows:
@@ -158,10 +158,10 @@ class Maneuver(object):
         R = r_f / r_i
         Rs = r_b / r_i
         dv_a = ((np.sqrt(2 * Rs / (1 + Rs)) - 1) * v_i).decompose()
-        dv_b = (-np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) -
-                                    np.sqrt(1 / (1 + Rs))) * v_i ).decompose()
-        dv_c = (-(np.sqrt(2 * Rs / (R + Rs)) - 1)
-                / np.sqrt(R) * v_i).decompose()
+        dv_b = (
+            -np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) - np.sqrt(1 / (1 + Rs))) * v_i
+        ).decompose()
+        dv_c = (-(np.sqrt(2 * Rs / (R + Rs)) - 1) / np.sqrt(R) * v_i).decompose()
         t_trans1 = (np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)).decompose()
         t_trans2 = (np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)).decompose()
         return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
