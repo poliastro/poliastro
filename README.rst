@@ -61,9 +61,8 @@ It is released under the MIT license.
 .. code-block:: python
 
     from poliastro.examples import molniya
-    from poliastro.plotting import plot
 
-    plot(molniya)
+    molniya.plot()
 
 .. image:: https://github.com/poliastro/poliastro/raw/master/docs/source/examples/molniya.png
    :align: center
