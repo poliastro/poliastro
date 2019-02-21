@@ -45,19 +45,20 @@ from poliastro.frames import (
     get_frame,
 )
 from poliastro.twobody import Orbit
-from poliastro.twobody.orbit import TimeScaleWarning
+from poliastro.twobody.orbit import OrbitSamplingWarning, TimeScaleWarning
 from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 
 @pytest.fixture()
-def hyperbolic_orbit():
+def hyperbolic():
     r = [1.197659243752796e09, -4.443716685978071e09, -1.747610548576734e09] * u.km
     v = (
         [5.540549267188614e00, -1.251544669134140e01, -4.848892572767733e00]
         * u.km
         / u.s
     )
-    return r, v
+    epoch = Time("2015-07-14 07:59", scale="tdb")
+    return Orbit.from_vectors(Sun, r, v, epoch)
 
 
 def test_default_time_for_new_state():
@@ -261,12 +262,8 @@ def test_sample_big_orbits(method):
     assert len(positions) == 15
 
 
-def test_hyperbolic_nu_value_check(hyperbolic_orbit):
-    r, v = hyperbolic_orbit
-
-    ss = Orbit.from_vectors(Sun, r, v, Time("2015-07-14 07:59", scale="tdb"))
-
-    positions = ss.sample(100)
+def test_hyperbolic_nu_value_check(hyperbolic):
+    positions = hyperbolic.sample(100)
 
     assert isinstance(positions, HCRS)
     assert len(positions) == 100
@@ -285,18 +282,33 @@ def test_hyperbolic_modulus_wrapped_nu():
     assert_quantity_allclose(positions[0].data.xyz, ss.r)
 
 
-def test_orbit_is_pickable(hyperbolic_orbit):
-    r, v = hyperbolic_orbit
-    epoch = Time("2015-07-14 07:59", scale="tdb")
+@pytest.mark.parametrize("min_anomaly", [-30 * u.deg, -10 * u.deg])
+@pytest.mark.parametrize("max_anomaly", [10 * u.deg, 30 * u.deg])
+def test_sample_hyperbolic_limits(hyperbolic, min_anomaly, max_anomaly):
+    num_points = 50
 
-    ss = Orbit.from_vectors(Sun, r, v, epoch)
+    coords = hyperbolic.sample(
+        num_points, min_anomaly=min_anomaly, max_anomaly=max_anomaly
+    )
 
-    pickled = pickle.dumps(ss)
+    assert len(coords) == num_points
+
+
+def test_sample_hyperbolic_outside_limits(hyperbolic):
+    with pytest.warns(OrbitSamplingWarning, match="anomaly outside range, clipping"):
+        hyperbolic.sample(3, min_anomaly=-np.pi * u.rad)
+
+    with pytest.warns(OrbitSamplingWarning, match="anomaly outside range, clipping"):
+        hyperbolic.sample(3, max_anomaly=np.pi * u.rad)
+
+
+def test_orbit_is_pickable(hyperbolic):
+    pickled = pickle.dumps(hyperbolic)
     ss_result = pickle.loads(pickled)
 
-    assert_array_equal(ss.r, ss_result.r)
-    assert_array_equal(ss.v, ss_result.v)
-    assert ss_result.epoch == ss.epoch
+    assert_array_equal(hyperbolic.r, ss_result.r)
+    assert_array_equal(hyperbolic.v, ss_result.v)
+    assert ss_result.epoch == hyperbolic.epoch
 
 
 @pytest.mark.parametrize(
@@ -305,9 +317,7 @@ def test_orbit_is_pickable(hyperbolic_orbit):
         (Sun, HCRS),
         (Mercury, MercuryICRS),
         (Venus, VenusICRS),
-        pytest.param(
-            Earth, GCRS, marks=pytest.mark.xfail
-        ),  # See https://github.com/astropy/astropy/issues/7793
+        (Earth, GCRS),
         (Mars, MarsICRS),
         (Jupiter, JupiterICRS),
         (Saturn, SaturnICRS),

@@ -31,10 +31,10 @@ setup(
     python_requires=">=3.5",
     install_requires=[
         "numpy",
-        "astropy>=3.0,<4.*",
-        "matplotlib<3.0.1",
+        "astropy>=3.1,<4.*",
+        "matplotlib>=2.0,!=3.0.1",
         "jplephem",
-        "scipy",
+        "scipy>=1.0",
         "beautifulsoup4>=4.5.3",
         "numba>=0.39 ; implementation_name=='cpython'",
         "requests",
@@ -43,6 +43,7 @@ setup(
         "astroquery>=0.3.8",
     ],
     extras_require={
+        "jupyter": ["notebook", "ipywidgets>=7.0"],
         "dev": [
             "black ; python_version>='3.6'",
             "coverage",
@@ -56,8 +57,8 @@ setup(
             "ipython>=5.0",
             "jupyter-client",
             "ipykernel",
-            "ipywidgets",
-        ]
+            "ipywidgets>=7.0",
+        ],
     },
     packages=find_packages("src"),
     package_dir={"": "src"},
