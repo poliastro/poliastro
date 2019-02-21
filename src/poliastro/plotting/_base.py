@@ -111,7 +111,8 @@ class BaseOrbitPlotter:
                 Trajectory(trajectory, None, label, trace.line.color)
             )
 
-        return self.show()
+        if not self._figure._in_batch_mode:
+            return self.show()
 
     def _plot_trajectory(self, trajectory, label, color, dashed):
         raise NotImplementedError
@@ -152,8 +153,8 @@ class BaseOrbitPlotter:
         )  # Arbitrary thresholds
         self._plot_point(radius, color, label, center=orbit.r)
 
-        self._figure.layout.update(self._layout)
-        return self._figure
+        if not self._figure._in_batch_mode:
+            return self.show()
 
     def _prepare_plot(self):
         if self._attractor is not None:
