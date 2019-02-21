@@ -1,8 +1,8 @@
 What's new
 ==========
 
-poliastro 0.12 - Unreleased
----------------------------
+poliastro 0.12.0 - 2019-02-21
+-----------------------------
 
 This major release brings lots of new features, several breaking changes
 that improve the overall consistency of the library, and a stronger bet
@@ -91,6 +91,9 @@ Bugs fixed
 * `Issue #483`_: :py:class:`~poliastro.plotting.OrbitPlotter2D`OrbitPlotter2D`
   results were not correct
 * `Issue #518`_: Trajectories were not redrawn when the frame was changed
+* `Issue #548`_: Improve installation instructions to include interactive and test
+  dependencies
+* `Issue #573`_: Fix outdated matplotlib version limits
 
 .. _`Issue #435`: https://github.com/poliastro/poliastro/issues/435
 .. _`Issue #469`: https://github.com/poliastro/poliastro/issues/469
@@ -99,6 +102,8 @@ Bugs fixed
 .. _`Issue #480`: https://github.com/poliastro/poliastro/issues/480
 .. _`Issue #483`: https://github.com/poliastro/poliastro/issues/483
 .. _`Issue #518`: https://github.com/poliastro/poliastro/issues/518
+.. _`Issue #548`: https://github.com/poliastro/poliastro/issues/548
+.. _`Issue #573`: https://github.com/poliastro/poliastro/issues/573
 
 Backwards incompatible changes
 ..............................
