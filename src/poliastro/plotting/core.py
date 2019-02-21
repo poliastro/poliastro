@@ -87,7 +87,8 @@ class OrbitPlotter3D(BaseOrbitPlotter):
             }
         )
 
-        return self.show()
+        if not self._figure._in_batch_mode:
+            return self.show()
 
 
 class OrbitPlotter2D(BaseOrbitPlotter):
