@@ -4,16 +4,15 @@ Getting started
 Requirements
 ------------
 
-poliastro requires the following Python packages:
+poliastro requires a number of Python packages, notably:
 
-* NumPy, for basic numerical routines
 * Astropy, for physical units and time handling
-* numba (optional), for accelerating the code
+* NumPy, for basic numerical routines
 * jplephem, for the planetary ephemerides using SPICE kernels
-* Plotly, for interactive orbit plotting
 * matplotlib, for static orbit plotting
+* numba (when using CPython), for accelerating the code
+* Plotly, for interactive orbit plotting
 * SciPy, for root finding and numerical propagation
-* pytest, for running the tests from the package
 
 poliastro is usually tested on Linux, Windows and OS X on Python
 3.5, 3.6 and 3.7 against latest NumPy.
@@ -95,7 +94,9 @@ If you face any further issues, you can refer to the `installation guide by Plot
 Testing
 -------
 
-If installed correctly, the tests can be run using pytest::
+If you want to test poliastro after installing it, you should also install
+pytest with either ``conda install pytest`` or ``pip install pytest``. Then
+you can run the tests to verify everything is working::
 
   $ python -c "import poliastro.testing; poliastro.testing.test()"
   ===================================== test session starts =====================================
@@ -106,6 +107,6 @@ If installed correctly, the tests can be run using pytest::
   ========= 738 passed, 3 skipped, 5 xfailed, 1 xpassed, 13 warnings in 392.12 seconds ==========
   $
 
-If for some reason any test fails, please report it in the `issue tracker`_.
+If for some reason any test fails, please report it with details of your environment in the `issue tracker`_.
 
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
