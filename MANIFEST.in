@@ -1,5 +1,3 @@
-graft docs
-
 include COPYING
 include AUTHORS
 
