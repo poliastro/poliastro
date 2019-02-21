@@ -12,7 +12,7 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez |orcid|
-:Version: 0.12b1
+:Version: 0.12.0
 
 .. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/0.12.x.svg?style=flat-square&logo=circleci
    :target: https://circleci.com/gh/poliastro/poliastro
@@ -30,7 +30,7 @@
    :target: https://codeclimate.com/github/poliastro/poliastro/maintainability
 
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
-   :target: https://docs.poliastro.space/en/v0.12b1/?badge=v0.12b1
+   :target: https://docs.poliastro.space/en/v0.12.0/?badge=v0.12.0
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/0.12.x/COPYING
@@ -131,7 +131,7 @@ install poliastro using `conda <http://conda.io>`_::
 
 Please check out the `documentation for alternative installation methods`_.
 
-.. _`documentation for alternative installation methods`: https://docs.poliastro.space/en/v0.12b1/getting_started.html#alternative-installation-methods
+.. _`documentation for alternative installation methods`: https://docs.poliastro.space/en/v0.12.0/getting_started.html#alternative-installation-methods
 
 Testing
 =======
@@ -225,7 +225,7 @@ poliastro is focused on interplanetary applications. This has two consequences:
 * It leaves out certain features that would be too Earth-specific, such as
   TLE reading, SGP4 propagation, groundtrack plotting and others.
 
-.. _`Related software`: https://docs.poliastro.space/en/v0.12b1/about.html#related-software
+.. _`Related software`: https://docs.poliastro.space/en/v0.12.0/about.html#related-software
 
 What's the future of the project?
 ---------------------------------
