@@ -107,12 +107,12 @@ class Orbit(object):
 
     @property
     def a(self):
-        """Semilatus rectum. """
+        """Semimajor axis. """
         return self.p / (1 - self.ecc ** 2)
 
     @property
     def p(self):
-        """Semimajor axis. """
+        """Semilatus rectum. """        
         return self._state.to_classical().p
 
     @property
