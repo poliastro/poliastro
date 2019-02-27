@@ -112,7 +112,7 @@ class Orbit(object):
 
     @property
     def p(self):
-        """Semilatus rectum. """        
+        """Semilatus rectum. """
         return self._state.to_classical().p
 
     @property
