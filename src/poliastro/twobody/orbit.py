@@ -10,9 +10,9 @@ from astropy.coordinates import (
     CartesianRepresentation,
     get_body_barycentric_posvel,
 )
-
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
+
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast

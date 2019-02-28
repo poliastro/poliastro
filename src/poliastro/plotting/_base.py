@@ -4,12 +4,12 @@ from itertools import cycle
 from typing import List
 
 import numpy as np
+import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-
-import plotly.colors
 from plotly.graph_objs import FigureWidget
 from plotly.offline import plot as export
+
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
 
