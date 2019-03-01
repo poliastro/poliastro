@@ -1,4 +1,3 @@
 # Used for beta.mybinder.org and Read the Docs
 https://github.com/poliastro/poliastro/archive/master.zip
 # Fix Plotly graphs, see https://github.com/rtfd/readthedocs.org/issues/4367
-https://github.com/rtfd/sphinx_rtd_theme/archive/a42c4d74fec660835393a4c9b1e7cb9e654ccc90.zip
