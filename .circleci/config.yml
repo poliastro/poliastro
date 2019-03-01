@@ -36,7 +36,6 @@ jobs:
             pip install numpy --quiet
             pip install . --quiet
             pip install .[dev] --quiet
-            pip install https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
 
       - run:
           name: run tests

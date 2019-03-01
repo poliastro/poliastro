@@ -61,7 +61,7 @@ setup(
             "pytest-cov<2.6.0",
             "pytest>=3.2",
             "sphinx",
-            # "sphinx_rtd_theme",  # Use https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
+            "sphinx_rtd_theme>=0.4.3",
         ],
     },
     packages=find_packages("src"),
