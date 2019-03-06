@@ -462,10 +462,10 @@ def test_plane_is_set_in_horizons():
         ),
     ],
 )
-def test_geostationary_creation_from_angular_velocity(
+def test_geosynchronous_creation_from_angular_velocity(
     attractor, angular_velocity, expected_a, expected_period
 ):
-    ss = Orbit.geostationary(attractor=attractor, angular_velocity=angular_velocity)
+    ss = Orbit.geosynchronous(attractor=attractor, angular_velocity=angular_velocity)
     assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
     assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-7)
 
@@ -477,8 +477,8 @@ def test_geostationary_creation_from_angular_velocity(
         (Mars, 24.6228 * u.hour, 20427595 * u.m),
     ],
 )
-def test_geostationary_creation_from_period(attractor, period, expected_a):
-    ss = Orbit.geostationary(attractor=attractor, period=period)
+def test_geosynchronous_creation_from_period(attractor, period, expected_a):
+    ss = Orbit.geosynchronous(attractor=attractor, period=period)
     assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
     assert_quantity_allclose(ss.period, period, rtol=1.0e-7)
 
@@ -490,10 +490,10 @@ def test_geostationary_creation_from_period(attractor, period, expected_a):
         (Mars, 24.6228 * u.hour, 1000000 * u.km, 20427595 * u.m),
     ],
 )
-def test_geostationary_creation_with_Hill_radius(
+def test_geosynchronous_creation_with_Hill_radius(
     attractor, period, hill_radius, expected_a
 ):
-    ss = Orbit.geostationary(
+    ss = Orbit.geosynchronous(
         attractor=attractor, period=period, hill_radius=hill_radius
     )
     assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
@@ -501,9 +501,9 @@ def test_geostationary_creation_with_Hill_radius(
 
 
 @pytest.mark.parametrize("attractor", [Earth, Mars])
-def test_geostationary_input(attractor):
+def test_geosynchronous_input(attractor):
     with pytest.raises(ValueError) as excinfo:
-        Orbit.geostationary(attractor=attractor)
+        Orbit.geosynchronous(attractor=attractor)
 
     assert (
         "ValueError: At least one among angular_velocity or period must be passed"
@@ -514,12 +514,12 @@ def test_geostationary_input(attractor):
 @pytest.mark.parametrize(
     "attractor,period,hill_radius", [(Venus, 243.025 * u.day, 1000000 * u.km)]
 )
-def test_geostationary_non_existence_condition(attractor, period, hill_radius):
+def test_geosynchronous_non_existence_condition(attractor, period, hill_radius):
     with pytest.raises(ValueError) as excinfo:
-        Orbit.geostationary(attractor=attractor, period=period, hill_radius=hill_radius)
+        Orbit.geosynchronous(attractor=attractor, period=period, hill_radius=hill_radius)
 
     assert (
-        "Geostationary orbit for the given parameters doesn't exist"
+        "geosynchronous orbit for the given parameters doesn't exist"
         in excinfo.exconly()
     )
 
