@@ -536,9 +536,16 @@ class Orbit(object):
         )
 
     @classmethod
-    @u.quantity_input(angular_velocity=u.rad / u.s, period=u.s, inclination=u.rad, hill_radius=u.m)
+    @u.quantity_input(
+        angular_velocity=u.rad / u.s, period=u.s, inclination=u.rad, hill_radius=u.m
+    )
     def geosynchronous(
-        cls, attractor, angular_velocity=None, period=None, inclination=0 * u.deg, hill_radius=None
+        cls,
+        attractor,
+        angular_velocity=None,
+        period=None,
+        inclination=0 * u.deg,
+        hill_radius=None,
     ):
         """Return the geosynchronous orbit for the given attractor and its inclination and rotational speed.
 
@@ -605,8 +612,36 @@ class Orbit(object):
             influence of the attractor.
             Hill SOI of parent(if exists) of the attractor is ignored if hill_radius is not provided.
         """
-        return cls.geosynchronous(attractor, angular_velocity, period, hill_radius=hill_radius)
-    
+        return cls.geosynchronous(
+            attractor, angular_velocity, period, hill_radius=hill_radius
+        )
+
+    @classmethod
+    @u.quantity_input(a=u.m, ecc=u.one, w=u.rad / u.s, period=u.s)
+    def heliocentric(cls, attractor, a, ecc, w=None, period=None):
+        if w is None and period is None:
+            raise ValueError("At least one among w or period must be passed")
+
+        if w is None:
+            w = 2 * np.pi / period
+
+        if a is None:
+            raise ValueError("The value of semi major axis is required")
+        mean_motion = np.sqrt(attractor.k / np.cube(a))
+        h = a * (1 - ecc ** 2)
+        theta = (-2 / 3) * ((h / attractor.k) ** 2) * (w / (mean_motion * attractor.J2))
+        inc = (180 / np.pi) * np.arccos(theta)
+
+        raan = (0 * u.deg,)
+        argp = (0 * u.deg,)
+        arglat = (0 * u.deg,)
+        epoch = (J2000,)
+        plane = Planes.EARTH_EQUATOR
+
+        return cls.from_classical(
+            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+        )
+
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def parabolic(

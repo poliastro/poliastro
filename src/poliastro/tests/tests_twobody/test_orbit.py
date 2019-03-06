@@ -516,7 +516,9 @@ def test_geosynchronous_input(attractor):
 )
 def test_geosynchronous_non_existence_condition(attractor, period, hill_radius):
     with pytest.raises(ValueError) as excinfo:
-        Orbit.geosynchronous(attractor=attractor, period=period, hill_radius=hill_radius)
+        Orbit.geosynchronous(
+            attractor=attractor, period=period, hill_radius=hill_radius
+        )
 
     assert (
         "geosynchronous orbit for the given parameters doesn't exist"
