@@ -31,7 +31,6 @@ def rv_pqw(k, p, ecc, nu):
 
     Parameters
     ----------
-
     k : float
         Standard gravitational parameter (km^3 / s^2).
     p : float
@@ -51,7 +50,6 @@ def rv_pqw(k, p, ecc, nu):
 
     Examples
     --------
-    >>> from poliastro.core.elements import rv_pqw
     >>> from poliastro.constants import GM_earth
     >>> k = GM_earth #Earth gravitational parameter
 
@@ -74,6 +72,18 @@ def rv_pqw(k, p, ecc, nu):
     r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
     v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T
     return r_pqw, v_pqw
+
+
+@jit
+def pqw2ijk(pqw, inc, raan, argp):
+    """Converts from perifocal to IJK.
+
+    """
+    ijk = transform(pqw, -argp, 2)
+    ijk = transform(ijk, -inc, 0)
+    ijk = transform(ijk, -raan, 2)
+
+    return ijk
 
 
 @jit
@@ -131,12 +141,8 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     """
     r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
 
-    r_ijk = transform(r_pqw, -argp, 2)
-    r_ijk = transform(r_ijk, -inc, 0)
-    r_ijk = transform(r_ijk, -raan, 2)
-    v_ijk = transform(v_pqw, -argp, 2)
-    v_ijk = transform(v_ijk, -inc, 0)
-    v_ijk = transform(v_ijk, -raan, 2)
+    r_ijk = pqw2ijk(r_pqw, inc, raan, argp)
+    v_ijk = pqw2ijk(v_pqw, inc, raan, argp)
 
     return r_ijk, v_ijk
 
@@ -271,7 +277,6 @@ def rv2coe(k, r, v, tol=1e-8):
 
     Returns
     -------
-
     p : float
         Semi-latus rectum of parameter (km)
     ecc: float
@@ -287,13 +292,11 @@ def rv2coe(k, r, v, tol=1e-8):
 
     Examples
     --------
-    >>> from poliastro.core.elements import rv2coe
     >>> from poliastro.constants import GM_earth
     >>> from astropy import units as u
-    >>> import numpy as np
-    >>> k = GM_earth.to(u.km**3 / u.s**2) #Earth gravitational parameter
-    >>> r = [-6045, -3490, 2500] * u.km
-    >>> v = [-3.457, 6.618, 2.533] * u.km / u.s
+    >>> k = GM_earth.to(u.km ** 3 / u.s ** 2).value  # Earth gravitational parameter
+    >>> r = np.array([-6045., -3490., 2500.])
+    >>> v = np.array([-3.457, 6.618, 2.533])
     >>> p, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
     >>> print("p:", p, "[km]")
     p: 8530.47436396927 [km]
@@ -308,10 +311,8 @@ def rv2coe(k, r, v, tol=1e-8):
     >>> print("nu:", np.rad2deg(nu), "[deg]")
     nu: 28.445804984192108 [deg]
 
-
     Note
     ----
-
     This example is a real exercise from Orbital Mechanics for Engineering
     students by Howard D.Curtis. This exercise is 4.3 of 3rd. Edition, page 200.
     """
