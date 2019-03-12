@@ -4,6 +4,8 @@
 import numpy as np
 from astropy import units as u
 
+from poliastro.core.elements import pqw2ijk, rv_pqw
+from poliastro.core.util import cross
 from poliastro.util import norm
 
 
@@ -94,22 +96,40 @@ class Maneuver(object):
             Final altitude of the orbit
         """
 
-        if orbit_i.ecc == 0:
+        if orbit_i.nu is not 0 * u.deg:
+            orbit_i = orbit_i.propagate_to_anomaly(0 * u.deg)
 
-            r_i = orbit_i.a
-            v_i = orbit_i.v
-            k = orbit_i.attractor.k
-            R = r_f / r_i
-            dv_a = ((np.sqrt(2 * R / (1 + R)) - 1) * v_i).decompose()
-            dv_b = (-(1 - np.sqrt(2 / (1 + R))) / np.sqrt(R) * v_i).decompose()
-            t_trans = (np.pi * np.sqrt((r_i * (1 + R) / 2) ** 3 / k)).decompose()
+        # Initial orbit data
+        k = orbit_i.attractor.k
+        r_i = orbit_i.r
+        v_i = orbit_i.v
+        h_i = norm(cross(r_i.to(u.m), v_i.to(u.m / u.s)) * u.m ** 2 / u.s)
+        p_i = h_i ** 2 / k.to(u.m ** 3 / u.s ** 2)
 
-            return cls((0 * u.s, dv_a), (t_trans, dv_b))
+        # Hohmann is defined always from the PQW frame, since it is the
+        # natural plane of the orbit
+        r_i, v_i = rv_pqw(k, p_i, orbit_i.ecc, orbit_i.nu)
 
-        else:
-            raise ValueError(
-                "Hohmann can only be applied to circular orbits (ecc == 0)"
-            )
+        # Now, we apply Hohmman maneuver
+        r_i = norm(r_i * u.m)
+        v_i = norm(v_i * u.m / u.s)
+        a_trans = (r_i + r_f) / 2
+
+        # This is the modulus of the velocities
+        dv_a = np.sqrt(2 * k / r_i - k / a_trans) - v_i
+        dv_b = np.sqrt(k / r_f) - np.sqrt(2 * k / r_f - k / a_trans)
+
+        # Write them in PQW frame
+        dv_a = np.array([0, dv_a.decompose().value, 0]) * u.m / u.s
+        dv_b = np.array([0, dv_b.decompose().value, 0]) * u.m / u.s
+
+        # Transform to IJK frame
+        dv_a = pqw2ijk(dv_a, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
+        dv_b = pqw2ijk(dv_b, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
+
+        t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
+
+        return cls((0 * u.s, dv_a), (t_trans, dv_b))
 
     @classmethod
     def bielliptic(cls, orbit_i, r_b, r_f):
