@@ -31,8 +31,8 @@ install:
   # Install dependencies
   - "choco install pandoc"
 
-  - "%PIP_BIN% install numpy"
-  - "%PIP_BIN% install .[dev]"  # Test installation correctness
+  - "%PYTHON_BIN% -m pip install --upgrade pip"
+  - "%PIP_BIN% install .[dev] --prefer-binary"  # Test installation correctness
 
 build: off
 
