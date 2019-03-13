@@ -12,7 +12,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m pip install tox --quiet
+            python3 -m pip install tox
 
       - run:
           name: check quality
@@ -37,8 +37,8 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
-            pip install . --quiet
-            pip install .[dev] --quiet
+            pip install .
+            pip install .[dev]
 
       - run:
           name: run tests
@@ -74,7 +74,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
-            pip install --editable .[dev] --quiet
+            pip install --editable .[dev]
 
       - run:
           name: run coverage
@@ -86,7 +86,7 @@ jobs:
           name: publish coverage
           command: |
             . venv/bin/activate
-            pip install codecov --quiet
+            pip install codecov
             codecov
 
   docs:
@@ -108,7 +108,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
-            pip install .[dev] --quiet
+            pip install .[dev]
             pip install https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
 
       - run:
