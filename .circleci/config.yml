@@ -25,6 +25,9 @@ jobs:
 
     working_directory: ~/repo
 
+    environment:
+      PIP_PREFER_BINARY: true
+
     steps:
       - checkout
 
@@ -59,6 +62,9 @@ jobs:
 
     working_directory: ~/repo
 
+    environment:
+      PIP_PREFER_BINARY: true
+
     steps:
       - checkout
 
@@ -88,6 +94,9 @@ jobs:
       - image: circleci/python:3.6
 
     working_directory: ~/repo
+
+    environment:
+      PIP_PREFER_BINARY: true
 
     steps:
       - checkout
