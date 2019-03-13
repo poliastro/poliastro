@@ -581,6 +581,32 @@ class Orbit(object):
         return cls.circular(attractor, altitude)
 
     @classmethod
+    @u.quantity_input(a=u.m, ecc=u.one, w=u.rad / u.s, period=u.s)
+    def heliocentric(cls, attractor, a, ecc, w=None, period=None):
+        if w is None and period is None:
+            raise ValueError("At least one among w or period must be passed")
+
+        if w is None:
+            w = 2 * np.pi / period
+
+        if a is None:
+            raise ValueError("The value of semi major axis is required")
+        mean_motion = np.sqrt(attractor.k / np.cube(a))
+        h = a * (1 - ecc ** 2)
+        theta = (-2 / 3) * ((h / attractor.k) ** 2) * (w / (mean_motion * attractor.J2))
+        inc = (180 / np.pi) * np.arccos(theta)
+
+        raan = (0 * u.deg,)
+        argp = (0 * u.deg,)
+        arglat = (0 * u.deg,)
+        epoch = (J2000,)
+        plane = Planes.EARTH_EQUATOR
+
+        return cls.from_classical(
+            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+        )
+
+    @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def parabolic(
         cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR
