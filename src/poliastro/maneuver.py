@@ -103,12 +103,17 @@ class Maneuver(object):
         k = orbit_i.attractor.k
         r_i = orbit_i.r
         v_i = orbit_i.v
-        h_i = norm(cross(r_i.to(u.m), v_i.to(u.m / u.s)) * u.m ** 2 / u.s)
+        h_i = norm(cross(r_i.to(u.m).value, v_i.to(u.m / u.s).value) * u.m ** 2 / u.s)
         p_i = h_i ** 2 / k.to(u.m ** 3 / u.s ** 2)
 
         # Hohmann is defined always from the PQW frame, since it is the
         # natural plane of the orbit
-        r_i, v_i = rv_pqw(k, p_i, orbit_i.ecc, orbit_i.nu)
+        r_i, v_i = rv_pqw(
+            k.to(u.m ** 3 / u.s ** 2).value,
+            p_i.to(u.m).value,
+            orbit_i.ecc.value,
+            orbit_i.nu.to(u.rad).value,
+        )
 
         # Now, we apply Hohmman maneuver
         r_i = norm(r_i * u.m)
@@ -120,12 +125,30 @@ class Maneuver(object):
         dv_b = np.sqrt(k / r_f) - np.sqrt(2 * k / r_f - k / a_trans)
 
         # Write them in PQW frame
-        dv_a = np.array([0, dv_a.decompose().value, 0]) * u.m / u.s
-        dv_b = np.array([0, -dv_b.decompose().value, 0]) * u.m / u.s
+        dv_a = np.array([0, dv_a.to(u.m / u.s).value, 0])
+        dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
 
         # Transform to IJK frame
-        dv_a = pqw2ijk(dv_a, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
-        dv_b = pqw2ijk(dv_b, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
+        dv_a = (
+            pqw2ijk(
+                dv_a,
+                orbit_i.inc.to(u.rad).value,
+                orbit_i.raan.to(u.rad).value,
+                orbit_i.argp.to(u.rad).value,
+            )
+            * u.m
+            / u.s
+        )
+        dv_b = (
+            pqw2ijk(
+                dv_b,
+                orbit_i.inc.to(u.rad).value,
+                orbit_i.raan.to(u.rad).value,
+                orbit_i.argp.to(u.rad).value,
+            )
+            * u.m
+            / u.s
+        )
 
         t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
 
@@ -179,12 +202,17 @@ class Maneuver(object):
         k = orbit_i.attractor.k
         r_i = orbit_i.r
         v_i = orbit_i.v
-        h_i = norm(cross(r_i.to(u.m), v_i.to(u.m / u.s)) * u.m ** 2 / u.s)
+        h_i = norm(cross(r_i.to(u.m).value, v_i.to(u.m / u.s).value) * u.m ** 2 / u.s)
         p_i = h_i ** 2 / k.to(u.m ** 3 / u.s ** 2)
 
         # Bielliptic is defined always from the PQW frame, since it is the
         # natural plane of the orbit
-        r_i, v_i = rv_pqw(k, p_i, orbit_i.ecc, orbit_i.nu)
+        r_i, v_i = rv_pqw(
+            k.to(u.m ** 3 / u.s ** 2).value,
+            p_i.to(u.m).value,
+            orbit_i.ecc.value,
+            orbit_i.nu.to(u.rad).value,
+        )
 
         # Define the transfer radius
         r_i = norm(r_i * u.m)
@@ -198,14 +226,41 @@ class Maneuver(object):
         dv_c = np.sqrt(k / r_f) - np.sqrt(2 * k / r_f - k / a_trans2)
 
         # Write impulses in PQW frame
-        dv_a = np.array([0, dv_a.decompose().value, 0]) * u.m / u.s
-        dv_b = np.array([0, -dv_b.decompose().value, 0]) * u.m / u.s
-        dv_c = np.array([0, dv_c.decompose().value, 0]) * u.m / u.s
+        dv_a = np.array([0, dv_a.to(u.m / u.s).value, 0])
+        dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
+        dv_c = np.array([0, dv_c.to(u.m / u.s).value, 0])
 
         # Transform to IJK frame
-        dv_a = pqw2ijk(dv_a, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
-        dv_b = pqw2ijk(dv_b, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
-        dv_c = pqw2ijk(dv_c, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
+        dv_a = (
+            pqw2ijk(
+                dv_a,
+                orbit_i.inc.to(u.rad).value,
+                orbit_i.raan.to(u.rad).value,
+                orbit_i.argp.to(u.rad).value,
+            )
+            * u.m
+            / u.s
+        )
+        dv_b = (
+            pqw2ijk(
+                dv_b,
+                orbit_i.inc.to(u.rad).value,
+                orbit_i.raan.to(u.rad).value,
+                orbit_i.argp.to(u.rad).value,
+            )
+            * u.m
+            / u.s
+        )
+        dv_c = (
+            pqw2ijk(
+                dv_c,
+                orbit_i.inc.to(u.rad).value,
+                orbit_i.raan.to(u.rad).value,
+                orbit_i.argp.to(u.rad).value,
+            )
+            * u.m
+            / u.s
+        )
 
         # Compute time for maneuver
         t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
