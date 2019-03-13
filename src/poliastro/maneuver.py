@@ -73,20 +73,20 @@ class Maneuver(object):
         By defining the relationship between orbit radius:
 
         .. math::
-            R = \frac{r_{f}}{r_{i}}
+            a_{trans} = \frac{r_{i} + r_{f}}{2}
 
         The Hohmann maneuver velocities can be expressed as:
 
         .. math::
             \begin{align}
-                \Delta v_{a} &= v_{i}\left ( \sqrt{\frac{2R}{1+R}} - 1\right )\\
-                \Delta v_{b} &= \frac{v_{i}}{\sqrt{R}}\left (\sqrt{\frac{2}{1+R}} - 1 \right )\\
+                \Delta v_{a} &= \sqrt{\frac{2\mu}{r_{i}} - \frac{\mu}{a_{trans}}} - v_{i}\\
+                \Delta v_{b} &= \sqrt{\frac{\mu}{r_{f}}} - \sqrt{\frac{2\mu}{r_{f}} - \frac{\mu}{a_{trans}}}
             \end{align}
 
         The time that takes to compelte the maneuver can be computed as:
 
         .. math::
-            \tau_{trans} = \pi \sqrt{\frac{(r{i} + r{f})^{3}}{8\mu}}
+            \tau_{trans} = \pi \sqrt{\frac{(a_{trans})^{3}}{\mu}}
 
         Parameters
         ----------
@@ -121,7 +121,7 @@ class Maneuver(object):
 
         # Write them in PQW frame
         dv_a = np.array([0, dv_a.decompose().value, 0]) * u.m / u.s
-        dv_b = np.array([0, dv_b.decompose().value, 0]) * u.m / u.s
+        dv_b = np.array([0, -dv_b.decompose().value, 0]) * u.m / u.s
 
         # Transform to IJK frame
         dv_a = pqw2ijk(dv_a, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
@@ -141,17 +141,17 @@ class Maneuver(object):
 
         .. math::
             \begin{align}
-                R &= \frac{r_{f}}{r_{i}}\\
-                R_{s} &= \frac{r_{b}}{r_{i}}\\
+                a_{trans1} &= \frac{r_{i} + r_{b}}{2}\\
+                a_{trans2} &= \frac{r_{b} + r_{f}}{2}\\
             \end{align}
 
         The increments in the velocity are:
 
         .. math::
             \begin{align}
-                \Delta v_{a} &= v_{i}\left ( \sqrt{\frac{2R{s}}{1+R{s}}} - 1\right )\\
-                \Delta v_{b} &= v_{i}\sqrt{\frac{2}{R_{s}}}\left (\sqrt{\frac{1}{1+R_{s}}} -  \sqrt{\frac{1}{1 + \frac{R_{s}}{R}}} \right )\\
-                \Delta v_{c} &= \frac{v_{i}}{\sqrt{R}}\left ( 1 - \sqrt{\frac{2R_{s}}{R+R_{s}}} \right )\\
+                \Delta v_{a} &= \sqrt{\frac{2\mu}{r_{i}} - \frac{\mu}{a_{trans1}}} - v_{i}\\
+                \Delta v_{b} &= \sqrt{\frac{2\mu}{r_{b}} - \frac{\mu}{a_{trans2}}} - \sqrt{\frac{2\mu}{r_{b}} - \frac{\mu}{a_trans{1}}}\\
+                \Delta v_{c} &= \sqrt{\frac{\mu}{r_{f}}} - \sqrt{\frac{2\mu}{r_{f}} - \frac{\mu}{a_{trans2}}}\\
             \end{align}
 
         The time of flight for this maneuver is the addition of the time needed for both transition orbits, following the same formula as
@@ -159,8 +159,8 @@ class Maneuver(object):
 
         .. math::
             \begin{align}
-                \tau_{trans_{a}} &= \pi \sqrt{\frac{(r_{i}(1 + R_{s}))^{3}}{8\mu}}\\
-                \tau_{trans_{b}} &= \pi \sqrt{\frac{(r_{i}(R + R_{s}))^{3}}{8\mu}}\\
+                \tau_{trans1} &= \pi \sqrt{\frac{a_{trans1}^{3}}{\mu}}\\
+                \tau_{trans2} &= \pi \sqrt{\frac{a_{trans2}^{3}}{\mu}}\\
             \end{align}
 
         Parameters
@@ -172,18 +172,45 @@ class Maneuver(object):
         r_f: astropy.unit.Quantity
             Final altitude of the orbit
         """
-        r_i = orbit_i.a
-        v_i = orbit_i.v
+        if orbit_i.nu is not 0 * u.deg:
+            orbit_i = orbit_i.propagate_to_anomaly(0 * u.deg)
+
+        # Initial orbit data
         k = orbit_i.attractor.k
-        R = r_f / r_i
-        Rs = r_b / r_i
-        dv_a = ((np.sqrt(2 * Rs / (1 + Rs)) - 1) * v_i).decompose()
-        dv_b = (
-            -np.sqrt(2 / Rs) * (np.sqrt(1 / (1 + Rs / R)) - np.sqrt(1 / (1 + Rs))) * v_i
-        ).decompose()
-        dv_c = (-(np.sqrt(2 * Rs / (R + Rs)) - 1) / np.sqrt(R) * v_i).decompose()
-        t_trans1 = (np.pi * np.sqrt((r_i * (1 + Rs) / 2) ** 3 / k)).decompose()
-        t_trans2 = (np.pi * np.sqrt((r_i * (R + Rs) / 2) ** 3 / k)).decompose()
+        r_i = orbit_i.r
+        v_i = orbit_i.v
+        h_i = norm(cross(r_i.to(u.m), v_i.to(u.m / u.s)) * u.m ** 2 / u.s)
+        p_i = h_i ** 2 / k.to(u.m ** 3 / u.s ** 2)
+
+        # Bielliptic is defined always from the PQW frame, since it is the
+        # natural plane of the orbit
+        r_i, v_i = rv_pqw(k, p_i, orbit_i.ecc, orbit_i.nu)
+
+        # Define the transfer radius
+        r_i = norm(r_i * u.m)
+        v_i = norm(v_i * u.m / u.s)
+        a_trans1 = (r_i + r_b) / 2
+        a_trans2 = (r_b + r_f) / 2
+
+        # Compute impulses
+        dv_a = np.sqrt(2 * k / r_i - k / a_trans1) - v_i
+        dv_b = np.sqrt(2 * k / r_b - k / a_trans2) - np.sqrt(2 * k / r_b - k / a_trans1)
+        dv_c = np.sqrt(k / r_f) - np.sqrt(2 * k / r_f - k / a_trans2)
+
+        # Write impulses in PQW frame
+        dv_a = np.array([0, dv_a.decompose().value, 0]) * u.m / u.s
+        dv_b = np.array([0, -dv_b.decompose().value, 0]) * u.m / u.s
+        dv_c = np.array([0, dv_c.decompose().value, 0]) * u.m / u.s
+
+        # Transform to IJK frame
+        dv_a = pqw2ijk(dv_a, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
+        dv_b = pqw2ijk(dv_b, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
+        dv_c = pqw2ijk(dv_c, orbit_i.inc, orbit_i.raan, orbit_i.argp) * u.m / u.s
+
+        # Compute time for maneuver
+        t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
+        t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
+
         return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
 
     def get_total_time(self):
