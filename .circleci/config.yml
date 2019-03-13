@@ -36,6 +36,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            pip install --upgrade pip
             pip install numpy --quiet
             pip install . --quiet
             pip install .[dev] --quiet
@@ -73,6 +74,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            pip install --upgrade pip
             pip install numpy --quiet
             pip install --editable .[dev] --quiet
 
@@ -107,6 +109,7 @@ jobs:
             sudo apt update && sudo apt install --no-install-recommends pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz
             python3 -m venv venv
             . venv/bin/activate
+            pip install --upgrade pip
             pip install .[dev] --quiet
             pip install https://github.com/Juanlu001/sphinx_rtd_theme/archive/js-head.zip
 
