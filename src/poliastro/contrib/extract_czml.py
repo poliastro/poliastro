@@ -1,9 +1,9 @@
-import numpy as np
 import json
 
-from astropy.time import Time
-from astropy.coordinates import CartesianRepresentation
+import numpy as np
 from astropy import units as u
+from astropy.coordinates import CartesianRepresentation
+from astropy.time import Time
 
 from poliastro.contrib.czml_extract_default_params import DEFAULTS
 
@@ -71,14 +71,27 @@ class ExtractorCZML:
         for t_key, t_val in DEFAULTS:
             self.parse_dict_tuples([i] + t_key[1:], t_val)
 
-        start_epoch = ExtractorCZML.format_date(min(Time(self.orbits[i][3]), Time(self.end_epoch)).iso)
+        start_epoch = ExtractorCZML.format_date(
+            min(Time(self.orbits[i][3]), Time(self.end_epoch)).iso
+        )
 
-        self.parse_dict_tuples([i], [("id", str(i)), ("availability", start_epoch + '/' + self.end_epoch)])
-        self.parse_dict_tuples([i, "path", "show"], [("interval", start_epoch + '/' + self.end_epoch)])
+        self.parse_dict_tuples(
+            [i], [("id", str(i)), ("availability", start_epoch + "/" + self.end_epoch)]
+        )
+        self.parse_dict_tuples(
+            [i, "path", "show"], [("interval", start_epoch + "/" + self.end_epoch)]
+        )
 
-        self.parse_dict_tuples([i, "position"], [("interpolationAlgorithm", "LAGRANGE"),
-                                                 ("interpolationDegree", 5), ("referenceFrame", "FIXED"),
-                                                 ("epoch", start_epoch), ("cartesian", list())])
+        self.parse_dict_tuples(
+            [i, "position"],
+            [
+                ("interpolationAlgorithm", "LAGRANGE"),
+                ("interpolationDegree", 5),
+                ("referenceFrame", "FIXED"),
+                ("epoch", start_epoch),
+                ("cartesian", list()),
+            ],
+        )
         self.init_orbit_packet_cords(i)
 
     def init_orbit_packet_cords(self, i):
@@ -92,10 +105,15 @@ class ExtractorCZML:
         h = (Time(self.end_epoch) - self.orbits[i][3]).to(u.second) / self.orbits[i][1]
 
         for k in range(self.orbits[i][1] + 2):
-            cords = self.orbits[i][0].represent_as(CartesianRepresentation).xyz.to(u.meter).value
+            cords = (
+                self.orbits[i][0]
+                .represent_as(CartesianRepresentation)
+                .xyz.to(u.meter)
+                .value
+            )
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
-            self.czml[i]['position']['cartesian'] += cords.tolist()
+            self.czml[i]["position"]["cartesian"] += cords.tolist()
             self.orbits[i][0] = self.orbits[i][0].propagate(h)
 
     def init_czml(self):
@@ -104,10 +122,19 @@ class ExtractorCZML:
         Builds packets.
         """
 
-        self.parse_dict_tuples([0], [("id", "document"), ("name", "simple"), ("version", "1.0")])
-        self.parse_dict_tuples([0, "clock"], [("interval", self.start_epoch + '/' + self.end_epoch),
-                                              ("currentTime", self.start_epoch), ("multiplier", 60),
-                                              ("range", "LOOP_STOP"), ("step", "SYSTEM_CLOCK_MULTIPLIER")])
+        self.parse_dict_tuples(
+            [0], [("id", "document"), ("name", "simple"), ("version", "1.0")]
+        )
+        self.parse_dict_tuples(
+            [0, "clock"],
+            [
+                ("interval", self.start_epoch + "/" + self.end_epoch),
+                ("currentTime", self.start_epoch),
+                ("multiplier", 60),
+                ("range", "LOOP_STOP"),
+                ("step", "SYSTEM_CLOCK_MULTIPLIER"),
+            ],
+        )
 
         self.init_orbit_packet(1)
 
@@ -132,7 +159,9 @@ class ExtractorCZML:
         if description is not None:
             self.parse_dict_tuples([i], [("description", description)])
 
-    def change_path_params(self, i, pixel_offset=None, color=None, width=None, show=None):
+    def change_path_params(
+        self, i, pixel_offset=None, color=None, width=None, show=None
+    ):
         """
         Changes the path parameters.
 
@@ -150,15 +179,21 @@ class ExtractorCZML:
             Indicates whether the path is visible
         """
         if pixel_offset is not None:
-            self.parse_dict_tuples([i, "label", "pixelOffset"], [("cartesian2", pixel_offset)])
+            self.parse_dict_tuples(
+                [i, "label", "pixelOffset"], [("cartesian2", pixel_offset)]
+            )
         if color is not None:
-            self.parse_dict_tuples([i, "path", "material", "solidColor", "color"], [("rgba", color)])
+            self.parse_dict_tuples(
+                [i, "path", "material", "solidColor", "color"], [("rgba", color)]
+            )
         if width is not None:
             self.parse_dict_tuples([i, "path"], [("width", width)])
         if show is not None:
             self.parse_dict_tuples([i, "path", "show"], [("boolean", show)])
 
-    def change_label_params(self, i, fill_color=None, outline_color=None, font=None, text=None, show=None):
+    def change_label_params(
+        self, i, fill_color=None, outline_color=None, font=None, text=None, show=None
+    ):
         """
         Change the label parameters.
 
@@ -180,7 +215,9 @@ class ExtractorCZML:
         if fill_color is not None:
             self.parse_dict_tuples([i, "label", "fillColor"], [("rgba", fill_color)])
         if outline_color is not None:
-            self.parse_dict_tuples([i, "label", "outlineColor"], [("rgba", outline_color)])
+            self.parse_dict_tuples(
+                [i, "label", "outlineColor"], [("rgba", outline_color)]
+            )
         if font is not None:
             self.parse_dict_tuples([i, "label"], [("font", font)])
         if text is not None:
@@ -215,7 +252,9 @@ class ExtractorCZML:
         if orbit.epoch < Time(self.start_epoch):
             orbit = orbit.propagate(Time(self.start_epoch) - orbit.epoch)
         elif orbit.epoch > Time(self.end_epoch):
-            raise ValueError("The orbit's epoch cannot exceed the constructors ending epoch")
+            raise ValueError(
+                "The orbit's epoch cannot exceed the constructors ending epoch"
+            )
 
         self.orbits[self.i] = [orbit, N, orbit.period, orbit.epoch]
         self.init_orbit_packet(self.i)
@@ -246,4 +285,4 @@ class ExtractorCZML:
         formatted_date : str
             date of the form "yyyy-mm-ddThh:mm:ssZ"
         """
-        return date[:10] + 'T' + date[11:-4] + 'Z'
+        return date[:10] + "T" + date[11:-4] + "Z"
