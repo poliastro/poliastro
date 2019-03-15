@@ -1,16 +1,17 @@
 import numpy as np
 import json
 
+from astropy.time import Time
 from astropy.coordinates import CartesianRepresentation
 from astropy import units as u
 
-from poliastro.contrib.czml_extract_default_params import PIC_SATELLITE, DEFAULTS
+from poliastro.contrib.czml_extract_default_params import DEFAULTS
 
 
 class ExtractorCZML:
     """A class for extracting orbitary data to Cesium"""
 
-    def __init__(self, orbit, N, fixed_rf=True):
+    def __init__(self, orbit, start_epoch, end_epoch, N, fixed_rf=True):
         """
         Orbital constructor
 
@@ -18,6 +19,10 @@ class ExtractorCZML:
         ----------
         orbit: poliastro.Orbit
             Orbit to be extracted
+        start_epoch: ~astropy.time.core.Time
+            Starting epoch
+        end_epoch: ~astropy.time.core.Time
+            Ending epoch
         N: int
             Number of sample points
         fixed_rf: bool
@@ -31,11 +36,9 @@ class ExtractorCZML:
         self.i = 1  # Current index id, used for insertion of new elements
 
         self.fixed_rf = fixed_rf
-        self.start_epoch = ExtractorCZML.format_date(orbit.epoch.iso)
-        self.end_epoch = ExtractorCZML.format_date((orbit.epoch + orbit.period).iso)
+        self.start_epoch = ExtractorCZML.format_date(start_epoch.value)
+        self.end_epoch = ExtractorCZML.format_date(end_epoch.value)
         self.init_czml()
-
-        return None
 
     def parse_dict_tuples(self, path, tups):
         """
@@ -66,16 +69,16 @@ class ExtractorCZML:
             Index of referenced orbit
         """
         for t_key, t_val in DEFAULTS:
-            self.parse_dict_tuples(t_key, t_val)
+            self.parse_dict_tuples([i] + t_key[1:], t_val)
 
-        self.parse_dict_tuples(["b0", "clock"], [("interval", self.start_epoch + '/' + self.end_epoch),
-                                                 ("currentTime", self.start_epoch), ("multiplier", 60)])
-        self.parse_dict_tuples(["b" + str(i)], [("availability", self.start_epoch + '/' + self.end_epoch)])
-        self.parse_dict_tuples(["b" + str(i), "path", "show"], [("interval", self.start_epoch + '/' + self.end_epoch)])
+        start_epoch = ExtractorCZML.format_date(min(Time(self.orbits[i][3]), Time(self.end_epoch)).iso)
 
-        self.parse_dict_tuples(["b" + str(i), "position"], [("interpolationAlgorithm", "LAGRANGE"),
-                                                            ("interpolationDegree", 5), ("referenceFrame", "FIXED"),
-                                                            ("epoch", self.start_epoch), ("cartesian", list())])
+        self.parse_dict_tuples([i], [("id", str(i)), ("availability", start_epoch + '/' + self.end_epoch)])
+        self.parse_dict_tuples([i, "path", "show"], [("interval", start_epoch + '/' + self.end_epoch)])
+
+        self.parse_dict_tuples([i, "position"], [("interpolationAlgorithm", "LAGRANGE"),
+                                                 ("interpolationDegree", 5), ("referenceFrame", "FIXED"),
+                                                 ("epoch", start_epoch), ("cartesian", list())])
         self.init_orbit_packet_cords(i)
 
     def init_orbit_packet_cords(self, i):
@@ -86,26 +89,25 @@ class ExtractorCZML:
         i: int
             Index of referenced orbit
         """
-        h = self.orbits[i][2] / self.orbits[i][1]
+        h = (Time(self.end_epoch) - self.orbits[i][3]).to(u.second) / self.orbits[i][1]
 
-        for k in range(self.orbits[i][1] + 1):
+        for k in range(self.orbits[i][1] + 2):
             cords = self.orbits[i][0].represent_as(CartesianRepresentation).xyz.to(u.meter).value
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
-            self.czml['b' + str(i)]['position']['cartesian'] += cords.tolist()
+            self.czml[i]['position']['cartesian'] += cords.tolist()
             self.orbits[i][0] = self.orbits[i][0].propagate(h)
 
     def init_czml(self):
         """
         Only called at the initialization of the extractor
         Builds packets.
-        TODO: Parametrize the variables
-        TODO: Add leadTime and trailTime
         """
 
-        self.parse_dict_tuples(["b0"], [("id", "document"), ("name", "simple"), ("version", "1.0")])
-        self.parse_dict_tuples(["b0", "clock"], [("interval", self.start_epoch + '/' + self.end_epoch),
-                                                 ("currentTime", self.start_epoch), ("multiplier", 60)])
+        self.parse_dict_tuples([0], [("id", "document"), ("name", "simple"), ("version", "1.0")])
+        self.parse_dict_tuples([0, "clock"], [("interval", self.start_epoch + '/' + self.end_epoch),
+                                              ("currentTime", self.start_epoch), ("multiplier", 60),
+                                              ("range", "LOOP_STOP"), ("step", "SYSTEM_CLOCK_MULTIPLIER")])
 
         self.init_orbit_packet(1)
 
@@ -122,20 +124,20 @@ class ExtractorCZML:
             Set orbit description
         """
         if id is not None:
-            self.parse_dict_tuples(['b' + str(i)], [("id", id)])
+            self.parse_dict_tuples([i], [("id", id)])
         if name is not None:
-            self.parse_dict_tuples(['b' + str(i)], [("name", name)])
+            self.parse_dict_tuples([i], [("name", name)])
         if description is not None:
-            self.parse_dict_tuples(['b' + str(i)], [("description", description)])
+            self.parse_dict_tuples([i], [("description", description)])
 
-    def change_label_params(self, i, fillColor=None, outlineColor=None, font=None, text=None, show=True):
+    def change_label_params(self, i, fill_color=None, outline_color=None, font=None, text=None, show=True):
         """
         Parameters
         n : int
             Referred body (count starts at 1)
-        fillColor: list (int)
+        fill_color: list (int)
             Fill Color in rgba format
-        outlineColor: list (int)
+        outline_color: list (int)
             Outline Color in rgba format
         font: str
             Set label font style and size (CSS syntax)
@@ -144,16 +146,16 @@ class ExtractorCZML:
         show: bool
             Indicates whether the label is visible
         """
-        if fillColor is not None:
-            self.parse_dict_tuples(['b' + str(i), "label", "fillColor"], [("rgba", fillColor)])
-        if outlineColor is not None:
-            self.parse_dict_tuples(['b' + str(i), "label", "outlineColor"], [("rgba", outlineColor)])
+        if fill_color is not None:
+            self.parse_dict_tuples([i, "label", "fillColor"], [("rgba", fill_color)])
+        if outline_color is not None:
+            self.parse_dict_tuples([i, "label", "outlineColor"], [("rgba", outline_color)])
         if font is not None:
-            self.parse_dict_tuples(['b' + str(i), "label"], [("font", font)])
+            self.parse_dict_tuples([i, "label"], [("font", font)])
         if text is not None:
-            self.parse_dict_tuples(['b' + str(i), "label"], [("text", text)])
+            self.parse_dict_tuples([i, "label"], [("text", text)])
         if show is not None:
-            self.parse_dict_tuples(['b' + str(i), "label"], [("show", show)])
+            self.parse_dict_tuples([i, "label"], [("show", show)])
 
     def extract(self, ext_location=None):
         """
@@ -164,6 +166,41 @@ class ExtractorCZML:
         """
 
         return json.dumps(list(self.czml.values()))
+
+    def add_orbit(self, orbit, N):
+        """
+        Adds an orbit
+
+        Parameters
+        ----------
+        orbit: poliastro.Orbit
+            Orbit to be added
+        N: int
+            Number of sample points
+        """
+
+        self.i += 1
+
+        if orbit.epoch < Time(self.start_epoch):
+            orbit = orbit.propagate(Time(self.start_epoch) - orbit.epoch)
+        elif orbit.epoch > Time(self.end_epoch):
+            raise ValueError("The orbit's epoch cannot exceed the constructors ending epoch")
+
+        self.orbits[self.i] = [orbit, N, orbit.period, orbit.epoch]
+        self.init_orbit_packet(self.i)
+
+    def del_orbit(self, i):
+        """
+        Deletes an existing orbit
+
+        Parameters
+        ----------
+        i: int
+            Index of orbit to delete
+        """
+
+        del self.orbits[i]
+        del self.czml[i]
 
     @staticmethod
     def format_date(date):
