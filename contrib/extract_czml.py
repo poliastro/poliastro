@@ -26,9 +26,9 @@ class ExtractorCZML:
             with constant velocity.
         """
         self.czml = dict()
-        self.orbits = {1:[orbit, N, orbit.period, orbit.epoch]}
+        self.orbits = {1: [orbit, N, orbit.period, orbit.epoch]}
 
-        self.i = 1 #Current index id, used for insertion of new elements
+        self.i = 1  # Current index id, used for insertion of new elements
 
         self.fixed_rf = fixed_rf
         self.start_epoch = ExtractorCZML.format_date(orbit.epoch.iso)
@@ -69,13 +69,13 @@ class ExtractorCZML:
             self.parse_dict_tuples(t_key, t_val)
 
         self.parse_dict_tuples(["b0", "clock"], [("interval", self.start_epoch + '/' + self.end_epoch),
-                                                ("currentTime", self.start_epoch), ("multiplier", 60)])
-        self.parse_dict_tuples(["b"+str(i)], [("availability", self.start_epoch + '/' + self.end_epoch)])
-        self.parse_dict_tuples(["b"+str(i), "path", "show"], [("interval", self.start_epoch + '/' + self.end_epoch)])
+                                                 ("currentTime", self.start_epoch), ("multiplier", 60)])
+        self.parse_dict_tuples(["b" + str(i)], [("availability", self.start_epoch + '/' + self.end_epoch)])
+        self.parse_dict_tuples(["b" + str(i), "path", "show"], [("interval", self.start_epoch + '/' + self.end_epoch)])
 
-        self.parse_dict_tuples(["b"+str(i), "position"], [("interpolationAlgorithm", "LAGRANGE"),
-                                                ("interpolationDegree", 5), ("referenceFrame", "FIXED"),
-                                                ("epoch", self.start_epoch), ("cartesian", list())])
+        self.parse_dict_tuples(["b" + str(i), "position"], [("interpolationAlgorithm", "LAGRANGE"),
+                                                            ("interpolationDegree", 5), ("referenceFrame", "FIXED"),
+                                                            ("epoch", self.start_epoch), ("cartesian", list())])
         self.init_orbit_packet_cords(i)
 
     def init_orbit_packet_cords(self, i):
@@ -92,7 +92,7 @@ class ExtractorCZML:
             cords = self.orbits[i][0].represent_as(CartesianRepresentation).xyz.to(u.meter).value
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
-            self.czml['b'+str(i)]['position']['cartesian'] += cords.tolist()
+            self.czml['b' + str(i)]['position']['cartesian'] += cords.tolist()
             self.orbits[i][0] = self.orbits[i][0].propagate(h)
 
     def init_czml(self):
@@ -105,7 +105,7 @@ class ExtractorCZML:
 
         self.parse_dict_tuples(["b0"], [("id", "document"), ("name", "simple"), ("version", "1.0")])
         self.parse_dict_tuples(["b0", "clock"], [("interval", self.start_epoch + '/' + self.end_epoch),
-                                ("currentTime", self.start_epoch), ("multiplier", 60)])
+                                                 ("currentTime", self.start_epoch), ("multiplier", 60)])
 
         self.init_orbit_packet(1)
 
@@ -122,7 +122,7 @@ class ExtractorCZML:
             Set orbit description
         """
         if id is not None:
-            self.parse_dict_tuples(['b'+str(i)], [("id", id)])
+            self.parse_dict_tuples(['b' + str(i)], [("id", id)])
         if name is not None:
             self.parse_dict_tuples(['b' + str(i)], [("name", name)])
         if description is not None:
@@ -155,7 +155,6 @@ class ExtractorCZML:
         if show is not None:
             self.parse_dict_tuples(['b' + str(i), "label"], [("show", show)])
 
-
     def extract(self, ext_location=None):
         """
         Parameters
@@ -180,9 +179,3 @@ class ExtractorCZML:
             date of the form "yyyy-mm-ddThh:mm:ssZ"
         """
         return date[:10] + 'T' + date[11:-4] + 'Z'
-
-
-if __name__ == '__main__':
-    from examples import molniya
-    A = ExtractorCZML(molniya, 80)
-    print(A.extract())
