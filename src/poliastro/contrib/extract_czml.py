@@ -113,6 +113,8 @@ class ExtractorCZML:
 
     def change_id_params(self, i, id=None, name=None, description=None):
         """
+        Change the id parameters.
+
         Parameters
         i : int
             Referred body (count starts at i)
@@ -130,10 +132,39 @@ class ExtractorCZML:
         if description is not None:
             self.parse_dict_tuples([i], [("description", description)])
 
-    def change_label_params(self, i, fill_color=None, outline_color=None, font=None, text=None, show=True):
+    def change_path_params(self, i, pixel_offset=None, color=None, width=None, show=None):
         """
+        Changes the path parameters.
+
         Parameters
-        n : int
+        ----------
+        i : int
+            Referred body (count starts at 1)
+        pixel_offset: list (int)
+            The pixel offset (up and right)
+        color: list (int)
+            Rgba path color
+        width: int
+            Path width
+        show: bool
+            Indicates whether the path is visible
+        """
+        if pixel_offset is not None:
+            self.parse_dict_tuples([i, "label", "pixelOffset"], [("cartesian2", pixel_offset)])
+        if color is not None:
+            self.parse_dict_tuples([i, "path", "material", "solidColor", "color"], [("rgba", color)])
+        if width is not None:
+            self.parse_dict_tuples([i, "path"], [("width", width)])
+        if show is not None:
+            self.parse_dict_tuples([i, "path", "show"], [("boolean", show)])
+
+    def change_label_params(self, i, fill_color=None, outline_color=None, font=None, text=None, show=None):
+        """
+        Change the label parameters.
+
+        Parameters
+        ----------
+        i : int
             Referred body (count starts at 1)
         fill_color: list (int)
             Fill Color in rgba format
