@@ -4,7 +4,7 @@ import json
 from astropy.coordinates import CartesianRepresentation
 from astropy import units as u
 
-from contrib.czml_extract_default_params import PIC_SATELLITE, DEFAULTS
+from poliastro.contrib.czml_extract_default_params import PIC_SATELLITE, DEFAULTS
 
 
 class ExtractorCZML:
