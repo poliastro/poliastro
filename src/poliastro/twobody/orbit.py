@@ -648,21 +648,32 @@ class Orbit(object):
 
         a = Earth.R + alt
 
-        for critical_argp in Earth.critical_argps:
-            if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
-                ecc = -Earth.J3 * Earth.R * np.sin(inc) / 2 / Earth.J2 / a
-                return cls.from_classical(
-                    Earth, a, ecc, inc, raan, argp, arglat, epoch, plane
-                )
+        critical_argp = cls._find_closest_value(argp, Earth.critical_argps)
+        if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
+            return cls._frozen_critical_argp(a, inc, argp, raan, arglat, epoch, plane)
 
-        for critical_inclination in Earth.critical_inclinations:
-            if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
-                ecc = 5.5e-2 * u.one  # Same as the moon
-                return cls.from_classical(
-                    Earth, a, ecc, inc, raan, argp, arglat, epoch, plane
-                )
+        critical_inclination = cls._find_closest_value(inc, Earth.critical_inclinations)
+        if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
+            return cls._frozen_critical_inclination(
+                a, inc, argp, raan, arglat, epoch, plane
+            )
 
         raise ValueError("Can't create a frozen orbit from given arguments")
+
+    @classmethod
+    def _find_closest_value(cls, value, values):
+        index = np.abs(np.asarray(values) - value).argmin()
+        return Earth.critical_argps[index]
+
+    @classmethod
+    def _frozen_critical_argp(cls, a, inc, argp, raan, arglat, epoch, plane):
+        ecc = -Earth.J3 * Earth.R * np.sin(inc) / 2 / Earth.J2 / a
+        return cls.from_classical(Earth, a, ecc, inc, raan, argp, arglat, epoch, plane)
+
+    @classmethod
+    def _frozen_critical_inclination(cls, a, inc, argp, raan, arglat, epoch, plane):
+        ecc = 5.5e-2 * u.one  # Same as the moon
+        return cls.from_classical(Earth, a, ecc, inc, raan, argp, arglat, epoch, plane)
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
