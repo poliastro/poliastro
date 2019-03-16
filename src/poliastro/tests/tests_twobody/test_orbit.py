@@ -205,6 +205,56 @@ def test_pqw_for_circular_equatorial_orbit():
     assert_allclose(w, expected_w)
 
 
+def test_frozen_orbit_argp():
+    expected_argp = Earth.critical_argps[-1]
+    orbit = Orbit.frozen(1e6 * u.m, argp=expected_argp)
+    argp = orbit.argp
+    assert_allclose(argp, expected_argp)
+
+
+def test_frozen_orbit_inc():
+    expected_inc = Earth.critical_inclinations[-1]
+    orbit = Orbit.frozen(1e6 * u.m, inc=expected_inc)
+    inc = orbit.inc
+    assert_allclose(inc, expected_inc)
+
+
+def test_frozen_orbit_argp_and_inc():
+    expected_argp = Earth.critical_argps[-1]
+    expected_inc = Earth.critical_inclinations[-1]
+    orbit = Orbit.frozen(1e3 * u.km, inc=expected_inc, argp=expected_argp)
+    argp = orbit.argp
+    inc = orbit.inc
+    assert_allclose(argp, expected_argp)
+    assert_allclose(inc, expected_inc)
+
+
+def test_frozen_orbit_value_error():
+    expected_argp = 0 * u.deg  # Non-critical value
+    expected_inc = 0 * u.deg  # Non-critical value
+    with pytest.raises(ValueError):
+        Orbit.frozen(1e6 * u.m, inc=expected_inc, argp=expected_argp)
+
+
+def test_frozen_orbit_no_args():
+    Orbit.frozen(1 * u.AU)
+
+
+def test_frozen_orbit_non_critical_argp():
+    orbit = Orbit.frozen(1 * u.AU, argp=0 * u.deg)  # Non-critical value
+    assert orbit.inc in Earth.critical_inclinations
+
+
+def test_frozen_orbit_non_critical_inclination():
+    orbit = Orbit.frozen(1e3 * u.km, inc=0 * u.deg)  # Non-critical value
+    assert orbit.argp in Earth.critical_argps
+
+
+def test_frozen_orbit_invalid_alt():
+    with pytest.raises(ValueError):
+        Orbit.frozen(-1 * u.m)
+
+
 def test_orbit_representation():
     ss = Orbit.circular(
         Earth, 600 * u.km, 20 * u.deg, epoch=Time("2018-09-08 09:04:00", scale="tdb")

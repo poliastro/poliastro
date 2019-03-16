@@ -610,6 +610,67 @@ class Orbit(object):
         ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu)
         return cls(ss, epoch, plane)
 
+    @classmethod
+    @u.quantity_input(alt=u.m, inc=u.rad, argp=u.rad, raan=u.rad, arglat=u.rad)
+    def frozen(
+        cls,
+        alt,
+        inc=Earth.critical_inclinations[0],
+        argp=Earth.critical_argps[0],
+        raan=0 * u.deg,
+        arglat=0 * u.deg,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
+    ):
+        """Return frozen 'Orbit'.
+
+        Parameters
+        ----------
+        alt : ~astropy.units.Quantity
+            Altitude over surface.
+        inc : ~astropy.units.Quantity, optional
+            Inclination, default to critical value.
+        argp : ~astropy.units.Quantity, optional
+            Argument of the pericenter, default to critical value.
+        raan : ~astropy.units.Quantity, optional
+            Right ascension of the ascending node, default to 0 deg.
+        arglat : ~astropy.units.Quantity, optional
+            Argument of latitude, default to 0 deg.
+        epoch: ~astropy.time.Time, optional
+            Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
+        """
+
+        if alt <= 0:
+            raise ValueError(
+                "The semimajor axis may not be smaller that the earth's radius"
+            )
+
+        a = Earth.R + alt
+
+        for critical_argp in Earth.critical_argps:
+            if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
+                if inc is None:
+                    inc = Earth.critical_inclinations[0]
+                ecc = -Earth.J3 * Earth.R * np.sin(inc) / 2 / Earth.J2 / a
+
+                return cls.from_classical(
+                    Earth, a, ecc, inc, raan, argp, arglat, epoch, plane
+                )
+
+        for critical_inclination in Earth.critical_inclinations:
+            if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
+                # Didn't want to put zero here, to avoid a perfect circle, but
+                # this could be any number between zero and one
+                ecc = 6e-3 * u.one
+
+                return cls.from_classical(
+                    Earth, a, ecc, inc, raan, argp, arglat, epoch, plane
+                )
+
+        raise ValueError("Can't create a frozen orbit from given arguments")
+
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
 

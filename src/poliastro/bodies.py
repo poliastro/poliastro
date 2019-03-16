@@ -168,6 +168,8 @@ class _Earth(_Body):
     J3 = constants.J3_earth
     H0 = constants.H0_earth
     rho0 = constants.rho0_earth
+    critical_inclinations = constants.critical_inclinations_earth
+    critical_argps = constants.critical_argps_earth
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):

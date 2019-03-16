@@ -25,6 +25,7 @@ J2 for the Sun was obtained from:
   from helioseismology, Redouane Mecheri et al)
 
 """
+import numpy as np
 from astropy import time
 from astropy.constants import Constant
 
@@ -337,3 +338,45 @@ Wdivc_sun = Constant(
     "Howard Curtis",
     system="si",
 )
+
+critical_inclinations_earth = [
+    Constant(
+        "i1_earth",
+        "first critical inclination for earth's frozen orbit",
+        63.4349 * np.pi / 180,
+        "rad",
+        0,
+        "Orlov, A. A (1953)",
+        system="si",
+    ),
+    Constant(
+        "i2_earth",
+        "second critical inclination for earth's frozen orbit",
+        116.5651 * np.pi / 180,
+        "rad",
+        0,
+        "Orlov, A. A (1953)",
+        system="si",
+    ),
+]
+
+critical_argps_earth = [
+    Constant(
+        "w1_earth",
+        "first critical argument of periapsis for earth's frozen orbit",
+        np.pi / 2,
+        "rad",
+        0,
+        "Orlov, A. A (1953)",
+        system="si",
+    ),
+    Constant(
+        "w2_earth",
+        "second critical argument of periapsis for earth's frozen orbit",
+        3 * np.pi / 2,
+        "rad",
+        0,
+        "Orlov, A. A (1953)",
+        system="si",
+    ),
+]
