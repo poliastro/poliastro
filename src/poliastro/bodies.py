@@ -133,9 +133,9 @@ class _Mercury(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-        ra = (281.01 - 0.033 * T) * u.deg
-        dec = (61.45 - 0.005 * T) * u.deg
-        W = (329.548 + 6.1385025 * d) * u.deg
+        ra = (281.0097 - 0.0328 * T) * u.deg
+        dec = (61.4143 - 0.0049 * T) * u.deg
+        W = (329.5469 + 6.1385025 * d) * u.deg
 
         return ra, dec, W
 
@@ -234,7 +234,7 @@ class _Jupiter(_Body):
             - 0.000013 * math.cos(Jd.to("rad").value)
             + 0.000926 * math.cos(Je.to("rad").value)
         ) * u.deg
-        W = (284.95 + 870.5366420 * d) * u.deg
+        W = (284.95 + 870.5360000 * d) * u.deg
 
         return ra, dec, W
 
@@ -302,9 +302,9 @@ class _Pluto(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-        ra = 312.993 * u.deg
-        dec = 6.163 * u.deg
-        W = (190.147 + 360.9856235 * d) * u.deg
+        ra = 132.993 * u.deg
+        dec = -6.163 * u.deg
+        W = (302.695 + 56.3625225 * d) * u.deg
 
         return ra, dec, W
 
@@ -369,7 +369,7 @@ class _Moon(_Body):
             - 0.0009 * math.cos(E13.to("rad").value)
         ) * u.deg
         W = (
-            38.321
+            38.3213
             + 13.17635815 * d
             - 1.4e-12 * d ** 2
             + 3.5610 * math.sin(E1.to("rad").value)
