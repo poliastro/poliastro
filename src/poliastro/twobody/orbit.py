@@ -641,7 +641,6 @@ class Orbit(object):
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
-
         if alt <= 0:
             raise ValueError(
                 "The semimajor axis may not be smaller that the earth's radius"
@@ -651,20 +650,14 @@ class Orbit(object):
 
         for critical_argp in Earth.critical_argps:
             if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
-                if inc is None:
-                    inc = Earth.critical_inclinations[0]
                 ecc = -Earth.J3 * Earth.R * np.sin(inc) / 2 / Earth.J2 / a
-
                 return cls.from_classical(
                     Earth, a, ecc, inc, raan, argp, arglat, epoch, plane
                 )
 
         for critical_inclination in Earth.critical_inclinations:
             if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
-                # Didn't want to put zero here, to avoid a perfect circle, but
-                # this could be any number between zero and one
-                ecc = 6e-3 * u.one
-
+                ecc = 5.5e-2 * u.one  # Same as the moon
                 return cls.from_classical(
                     Earth, a, ecc, inc, raan, argp, arglat, epoch, plane
                 )
