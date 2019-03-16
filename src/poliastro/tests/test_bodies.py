@@ -1,14 +1,12 @@
-import pytest
-from astropy import units as u
-from astropy.time import Time
-from astropy.tests.helper import assert_quantity_allclose
-
-from poliastro.bodies import *
-from poliastro import bodies
-from poliastro import constants
 import math
 
+import pytest
 import spiceypy as spice
+from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
+from astropy.time import Time
+from poliastro import bodies, constants
+from poliastro.bodies import *
 
 
 def test_body_has_k_given_in_constructor():
