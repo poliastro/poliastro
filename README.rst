@@ -171,14 +171,15 @@ welcome! For more information, head to `CONTRIBUTING.rst`_.
 Support
 =======
 
-|mailing|
+|mailing|  |matrix|
 
-Release announcements and general discussion take place on our `mailing list`_.
-Feel free to join!
+Release announcements and general discussion take place on our `Mailing List`_ .
 
-.. _`mailing list`: https://groups.io/g/poliastro-dev
+For further clarifications and discussions, feel free to join Poliastro `Chat Room`_.
 
-https://groups.io/g/poliastro-dev
+.. _`Chat Room`: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
+.. _`Mailing List`: https://groups.io/g/poliastro-dev
+
 
 Citing
 ======
