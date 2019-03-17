@@ -91,8 +91,8 @@ def test_from_relative():
 
 class TestRotElements():
 
-    kernel_dir = os.path.abspath(os.path.realpath("kernels"))
-    kernel_name = os.path.join(kernel_dir, "pck00010.tpc")
+    kernel_folder = os.path.join(os.getcwd(), "src/poliastro/tests/kernels")
+    kernel_name = os.path.join(kernel_folder, "pck00010.tpc")
     spice.furnsh(kernel_name)
 
     @pytest.fixture()
