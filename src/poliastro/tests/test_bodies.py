@@ -1,12 +1,26 @@
 import math
+import os
 
 import pytest
-import spiceypy as spice
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from poliastro import bodies, constants
-from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Moon
+from poliastro.bodies import (
+    Earth,
+    Jupiter,
+    Mars,
+    Mercury,
+    Moon,
+    Neptune,
+    Pluto,
+    Saturn,
+    Sun,
+    Uranus,
+    Venus,
+)
+
+import spiceypy as spice
 
 
 def test_body_has_k_given_in_constructor():
@@ -77,7 +91,9 @@ def test_from_relative():
 
 class TestRotElements():
 
-    spice.furnsh("kernels/pck00010.tpc")
+    kernel_dir = os.path.abspath(os.path.realpath("kernels"))
+    kernel_name = os.path.join(kernel_dir, "pck00010.tpc")
+    spice.furnsh(kernel_name)
 
     @pytest.fixture()
     def set_epoch(self):
@@ -107,9 +123,9 @@ class TestRotElements():
 
     def test_Mercury(self, set_epoch):
         epoch, T, d = set_epoch
-        value_from_poliastro = [i.value for i in Venus.rot_elements_at_epoch(epoch)]
+        value_from_poliastro = [i.value for i in Mercury.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Venus')
+        body_code = spice.bodn2c('Mercury')
 
         BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
         BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
@@ -301,9 +317,9 @@ class TestRotElements():
 
         body_code = spice.bodn2c('Pluto')
 
-        BODY_POLE_RA = spice.gdpool('BODY'+ str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY'+ str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY'+ str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
+        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
+        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -340,7 +356,6 @@ class TestRotElements():
         E11 = BODY3_NUT_PREC_ANGLES[20] + BODY3_NUT_PREC_ANGLES[21] * T
         E12 = BODY3_NUT_PREC_ANGLES[22] + BODY3_NUT_PREC_ANGLES[23] * T
         E13 = BODY3_NUT_PREC_ANGLES[24] + BODY3_NUT_PREC_ANGLES[25] * T
-
         body_RA = (
             BODY_POLE_RA[0]
             + BODY_POLE_RA[1] * T
@@ -358,7 +373,6 @@ class TestRotElements():
             + BODY301_NUT_PREC_RA[11] * math.sin(math.radians(E12))
             + BODY301_NUT_PREC_RA[12] * math.sin(math.radians(E13))
         )
-
         body_DEC = (
             BODY_POLE_DEC[0]
             + BODY_POLE_DEC[1] * T
@@ -376,7 +390,6 @@ class TestRotElements():
             + BODY301_NUT_PREC_DEC[11] * math.cos(math.radians(E12))
             + BODY301_NUT_PREC_DEC[12] * math.cos(math.radians(E13))
         )
-
         body_PM = (
             BODY_PM[0]
             + BODY_PM[1] * d
@@ -395,7 +408,6 @@ class TestRotElements():
             + BODY301_NUT_PREC_PM[11] * math.sin(math.radians(E12))
             + BODY301_NUT_PREC_PM[12] * math.sin(math.radians(E13))
         )
-
         value_from_spice = [body_RA, body_DEC, body_PM]
 
         for i, j in zip(value_from_poliastro, value_from_spice):
