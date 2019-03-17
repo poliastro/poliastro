@@ -13,6 +13,4 @@ def main():
     )
     parser.add_argument("--version", action="version", version=poliastro.__version__)
 
-    args = parser.parse_args()
-
     parser.print_help()

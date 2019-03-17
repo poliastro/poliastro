@@ -130,7 +130,7 @@ In this case, we'd use the method
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    
+
     ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
 Notice that whether we create a ``Orbit`` from :math:`(r)` and :math:`(v)` or from
@@ -227,7 +227,7 @@ Studying artificial perturbations: thrust
 
 In addition to natural perturbations, poliastro also has
 built-in artificial perturbations (thrusts) aimed
-at intentional change of some orbital elements. 
+at intentional change of some orbital elements.
 Let us simultaineously change eccentricy and inclination::
 
     >>> from poliastro.twobody.thrust import change_inc_ecc
@@ -272,7 +272,7 @@ method or instantiating it directly.
     from poliastro.maneuver import Maneuver
 
     dv = [5, 0, 0] * u.m / u.s
-    
+
     man = Maneuver.impulse(dv)
     man = Maneuver((0 * u.s, dv))  # Equivalent
 
@@ -328,7 +328,7 @@ easily visualize in two dimensions:
 .. code-block:: python
 
     from poliastro.plotting import OrbitPlotter
-    
+
     op = OrbitPlotter2D()
     ss_a, ss_f = ss_i.apply_maneuver(hoh, intermediate=True)
     op.plot(ss_i, label="Initial orbit")
@@ -340,7 +340,7 @@ Which produces this beautiful plot:
 .. figure:: _static/hohmann.png
    :align: center
    :alt: Hohmann transfer
-   
+
    Plot of a Hohmann transfer.
 
 Where are the planets? Computing ephemerides
@@ -429,41 +429,5 @@ And these are the results::
    Mars Science Laboratory orbit.
 
 .. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
-
-Working with NEOs
------------------
-
-`NEOs (Near Earth Objects)`_ are asteroids and comets whose orbits are near to earth (obvious, isn't it?).
-More correctly, their perihelion (closest approach to the Sun) is less than 1.3 astronomical units (≈ 200 * 10\ :sup:`6` km).
-Currently, they are being an important subject of study for scientists around the world, due to their status as the relatively
-unchanged remains from the solar system formation process.
-
-Because of that, a new module related to NEOs has been added to ``poliastro``
-as part of `SOCIS 2017 project`_.
-
-For the moment, it is possible to search NEOs by name (also using wildcards),
-and get their orbits straight from NASA APIs, using :py:func:`~poliastro.neos.orbit_from_name`.
-For example, we can get `Apophis asteroid (99942 Apophis)`_ orbit with one command, and plot it:
-
-.. code-block:: python
-
-    from poliastro.neos import neows
-
-    apophis_orbit = neows.orbit_from_name('apophis')  # Also '99942' or '99942 apophis' works
-    earth_orbit =  Orbit.from_body_ephem(Earth)
-
-    op = OrbitPlotter()
-    op.plot(earth_orbit, label='Earth')
-    op.plot(apophis_orbit, label='Apophis')
-
-.. figure:: _static/neos.png
-   :align: center
-   :alt: Apophis asteroid orbit
-   
-   Apophis asteroid orbit compared to Earth orbit.
-
-.. _`SOCIS 2017 project`: https://github.com/poliastro/poliastro/wiki/SOCIS-2017
-.. _`NEOs (Near Earth Objects)`: https://en.wikipedia.org/wiki/Near-Earth_object
-.. _`Apophis asteroid (99942 Apophis)`: https://en.wikipedia.org/wiki/99942_Apophis
 
 *Per Python ad astra* ;)
