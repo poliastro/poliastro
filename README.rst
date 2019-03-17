@@ -180,7 +180,6 @@ For further clarifications and discussions, feel free to join Poliastro `Chat Ro
 .. _`Chat Room`: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 .. _`Mailing List`: https://groups.io/g/poliastro-dev
 
-https://groups.io/g/poliastro-dev
 
 Citing
 ======
