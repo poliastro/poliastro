@@ -645,7 +645,6 @@ class Orbit(object):
             raise ValueError(
                 "The semimajor axis may not be smaller that the earth's radius"
             )
-
         a = Earth.R + alt
 
         critical_argp = cls._find_closest_value(argp, Earth.critical_argps)
@@ -662,8 +661,9 @@ class Orbit(object):
 
     @classmethod
     def _find_closest_value(cls, value, values):
-        index = np.abs(np.asarray(values) - value).argmin()
-        return Earth.critical_argps[index]
+        critical_values = [critical_arg.value for critical_arg in values]
+        index = np.abs(np.asarray(critical_values) * u.rad - value).argmin()
+        return values[index]
 
     @classmethod
     def _frozen_critical_argp(cls, a, inc, argp, raan, arglat, epoch, plane):
