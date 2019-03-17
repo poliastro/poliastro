@@ -171,7 +171,7 @@ welcome! For more information, head to `CONTRIBUTING.rst`_.
 Support
 =======
 
-|mailing|
+|mailing|  |matrix|
 
 Release announcements and general discussion take place on our `Mailing List`_ .
 
