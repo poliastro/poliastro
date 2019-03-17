@@ -2,9 +2,11 @@ import math
 import os
 
 import pytest
+import spiceypy as spice
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+
 from poliastro import bodies, constants
 from poliastro.bodies import (
     Earth,
@@ -19,8 +21,6 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-
-import spiceypy as spice
 
 
 def test_body_has_k_given_in_constructor():
