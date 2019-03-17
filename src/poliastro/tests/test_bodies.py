@@ -89,7 +89,7 @@ def test_from_relative():
     assert bodies.Earth.R == VALUECHECK.R
 
 
-class TestRotElements():
+class TestRotElements:
 
     kernel_folder = os.path.join(os.getcwd(), "src/poliastro/tests/kernels")
     kernel_name = os.path.join(kernel_folder, "pck00010.tpc")
@@ -97,8 +97,8 @@ class TestRotElements():
 
     @pytest.fixture()
     def set_epoch(self):
-        time = ['2000-01-01T00:00:00.00']
-        epoch = Time(time, format='isot', scale='utc')
+        time = ["2000-01-01T00:00:00.00"]
+        epoch = Time(time, format="isot", scale="utc")
         T = (epoch.tdb - constants.J2000).to("day").value / 36525
         d = (epoch.tdb - constants.J2000).to("day").value
         return epoch, T, d
@@ -107,11 +107,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Sun.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Sun')
+        body_code = spice.bodn2c("Sun")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0]
         body_DEC = BODY_POLE_DEC[0]
@@ -125,11 +125,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Mercury.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Mercury')
+        body_code = spice.bodn2c("Mercury")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -143,11 +143,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Venus.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Venus')
+        body_code = spice.bodn2c("Venus")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -161,11 +161,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Earth.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Earth')
+        body_code = spice.bodn2c("Earth")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -179,11 +179,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Mars.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Mars')
+        body_code = spice.bodn2c("Mars")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -197,14 +197,14 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Jupiter.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Jupiter')
+        body_code = spice.bodn2c("Jupiter")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
-        BODY5_NUT_PREC_ANGLES = spice.gdpool('BODY5_NUT_PREC_ANGLES', 0, 30)
-        BODY599_NUT_PREC_RA = spice.gdpool('BODY599_NUT_PREC_RA', 0, 15)
-        BODY599_NUT_PREC_DEC = spice.gdpool('BODY599_NUT_PREC_DEC', 0, 15)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
+        BODY5_NUT_PREC_ANGLES = spice.gdpool("BODY5_NUT_PREC_ANGLES", 0, 30)
+        BODY599_NUT_PREC_RA = spice.gdpool("BODY599_NUT_PREC_RA", 0, 15)
+        BODY599_NUT_PREC_DEC = spice.gdpool("BODY599_NUT_PREC_DEC", 0, 15)
 
         Ja = BODY5_NUT_PREC_ANGLES[20] + BODY5_NUT_PREC_ANGLES[21] * T
         Jb = BODY5_NUT_PREC_ANGLES[22] + BODY5_NUT_PREC_ANGLES[23] * T
@@ -243,11 +243,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Saturn.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Saturn')
+        body_code = spice.bodn2c("Saturn")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -261,11 +261,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Uranus.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Uranus')
+        body_code = spice.bodn2c("Uranus")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -279,16 +279,16 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Neptune.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Neptune')
+        body_code = spice.bodn2c("Neptune")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
-        BODY899_NUT_PREC_RA = spice.gdpool('BODY899_NUT_PREC_RA', 0, 8)
-        BODY899_NUT_PREC_DEC = spice.gdpool('BODY899_NUT_PREC_DEC', 0, 8)
-        BODY899_NUT_PREC_PM = spice.gdpool('BODY899_NUT_PREC_PM', 0, 8)
-        BODY8_NUT_PREC_ANGLES = spice.gdpool('BODY8_NUT_PREC_ANGLES', 0, 35)
+        BODY899_NUT_PREC_RA = spice.gdpool("BODY899_NUT_PREC_RA", 0, 8)
+        BODY899_NUT_PREC_DEC = spice.gdpool("BODY899_NUT_PREC_DEC", 0, 8)
+        BODY899_NUT_PREC_PM = spice.gdpool("BODY899_NUT_PREC_PM", 0, 8)
+        BODY8_NUT_PREC_ANGLES = spice.gdpool("BODY8_NUT_PREC_ANGLES", 0, 35)
 
         N = BODY8_NUT_PREC_ANGLES[0] + BODY8_NUT_PREC_ANGLES[1] * T
         body_RA = (
@@ -315,11 +315,11 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Pluto.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Pluto')
+        body_code = spice.bodn2c("Pluto")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
 
         body_RA = BODY_POLE_RA[0] + BODY_POLE_RA[1] * T
         body_DEC = BODY_POLE_DEC[0] + BODY_POLE_DEC[1] * T
@@ -333,15 +333,15 @@ class TestRotElements():
         epoch, T, d = set_epoch
         value_from_poliastro = [i.value for i in Moon.rot_elements_at_epoch(epoch)]
 
-        body_code = spice.bodn2c('Moon')
+        body_code = spice.bodn2c("Moon")
 
-        BODY_POLE_RA = spice.gdpool('BODY' + str(body_code) + '_POLE_RA', 0, 3)
-        BODY_POLE_DEC = spice.gdpool('BODY' + str(body_code) + '_POLE_DEC', 0, 3)
-        BODY_PM = spice.gdpool('BODY' + str(body_code) + '_PM', 0, 3)
-        BODY3_NUT_PREC_ANGLES = spice.gdpool('BODY3_NUT_PREC_ANGLES', 0, 30)
-        BODY301_NUT_PREC_RA = spice.gdpool('BODY301_NUT_PREC_RA', 0, 15)
-        BODY301_NUT_PREC_DEC = spice.gdpool('BODY301_NUT_PREC_DEC', 0, 15)
-        BODY301_NUT_PREC_PM = spice.gdpool('BODY301_NUT_PREC_PM', 0, 15)
+        BODY_POLE_RA = spice.gdpool("BODY" + str(body_code) + "_POLE_RA", 0, 3)
+        BODY_POLE_DEC = spice.gdpool("BODY" + str(body_code) + "_POLE_DEC", 0, 3)
+        BODY_PM = spice.gdpool("BODY" + str(body_code) + "_PM", 0, 3)
+        BODY3_NUT_PREC_ANGLES = spice.gdpool("BODY3_NUT_PREC_ANGLES", 0, 30)
+        BODY301_NUT_PREC_RA = spice.gdpool("BODY301_NUT_PREC_RA", 0, 15)
+        BODY301_NUT_PREC_DEC = spice.gdpool("BODY301_NUT_PREC_DEC", 0, 15)
+        BODY301_NUT_PREC_PM = spice.gdpool("BODY301_NUT_PREC_PM", 0, 15)
 
         E1 = BODY3_NUT_PREC_ANGLES[0] + BODY3_NUT_PREC_ANGLES[1] * T
         E2 = BODY3_NUT_PREC_ANGLES[2] + BODY3_NUT_PREC_ANGLES[3] * T
@@ -393,7 +393,7 @@ class TestRotElements():
         body_PM = (
             BODY_PM[0]
             + BODY_PM[1] * d
-            + BODY_PM[2] * d**2
+            + BODY_PM[2] * d ** 2
             + BODY301_NUT_PREC_PM[0] * math.sin(math.radians(E1))
             + BODY301_NUT_PREC_PM[1] * math.sin(math.radians(E2))
             + BODY301_NUT_PREC_PM[2] * math.sin(math.radians(E3))
