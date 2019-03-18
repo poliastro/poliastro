@@ -9,7 +9,6 @@ from astropy.coordinates import (
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric_posvel,
-    solar_system_ephemeris,
 )
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
@@ -371,20 +370,19 @@ class Orbit(object):
     def from_body_ephem(cls, body, epoch=None):
         """Return osculating `Orbit` of a body at a given time."""
         # TODO: https://github.com/poliastro/poliastro/issues/445
-        if body.name.lower() not in solar_system_ephemeris.bodies:
-            error_message = (
-                "Wrong ephemeris selected, cannot load "
-                + str(body.name)
-                + " data, as "
-                + str(body.name)
-                + " is not a part of selected ephemeris. Do run this command before calling from_body_ephem ------> solar_system_ephemeris.set('XXXXX') ------> where XXXXX contains the ephemeris having "
-                + str(body.name)
-                + " as one of its objects"
+        if body.name == "Pluto":
+            raise NotImplementedError(
+                """Default Ephemeris selected. To change it, please do
+
+            >>> solar_system_ephemeris.set('de432s')
+
+            """
             )
-            raise KeyError(error_message)
+
         else:
             if not epoch:
                 epoch = time.Time.now().tdb
+
             elif epoch.scale != "tdb":
                 epoch = epoch.tdb
                 warn(
@@ -392,7 +390,9 @@ class Orbit(object):
                     "{}. Use Time(..., scale='tdb') instead.".format(epoch.tdb.value),
                     TimeScaleWarning,
                 )
+
             r, v = get_body_barycentric_posvel(body.name, epoch)
+
             if body == Moon:
                 # TODO: The attractor is in fact the Earth-Moon Barycenter
                 icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
@@ -407,6 +407,7 @@ class Orbit(object):
                     gcrs_cart.differentials["s"].d_xyz.to(u.km / u.day),
                     epoch,
                 )
+
             else:
                 # TODO: The attractor is not really the Sun, but the Solar System
                 # Barycenter
