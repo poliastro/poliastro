@@ -378,7 +378,7 @@ class Orbit(object):
             body.name == "Pluto"
             and body.name.lower() not in solar_system_ephemeris.bodies
         ):
-            raise NotImplementedError(
+            raise KeyError(
                 """Default Ephemeris selected. To change it, please do
                 >>> solar_system_ephemeris.set('de432s')"""
             )
