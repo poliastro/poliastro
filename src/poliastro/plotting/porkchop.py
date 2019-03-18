@@ -28,7 +28,7 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
     tof = t_arrival - t_launch
 
     if tof <= 0:
-        return None, None, None
+        return None, None, None, None, None
 
     try:
         (v_dpt, v_arr), = lambert(Sun.k, rr_dpt_body.xyz, rr_arr_body.xyz, tof)
@@ -40,19 +40,21 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
         c3_arrival = dv_arr ** 2
 
         return (
+            dv_dpt.to(u.km / u.s).value,
+            dv_arr.to(u.km / u.s).value,
             c3_launch.to(u.km ** 2 / u.s ** 2).value,
             c3_arrival.to(u.km ** 2 / u.s ** 2).value,
             tof.jd,
         )
 
     except AssertionError:
-        return None, None, None
+        return None, None, None, None, None
 
 
 # numpy.vectorize is amazing
 targetting_vec = np.vectorize(
     _targetting,
-    otypes=[np.ndarray, np.ndarray, np.ndarray],
+    otypes=[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
     excluded=["departure_body", "target_body"],
 )
 
@@ -63,8 +65,10 @@ def porkchop(
     launch_span,
     arrival_span,
     ax=None,
-    time_lines=True,
+    tfl=True,
+    vhp=True,
     max_c3=45.0 * u.km ** 2 / u.s ** 2,
+    max_vhp=5 * u.km / u.s,
 ):
     """Plots porkchop between two bodies.
 
@@ -80,6 +84,14 @@ def porkchop(
         Time span for arrival
     ax: matplotlib.axes.Axes:
         For custom figures
+    tfl: boolean
+        For plotting time flight contour lines
+    vhp: boolean
+        For plotting arrival velocity contour lines
+    max_c3: float
+        Sets the maximum C3 value for porkchop
+    max_vhp: float
+        Sets the maximum arrival velocity for porkchop
 
     Returns
     -------
@@ -97,10 +109,10 @@ def porkchop(
     >>> from poliastro.util import time_range
     >>> launch_span = time_range("2005-04-30", end="2005-10-07")
     >>> arrival_span = time_range("2005-11-16", end="2006-12-21")
-    >>> c3dpt, c3arr, tof = porkchop(Earth, Mars, launch_span, arrival_span)
+    >>> dv_launch, dev_dpt, c3dpt, c3arr, tof = porkchop(Earth, Mars, launch_span, arrival_span)
     """
 
-    c3_launch, c3_arrival, tof = targetting_vec(
+    dv_launch, dv_arrival, c3_launch, c3_arrival, tof = targetting_vec(
         departure_body,
         target_body,
         launch_span[np.newaxis, :],
@@ -136,11 +148,11 @@ def porkchop(
     cbar.set_label("km2 / s2")
     ax.clabel(line, inline=1, fmt="%1.1f", colors="k", fontsize=10)
 
-    if time_lines:
+    if tfl:
 
         time_levels = np.linspace(100, 500, 5)
 
-        t = ax.contour(
+        tfl_contour = ax.contour(
             [D.to_datetime() for D in launch_span],
             [A.to_datetime() for A in arrival_span],
             tof,
@@ -150,13 +162,28 @@ def porkchop(
             linewidths=3.5,
         )
 
-        ax.clabel(t, inline=1, fmt="%1.1f", colors="r", fontsize=14)
+        ax.clabel(tfl_contour, inline=1, fmt="%1.1f", colors="r", fontsize=14)
+
+    if vhp:
+
+        vhp_levels = np.linspace(0, max_vhp.to(u.km / u.s).value, 5)
+
+        vhp_contour = ax.contour(
+            [D.to_datetime() for D in launch_span],
+            [A.to_datetime() for A in arrival_span],
+            dv_arrival,
+            vhp_levels,
+            colors="navy",
+            linewidths=2.0,
+        )
+
+        ax.clabel(vhp_contour, inline=1, fmt="%1.1f", colors="navy", fontsize=12)
 
     ax.grid()
     fig.autofmt_xdate()
 
     ax.set_title(
-        "{} - {} for year {}, C3 Launch, TFL".format(
+        "{} - {} for year {}, C3 Launch".format(
             departure_body.name, target_body.name, launch_span[0].datetime.year
         ),
         fontsize=14,
@@ -166,6 +193,8 @@ def porkchop(
     ax.set_ylabel("Arrival date", fontsize=10, fontweight="bold")
 
     return (
+        dv_launch * u.km / u.s,
+        dv_arrival * u.km / u.s,
         c3_launch * u.km ** 2 / u.s ** 2,
         c3_arrival * u.km ** 2 / u.s ** 2,
         tof * u.d,
