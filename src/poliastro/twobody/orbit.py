@@ -379,7 +379,10 @@ class Orbit(object):
             and body.name.lower() not in solar_system_ephemeris.bodies
         ):
             raise KeyError(
-                """Default Ephemeris selected. To change it, please do
+                """These bodies can not be found in the "builtin" ephemeris. Please change the ephemeris.
+                >>> from astropy.coordinates import solar_system_ephemeris
+                >>> solar_system_ephemeris.set('jpl')"""
+
                 >>> solar_system_ephemeris.set('de432s')"""
             )
 
