@@ -129,3 +129,27 @@ def hyp_nu_limit(ecc, r_max_ratio=np.inf):
 
     """
     return np.arccos(-(1 - 1 / r_max_ratio) / ecc)
+
+
+@u.quantity_input(a=u.m, inc=u.rad)
+def get_eccentricity_critical_argp(attractor, a, inc):
+    """Calculates the eccentricity for frozen orbits when the argument of perigee is critical
+
+    Parameters
+    ----------
+    attractor : Body
+        Main attractor.
+    a : ~astropy.units.Quantity
+        Orbit's semimajor axis
+    inc : ~astropy.units.Quantity, optional
+         Inclination, default to critical value.
+
+    """
+    ecc = -attractor.J3 * attractor.R * np.sin(inc) / 2 / attractor.J2 / a
+    return ecc
+
+
+def get_eccentricity_critical_inc():
+    """Calculates the eccentricity when a frozen orbit has critical inclination"""
+    ecc = 5.5e-2 * u.one  # Same as the moon
+    return ecc

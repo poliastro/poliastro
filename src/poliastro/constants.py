@@ -281,7 +281,7 @@ R_moon = Constant(
 
 J2_sun = Constant(
     "J2_sun",
-    "Sun J2 non-oblateness coefficient",
+    "Sun J2 oblateness coefficient",
     2.20e-7,
     "",
     0.01e-7,
@@ -291,7 +291,7 @@ J2_sun = Constant(
 
 J2_earth = Constant(
     "J2_earth",
-    "Earth J2 non-oblateness coefficient",
+    "Earth J2 oblateness coefficient",
     0.00108263,
     "",
     1,
@@ -301,8 +301,48 @@ J2_earth = Constant(
 
 J3_earth = Constant(
     "J3_earth",
-    "Earth J3 non-oblateness coefficient",
+    "Earth J3 asymmetry between the northern and southern hemispheres",
     -2.5326613168e-6,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J2_mars = Constant(
+    "J2_mars",
+    "Mars J2 oblateness coefficient",
+    0.0019555,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J3_mars = Constant(
+    "J3_mars",
+    "Mars J3 asymmetry between the northern and southern hemispheres",
+    3.1450e-5,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J2_venus = Constant(
+    "J2_venus",
+    "Venus J2 oblateness coefficient",
+    4.4044e-6,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J3_venus = Constant(
+    "J3_venus",
+    "Venus J3 asymmetry between the northern and southern hemispheres",
+    -2.1082e-6,
     "",
     1,
     "HAL archives",
@@ -339,9 +379,9 @@ Wdivc_sun = Constant(
     system="si",
 )
 
-critical_inclinations_earth = [
+critical_inclinations = [
     Constant(
-        "i1_earth",
+        "i1",
         "first critical inclination for earth's frozen orbit",
         63.4349 * np.pi / 180,
         "rad",
@@ -350,7 +390,7 @@ critical_inclinations_earth = [
         system="si",
     ),
     Constant(
-        "i2_earth",
+        "i2",
         "second critical inclination for earth's frozen orbit",
         116.5651 * np.pi / 180,
         "rad",
@@ -360,9 +400,9 @@ critical_inclinations_earth = [
     ),
 ]
 
-critical_argps_earth = [
+critical_argps = [
     Constant(
-        "w1_earth",
+        "w1",
         "first critical argument of periapsis for earth's frozen orbit",
         np.pi / 2,
         "rad",
@@ -371,7 +411,7 @@ critical_argps_earth = [
         system="si",
     ),
     Constant(
-        "w2_earth",
+        "w2",
         "second critical argument of periapsis for earth's frozen orbit",
         3 * np.pi / 2,
         "rad",

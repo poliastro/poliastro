@@ -21,7 +21,12 @@ from poliastro.frames import Planes, get_frame
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
-from poliastro.util import hyp_nu_limit, norm
+from poliastro.util import (
+    hyp_nu_limit,
+    norm,
+    get_eccentricity_critical_argp,
+    get_eccentricity_critical_inc,
+)
 
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
@@ -614,18 +619,63 @@ class Orbit(object):
     @u.quantity_input(alt=u.m, inc=u.rad, argp=u.rad, raan=u.rad, arglat=u.rad)
     def frozen(
         cls,
+        attractor,
         alt,
-        inc=Earth.critical_inclinations[0],
-        argp=Earth.critical_argps[0],
+        inc=None,
+        argp=None,
         raan=0 * u.deg,
         arglat=0 * u.deg,
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
     ):
-        """Return frozen 'Orbit'.
+        """Return frozen Orbit.
+
+        To achieve frozen orbit these two equations have to be set to zero.
+        .. math::
+        \begin{align}
+
+        \dfrac {d\overline {e}}{dt}=\dfrac {-3\overline {n}J_{3}R^{3}_{E}\sin \left( \overline {i}\right) }{2a^{3}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \cos \overline {w}
+
+        \dfrac {d\overline {\omega }}{dt}=\dfrac {3\overline {n}J_{2}R^{2}_{E}}{a^{2}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \left[ 1+\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2}\overline {i}}{\sin \overline {i}}\right) \dfrac {\sin \overline {w}}{\overline {e}}\right]
+
+        \end{align}
+
+        The first approach would be to nullify next term to zero
+        .. math::
+        \begin{align}
+
+        ( 1-\dfrac {5}{4}\sin ^{2})
+
+        \end{align}
+
+        For which one obtains the so-called critical inclinations: i = 63.4349
+        or 116.5651 degrees. To escape the inclination requirement, the argument of periapsis can be
+        set to w = 90 or 270 degrees to nullify the second equation. Then, one should nullify the right-hand side of the first equation, which yields an expression that correlates the inclination of the object and the eccentricity of the orbit:
+        .. math::
+        \begin{align}
+            \overline {e}=-\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2} \overline {i}}{\sin \overline {i}}\right)
+        \end{align}
+
+        Assuming that e is negligible compared to J2, it can be shown that:
+        .. math::
+        \begin{align}
+            \overline {e}\approx -\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}}\sin \overline {i}
+        \end{align}
+
+        The implementation is divided in the following cases:
+
+        1- When the user gives a negative altitude, the method will raise a ValueError
+        2- When the attractor has not defined J2 or J3, the method will raise an AttributeError
+        3- When the attractor has J2/J3 outside of range 1 to 10 , the method will raise an NotImplementedError. Special case for Venus . See "Extension of the critical inclination" by Xiaodong Liu, Hexi Baoyin, and Xingrui Ma
+        4- When argp and inc are both given but neither are critical values, the method will raise a ValueError
+        5- If argp is not given or the given argp is a critical value, the last fomula is used to approximate eccentricity
+        6- If inc is not given or the given inc is critical,we set the eccentricity value the same as the Earth's moon.
+
 
         Parameters
         ----------
+        attractor : Body
+            Main attractor.
         alt : ~astropy.units.Quantity
             Altitude over surface.
         inc : ~astropy.units.Quantity, optional
@@ -641,22 +691,50 @@ class Orbit(object):
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
-        if alt <= 0:
+
+        try:
+
+            if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
+                raise NotImplementedError(
+                    "This has not been implemented for {}".format(attractor.name)
+                )
+
+            if inc is None:
+                inc = attractor.critical_inclinations[0]
+
+            if argp is None:
+                argp = attractor.critical_argps[0]
+
+            assert alt > 0
+
+            a = attractor.R + alt
+
+            critical_argp = cls._find_closest_value(argp, attractor.critical_argps)
+            if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
+                return cls._frozen_critical_argp(
+                    attractor, a, inc, argp, raan, arglat, epoch, plane
+                )
+
+            critical_inclination = cls._find_closest_value(
+                inc, attractor.critical_inclinations
+            )
+            if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
+                return cls._frozen_critical_inclination(
+                    attractor, a, inc, argp, raan, arglat, epoch, plane
+                )
+
+        except AttributeError:
+            raise AttributeError(
+                "Attractor {} has not spherical harmonics implemented".format(
+                    attractor.name
+                )
+            )
+        except AssertionError:
             raise ValueError(
-                "The semimajor axis may not be smaller that the earth's radius"
+                "The semimajor axis may not be smaller that {}'s radius".format(
+                    attractor.name
+                )
             )
-        a = Earth.R + alt
-
-        critical_argp = cls._find_closest_value(argp, Earth.critical_argps)
-        if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
-            return cls._frozen_critical_argp(a, inc, argp, raan, arglat, epoch, plane)
-
-        critical_inclination = cls._find_closest_value(inc, Earth.critical_inclinations)
-        if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
-            return cls._frozen_critical_inclination(
-                a, inc, argp, raan, arglat, epoch, plane
-            )
-
         raise ValueError("Can't create a frozen orbit from given arguments")
 
     @classmethod
@@ -666,14 +744,20 @@ class Orbit(object):
         return values[index]
 
     @classmethod
-    def _frozen_critical_argp(cls, a, inc, argp, raan, arglat, epoch, plane):
-        ecc = -Earth.J3 * Earth.R * np.sin(inc) / 2 / Earth.J2 / a
-        return cls.from_classical(Earth, a, ecc, inc, raan, argp, arglat, epoch, plane)
+    def _frozen_critical_argp(cls, attractor, a, inc, argp, raan, arglat, epoch, plane):
+        ecc = get_eccentricity_critical_argp(attractor, a, inc)
+        return cls.from_classical(
+            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+        )
 
     @classmethod
-    def _frozen_critical_inclination(cls, a, inc, argp, raan, arglat, epoch, plane):
-        ecc = 5.5e-2 * u.one  # Same as the moon
-        return cls.from_classical(Earth, a, ecc, inc, raan, argp, arglat, epoch, plane)
+    def _frozen_critical_inclination(
+        cls, attractor, a, inc, argp, raan, arglat, epoch, plane
+    ):
+        ecc = get_eccentricity_critical_inc()
+        return cls.from_classical(
+            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+        )
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
