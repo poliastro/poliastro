@@ -9,6 +9,7 @@ from astropy.coordinates import (
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric_posvel,
+    solar_system_ephemeris,
 )
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
@@ -372,7 +373,7 @@ class Orbit(object):
 
         # TODO: https://github.com/poliastro/poliastro/issues/445
 
-        if body.name == "Pluto":
+        if (body.name == "Pluto" and body.name.lower() not in solar_system_ephemeris.bodies):
             raise NotImplementedError(
                 """Default Ephemeris selected. To change it, please do
                 >>> solar_system_ephemeris.set('de432s')"""
