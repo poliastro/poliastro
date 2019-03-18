@@ -4,12 +4,12 @@ import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
     GCRS,
-    solar_system_ephemeris,
     ICRS,
     Angle,
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric_posvel,
+    solar_system_ephemeris,
 )
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
@@ -374,8 +374,16 @@ class Orbit(object):
         """
         # TODO: https://github.com/poliastro/poliastro/issues/445
         if body.name.lower() not in solar_system_ephemeris.bodies:
-            error_message="Wrong ephemeris selected, cannot load " + str(body.name) + " data, as " + str(body.name) + " is not a part of selected ephemeris. "  
-            error_message+="Do run this command before calling from_body_ephem ------> solar_system_ephemeris.set('XXXXX') ------> where XXXXX contains the ephemeris having " + str(body.name) + " as one of its objects"
+            error_message = (
+                "Wrong ephemeris selected, cannot load "
+                + str(body.name)
+                + " data, as "
+                + str(body.name)
+                + " is not a part of selected ephemeris. Do run this command before calling from_body_ephem ------> solar_system_ephemeris.set('XXXXX') ------> where XXXXX contains the ephemeris having "
+                + str(body.name)
+                + " as one of its objects"
+            )
+
             raise KeyError(error_message)
         else:
             if not epoch:
@@ -408,12 +416,12 @@ class Orbit(object):
             else:
                 # TODO: The attractor is not really the Sun, but the Solar System
                 # Barycenter
-                ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+                ss = cls.from_vectors(
+                    Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch
+                )
                 ss._frame = ICRS()  # Hack!
 
             return ss
-            
-
 
     @classmethod
     def from_horizons(
