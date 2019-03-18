@@ -516,7 +516,7 @@ class Orbit(object):
             )
 
             return ss
-            
+
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
     def circular(
