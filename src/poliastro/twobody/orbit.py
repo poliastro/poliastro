@@ -9,7 +9,6 @@ from astropy.coordinates import (
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric_posvel,
-    solar_system_ephemeris,
 )
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
@@ -369,23 +368,12 @@ class Orbit(object):
 
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
+        """Return osculating `Orbit` of a body at a given time.
 
-        """Return osculating `Orbit` of a body at a given time."""
-
+        """
         # TODO: https://github.com/poliastro/poliastro/issues/445
-
-        if (
-            body.name == "Pluto"
-            and body.name.lower() not in solar_system_ephemeris.bodies
-        ):
-            raise KeyError(
-                """These bodies can not be found in the "builtin" ephemeris. To change the ephemeris, do
-                >>> solar_system_ephemeris.set('jpl')"""
-            )
-
         if not epoch:
             epoch = time.Time.now().tdb
-
         elif epoch.scale != "tdb":
             epoch = epoch.tdb
             warn(
@@ -420,46 +408,6 @@ class Orbit(object):
         return ss
 
     @classmethod
-    def from_horizons(
-        cls, name, epoch=None, plane=Planes.EARTH_EQUATOR, id_type="smallbody"
-    ):
-        """Return osculating `Orbit` of a body using JPLHorizons module of Astroquery.
-
-        Parameters
-        ----------
-        name : string
-            Name of the body to query for.
-        epoch : ~astropy.time.Time, optional
-            Epoch, default to None.
-        plane : ~poliastro.frames.Planes
-            Fundamental plane of the frame.
-        id_type : string, optional
-            Use "smallbody" for Asteroids and Comets, and "majorbody"
-            for Planets and Satellites.
-
-        """
-        if not epoch:
-            epoch = time.Time.now()
-        if plane == Planes.EARTH_EQUATOR:
-            refplane = "earth"
-        elif plane == Planes.EARTH_ECLIPTIC:
-            refplane = "ecliptic"
-
-        obj = Horizons(id=name, epochs=epoch.jd, id_type=id_type).elements(
-            refplane=refplane
-        )
-        a = obj["a"][0] * u.au
-        ecc = obj["e"][0] * u.one
-        inc = obj["incl"][0] * u.deg
-        raan = obj["Omega"][0] * u.deg
-        argp = obj["w"][0] * u.deg
-        nu = obj["nu"][0] * u.deg
-        ss = cls.from_classical(
-            Sun, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
-        )
-        return ss
-
-    @classmethod
     def from_sbdb(cls, name, **kargs):
         """Return osculating `Orbit` by using `SBDB` from Astroquery.
 
@@ -480,32 +428,44 @@ class Orbit(object):
         """
 
         obj = SBDB.query(name, full_precision=True, **kargs)
+        
+        try:
+            obj["count"]
+            # no error till now ---> more than one object has been found
+            objects_name=obj["list"]["name"]                            #contains all the name of the objects
+            objects_name_in_str=""                                      #used to store them in string form each in new line
+            for i in objects_name:
+                objects_name_in_str+= i + "\n"
 
-        a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
-        ecc = float(obj["orbit"]["elements"]["e"]) * u.one
-        inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
-        raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
-        argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
+            raise ValueError(str(obj["count"]) + " different objects found: \n" + objects_name_in_str)
 
-        # Since JPL provides Mean Anomaly (M) we need to make
-        # the conversion to the true anomaly (\nu)
-        nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
+        except KeyError:
+            a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
+            ecc = float(obj["orbit"]["elements"]["e"]) * u.one
+            inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
+            raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
+            argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
 
-        epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
+            # Since JPL provides Mean Anomaly (M) we need to make
+            # the conversion to the true anomaly (\nu)
+            nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
 
-        ss = cls.from_classical(
-            Sun,
-            a,
-            ecc,
-            inc,
-            raan,
-            argp,
-            nu,
-            epoch=epoch.tdb,
-            plane=Planes.EARTH_ECLIPTIC,
-        )
+            epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
-        return ss
+            ss = cls.from_classical(
+                Sun,
+                a,
+                ecc,
+                inc,
+                raan,
+                argp,
+                nu,
+                epoch=epoch.tdb,
+                plane=Planes.EARTH_ECLIPTIC,
+            )
+
+            return ss
+
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
