@@ -476,32 +476,47 @@ class Orbit(object):
 
         obj = SBDB.query(name, full_precision=True, **kargs)
 
-        a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
-        ecc = float(obj["orbit"]["elements"]["e"]) * u.one
-        inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
-        raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
-        argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
+        try:
+            obj["count"]
+            # no error till now ---> more than one object has been found
+            objects_name = obj["list"]["name"]  # contains all the name of the objects
+            objects_name_in_str = (
+                ""
+            )  # used to store them in string form each in new line
+            for i in objects_name:
+                objects_name_in_str += i + "\n"
 
-        # Since JPL provides Mean Anomaly (M) we need to make
-        # the conversion to the true anomaly (\nu)
-        nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
+            raise ValueError(
+                str(obj["count"]) + " different objects found: \n" + objects_name_in_str
+            )
 
-        epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
+        except KeyError:
+            a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
+            ecc = float(obj["orbit"]["elements"]["e"]) * u.one
+            inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
+            raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
+            argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
 
-        ss = cls.from_classical(
-            Sun,
-            a,
-            ecc,
-            inc,
-            raan,
-            argp,
-            nu,
-            epoch=epoch.tdb,
-            plane=Planes.EARTH_ECLIPTIC,
-        )
+            # Since JPL provides Mean Anomaly (M) we need to make
+            # the conversion to the true anomaly (\nu)
+            nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
 
-        return ss
+            epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
+            ss = cls.from_classical(
+                Sun,
+                a,
+                ecc,
+                inc,
+                raan,
+                argp,
+                nu,
+                epoch=epoch.tdb,
+                plane=Planes.EARTH_ECLIPTIC,
+            )
+
+            return ss
+            
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
     def circular(
