@@ -379,7 +379,7 @@ class Orbit(object):
             and body.name.lower() not in solar_system_ephemeris.bodies
         ):
             raise KeyError(
-                """These bodies can not be found in the "builtin" ephemeris. Tochange the ephemeri,. do
+                """These bodies can not be found in the "builtin" ephemeris. To change the ephemeris, do
                 >>> solar_system_ephemeris.set('jpl')"""
             )
 
