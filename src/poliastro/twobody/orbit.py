@@ -4,6 +4,7 @@ import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
     GCRS,
+    solar_system_ephemeris,
     ICRS,
     Angle,
     CartesianDifferential,
@@ -372,7 +373,9 @@ class Orbit(object):
 
         """
         # TODO: https://github.com/poliastro/poliastro/issues/445
-        try:    
+        if body.name.lower() not in solar_system_ephemeris.bodies:
+            raise KeyError("Wrong ephemeris selected, cannot load " + str(body.name) + " data as " + str(body.name) + " is not a part of selected ephemeris")
+        else:
             if not epoch:
                 epoch = time.Time.now().tdb
             elif epoch.scale != "tdb":
@@ -407,9 +410,7 @@ class Orbit(object):
                 ss._frame = ICRS()  # Hack!
 
             return ss
-        except KeyError:
-            import sys
-            sys.exit("new error message here")
+            
 
 
     @classmethod
