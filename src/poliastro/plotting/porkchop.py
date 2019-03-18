@@ -41,7 +41,7 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
 
         return (
             dv_dpt.to(u.km / u.s).value,
-            dv_arr.to(u.km/ u.s).value,
+            dv_arr.to(u.km / u.s).value,
             c3_launch.to(u.km ** 2 / u.s ** 2).value,
             c3_arrival.to(u.km ** 2 / u.s ** 2).value,
             tof.jd,
@@ -68,8 +68,8 @@ def porkchop(
     tfl=True,
     vhp=True,
     max_c3=45.0 * u.km ** 2 / u.s ** 2,
-    max_vhp=5 * u.km / u.s
-    ):
+    max_vhp=5 * u.km / u.s,
+):
     """Plots porkchop between two bodies.
 
     Parameters
@@ -92,7 +92,7 @@ def porkchop(
         Sets the maximum C3 value for porkchop
     max_vhp: float
         Sets the maximum arrival velocity for porkchop
-        
+
     Returns
     -------
     c3_launch: np.ndarray
@@ -109,7 +109,7 @@ def porkchop(
     >>> from poliastro.util import time_range
     >>> launch_span = time_range("2005-04-30", end="2005-10-07")
     >>> arrival_span = time_range("2005-11-16", end="2006-12-21")
-    >>> c3dpt, c3arr, tof = porkchop(Earth, Mars, launch_span, arrival_span)
+    >>> dv_launch, dev_dpt, c3dpt, c3arr, tof = porkchop(Earth, Mars, launch_span, arrival_span)
     """
 
     dv_launch, dv_arrival, c3_launch, c3_arrival, tof = targetting_vec(
@@ -165,7 +165,7 @@ def porkchop(
         ax.clabel(tfl_contour, inline=1, fmt="%1.1f", colors="r", fontsize=14)
 
     if vhp:
-        
+
         vhp_levels = np.linspace(0, max_vhp.to(u.km / u.s).value, 5)
 
         vhp_contour = ax.contour(
