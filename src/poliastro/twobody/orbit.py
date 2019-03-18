@@ -369,9 +369,7 @@ class Orbit(object):
 
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
-        """Return osculating `Orbit` of a body at a given time.
-
-        """
+        """Return osculating `Orbit` of a body at a given time."""
         # TODO: https://github.com/poliastro/poliastro/issues/445
         if body.name.lower() not in solar_system_ephemeris.bodies:
             error_message = (
@@ -383,7 +381,6 @@ class Orbit(object):
                 + str(body.name)
                 + " as one of its objects"
             )
-
             raise KeyError(error_message)
         else:
             if not epoch:
@@ -395,9 +392,7 @@ class Orbit(object):
                     "{}. Use Time(..., scale='tdb') instead.".format(epoch.tdb.value),
                     TimeScaleWarning,
                 )
-
             r, v = get_body_barycentric_posvel(body.name, epoch)
-
             if body == Moon:
                 # TODO: The attractor is in fact the Earth-Moon Barycenter
                 icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
@@ -412,7 +407,6 @@ class Orbit(object):
                     gcrs_cart.differentials["s"].d_xyz.to(u.km / u.day),
                     epoch,
                 )
-
             else:
                 # TODO: The attractor is not really the Sun, but the Solar System
                 # Barycenter
