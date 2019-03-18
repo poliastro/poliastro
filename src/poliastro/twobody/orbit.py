@@ -9,6 +9,7 @@ from astropy.coordinates import (
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric_posvel,
+    solar_system_ephemeris,
 )
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
@@ -368,12 +369,23 @@ class Orbit(object):
 
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
-        """Return osculating `Orbit` of a body at a given time.
 
-        """
+        """Return osculating `Orbit` of a body at a given time."""
+
         # TODO: https://github.com/poliastro/poliastro/issues/445
+
+        if (
+            body.name == "Pluto"
+            and body.name.lower() not in solar_system_ephemeris.bodies
+        ):
+            raise KeyError(
+                """Default Ephemeris selected. To change it, please do
+                >>> solar_system_ephemeris.set('de432s')"""
+            )
+
         if not epoch:
             epoch = time.Time.now().tdb
+
         elif epoch.scale != "tdb":
             epoch = epoch.tdb
             warn(
