@@ -887,9 +887,9 @@ def test_from_sbdb():
 
         assert ss_classical == SBDB_DATA[target_name]
 
+
 def test_from_sbdb_raise_valueerror():
     with pytest.raises(ValueError) as e:
         Orbit.from_sbdb(name="Halley")
-        
-    assert str(e.value)[0]=='2'
 
+    assert str(e.value)[0] == "2"
