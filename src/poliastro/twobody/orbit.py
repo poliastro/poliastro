@@ -374,7 +374,9 @@ class Orbit(object):
         """
         # TODO: https://github.com/poliastro/poliastro/issues/445
         if body.name.lower() not in solar_system_ephemeris.bodies:
-            raise KeyError("Wrong ephemeris selected, cannot load " + str(body.name) + " data as " + str(body.name) + " is not a part of selected ephemeris")
+            error_message="Wrong ephemeris selected, cannot load " + str(body.name) + " data, as " + str(body.name) + " is not a part of selected ephemeris. "  
+            error_message+="Do run this command before calling from_body_ephem ------> solar_system_ephemeris.set('XXXXX') ------> where XXXXX contains the ephemeris having " + str(body.name) + " as one of its objects"
+            raise KeyError(error_message)
         else:
             if not epoch:
                 epoch = time.Time.now().tdb
