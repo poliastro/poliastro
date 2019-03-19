@@ -2,6 +2,7 @@ import math
 import os
 
 import pytest
+import requests
 import spiceypy as spice
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
@@ -90,9 +91,23 @@ def test_from_relative():
 
 
 class TestRotElements:
+    """Orientation models to calculate the rotational elements (ICRF right ascension
+    and declination and prime meridian location) are given in the kernel file
+    "pck00010.tpc", provided by Nasa. These models have been used to calculate
+    the rotational elements.
+    The kernel file provides the coefficients of polynomials and trigonometric terms of
+    the models. Hence, in the tests, coefficients are taken from the kernel file and
+    plugged into the polynomial/trigonometric terms.
+    Url for kernel file is "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00010.tpc"
+    """
 
+    # Download the kernel file
     kernel_folder = os.path.join(os.getcwd(), "src/poliastro/tests/kernels")
     kernel_name = os.path.join(kernel_folder, "pck00010.tpc")
+    kernel_url = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00010.tpc"
+    r = requests.get(kernel_url)
+    with open(kernel_name, "wb") as f:
+        f.write(r.content)
     spice.furnsh(kernel_name)
 
     @pytest.fixture()
@@ -412,3 +427,5 @@ class TestRotElements:
 
         for i, j in zip(value_from_poliastro, value_from_spice):
             assert_quantity_allclose(i, j)
+
+    os.remove(kernel_name)
