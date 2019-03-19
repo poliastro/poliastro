@@ -680,15 +680,9 @@ class Orbit(object):
         """
 
         try:
-            if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
-                raise NotImplementedError(
-                    "This has not been implemented for {}".format(attractor.name)
-                )
+            cls._frozen_check_preconditions(attractor, alt)
 
             argp, inc = cls._frozen_load_defaults_if_needed(attractor, argp, inc)
-
-            assert alt > 0
-
             a = attractor.R + alt
 
             critical_argp = cls._find_closest_value(argp, attractor.critical_argps)
@@ -715,6 +709,15 @@ class Orbit(object):
         critical_values = [critical_arg.value for critical_arg in values]
         index = np.abs(np.asarray(critical_values) * u.rad - value).argmin()
         return values[index]
+
+    @classmethod
+    def _frozen_check_preconditions(cls, attractor, alt):
+        if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
+            raise NotImplementedError(
+                "This has not been implemented for {}".format(attractor.name)
+            )
+
+        assert alt > 0
 
     @classmethod
     def _frozen_load_defaults_if_needed(cls, attractor, argp, inc):
