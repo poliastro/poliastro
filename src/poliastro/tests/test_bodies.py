@@ -101,13 +101,19 @@ class TestRotElements:
     Url for kernel file is "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00010.tpc"
     """
 
-    # Download the kernel file
+    # Create the kernel folder and download the kernel file
     kernel_folder = os.path.join(os.getcwd(), "src/poliastro/tests/kernels")
     kernel_name = os.path.join(kernel_folder, "pck00010.tpc")
     kernel_url = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00010.tpc"
+    try:
+        # Create target Directory
+        os.mkdir(kernel_folder)
+    except FileExistsError:
+        pass
     r = requests.get(kernel_url)
     with open(kernel_name, "wb") as f:
         f.write(r.content)
+
     spice.furnsh(kernel_name)
 
     @pytest.fixture()
@@ -427,5 +433,3 @@ class TestRotElements:
 
         for i, j in zip(value_from_poliastro, value_from_spice):
             assert_quantity_allclose(i, j)
-
-    os.remove(kernel_name)
