@@ -639,23 +639,15 @@ class Orbit(object):
 
         The first approach would be to nullify next term to zero
         .. math::
-            \begin{align}
-                ( 1-\dfrac {5}{4}\sin ^{2})
-            \end{align}
+            ( 1-\dfrac {5}{4}\sin ^{2})
 
-        For which one obtains the so-called critical inclinations: i = 63.4349
-        or 116.5651 degrees. To escape the inclination requirement, the argument of periapsis can be
-        set to w = 90 or 270 degrees to nullify the second equation. Then, one should nullify the right-hand side of the first equation, which yields an expression that correlates the inclination of the object and the eccentricity of the orbit:
+        For which one obtains the so-called critical inclinations: i = 63.4349 or 116.5651 degrees. To escape the inclination requirement, the argument of periapsis can be set to w = 90 or 270 degrees to nullify the second equation. Then, one should nullify the right-hand side of the first equation, which yields an expression that correlates the inclination of the object and the eccentricity of the orbit:
         .. math::
-            \begin{align}
-                \overline {e}=-\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2} \overline {i}}{\sin \overline {i}}\right)
-            \end{align}
+            \overline {e}=-\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2} \overline {i}}{\sin \overline {i}}\right)
 
         Assuming that e is negligible compared to J2, it can be shown that:
         .. math::
-            \begin{align}
-                \overline {e}\approx -\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}}\sin \overline {i}
-            \end{align}
+            \overline {e}\approx -\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}}\sin \overline {i}
 
         The implementation is divided in the following cases:
 
@@ -713,10 +705,10 @@ class Orbit(object):
                     attractor, a, inc, argp, raan, arglat, epoch, plane
                 )
 
+            raise ValueError("Can't create a frozen orbit from given arguments")
+
         except Exception as exception:
             cls._frozen_handle_exception(exception, attractor)
-
-        raise ValueError("Can't create a frozen orbit from given arguments")
 
     @classmethod
     def _find_closest_value(cls, value, values):
