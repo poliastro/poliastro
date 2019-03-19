@@ -631,21 +631,25 @@ class Orbit(object):
         r"""Return frozen Orbit.
 
         To achieve frozen orbit these two equations have to be set to zero.
+
         .. math::
             \begin{align}
-                \dfrac {d\overline {e}}{dt}=\dfrac {-3\overline {n}J_{3}R^{3}_{E}\sin \left( \overline {i}\right) }{2a^{3}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \cos \overline {w}
+                \dfrac {d\overline {e}}{dt}=\dfrac {-3\overline {n}J_{3}R^{3}_{E}\sin \left( \overline {i}\right) }{2a^{3}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \cos \overline {w}\\
                 \dfrac {d\overline {\omega }}{dt}=\dfrac {3\overline {n}J_{2}R^{2}_{E}}{a^{2}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \left[ 1+\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2}\overline {i}}{\sin \overline {i}}\right) \dfrac {\sin \overline {w}}{\overline {e}}\right]
             \end{align}
 
-        The first approach would be to nullify next term to zero
+        The first approach would be to nullify following term to zero:
+
         .. math::
             ( 1-\dfrac {5}{4}\sin ^{2})
 
         For which one obtains the so-called critical inclinations: i = 63.4349 or 116.5651 degrees. To escape the inclination requirement, the argument of periapsis can be set to w = 90 or 270 degrees to nullify the second equation. Then, one should nullify the right-hand side of the first equation, which yields an expression that correlates the inclination of the object and the eccentricity of the orbit:
+
         .. math::
             \overline {e}=-\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2} \overline {i}}{\sin \overline {i}}\right)
 
         Assuming that e is negligible compared to J2, it can be shown that:
+
         .. math::
             \overline {e}\approx -\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}}\sin \overline {i}
 
@@ -655,8 +659,8 @@ class Orbit(object):
         2- When the attractor has not defined J2 or J3, the method will raise an AttributeError
         3- When the attractor has J2/J3 outside of range 1 to 10 , the method will raise an NotImplementedError. Special case for Venus . See "Extension of the critical inclination" by Xiaodong Liu, Hexi Baoyin, and Xingrui Ma
         4- When argp and inc are both given but neither are critical values, the method will raise a ValueError
-        5- If argp is not given or the given argp is a critical value, the last fomula is used to approximate eccentricity
-        6- If inc is not given or the given inc is critical,we set the eccentricity value the same as the Earth's moon.
+        5- If argp is not given or the given argp is a critical value, the last formula is used to approximate eccentricity
+        6- If inc is not given or the given inc is critical, we set the eccentricity value the same as the Earth's moon.
 
 
         Parameters
