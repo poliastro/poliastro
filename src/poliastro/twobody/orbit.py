@@ -688,17 +688,12 @@ class Orbit(object):
         """
 
         try:
-
             if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
                 raise NotImplementedError(
                     "This has not been implemented for {}".format(attractor.name)
                 )
 
-            if inc is None:
-                inc = attractor.critical_inclinations[0]
-
-            if argp is None:
-                argp = attractor.critical_argps[0]
+            argp, inc = cls._frozen_load_defaults_if_needed(attractor, argp, inc)
 
             assert alt > 0
 
@@ -718,18 +713,9 @@ class Orbit(object):
                     attractor, a, inc, argp, raan, arglat, epoch, plane
                 )
 
-        except AttributeError:
-            raise AttributeError(
-                "Attractor {} has not spherical harmonics implemented".format(
-                    attractor.name
-                )
-            )
-        except AssertionError:
-            raise ValueError(
-                "The semimajor axis may not be smaller that {}'s radius".format(
-                    attractor.name
-                )
-            )
+        except Exception as exception:
+            cls._frozen_handle_exception(exception, attractor)
+
         raise ValueError("Can't create a frozen orbit from given arguments")
 
     @classmethod
@@ -737,6 +723,13 @@ class Orbit(object):
         critical_values = [critical_arg.value for critical_arg in values]
         index = np.abs(np.asarray(critical_values) * u.rad - value).argmin()
         return values[index]
+
+    @classmethod
+    def _frozen_load_defaults_if_needed(cls, attractor, argp, inc):
+        argp = attractor.critical_argps[0] if argp is None else argp
+        inc = attractor.critical_inclinations[0] if inc is None else inc
+
+        return argp, inc
 
     @classmethod
     def _frozen_critical_argp(cls, attractor, a, inc, argp, raan, arglat, epoch, plane):
@@ -753,6 +746,24 @@ class Orbit(object):
         return cls.from_classical(
             attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
         )
+
+    @classmethod
+    def _frozen_handle_exception(cls, exception, attractor):
+        if isinstance(exception, AttributeError):
+            raise AttributeError(
+                "Attractor {} has not spherical harmonics implemented".format(
+                    attractor.name
+                )
+            )
+
+        elif isinstance(exception, AssertionError):
+            raise ValueError(
+                "The semimajor axis may not be smaller that {}'s radius".format(
+                    attractor.name
+                )
+            )
+
+        raise exception
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
