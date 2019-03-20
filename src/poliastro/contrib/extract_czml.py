@@ -11,34 +11,31 @@ from poliastro.contrib.czml_extract_default_params import DEFAULTS
 class ExtractorCZML:
     """A class for extracting orbitary data to Cesium"""
 
-    def __init__(self, orbit, start_epoch, end_epoch, N, fixed_rf=True):
+    def __init__(self, start_epoch, end_epoch, N):
         """
         Orbital constructor
 
         Parameters
         ----------
-        orbit: poliastro.Orbit
-            Orbit to be extracted
         start_epoch: ~astropy.time.core.Time
             Starting epoch
         end_epoch: ~astropy.time.core.Time
             Ending epoch
         N: int
-            Number of sample points
-        fixed_rf: bool
-            Determines whether the reference frame is fixed
-            When set to false, it assumes the frame moving
-            with constant velocity.
+            Default number of sample points.
+            Unless otherwise specified, the number
+            of sampled data points will be N when calling
+            add_orbit()
         """
         self.czml = dict()
-        self.orbits = {1: [orbit, N, orbit.period, orbit.epoch]}
+        self.orbits = []
+        self.N = N
+        self.i = 0
 
-        self.i = 1  # Current index id, used for insertion of new elements
+        self.start_epoch = ExtractorCZML.format_date(start_epoch)
+        self.end_epoch = ExtractorCZML.format_date(end_epoch)
 
-        self.fixed_rf = fixed_rf
-        self.start_epoch = ExtractorCZML.format_date(start_epoch.value)
-        self.end_epoch = ExtractorCZML.format_date(end_epoch.value)
-        self.init_czml()
+        self.__init_czml__()
 
     def parse_dict_tuples(self, path, tups):
         """
@@ -59,7 +56,7 @@ class ExtractorCZML:
         for t in tups:
             curr[t[0]] = t[1]
 
-    def init_orbit_packet(self, i):
+    def __init_orbit_packet__(self, i):
         """
         Sets the default values for a given orbit
 
@@ -68,18 +65,23 @@ class ExtractorCZML:
         i : int
             Index of referenced orbit
         """
-        for t_key, t_val in DEFAULTS:
-            self.parse_dict_tuples([i] + t_key[1:], t_val)
+
+        self.czml[i] = DEFAULTS.copy()
 
         start_epoch = ExtractorCZML.format_date(
-            min(Time(self.orbits[i][3]), Time(self.end_epoch)).iso
+            min(self.orbits[i][2], self.start_epoch)
         )
 
         self.parse_dict_tuples(
-            [i], [("id", str(i)), ("availability", start_epoch + "/" + self.end_epoch)]
+            [i],
+            [
+                ("id", str(i)),
+                ("availability", start_epoch.value + "/" + self.end_epoch.value),
+            ],
         )
         self.parse_dict_tuples(
-            [i, "path", "show"], [("interval", start_epoch + "/" + self.end_epoch)]
+            [i, "path", "show"],
+            [("interval", start_epoch.value + "/" + self.end_epoch.value)],
         )
 
         self.parse_dict_tuples(
@@ -88,13 +90,13 @@ class ExtractorCZML:
                 ("interpolationAlgorithm", "LAGRANGE"),
                 ("interpolationDegree", 5),
                 ("referenceFrame", "FIXED"),
-                ("epoch", start_epoch),
+                ("epoch", start_epoch.value),
                 ("cartesian", list()),
             ],
         )
-        self.init_orbit_packet_cords(i)
+        self.__init_orbit_packet_cords__(i)
 
-    def init_orbit_packet_cords(self, i):
+    def __init_orbit_packet_cords__(self, i):
         """
 
         Parameters
@@ -102,7 +104,7 @@ class ExtractorCZML:
         i: int
             Index of referenced orbit
         """
-        h = (Time(self.end_epoch) - self.orbits[i][3]).to(u.second) / self.orbits[i][1]
+        h = (self.end_epoch - self.orbits[i][2]).to(u.second) / self.orbits[i][1]
 
         for k in range(self.orbits[i][1] + 2):
             cords = (
@@ -116,27 +118,25 @@ class ExtractorCZML:
             self.czml[i]["position"]["cartesian"] += cords.tolist()
             self.orbits[i][0] = self.orbits[i][0].propagate(h)
 
-    def init_czml(self):
+    def __init_czml__(self):
         """
         Only called at the initialization of the extractor
         Builds packets.
         """
 
         self.parse_dict_tuples(
-            [0], [("id", "document"), ("name", "simple"), ("version", "1.0")]
+            [-1], [("id", "document"), ("name", "simple"), ("version", "1.0")]
         )
         self.parse_dict_tuples(
-            [0, "clock"],
+            [-1, "clock"],
             [
-                ("interval", self.start_epoch + "/" + self.end_epoch),
-                ("currentTime", self.start_epoch),
+                ("interval", self.start_epoch.value + "/" + self.end_epoch.value),
+                ("currentTime", self.start_epoch.value),
                 ("multiplier", 60),
                 ("range", "LOOP_STOP"),
                 ("step", "SYSTEM_CLOCK_MULTIPLIER"),
             ],
         )
-
-        self.init_orbit_packet(1)
 
     def change_id_params(self, i, id=None, name=None, description=None):
         """
@@ -235,7 +235,7 @@ class ExtractorCZML:
 
         return json.dumps(list(self.czml.values()))
 
-    def add_orbit(self, orbit, N):
+    def add_orbit(self, orbit, N=None):
         """
         Adds an orbit
 
@@ -247,42 +247,33 @@ class ExtractorCZML:
             Number of sample points
         """
 
-        self.i += 1
+        if N is None:
+            N = self.N
 
         if orbit.epoch < Time(self.start_epoch):
-            orbit = orbit.propagate(Time(self.start_epoch) - orbit.epoch)
+            orbit = orbit.propagate(self.start_epoch - orbit.epoch)
         elif orbit.epoch > Time(self.end_epoch):
             raise ValueError(
-                "The orbit's epoch cannot exceed the constructors ending epoch"
+                "The orbit's epoch cannot exceed the constructor's ending epoch"
             )
 
-        self.orbits[self.i] = [orbit, N, orbit.period, orbit.epoch]
-        self.init_orbit_packet(self.i)
+        self.orbits.append([orbit, N, orbit.epoch])
 
-    def del_orbit(self, i):
-        """
-        Deletes an existing orbit
+        self.__init_orbit_packet__(self.i)
 
-        Parameters
-        ----------
-        i: int
-            Index of orbit to delete
-        """
-
-        del self.orbits[i]
-        del self.czml[i]
+        self.i += 1
 
     @staticmethod
     def format_date(date):
         """
         Parameters
         ----------
-        date : str
-            date of the form "yyyy-mm-dd hh:mm:ss.ssss"
+        date : ~astropy.time.core.Time
+            input date
 
         Returns
         -------
-        formatted_date : str
-            date of the form "yyyy-mm-ddThh:mm:ssZ"
+        formatted_date : ~astropy.time.core.Time
+            ISO 8601 - compliant date
         """
-        return date[:10] + "T" + date[11:-4] + "Z"
+        return Time(date, format="isot")
