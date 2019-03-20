@@ -659,24 +659,23 @@ class Orbit(object):
             \overline {e}\approx -\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}}\sin \overline {i}
 
         The implementation is divided in the following cases:
-        \begin{enumerate}
-            \item When the user gives a negative altitude, the method will raise a ValueError
-            \item When the attractor has not defined J2 or J3, the method will raise an AttributeError
-            \item When the attractor has J2/J3 outside of range 1 to 10 , the method will raise an NotImplementedError. Special case for Venus.See "Extension of the critical inclination" by Xiaodong Liu, Hexi Baoyin, and Xingrui Ma
-            \item If argp is not given or the given argp is a critical value:
-            \begin{enumerate}
-                \item if eccentricity is none and inclination is none, the inclination is set with a critical value and the eccentricity is obtained from the last formula mentioned
-                \item if only eccentricity is none, we calculate this value with the last formula mentioned
-                \item if only inclination is none ,we calculate this value with the formula for eccentricity with critical argp.
-            \end{enumerate}
-            \item If inc is not given or the given inc is critical:
-            \begin{enumerate}
-                \item if the argp and the eccentricity is given we keep these values to create the orbit
-                \item if the eccentricity is given we keep this value, if not, default to the eccentricity of the Moon's orbit around the Earth
-            \end{enumerate}
-            \item if it's not possible to create an orbit with the the argp and the inclination given, both of them are set to the critical values and the eccentricity is calculate with the last formula
 
-        \end{enumerate}
+            1. When the user gives a negative altitude, the method will raise a ValueError
+            2. When the attractor has not defined J2 or J3, the method will raise an AttributeError
+            3. When the attractor has J2/J3 outside of range 1 to 10 , the method will raise an NotImplementedError. Special case for Venus.See "Extension of the critical inclination" by Xiaodong Liu, Hexi Baoyin, and Xingrui Ma
+            4. If argp is not given or the given argp is a critical value:
+
+                * if eccentricity is none and inclination is none, the inclination is set with a critical value and the eccentricity is obtained from the last formula mentioned
+                * if only eccentricity is none, we calculate this value with the last formula mentioned
+                * if only inclination is none ,we calculate this value with the formula for eccentricity with critical argp.
+
+            5. If inc is not given or the given inc is critical:
+
+                * if the argp and the eccentricity is given we keep these values to create the orbit
+                * if the eccentricity is given we keep this value, if not, default to the eccentricity of the Moon's orbit around the Earth
+
+            6. if it's not possible to create an orbit with the the argp and the inclination given, both of them are set to the critical values and the eccentricity is calculate with the last formula
+
 
         Parameters
         ----------
