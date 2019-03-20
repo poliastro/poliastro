@@ -25,7 +25,7 @@ J2 for the Sun was obtained from:
   from helioseismology, Redouane Mecheri et al)
 
 """
-import numpy as np
+
 from astropy import time
 from astropy.constants import Constant
 
