@@ -8,7 +8,7 @@ from astropy.time import Time
 from poliastro.contrib.czml_extract_default_params import DEFAULTS
 
 
-class ExtractorCZML:
+class CZMLExtractor:
     """A class for extracting orbitary data to Cesium"""
 
     def __init__(self, start_epoch, end_epoch, N):
@@ -32,8 +32,8 @@ class ExtractorCZML:
         self.N = N
         self.i = 0
 
-        self.start_epoch = ExtractorCZML.format_date(start_epoch)
-        self.end_epoch = ExtractorCZML.format_date(end_epoch)
+        self.start_epoch = CZMLExtractor.format_date(start_epoch)
+        self.end_epoch = CZMLExtractor.format_date(end_epoch)
 
         self.__init_czml__()
 
@@ -68,7 +68,7 @@ class ExtractorCZML:
 
         self.czml[i] = DEFAULTS.copy()
 
-        start_epoch = ExtractorCZML.format_date(
+        start_epoch = CZMLExtractor.format_date(
             min(self.orbits[i][2], self.start_epoch)
         )
 
