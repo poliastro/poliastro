@@ -24,8 +24,10 @@ from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
+    get_inclination_critical_argp,
     hyp_nu_limit,
     norm,
+    find_closest_value,
 )
 
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
@@ -616,7 +618,9 @@ class Orbit(object):
         return cls(ss, epoch, plane)
 
     @classmethod
-    @u.quantity_input(alt=u.m, inc=u.rad, argp=u.rad, raan=u.rad, arglat=u.rad)
+    @u.quantity_input(
+        alt=u.m, inc=u.rad, argp=u.rad, raan=u.rad, arglat=u.rad, ecc=u.one
+    )
     def frozen(
         cls,
         attractor,
@@ -625,18 +629,19 @@ class Orbit(object):
         argp=None,
         raan=0 * u.deg,
         arglat=0 * u.deg,
+        ecc=None,
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
     ):
-        r"""Return frozen Orbit.
+        r"""Return frozen Orbit. If any of the given arguments results in an impossibility, some values will be overwritten
 
         To achieve frozen orbit these two equations have to be set to zero.
 
         .. math::
-            \begin{align}
-                \dfrac {d\overline {e}}{dt}=\dfrac {-3\overline {n}J_{3}R^{3}_{E}\sin \left( \overline {i}\right) }{2a^{3}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \cos \overline {w}\\
-                \dfrac {d\overline {\omega }}{dt}=\dfrac {3\overline {n}J_{2}R^{2}_{E}}{a^{2}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \left[ 1+\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2}\overline {i}}{\sin \overline {i}}\right) \dfrac {\sin \overline {w}}{\overline {e}}\right]
-            \end{align}
+            \dfrac {d\overline {e}}{dt}=\dfrac {-3\overline {n}J_{3}R^{3}_{E}\sin \left( \overline {i}\right) }{2a^{3}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \cos \overline {w}
+
+        .. math::
+            \dfrac {d\overline {\omega }}{dt}=\dfrac {3\overline {n}J_{2}R^{2}_{E}}{a^{2}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \left[ 1+\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2}\overline {i}}{\sin \overline {i}}\right) \dfrac {\sin \overline {w}}{\overline {e}}\right]
 
         The first approach would be to nullify following term to zero:
 
@@ -654,14 +659,24 @@ class Orbit(object):
             \overline {e}\approx -\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}}\sin \overline {i}
 
         The implementation is divided in the following cases:
+        \begin{enumerate}
+            \item When the user gives a negative altitude, the method will raise a ValueError
+            \item When the attractor has not defined J2 or J3, the method will raise an AttributeError
+            \item When the attractor has J2/J3 outside of range 1 to 10 , the method will raise an NotImplementedError. Special case for Venus.See "Extension of the critical inclination" by Xiaodong Liu, Hexi Baoyin, and Xingrui Ma
+            \item If argp is not given or the given argp is a critical value:
+            \begin{enumerate}
+                \item if eccentricity is none and inclination is none, the inclination is set with a critical value and the eccentricity is obtained from the last formula mentioned
+                \item if only eccentricity is none, we calculate this value with the last formula mentioned
+                \item if only inclination is none ,we calculate this value with the formula for eccentricity with critical argp.
+            \end{enumerate}
+            \item If inc is not given or the given inc is critical:
+            \begin{enumerate}
+                \item if the argp and the eccentricity is given we keep these values to create the orbit
+                \item if the eccentricity is given we keep this value, if not, default to the eccentricity of the Moon's orbit around the Earth
+            \end{enumerate}
+            \item if it's not possible to create an orbit with the the argp and the inclination given, both of them are set to the critical values and the eccentricity is calculate with the last formula
 
-        1- When the user gives a negative altitude, the method will raise a ValueError
-        2- When the attractor has not defined J2 or J3, the method will raise an AttributeError
-        3- When the attractor has J2/J3 outside of range 1 to 10 , the method will raise an NotImplementedError. Special case for Venus . See "Extension of the critical inclination" by Xiaodong Liu, Hexi Baoyin, and Xingrui Ma
-        4- When argp and inc are both given but neither are critical values, the method will raise a ValueError
-        5- If argp is not given or the given argp is a critical value, the last formula is used to approximate eccentricity
-        6- If inc is not given or the given inc is critical, we set the eccentricity value the same as the Earth's moon.
-
+        \end{enumerate}
 
         Parameters
         ----------
@@ -677,92 +692,67 @@ class Orbit(object):
             Right ascension of the ascending node, default to 0 deg.
         arglat : ~astropy.units.Quantity, optional
             Argument of latitude, default to 0 deg.
+        ecc : ~astropy.units.Quantity
+            Eccentricity, default to the eccentricity of the Moon's orbit around the Earth
         epoch: ~astropy.time.Time, optional
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
-
+        critical_argps = [np.pi / 2, 3 * np.pi / 2] * u.rad
+        critical_inclinations = [63.4349 * np.pi / 180, 116.5651 * np.pi / 180] * u.rad
         try:
-            cls._frozen_check_preconditions(attractor, alt)
+            if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
+                raise NotImplementedError(
+                    "This has not been implemented for {}".format(attractor.name)
+                )
 
-            argp, inc = cls._frozen_load_defaults_if_needed(attractor, argp, inc)
+            assert alt > 0
+
+            argp = critical_argps[0] if argp is None else argp
             a = attractor.R + alt
 
-            critical_argp = cls._find_closest_value(argp, attractor.critical_argps)
+            critical_argp = find_closest_value(argp, critical_argps)
             if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
-                return cls._frozen_critical_argp(
-                    attractor, a, inc, argp, raan, arglat, epoch, plane
+                if inc is None and ecc is None:
+                    inc = critical_inclinations[0]
+                    ecc = get_eccentricity_critical_argp(attractor, a, inc)
+                elif ecc is None:
+                    ecc = get_eccentricity_critical_argp(attractor, a, inc)
+                else:
+                    inc = get_inclination_critical_argp(attractor, a, ecc)
+                return cls.from_classical(
+                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
                 )
 
-            critical_inclination = cls._find_closest_value(
-                inc, attractor.critical_inclinations
-            )
+            inc = critical_inclinations[0] if inc is None else inc
+            critical_inclination = find_closest_value(inc, critical_inclinations)
             if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
-                return cls._frozen_critical_inclination(
-                    attractor, a, inc, argp, raan, arglat, epoch, plane
+                ecc = get_eccentricity_critical_inc(ecc)
+                return cls.from_classical(
+                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
                 )
 
-            raise ValueError("Can't create a frozen orbit from given arguments")
+            argp = critical_argps[0]
+            inc = critical_inclinations[0]
+            ecc = get_eccentricity_critical_argp(attractor, a, inc)
 
-        except Exception as exception:
-            cls._frozen_handle_exception(exception, attractor)
-
-    @classmethod
-    def _find_closest_value(cls, value, values):
-        critical_values = [critical_arg.value for critical_arg in values]
-        index = np.abs(np.asarray(critical_values) * u.rad - value).argmin()
-        return values[index]
-
-    @classmethod
-    def _frozen_check_preconditions(cls, attractor, alt):
-        if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
-            raise NotImplementedError(
-                "This has not been implemented for {}".format(attractor.name)
+            return cls.from_classical(
+                attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
             )
 
-        assert alt > 0
-
-    @classmethod
-    def _frozen_load_defaults_if_needed(cls, attractor, argp, inc):
-        argp = attractor.critical_argps[0] if argp is None else argp
-        inc = attractor.critical_inclinations[0] if inc is None else inc
-
-        return argp, inc
-
-    @classmethod
-    def _frozen_critical_argp(cls, attractor, a, inc, argp, raan, arglat, epoch, plane):
-        ecc = get_eccentricity_critical_argp(attractor, a, inc)
-        return cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
-        )
-
-    @classmethod
-    def _frozen_critical_inclination(
-        cls, attractor, a, inc, argp, raan, arglat, epoch, plane
-    ):
-        ecc = get_eccentricity_critical_inc()
-        return cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
-        )
-
-    @classmethod
-    def _frozen_handle_exception(cls, exception, attractor):
-        if isinstance(exception, AttributeError):
+        except AttributeError:
             raise AttributeError(
                 "Attractor {} has not spherical harmonics implemented".format(
                     attractor.name
                 )
             )
-
-        elif isinstance(exception, AssertionError):
+        except AssertionError:
             raise ValueError(
                 "The semimajor axis may not be smaller that {}'s radius".format(
                     attractor.name
                 )
             )
-
-        raise exception
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.

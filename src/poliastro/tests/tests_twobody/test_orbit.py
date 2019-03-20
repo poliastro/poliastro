@@ -206,34 +206,22 @@ def test_pqw_for_circular_equatorial_orbit():
 
 
 @pytest.mark.parametrize(
-    "attractor,alt,argp,expected_argp",
-    [
-        (Earth, 1e6 * u.m, Earth.critical_argps[-1], Earth.critical_argps[-1]),
-        (Mars, 3e8 * u.m, Mars.critical_argps[0], Mars.critical_argps[0]),
-    ],
-)
-def test_frozen_orbit_argp(attractor, alt, argp, expected_argp):
-    orbit = Orbit.frozen(attractor, alt, argp=argp)
-    argp = orbit.argp
-    assert_allclose(argp, expected_argp)
-
-
-@pytest.mark.parametrize(
-    "attractor,alt,inc,expected_inc",
+    "attractor,alt,argp,expected_argp,expected_inc",
     [
         (
             Earth,
             1e6 * u.m,
-            Earth.critical_inclinations[-1],
-            Earth.critical_inclinations[-1],
+            3 * np.pi / 2 * u.rad,
+            3 * np.pi / 2 * u.rad,
+            63.4349 * np.pi / 180 * u.rad,
         ),
-        (Mars, 3e8 * u.m, Mars.critical_inclinations[0], Mars.critical_inclinations[0]),
+        (Mars, 3e8 * u.m, 0 * u.deg, 0 * u.deg, 63.4349 * np.pi / 180 * u.rad),
     ],
 )
-def test_frozen_orbit_inc(attractor, alt, inc, expected_inc):
-    orbit = Orbit.frozen(attractor, alt, inc=inc)
-    inc = orbit.inc
-    assert_allclose(inc, expected_inc)
+def test_frozen_orbit_argp(attractor, alt, argp, expected_argp, expected_inc):
+    orbit = Orbit.frozen(attractor, alt, argp=argp)
+    assert_allclose(orbit.argp, expected_argp)
+    assert_allclose(orbit.inc, expected_inc)
 
 
 @pytest.mark.parametrize(
@@ -242,25 +230,38 @@ def test_frozen_orbit_inc(attractor, alt, inc, expected_inc):
         (
             Earth,
             1e6 * u.m,
-            Earth.critical_inclinations[-1],
-            Earth.critical_argps[-1],
-            Earth.critical_inclinations[-1],
-            Earth.critical_argps[-1],
+            116.5651 * np.pi / 180 * u.rad,
+            3 * np.pi / 2 * u.rad,
+            116.5651 * np.pi / 180 * u.rad,
+            3 * np.pi / 2 * u.rad,
         ),
         (
             Mars,
             3e8 * u.m,
-            Mars.critical_inclinations[0],
-            Mars.critical_argps[0],
-            Mars.critical_inclinations[0],
-            Mars.critical_argps[0],
+            63.4349 * np.pi / 180 * u.rad,
+            np.pi / 2 * u.rad,
+            63.4349 * np.pi / 180 * u.rad,
+            np.pi / 2 * u.rad,
         ),
     ],
 )
-def test_frozen_orbit_argp_and_inc(
+def test_frozen_orbit_with_critical_argp_and_critical_inc(
     attractor, alt, inc, argp, expected_inc, expected_argp
 ):
     orbit = Orbit.frozen(attractor, alt, inc=inc, argp=argp)
+    assert_allclose(orbit.argp, expected_argp)
+    assert_allclose(orbit.inc, expected_inc)
+
+
+@pytest.mark.parametrize(
+    "attractor,alt,expected_inc,expected_argp",
+    [
+        (Earth, 1e6 * u.m, 63.4349 * np.pi / 180 * u.rad, np.pi / 2 * u.rad),
+        (Mars, 3e8 * u.m, 63.4349 * np.pi / 180 * u.rad, np.pi / 2 * u.rad),
+    ],
+)
+def test_frozen_orbit_no_args(attractor, alt, expected_inc, expected_argp):
+    orbit = Orbit.frozen(attractor, alt)
     argp = orbit.argp
     inc = orbit.inc
     assert_allclose(argp, expected_argp)
@@ -268,54 +269,37 @@ def test_frozen_orbit_argp_and_inc(
 
 
 @pytest.mark.parametrize(
-    "attractor,alt,inc,argp",
+    "attractor,alt,argp,expected_inc,ecc,expected_ecc",
     [
         (
             Earth,
             1e6 * u.m,
             2 * u.deg,  # Non critical value
-            15 * u.deg,  # Non critical value
+            63.4349 * np.pi / 180 * u.rad,
+            None,
+            0.0549 * u.one,
         ),
         (
             Mars,
             3e8 * u.m,
             0 * u.deg,  # Non critical value
-            0 * u.deg,  # Non critical value
+            63.4349 * np.pi / 180 * u.rad,
+            0.04 * u.one,
+            0.04 * u.one,
         ),
     ],
 )
-def test_frozen_orbit_value_error(attractor, alt, inc, argp):
-    with pytest.raises(ValueError) as excinfo:
-        Orbit.frozen(attractor, alt, inc=inc, argp=argp)
-
-    assert excinfo.type == ValueError
-    assert str(excinfo.value) == "Can't create a frozen orbit from given arguments"
-
-
-def test_frozen_orbit_no_args():
-    Orbit.frozen(Earth, 1 * u.AU)
-
-
-@pytest.mark.parametrize(
-    "attractor,alt,argp,expected_inc",
-    [
-        (
-            Earth,
-            1e6 * u.m,
-            2 * u.deg,  # Non critical value
-            Earth.critical_inclinations,
-        ),
-        (Mars, 3e8 * u.m, 0 * u.deg, Mars.critical_inclinations),  # Non critical value
-    ],
-)
-def test_frozen_orbit_non_critical_argp(attractor, alt, argp, expected_inc):
-    orbit = Orbit.frozen(attractor, alt, argp=argp)  # Non-critical value
-    assert orbit.inc in expected_inc
+def test_frozen_orbit_with_non_critical_argp(
+    attractor, alt, argp, expected_inc, ecc, expected_ecc
+):
+    orbit = Orbit.frozen(attractor, alt, argp=argp, ecc=ecc)  # Non-critical value
+    assert_allclose(orbit.inc, expected_inc)
+    assert_allclose(orbit.ecc, expected_ecc)
 
 
 def test_frozen_orbit_non_critical_inclination():
     orbit = Orbit.frozen(Earth, 1e3 * u.km, inc=0 * u.deg)  # Non-critical value
-    assert orbit.argp in Earth.critical_argps
+    assert orbit.argp in [np.pi / 2, 3 * np.pi / 2] * u.rad
 
 
 def test_frozen_orbit_venus_special_case():

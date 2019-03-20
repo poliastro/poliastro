@@ -149,6 +149,7 @@ class _Venus(_Body):
     mass = k / G
     J2 = constants.J2_venus
     J3 = constants.J3_venus
+    ecc = 0.007 * u.one
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -170,8 +171,6 @@ class _Earth(_Body):
     J3 = constants.J3_earth
     H0 = constants.H0_earth
     rho0 = constants.rho0_earth
-    critical_inclinations = constants.critical_inclinations
-    critical_argps = constants.critical_argps
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -191,8 +190,6 @@ class _Mars(_Body):
     mass = k / G
     J2 = constants.J2_mars
     J3 = constants.J3_mars
-    critical_inclinations = constants.critical_inclinations
-    critical_argps = constants.critical_argps
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
