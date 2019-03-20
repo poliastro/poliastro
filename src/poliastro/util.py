@@ -129,3 +129,69 @@ def hyp_nu_limit(ecc, r_max_ratio=np.inf):
 
     """
     return np.arccos(-(1 - 1 / r_max_ratio) / ecc)
+
+
+@u.quantity_input(a=u.m, inc=u.rad)
+def get_eccentricity_critical_argp(attractor, a, inc):
+    """Calculates the eccentricity for frozen orbits when the argument of perigee is critical
+
+    Parameters
+    ----------
+    attractor : Body
+        Main attractor.
+    a : ~astropy.units.Quantity
+        Orbit's semimajor axis
+    inc : ~astropy.units.Quantity, optional
+         Inclination, default to critical value.
+
+    """
+    ecc = -attractor.J3 * attractor.R * np.sin(inc) / 2 / attractor.J2 / a
+    return ecc
+
+
+@u.quantity_input(a=u.m, ecc=u.one)
+def get_inclination_critical_argp(attractor, a, ecc):
+    """Calculates the inclination for frozen orbits when the argument of perigee is critical and the eccentricity is given
+
+    Parameters
+    ----------
+    attractor : Body
+        Main attractor.
+    a : ~astropy.units.Quantity
+        Orbit's semimajor axis
+    ecc : ~astropy.units.Quantity, optional
+         Eccentricity
+    """
+    inc = np.arcsin(-ecc * a * attractor.J2 * 2 / attractor.R / attractor.J3) * u.rad
+    return inc
+
+
+@u.quantity_input(ecc=u.one)
+def get_eccentricity_critical_inc(ecc=None):
+    """Calculates the eccentricity when a frozen orbit has critical inclination
+
+    If ecc is None we set an arbitrary value which is the Moon ecc because it seems reasonable
+
+    Parameters
+    ----------
+    ecc: : ~astropy.units.Quantity, optional
+        Eccentricity, or None if it was not defined
+    """
+    moon_ecc = 0.0549 * u.one
+    ecc = moon_ecc if ecc is None else ecc
+    return ecc
+
+
+@u.quantity_input(value=u.rad, values=u.rad)
+def find_closest_value(value, values):
+    """Calculates the closest value in the given values
+    Parameters
+    ----------
+    value : ~astropy.units.Quantity
+
+    values : ~astropy.units.Quantity
+
+
+    """
+    index = np.abs(np.asarray(values) * u.rad - value).argmin()
+    return values[index]

@@ -25,6 +25,7 @@ J2 for the Sun was obtained from:
   from helioseismology, Redouane Mecheri et al)
 
 """
+
 from astropy import time
 from astropy.constants import Constant
 
@@ -280,7 +281,7 @@ R_moon = Constant(
 
 J2_sun = Constant(
     "J2_sun",
-    "Sun J2 non-oblateness coefficient",
+    "Sun J2 oblateness coefficient",
     2.20e-7,
     "",
     0.01e-7,
@@ -290,7 +291,7 @@ J2_sun = Constant(
 
 J2_earth = Constant(
     "J2_earth",
-    "Earth J2 non-oblateness coefficient",
+    "Earth J2 oblateness coefficient",
     0.00108263,
     "",
     1,
@@ -300,8 +301,48 @@ J2_earth = Constant(
 
 J3_earth = Constant(
     "J3_earth",
-    "Earth J3 non-oblateness coefficient",
+    "Earth J3 asymmetry between the northern and southern hemispheres",
     -2.5326613168e-6,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J2_mars = Constant(
+    "J2_mars",
+    "Mars J2 oblateness coefficient",
+    0.0019555,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J3_mars = Constant(
+    "J3_mars",
+    "Mars J3 asymmetry between the northern and southern hemispheres",
+    3.1450e-5,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J2_venus = Constant(
+    "J2_venus",
+    "Venus J2 oblateness coefficient",
+    4.4044e-6,
+    "",
+    1,
+    "HAL archives",
+    system="si",
+)
+
+J3_venus = Constant(
+    "J3_venus",
+    "Venus J3 asymmetry between the northern and southern hemispheres",
+    -2.1082e-6,
     "",
     1,
     "HAL archives",

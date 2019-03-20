@@ -205,6 +205,130 @@ def test_pqw_for_circular_equatorial_orbit():
     assert_allclose(w, expected_w)
 
 
+@pytest.mark.parametrize(
+    "attractor,alt,argp,expected_argp,expected_inc",
+    [
+        (
+            Earth,
+            1e6 * u.m,
+            3 * np.pi / 2 * u.rad,
+            3 * np.pi / 2 * u.rad,
+            63.4349 * np.pi / 180 * u.rad,
+        ),
+        (Mars, 3e8 * u.m, 0 * u.deg, 0 * u.deg, 63.4349 * np.pi / 180 * u.rad),
+    ],
+)
+def test_frozen_orbit_argp(attractor, alt, argp, expected_argp, expected_inc):
+    orbit = Orbit.frozen(attractor, alt, argp=argp)
+    assert_allclose(orbit.argp, expected_argp)
+    assert_allclose(orbit.inc, expected_inc)
+
+
+@pytest.mark.parametrize(
+    "attractor,alt,inc,argp,expected_inc,expected_argp",
+    [
+        (
+            Earth,
+            1e6 * u.m,
+            116.5651 * np.pi / 180 * u.rad,
+            3 * np.pi / 2 * u.rad,
+            116.5651 * np.pi / 180 * u.rad,
+            3 * np.pi / 2 * u.rad,
+        ),
+        (
+            Mars,
+            3e8 * u.m,
+            63.4349 * np.pi / 180 * u.rad,
+            np.pi / 2 * u.rad,
+            63.4349 * np.pi / 180 * u.rad,
+            np.pi / 2 * u.rad,
+        ),
+    ],
+)
+def test_frozen_orbit_with_critical_argp_and_critical_inc(
+    attractor, alt, inc, argp, expected_inc, expected_argp
+):
+    orbit = Orbit.frozen(attractor, alt, inc=inc, argp=argp)
+    assert_allclose(orbit.argp, expected_argp)
+    assert_allclose(orbit.inc, expected_inc)
+
+
+@pytest.mark.parametrize(
+    "attractor,alt,expected_inc,expected_argp",
+    [
+        (Earth, 1e6 * u.m, 63.4349 * np.pi / 180 * u.rad, np.pi / 2 * u.rad),
+        (Mars, 3e8 * u.m, 63.4349 * np.pi / 180 * u.rad, np.pi / 2 * u.rad),
+    ],
+)
+def test_frozen_orbit_no_args(attractor, alt, expected_inc, expected_argp):
+    orbit = Orbit.frozen(attractor, alt)
+    argp = orbit.argp
+    inc = orbit.inc
+    assert_allclose(argp, expected_argp)
+    assert_allclose(inc, expected_inc)
+
+
+@pytest.mark.parametrize(
+    "attractor,alt,argp,expected_inc,ecc,expected_ecc",
+    [
+        (
+            Earth,
+            1e6 * u.m,
+            2 * u.deg,  # Non critical value
+            63.4349 * np.pi / 180 * u.rad,
+            None,
+            0.0549 * u.one,
+        ),
+        (
+            Mars,
+            3e8 * u.m,
+            0 * u.deg,  # Non critical value
+            63.4349 * np.pi / 180 * u.rad,
+            0.04 * u.one,
+            0.04 * u.one,
+        ),
+    ],
+)
+def test_frozen_orbit_with_non_critical_argp(
+    attractor, alt, argp, expected_inc, ecc, expected_ecc
+):
+    orbit = Orbit.frozen(attractor, alt, argp=argp, ecc=ecc)  # Non-critical value
+    assert_allclose(orbit.inc, expected_inc)
+    assert_allclose(orbit.ecc, expected_ecc)
+
+
+def test_frozen_orbit_non_critical_inclination():
+    orbit = Orbit.frozen(Earth, 1e3 * u.km, inc=0 * u.deg)  # Non-critical value
+    assert orbit.argp in [np.pi / 2, 3 * np.pi / 2] * u.rad
+
+
+def test_frozen_orbit_venus_special_case():
+    with pytest.raises(NotImplementedError) as excinfo:
+        Orbit.frozen(Venus, 1 * u.m)
+    assert excinfo.type == NotImplementedError
+    assert str(excinfo.value) == "This has not been implemented for Venus"
+
+
+def test_frozen_orbit_non_spherical_arguments():
+    with pytest.raises(AttributeError) as excinfo:
+        Orbit.frozen(Jupiter, 1 * u.m)
+    assert excinfo.type == AttributeError
+    assert (
+        str(excinfo.value)
+        == "Attractor Jupiter has not spherical harmonics implemented"
+    )
+
+
+def test_frozen_orbit_altitude():
+    with pytest.raises(ValueError) as excinfo:
+        Orbit.frozen(Earth, -1 * u.m)
+    assert excinfo.type == ValueError
+    assert (
+        str(excinfo.value)
+        == "The semimajor axis may not be smaller that Earth's radius"
+    )
+
+
 def test_orbit_representation():
     ss = Orbit.circular(
         Earth, 600 * u.km, 20 * u.deg, epoch=Time("2018-09-08 09:04:00", scale="tdb")

@@ -147,6 +147,9 @@ class _Venus(_Body):
     symbol = u"\u2640"
     R = constants.R_venus
     mass = k / G
+    J2 = constants.J2_venus
+    J3 = constants.J3_venus
+    ecc = 0.007 * u.one
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -185,6 +188,8 @@ class _Mars(_Body):
     symbol = u"\u2642"
     R = constants.R_mars
     mass = k / G
+    J2 = constants.J2_mars
+    J3 = constants.J3_mars
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
