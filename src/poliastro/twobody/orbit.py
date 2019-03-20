@@ -22,12 +22,12 @@ from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
+    find_closest_value,
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
     get_inclination_critical_argp,
     hyp_nu_limit,
     norm,
-    find_closest_value,
 )
 
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
