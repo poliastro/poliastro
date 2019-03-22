@@ -23,7 +23,11 @@ from astropy.coordinates import (
 )
 from astropy.coordinates.baseframe import FrameMeta
 from astropy.coordinates.builtin_frames.utils import DEFAULT_OBSTIME, get_jd12
-from astropy.coordinates.matrix_utilities import matrix_transpose, rotation_matrix
+from astropy.coordinates.matrix_utilities import (
+    matrix_product,
+    matrix_transpose,
+    rotation_matrix,
+)
 from astropy.coordinates.transformations import DynamicMatrixTransform
 
 from poliastro.bodies import (
