@@ -243,10 +243,12 @@ def _make_rotation_matrix_from_reprs(start_representation, end_representation):
     return matrix
 
 
-_EARTH_NORTH_POLE_GCRS = UnitSphericalRepresentation(lon=0 * u.deg, lat=66.5 * u.deg)
+_EARTH_ORBIT_PERPEN_POINT_GCRS = UnitSphericalRepresentation(
+    lon=0 * u.deg, lat=66.5 * u.deg
+)
 
 _EARTH_DETILT_MATRIX = _make_rotation_matrix_from_reprs(
-    _EARTH_NORTH_POLE_GCRS, CartesianRepresentation(0, 0, 1)
+    _EARTH_ORBIT_PERPEN_POINT_GCRS, CartesianRepresentation(0, 0, 1)
 )
 
 
