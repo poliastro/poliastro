@@ -13,6 +13,7 @@ from astropy.coordinates import (
     BaseEclipticFrame,
     BaseRADecFrame,
     CartesianDifferential,
+    CartesianRepresentation,
     FunctionTransformWithFiniteDifference,
     TimeAttribute,
     UnitSphericalRepresentation,
@@ -23,6 +24,7 @@ from astropy.coordinates import (
 from astropy.coordinates.baseframe import FrameMeta
 from astropy.coordinates.builtin_frames.utils import DEFAULT_OBSTIME, get_jd12
 from astropy.coordinates.matrix_utilities import matrix_transpose, rotation_matrix
+from astropy.coordinates.transformations import DynamicMatrixTransform
 
 from poliastro.bodies import (
     Earth,
@@ -220,6 +222,32 @@ class PlutoICRS(_PlanetaryICRS):
     body = Pluto
 
 
+def _make_rotation_matrix_from_reprs(start_representation, end_representation):
+    """
+    Return the matrix for the direct rotation from one representation to a second representation.
+    The representations need not be normalized first.
+    """
+    A = start_representation.to_cartesian()
+    B = end_representation.to_cartesian()
+    rotation_axis = A.cross(B)
+    rotation_angle = -np.arccos(
+        A.dot(B) / (A.norm() * B.norm())
+    )  # negation is required
+
+    # This line works around some input/output quirks of Astropy's rotation_matrix()
+    matrix = np.array(rotation_matrix(rotation_angle, rotation_axis.xyz.value.tolist()))
+    return matrix
+
+
+_EARTH_NORTH_POLE_GCRS = UnitSphericalRepresentation(lon=0 * u.deg, lat=90 * u.deg)
+
+_EARTH_PERP_TO_ORBIT_AXIS = UnitSphericalRepresentation(lon=0 * u.deg, lat=66.5 * u.deg)
+
+_EARTH_DETILT_MATRIX = _make_rotation_matrix_from_reprs(
+    _EARTH_NORTH_POLE_GCRS, _EARTH_PERP_TO_ORBIT_AXIS
+)
+
+
 class GeocentricSolarEcliptic(BaseEclipticFrame):
     """
     This system has its X axis towards the Sun and its Z axis perpendicular to
@@ -233,31 +261,37 @@ class GeocentricSolarEcliptic(BaseEclipticFrame):
     obstime = TimeAttribute(default=DEFAULT_OBSTIME)
 
 
-@frame_transform_graph.transform(
-    FunctionTransformWithFiniteDifference,
-    GCRS,
-    GeocentricSolarEcliptic,
-    finite_difference_frameattr_name="obstime",
-)
+@frame_transform_graph.transform(DynamicMatrixTransform, GCRS, GeocentricSolarEcliptic)
 def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
-    # first get us to a 0 pos/vel GCRS at the target equinox
-    gcrs_coo2 = gcrs_coo.transform_to(GCRS(obstime=to_frame.obstime))
 
-    rmat = _ecliptic_rotation_matrix()
-    newrepr = gcrs_coo2.cartesian.transform(rmat)
-    return to_frame.realize_frame(newrepr)
+    if to_frame.obstime is None:
+        raise ValueError(
+            "To perform this transformation the coordinate"
+            " Frame needs an obstime Attribute"
+        )
+
+    sun_pos_icrs = get_body_barycentric("sun", to_frame.obstime)
+    earth_pos_icrs = get_body_barycentric("earth", to_frame.obstime)
+    sun_earth = earth_pos_icrs - sun_pos_icrs
+
+    sun_earth_detilt = sun_earth.transform(_EARTH_DETILT_MATRIX)
+
+    x_axis = CartesianRepresentation(1, 0, 0)
+
+    if to_frame.obstime.isscalar:
+        rot_matrix = _make_rotation_matrix_from_reprs(sun_earth_detilt, x_axis)
+    else:
+        rot_matrix_list = [
+            _make_rotation_matrix_from_reprs(vect, x_axis) for vect in sun_earth_detilt
+        ]
+        rot_matrix = np.stack(rot_matrix_list)
+
+    return matrix_product(rot_matrix, _EARTH_DETILT_MATRIX)
 
 
-@frame_transform_graph.transform(
-    FunctionTransformWithFiniteDifference, GeocentricSolarEcliptic, GCRS
-)
+@frame_transform_graph.transform(DynamicMatrixTransform, GeocentricSolarEcliptic, GCRS)
 def geosolarecliptic_to_gcrs(from_coo, gcrs_frame):
-    rmat = _ecliptic_rotation_matrix()
-    newrepr = from_coo.cartesian.transform(matrix_transpose(rmat))
-    gcrs = GCRS(newrepr, obstime=from_coo.obstime)
-
-    # now do any needed offsets (no-op if same obstime and 0 pos/vel)
-    return gcrs.transform_to(gcrs_frame)
+    return matrix_transpose(gcrs_to_geosolarecliptic(gcrs_frame, from_coo))
 
 
 _FRAME_MAPPING = {
