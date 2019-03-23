@@ -1,11 +1,13 @@
+import copy
 import json
 
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 
 from poliastro.contrib.czml_extract_default_params import DEFAULTS
+from poliastro.twobody.propagation import propagate
 
 
 class CZMLExtractor:
@@ -35,7 +37,7 @@ class CZMLExtractor:
         self.start_epoch = CZMLExtractor.format_date(start_epoch)
         self.end_epoch = CZMLExtractor.format_date(end_epoch)
 
-        self.__init_czml__()
+        self._init_czml_()
 
     def parse_dict_tuples(self, path, tups):
         """
@@ -49,14 +51,13 @@ class CZMLExtractor:
 
         # We only want to pass a reference czml, then by modifying our reference, we'll be modifying our base dictionary
         # which allows us to walk through a path of arbitrary length
-
         curr = self.czml
         for p in path:
             curr = curr.setdefault(p, {})
         for t in tups:
             curr[t[0]] = t[1]
 
-    def __init_orbit_packet__(self, i):
+    def _init_orbit_packet_(self, i):
         """
         Sets the default values for a given orbit
 
@@ -66,7 +67,7 @@ class CZMLExtractor:
             Index of referenced orbit
         """
 
-        self.czml[i] = DEFAULTS.copy()
+        self.czml[i] = copy.deepcopy(DEFAULTS)
 
         start_epoch = CZMLExtractor.format_date(
             min(self.orbits[i][2], self.start_epoch)
@@ -94,9 +95,9 @@ class CZMLExtractor:
                 ("cartesian", list()),
             ],
         )
-        self.__init_orbit_packet_cords__(i)
+        self._init_orbit_packet_cords_(i)
 
-    def __init_orbit_packet_cords__(self, i):
+    def _init_orbit_packet_cords_(self, i):
         """
 
         Parameters
@@ -107,18 +108,16 @@ class CZMLExtractor:
         h = (self.end_epoch - self.orbits[i][2]).to(u.second) / self.orbits[i][1]
 
         for k in range(self.orbits[i][1] + 2):
-            cords = (
-                self.orbits[i][0]
-                .represent_as(CartesianRepresentation)
-                .xyz.to(u.meter)
-                .value
-            )
+            position = propagate(self.orbits[i][0], TimeDelta(k * h))
+
+            cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
-            self.czml[i]["position"]["cartesian"] += cords.tolist()
-            self.orbits[i][0] = self.orbits[i][0].propagate(h)
+            self.czml[i]["position"]["cartesian"] += list(
+                map(lambda x: x[0], cords.tolist())
+            )
 
-    def __init_czml__(self):
+    def _init_czml_(self):
         """
         Only called at the initialization of the extractor
         Builds packets.
@@ -232,6 +231,9 @@ class CZMLExtractor:
         ext_location : str
             Path to extract your file to, if not path is given, return the dump in the console
         """
+        if ext_location:
+            with open(ext_location, "w+") as fp:
+                fp.write(json.dumps(list(self.czml.values())))
 
         return json.dumps(list(self.czml.values()))
 
@@ -259,7 +261,7 @@ class CZMLExtractor:
 
         self.orbits.append([orbit, N, orbit.epoch])
 
-        self.__init_orbit_packet__(self.i)
+        self._init_orbit_packet_(self.i)
 
         self.i += 1
 
