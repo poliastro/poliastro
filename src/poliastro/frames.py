@@ -18,6 +18,7 @@ from astropy.coordinates import (
     TimeAttribute,
     UnitSphericalRepresentation,
     frame_transform_graph,
+    get_body,
     get_body_barycentric,
     get_body_barycentric_posvel,
 )
@@ -274,9 +275,9 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
             " Frame needs an obstime Attribute"
         )
 
-    sun_pos_icrs = get_body_barycentric("sun", to_frame.obstime)
-    earth_pos_icrs = get_body_barycentric("earth", to_frame.obstime)
-    sun_earth = earth_pos_icrs - sun_pos_icrs
+    sun_pos_gcrs = get_body("sun", to_frame.obstime).cartesian
+    earth_pos_gcrs = get_body("earth", to_frame.obstime).cartesian
+    sun_earth = sun_pos_gcrs - earth_pos_gcrs
 
     sun_earth_detilt = sun_earth.transform(_EARTH_DETILT_MATRIX)
 
