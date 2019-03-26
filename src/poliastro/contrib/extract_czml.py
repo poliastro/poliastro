@@ -58,14 +58,6 @@ class CZMLExtractor:
             curr[t[0]] = t[1]
 
     def _init_orbit_packet_(self, i):
-        """
-        Sets the default values for a given orbit
-
-        Parameters
-        ----------
-        i : int
-            Index of referenced orbit
-        """
 
         self.czml[i] = copy.deepcopy(DEFAULTS)
 
@@ -137,28 +129,31 @@ class CZMLExtractor:
             ],
         )
 
-    def change_id_params(self, i, id=None, name=None, description=None):
+    def _change_id_params_(self, i, o_id=None, name=None, description=None):
         """
         Change the id parameters.
 
         Parameters
+        ----------
+
         i : int
             Referred body (count starts at i)
         id: str
-            Set orbit id
+           Set orbit id
         name: str
             Set orbit name
         description: str
             Set orbit description
         """
-        if id is not None:
-            self.parse_dict_tuples([i], [("id", id)])
+
+        if o_id is not None:
+            self.parse_dict_tuples([i], [("id", o_id)])
         if name is not None:
             self.parse_dict_tuples([i], [("name", name)])
         if description is not None:
             self.parse_dict_tuples([i], [("description", description)])
 
-    def change_path_params(
+    def _change_path_params_(
         self, i, pixel_offset=None, color=None, width=None, show=None
     ):
         """
@@ -190,7 +185,7 @@ class CZMLExtractor:
         if show is not None:
             self.parse_dict_tuples([i, "path", "show"], [("boolean", show)])
 
-    def change_label_params(
+    def _change_label_params_(
         self, i, fill_color=None, outline_color=None, font=None, text=None, show=None
     ):
         """
@@ -237,7 +232,23 @@ class CZMLExtractor:
 
         return json.dumps(list(self.czml.values()))
 
-    def add_orbit(self, orbit, N=None):
+    def add_orbit(
+        self,
+        orbit,
+        N=None,
+        id_id=None,
+        id_name=None,
+        id_description=None,
+        path_pixel_offset=None,
+        path_color=None,
+        path_width=None,
+        path_show=None,
+        label_fill_color=None,
+        label_outline_color=None,
+        label_font=None,
+        label_text=None,
+        label_show=None,
+    ):
         """
         Adds an orbit
 
@@ -247,6 +258,48 @@ class CZMLExtractor:
             Orbit to be added
         N: int
             Number of sample points
+
+        Parameters
+        ----------
+        i : int
+            Index of referenced orbit
+
+        Id parameters:
+        -------------
+
+        id_id: str
+            Set orbit id
+        id_name: str
+            Set orbit name
+        id_description: str
+            Set orbit description
+
+        Path parameters
+        ---------------
+
+        path_pixel_offset: list (int)
+            The pixel offset (up and right)
+        path_color: list (int)
+            Rgba path color
+        path_width: int
+            Path width
+        path_show: bool
+            Indicates whether the path is visible
+
+        Label parameters
+        ----------
+
+        label_fill_color: list (int)
+            Fill Color in rgba format
+        label_outline_color: list (int)
+            Outline Color in rgba format
+        label_font: str
+            Set label font style and size (CSS syntax)
+        label_text: str
+            Set label text
+        label_show: bool
+            Indicates whether the label is visible
+
         """
 
         if N is None:
@@ -262,6 +315,25 @@ class CZMLExtractor:
         self.orbits.append([orbit, N, orbit.epoch])
 
         self._init_orbit_packet_(self.i)
+
+        self._change_id_params_(
+            self.i, o_id=id_id, name=id_name, description=id_description
+        )
+        self._change_path_params_(
+            self.i,
+            pixel_offset=path_pixel_offset,
+            color=path_color,
+            width=path_width,
+            show=path_show,
+        )
+        self._change_label_params_(
+            self.i,
+            fill_color=label_fill_color,
+            outline_color=label_outline_color,
+            font=label_font,
+            text=label_text,
+            show=label_show,
+        )
 
         self.i += 1
 
