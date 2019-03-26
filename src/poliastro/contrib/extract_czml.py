@@ -82,7 +82,7 @@ class CZMLExtractor:
             [
                 ("interpolationAlgorithm", "LAGRANGE"),
                 ("interpolationDegree", 5),
-                ("referenceFrame", "FIXED"),
+                ("referenceFrame", "INERTIAL"),
                 ("epoch", start_epoch.value),
                 ("cartesian", list()),
             ],
