@@ -1,9 +1,8 @@
 import pytest
-
 from numpy.testing import assert_allclose
 
 from poliastro.czml.extract_czml import CZMLExtractor
-from poliastro.examples import molniya, iss
+from poliastro.examples import iss, molniya
 
 
 def test_czml_add_orbit():
