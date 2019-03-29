@@ -8,6 +8,7 @@ from astropy import coordinates as coord, units as u
 
 from poliastro.bodies import Sun
 from poliastro.iod import lambert
+from poliastro.twobody.orbit import Orbit
 from poliastro.util import norm
 
 
@@ -17,12 +18,23 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
     """
 
     # Compute departure and arrival positions
-    rr_dpt_body, vv_dpt_body = coord.get_body_barycentric_posvel(
-        departure_body.name, t_launch
-    )
-    rr_arr_body, vv_arr_body = coord.get_body_barycentric_posvel(
-        target_body.name, t_arrival
-    )
+    if isinstance(departure_body, Orbit):
+        rr, vv = departure_body.propagate(t_launch).rv()
+        rr_dpt_body = coord.CartesianRepresentation(rr)
+        vv_dpt_body = coord.CartesianRepresentation(vv)
+    else:
+        rr_dpt_body, vv_dpt_body = coord.get_body_barycentric_posvel(
+            departure_body.name, t_launch
+        )
+
+    if isinstance(target_body, Orbit):
+        rr, vv = target_body.propagate(t_arrival).rv()
+        rr_arr_body = coord.CartesianRepresentation(rr)
+        vv_arr_body = coord.CartesianRepresentation(vv)
+    else:
+        rr_arr_body, vv_arr_body = coord.get_body_barycentric_posvel(
+            target_body.name, t_arrival
+        )
 
     # Compute time of flight
     tof = t_arrival - t_launch
@@ -182,13 +194,24 @@ def porkchop(
     ax.grid()
     fig.autofmt_xdate()
 
-    ax.set_title(
-        "{} - {} for year {}, C3 Launch".format(
-            departure_body.name, target_body.name, launch_span[0].datetime.year
-        ),
-        fontsize=14,
-        fontweight="bold",
-    )
+    if not hasattr(target_body, "name"):
+
+        ax.set_title(
+            "{} - {} for year {}, C3 Launch".format(
+                departure_body.name, "Target Body", launch_span[0].datetime.year
+            ),
+            fontsize=14,
+            fontweight="bold",
+        )
+    else:
+        ax.set_title(
+            "{} - {} for year {}, C3 Launch".format(
+                departure_body.name, target_body.name, launch_span[0].datetime.year
+            ),
+            fontsize=14,
+            fontweight="bold",
+        )
+
     ax.set_xlabel("Launch date", fontsize=10, fontweight="bold")
     ax.set_ylabel("Arrival date", fontsize=10, fontweight="bold")
 
