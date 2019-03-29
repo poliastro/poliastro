@@ -17,6 +17,11 @@ Contains some predefined bodies of the Solar System:
 and a way to define new bodies (:py:class:`~Body` class).
 
 Data references can be found in :py:mod:`~poliastro.constants`
+
+For calculating rotational elements at epoch, orientation models from the kernel file
+"pck00010.tpc" have been used. This kernel is provided by Nasa at the url
+"https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00010.tpc"
+The method to calculate the rotational elements at epoch is explained there.
 """
 import math
 
