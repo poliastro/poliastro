@@ -6,17 +6,56 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy import coordinates as coord, units as u
 
-from poliastro.bodies import Sun
+from poliastro.bodies import (
+    Earth,
+    Jupiter,
+    Mars,
+    Mercury,
+    Moon,
+    Neptune,
+    Pluto,
+    Saturn,
+    Sun,
+    Uranus,
+    Venus,
+)
 from poliastro.iod import lambert
-from poliastro.twobody.orbit import Orbit
 from poliastro.util import norm
+
+
+def _get_state(body, time):
+    """ Computes the position of a body for a given time. """
+
+    solar_system_bodies = [
+        Sun,
+        Mercury,
+        Venus,
+        Earth,
+        Moon,
+        Mars,
+        Jupiter,
+        Saturn,
+        Uranus,
+        Neptune,
+        Pluto,
+    ]
+
+    # We check if body belongs to poliastro.bodies
+    if body in solar_system_bodies:
+        rr, vv = coord.get_body_barycentric_posvel(body.name, time)
+    else:
+        rr, vv = body.propagate(time).rv()
+        rr = coord.CartesianRepresentation(rr)
+        vv = coord.CartesianRepresentation(vv)
+
+    return rr, vv
 
 
 def _targetting(departure_body, target_body, t_launch, t_arrival):
     """This function returns the increment in departure and arrival velocities.
 
     """
-
+    """
     # Compute departure and arrival positions
     if isinstance(departure_body, Orbit):
         rr, vv = departure_body.propagate(t_launch).rv()
@@ -35,6 +74,10 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
         rr_arr_body, vv_arr_body = coord.get_body_barycentric_posvel(
             target_body.name, t_arrival
         )
+    """
+
+    rr_dpt_body, vv_dpt_body = _get_state(departure_body, t_launch)
+    rr_arr_body, vv_arr_body = _get_state(target_body, t_arrival)
 
     # Compute time of flight
     tof = t_arrival - t_launch
