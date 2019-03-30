@@ -319,7 +319,7 @@ def rv2coe(k, r, v, tol=1e-8):
     """
 
     h = cross(r, v)
-    n = cross([0, 0, 1], h) / norm(h)
+    n = cross([0, 0, 1], h)
     e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
     ecc = norm(e)
     p = h.dot(h) / k
@@ -351,11 +351,11 @@ def rv2coe(k, r, v, tol=1e-8):
         else:
             e_sh = r.dot(v) / sqrt(-ka)
             e_ch = norm(r) * (norm(v) ** 2) / k - 1
-            nu = F_to_nu(np.arctan2(e_sh, e_ch), ecc)
+            nu = F_to_nu(np.log((e_ch + e_sh) / (e_ch - e_sh)) / 2, ecc)
 
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
         px = r.dot(n)
-        py = r.dot(cross(h, n)) / h.dot(h)
+        py = r.dot(cross(h, n)) / norm(h)
         argp = (np.arctan2(py, px) - nu) % (2 * np.pi)
 
     nu = (nu + np.pi) % (2 * np.pi) - np.pi
