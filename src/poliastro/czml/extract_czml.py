@@ -1,12 +1,13 @@
 import copy
 import json
+from typing import Any, Dict, List
 
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
 
-from poliastro.contrib.czml_extract_default_params import DEFAULTS
+from poliastro.czml.czml_extract_default_params import DEFAULTS
 from poliastro.twobody.propagation import propagate
 
 
@@ -29,8 +30,8 @@ class CZMLExtractor:
             of sampled data points will be N when calling
             add_orbit()
         """
-        self.czml = dict()
-        self.orbits = []
+        self.czml = dict()  # type: Dict[int, Any]
+        self.orbits = []  # type: List[Any]
         self.N = N
         self.i = 0
 
