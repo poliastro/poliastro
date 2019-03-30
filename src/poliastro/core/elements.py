@@ -6,6 +6,7 @@
 import numpy as np
 from numpy.core.umath import cos, sin, sqrt
 
+from poliastro.core.angles import E_to_nu, F_to_nu
 from poliastro.core.util import cross, norm, transform
 
 from ._jit import jit
@@ -307,9 +308,9 @@ def rv2coe(k, r, v, tol=1e-8):
     >>> print("raan:", np.rad2deg(raan), "[deg]")
     raan: 255.27928533439618 [deg]
     >>> print("argp:", np.rad2deg(argp), "[deg]")
-    argp: 20.068139973005362 [deg]
+    argp: 20.068139973005366 [deg]
     >>> print("nu:", np.rad2deg(nu), "[deg]")
-    nu: 28.445804984192108 [deg]
+    nu: 28.445804984192122 [deg]
 
     Note
     ----
@@ -318,7 +319,7 @@ def rv2coe(k, r, v, tol=1e-8):
     """
 
     h = cross(r, v)
-    n = cross([0, 0, 1], h) / norm(h)
+    n = cross([0, 0, 1], h)
     e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
     ecc = norm(e)
     p = h.dot(h) / k
@@ -330,20 +331,34 @@ def rv2coe(k, r, v, tol=1e-8):
     if equatorial and not circular:
         raan = 0
         argp = np.arctan2(e[1], e[0]) % (2 * np.pi)  # Longitude of periapsis
-        nu = np.arctan2(h.dot(cross(e, r)) / norm(h), r.dot(e)) % (2 * np.pi)
+        nu = np.arctan2(h.dot(cross(e, r)) / norm(h), r.dot(e))
     elif not equatorial and circular:
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
         argp = 0
         # Argument of latitude
-        nu = np.arctan2(r.dot(cross(h, n)) / norm(h), r.dot(n)) % (2 * np.pi)
+        nu = np.arctan2(r.dot(cross(h, n)) / norm(h), r.dot(n))
     elif equatorial and circular:
         raan = 0
         argp = 0
         nu = np.arctan2(r[1], r[0]) % (2 * np.pi)  # True longitude
     else:
+        a = p / (1 - (ecc ** 2))
+        ka = k * a
+        if a > 0:
+            e_se = r.dot(v) / sqrt(ka)
+            e_ce = norm(r) * (norm(v) ** 2) / k - 1
+            nu = E_to_nu(np.arctan2(e_se, e_ce), ecc)
+        else:
+            e_sh = r.dot(v) / sqrt(-ka)
+            e_ch = norm(r) * (norm(v) ** 2) / k - 1
+            nu = F_to_nu(np.log((e_ch + e_sh) / (e_ch - e_sh)) / 2, ecc)
+
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
-        argp = np.arctan2(e.dot(cross(h, n)) / norm(h), e.dot(n)) % (2 * np.pi)
-        nu = np.arctan2(r.dot(cross(h, e)) / norm(h), r.dot(e)) % (2 * np.pi)
+        px = r.dot(n)
+        py = r.dot(cross(h, n)) / norm(h)
+        argp = (np.arctan2(py, px) - nu) % (2 * np.pi)
+
+    nu = (nu + np.pi) % (2 * np.pi) - np.pi
 
     return p, ecc, inc, raan, argp, nu
 
