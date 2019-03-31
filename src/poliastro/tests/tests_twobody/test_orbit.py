@@ -516,8 +516,7 @@ def test_orbit_represent_as_produces_correct_data():
     ).all()
 
 
-@pytest.mark.parametrize("value", [1 * u.h, 10 * u.deg])
-def test_orbit_propagate_retains_plane(value):
+def test_orbit_propagate_retains_plane():
     r = [1e09, -4e09, -1e09] * u.km
     v = [5e00, -1e01, -4e00] * u.km / u.s
 
