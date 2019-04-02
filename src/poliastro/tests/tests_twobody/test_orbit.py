@@ -1,5 +1,6 @@
 import pickle
 
+import matplotlib
 import numpy as np
 import pytest
 from astropy import units as u
@@ -433,6 +434,38 @@ def test_orbit_is_pickable(hyperbolic):
     assert_array_equal(hyperbolic.r, ss_result.r)
     assert_array_equal(hyperbolic.v, ss_result.v)
     assert ss_result.epoch == hyperbolic.epoch
+
+
+def test_orbit_plot_is_static():
+
+    # Data from Curtis, example 4.3
+    r = [-6045, -3490, 2500] * u.km
+    v = [-3.457, 6.618, 2.533] * u.km / u.s
+    ss = Orbit.from_vectors(Earth, r, v)
+    plot = ss.plot(static=True)
+    assert isinstance(plot[0], matplotlib.lines.Line2D)
+    assert isinstance(plot[1], matplotlib.lines.Line2D)
+
+
+def test_orbit_plot_static_3d():
+    # Data from Curtis, example 4.3
+    r = [-6045, -3490, 2500] * u.km
+    v = [-3.457, 6.618, 2.533] * u.km / u.s
+    ss = Orbit.from_vectors(Earth, r, v)
+    with pytest.raises(ValueError, match="static and use_3d cannot be true"):
+        ss.plot(static=True, use_3d=True)
+
+
+@pytest.mark.parametrize("use_3d", [False, True])
+def test_orbit_plot_is_not_static(use_3d):
+    from plotly.graph_objs import FigureWidget
+
+    # Data from Curtis, example 4.3
+    r = [-6045, -3490, 2500] * u.km
+    v = [-3.457, 6.618, 2.533] * u.km / u.s
+    ss = Orbit.from_vectors(Earth, r, v)
+    plot = ss.plot(static=False, use_3d=use_3d)
+    assert isinstance(plot, FigureWidget)
 
 
 @pytest.mark.parametrize(
