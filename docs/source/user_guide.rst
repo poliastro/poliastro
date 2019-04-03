@@ -106,7 +106,7 @@ orbit.
 From classical orbital elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can also define a :py:class:`~poliastro.twobody.orbit.Orbit` using a set of
+We can also define an :py:class:`~poliastro.twobody.orbit.Orbit` using a set of
 six parameters called orbital elements. Although there are several of
 these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
@@ -133,7 +133,7 @@ In this case, we'd use the method
     
     ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
-Notice that whether we create a ``Orbit`` from :math:`(r)` and :math:`(v)` or from
+Notice that whether we create an ``Orbit`` from :math:`(r)` and :math:`(v)` or from
 elements we can access many mathematical properties of the orbit::
 
     >>> ss.period.to(u.day)
