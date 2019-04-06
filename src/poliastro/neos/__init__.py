@@ -11,6 +11,7 @@ The orbits returned by the functions in this package are in the
 
 """
 
+
 def neos():
     raise NotImplementedError(
         """This module is deprecated from poliastro and a wrapper
