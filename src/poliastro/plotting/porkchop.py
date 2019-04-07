@@ -6,9 +6,49 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy import coordinates as coord, units as u
 
-from poliastro.bodies import Sun
+from poliastro.bodies import (
+    Earth,
+    Jupiter,
+    Mars,
+    Mercury,
+    Moon,
+    Neptune,
+    Pluto,
+    Saturn,
+    Sun,
+    Uranus,
+    Venus,
+)
 from poliastro.iod import lambert
 from poliastro.util import norm
+
+
+def _get_state(body, time):
+    """ Computes the position of a body for a given time. """
+
+    solar_system_bodies = [
+        Sun,
+        Mercury,
+        Venus,
+        Earth,
+        Moon,
+        Mars,
+        Jupiter,
+        Saturn,
+        Uranus,
+        Neptune,
+        Pluto,
+    ]
+
+    # We check if body belongs to poliastro.bodies
+    if body in solar_system_bodies:
+        rr, vv = coord.get_body_barycentric_posvel(body.name, time)
+    else:
+        rr, vv = body.propagate(time).rv()
+        rr = coord.CartesianRepresentation(rr)
+        vv = coord.CartesianRepresentation(vv)
+
+    return rr, vv
 
 
 def _targetting(departure_body, target_body, t_launch, t_arrival):
@@ -16,13 +56,8 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
 
     """
 
-    # Compute departure and arrival positions
-    rr_dpt_body, vv_dpt_body = coord.get_body_barycentric_posvel(
-        departure_body.name, t_launch
-    )
-    rr_arr_body, vv_arr_body = coord.get_body_barycentric_posvel(
-        target_body.name, t_arrival
-    )
+    rr_dpt_body, vv_dpt_body = _get_state(departure_body, t_launch)
+    rr_arr_body, vv_arr_body = _get_state(target_body, t_arrival)
 
     # Compute time of flight
     tof = t_arrival - t_launch
@@ -182,13 +217,24 @@ def porkchop(
     ax.grid()
     fig.autofmt_xdate()
 
-    ax.set_title(
-        "{} - {} for year {}, C3 Launch".format(
-            departure_body.name, target_body.name, launch_span[0].datetime.year
-        ),
-        fontsize=14,
-        fontweight="bold",
-    )
+    if not hasattr(target_body, "name"):
+
+        ax.set_title(
+            "{} - {} for year {}, C3 Launch".format(
+                departure_body.name, "Target Body", launch_span[0].datetime.year
+            ),
+            fontsize=14,
+            fontweight="bold",
+        )
+    else:
+        ax.set_title(
+            "{} - {} for year {}, C3 Launch".format(
+                departure_body.name, target_body.name, launch_span[0].datetime.year
+            ),
+            fontsize=14,
+            fontweight="bold",
+        )
+
     ax.set_xlabel("Launch date", fontsize=10, fontweight="bold")
     ax.set_ylabel("Arrival date", fontsize=10, fontweight="bold")
 
