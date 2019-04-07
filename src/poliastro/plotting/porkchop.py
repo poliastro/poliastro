@@ -55,26 +55,6 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
     """This function returns the increment in departure and arrival velocities.
 
     """
-    """
-    # Compute departure and arrival positions
-    if isinstance(departure_body, Orbit):
-        rr, vv = departure_body.propagate(t_launch).rv()
-        rr_dpt_body = coord.CartesianRepresentation(rr)
-        vv_dpt_body = coord.CartesianRepresentation(vv)
-    else:
-        rr_dpt_body, vv_dpt_body = coord.get_body_barycentric_posvel(
-            departure_body.name, t_launch
-        )
-
-    if isinstance(target_body, Orbit):
-        rr, vv = target_body.propagate(t_arrival).rv()
-        rr_arr_body = coord.CartesianRepresentation(rr)
-        vv_arr_body = coord.CartesianRepresentation(vv)
-    else:
-        rr_arr_body, vv_arr_body = coord.get_body_barycentric_posvel(
-            target_body.name, t_arrival
-        )
-    """
 
     rr_dpt_body, vv_dpt_body = _get_state(departure_body, t_launch)
     rr_arr_body, vv_arr_body = _get_state(target_body, t_arrival)

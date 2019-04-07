@@ -8,9 +8,7 @@ from poliastro.util import time_range
 
 @pytest.mark.mpl_image_compare
 def test_porkchop_plotting():
-
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
+    fig, ax = plt.subplots()
 
     launch_span = time_range("2005-04-30", end="2005-10-07")
     arrival_span = time_range("2005-11-16", end="2006-12-21")
