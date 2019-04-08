@@ -21,7 +21,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
         \vec{v} &= \frac{1}{g}(\dot{g}\vec{r} - \vec{r_{0}})
 
     Therefore, the lagrange coefficients need to be computed. For the case of
-    Lamber's problem, they can be expresed by terms of the initial and final vector:
+    Lamber's problem, they can be expressed by terms of the initial and final vector:
 
     .. math::
 
@@ -188,7 +188,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     v1: ~numpy.array
         Initial velocity vector
     v2: ~numpy.array
-        FInal velocity vector
+        Final velocity vector
 
     """
 
