@@ -431,4 +431,27 @@ And these are the results::
 .. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
 
 
+Fetching Orbits from external sources
+-------------------------------------
+
+As of now, poliastro supports fetching orbits from 2 online databases from Jet Propulsion Laboratory,
+SBDB and Horizons.
+
+JPL Horizons can be used to generate ephemerides for solar-system bodies. And JPL SBDB (Small-Body Database Browser)
+provides data for all known asteroids and many comets.
+
+The data is fetched using the wrappers to these services provided by `astroquery`_ .
+
+.. code-block:: python
+
+    from poliastro.twobody import Orbit
+
+    Orbit.from_horizons('Ceres')
+
+    Orbit.from_sbdb('apophis')
+
+And both of them will return :py:obj:`poliastro.twobody.Orbit` objects!
+
+.. _`astroquery`: https://astroquery.readthedocs.io/
+
 *Per Python ad astra* ;)
