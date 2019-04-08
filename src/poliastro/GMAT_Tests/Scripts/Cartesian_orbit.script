@@ -1,0 +1,59 @@
+%General Mission Analysis Tool(GMAT) Script
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft SpaceCraft;
+GMAT SpaceCraft.DateFormat = TAIModJulian;
+GMAT SpaceCraft.Epoch = '21545';
+GMAT SpaceCraft.CoordinateSystem = EarthMJ2000Eq;
+GMAT SpaceCraft.DisplayStateType = Cartesian;
+GMAT SpaceCraft.X = 7100;
+GMAT SpaceCraft.Y = 452;
+GMAT SpaceCraft.Z = 1300;
+GMAT SpaceCraft.VX = 0.4;
+GMAT SpaceCraft.VY = 7.35;
+GMAT SpaceCraft.VZ = 4;
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel InternalODEModel;
+GMAT InternalODEModel.CentralBody = Earth;
+GMAT InternalODEModel.PointMasses = {Earth};
+GMAT InternalODEModel.Drag = None;
+GMAT InternalODEModel.SRP = Off;
+GMAT InternalODEModel.RelativisticCorrection = Off;
+GMAT InternalODEModel.ErrorControl = RSSStep;
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator DefaultProp;
+GMAT DefaultProp.FM = InternalODEModel;
+GMAT DefaultProp.Type = RungeKutta89;
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create ReportFile ReportFile1;
+GMAT ReportFile1.SolverIterations = Current;
+GMAT ReportFile1.Filename = 'Reports/Cartesian_orbit.csv';
+GMAT ReportFile1.Precision = 16;
+GMAT ReportFile1.Add = {SpaceCraft.ElapsedSecs, SpaceCraft.EarthMJ2000Eq.X, SpaceCraft.EarthMJ2000Eq.Y, SpaceCraft.EarthMJ2000Eq.Z, SpaceCraft.EarthMJ2000Eq.VX, SpaceCraft.EarthMJ2000Eq.VY, SpaceCraft.EarthMJ2000Eq.VZ};
+GMAT ReportFile1.WriteHeaders = true;
+GMAT ReportFile1.ZeroFill = Off;
+GMAT ReportFile1.FixedWidth = false;
+GMAT ReportFile1.Delimiter = ',';
+GMAT ReportFile1.WriteReport = true;
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+Propagate DefaultProp(SpaceCraft) {SpaceCraft.ElapsedSecs = 12000.0};

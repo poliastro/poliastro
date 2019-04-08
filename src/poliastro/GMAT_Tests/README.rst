@@ -1,0 +1,3 @@
+For validation against GMAT, the GMAT scripts and the corresponding reports generated have been provided. In case the user wants to generate the reports locally, the ``run_scripts.py`` can be run. This script will automatically run all the scripts and replace the pre-generated reports with the locally generated ones.
+The script has to be run in the folder containing GMAT console in case of linux, i.e. GMAT/../bin/ .
+It is assumed both the poliastro and GMAT directory are in the root directory.
