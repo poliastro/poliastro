@@ -529,7 +529,7 @@ New contributors
 
 Thanks to the generous SOCIS grant from the European Space Agency,
 Antonio Hidalgo has devoted three months developing poliastro full time
-and gained write acces to the repository.
+and gained write access to the repository.
 
 This is the complete list of the people that contributed to this release,
 with a + sign indicating first contribution.

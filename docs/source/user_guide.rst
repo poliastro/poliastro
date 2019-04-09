@@ -228,7 +228,7 @@ Studying artificial perturbations: thrust
 In addition to natural perturbations, poliastro also has
 built-in artificial perturbations (thrusts) aimed
 at intentional change of some orbital elements. 
-Let us simultaineously change eccentricy and inclination::
+Let us simultaneously change eccentricy and inclination::
 
     >>> from poliastro.twobody.thrust import change_inc_ecc
     >>> from poliastro.twobody import Orbit

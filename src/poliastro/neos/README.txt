@@ -386,7 +386,7 @@ USAGE
  of the old D3READ subroutine for DASTCOM3 and DASTCOM4. They can be used if 
  necessary for a "quick and dirty" inclusion of DASTCOM5, by those previously 
  using D3READ and wanting to minimize changes to their existing software, but 
- are not recommmended for general use. 
+ are not recommended for general use. 
 
  The obsolete D3READ subroutine they emulate returned different data in the 
  same array slots depending on whether the object was a comet or asteroid.
@@ -670,7 +670,7 @@ PROGRAMMER NOTES
  Call DXINI to initialize, then call DXBND to retrieve the logical record 
  bounds (and bias pointers) for each category of object. Proceed to read each 
  record in sequence, calling DXREAD as IOBJ is incremented positively from 
- BND(4) to BND(1) for numbered asterods, BND(5) to BND(2) for unnumbered 
+ BND(4) to BND(1) for numbered asteroids, BND(5) to BND(2) for unnumbered 
  asteroids, and from BND(6) to BND(3) for comets.
 
 

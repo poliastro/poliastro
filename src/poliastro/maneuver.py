@@ -83,7 +83,7 @@ class Maneuver(object):
                 \Delta v_{b} &= \sqrt{\frac{\mu}{r_{f}}} - \sqrt{\frac{2\mu}{r_{f}} - \frac{\mu}{a_{trans}}}
             \end{align}
 
-        The time that takes to compelte the maneuver can be computed as:
+        The time that takes to complete the maneuver can be computed as:
 
         .. math::
             \tau_{trans} = \pi \sqrt{\frac{(a_{trans})^{3}}{\mu}}
@@ -159,7 +159,7 @@ class Maneuver(object):
         r"""Compute a bielliptic transfer between two circular orbits.
 
         The bielliptic maneuver employs two Hohmann transfers, therefore two
-        intermediate orbits are stablished. We define the different radius
+        intermediate orbits are established. We define the different radius
         relationships as follows:
 
         .. math::
