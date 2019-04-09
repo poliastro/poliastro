@@ -7,6 +7,7 @@ from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
 
+from poliastro.constants import R_earth
 from poliastro.czml.czml_extract_default_params import DEFAULTS
 from poliastro.twobody.propagation import propagate
 
@@ -14,7 +15,7 @@ from poliastro.twobody.propagation import propagate
 class CZMLExtractor:
     """A class for extracting orbitary data to Cesium"""
 
-    def __init__(self, start_epoch, end_epoch, N):
+    def __init__(self, start_epoch, end_epoch, N, attractor_r=R_earth):
         """
         Orbital constructor
 
@@ -29,11 +30,17 @@ class CZMLExtractor:
             Unless otherwise specified, the number
             of sampled data points will be N when calling
             add_orbit()
+        attractor_r: ~astropy.constants.constant.Constant
+            radius of the attractor of the orbit, defaults to
+            the earth's radius
         """
         self.czml = dict()  # type: Dict[int, Any]
         self.orbits = []  # type: List[Any]
         self.N = N
         self.i = 0
+
+        # The coefficient of the coordinate scaling transformation
+        self.r_cf = (R_earth / attractor_r).value
 
         self.start_epoch = CZMLExtractor.format_date(start_epoch)
         self.end_epoch = CZMLExtractor.format_date(end_epoch)
@@ -103,7 +110,10 @@ class CZMLExtractor:
         for k in range(self.orbits[i][1] + 2):
             position = propagate(self.orbits[i][0], TimeDelta(k * h))
 
-            cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
+            cords = (
+                self.r_cf
+                * position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
+            )
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
             self.czml[i]["position"]["cartesian"] += list(
