@@ -70,9 +70,10 @@ You will also need to understand how git works. git is a decentralized
 version control system that preserves the history of the software, helps
 tracking changes and allows for multiple versions of the code to exist
 at the same time. If you are new to git and version control, I recommend
-following `the Try Git tutorial`_.
+following `the Try Git tutorial`_ and `Git Workflow tutorial`_.
 
 .. _`the Try Git tutorial`: https://try.github.io/
+.. _`Git Workflow tutorial`: https://www.asmeurer.com/git-workflow/
 
 If you already know how all this works and would like to contribute new
 features then that's awesome! Before rushing out though please make sure it
