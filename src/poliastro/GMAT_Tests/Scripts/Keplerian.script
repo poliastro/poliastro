@@ -8,13 +8,13 @@ Create Spacecraft SpaceCraft;
 GMAT SpaceCraft.DateFormat = TAIModJulian;
 GMAT SpaceCraft.Epoch = '21545';
 GMAT SpaceCraft.CoordinateSystem = EarthMJ2000Eq;
-GMAT SpaceCraft.DisplayStateType = Cartesian;
-GMAT SpaceCraft.X = 7100.9875;
-GMAT SpaceCraft.Y = 452.5421;
-GMAT SpaceCraft.Z = 1300.4123;
-GMAT SpaceCraft.VX = 0.4455;
-GMAT SpaceCraft.VY = 7.3545;
-GMAT SpaceCraft.VZ = 3.9875;
+GMAT SpaceCraft.DisplayStateType = Keplerian;
+GMAT SpaceCraft.SMA = 9953.2389;
+GMAT SpaceCraft.ECC = 0.3270000000000001;
+GMAT SpaceCraft.INC = 29.09300000000001;
+GMAT SpaceCraft.RAAN = 344.47;
+GMAT SpaceCraft.AOP = 335.958;
+GMAT SpaceCraft.TA = 45.73600000000006;
 
 %----------------------------------------
 %---------- ForceModels
@@ -35,13 +35,19 @@ GMAT InternalODEModel.ErrorControl = RSSStep;
 Create Propagator DefaultProp;
 GMAT DefaultProp.FM = InternalODEModel;
 GMAT DefaultProp.Type = RungeKutta89;
+GMAT DefaultProp.InitialStepSize = 60;
+GMAT DefaultProp.Accuracy = 9.999999999999999e-012;
+GMAT DefaultProp.MinStep = 0.001;
+GMAT DefaultProp.MaxStep = 2700;
+GMAT DefaultProp.MaxStepAttempts = 50;
+GMAT DefaultProp.StopIfAccuracyIsViolated = true;
 
 %----------------------------------------
 %---------- Subscribers
 %----------------------------------------
 
 Create ReportFile ReportFile1;
-GMAT ReportFile1.Filename = 'Reports/Cartesian_orbit.txt';
+GMAT ReportFile1.Filename = 'Reports/Keplerian_orbit.txt';
 GMAT ReportFile1.FixedWidth = false;
 GMAT ReportFile1.Delimiter = ' ';
 GMAT ReportFile1.WriteHeaders = true;
@@ -54,7 +60,7 @@ GMAT ReportFile1.WriteReport = true;
 %----------------------------------------
 
 BeginMissionSequence;
-Report ReportFile1 SpaceCraft.ElapsedSecs SpaceCraft.EarthMJ2000Eq.X SpaceCraft.EarthMJ2000Eq.Y SpaceCraft.EarthMJ2000Eq.Z SpaceCraft.EarthMJ2000Eq.VX SpaceCraft.EarthMJ2000Eq.VY SpaceCraft.EarthMJ2000Eq.VZ;
+Report ReportFile1 SpaceCraft.ElapsedSecs SpaceCraft.EarthMJ2000Eq.X SpaceCraft.EarthMJ2000Eq.Y SpaceCraft.EarthMJ2000Eq.Z      SpaceCraft.EarthMJ2000Eq.VX SpaceCraft.EarthMJ2000Eq.VY SpaceCraft.EarthMJ2000Eq.VZ SpaceCraft.Earth.SMA SpaceCraft.Earth.ECC SpaceCraft.EarthMJ2000Eq.INC SpaceCraft.EarthMJ2000Eq.RAAN SpaceCraft.EarthMJ2000Eq.AOP SpaceCraft.Earth.TA;
 Propagate DefaultProp(SpaceCraft) {SpaceCraft.ElapsedSecs = 12000.0};
 GMAT ReportFile1.WriteHeaders = False;
-Report ReportFile1 SpaceCraft.ElapsedSecs SpaceCraft.EarthMJ2000Eq.X SpaceCraft.EarthMJ2000Eq.Y SpaceCraft.EarthMJ2000Eq.Z SpaceCraft.EarthMJ2000Eq.VX SpaceCraft.EarthMJ2000Eq.VY SpaceCraft.EarthMJ2000Eq.VZ;
+Report ReportFile1 SpaceCraft.ElapsedSecs SpaceCraft.EarthMJ2000Eq.X SpaceCraft.EarthMJ2000Eq.Y SpaceCraft.EarthMJ2000Eq.Z      SpaceCraft.EarthMJ2000Eq.VX SpaceCraft.EarthMJ2000Eq.VY SpaceCraft.EarthMJ2000Eq.VZ SpaceCraft.Earth.SMA SpaceCraft.Earth.ECC SpaceCraft.EarthMJ2000Eq.INC SpaceCraft.EarthMJ2000Eq.RAAN SpaceCraft.EarthMJ2000Eq.AOP SpaceCraft.Earth.TA;
