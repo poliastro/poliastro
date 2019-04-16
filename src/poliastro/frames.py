@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Dict
 
 import numpy as np
-from astropy import _erfa, units as u
+from astropy import _erfa as erfa, units as u
 from astropy.coordinates import (
     GCRS,
     ICRS,
@@ -67,7 +67,7 @@ class HeliocentricEclipticJ2000(BaseEclipticFrame):
 
 def _ecliptic_rotation_matrix():
     jd1, jd2 = get_jd12(J2000, J2000.scale)
-    obl = _erfa.obl80(jd1, jd2) * u.radian
+    obl = erfa.obl80(jd1, jd2) * u.radian
     assert obl.to(u.arcsec).value == 84381.448
     return rotation_matrix(obl, "x")
 
@@ -244,13 +244,14 @@ def _make_rotation_matrix_from_reprs(start_representation, end_representation):
     return matrix
 
 
-_EARTH_ORBIT_PERPEN_POINT_GCRS = UnitSphericalRepresentation(
-    lon=0 * u.deg, lat=66.5 * u.deg
-)
-
-_EARTH_DETILT_MATRIX = _make_rotation_matrix_from_reprs(
-    _EARTH_ORBIT_PERPEN_POINT_GCRS, CartesianRepresentation(0, 0, 1)
-)
+def _obliquity_rotation_matrix(equinox):
+    """
+    Function to calculate obliquity of the earth.
+    This uses obl06 of erfa.
+    """
+    jd1, jd2 = get_jd12(equinox, "tt")
+    obl = erfa.obl06(jd1, jd2) * u.radian
+    return obl * u.deg
 
 
 class GeocentricSolarEcliptic(BaseEclipticFrame):
@@ -274,14 +275,22 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
             "To perform this transformation the coordinate"
             " Frame needs an obstime Attribute"
         )
+    _earth_orbit_perpen_point_gcrs = UnitSphericalRepresentation(
+        lon=0 * u.deg, lat=(90 * u.deg - -_obliquity_rotation_matrix(to_frame.obstime))
+    )
+
+    _earth_detilt_matrix = _make_rotation_matrix_from_reprs(
+        _earth_orbit_perpen_point_gcrs, CartesianRepresentation(0, 0, 1)
+    )
 
     sun_pos_gcrs = get_body("sun", to_frame.obstime).cartesian
     earth_pos_gcrs = get_body("earth", to_frame.obstime).cartesian
     sun_earth = sun_pos_gcrs - earth_pos_gcrs
 
-    sun_earth_detilt = sun_earth.transform(_EARTH_DETILT_MATRIX)
+    sun_earth_detilt = sun_earth.transform(_earth_detilt_matrix)
 
     x_axis = CartesianRepresentation(1, 0, 0)
+    # Earth-Sun Line in Geocentric Solar Ecliptic Frame
 
     if to_frame.obstime.isscalar:
         rot_matrix = _make_rotation_matrix_from_reprs(sun_earth_detilt, x_axis)
@@ -291,7 +300,7 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
         ]
         rot_matrix = np.stack(rot_matrix_list)
 
-    return matrix_product(rot_matrix, _EARTH_DETILT_MATRIX)
+    return matrix_product(rot_matrix, _earth_detilt_matrix)
 
 
 @frame_transform_graph.transform(DynamicMatrixTransform, GeocentricSolarEcliptic, GCRS)
