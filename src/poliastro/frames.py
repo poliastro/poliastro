@@ -244,14 +244,14 @@ def _make_rotation_matrix_from_reprs(start_representation, end_representation):
     return matrix
 
 
-def _obliquity_rotation_matrix(equinox):
+def _obliquity_rotation_value(equinox):
     """
     Function to calculate obliquity of the earth.
     This uses obl06 of erfa.
     """
     jd1, jd2 = get_jd12(equinox, "tt")
     obl = erfa.obl06(jd1, jd2) * u.radian
-    return obl * u.deg
+    return obl.to(u.deg)
 
 
 class GeocentricSolarEcliptic(BaseEclipticFrame):
@@ -276,7 +276,7 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
             " Frame needs an obstime Attribute"
         )
     _earth_orbit_perpen_point_gcrs = UnitSphericalRepresentation(
-        lon=0 * u.deg, lat=(90 * u.deg - -_obliquity_rotation_matrix(to_frame.obstime))
+        lon=0 * u.deg, lat=(90 * u.deg - _obliquity_rotation_value(to_frame.obstime))
     )
 
     _earth_detilt_matrix = _make_rotation_matrix_from_reprs(
@@ -289,8 +289,8 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
 
     sun_earth_detilt = sun_earth.transform(_earth_detilt_matrix)
 
-    x_axis = CartesianRepresentation(1, 0, 0)
     # Earth-Sun Line in Geocentric Solar Ecliptic Frame
+    x_axis = CartesianRepresentation(1, 0, 0)
 
     if to_frame.obstime.isscalar:
         rot_matrix = _make_rotation_matrix_from_reprs(sun_earth_detilt, x_axis)
