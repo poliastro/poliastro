@@ -88,6 +88,7 @@ Contents
     api/safe/safe_index
     api/core/core_index
     changelog
+    contributing
     references
 
 
