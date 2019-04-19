@@ -2,7 +2,6 @@
 
 """
 import functools
-from warnings import warn
 
 import numpy as np
 from astropy import time, units as u
@@ -222,19 +221,4 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
         rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
     )
 
-    # If the frame supports obstime, set the time values
-    kwargs = {}
-    if "obstime" in orbit.frame.frame_attributes:
-        kwargs["obstime"] = orbit.epoch + time_of_flight
-    else:
-        warn(
-            "Frame {} does not support 'obstime', time values were not returned".format(
-                orbit.frame.__class__
-            )
-        )
-
-    # Use of a protected method instead of frame.realize_frame
-    # because the latter does not let the user choose the representation type
-    # in one line despite its parameter names, see
-    # https://github.com/astropy/astropy/issues/7784
-    return orbit.frame._replicate(cartesian, representation_type="cartesian", **kwargs)
+    return cartesian

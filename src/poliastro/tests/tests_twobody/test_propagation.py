@@ -1,11 +1,12 @@
 import numpy as np
 import pytest
 from astropy import time, units as u
+from astropy.coordinates import CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose
 from pytest import approx
 
-from poliastro.bodies import Earth, Sun
+from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.elements import rv2coe
 from poliastro.examples import iss
@@ -327,3 +328,16 @@ def test_propagation_sets_proper_epoch():
     propagated = florence.propagate(expected_epoch)
 
     assert propagated.epoch == expected_epoch
+
+
+def test_propagation_custom_body_raises_warning_and_returns_coords():
+    # See https://github.com/poliastro/poliastro/issues/649
+    orbit = Orbit.circular(Moon, 100 * u.km)
+
+    with pytest.warns(
+        UserWarning, match="returning only cartesian coordinates instead"
+    ):
+        coords = orbit.sample(10)
+
+    assert isinstance(coords, CartesianRepresentation)
+    assert len(coords) == 10
