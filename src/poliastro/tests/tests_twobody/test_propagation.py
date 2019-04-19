@@ -314,7 +314,6 @@ def test_long_propagation_preserves_orbit_elements(method):
         r_new.to(u.km).value,
         v_new.to(u.km / u.s).value,
     )[:-1]
-    print(params_ini, params_final)
     assert_quantity_allclose(params_ini, params_final)
 
 
