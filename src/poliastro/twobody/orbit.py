@@ -906,16 +906,27 @@ class Orbit(object):
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        # TODO: Create a from_coordinates method
-        coords = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)[0]
+        cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
 
-        # Even after indexing the result of propagate,
-        # the frame obstime might have an array of times
-        # See the propagate function for reasoning about the usage of a
-        # protected method
-        coords = coords._replicate(
-            coords.data, representation_type="cartesian", obstime=coords.obstime[0]
+        # If the frame supports obstime, set the time values
+        kwargs = {}
+        if "obstime" in self.frame.frame_attributes:
+            kwargs["obstime"] = self.epoch + time_of_flight
+        else:
+            warn(
+                "Frame {} does not support 'obstime', time values were not returned".format(
+                    self.frame.__class__
+                )
+            )
+
+        # Use of a protected method instead of frame.realize_frame
+        # because the latter does not let the user choose the representation type
+        # in one line despite its parameter names, see
+        # https://github.com/astropy/astropy/issues/7784
+        coords = self.frame._replicate(
+            cartesian, representation_type="cartesian", **kwargs
         )
+
         return self.from_coords(self.attractor, coords, plane=self.plane)
 
     @u.quantity_input(value=u.rad)
@@ -1040,8 +1051,38 @@ class Orbit(object):
         else:
             nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
-        time_values = self._generate_time_values(nu_values)
-        return propagate(self, time.TimeDelta(time_values), method=method)
+        time_values = time.TimeDelta(self._generate_time_values(nu_values))
+        cartesian = propagate(self, time_values, method=method)
+
+        # TODO: Unify with propagate
+        # If the frame supports obstime, set the time values
+        try:
+            kwargs = {}
+            if "obstime" in self.frame.frame_attributes:
+                kwargs["obstime"] = self.epoch + time_values
+            else:
+                warn(
+                    "Frame {} does not support 'obstime', time values were not returned".format(
+                        self.frame.__class__
+                    )
+                )
+
+            # Use of a protected method instead of frame.realize_frame
+            # because the latter does not let the user choose the representation type
+            # in one line despite its parameter names, see
+            # https://github.com/astropy/astropy/issues/7784
+            coords = self.frame._replicate(
+                cartesian, representation_type="cartesian", **kwargs
+            )
+            return coords
+
+        except NotImplementedError:
+            warn(
+                "No frame found for attractor {}, returning only cartesian coordinates instead".format(
+                    self.attractor
+                )
+            )
+            return cartesian
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
