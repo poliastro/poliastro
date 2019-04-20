@@ -892,4 +892,7 @@ def test_from_sbdb_raise_valueerror():
     with pytest.raises(ValueError) as e:
         Orbit.from_sbdb(name="Halley")
 
-    assert str(e.value)[0] == "2"
+    assert (
+        str(e.value)
+        == "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley\n"
+    )
