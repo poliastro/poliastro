@@ -21,14 +21,7 @@ from poliastro.frames import Planes, get_frame
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
-from poliastro.util import (
-    find_closest_value,
-    get_eccentricity_critical_argp,
-    get_eccentricity_critical_inc,
-    get_inclination_critical_argp,
-    hyp_nu_limit,
-    norm,
-)
+from poliastro.util import hyp_nu_limit, norm
 
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
@@ -51,24 +44,20 @@ class OrbitSamplingWarning(UserWarning):
 class Orbit(object):
     """Position and velocity of a body with respect to an attractor
     at a given time (epoch).
-
     Regardless of how the Orbit is created, the implicit
     reference system is an inertial one. For the specific case
     of the Solar System, this can be assumed to be the
     International Celestial Reference System or ICRS.
-
     """
 
     def __init__(self, state, epoch, plane):
         """Constructor.
-
         Parameters
         ----------
         state : BaseState
             Position and velocity or orbital elements.
         epoch : ~astropy.time.Time
             Epoch of the orbit.
-
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
@@ -93,9 +82,7 @@ class Orbit(object):
     @property
     def frame(self):
         """Reference frame of the orbit.
-
         .. versionadded:: 0.11.0
-
         """
         if self._frame is None:
             self._frame = get_frame(self.attractor, self._plane, self.epoch)
@@ -221,7 +208,6 @@ class Orbit(object):
     @u.quantity_input(r=u.m, v=u.m / u.s)
     def from_vectors(cls, attractor, r, v, epoch=J2000, plane=Planes.EARTH_EQUATOR):
         """Return `Orbit` from position and velocity vectors.
-
         Parameters
         ----------
         attractor : Body
@@ -234,7 +220,6 @@ class Orbit(object):
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
-
         """
         assert np.any(r.value), "Position vector must be non zero"
 
@@ -245,14 +230,12 @@ class Orbit(object):
     def from_coords(cls, attractor, coord, plane=Planes.EARTH_EQUATOR):
         """Creates an `Orbit` from an attractor and astropy `SkyCoord`
         or `BaseCoordinateFrame` instance.
-
         This method accepts position
         and velocity in any reference frame unlike `Orbit.from_vector`
         which can accept inputs in only inertial reference frame centred
         at attractor. Also note that the frame information is lost after
         creation of the orbit and only the inertial reference frame at
         body centre will be used for all purposes.
-
         Parameters
         ----------
         attractor: Body
@@ -262,7 +245,6 @@ class Orbit(object):
             a representation and its differential with respect to time.
         plane : ~poliastro.frames.Planes, optional
             Final orbit plane, default to Earth Equator.
-
         """
         if "s" not in coord.cartesian.differentials:
             raise ValueError(
@@ -306,7 +288,6 @@ class Orbit(object):
         plane=Planes.EARTH_EQUATOR,
     ):
         """Return `Orbit` from classical orbital elements.
-
         Parameters
         ----------
         attractor : Body
@@ -327,7 +308,6 @@ class Orbit(object):
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
-
         """
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use Orbit.parabolic instead")
@@ -347,7 +327,6 @@ class Orbit(object):
         cls, attractor, p, f, g, h, k, L, epoch=J2000, plane=Planes.EARTH_EQUATOR
     ):
         """Return `Orbit` from modified equinoctial elements.
-
         Parameters
         ----------
         attractor : Body
@@ -368,7 +347,6 @@ class Orbit(object):
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
-
         """
         ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L)
         return cls(ss, epoch, plane)
@@ -376,7 +354,6 @@ class Orbit(object):
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
         """Return osculating `Orbit` of a body at a given time.
-
         """
         # TODO: https://github.com/poliastro/poliastro/issues/445
         if not epoch:
@@ -419,7 +396,6 @@ class Orbit(object):
         cls, name, epoch=None, plane=Planes.EARTH_EQUATOR, id_type="smallbody"
     ):
         """Return osculating `Orbit` of a body using JPLHorizons module of Astroquery.
-
         Parameters
         ----------
         name : string
@@ -431,7 +407,6 @@ class Orbit(object):
         id_type : string, optional
             Use "smallbody" for Asteroids and Comets, and "majorbody"
             for Planets and Satellites.
-
         """
         if not epoch:
             epoch = time.Time.now()
@@ -457,17 +432,14 @@ class Orbit(object):
     @classmethod
     def from_sbdb(cls, name, **kargs):
         """Return osculating `Orbit` by using `SBDB` from Astroquery.
-
         Parameters
         ----------
         body_name: string
             Name of the body to make the request.
-
         Returns
         -------
         ss: poliastro.twobody.orbit.Orbit
             Orbit corresponding to body_name
-
         Examples
         --------
         >>> from poliastro.twobody.orbit import Orbit
@@ -475,9 +447,8 @@ class Orbit(object):
         """
 
         obj = SBDB.query(name, full_precision=True, **kargs)
-
-        try:
-            obj["count"]
+                
+        if "count" in obj:
             # no error till now ---> more than one object has been found
             objects_name = obj["list"]["name"]  # contains all the name of the objects
             objects_name_in_str = (
@@ -490,33 +461,32 @@ class Orbit(object):
                 str(obj["count"]) + " different objects found: \n" + objects_name_in_str
             )
 
-        except KeyError:
-            a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
-            ecc = float(obj["orbit"]["elements"]["e"]) * u.one
-            inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
-            raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
-            argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
+        a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
+        ecc = float(obj["orbit"]["elements"]["e"]) * u.one
+        inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
+        raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
+        argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
 
-            # Since JPL provides Mean Anomaly (M) we need to make
-            # the conversion to the true anomaly (\nu)
-            nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
+        # Since JPL provides Mean Anomaly (M) we need to make
+        # the conversion to the true anomaly (\nu)
+        nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
 
-            epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
+        epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
-            ss = cls.from_classical(
-                Sun,
-                a,
-                ecc,
-                inc,
-                raan,
-                argp,
-                nu,
-                epoch=epoch.tdb,
-                plane=Planes.EARTH_ECLIPTIC,
-            )
+        ss = cls.from_classical(
+            Sun,
+            a,
+            ecc,
+            inc,
+            raan,
+            argp,
+            nu,
+            epoch=epoch.tdb,
+            plane=Planes.EARTH_ECLIPTIC,
+        )
 
-            return ss
-
+        return ss
+            
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
     def circular(
@@ -530,7 +500,6 @@ class Orbit(object):
         plane=Planes.EARTH_EQUATOR,
     ):
         """Return circular `Orbit`.
-
         Parameters
         ----------
         attractor : Body
@@ -547,7 +516,6 @@ class Orbit(object):
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
-
         """
         a = attractor.R + alt
         ecc = 0 * u.one
@@ -563,7 +531,6 @@ class Orbit(object):
         cls, attractor, angular_velocity=None, period=None, hill_radius=None
     ):
         """Return the geostationary orbit for the given attractor and its rotational speed.
-
         Parameters
         ----------
         attractor : Body
@@ -608,7 +575,6 @@ class Orbit(object):
         cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR
     ):
         """Return parabolic `Orbit`.
-
         Parameters
         ----------
         attractor : Body
@@ -627,157 +593,17 @@ class Orbit(object):
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
-
         """
         ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu)
         return cls(ss, epoch, plane)
 
-    @classmethod
-    @u.quantity_input(
-        alt=u.m, inc=u.rad, argp=u.rad, raan=u.rad, arglat=u.rad, ecc=u.one
-    )
-    def frozen(
-        cls,
-        attractor,
-        alt,
-        inc=None,
-        argp=None,
-        raan=0 * u.deg,
-        arglat=0 * u.deg,
-        ecc=None,
-        epoch=J2000,
-        plane=Planes.EARTH_EQUATOR,
-    ):
-        r"""Return frozen Orbit. If any of the given arguments results in an impossibility, some values will be overwritten
-
-        To achieve frozen orbit these two equations have to be set to zero.
-
-        .. math::
-            \dfrac {d\overline {e}}{dt}=\dfrac {-3\overline {n}J_{3}R^{3}_{E}\sin \left( \overline {i}\right) }{2a^{3}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \cos \overline {w}
-
-        .. math::
-            \dfrac {d\overline {\omega }}{dt}=\dfrac {3\overline {n}J_{2}R^{2}_{E}}{a^{2}\left( 1-\overline {e}^{2}\right) ^{2}}\left( 1-\dfrac {5}{4}\sin ^{2}\overline {i}\right) \left[ 1+\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2}\overline {i}}{\sin \overline {i}}\right) \dfrac {\sin \overline {w}}{\overline {e}}\right]
-
-        The first approach would be to nullify following term to zero:
-
-        .. math::
-            ( 1-\dfrac {5}{4}\sin ^{2})
-
-        For which one obtains the so-called critical inclinations: i = 63.4349 or 116.5651 degrees. To escape the inclination requirement, the argument of periapsis can be set to w = 90 or 270 degrees to nullify the second equation. Then, one should nullify the right-hand side of the first equation, which yields an expression that correlates the inclination of the object and the eccentricity of the orbit:
-
-        .. math::
-            \overline {e}=-\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}\left( 1-\overline {e}^{2}\right) }\left( \dfrac {\sin ^{2}\overline {i}-\overline {e}\cos ^{2} \overline {i}}{\sin \overline {i}}\right)
-
-        Assuming that e is negligible compared to J2, it can be shown that:
-
-        .. math::
-            \overline {e}\approx -\dfrac {J_{3}R_{E}}{2J_{2}\overline {a}}\sin \overline {i}
-
-        The implementation is divided in the following cases:
-
-            1. When the user gives a negative altitude, the method will raise a ValueError
-            2. When the attractor has not defined J2 or J3, the method will raise an AttributeError
-            3. When the attractor has J2/J3 outside of range 1 to 10 , the method will raise an NotImplementedError. Special case for Venus.See "Extension of the critical inclination" by Xiaodong Liu, Hexi Baoyin, and Xingrui Ma
-            4. If argp is not given or the given argp is a critical value:
-
-                * if eccentricity is none and inclination is none, the inclination is set with a critical value and the eccentricity is obtained from the last formula mentioned
-                * if only eccentricity is none, we calculate this value with the last formula mentioned
-                * if only inclination is none ,we calculate this value with the formula for eccentricity with critical argp.
-
-            5. If inc is not given or the given inc is critical:
-
-                * if the argp and the eccentricity is given we keep these values to create the orbit
-                * if the eccentricity is given we keep this value, if not, default to the eccentricity of the Moon's orbit around the Earth
-
-            6. if it's not possible to create an orbit with the the argp and the inclination given, both of them are set to the critical values and the eccentricity is calculate with the last formula
-
-
-        Parameters
-        ----------
-        attractor : Body
-            Main attractor.
-        alt : ~astropy.units.Quantity
-            Altitude over surface.
-        inc : ~astropy.units.Quantity, optional
-            Inclination, default to critical value.
-        argp : ~astropy.units.Quantity, optional
-            Argument of the pericenter, default to critical value.
-        raan : ~astropy.units.Quantity, optional
-            Right ascension of the ascending node, default to 0 deg.
-        arglat : ~astropy.units.Quantity, optional
-            Argument of latitude, default to 0 deg.
-        ecc : ~astropy.units.Quantity
-            Eccentricity, default to the eccentricity of the Moon's orbit around the Earth
-        epoch: ~astropy.time.Time, optional
-            Epoch, default to J2000.
-        plane : ~poliastro.frames.Planes
-            Fundamental plane of the frame.
-        """
-        critical_argps = [np.pi / 2, 3 * np.pi / 2] * u.rad
-        critical_inclinations = [63.4349 * np.pi / 180, 116.5651 * np.pi / 180] * u.rad
-        try:
-            if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
-                raise NotImplementedError(
-                    "This has not been implemented for {}".format(attractor.name)
-                )
-
-            assert alt > 0
-
-            argp = critical_argps[0] if argp is None else argp
-            a = attractor.R + alt
-
-            critical_argp = find_closest_value(argp, critical_argps)
-            if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
-                if inc is None and ecc is None:
-                    inc = critical_inclinations[0]
-                    ecc = get_eccentricity_critical_argp(attractor, a, inc)
-                elif ecc is None:
-                    ecc = get_eccentricity_critical_argp(attractor, a, inc)
-                else:
-                    inc = get_inclination_critical_argp(attractor, a, ecc)
-                return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
-                )
-
-            inc = critical_inclinations[0] if inc is None else inc
-            critical_inclination = find_closest_value(inc, critical_inclinations)
-            if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
-                ecc = get_eccentricity_critical_inc(ecc)
-                return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
-                )
-
-            argp = critical_argps[0]
-            inc = critical_inclinations[0]
-            ecc = get_eccentricity_critical_argp(attractor, a, inc)
-
-            return cls.from_classical(
-                attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
-            )
-
-        except AttributeError:
-            raise AttributeError(
-                "Attractor {} has not spherical harmonics implemented".format(
-                    attractor.name
-                )
-            )
-        except AssertionError:
-            raise ValueError(
-                "The semimajor axis may not be smaller that {}'s radius".format(
-                    attractor.name
-                )
-            )
-
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
-
         .. versionadded:: 0.11.0
-
         Parameters
         ----------
         representation : ~astropy.coordinates.BaseRepresentation
             Representation object to use. It must be a class, not an instance.
-
         Examples
         --------
         >>> from poliastro.examples import iss
@@ -797,7 +623,6 @@ class Orbit(object):
         <SphericalRepresentation (lon, lat, distance) in (rad, rad, km)
             (4.91712525, 0.89732339, 6774.76995296)
          (has differentials w.r.t.: 's')>
-
         """
         # As we do not know the differentials, we first convert to cartesian,
         # then let the frame represent_as do the rest
@@ -813,14 +638,11 @@ class Orbit(object):
 
     def to_icrs(self):
         """Creates a new Orbit object with its coordinates transformed to ICRS.
-
         Notice that, strictly speaking, the center of ICRS is the Solar System Barycenter
         and not the Sun, and therefore these orbits cannot be propagated in the context
         of the two body problem. Therefore, this function exists merely for practical
         purposes.
-
         .. versionadded:: 0.11.0
-
         """
         coords = self.frame.realize_frame(self.represent_as(CartesianRepresentation))
         coords.representation_type = CartesianRepresentation
@@ -894,10 +716,8 @@ class Orbit(object):
 
     def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
         """Propagates an orbit a specified time.
-
         If value is true anomaly, propagate orbit to this anomaly and return the result.
         Otherwise, if time is provided, propagate this `Orbit` some `time` and return the result.
-
         Parameters
         ----------
         value : ~astropy.units.Quantity, ~astropy.time.Time, ~astropy.time.TimeDelta
@@ -908,12 +728,10 @@ class Orbit(object):
             Method used for propagation
         **kwargs
             parameters used in perturbation models
-
         Returns
         -------
         Orbit
             New orbit after propagation.
-
         """
         if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
             time_of_flight = value - self.epoch
@@ -947,16 +765,13 @@ class Orbit(object):
     @u.quantity_input(value=u.rad)
     def propagate_to_anomaly(self, value):
         """Propagates an orbit to a specific true anomaly.
-
         Parameters
         ----------
         value : ~astropy.units.Quantity
-
         Returns
         -------
         Orbit
             Resulting orbit after propagation.
-
         """
         # TODO: Avoid repeating logic with mean_motion?
         p, ecc, inc, raan, argp, _ = rv2coe(
@@ -1024,9 +839,7 @@ class Orbit(object):
         self, values=100, *, min_anomaly=None, max_anomaly=None, method=mean_motion
     ):
         r"""Samples an orbit to some specified time values.
-
         .. versionadded:: 0.8.0
-
         Parameters
         ----------
         values : int
@@ -1039,18 +852,15 @@ class Orbit(object):
             or a value that corresponds to :math:`r = 3p`.
         method : function, optional
             Method used for propagation
-
         Returns
         -------
         positions: ~astropy.coordinates.BaseCoordinateFrame
             Array of x, y, z positions, with proper times as the frame attributes if supported.
-
         Notes
         -----
         When specifying a number of points, the initial and final
         position is present twice inside the result (first and
         last row). This is more useful for plotting.
-
         Examples
         --------
         >>> from astropy import units as u
@@ -1059,7 +869,6 @@ class Orbit(object):
         <GCRS Coordinate ...>
         >>> iss.sample(10)  # doctest: +ELLIPSIS
         <GCRS Coordinate ...>
-
         """
         if self.ecc < 1:
             nu_values = self._sample_closed(values, min_anomaly, max_anomaly)
@@ -1114,16 +923,13 @@ class Orbit(object):
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.
-
         Optionally return intermediate states (default to False).
-
         Parameters
         ----------
         maneuver : Maneuver
             Maneuver to apply.
         intermediate : bool, optional
             Return intermediate states, default to False.
-
         """
         orbit_new = self  # Initialize
         states = []
@@ -1141,25 +947,16 @@ class Orbit(object):
             res = orbit_new
         return res
 
-    def plot(self, label=None, use_3d=False, static=False):
+    def plot(self, label=None, use_3d=False):
         """Plots the orbit as an interactive widget.
-
         Parameters
         ----------
         label : str, optional
             Label for the orbit, defaults to empty.
         use_3d : bool, optional
             Produce a 3D plot, default to False.
-        static : bool, optional
-            Produce a static image of the figure, default to false
         """
-        from poliastro.plotting.static import StaticOrbitPlotter
-
-        if static and use_3d:
-            raise ValueError("static and use_3d cannot be true at the same time")
-        elif static:
-            return StaticOrbitPlotter().plot(self, label=label)
-        elif use_3d:
+        if use_3d:
             return OrbitPlotter3D().plot(self, label=label)
         else:
             return OrbitPlotter2D().plot(self, label=label)
