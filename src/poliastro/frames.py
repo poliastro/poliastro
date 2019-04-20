@@ -270,11 +270,11 @@ class GeocentricSolarEcliptic(BaseEclipticFrame):
 @frame_transform_graph.transform(DynamicMatrixTransform, GCRS, GeocentricSolarEcliptic)
 def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
 
-    if to_frame.obstime is None:
+    if not to_frame.obstime.isscalar:
         raise ValueError(
-            "To perform this transformation the coordinate"
-            " Frame needs an obstime Attribute"
+            "To perform this transformation the obstime Attribute must be a scalar."
         )
+
     _earth_orbit_perpen_point_gcrs = UnitSphericalRepresentation(
         lon=0 * u.deg, lat=(90 * u.deg - _obliquity_rotation_value(to_frame.obstime))
     )
@@ -292,13 +292,7 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
     # Earth-Sun Line in Geocentric Solar Ecliptic Frame
     x_axis = CartesianRepresentation(1, 0, 0)
 
-    if to_frame.obstime.isscalar:
-        rot_matrix = _make_rotation_matrix_from_reprs(sun_earth_detilt, x_axis)
-    else:
-        rot_matrix_list = [
-            _make_rotation_matrix_from_reprs(vect, x_axis) for vect in sun_earth_detilt
-        ]
-        rot_matrix = np.stack(rot_matrix_list)
+    rot_matrix = _make_rotation_matrix_from_reprs(sun_earth_detilt, x_axis)
 
     return matrix_product(rot_matrix, _earth_detilt_matrix)
 
