@@ -109,7 +109,7 @@ These are some succint steps to set up a development environment:
 3. `Fork poliastro <https://help.github.com/articles/fork-a-repo/>`_.
 4. `Clone your fork <https://help.github.com/articles/cloning-a-repository/>`_.
 5. Install it in development mode using
-   :code:`pip install --editable /path/to/poliastro/[dev]` (this means that the
+   :code:`pip3 install --editable /absolute_path_to_above_cloned_poliastro_repo` (this means that the
    installed code will change as soon as you change it in the download
    location).
 6. Create a new branch.
