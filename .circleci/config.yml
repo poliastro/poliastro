@@ -8,7 +8,7 @@ jobs:
 
     environment:
       PIP_PREFER_BINARY: true
-      PIP_PROGRESS_BAR: off
+      PIP_PROGRESS_BAR: "off"
 
     steps:
       - checkout
@@ -31,7 +31,7 @@ jobs:
 
     environment:
       PIP_PREFER_BINARY: true
-      PIP_PROGRESS_BAR: off
+      PIP_PROGRESS_BAR: "off"
 
     steps:
       - checkout
@@ -69,7 +69,7 @@ jobs:
 
     environment:
       PIP_PREFER_BINARY: true
-      PIP_PROGRESS_BAR: off
+      PIP_PROGRESS_BAR: "off"
 
     steps:
       - checkout
@@ -103,7 +103,7 @@ jobs:
 
     environment:
       PIP_PREFER_BINARY: true
-      PIP_PROGRESS_BAR: off
+      PIP_PROGRESS_BAR: "off"
 
     steps:
       - checkout
