@@ -476,6 +476,19 @@ class Orbit(object):
 
         obj = SBDB.query(name, full_precision=True, **kargs)
 
+        if "count" in obj:
+            # no error till now ---> more than one object has been found
+            objects_name = obj["list"]["name"]  # contains all the name of the objects
+            objects_name_in_str = (
+                ""
+            )  # used to store them in string form each in new line
+            for i in objects_name:
+                objects_name_in_str += i + "\n"
+
+            raise ValueError(
+                str(obj["count"]) + " different objects found: \n" + objects_name_in_str
+            )
+
         a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
         ecc = float(obj["orbit"]["elements"]["e"]) * u.one
         inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
