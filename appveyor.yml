@@ -18,23 +18,28 @@ branches:
     - 0.11.x
     - 0.12.x
 
-matrix:
-  fast_finish: true
+environment:
+  matrix:
+    - TOXENV: check
+      PYTHON: C:\Python36\python.exe
+
+    - TOXENV: 'py36'
+      PYTHON: C:\Python36-x64\python.exe
+
+    - TOXENV: 'py37'
+      PYTHON: C:\Python37-x64\python.exe
+
+init:
+  - ps: echo $env:TOXENV
+  - ps: ls C:\Python*
 
 install:
-  - "set PYTHON_BIN=C:\\Python36-x64\\python.exe"
-  - "set PIP_BIN=C:\\Python36-x64\\Scripts\\pip.exe"
-
-  # Check that we have the expected version of Python
-  - "%PYTHON_BIN% --version"
-
   # Install dependencies
-  - "choco install pandoc"
-
-  - "%PYTHON_BIN% -m pip install --upgrade pip"
-  - "%PIP_BIN% install .[dev] --prefer-binary"  # Test installation correctness
+  - '%PYTHON% --version'
+  - "%PYTHON% -m pip install --upgrade pip"
+  - '%PYTHON% -m pip install tox'
 
 build: off
 
 test_script:
-  - "%PYTHON_BIN% -m pytest -vv"  # Test against installed code
+  - '%WITH_COMPILER% %PYTHON% -m tox'

@@ -6,6 +6,10 @@ jobs:
 
     working_directory: ~/repo
 
+    environment:
+      PIP_PREFER_BINARY: true
+      PIP_PROGRESS_BAR: "off"
+
     steps:
       - checkout
 
@@ -27,6 +31,7 @@ jobs:
 
     environment:
       PIP_PREFER_BINARY: true
+      PIP_PROGRESS_BAR: "off"
 
     steps:
       - checkout
@@ -64,6 +69,7 @@ jobs:
 
     environment:
       PIP_PREFER_BINARY: true
+      PIP_PROGRESS_BAR: "off"
 
     steps:
       - checkout
@@ -97,6 +103,7 @@ jobs:
 
     environment:
       PIP_PREFER_BINARY: true
+      PIP_PROGRESS_BAR: "off"
 
     steps:
       - checkout

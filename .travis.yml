@@ -3,38 +3,36 @@
 # This is not a problem because Python will be installed through conda
 
 language: generic
-os: osx
-
-branches:
-  only:
-    - master
-    - 0.3.x
-    - 0.4.x
-    - 0.5.x
-    - 0.6.x
-    - 0.7.x
-    - 0.8.x
-    - 0.9.x
-    - 0.10.x
-    - 0.11.x
-    - 0.12.x
-
-env:
-  global:
-    - MPLBACKEND="Agg"
-
+ox: osx
+matrix:
+  include:
+    - python: '3.6'
+      env:
+        - TOXENV=check
+    - python: '3.6'
+      env:
+        - TOXENV=docs
+    - python: '3.5'
+      env:
+        - TOXENV=py35
+    - python: '3.6'
+      env:
+        - TOXENV=py36
+    - python: '3.7'
+      env:
+        - TOXENV=py37
+    - python: 'pypy3.5-6.0'
+      env:
+        - TOXENV=pypy3
 before_install:
-  - HOMEBREW_NO_AUTO_UPDATE=1 brew install python3
-  - python3 -m venv venv
-  - source venv/bin/activate
-  - python3 -m pip install --upgrade pip
-
+  - python --version
+  - uname -a
+  - lsb_release -a
 install:
-  - pip install numpy  # Required
-  - pip install .  # Test installation correctness
-  - pip install .[dev]  # Test development dependencies
-
+  - pip install tox
+  - virtualenv --version
+  - easy_install --version
+  - pip --version
+  - tox --version
 script:
-  - pytest -vv  # Test against installed code
-
-sudo: false
+  - tox
