@@ -21,46 +21,25 @@ branches:
 environment:
   matrix:
     - TOXENV: check
-      TOXPYTHON: C:\Python36\python.exe
-      PYTHON_HOME: C:\Python36
-      PYTHON_VERSION: '3.6'
-      PYTHON_ARCH: '64'
+      PYTHON: C:\Python36\python.exe
 
     - TOXENV: 'py36'
-      TOXPYTHON: C:\Python36-x64\python.exe
-      PYTHON_HOME: C:\Python36-x64
-      PYTHON_VERSION: '3.6'
-      PYTHON_ARCH: '64'
+      PYTHON: C:\Python36-x64\python.exe
 
     - TOXENV: 'py37'
-      TOXPYTHON: C:\Python37-x64\python.exe
-      PYTHON_HOME: C:\Python37-x64
-      PYTHON_VERSION: '3.7'
-      PYTHON_ARCH: '64'
+      PYTHON: C:\Python37-x64\python.exe
 
 init:
   - ps: echo $env:TOXENV
   - ps: ls C:\Python*
 
 install:
-  - "set PYTHON_BIN=C:\\Python36-x64\\python.exe"
-  - "set PIP_BIN=C:\\Python36-x64\\Scripts\\pip.exe"
-
-  # Check that we have the expected version of Python
-  - "%PYTHON_BIN% --version"
-
   # Install dependencies
-
-  - "%PYTHON_BIN% -m pip install --upgrade pip"
-  - "%PYTHON_BIN% -m pip install -U pytest"
-  - "%PIP_BIN% install .[dev] --prefer-binary" # Test installation correctnessinstall:
-
-  - '%TOXPYTHON% --version'
-  - '%PYTHON_HOME%\Scripts\pip --version'
-  - '%TOXPYTHON% -m pip install tox'
-  - '%TOXPYTHON% -m pip install -U pytest'
+  - '%PYTHON% --version'
+  - "%PYTHON% -m pip install --upgrade pip"
+  - '%PYTHON% -m pip install tox'
 
 build: off
 
 test_script:
-  - '%WITH_COMPILER% %PYTHON_HOME%\Scripts\tox'
+  - '%WITH_COMPILER% %PYTHON% -m tox'
