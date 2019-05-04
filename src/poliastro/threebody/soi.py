@@ -52,16 +52,7 @@ def laplace_radius(body, a=None):
     # Compute semimajor axis at epoch J2000 for the body if it was not
     # introduced by the user
     if a is None:
-        try:
-            a = Orbit.from_body_ephem(body, J2000_TDB).a
-
-        except KeyError:
-            raise RuntimeError(
-                """To compute the semimajor axis for Moon and Pluto use the JPL ephemeris:
-
->>> from astropy.coordinates import solar_system_ephemeris
->>> solar_system_ephemeris.set("jpl")"""
-            )
+        a = Orbit.from_body_ephem(body, J2000_TDB).a
 
     r_SOI = a * (body.k / body.parent.k) ** (2 / 5)
 
@@ -90,18 +81,10 @@ def hill_radius(body, a=None, e=None):
     # Compute semimajor and eccentricity axis at epoch J2000 for the body if it was not
     # introduced by the user
     if a is None or e is None:
-        try:
-            ss = Orbit.from_body_ephem(body, J2000_TDB)
-            a = a if a is not None else ss.a
-            e = e if e is not None else ss.ecc
 
-        except KeyError:
-            raise RuntimeError(
-                """To compute the semimajor axis or eccentricity for Moon and Pluto use the JPL ephemeris:
-
->>> from astropy.coordinates import solar_system_ephemeris
->>> solar_system_ephemeris.set("jpl")"""
-            )
+        ss = Orbit.from_body_ephem(body, J2000_TDB)
+        a = a if a is not None else ss.a
+        e = e if e is not None else ss.ecc
 
     mass_ratio = body.k / (3 * body.parent.k)
     r_SOI = a * (1 - e) * (mass_ratio ** (1 / 3))

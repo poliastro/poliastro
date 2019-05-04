@@ -162,6 +162,13 @@ def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     assert expected_epoch_string in str(w.message)
 
 
+@pytest.mark.parametrize("body", [Moon, Pluto])
+def test_from_ephem_raises_error_for_pluto_moon(body):
+    with pytest.raises(RuntimeError) as excinfo:
+        Orbit.from_body_ephem(body)
+    assert "To compute the position and velocity" in excinfo.exconly()
+
+
 def test_circular_has_proper_semimajor_axis():
     alt = 500 * u.km
     attractor = Earth

@@ -8,9 +8,7 @@ from poliastro.bodies import (
     Jupiter,
     Mars,
     Mercury,
-    Moon,
     Neptune,
-    Pluto,
     Saturn,
     Uranus,
     Venus,
@@ -41,16 +39,6 @@ def test_laplace_radius(body, expected_r_SOI):
     assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
 
 
-@pytest.mark.parametrize("missing_body", [Moon, Pluto])
-def test_compute_missing_body_laplace_radius_raises_error(missing_body):
-    with pytest.raises(RuntimeError) as excinfo:
-        laplace_radius(missing_body)
-    assert (
-        "To compute the semimajor axis for Moon and Pluto use the JPL ephemeris"
-        in excinfo.exconly()
-    )
-
-
 def test_laplace_radius_given_a():
     parent = Body(None, 1 * u.km ** 3 / u.s ** 2, "Parent")
     body = Body(parent, 1 * u.km ** 3 / u.s ** 2, "Body")
@@ -79,16 +67,6 @@ def test_hill_radius(body, expected_r_SOI):
     r_SOI = hill_radius(body, e=0 * u.one)
 
     assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
-
-
-@pytest.mark.parametrize("missing_body", [Moon, Pluto])
-def test_compute_missing_body_hill_radius_raises_error(missing_body):
-    with pytest.raises(RuntimeError) as excinfo:
-        hill_radius(missing_body)
-    assert (
-        "To compute the semimajor axis or eccentricity for Moon and Pluto use the JPL ephemeris"
-        in excinfo.exconly()
-    )
 
 
 def test_hill_radius_given_a():
