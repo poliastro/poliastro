@@ -2,9 +2,10 @@ import numpy as np
 import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.time import Time
 from numpy.testing import assert_allclose
 
-from poliastro.bodies import Earth
+from poliastro.bodies import Earth, Moon
 from poliastro.maneuver import Maneuver
 from poliastro.twobody import Orbit
 
@@ -74,3 +75,18 @@ def test_bielliptic_maneuver():
     assert_allclose(ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-12 * u.one)
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
     assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-6)
+
+
+def test_apply_maneuver_correct_dimensions():
+    orb = Orbit.from_vectors(
+        Moon,
+        [-22681.58976181, 942.47776988, 0] * u.km,
+        [-0.04578917, -0.19408599, 0.0] * u.km / u.s,
+        Time("2023-08-30 23:14", scale="tdb"),
+    )
+    man = Maneuver((1 * u.s, [0.01, 0, 0] * u.km / u.s))
+
+    new_orb = orb.apply_maneuver(man, intermediate=False)
+
+    assert new_orb.r.ndim == 1
+    assert new_orb.v.ndim == 1

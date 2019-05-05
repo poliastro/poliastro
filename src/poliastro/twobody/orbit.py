@@ -238,6 +238,11 @@ class Orbit(object):
         """
         assert np.any(r.value), "Position vector must be non zero"
 
+        if r.ndim > 1 or v.ndim > 1:
+            raise ValueError(
+                "Vectors must have dimension 1, got {} and {}".format(r.ndim, v.ndim)
+            )
+
         ss = RVState(attractor, r, v)
         return cls(ss, epoch, plane)
 
@@ -946,8 +951,8 @@ class Orbit(object):
         except NotImplementedError:
             return self.from_vectors(
                 self.attractor,
-                cartesian.xyz,
-                cartesian.differentials["s"].d_xyz,
+                cartesian[0].xyz,
+                cartesian[0].differentials["s"].d_xyz,
                 new_epoch,
             )
 

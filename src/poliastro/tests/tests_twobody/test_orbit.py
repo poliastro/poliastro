@@ -896,10 +896,19 @@ def test_from_sbdb():
 
 
 def test_from_sbdb_raise_valueerror():
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError) as excinfo:
         Orbit.from_sbdb(name="Halley")
 
     assert (
-        str(e.value)
+        str(excinfo.value)
         == "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley\n"
     )
+
+
+def test_orbit_wrong_dimensions_fails():
+    bad_r = [[1000, 0, 0]] * u.km
+    bad_v = [[[0, 10, 0]]] * u.km / u.s
+
+    with pytest.raises(ValueError) as excinfo:
+        Orbit.from_vectors(Earth, bad_r, bad_v)
+    assert "ValueError: Vectors must have dimension 1, got 2 and 3" in excinfo.exconly()
