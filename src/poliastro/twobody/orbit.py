@@ -924,27 +924,32 @@ class Orbit(object):
             time_of_flight = time.TimeDelta(value)
 
         cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+        new_epoch = self.epoch + time_of_flight
 
+        # TODO: Unify with sample
         # If the frame supports obstime, set the time values
-        kwargs = {}
-        if "obstime" in self.frame.frame_attributes:
-            kwargs["obstime"] = self.epoch + time_of_flight
-        else:
-            warn(
-                "Frame {} does not support 'obstime', time values were not returned".format(
-                    self.frame.__class__
-                )
+        try:
+            kwargs = {}
+            if "obstime" in self.frame.frame_attributes:
+                kwargs["obstime"] = new_epoch
+
+            # Use of a protected method instead of frame.realize_frame
+            # because the latter does not let the user choose the representation type
+            # in one line despite its parameter names, see
+            # https://github.com/astropy/astropy/issues/7784
+            coords = self.frame._replicate(
+                cartesian, representation_type="cartesian", **kwargs
             )
 
-        # Use of a protected method instead of frame.realize_frame
-        # because the latter does not let the user choose the representation type
-        # in one line despite its parameter names, see
-        # https://github.com/astropy/astropy/issues/7784
-        coords = self.frame._replicate(
-            cartesian, representation_type="cartesian", **kwargs
-        )
+            return self.from_coords(self.attractor, coords, plane=self.plane)
 
-        return self.from_coords(self.attractor, coords, plane=self.plane)
+        except NotImplementedError:
+            return self.from_vectors(
+                self.attractor,
+                cartesian.xyz,
+                cartesian.differentials["s"].d_xyz,
+                new_epoch,
+            )
 
     @u.quantity_input(value=u.rad)
     def propagate_to_anomaly(self, value):
