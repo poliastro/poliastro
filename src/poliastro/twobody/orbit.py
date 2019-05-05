@@ -951,8 +951,8 @@ class Orbit(object):
         except NotImplementedError:
             return self.from_vectors(
                 self.attractor,
-                cartesian.xyz,
-                cartesian.differentials["s"].d_xyz,
+                cartesian[0].xyz,
+                cartesian[0].differentials["s"].d_xyz,
                 new_epoch,
             )
 
