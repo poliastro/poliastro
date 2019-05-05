@@ -329,7 +329,7 @@ def test_propagation_sets_proper_epoch():
     assert propagated.epoch == expected_epoch
 
 
-def test_propagation_custom_body_raises_warning_and_returns_coords():
+def test_sample_custom_body_raises_warning_and_returns_coords():
     # See https://github.com/poliastro/poliastro/issues/649
     orbit = Orbit.circular(Moon, 100 * u.km)
 
@@ -340,3 +340,9 @@ def test_propagation_custom_body_raises_warning_and_returns_coords():
 
     assert isinstance(coords, CartesianRepresentation)
     assert len(coords) == 10
+
+
+def test_propagation_custom_body_works():
+    # See https://github.com/poliastro/poliastro/issues/649
+    orbit = Orbit.circular(Moon, 100 * u.km)
+    orbit.propagate(1 * u.h)

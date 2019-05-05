@@ -20,9 +20,6 @@ branches:
 
 environment:
   matrix:
-    - TOXENV: check
-      PYTHON: C:\Python36\python.exe
-
     - TOXENV: 'py36'
       PYTHON: C:\Python36-x64\python.exe
 
