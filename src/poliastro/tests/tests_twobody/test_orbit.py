@@ -896,10 +896,10 @@ def test_from_sbdb():
 
 
 def test_from_sbdb_raise_valueerror():
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError) as excinfo:
         Orbit.from_sbdb(name="Halley")
 
     assert (
-        str(e.value)
+        str(excinfo.value)
         == "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley\n"
     )
