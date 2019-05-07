@@ -36,3 +36,12 @@ DEFAULTS = {
         "material": {"solidColor": {"color": {"rgba": [255, 255, 0, 255]}}},
     },
 }
+
+CUSTOM_PACKET = {
+    "id": "custom_properties",
+    "properties": {
+        "custom_attractor": False,
+        "ellipsoid": [{"array": [0, 0, 0]}],
+        "map_url": "",
+    },
+}
