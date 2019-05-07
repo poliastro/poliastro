@@ -7,8 +7,7 @@ from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
 
-from poliastro.czml.czml_extract_default_params import CUSTOM_PACKET
-from poliastro.czml.czml_extract_default_params import DEFAULTS
+from poliastro.czml.czml_extract_default_params import CUSTOM_PACKET, DEFAULTS
 from poliastro.twobody.propagation import propagate
 
 
