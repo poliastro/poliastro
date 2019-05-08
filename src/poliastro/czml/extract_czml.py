@@ -31,8 +31,8 @@ class CZMLExtractor:
             add_orbit()
         """
         self.czml = dict()  # type: Dict[int, Any]
-        self.cust_czml = dict()
-        self.cust_czml[-1] = copy.deepcopy(CUSTOM_PACKET)  # type: Dict[int, Any]
+        self.cust_czml = dict()  # type: Dict[int, Any]
+        self.cust_czml[-1] = copy.deepcopy(CUSTOM_PACKET)
         self.cust_prop = [ellipsoid, pr_map]
 
         self.orbits = []  # type: List[Any]
