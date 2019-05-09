@@ -10,6 +10,26 @@ from poliastro.examples import iss, molniya
 from poliastro.twobody.propagation import propagate
 
 
+def test_czml_custom_packet():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+
+    ellipsoidr = [6373100, 6373100, 6373100]
+    pr_map_url = (
+        "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+    )
+
+    extractor = CZMLExtractor(
+        start_epoch, end_epoch, sample_points, ellipsoid=ellipsoidr, pr_map=pr_map_url
+    )
+
+    # Test that custom packet parameters where set correctly
+    assert extractor.cust_czml[-1]["properties"]["ellipsoid"][0]["array"] == ellipsoidr
+    assert extractor.cust_czml[-1]["properties"]["map_url"] == pr_map_url
+
+
 def test_czml_add_orbit():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
