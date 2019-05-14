@@ -7,7 +7,7 @@ import numpy as np
 from numpy.core.umath import cos, sin, sqrt
 
 from poliastro.core.angles import E_to_nu, F_to_nu
-from poliastro.core.util import cross, norm, transform
+from poliastro.core.util import cross, norm, rotation_matrix, transform
 
 from ._jit import jit
 
@@ -88,6 +88,16 @@ def pqw2ijk(pqw, inc, raan, argp):
 
 
 @jit
+def coe_rotation_matrix(inc, raan, argp):
+    """Create a rotation matrix for coe transformation
+    """
+    r = rotation_matrix(raan, 2)
+    r = np.multiply(r, rotation_matrix(inc, 0))
+    r = np.multiply(r, rotation_matrix(argp, 2))
+    return r
+
+
+@jit
 def coe2rv(k, p, ecc, inc, raan, argp, nu):
     r"""Converts from classical orbital to state vectors.
 
@@ -141,9 +151,10 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
         Velocity vector in basis ijk
     """
     r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
+    rm = coe_rotation_matrix(inc, raan, argp)
 
-    r_ijk = pqw2ijk(r_pqw, inc, raan, argp)
-    v_ijk = pqw2ijk(v_pqw, inc, raan, argp)
+    r_ijk = np.multiply(r_pqw, rm)
+    v_ijk = np.multiply(v_pqw, rm)
 
     return r_ijk, v_ijk
 
