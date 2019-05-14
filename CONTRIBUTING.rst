@@ -111,10 +111,11 @@ These are some succint steps to set up a development environment:
    :code:`pip install --editable /path/to/poliastro/[dev]` (this means that the
    installed code will change as soon as you change it in the download
    location).
-6. Create a new branch.
-7. Make changes and commit.
-8. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
-9. `Open a pull request! <https://help.github.com/articles/creating-a-pull-request/>`_
+6. Run `tox -e reformat` to make the format consistent.
+7. Create a new branch.
+8. Make changes and commit.
+9. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
+10. `Open a pull request! <https://help.github.com/articles/creating-a-pull-request/>`_
 
 For more detailed explanations, please check out the `Astropy development docs`__.
 
