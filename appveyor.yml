@@ -34,9 +34,9 @@ install:
   # Install dependencies
   - '%PYTHON% --version'
   - "%PYTHON% -m pip install --upgrade pip"
-  - '%PYTHON% -m pip install tox'
+  - '%PYTHON% -m pip install --upgrade tox virtualenv'
 
 build: off
 
 test_script:
-  - '%WITH_COMPILER% %PYTHON% -m tox'
+  - "%PYTHON% -m tox"
