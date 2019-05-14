@@ -34,7 +34,7 @@ install:
   # Install dependencies
   - '%PYTHON% --version'
   - "%PYTHON% -m pip install --upgrade pip"
-  - '%PYTHON% -m pip install tox'
+  - '%PYTHON% -m pip install --upgrade tox virtualenv'
 
 build: off
 
