@@ -39,4 +39,4 @@ install:
 build: off
 
 test_script:
-  - '%WITH_COMPILER% %PYTHON% -m tox'
+  - "%PYTHON% -m tox"
