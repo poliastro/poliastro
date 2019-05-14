@@ -92,8 +92,8 @@ def coe_rotation_matrix(inc, raan, argp):
     """Create a rotation matrix for coe transformation
     """
     r = rotation_matrix(raan, 2)
-    r = np.multiply(r, rotation_matrix(inc, 0))
-    r = np.multiply(r, rotation_matrix(argp, 2))
+    r = np.multiply(rotation_matrix(inc, 0), r)
+    r = np.multiply(rotation_matrix(argp, 2), r)
     return r
 
 
@@ -153,8 +153,8 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
     rm = coe_rotation_matrix(inc, raan, argp)
 
-    r_ijk = np.multiply(r_pqw, rm)
-    v_ijk = np.multiply(v_pqw, rm)
+    r_ijk = rm @ r_pqw
+    v_ijk = rm @ v_pqw
 
     return r_ijk, v_ijk
 
