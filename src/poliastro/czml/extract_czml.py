@@ -338,7 +338,9 @@ class CZMLExtractor:
 
         if label_fill_color is not None:
             self.parse_dict_tuples(
-                [i, "label", "fillColor"], [("rgba", label_fill_color)], dict=self.gs_czml
+                [i, "label", "fillColor"],
+                [("rgba", label_fill_color)],
+                dict=self.gs_czml,
             )
         if label_outline_color is not None:
             self.parse_dict_tuples(
@@ -360,9 +362,7 @@ class CZMLExtractor:
             )
 
     def add_ground_station(
-        self,r(
-        molniya.epoch,
-        molniya.epoch
+        self,
         pos,
         id_name=None,
         id_description=None,
