@@ -7,7 +7,7 @@ import numpy as np
 from numpy.core.umath import cos, sin, sqrt
 
 from poliastro.core.angles import E_to_nu, F_to_nu
-from poliastro.core.util import cross, norm, rotation_matrix, transform
+from poliastro.core.util import cross, norm, rotation_matrix
 
 from ._jit import jit
 
@@ -73,18 +73,6 @@ def rv_pqw(k, p, ecc, nu):
     r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
     v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T
     return r_pqw, v_pqw
-
-
-@jit
-def pqw2ijk(pqw, inc, raan, argp):
-    """Converts from perifocal to IJK.
-
-    """
-    ijk = transform(pqw, -argp, 2)
-    ijk = transform(ijk, -inc, 0)
-    ijk = transform(ijk, -raan, 2)
-
-    return ijk
 
 
 @jit
