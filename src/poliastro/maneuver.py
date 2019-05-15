@@ -4,7 +4,7 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.core.elements import pqw2ijk, rv_pqw
+from poliastro.core.elements import coe_rotation_matrix, rv_pqw
 from poliastro.core.util import cross
 from poliastro.util import norm
 
@@ -129,26 +129,14 @@ class Maneuver(object):
         dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
 
         # Transform to IJK frame
-        dv_a = (
-            pqw2ijk(
-                dv_a,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
+        rot_matrix = coe_rotation_matrix(
+            orbit_i.inc.to(u.rad).value,
+            orbit_i.raan.to(u.rad).value,
+            orbit_i.argp.to(u.rad).value,
         )
-        dv_b = (
-            pqw2ijk(
-                dv_b,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
+
+        dv_a = (rot_matrix @ dv_a) * u.m / u.s
+        dv_b = (rot_matrix @ dv_b) * u.m / u.s
 
         t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
 
@@ -230,37 +218,16 @@ class Maneuver(object):
         dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
         dv_c = np.array([0, dv_c.to(u.m / u.s).value, 0])
 
+        rot_matrix = coe_rotation_matrix(
+            orbit_i.inc.to(u.rad).value,
+            orbit_i.raan.to(u.rad).value,
+            orbit_i.argp.to(u.rad).value,
+        )
+
         # Transform to IJK frame
-        dv_a = (
-            pqw2ijk(
-                dv_a,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
-        dv_b = (
-            pqw2ijk(
-                dv_b,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
-        dv_c = (
-            pqw2ijk(
-                dv_c,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
+        dv_a = (rot_matrix @ dv_a) * u.m / u.s
+        dv_b = (rot_matrix @ dv_b) * u.m / u.s
+        dv_c = (rot_matrix @ dv_c) * u.m / u.s
 
         # Compute time for maneuver
         t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)

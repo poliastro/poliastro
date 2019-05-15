@@ -76,18 +76,6 @@ def rv_pqw(k, p, ecc, nu):
 
 
 @jit
-def pqw2ijk(pqw, inc, raan, argp):
-    """Converts from perifocal to IJK.
-
-    """
-    ijk = transform(pqw, -argp, 2)
-    ijk = transform(ijk, -inc, 0)
-    ijk = transform(ijk, -raan, 2)
-
-    return ijk
-
-
-@jit
 def coe_rotation_matrix(inc, raan, argp):
     """Create a rotation matrix for coe transformation
     """
