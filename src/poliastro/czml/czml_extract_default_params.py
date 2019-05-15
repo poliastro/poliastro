@@ -1,4 +1,5 @@
 PIC_SATELLITE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII="
+PIC_GROUNDSTATION = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACvSURBVDhPrZDRDcMgDAU9GqN0lIzijw6SUbJJygUeNQgSqepJTyHG91LVVpwDdfxM3T9TSl1EXZvDwii471fivK73cBFFQNTT/d2KoGpfGOpSIkhUpgUMxq9DFEsWv4IXhlyCnhBFnZcFEEuYqbiUlNwWgMTdrZ3JbQFoEVG53rd8ztG9aPJMnBUQf/VFraBJeWnLS0RfjbKyLJA8FkT5seDYS1Qwyv8t0B/5C2ZmH2/eTGNNBgMmAAAAAElFTkSuQmCC"
 
 DEFAULTS = {
     "id": "1",
@@ -35,6 +36,35 @@ DEFAULTS = {
         "resolution": 120,
         "material": {"solidColor": {"color": {"rgba": [255, 255, 0, 255]}}},
     },
+}
+
+GROUNDSTATION_DEFAULTS = {
+    "id": "1",
+    "name": "NAME",
+    "availability": "0000-00-00T00:00:00Z/0000-00-00T00:00:00Z",
+    "description": "DESCRIPTION",
+    "billboard": {
+        "eyeOffset": {"cartesian": [0, 0, 0]},
+        "horizontalOrigin": "CENTER",
+        "image": PIC_GROUNDSTATION,
+        "pixelOffset": {"cartesian2": [0, 0]},
+        "scale": 1.5,
+        "show": True,
+        "verticalOrigin": "CENTER",
+    },
+    "label": {
+        "fillColor": {"rgba": [0, 0, 0, 255]},
+        "font": "11pt Lucida Console",
+        "horizontalOrigin": "LEFT",
+        "outlineColor": {"rgba": [0, 0, 0, 255]},
+        "outlineWidth": 0,
+        "pixelOffset": {"cartesian2": [0, 0]},
+        "show": True,
+        "style": "FILL_AND_OUTLINE",
+        "text": "TEXT",
+        "verticalOrigin": "CENTER",
+    },
+    "position": {"cartesian": [0, 0, 0]},
 }
 
 CUSTOM_PACKET = {
