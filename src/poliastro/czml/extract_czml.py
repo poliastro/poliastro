@@ -7,14 +7,14 @@ from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
 
-from poliastro.czml.czml_extract_default_params import DEFAULTS
+from poliastro.czml.czml_extract_default_params import CUSTOM_PACKET, DEFAULTS
 from poliastro.twobody.propagation import propagate
 
 
 class CZMLExtractor:
     """A class for extracting orbitary data to Cesium"""
 
-    def __init__(self, start_epoch, end_epoch, N):
+    def __init__(self, start_epoch, end_epoch, N, ellipsoid=None, pr_map=None):
         """
         Orbital constructor
 
@@ -31,6 +31,10 @@ class CZMLExtractor:
             add_orbit()
         """
         self.czml = dict()  # type: Dict[int, Any]
+        self.cust_czml = dict()  # type: Dict[int, Any]
+        self.cust_czml[-1] = copy.deepcopy(CUSTOM_PACKET)
+        self.cust_prop = [ellipsoid, pr_map]
+
         self.orbits = []  # type: List[Any]
         self.N = N
         self.i = 0
@@ -38,9 +42,12 @@ class CZMLExtractor:
         self.start_epoch = CZMLExtractor.format_date(start_epoch)
         self.end_epoch = CZMLExtractor.format_date(end_epoch)
 
+        if sum([c is None for c in self.cust_prop]) == 0:
+            self._change_custom_params(*self.cust_prop)
+
         self._init_czml_()
 
-    def parse_dict_tuples(self, path, tups):
+    def parse_dict_tuples(self, path, tups, dict=None):
         """
         Parameters
         ----------
@@ -48,11 +55,17 @@ class CZMLExtractor:
             Dictionary path to insert to
         tups : list (val, val)
             Tuples to be assigned
+        dict: dictionary
+            Referenced dictionary
         """
 
         # We only want to pass a reference czml, then by modifying our reference, we'll be modifying our base dictionary
         # which allows us to walk through a path of arbitrary length
-        curr = self.czml
+        if dict is None:
+            curr = self.czml
+        else:
+            curr = dict
+
         for p in path:
             curr = curr.setdefault(p, {})
         for t in tups:
@@ -129,6 +142,27 @@ class CZMLExtractor:
                 ("step", "SYSTEM_CLOCK_MULTIPLIER"),
             ],
         )
+
+    def _change_custom_params(self, ellipsoid, pr_map):
+        """
+        Change the custom properties package.
+
+        Parameters
+        ----------
+        ellipsoid: list(int)
+            Defines the attractor ellipsoid. The list must have three numbers
+            representing the radii in the x, y and z axis
+        pr_map: str
+            A URL to the projection of the defined ellipsoid (UV map)
+        """
+        self.cust_czml[-1]["properties"]["ellipsoid"][0]["array"] = ellipsoid
+        self.parse_dict_tuples(
+            [-1, "properties"], [("custom_attractor", True)], dict=self.cust_czml
+        )
+        self.parse_dict_tuples(
+            [-1, "properties"], [("map_url", pr_map)], dict=self.cust_czml
+        )
+        return
 
     def _change_id_params_(self, i, o_id=None, name=None, description=None):
         """
@@ -229,9 +263,11 @@ class CZMLExtractor:
         """
         if ext_location:
             with open(ext_location, "w+") as fp:
-                fp.write(json.dumps(list(self.czml.values())))
+                fp.write(
+                    json.dumps(list(self.czml.values()) + list(self.cust_czml.values()))
+                )
 
-        return json.dumps(list(self.czml.values()))
+        return json.dumps(list(self.czml.values()) + list(self.cust_czml.values()))
 
     def add_orbit(
         self,
