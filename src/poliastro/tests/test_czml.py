@@ -67,6 +67,32 @@ def test_czml_add_orbit():
     assert extractor.czml[1]["path"]["show"]["boolean"] is False
 
 
+def test_czml_ground_station():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    extractor.add_ground_station(
+        [1216469.9, -4736121.7, 4081386.9],
+        id_name="GS",
+        label_fill_color=[120, 120, 120, 255],
+        label_text="GS test",
+    )
+
+    assert extractor.gs_czml[0]["id"] == "GS0"
+    assert (
+        extractor.gs_czml[0]["availability"]
+        == "2013-03-18T12:00:00.000/2013-03-18T23:59:35.108"
+    )
+    assert extractor.gs_czml[0]["name"] == "GS"
+    assert extractor.gs_czml[0]["label"]["fillColor"]["rgba"] == [120, 120, 120, 255]
+    assert extractor.gs_czml[0]["label"]["text"] == "GS test"
+    assert extractor.gs_czml[0]["label"]["show"] is True
+
+
 def test_czml_invalid_orbit_epoch_error():
     start_epoch = molniya.epoch
     end_epoch = molniya.epoch + molniya.period
