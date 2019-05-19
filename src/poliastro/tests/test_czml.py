@@ -82,6 +82,8 @@ def test_czml_ground_station():
         label_text="GS test",
     )
 
+    extractor.add_ground_station([0.70930, 0.40046], label_show=False)
+
     assert extractor.gs_czml[0]["id"] == "GS0"
     assert (
         extractor.gs_czml[0]["availability"]
@@ -91,6 +93,10 @@ def test_czml_ground_station():
     assert extractor.gs_czml[0]["label"]["fillColor"]["rgba"] == [120, 120, 120, 255]
     assert extractor.gs_czml[0]["label"]["text"] == "GS test"
     assert extractor.gs_czml[0]["label"]["show"] is True
+
+    cords = [4456924.997008477, 1886774.8000006324, 4154098.219336245]
+    for i, j in zip(extractor.gs_czml[1]["position"]["cartesian"], cords):
+        assert_allclose(i, j, rtol=1e-4)
 
 
 def test_czml_invalid_orbit_epoch_error():

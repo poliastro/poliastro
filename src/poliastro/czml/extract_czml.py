@@ -381,6 +381,8 @@ class CZMLExtractor:
             Orbit to be added
         pos: list [int]
             coordinates of ground station
+            [x y z] cartesian coordinates
+            [u v] ellipsoidal coordinates (0 elevation)
 
         Id parameters:
         -------------
@@ -404,6 +406,18 @@ class CZMLExtractor:
         label_show: bool
             Indicates whether the label is visible
         """
+        if len(pos) == 2:
+            u, v = pos
+            if self.cust_prop[0]:
+                a, b = self.cust_prop[0][:1]  # get semi-major and semi-minor axises
+            else:
+                a, b = 6378137.0, 6378137.0
+            N = a / np.sqrt(1 - (1 - (a / b) ** 2) * np.sqrt(np.sin(u)))
+            x = N * np.cos(u) * np.cos(v)
+            y = N * np.cos(u) * np.sin(v)
+            z = (N * (a / b) ** 2) * np.sin(u)
+            pos = x, y, z
+
         self._init_ground_station_packet_(self.gs_n, pos)
         self._change_ground_station_params_(
             id_name=id_name,
