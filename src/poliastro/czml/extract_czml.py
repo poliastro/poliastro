@@ -12,6 +12,7 @@ from poliastro.czml.czml_extract_default_params import (
     DEFAULTS,
     GROUNDSTATION_DEFAULTS,
 )
+from poliastro.czml.utils import ellipsoidal_to_cartesian
 from poliastro.twobody.propagation import propagate
 
 
@@ -412,11 +413,7 @@ class CZMLExtractor:
                 a, b = self.cust_prop[0][:1]  # get semi-major and semi-minor axises
             else:
                 a, b = 6378137.0, 6378137.0
-            N = a / np.sqrt(1 - (1 - (a / b) ** 2) * np.sqrt(np.sin(u)))
-            x = N * np.cos(u) * np.cos(v)
-            y = N * np.cos(u) * np.sin(v)
-            z = (N * (a / b) ** 2) * np.sin(u)
-            pos = x, y, z
+            pos = ellipsoidal_to_cartesian(a, b, u, v)
 
         self._init_ground_station_packet_(self.gs_n, pos)
         self._change_ground_station_params_(
