@@ -1,4 +1,4 @@
 from .core import OrbitPlotter2D, OrbitPlotter3D
-from .static import OrbitPlotter
+from .static import StaticOrbitPlotter
 
-__all__ = ["OrbitPlotter2D", "OrbitPlotter3D", "OrbitPlotter"]
+__all__ = ["OrbitPlotter2D", "OrbitPlotter3D", "StaticOrbitPlotter"]

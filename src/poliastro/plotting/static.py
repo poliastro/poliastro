@@ -12,17 +12,6 @@ from poliastro.util import norm
 from ._base import Trajectory
 
 
-class OrbitPlotter:
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError(
-            """This class was renamed. Please do
-
->>> from poliastro.plotting.static import StaticOrbitPlotter
-
-instead."""
-        )
-
-
 class StaticOrbitPlotter:
     """StaticOrbitPlotter class.
 
