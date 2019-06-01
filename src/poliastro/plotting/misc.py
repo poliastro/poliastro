@@ -11,10 +11,45 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
+from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody import Orbit
 
 
-def plot_solar_system(outer=True, epoch=None, use_3d=False):
+def _plot_bodies(orbit_plotter, outer=True, epoch=None):
+    bodies = [Mercury, Venus, Earth, Mars]
+    if outer:
+        bodies.extend([Jupiter, Saturn, Uranus, Neptune])
+
+    for body in bodies:
+        orb = Orbit.from_body_ephem(body, epoch)
+        orbit_plotter.plot(orb, label=str(body))
+
+
+def _plot_solar_system_2d(outer=True, epoch=None, interactive=False):
+    pqw = Orbit.from_body_ephem(Earth, epoch).pqw()
+    if interactive:
+        orbit_plotter = (
+            OrbitPlotter2D()
+        )  # type: Union[OrbitPlotter2D, StaticOrbitPlotter]
+        orbit_plotter.set_frame(*pqw)
+    else:
+        orbit_plotter = StaticOrbitPlotter()
+        orbit_plotter.set_frame(*pqw)
+
+    _plot_bodies(orbit_plotter, outer, epoch)
+
+    return orbit_plotter
+
+
+def _plot_solar_system_3d(outer=True, epoch=None):
+    orbit_plotter = OrbitPlotter3D()
+
+    _plot_bodies(orbit_plotter, outer, epoch)
+
+    return orbit_plotter
+
+
+def plot_solar_system(outer=True, epoch=None, use_3d=False, interactive=False):
     """
     Plots the whole solar system in one single call.
 
@@ -28,20 +63,18 @@ def plot_solar_system(outer=True, epoch=None, use_3d=False):
         Epoch value of the plot, default to J2000.
     use_3d : bool, optional
         Produce 3D plot, default to False.
+    interactive : bool, optional
+        Produce an interactive (rather than static) image of the orbit, default to False.
+        This option requires Plotly properly installed and configured for your environment.
 
     """
-    bodies = [Mercury, Venus, Earth, Mars]
-    if outer:
-        bodies.extend([Jupiter, Saturn, Uranus, Neptune])
-
-    if use_3d:
-        op = OrbitPlotter3D()  # type: Union[OrbitPlotter3D, OrbitPlotter2D]
+    if not interactive and use_3d:
+        raise ValueError(
+            "The static plotter does not support 3D, use `interactive=True`"
+        )
+    elif use_3d:
+        op = _plot_solar_system_3d(outer, epoch)
     else:
-        op = OrbitPlotter2D()
-        op.set_frame(*Orbit.from_body_ephem(Earth, epoch).pqw())  # type: ignore
-
-    for body in bodies:
-        orb = Orbit.from_body_ephem(body, epoch)
-        op.plot(orb, label=str(body))
+        op = _plot_solar_system_2d(outer, epoch, interactive)
 
     return op
