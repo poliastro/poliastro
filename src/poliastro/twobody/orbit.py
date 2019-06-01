@@ -19,6 +19,7 @@ from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
+from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
@@ -1165,8 +1166,6 @@ class Orbit(object):
         static : bool, optional
             Produce a static image of the figure, default to false
         """
-        from poliastro.plotting.static import StaticOrbitPlotter
-
         if static and use_3d:
             raise ValueError("static and use_3d cannot be true at the same time")
         elif static:
