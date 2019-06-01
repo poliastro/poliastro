@@ -218,7 +218,6 @@ def porkchop(
     fig.autofmt_xdate()
 
     if not hasattr(target_body, "name"):
-
         ax.set_title(
             "{} - {} for year {}, C3 Launch".format(
                 departure_body.name, "Target Body", launch_span[0].datetime.year
