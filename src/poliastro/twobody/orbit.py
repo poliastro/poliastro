@@ -1033,9 +1033,7 @@ class Orbit(object):
         nu_values = np.linspace(*limits, values)
         return nu_values
 
-    def sample(
-        self, values=100, *, min_anomaly=None, max_anomaly=None, method=mean_motion
-    ):
+    def sample(self, values=100, *, min_anomaly=None, max_anomaly=None):
         r"""Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
@@ -1050,8 +1048,6 @@ class Orbit(object):
             and for hyperbolic orbits it will be :math:`\nu \in \left[-\nu_c, \nu_c \right]`,
             where :math:`\nu_c` is either the current true anomaly
             or a value that corresponds to :math:`r = 3p`.
-        method : function, optional
-            Method used for propagation
 
         Returns
         -------
@@ -1080,7 +1076,7 @@ class Orbit(object):
             nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
         time_values = time.TimeDelta(self._generate_time_values(nu_values))
-        cartesian = propagate(self, time_values, method=method)
+        cartesian = propagate(self, time_values)
 
         # TODO: Unify with propagate
         # If the frame supports obstime, set the time values

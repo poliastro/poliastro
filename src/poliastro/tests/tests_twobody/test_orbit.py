@@ -47,7 +47,6 @@ from poliastro.frames import (
 )
 from poliastro.twobody.angles import M_to_nu
 from poliastro.twobody.orbit import Orbit, OrbitSamplingWarning, TimeScaleWarning
-from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 
 @pytest.fixture()
@@ -382,15 +381,14 @@ def test_sample_num_points(num_points):
     # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
 
 
-@pytest.mark.parametrize("method", [mean_motion, cowell, kepler])
-def test_sample_big_orbits(method):
+def test_sample_big_orbits():
     # See https://github.com/poliastro/poliastro/issues/265
     ss = Orbit.from_vectors(
         Sun,
         [-9018878.6, -94116055, 22619059] * u.km,
         [-49.950923, -12.948431, -4.2925158] * u.km / u.s,
     )
-    positions = ss.sample(15, method=method)
+    positions = ss.sample(15)
     assert len(positions) == 15
 
 
