@@ -1150,7 +1150,7 @@ class Orbit(object):
             res = orbit_new
         return res
 
-    def plot(self, label=None, use_3d=False, static=False):
+    def plot(self, label=None, use_3d=False, interactive=False):
         """Plots the orbit as an interactive widget.
 
         Parameters
@@ -1159,12 +1159,15 @@ class Orbit(object):
             Label for the orbit, defaults to empty.
         use_3d : bool, optional
             Produce a 3D plot, default to False.
-        static : bool, optional
-            Produce a static image of the figure, default to false
+        interactive : bool, optional
+            Produce an interactive (rather than static) image of the orbit, default to False.
+            This option requires Plotly properly installed and configured for your environment.
         """
-        if static and use_3d:
-            raise ValueError("static and use_3d cannot be true at the same time")
-        elif static:
+        if not interactive and use_3d:
+            raise ValueError(
+                "The static plotter does not support 3D, use `interactive=True`"
+            )
+        elif not interactive:
             return StaticOrbitPlotter().plot(self, label=label)
         elif use_3d:
             return OrbitPlotter3D().plot(self, label=label)
