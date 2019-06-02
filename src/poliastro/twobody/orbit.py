@@ -19,6 +19,7 @@ from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
 from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
+from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
@@ -1032,9 +1033,7 @@ class Orbit(object):
         nu_values = np.linspace(*limits, values)
         return nu_values
 
-    def sample(
-        self, values=100, *, min_anomaly=None, max_anomaly=None, method=mean_motion
-    ):
+    def sample(self, values=100, *, min_anomaly=None, max_anomaly=None):
         r"""Samples an orbit to some specified time values.
 
         .. versionadded:: 0.8.0
@@ -1049,8 +1048,6 @@ class Orbit(object):
             and for hyperbolic orbits it will be :math:`\nu \in \left[-\nu_c, \nu_c \right]`,
             where :math:`\nu_c` is either the current true anomaly
             or a value that corresponds to :math:`r = 3p`.
-        method : function, optional
-            Method used for propagation
 
         Returns
         -------
@@ -1079,7 +1076,7 @@ class Orbit(object):
             nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
         time_values = time.TimeDelta(self._generate_time_values(nu_values))
-        cartesian = propagate(self, time_values, method=method)
+        cartesian = propagate(self, time_values)
 
         # TODO: Unify with propagate
         # If the frame supports obstime, set the time values
@@ -1153,7 +1150,7 @@ class Orbit(object):
             res = orbit_new
         return res
 
-    def plot(self, label=None, use_3d=False, static=False):
+    def plot(self, label=None, use_3d=False, interactive=False):
         """Plots the orbit as an interactive widget.
 
         Parameters
@@ -1162,14 +1159,15 @@ class Orbit(object):
             Label for the orbit, defaults to empty.
         use_3d : bool, optional
             Produce a 3D plot, default to False.
-        static : bool, optional
-            Produce a static image of the figure, default to false
+        interactive : bool, optional
+            Produce an interactive (rather than static) image of the orbit, default to False.
+            This option requires Plotly properly installed and configured for your environment.
         """
-        from poliastro.plotting.static import StaticOrbitPlotter
-
-        if static and use_3d:
-            raise ValueError("static and use_3d cannot be true at the same time")
-        elif static:
+        if not interactive and use_3d:
+            raise ValueError(
+                "The static plotter does not support 3D, use `interactive=True`"
+            )
+        elif not interactive:
             return StaticOrbitPlotter().plot(self, label=label)
         elif use_3d:
             return OrbitPlotter3D().plot(self, label=label)

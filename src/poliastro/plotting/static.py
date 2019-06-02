@@ -7,21 +7,9 @@ from astropy.coordinates import CartesianRepresentation
 from matplotlib import pyplot as plt
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
-from poliastro.twobody.propagation import mean_motion
 from poliastro.util import norm
 
 from ._base import Trajectory
-
-
-class OrbitPlotter:
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError(
-            """This class was renamed. Please do
-
->>> from poliastro.plotting.static import StaticOrbitPlotter
-
-instead."""
-        )
 
 
 class StaticOrbitPlotter:
@@ -209,7 +197,7 @@ class StaticOrbitPlotter:
 
         return lines
 
-    def plot(self, orbit, label=None, color=None, method=mean_motion):
+    def plot(self, orbit, label=None, color=None):
         """Plots state and osculating orbit in their plane.
         """
         if not self._frame:
@@ -217,7 +205,7 @@ class StaticOrbitPlotter:
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
-        positions = orbit.sample(self.num_points, method=method)
+        positions = orbit.sample(self.num_points)
         if label:
             label = generate_label(orbit, label)
 

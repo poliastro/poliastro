@@ -47,7 +47,6 @@ from poliastro.frames import (
 )
 from poliastro.twobody.angles import M_to_nu
 from poliastro.twobody.orbit import Orbit, OrbitSamplingWarning, TimeScaleWarning
-from poliastro.twobody.propagation import cowell, kepler, mean_motion
 
 
 @pytest.fixture()
@@ -382,15 +381,14 @@ def test_sample_num_points(num_points):
     # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
 
 
-@pytest.mark.parametrize("method", [mean_motion, cowell, kepler])
-def test_sample_big_orbits(method):
+def test_sample_big_orbits():
     # See https://github.com/poliastro/poliastro/issues/265
     ss = Orbit.from_vectors(
         Sun,
         [-9018878.6, -94116055, 22619059] * u.km,
         [-49.950923, -12.948431, -4.2925158] * u.km / u.s,
     )
-    positions = ss.sample(15, method=method)
+    positions = ss.sample(15)
     assert len(positions) == 15
 
 
@@ -444,12 +442,13 @@ def test_orbit_is_pickable(hyperbolic):
 
 
 def test_orbit_plot_is_static():
-
     # Data from Curtis, example 4.3
     r = [-6045, -3490, 2500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-    plot = ss.plot(static=True)
+
+    plot = ss.plot()
+
     assert isinstance(plot[0], matplotlib.lines.Line2D)
     assert isinstance(plot[1], matplotlib.lines.Line2D)
 
@@ -459,8 +458,11 @@ def test_orbit_plot_static_3d():
     r = [-6045, -3490, 2500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-    with pytest.raises(ValueError, match="static and use_3d cannot be true"):
-        ss.plot(static=True, use_3d=True)
+    with pytest.raises(
+        ValueError,
+        match="The static plotter does not support 3D, use `interactive=True`",
+    ):
+        ss.plot(use_3d=True)
 
 
 @pytest.mark.parametrize("use_3d", [False, True])
@@ -471,7 +473,9 @@ def test_orbit_plot_is_not_static(use_3d):
     r = [-6045, -3490, 2500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-    plot = ss.plot(static=False, use_3d=use_3d)
+
+    plot = ss.plot(interactive=True, use_3d=use_3d)
+
     assert isinstance(plot, FigureWidget)
 
 
