@@ -42,8 +42,8 @@ extensions = [
     'sphinx.ext.intersphinx',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
-    'sphinx.ext.mathjax', #New module for matrix visualization
-    'sphinx.ext.graphviz', # For creating the diagrams
+    'sphinx.ext.mathjax',  # Maths visualization
+    'sphinx.ext.graphviz',  # Dependency diagrams
 ]
 
 # Custom configuration
@@ -55,7 +55,7 @@ templates_path = ['_templates']
 # The suffix of source filenames.
 source_suffix = '.rst'
 
-#Warning suppresses
+# Warning suppresses
 suppress_warnings = ['image.nonlocal_uri']
 
 # The encoding of source files.
