@@ -29,4 +29,4 @@ def ellipsoidal_to_cartesian(a, b, lat, lon):
     x = cr * np.cos(lat) * np.cos(lon)
     y = cr * np.cos(lat) * np.sin(lon)
     z = (a / b) ** 2 * cr * np.sin(lat)
-    return [x, y, z]
+    return x, y, z

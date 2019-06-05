@@ -37,7 +37,6 @@ class CZMLExtractor:
         """
         self.czml = dict()  # type: Dict[int, Any]
         self.cust_czml = dict()  # type: Dict[int, Any]
-        self.gs_czml = dict()  # type: Dict[int, Any]
 
         self.cust_czml[-1] = copy.deepcopy(CUSTOM_PACKET)
         self.cust_prop = [ellipsoid, pr_map]
@@ -80,17 +79,16 @@ class CZMLExtractor:
             curr[t[0]] = t[1]
 
     def _init_ground_station_packet_(self, i, pos):
-        self.gs_czml[i] = copy.deepcopy(GROUNDSTATION_DEFAULTS)
+        self.czml["GS" + str(i)] = copy.deepcopy(GROUNDSTATION_DEFAULTS)
 
         self.parse_dict_tuples(
-            [i],
+            ["GS" + str(i)],
             [
                 ("id", "GS" + str(i)),
                 ("availability", self.start_epoch.value + "/" + self.end_epoch.value),
             ],
-            dict=self.gs_czml,
         )
-        self.parse_dict_tuples([i, "position"], [("cartesian", pos)], dict=self.gs_czml)
+        self.parse_dict_tuples(["GS" + str(i), "position"], [("cartesian", pos)])
 
     def _init_orbit_packet_(self, i):
 
@@ -285,18 +283,10 @@ class CZMLExtractor:
         if ext_location:
             with open(ext_location, "w+") as fp:
                 fp.write(
-                    json.dumps(
-                        list(self.czml.values())
-                        + list(self.gs_czml.values())
-                        + list(self.cust_czml.values())
-                    )
+                    json.dumps(list(self.czml.values()) + list(self.cust_czml.values()))
                 )
 
-        return json.dumps(
-            list(self.czml.values())
-            + list(self.gs_czml.values())
-            + list(self.cust_czml.values())
-        )
+        return json.dumps(list(self.czml.values()) + list(self.cust_czml.values()))
 
     def _change_ground_station_params_(
         self,
@@ -333,34 +323,25 @@ class CZMLExtractor:
         i = self.gs_n
 
         if id_name is not None:
-            self.parse_dict_tuples([i], [("name", id_name)], dict=self.gs_czml)
+            self.parse_dict_tuples(["GS" + str(i)], [("name", id_name)])
         if id_description is not None:
-            self.parse_dict_tuples([i], [("name", id_description)], dict=self.gs_czml)
+            self.parse_dict_tuples(["GS" + str(i)], [("name", id_description)])
 
         if label_fill_color is not None:
             self.parse_dict_tuples(
-                [i, "label", "fillColor"],
-                [("rgba", label_fill_color)],
-                dict=self.gs_czml,
+                ["GS" + str(i), "label", "fillColor"], [("rgba", label_fill_color)]
             )
         if label_outline_color is not None:
             self.parse_dict_tuples(
-                [i, "label", "outlineColor"],
+                ["GS" + str(i), "label", "outlineColor"],
                 [("rgba", label_outline_color)],
-                dict=self.gs_czml,
             )
         if label_font is not None:
-            self.parse_dict_tuples(
-                [i, "label"], [("font", label_font)], dict=self.gs_czml
-            )
+            self.parse_dict_tuples(["GS" + str(i), "label"], [("font", label_font)])
         if label_text is not None:
-            self.parse_dict_tuples(
-                [i, "label"], [("text", label_text)], dict=self.gs_czml
-            )
+            self.parse_dict_tuples(["GS" + str(i), "label"], [("text", label_text)])
         if label_show is not None:
-            self.parse_dict_tuples(
-                [i, "label"], [("show", label_show)], dict=self.gs_czml
-            )
+            self.parse_dict_tuples(["GS" + str(i), "label"], [("show", label_show)])
 
     def add_ground_station(
         self,
@@ -380,9 +361,8 @@ class CZMLExtractor:
         ----------
         orbit: poliastro.Orbit
             Orbit to be added
-        pos: list [int]
+        pos: list [~astropy.units]
             coordinates of ground station
-            [x y z] cartesian coordinates
             [u v] ellipsoidal coordinates (0 elevation)
 
         Id parameters:
@@ -407,13 +387,21 @@ class CZMLExtractor:
         label_show: bool
             Indicates whether the label is visible
         """
-        if len(pos) == 2:
-            u, v = pos
+        if (
+            len(pos) == 2
+            and isinstance(pos[0], u.quantity.Quantity)
+            and isinstance(pos[0], u.quantity.Quantity)
+        ):
+            u0, v0 = pos
             if self.cust_prop[0]:
                 a, b = self.cust_prop[0][:1]  # get semi-major and semi-minor axises
             else:
                 a, b = 6378137.0, 6378137.0
-            pos = ellipsoidal_to_cartesian(a, b, u, v)
+            pos = list(map(lambda x: x.value, ellipsoidal_to_cartesian(a, b, u0, v0)))
+        else:
+            raise TypeError(
+                "Invalid coordinates. Coordinates must be of the form [u, v] where u, v are astropy units"
+            )
 
         self._init_ground_station_packet_(self.gs_n, pos)
         self._change_ground_station_params_(
