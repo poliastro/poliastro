@@ -7,7 +7,12 @@ from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
 
-from poliastro.czml.czml_extract_default_params import CUSTOM_PACKET, DEFAULTS
+from poliastro.czml.czml_extract_default_params import (
+    CUSTOM_PACKET,
+    DEFAULTS,
+    GROUNDSTATION_DEFAULTS,
+)
+from poliastro.czml.utils import ellipsoidal_to_cartesian
 from poliastro.twobody.propagation import propagate
 
 
@@ -32,12 +37,14 @@ class CZMLExtractor:
         """
         self.czml = dict()  # type: Dict[int, Any]
         self.cust_czml = dict()  # type: Dict[int, Any]
+
         self.cust_czml[-1] = copy.deepcopy(CUSTOM_PACKET)
         self.cust_prop = [ellipsoid, pr_map]
 
         self.orbits = []  # type: List[Any]
         self.N = N
         self.i = 0
+        self.gs_n = 0
 
         self.start_epoch = CZMLExtractor.format_date(start_epoch)
         self.end_epoch = CZMLExtractor.format_date(end_epoch)
@@ -70,6 +77,18 @@ class CZMLExtractor:
             curr = curr.setdefault(p, {})
         for t in tups:
             curr[t[0]] = t[1]
+
+    def _init_ground_station_packet_(self, i, pos):
+        self.czml["GS" + str(i)] = copy.deepcopy(GROUNDSTATION_DEFAULTS)
+
+        self.parse_dict_tuples(
+            ["GS" + str(i)],
+            [
+                ("id", "GS" + str(i)),
+                ("availability", self.start_epoch.value + "/" + self.end_epoch.value),
+            ],
+        )
+        self.parse_dict_tuples(["GS" + str(i), "position"], [("cartesian", pos)])
 
     def _init_orbit_packet_(self, i):
 
@@ -268,6 +287,133 @@ class CZMLExtractor:
                 )
 
         return json.dumps(list(self.czml.values()) + list(self.cust_czml.values()))
+
+    def _change_ground_station_params_(
+        self,
+        id_name=None,
+        id_description=None,
+        label_fill_color=None,
+        label_font=None,
+        label_outline_color=None,
+        label_text=None,
+        label_show=True,
+    ):
+        """
+         Change ground station parameters
+
+        Parameters
+        ----------
+
+        id_name: str
+            Set ground station name
+        id_description: str
+            Set ground station description
+
+        label_fill_color: list (int)
+            Fill Color in rgba format
+        label_outline_color: list (int)
+            Outline Color in rgba format
+        label_font: str
+            Set label font style and size (CSS syntax)
+        label_text: str
+            Set label text
+        label_show: bool
+            Indicates whether the label is visible
+    """
+        i = self.gs_n
+
+        if id_name is not None:
+            self.parse_dict_tuples(["GS" + str(i)], [("name", id_name)])
+        if id_description is not None:
+            self.parse_dict_tuples(["GS" + str(i)], [("name", id_description)])
+
+        if label_fill_color is not None:
+            self.parse_dict_tuples(
+                ["GS" + str(i), "label", "fillColor"], [("rgba", label_fill_color)]
+            )
+        if label_outline_color is not None:
+            self.parse_dict_tuples(
+                ["GS" + str(i), "label", "outlineColor"],
+                [("rgba", label_outline_color)],
+            )
+        if label_font is not None:
+            self.parse_dict_tuples(["GS" + str(i), "label"], [("font", label_font)])
+        if label_text is not None:
+            self.parse_dict_tuples(["GS" + str(i), "label"], [("text", label_text)])
+        if label_show is not None:
+            self.parse_dict_tuples(["GS" + str(i), "label"], [("show", label_show)])
+
+    def add_ground_station(
+        self,
+        pos,
+        id_name=None,
+        id_description=None,
+        label_fill_color=None,
+        label_font=None,
+        label_outline_color=None,
+        label_text=None,
+        label_show=True,
+    ):
+        """
+        Adds a ground station
+
+        Parameters
+        ----------
+        orbit: poliastro.Orbit
+            Orbit to be added
+        pos: list [~astropy.units]
+            coordinates of ground station
+            [u v] ellipsoidal coordinates (0 elevation)
+
+        Id parameters:
+        -------------
+
+        id_name: str
+            Set ground station name
+        id_description: str
+            Set ground station description
+
+        Label parameters
+        ----------
+
+        label_fill_color: list (int)
+            Fill Color in rgba format
+        label_outline_color: list (int)
+            Outline Color in rgba format
+        label_font: str
+            Set label font style and size (CSS syntax)
+        label_text: str
+            Set label text
+        label_show: bool
+            Indicates whether the label is visible
+        """
+        if (
+            len(pos) == 2
+            and isinstance(pos[0], u.quantity.Quantity)
+            and isinstance(pos[0], u.quantity.Quantity)
+        ):
+            u0, v0 = pos
+            if self.cust_prop[0]:
+                a, b = self.cust_prop[0][:1]  # get semi-major and semi-minor axises
+            else:
+                a, b = 6378137.0, 6378137.0
+            pos = list(map(lambda x: x.value, ellipsoidal_to_cartesian(a, b, u0, v0)))
+        else:
+            raise TypeError(
+                "Invalid coordinates. Coordinates must be of the form [u, v] where u, v are astropy units"
+            )
+
+        self._init_ground_station_packet_(self.gs_n, pos)
+        self._change_ground_station_params_(
+            id_name=id_name,
+            id_description=id_description,
+            label_fill_color=label_fill_color,
+            label_font=label_font,
+            label_outline_color=label_outline_color,
+            label_text=label_text,
+            label_show=label_show,
+        )
+        self.gs_n += 1
 
     def add_orbit(
         self,

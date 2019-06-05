@@ -67,6 +67,42 @@ def test_czml_add_orbit():
     assert extractor.czml[1]["path"]["show"]["boolean"] is False
 
 
+def test_czml_ground_station():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    extractor.add_ground_station(
+        [32 * u.degree, 62 * u.degree],
+        id_name="GS",
+        label_fill_color=[120, 120, 120, 255],
+        label_text="GS test",
+    )
+
+    extractor.add_ground_station([0.70930 * u.rad, 0.40046 * u.rad], label_show=False)
+
+    assert extractor.czml["GS0"]["id"] == "GS0"
+    assert (
+        extractor.czml["GS0"]["availability"]
+        == "2013-03-18T12:00:00.000/2013-03-18T23:59:35.108"
+    )
+    assert extractor.czml["GS0"]["name"] == "GS"
+    assert extractor.czml["GS0"]["label"]["fillColor"]["rgba"] == [120, 120, 120, 255]
+    assert extractor.czml["GS0"]["label"]["text"] == "GS test"
+    assert extractor.czml["GS0"]["label"]["show"] is True
+
+    cords = [2539356.1623202674, 4775834.339416022, 3379897.6662185807]
+    for i, j in zip(extractor.czml["GS0"]["position"]["cartesian"], cords):
+        assert_allclose(i, j, rtol=1e-4)
+
+    cords = [4456924.997008477, 1886774.8000006324, 4154098.219336245]
+    for i, j in zip(extractor.czml["GS1"]["position"]["cartesian"], cords):
+        assert_allclose(i, j, rtol=1e-4)
+
+
 def test_czml_invalid_orbit_epoch_error():
     start_epoch = molniya.epoch
     end_epoch = molniya.epoch + molniya.period
