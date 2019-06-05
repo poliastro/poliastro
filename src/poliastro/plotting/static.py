@@ -80,14 +80,26 @@ class StaticOrbitPlotter:
         self.ax.relim()
         self.ax.autoscale()
 
-    def _plot_trajectory(self, trajectory, color=None):
+    def _plot_trajectory(self, trajectory, color=None, trail=False):
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
-        lines = self.ax.plot(x.to(u.km).value, y.to(u.km).value, "--", color=color)
+        if trail:
+            for i in range(len(x)):
+                # The fadind line is painted from back. Fading factor is
+                # completly arbitrary.
+                fading_factor = i / len(x) * 0.05
+                lines = self.ax.plot(
+                    x[::-1][i:].to(u.km).value,
+                    y[::-1][i:].to(u.km).value,
+                    alpha=fading_factor,
+                    color=color,
+                )
+        else:
+            lines = self.ax.plot(x.to(u.km).value, y.to(u.km).value, "--", color=color)
 
         return lines
 
-    def plot_trajectory(self, trajectory, *, label=None, color=None):
+    def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         Parameters
@@ -98,6 +110,8 @@ class StaticOrbitPlotter:
             Label.
         color : str, optional
             Color string.
+        trail: bool, optional
+            Plots the Orbit's trail
 
         """
         if self._attractor is None or self._frame is None:
@@ -110,7 +124,7 @@ class StaticOrbitPlotter:
         self._redraw_attractor(
             trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
         )  # Arbitrary threshold
-        lines = self._plot_trajectory(trajectory, color)
+        lines = self._plot_trajectory(trajectory, color, trail)
 
         if label:
             lines[0].set_label(label)
@@ -161,8 +175,8 @@ class StaticOrbitPlotter:
             mpl.patches.Circle((0, 0), self._attractor_radius.value, lw=0, color=color)
         )
 
-    def _plot(self, trajectory, state=None, label=None, color=None):
-        lines = self._plot_trajectory(trajectory, color)
+    def _plot(self, trajectory, state=None, label=None, color=None, trail=False):
+        lines = self._plot_trajectory(trajectory, color, trail=trail)
 
         if state is not None:
             x0, y0 = self._project(state[None])
@@ -197,7 +211,7 @@ class StaticOrbitPlotter:
 
         return lines
 
-    def plot(self, orbit, label=None, color=None):
+    def plot(self, orbit, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
         """
         if not self._frame:
@@ -205,11 +219,19 @@ class StaticOrbitPlotter:
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
-        positions = orbit.sample(self.num_points)
+        if trail:
+            # Just plot the last 120 degrees of true anomaly
+            positions = orbit.sample(
+                self.num_points,
+                min_anomaly=orbit.nu,
+                max_anomaly=orbit.nu - 120 * u.deg,
+            )
+        else:
+            positions = orbit.sample(self.num_points)
         if label:
             label = generate_label(orbit, label)
 
-        lines = self._plot(positions, orbit.r, label, color)
+        lines = self._plot(positions, orbit.r, label, color, trail=trail)
 
         self._trajectories.append(
             Trajectory(positions, orbit.r, label, lines[0].get_color())
