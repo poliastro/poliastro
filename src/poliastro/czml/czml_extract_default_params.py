@@ -75,3 +75,25 @@ CUSTOM_PACKET = {
         "map_url": "",
     },
 }
+
+ACCESS_PACKET = {
+    "id": "FKC7SQFxL5",
+    "name": "Accesses",
+    "description": "List of Accesses",
+}
+
+SATTELITE_PASS_PACKET = {
+    "id": "",
+    "name": "",
+    "parent": "FKC7SQFxL5",
+    "availability": [],
+    "polyline": {
+        "show": [],
+        "width": 1,
+        "material": {"solidColor": {"color": {"rgba": [0, 255, 0, 255]}}},
+        "arcType": "NONE",
+        "positions": {
+            "references": ["Satellite/Geoeye1#position", "Satellite/ISS#position"]
+        },
+    },
+}
