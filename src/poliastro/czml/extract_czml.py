@@ -534,3 +534,4 @@ class CZMLExtractor:
             ISO 8601 - compliant date
         """
         return Time(date, format="isot")
+
