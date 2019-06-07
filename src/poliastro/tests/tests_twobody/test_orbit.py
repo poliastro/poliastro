@@ -585,8 +585,8 @@ def test_from_horizons_raise_valueerror():
 
 
 @pytest.mark.remote_data
-def test_orbits_are_same():
     epoch = Time("2018-07-23")
+def test_orbit_from_horizons_has_expected_elements():
     # Orbit Parameters of Ceres
     # Taken from https://ssd.jpl.nasa.gov/horizons.cgi
     ss = Orbit.from_classical(
