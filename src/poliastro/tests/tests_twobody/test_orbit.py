@@ -585,18 +585,18 @@ def test_from_horizons_raise_valueerror():
 
 
 @pytest.mark.remote_data
-def test_orbits_are_same():
-    epoch = Time("2018-07-23")
+def test_orbit_from_horizons_has_expected_elements():
+    epoch = Time("2018-07-23", scale="tdb")
     # Orbit Parameters of Ceres
     # Taken from https://ssd.jpl.nasa.gov/horizons.cgi
     ss = Orbit.from_classical(
         Sun,
-        2.767107584017257 * u.au,
-        0.07554802949294502 * u.one,
-        27.18502520750381 * u.deg,
-        23.36913256044832 * u.deg,
-        132.2919806192451 * u.deg,
-        21.28958091587153 * u.deg,
+        2.767107592216510 * u.au,
+        7.554803091400027e-2 * u.one,
+        2.718502494739172e1 * u.deg,
+        2.336913218336299e1 * u.deg,
+        1.322919809219236e2 * u.deg,
+        2.128957916690369e1 * u.deg,
         epoch,
     )
     ss1 = Orbit.from_horizons(name="Ceres", epoch=epoch)
@@ -882,12 +882,12 @@ def test_from_sbdb():
 
     SBDB_DATA = {
         "Ceres": (
-            2.769165146349478 * u.AU,
-            0.07600902762923671 * u.one,
-            10.59406732590292 * u.deg,
-            80.30553084093981 * u.deg,
-            73.59769486239257 * u.deg,
-            M_to_nu(77.37209773768207 * u.deg, 0.07600902762923671 * u.one),
+            2.76916515450648 * u.AU,
+            0.07600902910070946 * u.one,
+            10.59406704424526 * u.deg,
+            80.30553156826473 * u.deg,
+            73.597694115971 * u.deg,
+            M_to_nu(77.37209588584763 * u.deg, 0.07600902910070946 * u.one),
         )
     }
 
