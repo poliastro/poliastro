@@ -85,6 +85,8 @@ class StaticOrbitPlotter:
         if trail and color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319
             color = next(self.ax._get_lines.prop_cycler)["color"]
+
+        if trail:
             colors = [color, to_rgba(color, 0)]
         else:
             colors = [color]
