@@ -5,11 +5,22 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from matplotlib import pyplot as plt
+from matplotlib.collections import LineCollection
+from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
 
 from ._base import Trajectory
+
+
+def _segments_from_arrays(x, y):
+    # Copied pasted from
+    # https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/multicolored_line.html
+    # because this API is impossible to understand
+    points = np.column_stack([x.to(u.km).value, y.to(u.km).value])[:, None, :]
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    return segments
 
 
 class StaticOrbitPlotter:
@@ -70,36 +81,47 @@ class StaticOrbitPlotter:
         if self._trajectories:
             self._redraw()
 
+    def _get_colors(self, color, trail):
+        if trail and color is None:
+            # HACK: https://stackoverflow.com/a/13831816/554319
+            color = next(self.ax._get_lines.prop_cycler)["color"]
+            colors = [color, to_rgba(color, 0)]
+        else:
+            colors = [color]
+
+        return colors
+
     def _redraw(self):
         for artist in self.ax.lines + self.ax.collections:
             artist.remove()
 
-        for trajectory, state, label, color in self._trajectories:
-            self._plot(trajectory, state, label, color)
+        for trajectory, state, label, colors in self._trajectories:
+            self._plot(trajectory, state, label, colors)
 
         self.ax.relim()
         self.ax.autoscale()
 
-    def _plot_trajectory(self, trajectory, color=None, trail=False):
+    def _plot_trajectory(self, trajectory, colors=None):
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
-        if trail:
-            for i in range(len(x)):
-                # The fadind line is painted from back. Fading factor is
-                # completly arbitrary.
-                fading_factor = i / len(x) * 0.05
-                lines = self.ax.plot(
-                    x[::-1][i:].to(u.km).value,
-                    y[::-1][i:].to(u.km).value,
-                    alpha=fading_factor,
-                    color=color,
-                )
-        else:
-            lines = self.ax.plot(x.to(u.km).value, y.to(u.km).value, "--", color=color)
-            if color is None:
-                color = lines[0].get_color()
 
-        return lines, color
+        if len(colors) > 1:
+            segments = _segments_from_arrays(x, y)
+            cmap = LinearSegmentedColormap.from_list(
+                "{}_to_alpha".format(colors[0]),  # Useless name
+                colors,
+            )
+            lc = LineCollection(segments, linestyles="dashed", cmap=cmap)
+            lc.set_array(np.linspace(0, 1, len(x)))
+
+            self.ax.add_collection(lc)
+            lines = [lc]
+
+        else:
+            lines = self.ax.plot(x.to(u.km).value, y.to(u.km).value, "--", color=colors[0])
+            colors = [lines[0].get_color()]
+
+        return lines, colors
 
     def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
@@ -126,7 +148,9 @@ class StaticOrbitPlotter:
         self._redraw_attractor(
             trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
         )  # Arbitrary threshold
-        lines, color = self._plot_trajectory(trajectory, color, trail)
+
+        colors = self._get_colors(color, trail)
+        lines, colors = self._plot_trajectory(trajectory, colors)
 
         if label:
             lines[0].set_label(label)
@@ -135,7 +159,7 @@ class StaticOrbitPlotter:
             )
 
         self._trajectories.append(
-            Trajectory(trajectory, None, label, color)
+            Trajectory(trajectory, None, label, colors)
         )
 
         return lines
@@ -177,8 +201,8 @@ class StaticOrbitPlotter:
             mpl.patches.Circle((0, 0), self._attractor_radius.value, lw=0, color=color)
         )
 
-    def _plot(self, trajectory, state=None, label=None, color=None, trail=False):
-        lines, color = self._plot_trajectory(trajectory, color, trail=trail)
+    def _plot(self, trajectory, state=None, label=None, colors=None):
+        lines, colors = self._plot_trajectory(trajectory, colors)
 
         if state is not None:
             x0, y0 = self._project(state[None])
@@ -189,7 +213,7 @@ class StaticOrbitPlotter:
                 y0.to(u.km).value,
                 "o",
                 mew=0,
-                color=color,
+                color=colors[0],
             )
             lines.append(l)
 
@@ -211,10 +235,11 @@ class StaticOrbitPlotter:
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
 
-        return lines
+        return lines, colors
 
     def plot(self, orbit, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
+
         """
         if not self._frame:
             self.set_frame(*orbit.pqw())
@@ -227,9 +252,10 @@ class StaticOrbitPlotter:
         if label:
             label = generate_label(orbit, label)
 
-        lines, color = self._plot(positions, orbit.r, label, color, trail=trail)
+        colors = self._get_colors(color, trail)
+        lines, colors = self._plot(positions, orbit.r, label, colors)
 
         self._trajectories.append(
-            Trajectory(positions, orbit.r, label, color)
+            Trajectory(positions, orbit.r, label, colors)
         )
         return lines
