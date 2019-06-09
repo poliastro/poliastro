@@ -111,7 +111,7 @@ class StaticOrbitPlotter:
                 "{}_to_alpha".format(colors[0]), colors  # Useless name
             )
             lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
-            lc.set_array(np.linspace(0, 1, len(x)))
+            lc.set_array(np.linspace(1, 0, len(x)))
 
             self.ax.add_collection(lc)
             lines = [lc]
