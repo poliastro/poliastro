@@ -96,8 +96,10 @@ class StaticOrbitPlotter:
                 )
         else:
             lines = self.ax.plot(x.to(u.km).value, y.to(u.km).value, "--", color=color)
+            if color is None:
+                color = lines[0].get_color()
 
-        return lines
+        return lines, color
 
     def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
@@ -124,7 +126,7 @@ class StaticOrbitPlotter:
         self._redraw_attractor(
             trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
         )  # Arbitrary threshold
-        lines = self._plot_trajectory(trajectory, color, trail)
+        lines, color = self._plot_trajectory(trajectory, color, trail)
 
         if label:
             lines[0].set_label(label)
@@ -133,7 +135,7 @@ class StaticOrbitPlotter:
             )
 
         self._trajectories.append(
-            Trajectory(trajectory, None, label, lines[0].get_color())
+            Trajectory(trajectory, None, label, color)
         )
 
         return lines
@@ -176,7 +178,7 @@ class StaticOrbitPlotter:
         )
 
     def _plot(self, trajectory, state=None, label=None, color=None, trail=False):
-        lines = self._plot_trajectory(trajectory, color, trail=trail)
+        lines, color = self._plot_trajectory(trajectory, color, trail=trail)
 
         if state is not None:
             x0, y0 = self._project(state[None])
@@ -187,7 +189,7 @@ class StaticOrbitPlotter:
                 y0.to(u.km).value,
                 "o",
                 mew=0,
-                color=lines[0].get_color(),
+                color=color,
             )
             lines.append(l)
 
@@ -231,9 +233,9 @@ class StaticOrbitPlotter:
         if label:
             label = generate_label(orbit, label)
 
-        lines = self._plot(positions, orbit.r, label, color, trail=trail)
+        lines, color = self._plot(positions, orbit.r, label, color, trail=trail)
 
         self._trajectories.append(
-            Trajectory(positions, orbit.r, label, lines[0].get_color())
+            Trajectory(positions, orbit.r, label, color)
         )
         return lines
