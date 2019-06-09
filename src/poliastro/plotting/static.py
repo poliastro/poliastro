@@ -221,15 +221,9 @@ class StaticOrbitPlotter:
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
-        if trail:
-            # Just plot the last 120 degrees of true anomaly
-            positions = orbit.sample(
-                self.num_points,
-                min_anomaly=orbit.nu,
-                max_anomaly=orbit.nu - 120 * u.deg,
-            )
-        else:
-            positions = orbit.sample(self.num_points)
+
+        positions = orbit.sample(self.num_points)
+
         if label:
             label = generate_label(orbit, label)
 
