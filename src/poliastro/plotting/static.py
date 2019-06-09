@@ -108,8 +108,7 @@ class StaticOrbitPlotter:
         if len(colors) > 1:
             segments = _segments_from_arrays(x, y)
             cmap = LinearSegmentedColormap.from_list(
-                "{}_to_alpha".format(colors[0]),  # Useless name
-                colors,
+                "{}_to_alpha".format(colors[0]), colors  # Useless name
             )
             lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
             lc.set_array(np.linspace(0, 1, len(x)))
@@ -160,9 +159,7 @@ class StaticOrbitPlotter:
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
 
-        self._trajectories.append(
-            Trajectory(trajectory, None, label, colors)
-        )
+        self._trajectories.append(Trajectory(trajectory, None, label, colors))
 
         return lines
 
@@ -211,11 +208,7 @@ class StaticOrbitPlotter:
 
             # Plot current position
             l, = self.ax.plot(
-                x0.to(u.km).value,
-                y0.to(u.km).value,
-                "o",
-                mew=0,
-                color=colors[0],
+                x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=colors[0]
             )
             lines.append(l)
 
@@ -257,7 +250,5 @@ class StaticOrbitPlotter:
         colors = self._get_colors(color, trail)
         lines, colors = self._plot(positions, orbit.r, label, colors)
 
-        self._trajectories.append(
-            Trajectory(positions, orbit.r, label, colors)
-        )
+        self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
         return lines
