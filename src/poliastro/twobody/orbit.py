@@ -994,10 +994,17 @@ class Orbit(object):
         )
 
     def _sample_closed(self, values, min_anomaly, max_anomaly):
-        limits = [
-            min_anomaly.to(u.rad).value if min_anomaly is not None else 0,
-            max_anomaly.to(u.rad).value if max_anomaly is not None else 2 * np.pi,
-        ] * u.rad
+        min_anomaly = (
+            min_anomaly.to(u.rad).value
+            if min_anomaly is not None
+            else self.nu.to(u.rad).value
+        )
+        max_anomaly = (
+            max_anomaly.to(u.rad).value
+            if max_anomaly is not None
+            else self.nu.to(u.rad).value + 2 * np.pi
+        )
+        limits = [min_anomaly, max_anomaly] * u.rad
 
         # First sample eccentric anomaly, then transform into true anomaly
         # to minimize error in the apocenter, see
