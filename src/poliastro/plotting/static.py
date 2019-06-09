@@ -101,7 +101,7 @@ class StaticOrbitPlotter:
         self.ax.relim()
         self.ax.autoscale()
 
-    def _plot_trajectory(self, trajectory, colors=None):
+    def _plot_trajectory(self, trajectory, colors=None, linestyle="dashed"):
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
 
@@ -111,14 +111,16 @@ class StaticOrbitPlotter:
                 "{}_to_alpha".format(colors[0]),  # Useless name
                 colors,
             )
-            lc = LineCollection(segments, linestyles="dashed", cmap=cmap)
+            lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
             lc.set_array(np.linspace(0, 1, len(x)))
 
             self.ax.add_collection(lc)
             lines = [lc]
 
         else:
-            lines = self.ax.plot(x.to(u.km).value, y.to(u.km).value, "--", color=colors[0])
+            lines = self.ax.plot(
+                x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
+            )
             colors = [lines[0].get_color()]
 
         return lines, colors
