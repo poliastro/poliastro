@@ -49,7 +49,8 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            MPLBACKEND=Agg pytest --doctest-modules -vv  # Test against installed code
+            MPLBACKEND=Agg pytest -m "not mpl_image_compare" --doctest-modules -vv  # Test against installed code
+            MPLBACKEND=Agg pytest -m "mpl_image_compare" --mpl
 
   test_py36:
     <<: *test-template
