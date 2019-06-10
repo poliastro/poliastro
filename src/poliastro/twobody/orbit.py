@@ -1007,6 +1007,42 @@ class Orbit(object):
         ss._frame = ICRS()  # Hack!
         return ss
 
+    def get_perifocal_frame(self):
+        """Returns perifocal (PQW) frame for this orbit.
+
+        """
+        from astropy.coordinates import (
+            BaseCoordinateFrame,
+            frame_transform_graph,
+            StaticMatrixTransform,
+        )
+        from poliastro.core.elements import coe_rotation_matrix
+
+        class PerifocalFrame(BaseCoordinateFrame):
+            pass
+
+        @frame_transform_graph.transform(
+            StaticMatrixTransform, self.frame.__class__, PerifocalFrame
+        )
+        def source_to_perifocal():
+            return coe_rotation_matrix(
+                self.inc.to(u.rad).value,
+                self.raan.to(u.rad).value,
+                self.argp.to(u.rad).value,
+            ).T
+
+        @frame_transform_graph.transform(
+            StaticMatrixTransform, PerifocalFrame, self.frame.__class__
+        )
+        def perifocal_to_source():
+            return coe_rotation_matrix(
+                self.inc.to(u.rad).value,
+                self.raan.to(u.rad).value,
+                self.argp.to(u.rad).value,
+            )
+
+        return PerifocalFrame
+
     def rv(self):
         """Position and velocity vectors. """
         return self.r, self.v
