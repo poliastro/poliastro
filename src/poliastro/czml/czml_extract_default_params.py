@@ -93,7 +93,7 @@ SATTELITE_PASS_PACKET = {
         "material": {"solidColor": {"color": {"rgba": [0, 255, 0, 255]}}},
         "arcType": "NONE",
         "positions": {
-            "references": ["Satellite/Geoeye1#position", "Satellite/ISS#position"]
+            "references": ["GS0#position", "0#position"]
         },
     },
 }

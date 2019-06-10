@@ -52,55 +52,67 @@ def intersection_ellipsoid_line(a, b, c, u1, u2, u3, x, y, z):
 
     """
     # Get rid of one parameter by translating the line's direction vector
-    k, m = u2 / u1, u3 / u1
-    t0 = -(
-        a ** 2 * b ** 2 * m * z
-        + a ** 2 * c ** 2 * k * y
-        + b ** 2 * c ** 2 * x
+    k, l = u2 / u1, u3 / u1
+    t0 = (
+        -np.power(a, 2) * np.power(b, 2) * l * z
+        - np.power(a, 2) * np.power(c, 2) * k * y
+        - np.power(b, 2) * np.power(c, 2) * x
         + np.sqrt(
-            a ** 2
-            * b ** 2
-            * c ** 2
+            np.power(a, 2)
+            * np.power(b, 2)
+            * np.power(c, 2)
             * (
-                a ** 2 * b ** 2 * m ** 2
-                + a ** 2 * c ** 2 * k ** 2
-                - a ** 2 * k ** 2 * z ** 2
-                + 2 * a ** 2 * k * m * y * z
-                - a ** 2 * m ** 2 * y ** 2
-                + b ** 2 * c ** 2
-                - b ** 2 * m ** 2 * x ** 2
-                + 2 * b ** 2 * m * x * z
-                - b ** 2 * z ** 2
-                - c ** 2 * k ** 2 * x ** 2
-                + 2 * c ** 2 * k * x * y
-                - c ** 2 * y ** 2
+                np.power(a, 2) * np.power(b, 2) * np.power(l, 2)
+                + np.power(a, 2) * np.power(c, 2) * np.power(k, 2)
+                - np.power(a, 2) * np.power(k, 2) * np.power(z, 2)
+                + 2 * np.power(a, 2) * k * l * y * z
+                - np.power(a, 2) * np.power(l, 2) * np.power(y, 2)
+                + np.power(b, 2) * np.power(c, 2)
+                - np.power(b, 2) * np.power(l, 2) * np.power(x, 2)
+                + 2 * np.power(b, 2) * l * x * z
+                - np.power(b, 2) * np.power(z, 2)
+                - np.power(c, 2) * np.power(k, 2) * np.power(x, 2)
+                + 2 * np.power(c, 2) * k * x * y
+                - np.power(c, 2) * np.power(y, 2)
             )
         )
-    ) / (a ** 2 * b ** 2 * m ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
+    ) / (
+        np.power(a, 2) * np.power(b, 2) * np.power(l, 2)
+        + np.power(a, 2) * np.power(c, 2) * np.power(k, 2)
+        + np.power(b, 2) * np.power(c, 2)
+    )
     t1 = (
-        -a ** 2 * b ** 2 * m * z
-        - a ** 2 * c ** 2 * k * y
-        - b ** 2 * c ** 2 * x
+        np.power(a, 2) * np.power(b, 2) * l * z
+        + np.power(a, 2) * np.power(c, 2) * k * y
+        + np.power(b, 2) * np.power(c, 2) * x
         + np.sqrt(
-            a ** 2
-            * b ** 2
-            * c ** 2
+            np.power(a, 2)
+            * np.power(b, 2)
+            * np.power(c, 2)
             * (
-                a ** 2 * b ** 2 * m ** 2
-                + a ** 2 * c ** 2 * k ** 2
-                - a ** 2 * k ** 2 * z ** 2
-                + 2 * a ** 2 * k * m * y * z
-                - a ** 2 * m ** 2 * y ** 2
-                + b ** 2 * c ** 2
-                - b ** 2 * m ** 2 * x ** 2
-                + 2 * b ** 2 * m * x * z
-                - b ** 2 * z ** 2
-                - c ** 2 * k ** 2 * x ** 2
-                + 2 * c ** 2 * k * x * y
-                - c ** 2 * y ** 2
+                np.power(a, 2) * np.power(b, 2) * np.power(l, 2)
+                + np.power(a, 2) * np.power(c, 2) * np.power(k, 2)
+                - np.power(a, 2) * np.power(k, 2) * np.power(z, 2)
+                + 2 * np.power(a, 2) * k * l * y * z
+                - np.power(a, 2) * np.power(l, 2) * np.power(y, 2)
+                + np.power(b, 2) * np.power(c, 2)
+                - np.power(b, 2) * np.power(l, 2) * np.power(x, 2)
+                + 2 * np.power(b, 2) * l * x * z
+                - np.power(b, 2) * np.power(z, 2)
+                - np.power(c, 2) * np.power(k, 2) * np.power(x, 2)
+                + 2 * np.power(c, 2) * k * x * y
+                - np.power(c, 2) * np.power(y, 2)
             )
         )
-    ) / (a ** 2 * b ** 2 * m ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
-    p0, p1 = [x + t0, y + k * t0, z + m * t0], [x + t1, y + t1 * k, z + t1 * m]
+    ) / (
+        np.power(a, 2) * np.power(b, 2) * np.power(l, 2)
+        + np.power(a, 2) * np.power(c, 2) * np.power(k, 2)
+        + np.power(b, 2) * np.power(c, 2)
+    )
+    p0, p1 = [x + t0, y + k * t0, z + l * t0], [x - t1, y - t1 * k, z - t1 * l]
 
     return p0, p1
+
+
+def magnitude(u, v):
+    return np.sqrt(sum([(a - b) ** 2 for a, b in zip(u, v)]))

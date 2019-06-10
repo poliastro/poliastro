@@ -11,8 +11,13 @@ from poliastro.czml.czml_extract_default_params import (
     CUSTOM_PACKET,
     DEFAULTS,
     GROUNDSTATION_DEFAULTS,
+    SATTELITE_PASS_PACKET,
 )
-from poliastro.czml.utils import ellipsoidal_to_cartesian
+from poliastro.czml.utils import (
+    ellipsoidal_to_cartesian,
+    intersection_ellipsoid_line,
+    magnitude,
+)
 from poliastro.twobody.propagation import propagate
 
 
@@ -535,3 +540,72 @@ class CZMLExtractor:
         """
         return Time(date, format="isot")
 
+    def connect_gs_sat(self, gs, orbit, rtol=1e-4):
+
+        self.czml[str(gs) + "/" + str(orbit)] = copy.deepcopy(SATTELITE_PASS_PACKET)
+
+        self.parse_dict_tuples(
+            [str(gs) + "/" + str(orbit)], [("id", str(gs) + "/" + str(orbit))]
+        )
+
+        self.parse_dict_tuples(
+            [str(gs) + "/" + str(orbit), "polyline", "positions"],
+            [
+                (
+                    "references",
+                    [str("GS") + str(gs) + "#position", str(orbit) + "#position"],
+                )
+            ],
+        )
+
+        visible_block = False
+
+        pos_traj = self.czml[orbit]["position"]["cartesian"]
+        pos_gs = self.czml["GS" + str(gs)]["position"]["cartesian"]
+        sepoch = Time(self.start_epoch)
+        start_epoch = sepoch
+
+        # Check if ellipsoid is defined
+        if not self.cust_prop[0]:
+            a, b, c = 6378137.0, 6378137.0, 6356752.3142451793
+
+        for i in range(0, len(pos_traj), 4):
+            t, s_cords = pos_traj[i], pos_traj[i + 1 : i + 4]
+            intersection_p = intersection_ellipsoid_line(
+                a,
+                b,
+                c,
+                s_cords[0] - pos_gs[0],
+                s_cords[1] - pos_gs[1],
+                s_cords[2] - pos_gs[2],
+                pos_gs[0],
+                pos_gs[1],
+                pos_gs[2],
+            )
+
+            # Get the point of intersection to the ellipsoid
+            if magnitude(s_cords, intersection_p[1]) > magnitude(
+                s_cords, intersection_p[0]
+            ):
+                P = intersection_p[0]
+            else:
+                P = intersection_p[1]
+
+            if magnitude(P, pos_gs) <= rtol and visible_block is False:
+                visible_block = True
+
+                start_epoch = sepoch + TimeDelta(t, format="sec")
+
+            elif magnitude(P, pos_gs) > rtol and visible_block is True:
+                visible_block = False
+
+                end_epoch = sepoch + TimeDelta(t, format="sec")
+                epochr = start_epoch.value + "/" + end_epoch.value
+
+                packet = {"availability": epochr, "boolean": True}
+
+                self.czml[str(gs) + "/" + str(orbit)]["availability"].append(epochr)
+                self.czml[str(gs) + "/" + str(orbit)]["polyline"]["show"].append(packet)
+
+        print(pos_gs)
+        print(self.czml[str(gs) + "/" + str(orbit)])
