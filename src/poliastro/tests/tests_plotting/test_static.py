@@ -1,5 +1,6 @@
 import astropy.units as u
 import matplotlib.pyplot as plt
+import pytest
 
 from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.examples import iss
@@ -116,3 +117,12 @@ def test_redraw_keeps_trajectories():
     op.set_frame(*mars.pqw())
 
     assert len(op.trajectories) == 2
+
+
+@pytest.mark.mpl_image_compare
+def test_trail_plotting():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(iss, trail=True)
+
+    return fig
