@@ -19,7 +19,8 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.iod import lambert
+from poliastro.maneuver import Maneuver
+from poliastro.twobody.orbit import Orbit
 from poliastro.util import norm
 
 
@@ -48,29 +49,36 @@ def _get_state(body, time):
         rr = coord.CartesianRepresentation(rr)
         vv = coord.CartesianRepresentation(vv)
 
-    return rr, vv
+    return rr.xyz, vv.xyz
 
 
 def _targetting(departure_body, target_body, t_launch, t_arrival):
-    """This function returns the increment in departure and arrival velocities.
+    """This function returns the increment in departure and arrival velocities."""
 
-    """
-
+    # Get position and velocities for departure and arrival
     rr_dpt_body, vv_dpt_body = _get_state(departure_body, t_launch)
     rr_arr_body, vv_arr_body = _get_state(target_body, t_arrival)
 
-    # Compute time of flight
-    tof = t_arrival - t_launch
+    # Transform into Orbit objects
+    attractor = departure_body.parent
+    ss_dpt = Orbit.from_vectors(attractor, rr_dpt_body, vv_dpt_body, epoch=t_launch)
+    ss_arr = Orbit.from_vectors(attractor, rr_arr_body, vv_arr_body, epoch=t_arrival)
+
+    # Define time of flight
+    tof = ss_arr.epoch - ss_dpt.epoch
 
     if tof <= 0:
         return None, None, None, None, None
 
     try:
-        (v_dpt, v_arr), = lambert(Sun.k, rr_dpt_body.xyz, rr_arr_body.xyz, tof)
+        # Lambert is now a Maneuver object
+        man_lambert = Maneuver.lambert(ss_dpt, ss_arr)
+
+        # Get norm delta velocities
+        dv_dpt = norm(man_lambert.impulses[0][1])
+        dv_arr = norm(man_lambert.impulses[1][1])
 
         # Compute all the output variables
-        dv_dpt = norm(v_dpt - vv_dpt_body.xyz)
-        dv_arr = norm(v_arr - vv_arr_body.xyz)
         c3_launch = dv_dpt ** 2
         c3_arrival = dv_arr ** 2
 

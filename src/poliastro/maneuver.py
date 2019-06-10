@@ -6,6 +6,7 @@ from astropy import units as u
 
 from poliastro.core.elements import coe_rotation_matrix, rv_pqw
 from poliastro.core.util import cross
+from poliastro.iod.izzo import lambert as lambert_izzo
 from poliastro.util import norm
 
 
@@ -234,6 +235,41 @@ class Maneuver(object):
         t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
 
         return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
+
+    @classmethod
+    def lambert(cls, orbit_i, orbit_f, method=lambert_izzo, short=True, **kwargs):
+        """ Computes lambert maneuver between two different points.
+
+        Parameters
+        ----------
+        orbit_i: ~poliastro.twobody.Orbit
+            Initial orbit
+        orbit_f: ~poliastro.twobody.Orbit
+            Final orbit
+        method: function
+            Method for solving Lambert's problem
+        short: keyword, boolean
+            Selects between short and long solution
+        """
+
+        # Get initial algorithm conditions
+        k = orbit_i.attractor.k
+        r_i = orbit_i.r
+        r_f = orbit_f.r
+
+        # Time of flight is solved by substracting both orbit epochs
+        tof = orbit_f.epoch - orbit_i.epoch
+
+        # Compute all posible solutions to the Lambert transfer
+        sols = list(method(k, r_i, r_f, tof, **kwargs))
+
+        # Return short or long solution
+        if short:
+            dv_a, dv_b = sols[0]
+        else:
+            dv_a, dv_b = sols[-1]
+
+        return cls((0 * u.s, dv_a - orbit_i.v), (tof.to(u.s), orbit_f.v - dv_b))
 
     def get_total_time(self):
         """Returns total time of the maneuver.
