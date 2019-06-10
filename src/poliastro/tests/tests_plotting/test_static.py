@@ -1,6 +1,6 @@
-import astropy.units as u
 import matplotlib.pyplot as plt
 import pytest
+from astropy.coordinates import ICRS
 
 from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.examples import iss
@@ -16,12 +16,10 @@ def test_orbitplotter_has_axes():
 
 def test_set_frame():
     op = StaticOrbitPlotter()
-    p = [1, 0, 0] * u.one
-    q = [0, 1, 0] * u.one
-    w = [0, 0, 1] * u.one
-    op.set_frame(p, q, w)
+    frame = ICRS
+    op.set_frame(frame)
 
-    assert op._frame == (p, q, w)
+    assert op._frame == frame
 
 
 def test_axes_labels_and_title():
@@ -98,7 +96,7 @@ def test_set_frame_plots_same_colors():
     jupiter = Orbit.from_body_ephem(Jupiter)
     op.plot(jupiter)
     colors1 = [orb[2] for orb in op.trajectories]
-    op.set_frame(*jupiter.pqw())
+    op.set_frame(jupiter.get_perifocal_frame())
     colors2 = [orb[2] for orb in op.trajectories]
     assert colors1 == colors2
 
@@ -114,7 +112,7 @@ def test_redraw_keeps_trajectories():
 
     assert len(op.trajectories) == 2
 
-    op.set_frame(*mars.pqw())
+    op.set_frame(mars.get_perifocal_frame())
 
     assert len(op.trajectories) == 2
 

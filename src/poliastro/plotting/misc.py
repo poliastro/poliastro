@@ -27,15 +27,16 @@ def _plot_bodies(orbit_plotter, outer=True, epoch=None):
 
 
 def _plot_solar_system_2d(outer=True, epoch=None, interactive=False):
-    pqw = Orbit.from_body_ephem(Earth, epoch).pqw()
     if interactive:
         orbit_plotter = (
             OrbitPlotter2D()
         )  # type: Union[OrbitPlotter2D, StaticOrbitPlotter]
-        orbit_plotter.set_frame(*pqw)
+        orbit_plotter.set_frame(*Orbit.from_body_ephem(Earth, epoch).pqw())
     else:
         orbit_plotter = StaticOrbitPlotter()
-        orbit_plotter.set_frame(*pqw)
+        orbit_plotter.set_frame(
+            Orbit.from_body_ephem(Earth, epoch).get_perifocal_frame()
+        )
 
     _plot_bodies(orbit_plotter, outer, epoch)
 

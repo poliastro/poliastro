@@ -605,9 +605,7 @@ def test_orbit_from_horizons_has_expected_elements():
         epoch,
     )
     ss1 = Orbit.from_horizons(name="Ceres", epoch=epoch)
-    assert ss.pqw()[0].value.all() == ss1.pqw()[0].value.all()
-    assert ss.r_a == ss1.r_a
-    assert ss.a == ss1.a
+    assert ss.classical() == ss1.classical()
 
 
 @pytest.mark.remote_data

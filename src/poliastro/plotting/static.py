@@ -9,7 +9,6 @@ from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
-from poliastro.util import norm
 
 from ._base import Trajectory
 
@@ -63,20 +62,11 @@ class StaticOrbitPlotter:
     def trajectories(self):
         return self._trajectories
 
-    def set_frame(self, p_vec, q_vec, w_vec):
+    def set_frame(self, frame):
         """Sets perifocal frame.
 
-        Raises
-        ------
-        ValueError
-            If the vectors are not a set of mutually orthogonal unit vectors.
         """
-        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
-            raise ValueError("Vectors must be unit.")
-        elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
-            raise ValueError("Vectors must be mutually orthogonal.")
-        else:
-            self._frame = p_vec, q_vec, w_vec
+        self._frame = frame
 
         if self._trajectories:
             self._redraw()
@@ -104,8 +94,7 @@ class StaticOrbitPlotter:
         self.ax.autoscale()
 
     def _plot_trajectory(self, trajectory, colors=None, linestyle="dashed"):
-        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
-        x, y = self._project(rr)
+        x, y = self._project(trajectory)
 
         if len(colors) > 1:
             segments = _segments_from_arrays(x, y)
@@ -144,9 +133,14 @@ class StaticOrbitPlotter:
         if self._attractor is None or self._frame is None:
             raise ValueError(
                 "An attractor and a frame must be set up first, please use "
-                "set_attractor(Major_Body) and set_frame(*orbit.pqw()) "
+                "set_attractor(Major_Body) and set_frame(orbit.get_perifocal_frame()) "
                 "or plot(orbit)."
             )
+
+        # Strip velocities from trajectory if present
+        # HACK: Is there a better way?
+        trajectory = trajectory.copy()
+        trajectory.data.differentials.pop("s", None)
 
         self._redraw_attractor(
             trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
@@ -183,10 +177,8 @@ class StaticOrbitPlotter:
             )
 
     def _project(self, rr):
-        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
-        x = rr_proj.dot(self._frame[0])
-        y = rr_proj.dot(self._frame[1])
-        return x, y
+        rr_proj = rr.transform_to(self._frame).represent_as(CartesianRepresentation)
+        return rr_proj.x, rr_proj.y
 
     def _redraw_attractor(self, min_radius=0 * u.km):
         radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
@@ -239,7 +231,7 @@ class StaticOrbitPlotter:
 
         """
         if not self._frame:
-            self.set_frame(*orbit.pqw())
+            self.set_frame(orbit.get_perifocal_frame())
 
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
@@ -249,8 +241,14 @@ class StaticOrbitPlotter:
         if label:
             label = generate_label(orbit, label)
 
-        colors = self._get_colors(color, trail)
-        lines, colors = self._plot(positions, orbit.r, label, colors)
+        # Use of a protected method instead of frame.realize_frame
+        # because the latter does not let the user choose the representation type
+        # in one line despite its parameter names, see
+        # https://github.com/astropy/astropy/issues/7784
+        r_framed = orbit.frame._replicate(orbit.r, representation_type="cartesian")
 
-        self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
+        colors = self._get_colors(color, trail)
+        lines, colors = self._plot(positions, r_framed, label, colors)
+
+        self._trajectories.append(Trajectory(positions, r_framed, label, colors))
         return lines
