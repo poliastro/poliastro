@@ -18,8 +18,6 @@ from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
-from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
-from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
@@ -1168,8 +1166,14 @@ class Orbit(object):
                 "The static plotter does not support 3D, use `interactive=True`"
             )
         elif not interactive:
+            from poliastro.plotting.static import StaticOrbitPlotter
+
             return StaticOrbitPlotter().plot(self, label=label)
         elif use_3d:
+            from poliastro.plotting.core import OrbitPlotter3D
+
             return OrbitPlotter3D().plot(self, label=label)
         else:
+            from poliastro.plotting.core import OrbitPlotter2D
+
             return OrbitPlotter2D().plot(self, label=label)
