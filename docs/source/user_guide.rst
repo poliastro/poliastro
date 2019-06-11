@@ -393,11 +393,17 @@ flight is known in celestial mechanics as **Lambert's problem**, also
 known as two point boundary value problem. This contrasts with Kepler's
 problem or propagation, which is rather an initial value problem.
 
-The package :py:obj:`poliastro.iod` allows as to solve Lambert's problem,
-provided the main attractor's gravitational constant, the two position
-vectors and the time of flight. As you can imagine, being able to compute
-the positions of the planets as we saw in the previous section is the
+The package :py:obj:`poliastro.iod` holds the different raw algorithms to solve
+Lambert's problem, provided the main attractor's gravitational constant, the
+two position vectors and the time of flight. As you can imagine, being able to
+compute the positions of the planets as we saw in the previous section is the
 perfect complement to this feature!
+
+Since poliastro version 0.13 it is possible to solve Lambert's problem by making
+use of the :py:obj:`poliastro.maneuver` module. We just need to pass as
+arguments the initial and final orbits and the output will be a
+:py:obj:`poliastro.maneuver.Maneuver` instance. Time of flight is computed
+internally since orbits epochs are known.
 
 For instance, this is a simplified version of the example
 `Going to Mars with Python using poliastro`_, where the orbit of the
@@ -407,20 +413,19 @@ Mars Science Laboratory mission (rover Curiosity) is determined:
 
     date_launch = time.Time('2011-11-26 15:02', scale='utc')
     date_arrival = time.Time('2012-08-06 05:17', scale='utc')
-    tof = date_arrival - date_launch
 
     ss0 = Orbit.from_body_ephem(Earth, date_launch)
     ssf = Orbit.from_body_ephem(Mars, date_arrival)
 
-    from poliastro import iod
-    (v0, v), = iod.lambert(Sun.k, ss0.r, ssf.r, tof)
+    man_lambert = Maneuver.lambert(ss0, ssf)
+    dv_a, dv_b = man_lambert.impulses
 
 And these are the results::
 
-    >>> v0
-    <Quantity [-29.29150998, 14.53326521,  5.41691336] km / s>
-    >>> v
-    <Quantity [ 17.6154992 ,-10.99830723, -4.20796062] km / s>
+    >>> dv_a
+    (<Quantity 0. s>, <Quantity [-2.06420561,  2.58796837,  0.23911543] km / s>)
+    >>> dv_b
+    (<Quantity 21910501.00019529 s>, <Quantity [287832.91384349,  58935.96079319, -94156.93383463] km / d>)
 
 .. figure:: _static/msl.png
    :align: center
