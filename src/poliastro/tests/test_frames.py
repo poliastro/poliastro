@@ -123,9 +123,9 @@ def test_round_trip_from_GeocentricSolarEcliptic_gives_same_results():
 
 def test_GeocentricSolarEcliptic_against_data():
     gcrs = GCRS(ra="02h31m49.09s", dec="+89d15m50.8s", distance=200 * u.km)
-    gse = gcrs.transform_to(GeocentricSolarEcliptic(obstime=Time("J2000")))
-    lon = 233.11663895663975
-    lat = 48.64652559835358
+    gse = gcrs.transform_to(GeocentricSolarEcliptic(obstime=J2000))
+    lon = 233.11691362602866
+    lat = 48.64606410986667
     assert_quantity_allclose(gse.lat.value, lat, atol=1e-7)
     assert_quantity_allclose(gse.lon.value, lon, atol=1e-7)
 
