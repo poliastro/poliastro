@@ -44,6 +44,7 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.mathjax',  # Maths visualization
     'sphinx.ext.graphviz',  # Dependency diagrams
+    'notfound.extension',
 ]
 
 # Custom configuration
