@@ -45,7 +45,6 @@ from poliastro.frames import (
     VenusICRS,
     get_frame,
 )
-from poliastro.twobody.angles import M_to_nu
 from poliastro.twobody.orbit import Orbit, OrbitSamplingWarning, TimeScaleWarning
 
 
@@ -591,12 +590,12 @@ def test_orbit_from_horizons_has_expected_elements():
     # Taken from https://ssd.jpl.nasa.gov/horizons.cgi
     ss = Orbit.from_classical(
         Sun,
-        2.767107592216510 * u.au,
-        7.554803091400027e-2 * u.one,
-        2.718502494739172e1 * u.deg,
-        2.336913218336299e1 * u.deg,
-        1.322919809219236e2 * u.deg,
-        2.128957916690369e1 * u.deg,
+        2.76710759221651 * u.au,
+        0.07554803091400027 * u.one,
+        27.18502494739172 * u.deg,
+        23.36913218336299 * u.deg,
+        132.2919809219236 * u.deg,
+        21.28957916690369 * u.deg,
         epoch,
     )
     ss1 = Orbit.from_horizons(name="Ceres", epoch=epoch)
@@ -887,7 +886,7 @@ def test_from_sbdb():
             10.59406704424526 * u.deg,
             80.30553156826473 * u.deg,
             73.597694115971 * u.deg,
-            M_to_nu(77.37209588584763 * u.deg, 0.07600902910070946 * u.one),
+            86.01851107780747 * u.deg,
         )
     }
 
