@@ -8,6 +8,7 @@ from astropy.coordinates import (
     Angle,
     CartesianDifferential,
     CartesianRepresentation,
+    get_body_barycentric,
     get_body_barycentric_posvel,
 )
 from astroquery.jplhorizons import Horizons
@@ -18,6 +19,7 @@ from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
+from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
@@ -418,6 +420,37 @@ class Orbit(object):
             # Barycenter
             ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
             ss._frame = ICRS()  # Hack!
+
+        return ss
+
+    def change_attractor(self, new_attractor, plane=Planes.EARTH_EQUATOR):
+        """ Changes orbit attractor.
+
+        Parameters
+        ----------
+        new_attractor: poliastro.bodies.Body
+            Desired new attractor
+        plane: poliastro.frames.Planes
+            Reference plane
+
+        Returns
+        -------
+        ss: poliastro.twobody.orbit.Orbit
+            Orbit with new attractor
+
+        """
+
+        # Check if we are insde new attractor's SOI
+        r_soi = laplace_radius(new_attractor)
+        distance = norm(
+            self.r - get_body_barycentric(new_attractor.name, epoch=self.epoch).xyz
+        )
+        if distance > r_soi:
+            raise ValueError("Body is out of new attractor's SOI.")
+
+        new_frame = get_frame(new_attractor, plane, obstime=self.epoch)
+        coords = self.frame.realize_frame(self.represent_as(CartesianRepresentation))
+        ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
 
         return ss
 

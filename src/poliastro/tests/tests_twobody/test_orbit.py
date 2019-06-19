@@ -29,6 +29,7 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000, J2000_TDB
+from poliastro.examples import iss
 from poliastro.frames import (
     GCRS,
     HCRS,
@@ -915,3 +916,9 @@ def test_orbit_wrong_dimensions_fails():
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_vectors(Earth, bad_r, bad_v)
     assert "ValueError: Vectors must have dimension 1, got 2 and 3" in excinfo.exconly()
+
+
+def test_orbit_change_attractor_error():
+    with pytest.raises(ValueError) as excinfo:
+        iss.change_attractor(Sun)
+    assert "ValueError: Body is out of new attractor's SOI." in excinfo.exconly()
