@@ -440,13 +440,27 @@ class Orbit(object):
 
         """
 
-        # Check if we are insde new attractor's SOI
         r_soi = laplace_radius(new_attractor)
         distance = norm(
-            self.r - get_body_barycentric(new_attractor.name, epoch=self.epoch).xyz
+            self.r - get_body_barycentric(new_attractor.name, self.epoch).xyz
         )
-        if distance > r_soi:
-            raise ValueError("Body is out of new attractor's SOI.")
+
+        # If current attractor is the Sun
+        if self.attractor == Sun:
+            # Check if orbit is out of new attractor's SOI
+            if distance > r_soi:
+                raise ValueError("Orbit is out of new attractor's SOI.")
+        else:
+            r_soi_current = laplace_radius(self.attractor)
+            # Check if orbit is closed and inside of its attractor's SOI
+            if self.ecc < 1.0 and norm(self.r) <= r_soi_current:
+                raise ValueError(
+                    "Orbit will never leave the SOI of its current attractor."
+                )
+
+            # Check if orbit is open and inside of its attractor's SOI
+            if self.ecc >= 1.0 and norm(self.r) <= r_soi_current:
+                warn("Leaving the SOI of the current attractor")
 
         new_frame = get_frame(new_attractor, plane, obstime=self.epoch)
         coords = self.frame.realize_frame(self.represent_as(CartesianRepresentation))

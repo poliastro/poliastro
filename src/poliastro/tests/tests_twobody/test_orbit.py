@@ -918,7 +918,25 @@ def test_orbit_wrong_dimensions_fails():
     assert "ValueError: Vectors must have dimension 1, got 2 and 3" in excinfo.exconly()
 
 
-def test_orbit_change_attractor_error():
+def test_orbit_change_attractor():
+    Io = 501  # Id for Io moon
+    ss_io = Orbit.from_horizons(Io, epoch=J2000, id_type="majorbody")
+    ss_io = ss_io.change_attractor(Jupiter)
+    assert Jupiter == ss_io.attractor
+
+
+def test_orbit_change_attractor_out_of_SOI():
+    Io = 501  # Id for Io moon
+    ss_io = Orbit.from_horizons(Io, epoch=J2000, id_type="majorbody")
     with pytest.raises(ValueError) as excinfo:
-        iss.change_attractor(Sun)
-    assert "ValueError: Body is out of new attractor's SOI." in excinfo.exconly()
+        ss_io.change_attractor(Earth)
+    assert "ValueError: Orbit is out of new attractor's SOI." in excinfo.exconly()
+
+
+def test_orbit_change_attractor_orbit_closed():
+    with pytest.raises(ValueError) as excinfo:
+        iss.change_attractor(Mars)
+    assert (
+        "ValueError: Orbit will never leave the SOI of its current attractor."
+        in excinfo.exconly()
+    )
