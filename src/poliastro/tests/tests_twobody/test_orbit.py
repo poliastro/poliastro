@@ -29,6 +29,7 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000, J2000_TDB
+from poliastro.examples import iss
 from poliastro.frames import (
     GCRS,
     HCRS,
@@ -45,7 +46,12 @@ from poliastro.frames import (
     VenusICRS,
     get_frame,
 )
-from poliastro.twobody.orbit import Orbit, OrbitSamplingWarning, TimeScaleWarning
+from poliastro.twobody.orbit import (
+    Orbit,
+    OrbitSamplingWarning,
+    PatchedConicsWarning,
+    TimeScaleWarning,
+)
 
 
 @pytest.fixture()
@@ -875,10 +881,8 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 
 
 def test_from_sbdb():
-
     # Dictionary with structure: 'Object': [a, e, i, raan, argp, nu, epoch]
     # Notice JPL provides Mean anomaly, a conversion is needed to obtain nu
-
     SBDB_DATA = {
         "Ceres": (
             2.76916515450648 * u.AU,
@@ -915,3 +919,54 @@ def test_orbit_wrong_dimensions_fails():
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_vectors(Earth, bad_r, bad_v)
     assert "ValueError: Vectors must have dimension 1, got 2 and 3" in excinfo.exconly()
+
+
+def test_orbit_change_attractor():
+    Io = 501  # Id for Io moon
+    ss_io = Orbit.from_horizons(Io, epoch=J2000, id_type="majorbody")
+    ss_io = ss_io.change_attractor(Jupiter)
+    assert Jupiter == ss_io.attractor
+
+
+def test_orbit_change_attractor_returns_self():
+    assert iss.change_attractor(iss.attractor) is iss
+
+
+def test_orbit_change_attractor_out_of_SOI():
+    ss = Orbit.from_vectors(
+        Sun,
+        r=[5.98967334e08, 4.09500684e08, 1.60955500e08] * u.km,
+        v=[-13.30694373, 25.15256978, 11.59846936] * u.km / u.s,
+        epoch=J2000,
+    )
+
+    with pytest.raises(ValueError) as excinfo:
+        ss.change_attractor(Earth)
+    assert "ValueError: Orbit is out of new attractor's SOI" in excinfo.exconly()
+
+
+def test_orbit_change_attractor_unrelated_body():
+    with pytest.raises(ValueError) as excinfo:
+        iss.change_attractor(Mars)
+    assert "ValueError: Cannot change to unrelated attractor" in excinfo.exconly()
+
+
+def test_orbit_change_attractor_closed():
+    with pytest.raises(ValueError) as excinfo:
+        iss.change_attractor(Sun)
+    assert (
+        "ValueError: Orbit will never leave the SOI of its current attractor"
+        in excinfo.exconly()
+    )
+
+
+def test_orbit_change_attractor_open():
+    r = [-6045, -3490, 2500] * u.km
+    v = [-15.457, 6.618, 2.533] * u.km / u.s
+    ss = Orbit.from_vectors(Earth, r, v)
+
+    with pytest.warns(PatchedConicsWarning) as record:
+        ss.change_attractor(Sun)
+
+    assert len(record) == 1
+    assert "Leaving the SOI of the current attractor" in record[0].message.args[0]

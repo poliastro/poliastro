@@ -8,6 +8,7 @@ from astropy.coordinates import (
     Angle,
     CartesianDifferential,
     CartesianRepresentation,
+    get_body_barycentric,
     get_body_barycentric_posvel,
 )
 from astroquery.jplhorizons import Horizons
@@ -18,6 +19,7 @@ from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
+from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
@@ -44,6 +46,10 @@ class TimeScaleWarning(UserWarning):
 
 
 class OrbitSamplingWarning(UserWarning):
+    pass
+
+
+class PatchedConicsWarning(UserWarning):
     pass
 
 
@@ -418,6 +424,48 @@ class Orbit(object):
             # Barycenter
             ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
             ss._frame = ICRS()  # Hack!
+
+        return ss
+
+    def change_attractor(self, new_attractor):
+        """Changes orbit attractor.
+
+        Only changes from attractor to parent or the other way around are allowed.
+
+        Parameters
+        ----------
+        new_attractor: poliastro.bodies.Body
+            Desired new attractor.
+
+        Returns
+        -------
+        ss: poliastro.twobody.orbit.Orbit
+            Orbit with new attractor
+
+        """
+        if self.attractor == new_attractor:
+            return self
+        elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
+            r_soi = laplace_radius(new_attractor)
+            distance = norm(
+                self.r - get_body_barycentric(new_attractor.name, self.epoch).xyz
+            )
+        elif self.attractor.parent == new_attractor:  # "Earth -> Sun"
+            r_soi = laplace_radius(self.attractor)
+            distance = norm(self.r)
+        else:
+            raise ValueError("Cannot change to unrelated attractor")
+
+        if distance > r_soi:
+            raise ValueError("Orbit is out of new attractor's SOI")
+        elif self.ecc < 1.0:
+            raise ValueError("Orbit will never leave the SOI of its current attractor")
+        else:
+            warn("Leaving the SOI of the current attractor", PatchedConicsWarning)
+
+        new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
+        coords = self.frame.realize_frame(self.represent_as(CartesianRepresentation))
+        ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
 
         return ss
 
