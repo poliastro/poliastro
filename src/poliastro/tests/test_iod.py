@@ -3,6 +3,7 @@ from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth
+from poliastro.core import iod
 from poliastro.iod import izzo, vallado
 
 
@@ -111,3 +112,12 @@ def test_collinear_vectors_input(lambert):
         "ValueError: Lambert solution cannot be computed for collinear vectors"
         in excinfo.exconly()
     )
+
+
+@pytest.mark.parametrize("M", [1, 2, 3])
+def test_minimum_time_of_flight_convergence(M):
+    ll = -1
+    x_T_min_expected, T_min_expected = iod._compute_T_min(ll, M, numiter=10, rtol=1e-8)
+    y = iod._compute_y(x_T_min_expected, ll)
+    T_min = iod._tof_equation_y(x_T_min_expected, y, 0.0, ll, M)
+    assert T_min_expected == T_min

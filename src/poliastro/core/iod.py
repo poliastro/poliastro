@@ -315,8 +315,16 @@ def _compute_psi(x, y, ll):
 
 
 @jit
-def _tof_equation(x, y, T0, ll, M):
+def _tof_equation(x, T0, ll, M):
     """Time of flight equation.
+
+    """
+    return _tof_equation_y(x, _compute_y(x, ll), T0, ll, M)
+
+
+@jit
+def _tof_equation_y(x, y, T0, ll, M):
+    """Time of flight equation with externally computated y.
 
     """
     if M == 0 and np.sqrt(0.6) < x < np.sqrt(1.4):
@@ -359,7 +367,7 @@ def _compute_T_min(ll, M, numiter, rtol):
     """
     if ll == 1:
         x_T_min = 0.0
-        T_min = _tof_equation(x_T_min, _compute_y(x_T_min, ll), 0.0, ll, M)
+        T_min = _tof_equation(x_T_min, 0.0, ll, M)
     else:
         if M == 0:
             x_T_min = np.inf
@@ -367,10 +375,9 @@ def _compute_T_min(ll, M, numiter, rtol):
         else:
             # Set x_i > 0 to avoid problems at ll = -1
             x_i = 0.1
-            y = _compute_y(x_i, ll)
-            T_i = _tof_equation(x_i, y, 0.0, ll, M)
-            x_T_min = _halley(0.1, T_i, ll, rtol, numiter)
-            T_min = _tof_equation(x_T_min, y, 0.0, ll, M)
+            T_i = _tof_equation(x_i, 0.0, ll, M)
+            x_T_min = _halley(x_i, T_i, ll, rtol, numiter)
+            T_min = _tof_equation(x_T_min, 0.0, ll, M)
 
     return [x_T_min, T_min]
 
@@ -446,7 +453,7 @@ def _householder(p0, T0, ll, M, tol, maxiter):
     """
     for ii in range(maxiter):
         y = _compute_y(p0, ll)
-        fval = _tof_equation(p0, y, T0, ll, M)
+        fval = _tof_equation_y(p0, y, T0, ll, M)
         T = fval + T0
         fder = _tof_equation_p(p0, y, T, ll)
         fder2 = _tof_equation_p2(p0, y, T, fder, ll)
