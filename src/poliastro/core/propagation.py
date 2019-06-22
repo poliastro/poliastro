@@ -44,10 +44,10 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
 
 
 @jit
-def mean_motion(k, r0, v0, tof):
-    r"""Propagates orbit using mean motion. This algorithm depends on the geometric shape of the
-    orbit.
+def mean_motion(r0, v0, tof):
+    r"""Propagates orbit using mean motion.
 
+    This algorithm depends on the geometric shape of the orbit.
     For the case of the strong elliptic or strong hyperbolic orbits:
 
     ..  math::
@@ -56,14 +56,11 @@ def mean_motion(k, r0, v0, tof):
 
     .. versionadded:: 0.9.0
 
-
     Parameters
     ----------
-    k : float
-        Standar Gravitational parameter
-    r0 : ~astropy.units.Quantity
+    r0 : ~numpy.ndarray
         Initial position vector wrt attractor center.
-    v0 : ~astropy.units.Quantity
+    v0 : ~numpy.ndarray
         Initial velocity vector.
     tof : float
         Time of flight (s).
@@ -77,7 +74,7 @@ def mean_motion(k, r0, v0, tof):
     """
 
     # get the initial true anomaly and orbit parameters that are constant over time
-    p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
+    p, ecc, inc, raan, argp, nu0 = rv2coe(r0, v0)
 
     # get the initial mean anomaly
     M0 = nu_to_M(nu0, ecc)
@@ -86,21 +83,21 @@ def mean_motion(k, r0, v0, tof):
         a = p / (1.0 - ecc ** 2)
         # given the initial mean anomaly, calculate mean anomaly
         # at the end, mean motion (n) equals sqrt(mu / |a^3|)
-        M = M0 + tof * np.sqrt(k / np.abs(a ** 3))
+        M = M0 + tof * np.sqrt(1 / np.abs(a ** 3))
         nu = M_to_nu(M, ecc)
 
     # near-parabolic orbit
     else:
         q = p * np.abs(1.0 - ecc) / np.abs(1.0 - ecc ** 2)
         # mean motion n = sqrt(mu / 2 q^3) for parabolic orbit
-        M = M0 + tof * np.sqrt(k / 2.0 / (q ** 3))
+        M = M0 + tof * np.sqrt(1 / 2.0 / (q ** 3))
         nu = M_to_nu(M, ecc)
 
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    return coe2rv(p, ecc, inc, raan, argp, nu)
 
 
 @jit
-def kepler(k, r0, v0, tof, numiter):
+def kepler(r0, v0, tof, numiter):
     r"""Solves Kepler's Equation by applying a Newton-Raphson method.
 
     If the position of a body along its orbit wants to be computed
@@ -137,12 +134,9 @@ def kepler(k, r0, v0, tof, numiter):
 
     Parameters
     ----------
-
-    k: float
-        Standard gravitational parameter
-    r0: ~numpy.array
+    r0: ~numpy.ndarray
         Initial position vector
-    v0: ~numpy.array
+    v0: ~numpy.ndarray
         Initial velocity vector
     numiter: int
         Number of iterations
@@ -168,30 +162,29 @@ def kepler(k, r0, v0, tof, numiter):
     # Cache some results
     dot_r0v0 = np.dot(r0, v0)
     norm_r0 = np.dot(r0, r0) ** 0.5
-    sqrt_mu = k ** 0.5
-    alpha = -np.dot(v0, v0) / k + 2 / norm_r0
+    alpha = -np.dot(v0, v0) + 2 / norm_r0
 
     # First guess
     if alpha > 0:
         # Elliptic orbit
-        xi_new = sqrt_mu * tof * alpha
+        xi_new = tof * alpha
     elif alpha < 0:
         # Hyperbolic orbit
         xi_new = (
             np.sign(tof)
             * (-1 / alpha) ** 0.5
             * np.log(
-                (-2 * k * alpha * tof)
+                (-2 * alpha * tof)
                 / (
                     dot_r0v0
-                    + np.sign(tof) * np.sqrt(-k / alpha) * (1 - norm_r0 * alpha)
+                    + np.sign(tof) * np.sqrt(-1 / alpha) * (1 - norm_r0 * alpha)
                 )
             )
         )
     else:
         # Parabolic orbit
         # (Conservative initial guess)
-        xi_new = sqrt_mu * tof / norm_r0
+        xi_new = tof / norm_r0
 
     # Newton-Raphson iteration on the Kepler equation
     count = 0
@@ -202,15 +195,15 @@ def kepler(k, r0, v0, tof, numiter):
         c3_psi = c3(psi)
         norm_r = (
             xi * xi * c2_psi
-            + dot_r0v0 / sqrt_mu * xi * (1 - psi * c3_psi)
+            + dot_r0v0 / xi * (1 - psi * c3_psi)
             + norm_r0 * (1 - psi * c2_psi)
         )
         xi_new = (
             xi
             + (
-                sqrt_mu * tof
+                tof
                 - xi * xi * xi * c3_psi
-                - dot_r0v0 / sqrt_mu * xi * xi * c2_psi
+                - dot_r0v0 * xi * xi * c2_psi
                 - norm_r0 * xi * (1 - psi * c3_psi)
             )
             / norm_r
@@ -224,10 +217,10 @@ def kepler(k, r0, v0, tof, numiter):
 
     # Compute Lagrange coefficients
     f = 1 - xi ** 2 / norm_r0 * c2_psi
-    g = tof - xi ** 3 / sqrt_mu * c3_psi
+    g = tof - xi ** 3 * c3_psi
 
     gdot = 1 - xi ** 2 / norm_r * c2_psi
-    fdot = sqrt_mu / (norm_r * norm_r0) * xi * (psi * c3_psi - 1)
+    fdot = 1 / (norm_r * norm_r0) * xi * (psi * c3_psi - 1)
 
     return f, g, fdot, gdot
 

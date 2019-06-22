@@ -40,6 +40,7 @@ from poliastro.core.propagation import (
     pimienta as pimienta_fast,
 )
 from poliastro.integrators import DOP835
+from poliastro.util import norm
 
 
 def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
@@ -139,16 +140,18 @@ def mean_motion(k, r, v, tofs, **kwargs):
         Propagated velocity vectors.
 
     """
-    k = k.to(u.km ** 3 / u.s ** 2).value
-    r0 = r.to(u.km).value
-    v0 = v.to(u.km / u.s).value
-    tofs = tofs.to(u.s).value
+    DU = u.def_unit("DU", norm(r))
+    TU = u.def_unit("TU", np.sqrt((1 * DU) ** 3 / k))
 
-    results = [mean_motion_fast(k, r0, v0, tof) for tof in tofs]
+    r0 = r.to(DU).value
+    v0 = v.to(DU / TU).value
+    tofs = tofs.to(TU).value
+
+    results = [mean_motion_fast(r0, v0, tof) for tof in tofs]
     # TODO: Rewrite to avoid iterating twice
     return (
-        [result[0] for result in results] * u.km,
-        [result[1] for result in results] * u.km / u.s,
+        ([result[0] for result in results] * DU).to(u.km),
+        ([result[1] for result in results] * DU / TU).to(u.km / u.s),
     )
 
 
@@ -188,22 +191,24 @@ def kepler(k, r, v, tofs, numiter=350, **kwargs):
     and 85 % faster.
 
     """
-    k = k.to(u.km ** 3 / u.s ** 2).value
-    r0 = r.to(u.km).value
-    v0 = v.to(u.km / u.s).value
-    tofs = tofs.to(u.s).value
+    DU = u.def_unit("DU", norm(r))
+    TU = u.def_unit("TU", np.sqrt((1 * DU) ** 3 / k))
 
-    results = [_kepler(k, r0, v0, tof, numiter=numiter) for tof in tofs]
+    r0 = r.to(DU).value
+    v0 = v.to(DU / TU).value
+    tofs = tofs.to(TU).value
+
+    results = [_kepler(r0, v0, tof, numiter=numiter) for tof in tofs]
     # TODO: Rewrite to avoid iterating twice
     return (
-        [result[0] for result in results] * u.km,
-        [result[1] for result in results] * u.km / u.s,
+        ([result[0] for result in results] * DU).to(u.km),
+        ([result[1] for result in results] * DU / TU).to(u.km / u.s),
     )
 
 
-def _kepler(k, r0, v0, tof, *, numiter):
+def _kepler(r0, v0, tof, *, numiter):
     # Compute Lagrange coefficients
-    f, g, fdot, gdot = kepler_fast(k, r0, v0, tof, numiter)
+    f, g, fdot, gdot = kepler_fast(r0, v0, tof, numiter)
 
     assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
 

@@ -46,3 +46,12 @@ churi = Orbit.from_classical(
     time.Time("2015-11-05 12:00", scale="utc"),
 )
 """Comet 67P/Churyumov–Gerasimenko orbit example"""
+
+
+# TODO: Make epoch explicit
+halley = Orbit.from_vectors(
+    Sun,
+    [-9018878.63569932, -94116054.79839276, 22619058.69943215] * u.km,
+    [-49.95092305, -12.94843055, -4.29251577] * u.km / u.s,
+)
+"""Halley's comet orbit example"""

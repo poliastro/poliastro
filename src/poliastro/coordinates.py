@@ -9,6 +9,7 @@ import astropy.units as u
 import numpy as np
 
 from poliastro.core.elements import rv2coe
+from poliastro.util import norm
 
 
 def inertial_body_centered_to_pqw(r, v, source_body):
@@ -28,15 +29,20 @@ def inertial_body_centered_to_pqw(r, v, source_body):
     r_pqw, v_pqw : tuple (~astropy.units.Quantity)
         Position and velocity vectors in ICRS.
 
-
     """
-    r = r.to("km").value
-    v = v.to("km/s").value
-    k = source_body.k.to("km^3 / s^2").value
+    DU = u.def_unit("DU", norm(r))
+    TU = u.def_unit("TU", np.sqrt((1 * DU) ** 3 / source_body.k))
 
-    p, ecc, inc, _, _, nu = rv2coe(k, r, v)
+    r = r.to(DU).value
+    v = v.to(DU / TU).value
 
-    r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T * u.km
-    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T * u.km / u.s
+    p, ecc, inc, _, _, nu = rv2coe(r, v)
+
+    r_pqw = (
+        (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T * DU
+    ).to(u.km)
+    v_pqw = ((np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(1 / p)).T * DU / TU).to(
+        u.km / u.s
+    )
 
     return r_pqw, v_pqw

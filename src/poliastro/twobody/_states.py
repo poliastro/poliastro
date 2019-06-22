@@ -1,6 +1,8 @@
+import numpy as np
 from astropy import units as u
 
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
+from poliastro.util import norm
 
 
 class BaseState(object):
@@ -103,9 +105,11 @@ class ClassicalState(BaseState):
         """Converts to position and velocity vector representation.
 
         """
+        DU = u.def_unit("DU", self.p)
+        TU = u.def_unit("TU", np.sqrt((1 * DU) ** 3 / self.attractor.k))
+
         r, v = coe2rv(
-            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-            self.p.to(u.km).value,
+            1,
             self.ecc.value,
             self.inc.to(u.rad).value,
             self.raan.to(u.rad).value,
@@ -113,7 +117,7 @@ class ClassicalState(BaseState):
             self.nu.to(u.rad).value,
         )
 
-        return RVState(self.attractor, r * u.km, v * u.km / u.s)
+        return RVState(self.attractor, (r * DU).to(u.km), (v * DU / TU).to(u.km / u.s))
 
     def to_classical(self):
         """Converts to classical orbital elements representation.
@@ -175,15 +179,16 @@ class RVState(BaseState):
         """Converts to classical orbital elements representation.
 
         """
+        DU = u.def_unit("DU", norm(self.r))
+        TU = u.def_unit("TU", np.sqrt((1 * DU) ** 3 / self.attractor.k))
+
         (p, ecc, inc, raan, argp, nu) = rv2coe(
-            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-            self.r.to(u.km).value,
-            self.v.to(u.km / u.s).value,
+            self.r.to(DU).value, self.v.to(DU / TU).value
         )
 
         return ClassicalState(
             self.attractor,
-            p * u.km,
+            (p * DU).to(u.km),
             ecc * u.one,
             inc * u.rad,
             raan * u.rad,

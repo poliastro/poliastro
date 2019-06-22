@@ -6,6 +6,7 @@ from astropy import units as u
 from numpy import cross
 
 from poliastro.core.elements import coe_rotation_matrix, rv_pqw
+from poliastro.core.util import cross, norm as norm_fast
 from poliastro.iod.izzo import lambert as lambert_izzo
 from poliastro.util import norm
 
@@ -95,8 +96,8 @@ class Maneuver(object):
             Initial orbit
         r_f: astropy.unit.Quantity
             Final altitude of the orbit
-        """
 
+        """
         # Propagate till periapsis
         if orbit_i.nu != 0 * u.deg:
             t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
@@ -104,34 +105,34 @@ class Maneuver(object):
         else:
             t_pericenter = 0 * u.s
 
+        # TODO: Move part of this to a core function?
+        DU = u.def_unit("DU", norm(orbit_i.r))
+        TU = u.def_unit("TU", np.sqrt((1 * DU) ** 3 / orbit_i.attractor.k))
+
+        r_f = r_f.to(DU).value
+
         # Initial orbit data
-        k = orbit_i.attractor.k
-        r_i = orbit_i.r
-        v_i = orbit_i.v
-        h_i = norm(cross(r_i.to(u.m).value, v_i.to(u.m / u.s).value) * u.m ** 2 / u.s)
-        p_i = h_i ** 2 / k.to(u.m ** 3 / u.s ** 2)
+        r_i = orbit_i.r.to(DU).value
+        v_i = orbit_i.v.to(DU / TU).value
+        h_i = cross(r_i, v_i)
+        p_i = h_i.dot(h_i)
 
         # Hohmann is defined always from the PQW frame, since it is the
         # natural plane of the orbit
-        r_i, v_i = rv_pqw(
-            k.to(u.m ** 3 / u.s ** 2).value,
-            p_i.to(u.m).value,
-            orbit_i.ecc.value,
-            orbit_i.nu.to(u.rad).value,
-        )
+        r_trans, v_trans = rv_pqw(p_i, orbit_i.ecc.value, orbit_i.nu.to(u.rad).value)
 
         # Now, we apply Hohmman maneuver
-        r_i = norm(r_i * u.m)
-        v_i = norm(v_i * u.m / u.s)
-        a_trans = (r_i + r_f) / 2
+        r_trans = norm_fast(r_trans)
+        v_trans = norm_fast(v_trans)
+        a_trans = (r_trans + r_f) / 2
 
         # This is the modulus of the velocities
-        dv_a = np.sqrt(2 * k / r_i - k / a_trans) - v_i
-        dv_b = np.sqrt(k / r_f) - np.sqrt(2 * k / r_f - k / a_trans)
+        dv_a = np.sqrt(2 / r_trans - 1 / a_trans) - v_trans
+        dv_b = np.sqrt(1 / r_f) - np.sqrt(2 / r_f - 1 / a_trans)
 
         # Write them in PQW frame
-        dv_a = np.array([0, dv_a.to(u.m / u.s).value, 0])
-        dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
+        dv_a = np.array([0, dv_a, 0])
+        dv_b = np.array([0, -dv_b, 0])
 
         # Transform to IJK frame
         rot_matrix = coe_rotation_matrix(
@@ -140,14 +141,14 @@ class Maneuver(object):
             orbit_i.argp.to(u.rad).value,
         )
 
-        dv_a = (rot_matrix @ dv_a) * u.m / u.s
-        dv_b = (rot_matrix @ dv_b) * u.m / u.s
+        dv_a = (rot_matrix @ dv_a) * DU / TU
+        dv_b = (rot_matrix @ dv_b) * DU / TU
 
-        t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
+        t_trans = np.pi * np.sqrt(a_trans ** 3) * TU
 
         return cls(
-            (t_pericenter.decompose(), dv_a.decompose()),
-            (t_trans.decompose(), dv_b.decompose()),
+            (t_pericenter.to(u.s), dv_a.to(u.m / u.s)),
+            (t_trans.to(u.s), dv_b.to(u.m / u.s)),
         )
 
     @classmethod
@@ -199,37 +200,37 @@ class Maneuver(object):
         else:
             t_pericenter = 0 * u.s
 
+        DU = u.def_unit("DU", norm(orbit_i.r))
+        TU = u.def_unit("TU", np.sqrt((1 * DU) ** 3 / orbit_i.attractor.k))
+
+        r_b = r_b.to(DU).value
+        r_f = r_f.to(DU).value
+
         # Initial orbit data
-        k = orbit_i.attractor.k
-        r_i = orbit_i.r
-        v_i = orbit_i.v
-        h_i = norm(cross(r_i.to(u.m).value, v_i.to(u.m / u.s).value) * u.m ** 2 / u.s)
-        p_i = h_i ** 2 / k.to(u.m ** 3 / u.s ** 2)
+        r_i = orbit_i.r.to(DU).value
+        v_i = orbit_i.v.to(DU / TU).value
+        h_i = cross(r_i, v_i)
+        p_i = h_i.dot(h_i)
 
         # Bielliptic is defined always from the PQW frame, since it is the
         # natural plane of the orbit
-        r_i, v_i = rv_pqw(
-            k.to(u.m ** 3 / u.s ** 2).value,
-            p_i.to(u.m).value,
-            orbit_i.ecc.value,
-            orbit_i.nu.to(u.rad).value,
-        )
+        r_trans1, v_trans1 = rv_pqw(p_i, orbit_i.ecc.value, orbit_i.nu.to(u.rad).value)
 
         # Define the transfer radius
-        r_i = norm(r_i * u.m)
-        v_i = norm(v_i * u.m / u.s)
-        a_trans1 = (r_i + r_b) / 2
+        r_trans1 = norm_fast(r_trans1)
+        v_trans1 = norm_fast(v_trans1)
+        a_trans1 = (r_trans1 + r_b) / 2
         a_trans2 = (r_b + r_f) / 2
 
         # Compute impulses
-        dv_a = np.sqrt(2 * k / r_i - k / a_trans1) - v_i
-        dv_b = np.sqrt(2 * k / r_b - k / a_trans2) - np.sqrt(2 * k / r_b - k / a_trans1)
-        dv_c = np.sqrt(k / r_f) - np.sqrt(2 * k / r_f - k / a_trans2)
+        dv_a = np.sqrt(2 / r_trans1 - 1 / a_trans1) - v_trans1
+        dv_b = np.sqrt(2 / r_b - 1 / a_trans2) - np.sqrt(2 / r_b - 1 / a_trans1)
+        dv_c = np.sqrt(1 / r_f) - np.sqrt(2 / r_f - 1 / a_trans2)
 
         # Write impulses in PQW frame
-        dv_a = np.array([0, dv_a.to(u.m / u.s).value, 0])
-        dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
-        dv_c = np.array([0, dv_c.to(u.m / u.s).value, 0])
+        dv_a = np.array([0, dv_a, 0])
+        dv_b = np.array([0, -dv_b, 0])
+        dv_c = np.array([0, dv_c, 0])
 
         rot_matrix = coe_rotation_matrix(
             orbit_i.inc.to(u.rad).value,
@@ -238,18 +239,18 @@ class Maneuver(object):
         )
 
         # Transform to IJK frame
-        dv_a = (rot_matrix @ dv_a) * u.m / u.s
-        dv_b = (rot_matrix @ dv_b) * u.m / u.s
-        dv_c = (rot_matrix @ dv_c) * u.m / u.s
+        dv_a = (rot_matrix @ dv_a) * DU / TU
+        dv_b = (rot_matrix @ dv_b) * DU / TU
+        dv_c = (rot_matrix @ dv_c) * DU / TU
 
         # Compute time for maneuver
-        t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
-        t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
+        t_trans1 = np.pi * np.sqrt(a_trans1 ** 3) * TU
+        t_trans2 = np.pi * np.sqrt(a_trans2 ** 3) * TU
 
         return cls(
-            (t_pericenter.decompose(), dv_a.decompose()),
-            (t_trans1.decompose(), dv_b.decompose()),
-            (t_trans2.decompose(), dv_c.decompose()),
+            (t_pericenter.to(u.s), dv_a.to(u.m / u.s)),
+            (t_trans1.to(u.s), dv_b.to(u.m / u.s)),
+            (t_trans2.to(u.s), dv_c.to(u.m / u.s)),
         )
 
     @classmethod

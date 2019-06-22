@@ -208,8 +208,7 @@ def test_eccentric_to_true_range2pi(E, ecc):
 
 
 def test_convert_between_coe_and_rv_is_transitive(classical):
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value  # u.km**3 / u.s**2
-    res = rv2coe(k, *coe2rv(k, *classical))
+    res = rv2coe(*coe2rv(*classical))
     assert_allclose(res, classical)
 
 
@@ -219,24 +218,24 @@ def test_convert_between_coe_and_mee_is_transitive(classical):
 
 
 def test_convert_coe_and_rv_circular(circular):
-    k, expected_res = circular
-    res = rv2coe(k, *coe2rv(k, *expected_res))
+    _, expected_res = circular
+    res = rv2coe(*coe2rv(*expected_res))
     assert_allclose(res, expected_res, atol=1e-8)
 
 
 def test_convert_coe_and_rv_hyperbolic(hyperbolic):
-    k, expected_res = hyperbolic
-    res = rv2coe(k, *coe2rv(k, *expected_res))
+    _, expected_res = hyperbolic
+    res = rv2coe(*coe2rv(*expected_res))
     assert_allclose(res, expected_res, atol=1e-8)
 
 
 def test_convert_coe_and_rv_equatorial(equatorial):
-    k, expected_res = equatorial
-    res = rv2coe(k, *coe2rv(k, *expected_res))
+    _, expected_res = equatorial
+    res = rv2coe(*coe2rv(*expected_res))
     assert_allclose(res, expected_res, atol=1e-8)
 
 
 def test_convert_coe_and_rv_circular_equatorial(circular_equatorial):
-    k, expected_res = circular_equatorial
-    res = rv2coe(k, *coe2rv(k, *expected_res))
+    _, expected_res = circular_equatorial
+    res = rv2coe(*coe2rv(*expected_res))
     assert_allclose(res, expected_res, atol=1e-8)

@@ -14,7 +14,7 @@ from ._jit import jit
 
 
 @jit
-def rv_pqw(k, p, ecc, nu):
+def rv_pqw(p, ecc, nu):
     r"""Returns r and v vectors in perifocal frame.
 
     .. math::
@@ -33,18 +33,15 @@ def rv_pqw(k, p, ecc, nu):
 
     Parameters
     ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
     p : float
-        Semi-latus rectum or parameter (km).
+        Semi-latus rectum or parameter.
     ecc : float
         Eccentricity.
     nu: float
-        True anomaly (rad).
+        True anomaly.
 
     Returns
     -------
-
     r: ndarray
         Position. Dimension 3 vector
     v: ndarray
@@ -55,10 +52,10 @@ def rv_pqw(k, p, ecc, nu):
     >>> from poliastro.constants import GM_earth
     >>> k = GM_earth #Earth gravitational parameter
 
-    >>> ecc = 0.3 #Eccentricity
-    >>> h = 60000e6 #Angular momentum of the orbit [m^2]/[s]
-    >>> nu = np.deg2rad(120) #True Anomaly [rad]
-    >>> p = h**2 / k #Parameter of the orbit
+    >>> ecc = 0.3  # Eccentricity
+    >>> h = 60000e6  # Angular momentum of the orbit [m^2]/[s]
+    >>> nu = np.deg2rad(120)  # True Anomaly [rad]
+    >>> p = h ** 2 / k  # Parameter of the orbit
     >>> r, v = rv_pqw(k, p, ecc, nu)
 
     >>> #Printing the results
@@ -67,12 +64,12 @@ def rv_pqw(k, p, ecc, nu):
 
     Note
     ----
-
     These formulas can be checked at Curtis 3rd. Edition, page 110. Also the
     example proposed is 2.11 of Curtis 3rd Edition book.
+
     """
     r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
-    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T
+    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(1 / p)).T
     return r_pqw, v_pqw
 
 
@@ -87,7 +84,7 @@ def coe_rotation_matrix(inc, raan, argp):
 
 
 @jit
-def coe2rv(k, p, ecc, inc, raan, argp, nu):
+def coe2rv(p, ecc, inc, raan, argp, nu):
     r"""Converts from classical orbital to state vectors.
 
     Classical orbital elements are converted into position and velocity
@@ -139,7 +136,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     v_ijk: np.array
         Velocity vector in basis ijk
     """
-    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
+    r_pqw, v_pqw = rv_pqw(p, ecc, nu)
     rm = coe_rotation_matrix(inc, raan, argp)
 
     r_ijk = rm @ r_pqw
@@ -220,7 +217,7 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
 
 
 @jit
-def rv2coe(k, r, v, tol=1e-8):
+def rv2coe(r, v, tol=1e-8):
     r"""Converts from vectors to classical orbital elements.
 
     1. First the angular momentum is computed:
@@ -267,11 +264,9 @@ def rv2coe(k, r, v, tol=1e-8):
 
     Parameters
     ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2)
-    r : array
+    r : numpy.ndarray
         Position vector (km)
-    v : array
+    v : numpy.ndarray
         Velocity vector (km / s)
     tol : float, optional
         Tolerance for eccentricity and inclination checks, default to 1e-8
@@ -316,13 +311,13 @@ def rv2coe(k, r, v, tol=1e-8):
     ----
     This example is a real exercise from Orbital Mechanics for Engineering
     students by Howard D.Curtis. This exercise is 4.3 of 3rd. Edition, page 200.
-    """
 
+    """
     h = cross(r, v)
     n = cross([0, 0, 1], h)
-    e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
+    e = (v.dot(v) - 1 / (norm(r))) * r - r.dot(v) * v
     ecc = norm(e)
-    p = h.dot(h) / k
+    p = h.dot(h)
     inc = np.arccos(h[2] / norm(h))
 
     circular = ecc < tol
@@ -343,14 +338,13 @@ def rv2coe(k, r, v, tol=1e-8):
         nu = np.arctan2(r[1], r[0]) % (2 * np.pi)  # True longitude
     else:
         a = p / (1 - (ecc ** 2))
-        ka = k * a
         if a > 0:
-            e_se = r.dot(v) / sqrt(ka)
-            e_ce = norm(r) * (norm(v) ** 2) / k - 1
+            e_se = r.dot(v) / sqrt(a)
+            e_ce = norm(r) * (norm(v) ** 2) - 1
             nu = E_to_nu(np.arctan2(e_se, e_ce), ecc)
         else:
-            e_sh = r.dot(v) / sqrt(-ka)
-            e_ch = norm(r) * (norm(v) ** 2) / k - 1
+            e_sh = r.dot(v) / sqrt(-a)
+            e_ch = norm(r) * (norm(v) ** 2) - 1
             nu = F_to_nu(np.log((e_ch + e_sh) / (e_ch - e_sh)) / 2, ecc)
 
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
