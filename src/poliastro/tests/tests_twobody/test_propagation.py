@@ -12,7 +12,7 @@ from poliastro.core.elements import rv2coe
 from poliastro.examples import iss
 from poliastro.frames import Planes
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell, kepler, mean_motion
+from poliastro.twobody.propagation import cowell, gauss, kepler, mean_motion, gauss
 from poliastro.util import norm
 
 
@@ -38,7 +38,7 @@ def test_mean_motion(ecc):
     assert_quantity_allclose(orbit_cowell.v, orbit_mean_motion.v)
 
 
-@pytest.mark.parametrize("method", [kepler, mean_motion, cowell])
+@pytest.mark.parametrize("method", [kepler, mean_motion, cowell, gauss])
 def test_propagation(method):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
@@ -52,9 +52,24 @@ def test_propagation(method):
 
     r, v = ss1.rv()
 
-    assert_quantity_allclose(r, expected_r, rtol=1e-5)
+    assert_quantity_allclose(r.to(u.km), expected_r, rtol=1e-5)
     assert_quantity_allclose(v, expected_v, rtol=1e-4)
 
+@pytest.mark.parametrize("method", [kepler, mean_motion, cowell, gauss])
+def test_gauss(method):
+    # These data was taken from problem 5-30 in Battin 1999:
+    # "An introduction to the Mathematics and Methods of Astrodynamics"
+    r0 = [0.159321004, 0.579266185, 0.052359607] * u.AU
+    v0 = [-9.303603251, 3.018641330, 1.536362143] * u.AU / u.year
+    expected_r = [0.057594337, 0.605750797, 0.068345246] * u.AU
+
+    ss0 = Orbit.from_vectors(Sun, r0, v0)
+    tof = (0.021370777 - 0.010576712) * u.year
+
+    ss1 = ss0.propagate(tof, method=method)
+
+    r, v = ss1.rv()
+    assert_quantity_allclose(r, expected_r, rtol=1e-5)
 
 def test_propagating_to_certain_nu_is_correct():
     # take an elliptic orbit
