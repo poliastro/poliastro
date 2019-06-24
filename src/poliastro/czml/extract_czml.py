@@ -44,7 +44,7 @@ class CZMLExtractor:
             of sampled data points will be N when calling
             add_orbit()
         """
-        self.packets = []
+        self.packets = []  # type: List[Any]
 
         self.cust_prop = [ellipsoid, pr_map]
 
@@ -72,7 +72,7 @@ class CZMLExtractor:
         -------
         coordinate list
         """
-        cart_cords = []
+        cart_cords = []  # type: List[float]
 
         h = (self.end_epoch - self.orbits[i][2]).to(u.second) / self.orbits[i][1]
 
