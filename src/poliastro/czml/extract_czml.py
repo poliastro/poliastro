@@ -16,7 +16,7 @@ from czml3.properties import (
     Position,
     SolidColorMaterial,
 )
-from czml3.types import IntervalValue
+from czml3.types import IntervalValue, TimeInterval
 
 from poliastro.czml.utils import ellipsoidal_to_cartesian
 from poliastro.twobody.propagation import propagate
@@ -44,7 +44,7 @@ class CZMLExtractor:
             of sampled data points will be N when calling
             add_orbit()
         """
-        self.packets = []  # type: List[Any]
+        self.packets = []  # type: List[Packet]
 
         self.cust_prop = [ellipsoid, pr_map]
 
@@ -53,8 +53,8 @@ class CZMLExtractor:
         self.i = 0
         self.gs_n = 0
 
-        self.start_epoch = CZMLExtractor.format_date(start_epoch)
-        self.end_epoch = CZMLExtractor.format_date(end_epoch)
+        self.start_epoch = Time(start_epoch, format="isot")
+        self.end_epoch = Time(end_epoch, format="isot")
 
         self._init_czml_()
 
@@ -82,6 +82,7 @@ class CZMLExtractor:
             cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
+            # flatten list
             cart_cords += list(map(lambda x: x[0], cords.tolist()))
 
         return cart_cords
@@ -190,7 +191,9 @@ class CZMLExtractor:
         pckt = Packet(
             id="GS" + str(self.gs_n),
             description=id_description,
-            availability=self.start_epoch.value + "/" + self.end_epoch.value,
+            availability=TimeInterval(
+                start=self.start_epoch.datetime, end=self.end_epoch.value
+            ),
             position=Position(cartesian=pos),
             label=Label(
                 show=label_show,
@@ -203,13 +206,7 @@ class CZMLExtractor:
                 if label_outline_color is not None
                 else None,
             ),
-            billboard=Billboard(
-                image=PIC_GROUNDSTATION,
-                horizontalOrigin="CENTER",
-                verticalOrigin="CENTER",
-                scale=1,
-                show=True,
-            ),
+            billboard=Billboard(image=PIC_GROUNDSTATION, show=True),
         )
 
         self.packets.append(pckt)
@@ -287,15 +284,15 @@ class CZMLExtractor:
         self.orbits.append([orbit, N, orbit.epoch])
         cartesian_cords = self._init_orbit_packet_cords_(self.i)
 
-        start_epoch = CZMLExtractor.format_date(
-            min(self.orbits[self.i][2], self.start_epoch)
-        )
+        start_epoch = Time(min(self.orbits[self.i][2], self.start_epoch), format="isot")
 
         pckt = Packet(
             id=self.i,
             name=id_name,
             description=id_description,
-            availability=start_epoch.value + "/" + self.end_epoch.value,
+            availability=TimeInterval(
+                start=self.start_epoch.datetime, end=self.end_epoch.value
+            ),
             position=Position(
                 interpolationDegree=5,
                 interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
@@ -317,7 +314,7 @@ class CZMLExtractor:
             ),
             label=Label(
                 text=label_text,
-                font=label_font,
+                font=label_font if label_font is not None else "11pt Lucida Console",
                 show=label_show,
                 fillColor=Color(rgba=label_fill_color)
                 if label_fill_color is not None
@@ -326,30 +323,9 @@ class CZMLExtractor:
                 if label_outline_color is not None
                 else Color(rgba=[255, 255, 0, 255]),
             ),
-            billboard=Billboard(
-                horizontalOrigin="CENTER",
-                verticalOrigin="CENTER",
-                image=PIC_SATELLITE,
-                scale=1,
-                show=True,
-            ),
+            billboard=Billboard(image=PIC_SATELLITE, show=True),
         )
 
         self.packets.append(pckt)
 
         self.i += 1
-
-    @staticmethod
-    def format_date(date):
-        """
-        Parameters
-        ----------
-        date : ~astropy.time.core.Time
-            input date
-
-        Returns
-        -------
-        formatted_date : ~astropy.time.core.Time
-            ISO 8601 - compliant date
-        """
-        return Time(date, format="isot")
