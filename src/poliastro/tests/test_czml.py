@@ -78,7 +78,7 @@ def test_czml_add_orbit():
     }
 }, {
     "id": 0,
-    "availability": "2013-03-18T10:00:00Z/2013-03-18T23:59:35.108",
+    "availability": "2013-03-18T10:00:00Z/2013-03-18T21:59:35Z",
     "position": {
         "epoch": "2013-03-18T12:00:00.000",
         "interpolationAlgorithm": "LAGRANGE",
@@ -178,7 +178,7 @@ def test_czml_add_orbit():
     }
 }, {
     "id": 1,
-    "availability": "2013-03-18T10:00:00Z/2013-03-18T23:59:35.108",
+    "availability": "2013-03-18T10:00:00Z/2013-03-18T21:59:35Z",
     "position": {
         "epoch": "2013-03-18T12:00:00.000",
         "interpolationAlgorithm": "LAGRANGE",
@@ -324,7 +324,7 @@ def test_czml_ground_station():
     }
 }, {
     "id": "GS0",
-    "availability": "2013-03-18T10:00:00Z/2013-03-18T23:59:35.108",
+    "availability": "2013-03-18T10:00:00Z/2013-03-18T21:59:35Z",
     "position": {
         "cartesian": [
             2539356.1623202674,
@@ -353,7 +353,7 @@ def test_czml_ground_station():
     }
 }, {
     "id": "GS1",
-    "availability": "2013-03-18T10:00:00Z/2013-03-18T23:59:35.108",
+    "availability": "2013-03-18T10:00:00Z/2013-03-18T21:59:35Z",
     "position": {
         "cartesian": [
             4456924.997008477,
