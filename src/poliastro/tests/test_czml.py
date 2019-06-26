@@ -1,10 +1,10 @@
-import pytest  # isort:skip
+import pytest  # noqa: E402 isort:skip
 pytest.importorskip("czml3")
 
-from astropy import units as u
+from astropy import units as u  # noqa: E402
 
-from poliastro.czml.extract_czml import CZMLExtractor
-from poliastro.examples import iss, molniya
+from poliastro.czml.extract_czml import CZMLExtractor  # noqa: E402
+from poliastro.examples import iss, molniya  # noqa: E402
 
 
 def test_czml_custom_packet():
