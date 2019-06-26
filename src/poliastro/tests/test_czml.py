@@ -1,4 +1,4 @@
-import pytest
+import pytest  # isort:skip
 pytest.importorskip("czml3")
 
 from astropy import units as u
