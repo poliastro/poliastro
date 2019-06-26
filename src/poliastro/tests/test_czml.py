@@ -1,4 +1,6 @@
 import pytest
+pytest.importorskip("czml3")
+
 from astropy import units as u
 
 from poliastro.czml.extract_czml import CZMLExtractor
