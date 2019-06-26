@@ -1,4 +1,5 @@
 import pytest  # noqa: E402 isort:skip
+
 pytest.importorskip("czml3")
 
 from astropy import units as u  # noqa: E402
