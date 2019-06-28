@@ -60,14 +60,15 @@ class CZMLExtractor:
 
         self._change_custom_params(*self.cust_prop)
 
-    def _init_orbit_packet_cords_(self, i):
+    def _init_orbit_packet_cords_(self, i, rtol):
         """
 
         Parameters
         ----------
         i: int
             Index of referenced orbit
-
+        rtol: float
+            Maximum relative error permitted
         Returns
         -------
         coordinate list
@@ -76,14 +77,20 @@ class CZMLExtractor:
 
         h = (self.end_epoch - self.orbits[i][2]).to(u.second) / self.orbits[i][1]
 
+        # Get rounding factor given the relative tolerance
+        rf = 0
+        while rtol < 1:
+            rtol *= 10
+            rf += 1
+
         for k in range(self.orbits[i][1] + 2):
-            position = propagate(self.orbits[i][0], TimeDelta(k * h))
+            position = propagate(self.orbits[i][0], TimeDelta(k * h), rtol=rtol)
 
             cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
             # flatten list
-            cart_cords += list(map(lambda x: x[0], cords.tolist()))
+            cart_cords += list(map(lambda x: round(x[0], rf), cords.tolist()))
 
         return cart_cords
 
@@ -215,6 +222,7 @@ class CZMLExtractor:
     def add_orbit(
         self,
         orbit,
+        rtol=1e-10,
         N=None,
         id_name=None,
         id_description=None,
@@ -234,6 +242,8 @@ class CZMLExtractor:
         ----------
         orbit: poliastro.Orbit
             Orbit to be added
+        rtol: float
+            Maximum relative error permitted
         N: int
             Number of sample points
 
@@ -281,8 +291,13 @@ class CZMLExtractor:
                 "The orbit's epoch cannot exceed the constructor's ending epoch"
             )
 
+        if rtol <= 0 or rtol >= 1:
+            raise ValueError(
+                "The relative tolerance must be a value in the range (0, 1)"
+            )
+
         self.orbits.append([orbit, N, orbit.epoch])
-        cartesian_cords = self._init_orbit_packet_cords_(self.i)
+        cartesian_cords = self._init_orbit_packet_cords_(self.i, rtol=rtol)
 
         start_epoch = Time(min(self.orbits[self.i][2], self.start_epoch), format="isot")
 
