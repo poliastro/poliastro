@@ -4,22 +4,26 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
-from czml3.core import Packet, Preamble
-from czml3.enums import InterpolationAlgorithms, ReferenceFrames
-from czml3.properties import (
-    Billboard,
-    Clock,
-    Color,
-    Label,
-    Material,
-    Path,
-    Position,
-    SolidColorMaterial,
-)
-from czml3.types import IntervalValue, TimeInterval
 
 from poliastro.czml.utils import ellipsoidal_to_cartesian
 from poliastro.twobody.propagation import propagate
+
+try:
+    from czml3.core import Packet, Preamble
+    from czml3.enums import InterpolationAlgorithms, ReferenceFrames
+    from czml3.properties import (
+        Billboard,
+        Clock,
+        Color,
+        Label,
+        Material,
+        Path,
+        Position,
+        SolidColorMaterial,
+    )
+    from czml3.types import IntervalValue, TimeInterval
+except ImportError:
+    pass
 
 PIC_SATELLITE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII="
 PIC_GROUNDSTATION = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACvSURBVDhPrZDRDcMgDAU9GqN0lIzijw6SUbJJygUeNQgSqepJTyHG91LVVpwDdfxM3T9TSl1EXZvDwii471fivK73cBFFQNTT/d2KoGpfGOpSIkhUpgUMxq9DFEsWv4IXhlyCnhBFnZcFEEuYqbiUlNwWgMTdrZ3JbQFoEVG53rd8ztG9aPJMnBUQf/VFraBJeWnLS0RfjbKyLJA8FkT5seDYS1Qwyv8t0B/5C2ZmH2/eTGNNBgMmAAAAAElFTkSuQmCC"
