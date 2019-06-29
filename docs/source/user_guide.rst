@@ -459,4 +459,37 @@ And both of them will return :py:obj:`poliastro.twobody.Orbit` objects!
 
 .. _`astroquery`: https://astroquery.readthedocs.io/
 
+Creating a CZML packets
+-----------------------
+
+Poliastro allows users to create czml packets which can then be visualized with the help of Cesium.
+
+:Note: This feature requires the czml3_ library which requires Python 3.6 or higher.
+
+
+First load up the orbital data and the CZML Extractor:
+
+.. code-block:: python
+
+    from poliastro.examples import molniya, iss
+    from poliastro.czml.extract_czml import CZMLExtractor
+
+Specify the starting and ending epoch, as well as the number of sample points (the higher the number, the more accurate the trajectory).
+
+.. code-block:: python
+
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+    N = 10
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    extractor.add_orbit(molniya, label_text="Molniya")
+    extractor.add_orbit(iss, label_text="ISS")
+
+You can find the generated CZML file by calling ``extractor.packets``. After copying the CZML document contents, follow the directions  here_ to run the application.
+
+.. _`czml3`: https://github.com/poliastro/czml3
+.. _`here`: https://github.com/poliastro/cesium-app/blob/master/README.md
+
 *Per Python ad astra* ;)
