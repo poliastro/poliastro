@@ -12,33 +12,59 @@ from poliastro.core.elements import rv2coe
 from poliastro.examples import iss
 from poliastro.frames import Planes
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell, kepler, mean_motion
+from poliastro.twobody.propagation import cowell, kepler, kepler_improved, mean_motion
 from poliastro.util import norm
 
 
 @pytest.mark.parametrize(
     "ecc",
-    [0.0, 0.5, 0.99, 0.995, 0.999, 0.9999, 1.00001, 1.0001, 1.001, 1.005, 1.01, 2.0],
+    [
+        0.0,
+        0.5,
+        0.99,
+        0.995,
+        0.999,
+        0.9999,
+        0.99999,
+        1.00001,
+        1.0001,
+        1.001,
+        1.005,
+        1.01,
+        2.0,
+    ],
 )
 def test_mean_motion(ecc):
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     if ecc < 1.0:
-        orbit = Orbit.from_classical(
+        ss0 = Orbit.from_classical(
             Earth, 10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
         )
     else:
-        orbit = Orbit.from_classical(
+        ss0 = Orbit.from_classical(
             Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
         )
-    orbit_cowell = orbit.propagate(tof, method=cowell)
-    orbit_mean_motion = orbit.propagate(tof, method=mean_motion)
+    ss_cowell = ss0.propagate(tof, method=cowell)
+    ss_kepler_improved = ss0.propagate(tof, method=kepler_improved)
+    assert_quantity_allclose(ss_kepler_improved.r, ss_cowell.r)
+    assert_quantity_allclose(ss_kepler_improved.v, ss_cowell.v)
 
-    assert_quantity_allclose(orbit_cowell.r, orbit_mean_motion.r)
-    assert_quantity_allclose(orbit_cowell.v, orbit_mean_motion.v)
+
+def test_near_parabolic_orbit():
+    r = [8.0e3, 1.0e3, 0.0] * u.km
+    v = [-0.5, -0.5, 0.0] * u.km / u.s
+    tof = 1.0 * u.h
+    ss0 = Orbit.from_vectors(Earth, r, v)
+
+    ss_cowell = ss0.propagate(tof, method=cowell)
+    ss_kepler_improved = ss0.propagate(tof, method=kepler_improved)
+
+    assert_quantity_allclose(ss_kepler_improved.r, ss_cowell.r)
+    assert_quantity_allclose(ss_kepler_improved.v, ss_cowell.v)
 
 
-@pytest.mark.parametrize("method", [kepler, mean_motion, cowell])
+@pytest.mark.parametrize("method", [kepler, kepler_improved, mean_motion, cowell])
 def test_propagation(method):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
