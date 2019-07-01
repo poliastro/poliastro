@@ -217,10 +217,10 @@ class Orbit(object):
         return h_vec
 
     @property
-    def h_mom(self):
-        """Angular momentum. """
-        h_mom = np.linalg.norm(self.h_vec) * u.km ** 2
-        return h_mom
+    def h_mag(self):
+        """Specific angular momentum. """
+        h_mag = norm(self.h_vec)
+        return h_mag
 
     @property
     def arglat(self):

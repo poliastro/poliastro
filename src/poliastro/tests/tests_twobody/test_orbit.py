@@ -721,12 +721,12 @@ def test_expected_mean_anomaly():
     orbit = Orbit.from_classical(attractor, a, ecc, _a, _a, _a, nu)
     orbit_M = orbit.M
 
-    assert_allclose(orbit_M.value, expected_mean_anomaly.value, rtol=1e-2)
+    assert_quantity_allclose(orbit_M.value, expected_mean_anomaly.value, rtol=1e-2)
 
 
 def test_expected_angular_momentum():
     # Example from Curtis
-    expected_ang_mom = 72472 * u.km ** 2
+    expected_ang_mag = 72472 * u.km ** 2
 
     attractor = Earth
 
@@ -736,9 +736,9 @@ def test_expected_angular_momentum():
     nu = 120 * u.deg
 
     orbit = Orbit.from_classical(attractor, a, ecc, _a, _a, _a, nu)
-    orbit_h_mom = orbit.h_mom
+    orbit_h_mag = orbit.h_mag
 
-    assert_allclose(orbit_h_mom.value, expected_ang_mom.value, rtol=1e-2)
+    assert_quantity_allclose(orbit_h_mag.value, expected_ang_mag.value, rtol=1e-2)
 
 
 def test_expected_last_perifocal_passage():
@@ -755,7 +755,7 @@ def test_expected_last_perifocal_passage():
     orbit = Orbit.from_classical(attractor, a, ecc, _a, _a, _a, nu)
     orbit_t_p = orbit.t_p
 
-    assert_allclose(orbit_t_p.value, expected_t_p.value, rtol=1e-2)
+    assert_quantity_allclose(orbit_t_p.value, expected_t_p.value, rtol=1e-2)
 
 
 def test_convert_from_rv_to_coe():
