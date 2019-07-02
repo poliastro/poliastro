@@ -18,6 +18,7 @@ from poliastro.twobody.propagation import (
     markley,
     mean_motion,
     mikkola,
+    pimienta
 )
 from poliastro.util import norm
 
@@ -71,7 +72,7 @@ def test_near_parabolic_orbit():
 
 
 @pytest.mark.parametrize(
-    "method", [mean_motion, kepler, markley, mikkola, cowell]
+    "method", [mean_motion, kepler, markley, mikkola, pimienta, cowell]
 )
 def test_propagation(method):
     # Data from Vallado, example 2.4
