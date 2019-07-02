@@ -13,6 +13,7 @@ from poliastro.core.angles import (
     _kepler_equation,
     _kepler_equation_prime,
     nu_to_M,
+    F_to_nu
 )
 from poliastro.core.elements import coe2rv, rv2coe
 from poliastro.core.propagation import (
@@ -194,6 +195,107 @@ def _kepler(k, r0, v0, tof, *, numiter):
 
     return r, v
 
+
+def mikkola(k, r, v, tofs, rtol=None):
+    """ Solves Kepler Equation by a cubic approximation. This method is valid
+    no mater the orbit's nature.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+
+    Note
+    ----
+    This method was derived by Seppo Mikola in his paper *A Cubic Approximation
+    For Kepler's Equation* with DOI: https://doi.org/10.1007/BF01235850
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [_mikkola(k, r0, v0, tof) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
+def _mikkola(k, r0, v0, tof, rtol=None):
+    """ Raw algorithm for Mikkola's Kepler solver.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+
+    Note
+    ----
+    Original paper: https://doi.org/10.1007/BF01235850
+    """
+
+    # Solving for the classical elements
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    M0 = nu_to_M(nu, ecc)
+    a = p / (1 - ecc ** 2)
+    n = np.sqrt(k / a ** 3)
+    M = M0 + n * tof
+
+    if ecc < 1.0:
+        # Solving elliptical case
+
+        # Equation (9a)
+        alpha = (1 - ecc) / (4 * ecc + 1 / 2)
+        beta = M / 2 / (4 * ecc + 1 / 2)
+
+        # Equation (9b)
+        if beta >= 0:
+            z = (beta + np.sqrt(beta ** 2 + alpha ** 3)) ** (1 / 3)
+        else:
+            z = (beta - np.sqrt(beta ** 2 + alpha ** 3)) ** (1 / 3)
+
+        # Equation (9c)
+        s = z - alpha / z
+
+        # Apply correction term
+        ds = -0.078 * s ** 5 / (1 + ecc)
+        s = s + ds
+
+        # Equation (8)
+        E = M + ecc * (3 * s - 4 * s ** 3)
+        nu = E_to_nu(E, ecc)
+
+        return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 def kepler_improved(k, r, v, tofs, rtol=None):
     """ Kepler improved solution.
