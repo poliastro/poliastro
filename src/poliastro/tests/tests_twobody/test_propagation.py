@@ -12,7 +12,13 @@ from poliastro.core.elements import rv2coe
 from poliastro.examples import iss
 from poliastro.frames import Planes
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell, kepler, kepler_improved, mean_motion
+from poliastro.twobody.propagation import (
+    cowell,
+    kepler,
+    kepler_improved,
+    mean_motion,
+    mikkola,
+)
 from poliastro.util import norm
 
 
@@ -64,7 +70,9 @@ def test_near_parabolic_orbit():
     assert_quantity_allclose(ss_kepler_improved.v, ss_cowell.v)
 
 
-@pytest.mark.parametrize("method", [kepler, kepler_improved, mean_motion, cowell])
+@pytest.mark.parametrize(
+    "method", [mean_motion, kepler, kepler_improved, mikkola, cowell]
+)
 def test_propagation(method):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
