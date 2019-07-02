@@ -297,8 +297,9 @@ def _mikkola(k, r0, v0, tof, rtol=None):
 
         return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
-def kepler_improved(k, r, v, tofs, rtol=None):
-    """ Kepler improved solution.
+def markley(k, r, v, tofs, rtol=None):
+    """ Kepler Equation solver based on a fifth-order refinement of the solution
+    of a cubic equation.
 
     Parameters
     ----------
@@ -319,6 +320,11 @@ def kepler_improved(k, r, v, tofs, rtol=None):
         Propagated position vectors.
     vv : ~astropy.units.Quantity
         Propagated velocity vectors.
+
+    Note
+    ----
+    This method was originally presented by Markley in his paper *Kepler Equation Solver*
+    with DOI: https://doi.org/10.1007/BF00691917
     """
 
     k = k.to(u.m ** 3 / u.s ** 2).value
@@ -326,14 +332,14 @@ def kepler_improved(k, r, v, tofs, rtol=None):
     v0 = v.to(u.m / u.s).value
     tofs = tofs.to(u.s).value
 
-    results = [_kepler_improved(k, r0, v0, tof) for tof in tofs]
+    results = [_markley(k, r0, v0, tof) for tof in tofs]
     return (
         [result[0] for result in results] * u.m,
         [result[1] for result in results] * u.m / u.s,
     )
 
 
-def _kepler_improved(k, r0, v0, tof, rtol=None):
+def _markley(k, r0, v0, tof, rtol=None):
     """ Solves the kepler problem by a non iterative method. Relative error is
     around 1e-18, only limited by machine double-precission errors.
 

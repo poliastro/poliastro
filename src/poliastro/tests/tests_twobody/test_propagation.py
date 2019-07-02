@@ -15,7 +15,7 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import (
     cowell,
     kepler,
-    kepler_improved,
+    markley,
     mean_motion,
     mikkola,
 )
@@ -52,7 +52,7 @@ def test_mean_motion(ecc):
             Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
         )
     ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_kepler_improved = ss0.propagate(tof, method=kepler_improved)
+    ss_kepler_improved = ss0.propagate(tof, method=markley)
     assert_quantity_allclose(ss_kepler_improved.r, ss_cowell.r)
     assert_quantity_allclose(ss_kepler_improved.v, ss_cowell.v)
 
@@ -71,7 +71,7 @@ def test_near_parabolic_orbit():
 
 
 @pytest.mark.parametrize(
-    "method", [mean_motion, kepler, kepler_improved, mikkola, cowell]
+    "method", [mean_motion, kepler, markley, mikkola, cowell]
 )
 def test_propagation(method):
     # Data from Vallado, example 2.4
