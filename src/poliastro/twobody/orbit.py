@@ -217,10 +217,27 @@ class Orbit(object):
         return h_vec
 
     @property
+    def h_mag(self):
+        """Specific angular momentum. """
+        h_mag = norm(self.h_vec)
+        return h_mag
+
+    @property
     def arglat(self):
         """Argument of latitude. """
         arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
+
+    @property
+    def M(self):
+        """Mean anomaly. """
+        return nu_to_M(self.nu, self.ecc)
+
+    @property
+    def t_p(self):
+        """Elapsed time since latest perifocal passage. """
+        t_p = self.period * self.M / (360 * u.deg)
+        return t_p
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
