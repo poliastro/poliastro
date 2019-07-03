@@ -60,8 +60,30 @@ class GroundStation(object):
         """Returns orthonormal vectors tangential to the ellipsoid at the point of the ground station. """
         N = self.N
         u = np.array([1.0, 0, 0])
-        print(u - u.dot(N) * N, N, u)
         u -= u.dot(N) * N
         u /= np.linalg.norm(u)
         v = np.cross(N, u)
         return u, v
+
+    def visible(self, px, py, pz):
+        """
+        Determines whether an object located at a given point is visible from the ground station.
+        Returns true if true, false otherwise.
+
+        Parameters
+        ----------
+        px: ~astropy.units.quantity.Quantity
+            x-coordinate of the point
+        py: ~astropy.units.quantity.Quantity
+            y-coordinate of the point
+        pz: ~astropy.units.quantity.Quantity
+            z-coordinate of the point
+        """
+        c = [c.value for c in self.cartesian_cords]
+        u = np.array([px.value, py.value, pz.value])
+
+        N = self.N
+        d = -N.dot(c)
+        p = N.dot(u) + d
+
+        return p >= 0
