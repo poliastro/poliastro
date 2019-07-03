@@ -41,7 +41,7 @@ from poliastro.util import norm
         2.0,
     ],
 )
-def test_mean_motion(ecc):
+def test_near_parabolic(ecc):
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     if ecc < 1.0:
@@ -53,22 +53,23 @@ def test_mean_motion(ecc):
             Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
         )
     ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_kepler_improved = ss0.propagate(tof, method=markley)
-    assert_quantity_allclose(ss_kepler_improved.r, ss_cowell.r)
-    assert_quantity_allclose(ss_kepler_improved.v, ss_cowell.v)
+    ss_pimienta = ss0.propagate(tof, method=pimienta)
 
+    assert_quantity_allclose(ss.r, ss_cowell.r)
+    assert_quantity_allclose(ss.v, ss_cowell.v)
 
-def test_near_parabolic_orbit():
+@pytest.mark.parametrize("propagator", [markley, pimienta])
+def test_near_equatorial(propagator):
     r = [8.0e3, 1.0e3, 0.0] * u.km
-    v = [-0.5, -0.5, 0.0] * u.km / u.s
+    v = [-0.5, -0.5, 0.0001] * u.km / u.s
     tof = 1.0 * u.h
     ss0 = Orbit.from_vectors(Earth, r, v)
 
     ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_kepler_improved = ss0.propagate(tof, method=kepler_improved)
+    ss_propagator = ss0.propagate(tof, method=propagator)
 
-    assert_quantity_allclose(ss_kepler_improved.r, ss_cowell.r)
-    assert_quantity_allclose(ss_kepler_improved.v, ss_cowell.v)
+    assert_quantity_allclose(ss_propagator.r, ss_cowell.r, rtol=1e-4)
+    assert_quantity_allclose(ss_propagator.v, ss_cowell.v, rtol=1e-4)
 
 
 @pytest.mark.parametrize(

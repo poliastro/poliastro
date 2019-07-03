@@ -488,14 +488,46 @@ def _pimienta(k, r0, v0, tof):
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     M0 = nu_to_M(nu, ecc)
     semi_axis_a = p / (1 - ecc ** 2)
-    n = np.sqrt(k / semi_axis_a ** 3)
+    n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
     M = M0 + n * tof
 
     # Equation (32a), (32b), (32c) and (32d)
     c3 = 5 / 2 + 560 * ecc
-    a = 15 * (1 - ecc) / c3
     b = -M / c3
+
+    # Coefficient 'a' for elliptical and hyperbolic changes
+    if ecc < 1.0:
+        a = 15 * (1 - ecc) / c3
+    else:
+        a = 15 * (ecc - 1) / (5 / 2 + 560 * ecc)
+
     y = np.sqrt(b ** 2 / 4 + a ** 3 / 27)
+
+    # If Hyperbolic, we forget about computation
+    #TODO: Solution is not so accurate...
+    if ecc > 1.0:
+        x = (-b / 2 + y) ** (1 / 3) - (b / 2 + y) ** (1 / 3)
+        w = x - 0.01171875 * x ** 17 / (1 + 0.45 * x ** 2) / (1 + 4 * x ** 2) / ecc
+
+        # Solving for the true anomaly from the hyperbolic anomaly
+        F = (
+            ecc
+            * (
+                16384 * w ** 15
+                + 61440 * w ** 13
+                + 92160 * w ** 11
+                + 70400 * w ** 9
+                + 28800 * w ** 7
+                + 6048 * w ** 5
+                + 560 * w ** 3
+                + 15 * w
+            )
+            - M
+        )
+
+        nu = F_to_nu(F, ecc)
+
+        return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
     # Equation (33)
     x_bar = (-b / 2 + y) ** (1 / 3) - (b / 2 + y) ** (1 / 3)
@@ -797,7 +829,7 @@ def _pimienta(k, r0, v0, tof):
     x = x_bar + u15
     w = x - 0.01171875 * x ** 17 / (1 + ecc)
 
-    # solving for the true anomaly
+    # Solving for the true anomaly from eccentricity anomaly
     E = M + ecc * (
         -16384 * w ** 15
         + 61440 * w ** 13
@@ -812,7 +844,6 @@ def _pimienta(k, r0, v0, tof):
     nu = E_to_nu(E, ecc)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
-
 
 def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
