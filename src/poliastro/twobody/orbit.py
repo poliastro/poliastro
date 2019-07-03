@@ -187,6 +187,19 @@ class Orbit(object):
         return self.raan + self.argp + self.nu
 
     @property
+    def long_asc(self):
+        """Longitude of ascending node. """
+        h = self.h_vec
+        k = np.array([0, 0, 1])
+        n = np.cross(k, h)
+        long_asc = (
+            np.arccos(n[0] / np.linalg.norm(n))
+            if n[1] >= 0
+            else 2 * np.pi - np.arccos(n[0] / np.linalg.norm(n))
+        )
+        return long_asc
+
+    @property
     def period(self):
         """Period of the orbit. """
         return 2 * np.pi * u.rad / self.n
@@ -841,6 +854,54 @@ class Orbit(object):
             raise ValueError(
                 f"The semimajor axis may not be smaller that {attractor.name}'s radius"
             )
+
+    def calculate_pass(self, lat, long, H):
+        a = self.a  # semimajor axis
+        e = self.ecc  # eccentricity
+        i = self.inc  # equatorial inclination
+        O = self.long_asc  # longitude of ascending node
+        o = self.argp  # argument of perigee
+        T = self.period  # time of perifocal passage
+
+        n = self.n  # mean motion
+        ar = self.attractor.r  # equatorial radius
+        f = 0  # TODO: flattening
+
+        t0 = 1  # TODO: epoch universal time (rad)
+        th0 = 1  # TODO: sidereal station time (rad)
+        r_s = 1  # TODO: sidereal rate of change
+
+        def Z(E):
+            return np.array(
+                [
+                    np.cos(lat) * np.cos(th0 + r_s * (E - e * np.sin(E) / n + T - t0)),
+                    np.cos(lat) * np.sin(th0 + r_s * (E - e * np.sin(E) / n + T - t0)),
+                    np.sin(lat),
+                ]
+            )
+
+        G1 = np.array(ar / np.sqrt(1 - (2 * f - f * f) * np.sin(lat) ** 2) + H)
+        G2 = np.array(
+            (1 - f) ** 2 * ar / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
+        )
+        G = G1 * np.cos(lat) ** 2 + G2 * np.sin(lat) ** 2
+
+        P = np.array(
+            [
+                np.cos(o) * np.cos(O) - np.sin(o) * np.sin(O) * np.cos(i),
+                np.cos(o) * np.sin(O) + np.sin(o) * np.cos(O) * np.cos(i),
+                np.sin(o) * np.sin(i),
+            ]
+        )
+        Q = np.array(
+            [
+                -np.sin(o) * np.cos(O) - np.cos(o) * np.sin(O) * np.cos(i),
+                -np.sin(o) * np.sin(O) + np.cos(o) * np.cos(O) * np.cos(i),
+                np.cos(o) * np.sin(i),
+            ]
+        )
+
+        Z_av = 0.5 * (Z(2 * np.pi) + Z(0))
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
