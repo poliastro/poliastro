@@ -46,5 +46,5 @@ def test_visible():
 
     # TODO: Fix assert failing with 'is'
 
-    assert gs.visible(*p1) == True
-    assert gs.visible(*p2) == False
+    assert gs.is_visible(*p1) == True
+    assert gs.is_visible(*p2) == False

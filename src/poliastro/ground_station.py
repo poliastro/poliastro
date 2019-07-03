@@ -5,7 +5,7 @@ class GroundStation(object):
     """ Class representing a ground station on an arbitrary ellipsoid.
     """
 
-    def __init__(self, lon, lat, h, a, b):
+    def __init__(self, lon, lat, h, a, b, c = None):
         """
 
         Parameters
@@ -24,12 +24,18 @@ class GroundStation(object):
 
         b: ~astropy.units.quantity.Quantity
             semi-minor axis
+
+        c: ~astropy.units.quantity.Quantity
+            Third axis defining the ellipsoid.
+            If not set, it defaults to the value of a, making the ellipsoid
+            a spheroid.
         """
         self._lon = lon
         self._lat = lat
         self._h = h
         self._a = a
         self._b = b
+        self._c = c if c is not None else a
 
     @property
     def cartesian_cords(self):
@@ -51,7 +57,8 @@ class GroundStation(object):
     def N(self):
         """Normal vector of the ellipsoid at the point of the ground station. """
         x, y, z = self.cartesian_cords
-        N = np.array([2 * x.value, 2 * y.value, 2 * z.value])
+        a, b, c = self._a.value, self._b.value, self._c.value
+        N = np.array([2 * x.value / a**2, 2 * y.value / b**2, 2 * z.value / c**2])
         N = N / np.linalg.norm(N)
         return N
 
@@ -65,7 +72,8 @@ class GroundStation(object):
         v = np.cross(N, u)
         return u, v
 
-    def visible(self, px, py, pz):
+
+    def is_visible(self, px, py, pz):
         """
         Determines whether an object located at a given point is visible from the ground station.
         Returns true if true, false otherwise.
