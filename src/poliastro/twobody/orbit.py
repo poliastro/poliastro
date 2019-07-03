@@ -874,16 +874,15 @@ class Orbit(object):
         def Z(E):
             return np.array(
                 [
-                    np.cos(lat) * np.cos(th0 + r_s * (E - e * np.sin(E) / n + T - t0)),
-                    np.cos(lat) * np.sin(th0 + r_s * (E - e * np.sin(E) / n + T - t0)),
+                    np.cos(lat) * np.cos(th0 + r_s * ((E - e * np.sin(E)) / n + T - t0)),
+                    np.cos(lat) * np.sin(th0 + r_s * ((E - e * np.sin(E)) / n + T - t0)),
                     np.sin(lat),
                 ]
             )
 
-        G1 = np.array(ar / np.sqrt(1 - (2 * f - f * f) * np.sin(lat) ** 2) + H)
-        G2 = np.array(
-            (1 - f) ** 2 * ar / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
-        )
+        G1 = ar / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
+        G2 = (1 - f) ** 2 * ar / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
+
         G = G1 * np.cos(lat) ** 2 + G2 * np.sin(lat) ** 2
 
         P = np.array(
