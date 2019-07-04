@@ -20,6 +20,7 @@ from poliastro.twobody.propagation import (
     mikkola,
     pimienta,
     goodingI,
+    danby,
 )
 from poliastro.util import norm
 
@@ -54,7 +55,7 @@ def test_near_parabolic(ecc):
             Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
         )
     ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_pimienta = ss0.propagate(tof, method=pimienta)
+    ss_pimienta = ss0.propagate(tof, method=danby)
 
     assert_quantity_allclose(ss_pimienta.r, ss_cowell.r)
     assert_quantity_allclose(ss_pimienta.v, ss_cowell.v)
@@ -74,7 +75,7 @@ def test_near_equatorial(propagator):
 
 
 @pytest.mark.parametrize(
-    "method", [mean_motion, kepler, markley, mikkola, pimienta, goodingI, cowell]
+    "method", [mean_motion, kepler, markley, mikkola, pimienta, goodingI, danby, cowell]
 )
 def test_propagation(method):
     # Data from Vallado, example 2.4

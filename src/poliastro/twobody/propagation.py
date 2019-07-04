@@ -504,7 +504,7 @@ def _pimienta(k, r0, v0, tof):
     y = np.sqrt(b ** 2 / 4 + a ** 3 / 27)
 
     # If Hyperbolic, we forget about computation
-    #TODO: Solution is not so accurate...
+    # TODO: Solution is not so accurate...
     if ecc > 1.0:
         x = (-b / 2 + y) ** (1 / 3) - (b / 2 + y) ** (1 / 3)
         w = x - 0.01171875 * x ** 17 / (1 + 0.45 * x ** 2) / (1 + 4 * x ** 2) / ecc
@@ -845,6 +845,7 @@ def _pimienta(k, r0, v0, tof):
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
+
 def goodingI(k, r, v, tofs, numiter=150, rtol=1e-8):
     """ Solves the Elliptic Kepler Equation with a cubic convergence and
     accuracy better than 10e-12 rad is normally achieved. It is not accurate
@@ -927,9 +928,9 @@ def _goodingI(k, r0, v0, tof, numiter=150, rtol=1e-8):
     n = 0
     c = ecc * np.cos(M)
     s = ecc * np.sin(M)
-    psi = s / np.sqrt(1 - 2 * c +  ecc ** 2)
+    psi = s / np.sqrt(1 - 2 * c + ecc ** 2)
     f = 1.0
-    while f ** 2 >= rtol and n<=numiter:
+    while f ** 2 >= rtol and n <= numiter:
         xi = np.cos(psi)
         eta = np.sin(psi)
         fd = (1 - c * xi) + s * eta
@@ -942,6 +943,117 @@ def _goodingI(k, r0, v0, tof, numiter=150, rtol=1e-8):
     nu = E_to_nu(E, ecc)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
+
+def danby(k, r, v, tofs, rtol=None):
+    """ Kepler solver for both elliptic and parabolic orbits based on a 15th
+    order polynomial with accuracies around 10e-5 for elliptic case and 10e-13
+    in the hyperbolic regime.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+        Propagated velocity vectors.
+
+    Note
+    ----
+    This algorithm was developed by Pimienta-Peñalver and John L. Crassidis in
+    their paper *Accurate Kepler Equation solver without trascendental function
+    evaluations*.
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [_danby(k, r0, v0, tof) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
+def _danby(k, r0, v0, tof, numiter=150, rtol=1e-8):
+
+    # Solve first for eccentricity and mean anomaly
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    M0 = nu_to_M(nu, ecc)
+    semi_axis_a = p / (1 - ecc ** 2)
+    n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
+    M = M0 + n * tof
+
+    # Range mean anomaly
+    xma = M - 2 * np.pi * np.floor(M / 2 / np.pi)
+
+    if ecc == 0:
+        # Solving for circular orbit
+        nu = xma
+        return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
+    elif ecc < 1.0:
+        # For elliptical orbit
+        E = xma + 0.85 * np.sign(np.sin(xma)) * ecc
+
+    else:
+        # For parabolic and hyperbolic
+        E = np.log(2 * xma / ecc + 1.8)
+
+    # Iterations begin
+    n = 0
+    while n <= 20:
+
+        if ecc < 1.0:
+            s = ecc * np.sin(E)
+            c = ecc * np.cos(E)
+            f = E - s - xma
+            fp = 1 - c
+            fpp = s
+            fppp = c
+        else:
+            s = ecc * np.sinh(E)
+            c = ecc * np.cosh(E)
+            f = s - E - xma
+            fp = c - 1
+            fpp = s
+            fppp = c
+
+        if np.abs(f) <= rtol:
+
+            if ecc < 1.0:
+                sta = np.sqrt(1 - ecc ** 2) * np.sin(E)
+                cta = np.cos(E) - ecc
+            else:
+                sta = np.sqrt(ecc ** 2 - 1) * np.sinh(E)
+                cta = ecc - np.cosh(E)
+
+            nu = np.arctan2(sta, cta)
+            return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
+        else:
+            delta = -f / fp
+            delta_star = -f / (fp + 0.5 * delta * fpp)
+            deltak = -f / (fp + 0.5 * delta_star * fpp + delta_star ** 2 * fppp / 6)
+            E = E + deltak
+            n += 1
+
+    raise ValueError("Maximum number of iterations has been reached.")
+
 
 def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
