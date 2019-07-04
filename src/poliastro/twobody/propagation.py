@@ -845,6 +845,104 @@ def _pimienta(k, r0, v0, tof):
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
+def goodingI(k, r, v, tofs, numiter=150, rtol=1e-8):
+    """ Solves the Elliptic Kepler Equation with a cubic convergence and
+    accuracy better than 10e-12 rad is normally achieved. It is not accurate
+    when ecc=1.0 and M=0.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+
+    Note
+    ----
+    This method was derived by Seppo Mikola in his paper *A Cubic Approximation
+    For Kepler's Equation* with DOI: https://doi.org/10.1007/BF01235850
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [_goodingI(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
+def _goodingI(k, r0, v0, tof, numiter=150, rtol=1e-8):
+    """ Solves the Elliptic Kepler Equation with a cubic convergence and
+    accuracy better than 10e-12 rad is normally achieved. It is not accurate
+    when ecc=1.0 and M=0.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+     vv : ~astropy.units.Quantity
+
+    Note
+    ----
+    Original paper for the algorithm: https://doi.org/10.1007/BF01238923
+    """
+
+    # Solve first for eccentricity and mean anomaly
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    M0 = nu_to_M(nu, ecc)
+    semi_axis_a = p / (1 - ecc ** 2)
+    n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
+    M = M0 + n * tof
+
+    # Start the computation
+    n = 0
+    c = ecc * np.cos(M)
+    s = ecc * np.sin(M)
+    psi = s / np.sqrt(1 - 2 * c +  ecc ** 2)
+    f = 1.0
+    while f ** 2 >= rtol and n<=numiter:
+        xi = np.cos(psi)
+        eta = np.sin(psi)
+        fd = (1 - c * xi) + s * eta
+        fdd = c * eta + s * xi
+        f = psi - fdd
+        psi = psi - f * fd / (fd ** 2 - 0.5 * f * fdd)
+        n += 1
+
+    E = M + psi
+    nu = E_to_nu(E, ecc)
+
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
 def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
 
