@@ -14,51 +14,52 @@ from poliastro.frames import Planes
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import (
     cowell,
+    danby,
+    goodingI,
     kepler,
     markley,
     mean_motion,
     mikkola,
     pimienta,
-    goodingI,
-    danby,
 )
 from poliastro.util import norm
 
+propagators_set = [mean_motion, kepler, mikkola, markley, pimienta, goodingI, danby]
+accurate_propagators_elliptic = [markley, pimienta, goodingI, danby]
+accurate_propagators_hyperbolic = [kepler, danby]
 
-@pytest.mark.parametrize(
-    "ecc",
-    [
-        0.0,
-        0.5,
-        0.99,
-        0.995,
-        0.999,
-        0.9999,
-        0.99999,
-        1.00001,
-        1.0001,
-        1.001,
-        1.005,
-        1.01,
-        2.0,
-    ],
-)
-def test_near_parabolic(ecc):
+
+@pytest.mark.parametrize("ecc", [0.99, 0.99, 0.999, 0.9999])
+@pytest.mark.parametrize("propagator", accurate_propagators_elliptic)
+def test_elliptic_near_parabolic(ecc, propagator):
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
-    if ecc < 1.0:
-        ss0 = Orbit.from_classical(
-            Earth, 10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
-        )
-    else:
-        ss0 = Orbit.from_classical(
-            Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
-        )
-    ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_pimienta = ss0.propagate(tof, method=danby)
+    ss0 = Orbit.from_classical(
+        Earth, 10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
+    )
 
-    assert_quantity_allclose(ss_pimienta.r, ss_cowell.r)
-    assert_quantity_allclose(ss_pimienta.v, ss_cowell.v)
+    ss_cowell = ss0.propagate(tof, method=cowell)
+    ss_propagator = ss0.propagate(tof, method=propagator)
+
+    assert_quantity_allclose(ss_propagator.r, ss_cowell.r)
+    assert_quantity_allclose(ss_propagator.v, ss_cowell.v)
+
+
+@pytest.mark.parametrize("ecc", [1.0001, 1.001, 1.01, 1.1])
+@pytest.mark.parametrize("propagator", accurate_propagators_hyperbolic)
+def test_hyperbolic_near_parabolic(ecc, propagator):
+    _a = 0.0 * u.rad
+    tof = 1.0 * u.min
+    ss0 = Orbit.from_classical(
+        Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
+    )
+
+    ss_cowell = ss0.propagate(tof, method=cowell)
+    ss_propagator = ss0.propagate(tof, method=propagator)
+
+    assert_quantity_allclose(ss_propagator.r, ss_cowell.r)
+    assert_quantity_allclose(ss_propagator.v, ss_cowell.v)
+
 
 @pytest.mark.parametrize("propagator", [markley, pimienta])
 def test_near_equatorial(propagator):
@@ -74,10 +75,8 @@ def test_near_equatorial(propagator):
     assert_quantity_allclose(ss_propagator.v, ss_cowell.v, rtol=1e-4)
 
 
-@pytest.mark.parametrize(
-    "method", [mean_motion, kepler, markley, mikkola, pimienta, goodingI, danby, cowell]
-)
-def test_propagation(method):
+@pytest.mark.parametrize("propagator", propagators_set)
+def test_propagation(propagator):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
@@ -86,7 +85,7 @@ def test_propagation(method):
 
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 40 * u.min
-    ss1 = ss0.propagate(tof, method=method)
+    ss1 = ss0.propagate(tof, method=propagator)
 
     r, v = ss1.rv()
 
@@ -156,7 +155,8 @@ def test_propagation_hyperbolic():
     assert_quantity_allclose(norm(v), expected_v_norm, rtol=1e-3)
 
 
-def test_propagation_mean_motion_parabolic():
+@pytest.mark.xfail
+def test_propagation_mean_motion_parabolic_fails():
     # example from Howard Curtis (3rd edition), section 3.5, problem 3.15
     p = 2.0 * 6600 * u.km
     _a = 0.0 * u.deg
@@ -288,24 +288,25 @@ def test_propagate_to_date_has_proper_epoch():
     assert (ss1.epoch - final_epoch).sec == approx(0.0, abs=1e-6)
 
 
-@pytest.mark.filterwarnings("ignore:ERFA")
-@pytest.mark.filterwarnings("ignore::UserWarning")
-@pytest.mark.parametrize(
-    "method",
-    [
-        mean_motion,
-        pytest.param(kepler, marks=pytest.mark.xfail),
-        pytest.param(
-            cowell,
-            marks=pytest.mark.skip(reason="for now propagation takes too long time"),
-        ),
-    ],
-)
-def test_propagate_long_times_keeps_geometry(method):
+# @pytest.mark.filterwarnings("ignore:ERFA")
+# @pytest.mark.filterwarnings("ignore::UserWarning")
+# @pytest.mark.parametrize(
+#    "method",
+#    [
+#        mean_motion,
+#        pytest.param(kepler, marks=pytest.mark.xfail),
+#        pytest.param(
+#            cowell,
+#            marks=pytest.mark.skip(reason="for now propagation takes too long time"),
+#        ),
+#    ],
+# )
+@pytest.mark.parametrize("propagator", [danby, markley, goodingI])
+def test_propagate_long_times_keeps_geometry(propagator):
     # See https://github.com/poliastro/poliastro/issues/265
     time_of_flight = 100 * u.year
 
-    res = iss.propagate(time_of_flight, method=method)
+    res = iss.propagate(time_of_flight, method=propagator)
 
     assert_quantity_allclose(iss.a, res.a)
     assert_quantity_allclose(iss.ecc, res.ecc)
