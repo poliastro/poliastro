@@ -45,10 +45,8 @@ def test_visible():
     p1 = [cords[i] + 10 * gs.N[i] * u.m for i in range(3)]
     p2 = [cords[i] - 10 * gs.N[i] * u.m for i in range(3)]
 
-    # TODO: Fix assert failing with 'is'
-
-    assert gs.is_visible(*p1) == True
-    assert gs.is_visible(*p2) == False
+    assert gs.is_visible(*p1)
+    assert not gs.is_visible(*p2)
 
 
 def test_propagate():
