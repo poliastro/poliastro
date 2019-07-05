@@ -5,7 +5,7 @@ class GroundStation(object):
     """ Class representing a ground station on an arbitrary ellipsoid.
     """
 
-    def __init__(self, lon, lat, h, a, b, c=None):
+    def __init__(self, lon, lat, h, a, c):
         """
 
         Parameters
@@ -20,28 +20,23 @@ class GroundStation(object):
             geodetic height
 
         a: ~astropy.units.quantity.Quantity
-            semi-major axis
-
-        b: ~astropy.units.quantity.Quantity
-            semi-minor axis
+            polar semi-major axis
 
         c: ~astropy.units.quantity.Quantity
-            Third axis defining the ellipsoid.
-            If not set, it defaults to the value of a, making the ellipsoid
-            a spheroid.
+            equatorial semi-minor axis
         """
         self._lon = lon
         self._lat = lat
         self._h = h
         self._a = a
-        self._b = b
-        self._c = c if c is not None else a
+        self._b = a
+        self._c = c
 
     @property
     def cartesian_cords(self):
         """Convert to the Cartesian Coordinate system.
         """
-        e2 = 1 - (self._b / self._a) ** 2
+        e2 = 1 - (self._c / self._a) ** 2
         N = self._a / np.sqrt(1 - e2 * np.sin(self._lon) ** 2)
 
         x = (N + self._h) * np.cos(self._lon) * np.cos(self._lat)
@@ -53,7 +48,7 @@ class GroundStation(object):
     def f(self):
         """Get first flattening.
         """
-        return 1 - self._b / self._a
+        return 1 - self._c / self._a
 
     @property
     def N(self):
@@ -75,6 +70,14 @@ class GroundStation(object):
         u /= np.linalg.norm(u)
         v = np.cross(N, u)
         return u, v
+
+    @property
+    def radius_of_curvature_(self):
+        """Radius of curvature of the meridian at the latitude of the ground station.
+        """
+        e2 = 1 - (self._c / self._a) ** 2
+        rc = self._a * (1 - e2) / (1 - e2 * np.sin(self._lat) ** 2) ** 1.5
+        return rc
 
     def distance(self, px, py, pz):
         """

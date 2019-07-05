@@ -2,6 +2,7 @@ from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.ground_station import GroundStation
+from numpy.testing import assert_allclose
 
 
 def test_cartesian_coordinates():
