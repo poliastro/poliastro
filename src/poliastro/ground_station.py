@@ -1,12 +1,11 @@
 import numpy as np
-from astropy import time, units as u
 
 
 class GroundStation(object):
     """ Class representing a ground station on an arbitrary ellipsoid.
     """
 
-    def __init__(self, lon, lat, h, epoch, angular_velocity, a, b, c=None):
+    def __init__(self, lon, lat, h, a, b, c=None):
         """
 
         Parameters
@@ -19,12 +18,6 @@ class GroundStation(object):
 
         h: ~astropy.units.quantity.Quantity
             geodetic height
-
-        epoch: ~astropy.units.quantity.Quantity
-            starting epoch
-
-        angular_velocity: ~astropy.units.quantity.Quantity
-            angular velocity
 
         a: ~astropy.units.quantity.Quantity
             semi-major axis
@@ -40,8 +33,6 @@ class GroundStation(object):
         self._lon = lon
         self._lat = lat
         self._h = h
-        self._epoch = epoch
-        self._angular_velocity = angular_velocity
         self._a = a
         self._b = b
         self._c = c if c is not None else a
@@ -84,24 +75,6 @@ class GroundStation(object):
         u /= np.linalg.norm(u)
         v = np.cross(N, u)
         return u, v
-
-    def propagate(self, t):
-        """
-        Parameters
-        ----------
-        t: ~astropy.time.Time, ~astropy.time.TimeDelta
-            Time to propagate, either an epoch
-        """
-        if isinstance(t, time.Time):
-            delta_t = t - self._epoch
-        elif isinstance(t, time.TimeDelta):
-            delta_t = t
-        else:
-            raise ValueError(
-                "t must be either of astropy.time.Time or astropy.time.TimeDelta type"
-            )
-        angle = delta_t * self._angular_velocity
-        self._lat = (self._lat + angle) % (360 * u.deg)
 
     def distance(self, px, py, pz):
         """
