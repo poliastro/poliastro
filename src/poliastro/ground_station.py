@@ -72,7 +72,7 @@ class GroundStation(object):
         return u, v
 
     @property
-    def radius_of_curvature_(self):
+    def radius_of_curvature(self):
         """Radius of curvature of the meridian at the latitude of the ground station.
         """
         e2 = 1 - (self._c / self._a) ** 2
@@ -119,3 +119,39 @@ class GroundStation(object):
         p = N.dot(u) + d
 
         return p >= 0
+
+    def cartesian_to_ellipsoidal(self, x, y, z):
+        """
+        Converts ellipsoidal coordinates to the Cartesian coordinate system for the given ellipsoid.
+        Instead of the iterative formula, the function uses the approximation introduced in
+        Bowring, B. R. (1976). TRANSFORMATION FROM SPATIAL TO GEOGRAPHICAL COORDINATES
+
+
+        Parameters
+        ----------
+        x: ~astropy.units.quantity.Quantity
+            x coordinate
+
+        y: ~astropy.units.quantity.Quantity
+            y coordinate
+
+        z: ~astropy.units.quantity.Quantity
+            z coordinate
+
+        """
+        a = self._a
+        c = self._c
+        e2 = 1 - (c / a) ** 2
+        e2_ = e2 / (1 - e2)
+        p = np.sqrt(x ** 2 + y ** 2)
+        th = np.arctan(z * a / (p * c))
+        lon = np.arctan(y / x)
+        lat = np.arctan(
+            (z + e2_ * c * np.sin(th) ** 3) / (p - e2 * a * np.cos(th) ** 3)
+        )
+
+        v = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
+        h = p / np.cos(lat) - v
+        h = z / np.sin(lat) - (1 - e2) * v
+
+        return lat, lon, h
