@@ -13,9 +13,13 @@ from poliastro.examples import iss
 from poliastro.frames import Planes
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import (
+    ALL_PROPAGATORS,
+    ELLIPTIC_PROPAGATORS,
+    HYPERBOLIC_PROPAGATORS,
+    PARABOLIC_PROPAGATORS,
     cowell,
     danby,
-    goodingI,
+    gooding,
     kepler,
     markley,
     mean_motion,
@@ -24,14 +28,14 @@ from poliastro.twobody.propagation import (
 )
 from poliastro.util import norm
 
-propagators_set = [mean_motion, kepler, mikkola, markley, pimienta, goodingI, danby]
-accurate_propagators_elliptic = [markley, pimienta, goodingI, danby]
-accurate_propagators_hyperbolic = [kepler, danby]
 
-
-@pytest.mark.parametrize("ecc", [0.99, 0.99, 0.999, 0.9999])
-@pytest.mark.parametrize("propagator", accurate_propagators_elliptic)
+@pytest.mark.parametrize("ecc", [0.9, 0.99, 0.999, 0.9999, 0.99999])
+@pytest.mark.parametrize("propagator", ELLIPTIC_PROPAGATORS)
 def test_elliptic_near_parabolic(ecc, propagator):
+    # 'kepler fails if really close to parabolic'. Refer to issue #714.
+    if propagator in [kepler] and ecc > 0.99:
+        pytest.xfail()
+
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
@@ -46,8 +50,12 @@ def test_elliptic_near_parabolic(ecc, propagator):
 
 
 @pytest.mark.parametrize("ecc", [1.0001, 1.001, 1.01, 1.1])
-@pytest.mark.parametrize("propagator", accurate_propagators_hyperbolic)
+@pytest.mark.parametrize("propagator", HYPERBOLIC_PROPAGATORS)
 def test_hyperbolic_near_parabolic(ecc, propagator):
+    # Still not implemented. Refer to issue #714.
+    if propagator in [pimienta, gooding]:
+        pytest.skip()
+
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
@@ -61,7 +69,7 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
     assert_quantity_allclose(ss_propagator.v, ss_cowell.v)
 
 
-@pytest.mark.parametrize("propagator", [markley, pimienta])
+@pytest.mark.parametrize("propagator", [markley])
 def test_near_equatorial(propagator):
     r = [8.0e3, 1.0e3, 0.0] * u.km
     v = [-0.5, -0.5, 0.0001] * u.km / u.s
@@ -75,7 +83,7 @@ def test_near_equatorial(propagator):
     assert_quantity_allclose(ss_propagator.v, ss_cowell.v, rtol=1e-4)
 
 
-@pytest.mark.parametrize("propagator", propagators_set)
+@pytest.mark.parametrize("propagator", ALL_PROPAGATORS)
 def test_propagation(propagator):
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
@@ -155,13 +163,17 @@ def test_propagation_hyperbolic():
     assert_quantity_allclose(norm(v), expected_v_norm, rtol=1e-3)
 
 
-@pytest.mark.xfail
-def test_propagation_mean_motion_parabolic_fails():
+@pytest.mark.parametrize("propagator", PARABOLIC_PROPAGATORS)
+def test_propagation_parabolic(propagator):
     # example from Howard Curtis (3rd edition), section 3.5, problem 3.15
+    # TODO: add parabolic solver in some parabolic propagators, refer to #417
+    if propagator in [mikkola, gooding]:
+        pytest.skip()
+
     p = 2.0 * 6600 * u.km
     _a = 0.0 * u.deg
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
-    orbit = orbit.propagate(0.8897 / 2.0 * u.h, method=mean_motion)
+    orbit = orbit.propagate(0.8897 / 2.0 * u.h, method=propagator)
 
     _, _, _, _, _, nu0 = rv2coe(
         Earth.k.to(u.km ** 3 / u.s ** 2).value,
@@ -171,7 +183,7 @@ def test_propagation_mean_motion_parabolic_fails():
     assert_quantity_allclose(nu0, np.deg2rad(90.0), rtol=1e-4)
 
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
-    orbit = orbit.propagate(36.0 * u.h, method=mean_motion)
+    orbit = orbit.propagate(36.0 * u.h, method=propagator)
     assert_quantity_allclose(norm(orbit.r), 304700.0 * u.km, rtol=1e-4)
 
 
@@ -288,20 +300,7 @@ def test_propagate_to_date_has_proper_epoch():
     assert (ss1.epoch - final_epoch).sec == approx(0.0, abs=1e-6)
 
 
-# @pytest.mark.filterwarnings("ignore:ERFA")
-# @pytest.mark.filterwarnings("ignore::UserWarning")
-# @pytest.mark.parametrize(
-#    "method",
-#    [
-#        mean_motion,
-#        pytest.param(kepler, marks=pytest.mark.xfail),
-#        pytest.param(
-#            cowell,
-#            marks=pytest.mark.skip(reason="for now propagation takes too long time"),
-#        ),
-#    ],
-# )
-@pytest.mark.parametrize("propagator", [danby, markley, goodingI])
+@pytest.mark.parametrize("propagator", [danby, markley, gooding])
 def test_propagate_long_times_keeps_geometry(propagator):
     # See https://github.com/poliastro/poliastro/issues/265
     time_of_flight = 100 * u.year

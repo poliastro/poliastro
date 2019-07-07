@@ -386,7 +386,7 @@ def D_to_M(D, ecc):
 
 
 @jit
-def M_to_nu(M, ecc):
+def M_to_nu(M, ecc, delta=1e-2):
     """True anomaly from mean anomaly.
 
     .. versionadded:: 0.4.0
@@ -397,6 +397,8 @@ def M_to_nu(M, ecc):
         Mean anomaly.
     ecc : ~astropy.units.Quantity
         Eccentricity.
+    delta : float (optional)
+        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
     Returns
     -------
     nu : ~astropy.units.Quantity
@@ -409,10 +411,10 @@ def M_to_nu(M, ecc):
     33.67328493021166
 
     """
-    if ecc > 1:
+    if ecc > 1 + delta:
         F = M_to_F(M, ecc)
         nu = F_to_nu(F, ecc)
-    elif ecc < 1:
+    elif ecc < 1 - delta:
         E = M_to_E(M, ecc)
         nu = E_to_nu(E, ecc)
     else:
@@ -422,7 +424,7 @@ def M_to_nu(M, ecc):
 
 
 @jit
-def nu_to_M(nu, ecc):
+def nu_to_M(nu, ecc, delta=1e-2):
     """Mean anomaly from true anomaly.
 
     .. versionadded:: 0.4.0
@@ -433,6 +435,8 @@ def nu_to_M(nu, ecc):
         True anomaly.
     ecc : ~astropy.units.Quantity
         Eccentricity.
+    delta : float (optional)
+        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
 
     Returns
     -------
@@ -440,10 +444,10 @@ def nu_to_M(nu, ecc):
         Mean anomaly.
 
     """
-    if ecc > 1:
+    if ecc > 1 + delta:
         F = nu_to_F(nu, ecc)
         M = F_to_M(F, ecc)
-    elif ecc < 1:
+    elif ecc < 1 - delta:
         E = nu_to_E(nu, ecc)
         M = E_to_M(E, ecc)
     else:

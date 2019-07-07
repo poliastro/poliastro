@@ -281,7 +281,7 @@ def D_to_M(D, ecc):
 
 
 @u.quantity_input(M=u.rad, ecc=u.one)
-def M_to_nu(M, ecc):
+def M_to_nu(M, ecc, delta=1e-2):
     """True anomaly from mean anomaly.
 
     .. versionadded:: 0.4.0
@@ -292,6 +292,8 @@ def M_to_nu(M, ecc):
         Mean anomaly.
     ecc : ~astropy.units.Quantity
         Eccentricity.
+    delta : float (optional)
+        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
     Returns
     -------
     nu : ~astropy.units.Quantity
@@ -303,11 +305,11 @@ def M_to_nu(M, ecc):
     <Quantity 33.67328493 deg>
 
     """
-    return (M_to_nu_fast(M.to(u.rad).value, ecc.value) * u.rad).to(M.unit)
+    return (M_to_nu_fast(M.to(u.rad).value, ecc.value, delta) * u.rad).to(M.unit)
 
 
 @u.quantity_input(nu=u.rad, ecc=u.one)
-def nu_to_M(nu, ecc):
+def nu_to_M(nu, ecc, delta=1e-2):
     """Mean anomaly from true anomaly.
 
     .. versionadded:: 0.4.0
@@ -318,6 +320,8 @@ def nu_to_M(nu, ecc):
         True anomaly.
     ecc : ~astropy.units.Quantity
         Eccentricity.
+    delta : float (optional)
+        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
 
     Returns
     -------
@@ -325,7 +329,7 @@ def nu_to_M(nu, ecc):
         Mean anomaly.
 
     """
-    return (nu_to_M_fast(nu.to(u.rad).value, ecc.value) * u.rad).to(nu.unit)
+    return (nu_to_M_fast(nu.to(u.rad).value, ecc.value, delta) * u.rad).to(nu.unit)
 
 
 @u.quantity_input(nu=u.rad, ecc=u.one)
