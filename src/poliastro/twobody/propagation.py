@@ -1,4 +1,25 @@
-"""Propagation algorithms
+"""The following script holds the different high level functions for the
+different propagators available at poliastro:
+
++-------------+------------+-----------------+-----------------+
+|  Propagator | Elliptical |    Parabolic    |    Hyperbolic   |
++-------------+------------+-----------------+-----------------+
+| mean_motion |      ✓     |        ✓        |        ✓        |
++-------------+------------+-----------------+-----------------+
+|    kepler   |      ✓     |        ✓        |        ✓        |
++-------------+------------+-----------------+-----------------+
+|   mikkola   |      ✓     | NOT IMPLEMENTED |        ✓        |
++-------------+------------+-----------------+-----------------+
+|   markley   |      ✓     |        x        |        x        |
++-------------+------------+-----------------+-----------------+
+|   pimienta  |      ✓     |        ✓        | NOT IMPLEMENTED |
++-------------+------------+-----------------+-----------------+
+|   gooding   |      ✓     | NOT IMPLEMENTED | NOT IMPLEMENTED |
++-------------+------------+-----------------+-----------------+
+|    danby    |      ✓     |        x        |        ✓        |
++-------------+------------+-----------------+-----------------+
+|    cowell   |      ✓     |        ✓        |        ✓        |
++-------------+------------+-----------------+-----------------+
 
 """
 import functools
@@ -9,9 +30,14 @@ from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from scipy.integrate import solve_ivp
 
 from poliastro.core.propagation import (
+    danby as danby_fast,
     func_twobody,
+    gooding as gooding_fast,
     kepler as kepler_fast,
+    markley as markley_fast,
     mean_motion as mean_motion_fast,
+    mikkola as mikkola_fast,
+    pimienta as pimienta_fast,
 )
 from poliastro.integrators import DOP835
 
@@ -188,6 +214,218 @@ def _kepler(k, r0, v0, tof, *, numiter):
     return r, v
 
 
+def mikkola(k, r, v, tofs, rtol=None):
+    """ Solves Kepler Equation by a cubic approximation. This method is valid
+    no mater the orbit's nature.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+
+    Note
+    ----
+    This method was derived by Seppo Mikola in his paper *A Cubic Approximation
+    For Kepler's Equation* with DOI: https://doi.org/10.1007/BF01235850
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [mikkola_fast(k, r0, v0, tof) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
+def markley(k, r, v, tofs, rtol=None):
+    """ Elliptical Kepler Equation solver based on a fifth-order
+    refinement of the solution of a cubic equation.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+        Propagated velocity vectors.
+
+    Note
+    ----
+    This method was originally presented by Markley in his paper *Kepler Equation Solver*
+    with DOI: https://doi.org/10.1007/BF00691917
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [markley_fast(k, r0, v0, tof) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
+def pimienta(k, r, v, tofs, rtol=None):
+    """ Kepler solver for both elliptic and parabolic orbits based on a 15th
+    order polynomial with accuracies around 10e-5 for elliptic case and 10e-13
+    in the hyperbolic regime.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+        Propagated velocity vectors.
+
+    Note
+    ----
+    This algorithm was developed by Pimienta-Peñalver and John L. Crassidis in
+    their paper *Accurate Kepler Equation solver without trascendental function
+    evaluations*. Original paper is on Buffalo's UBIR repository: http://hdl.handle.net/10477/50522
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [pimienta_fast(k, r0, v0, tof) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
+def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
+    """ Solves the Elliptic Kepler Equation with a cubic convergence and
+    accuracy better than 10e-12 rad is normally achieved. It is not valid for
+    eccentricities equal or greater than 1.0.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+
+    Note
+    ----
+    This method was developed by Gooding and Odell in their paper *The
+    hyperbolic Kepler equation (and the elliptic equation revisited)* with
+    DOI: https://doi.org/10.1007/BF01235540
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
+def danby(k, r, v, tofs, rtol=1e-8):
+    """ Kepler solver for both elliptic and parabolic orbits based on Danby's
+    algorithm.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        Relative error for accuracy of the method.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+        Propagated velocity vectors.
+
+    Note
+    ----
+    This algorithm was developed by Danby in his paper *The solution of Kepler
+    Equation* with DOI: https://doi.org/10.1007/BF01686811
+    """
+
+    k = k.to(u.m ** 3 / u.s ** 2).value
+    r0 = r.to(u.m).value
+    v0 = v.to(u.m / u.s).value
+    tofs = tofs.to(u.s).value
+
+    results = [danby_fast(k, r0, v0, tof) for tof in tofs]
+    return (
+        [result[0] for result in results] * u.m,
+        [result[1] for result in results] * u.m / u.s,
+    )
+
+
 def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
 
@@ -203,6 +441,23 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
         Relative tolerance, default to 1e-10.
 
     """
+
+    # Check if propagator fulfills orbit requirements
+    if orbit.ecc < 1.0 and method not in ELLIPTIC_PROPAGATORS:
+        raise ValueError(
+            "Can not use an parabolic/hyperbolic propagator for elliptical orbits."
+        )
+    elif orbit.ecc == 1.0 and method not in PARABOLIC_PROPAGATORS:
+        raise ValueError(
+            "Can not use an elliptic/hyperbolic propagator for parabolic orbits."
+        )
+    elif orbit.ecc > 1.0 and method not in HYPERBOLIC_PROPAGATORS:
+        raise ValueError(
+            "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
+        )
+    else:
+        pass
+
     # Use the highest precision we can afford
     # np.atleast_1d does not work directly on TimeDelta objects
     jd1 = np.atleast_1d(time_of_flight.jd1)
@@ -222,3 +477,29 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
     )
 
     return cartesian
+
+
+ELLIPTIC_PROPAGATORS = [
+    mean_motion,
+    kepler,
+    mikkola,
+    markley,
+    pimienta,
+    gooding,
+    danby,
+    cowell,
+]
+PARABOLIC_PROPAGATORS = [mean_motion, kepler, mikkola, pimienta, gooding, cowell]
+HYPERBOLIC_PROPAGATORS = [
+    mean_motion,
+    kepler,
+    mikkola,
+    kepler,
+    pimienta,
+    gooding,
+    danby,
+    cowell,
+]
+ALL_PROPAGATORS = list(
+    set(ELLIPTIC_PROPAGATORS) & set(PARABOLIC_PROPAGATORS) & set(HYPERBOLIC_PROPAGATORS)
+)
