@@ -32,7 +32,9 @@ PIC_GROUNDSTATION = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAA
 class CZMLExtractor:
     """A class for extracting orbitary data to Cesium"""
 
-    def __init__(self, start_epoch, end_epoch, N, ellipsoid=None, pr_map=None):
+    def __init__(
+        self, start_epoch, end_epoch, N, ellipsoid=None, pr_map=None, scene3D=True
+    ):
         """
         Orbital constructor
 
@@ -47,10 +49,14 @@ class CZMLExtractor:
             Unless otherwise specified, the number
             of sampled data points will be N when calling
             add_orbit()
+        scene3D: bool
+            Determines the scene mode. If set to true, the scene
+            is set to 3D mode, otherwise it's the orthographic
+            projection.
         """
         self.packets = []  # type: List[Packet]
 
-        self.cust_prop = [ellipsoid, pr_map]
+        self.cust_prop = [ellipsoid, pr_map, scene3D]
 
         self.orbits = []  # type: List[Any]
         self.N = N
@@ -113,7 +119,7 @@ class CZMLExtractor:
         )
         self.packets.append(pckt)
 
-    def _change_custom_params(self, ellipsoid, pr_map):
+    def _change_custom_params(self, ellipsoid, pr_map, scene3D):
         """
         Change the custom properties package.
         Parameters
@@ -136,6 +142,7 @@ class CZMLExtractor:
             "custom_attractor": True,
             "ellipsoid": [{"array": ellipsoid}],
             "map_url": pr_map,
+            "scene3D": scene3D,
         }
 
         pckt = Packet(id="custom_properties", properties=custom_props)
