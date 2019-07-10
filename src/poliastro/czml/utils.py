@@ -114,8 +114,9 @@ def project_point_on_ellipsoid(x, y, z, a, b, c):
     a, b, c: semi-axises of the ellipsoid
     """
     p1, p2 = intersection_ellipsoid_line(x, y, z, x, y, z, a, b, c)
-    if np.linalg.norm(p1[0] - x, p1[1] - y, p1[2] - z) <= np.linalg.norm(
-        p2[0] - x, p2[1] - y, p2[2] - z
+
+    if np.linalg.norm([p1[0] - x, p1[1] - y, p1[2] - z]) <= np.linalg.norm(
+        [p2[0] - x, p2[1] - y, p2[2] - z]
     ):
         return p1
     else:
