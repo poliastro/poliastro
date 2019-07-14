@@ -7,7 +7,7 @@ import numpy as np
 import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from plotly.graph_objs import Figure
+from plotly.graph_objects import Figure
 from plotly.offline import plot as export
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
@@ -170,20 +170,3 @@ class BaseOrbitPlotter:
         """
         self._prepare_plot()
         return self._figure
-
-    def savefig(self, filename):
-        """Function for saving the plot locally.
-
-        Parameters
-        ----------
-        filename : string, format = "anyname.anyformat"
-                    anyformat can only be jpeg, png, svg, webp
-
-        """
-        basename, ext = os.path.splitext(filename)
-        export(
-            self.show(),
-            image=ext[1:],
-            image_filename=basename,
-            show_link=False,  # Boilerplate
-        )

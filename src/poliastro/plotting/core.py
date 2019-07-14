@@ -4,7 +4,7 @@
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from plotly.graph_objs import Layout, Scatter, Scatter3d, Surface
+from plotly.graph_objects import Layout, Scatter, Scatter3d, Surface
 
 from poliastro.plotting.util import generate_sphere
 from poliastro.util import norm
