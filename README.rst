@@ -17,9 +17,6 @@
 .. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/master.svg?style=flat-square&logo=circleci
    :target: https://circleci.com/gh/poliastro/poliastro
 
-.. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square&logo=travis
-   :target: https://travis-ci.org/poliastro/poliastro
-
 .. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square&logo=appveyor
    :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
 
@@ -48,7 +45,7 @@
    :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
    :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 
-|circleci| |travisci| |appveyor| |codecov| |codeclimate|
+|circleci| |appveyor| |codecov| |codeclimate|
 
 |docs| |license| |doi| |astropy| |mailing| |matrix|
 
@@ -109,14 +106,14 @@ poliastro requires the following Python packages:
 * plotly, for 2D and 3D interactive orbit plotting
 * SciPy, for root finding and numerical propagation
 
-poliastro is usually tested on Linux, Windows and OS X on Python
+poliastro is usually tested on Linux and Windows on Python
 3.5, 3.6 and 3.7 against latest NumPy.
+It should work on OS X without problems.
 
 ==============  ============  ===================
 Platform        Site          Status
 ==============  ============  ===================
 Linux           CircleCI      |circleci|
-OS X            Travis CI     |travisci|
 Windows x64     Appveyor      |appveyor|
 ==============  ============  ===================
 
