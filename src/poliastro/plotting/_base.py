@@ -43,7 +43,7 @@ class BaseOrbitPlotter:
             self._attractor = attractor
         elif attractor is not self._attractor:
             raise NotImplementedError(
-                "Attractor has already been set to {}.".format(self._attractor.name)
+                f"Attractor has already been set to {self._attractor.name}."
             )
 
     def set_attractor(self, attractor):

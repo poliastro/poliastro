@@ -110,7 +110,7 @@ class StaticOrbitPlotter:
         if len(colors) > 1:
             segments = _segments_from_arrays(x, y)
             cmap = LinearSegmentedColormap.from_list(
-                "{}_to_alpha".format(colors[0]), colors  # Useless name
+                f"{colors[0]}_to_alpha", colors  # Useless name
             )
             lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
             lc.set_array(np.linspace(1, 0, len(x)))
@@ -179,7 +179,7 @@ class StaticOrbitPlotter:
 
         elif attractor is not self._attractor:
             raise NotImplementedError(
-                "Attractor has already been set to {}.".format(self._attractor.name)
+                f"Attractor has already been set to {self._attractor.name}."
             )
 
     def _project(self, rr):

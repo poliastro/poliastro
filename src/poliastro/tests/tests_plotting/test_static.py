@@ -50,7 +50,7 @@ def test_legend():
     legend = plt.gca().get_legend()
 
     ss.epoch.out_subfmt = "date_hm"
-    label = "{} ({})".format(ss.epoch.iso, "ISS")
+    label = f"{ss.epoch.iso} (ISS)"
 
     assert legend.get_texts()[0].get_text() == label
 

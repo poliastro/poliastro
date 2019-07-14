@@ -28,7 +28,7 @@ from poliastro import constants
 
 class _Body(object):
     def __str__(self):
-        return "{0} ({1})".format(self.name, self.symbol)
+        return f"{self.name} ({self.symbol})"
 
     def __repr__(self):
         return self.__str__()

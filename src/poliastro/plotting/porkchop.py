@@ -227,17 +227,13 @@ def porkchop(
 
     if not hasattr(target_body, "name"):
         ax.set_title(
-            "{} - {} for year {}, C3 Launch".format(
-                departure_body.name, "Target Body", launch_span[0].datetime.year
-            ),
+            f"{departure_body.name} - Target Body for year {launch_span[0].datetime.year}, C3 Launch",
             fontsize=14,
             fontweight="bold",
         )
     else:
         ax.set_title(
-            "{} - {} for year {}, C3 Launch".format(
-                departure_body.name, target_body.name, launch_span[0].datetime.year
-            ),
+            f"{departure_body.name} - {target_body.name} for year {launch_span[0].datetime.year}, C3 Launch",
             fontsize=14,
             fontweight="bold",
         )
