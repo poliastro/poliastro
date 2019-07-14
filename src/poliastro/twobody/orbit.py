@@ -412,14 +412,18 @@ class Orbit(object):
             epoch = epoch.tdb
             warn(
                 "Input time was converted to scale='tdb' with value "
-                "{}. Use Time(..., scale='tdb') instead.".format(epoch.tdb.value),
+                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
                 TimeScaleWarning,
             )
         try:
             r, v = get_body_barycentric_posvel(body.name, epoch)
         except KeyError:
             raise RuntimeError(
-                "To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:\n>>>from astropy.coordinates import solar_system_ephemeris\n>>>solar_system_ephemeris.set('jpl')"
+                """To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:
+
+>>> from astropy.coordinates import solar_system_ephemeris
+>>> solar_system_ephemeris.set('jpl')
+"""
             )
         if body == Moon:
             # TODO: The attractor is in fact the Earth-Moon Barycenter
