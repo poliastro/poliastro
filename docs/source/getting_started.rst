@@ -14,8 +14,9 @@ poliastro requires a number of Python packages, notably:
 * Plotly, for interactive orbit plotting
 * SciPy, for root finding and numerical propagation
 
-poliastro is usually tested on Linux, Windows and OS X on Python
-3.5, 3.6 and 3.7 against latest NumPy.
+poliastro is usually tested on Linux and Windows on Python
+3.6 and 3.7 against latest NumPy.
+It should work on OS X without problems.
 
 Installation
 ------------

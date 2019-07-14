@@ -5,9 +5,9 @@ BODY_COLORS = {"Sun": "#ffcc00", "Earth": "#204a87", "Jupiter": "#ba3821"}
 
 def generate_label(orbit, label):
     orbit.epoch.out_subfmt = "date_hm"
-    label_ = "{}".format(orbit.epoch.iso)
+    label_ = f"{orbit.epoch.iso}"
     if label:
-        label_ += " ({})".format(label)
+        label_ += f" ({label})"
 
     return label_
 

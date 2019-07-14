@@ -262,7 +262,7 @@ class Orbit(object):
 
         if r.ndim > 1 or v.ndim > 1:
             raise ValueError(
-                "Vectors must have dimension 1, got {} and {}".format(r.ndim, v.ndim)
+                f"Vectors must have dimension 1, got {r.ndim} and {v.ndim}"
             )
 
         ss = RVState(attractor, r, v)
@@ -412,14 +412,18 @@ class Orbit(object):
             epoch = epoch.tdb
             warn(
                 "Input time was converted to scale='tdb' with value "
-                "{}. Use Time(..., scale='tdb') instead.".format(epoch.tdb.value),
+                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
                 TimeScaleWarning,
             )
         try:
             r, v = get_body_barycentric_posvel(body.name, epoch)
         except KeyError:
             raise RuntimeError(
-                "To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:\n>>>from astropy.coordinates import solar_system_ephemeris\n>>>solar_system_ephemeris.set('jpl')"
+                """To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:
+
+>>> from astropy.coordinates import solar_system_ephemeris
+>>> solar_system_ephemeris.set('jpl')
+"""
             )
         if body == Moon:
             # TODO: The attractor is in fact the Earth-Moon Barycenter
@@ -789,7 +793,7 @@ class Orbit(object):
         try:
             if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
                 raise NotImplementedError(
-                    "This has not been implemented for {}".format(attractor.name)
+                    f"This has not been implemented for {attractor.name}"
                 )
 
             assert alt > 0
@@ -828,15 +832,11 @@ class Orbit(object):
 
         except AttributeError:
             raise AttributeError(
-                "Attractor {} has not spherical harmonics implemented".format(
-                    attractor.name
-                )
+                f"Attractor {attractor.name} has not spherical harmonics implemented"
             )
         except AssertionError:
             raise ValueError(
-                "The semimajor axis may not be smaller that {}'s radius".format(
-                    attractor.name
-                )
+                f"The semimajor axis may not be smaller that {attractor.name}'s radius"
             )
 
     def represent_as(self, representation):
@@ -1156,9 +1156,7 @@ class Orbit(object):
                 kwargs["obstime"] = self.epoch + time_values
             else:
                 warn(
-                    "Frame {} does not support 'obstime', time values were not returned".format(
-                        self.frame.__class__
-                    )
+                    f"Frame {self.frame.__class__} does not support 'obstime', time values were not returned"
                 )
 
             # Use of a protected method instead of frame.realize_frame
@@ -1172,9 +1170,7 @@ class Orbit(object):
 
         except NotImplementedError:
             warn(
-                "No frame found for attractor {}, returning only cartesian coordinates instead".format(
-                    self.attractor
-                )
+                f"No frame found for attractor {self.attractor}, returning only cartesian coordinates instead"
             )
             return cartesian
 
