@@ -19,3 +19,4 @@ Jupyter notebooks
    /examples/Visualizing the SpaceX Tesla Roadster trip to Mars.ipynb
    /examples/Natural and artificial perturbations.ipynb
    /examples/Porkchops with poliastro.ipynb
+   /examples/Multirevolutions solution in Lamberts problem.ipynb
