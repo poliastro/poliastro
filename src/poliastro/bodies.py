@@ -28,7 +28,7 @@ from poliastro import constants
 
 class _Body(object):
     def __str__(self):
-        return u"{0} ({1})".format(self.name, self.symbol)
+        return "{0} ({1})".format(self.name, self.symbol)
 
     def __repr__(self):
         return self.__str__()
@@ -105,7 +105,7 @@ class _Sun(_Body):
     parent = None
     k = constants.GM_sun
     name = "Sun"
-    symbol = u"\u2609"
+    symbol = "\u2609"
     R = constants.R_sun
     mass = k / G
     J2 = constants.J2_sun
@@ -127,7 +127,7 @@ class _Mercury(_Body):
     parent = Sun
     k = constants.GM_mercury
     name = "Mercury"
-    symbol = u"\u263F"
+    symbol = "\u263F"
     R = constants.R_mercury
     mass = k / G
 
@@ -144,7 +144,7 @@ class _Venus(_Body):
     parent = Sun
     k = constants.GM_venus
     name = "Venus"
-    symbol = u"\u2640"
+    symbol = "\u2640"
     R = constants.R_venus
     mass = k / G
     J2 = constants.J2_venus
@@ -164,7 +164,7 @@ class _Earth(_Body):
     parent = Sun
     k = constants.GM_earth
     name = "Earth"
-    symbol = u"\u2641"
+    symbol = "\u2641"
     R = constants.R_earth
     mass = k / G
     J2 = constants.J2_earth
@@ -185,7 +185,7 @@ class _Mars(_Body):
     parent = Sun
     k = constants.GM_mars
     name = "Mars"
-    symbol = u"\u2642"
+    symbol = "\u2642"
     R = constants.R_mars
     mass = k / G
     J2 = constants.J2_mars
@@ -204,7 +204,7 @@ class _Jupiter(_Body):
     parent = Sun
     k = constants.GM_jupiter
     name = "Jupiter"
-    symbol = u"\u2643"
+    symbol = "\u2643"
     R = constants.R_jupiter
     mass = k / G
 
@@ -243,7 +243,7 @@ class _Saturn(_Body):
     parent = Sun
     k = constants.GM_saturn
     name = "Saturn"
-    symbol = u"\u2644"
+    symbol = "\u2644"
     R = constants.R_saturn
     mass = k / G
 
@@ -260,7 +260,7 @@ class _Uranus(_Body):
     parent = Sun
     k = constants.GM_uranus
     name = "Uranus"
-    symbol = u"\u26E2"
+    symbol = "\u26E2"
     R = constants.R_uranus
     mass = k / G
 
@@ -277,7 +277,7 @@ class _Neptune(_Body):
     parent = Sun
     k = constants.GM_neptune
     name = "Neptune"
-    symbol = u"\u2646"
+    symbol = "\u2646"
     R = constants.R_neptune
     mass = k / G
 
@@ -296,7 +296,7 @@ class _Pluto(_Body):
     parent = Sun
     k = constants.GM_pluto
     name = "Pluto"
-    symbol = u"\u2647"
+    symbol = "\u2647"
     R = constants.R_pluto
     mass = k / G
 
@@ -325,7 +325,7 @@ class _Moon(_Body):
     parent = Earth
     k = constants.GM_moon
     name = "Moon"
-    symbol = u"\u263E"
+    symbol = "\u263E"
     R = constants.R_moon
     mass = k / G
 
