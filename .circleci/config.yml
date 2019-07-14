@@ -23,35 +23,6 @@ jobs:
           command: |
             tox -e check
 
-  test_py35:
-    docker:
-      - image: circleci/python:3.5
-
-    working_directory: ~/repo
-
-    environment:
-      PIP_PREFER_BINARY: true
-      PIP_PROGRESS_BAR: "off"
-
-    steps:
-      - checkout
-
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip
-            pip install .
-            pip install .[dev]
-
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            MPLBACKEND=Agg pytest -m "not mpl_image_compare" --doctest-modules -vv  # Test against installed code
-            MPLBACKEND=Agg pytest -m "mpl_image_compare" --mpl
-
   test_py36: &test-template  # See https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462/2
     docker:
       - image: circleci/python:3.6
@@ -158,9 +129,6 @@ workflows:
   build_and_test:
     jobs:
       - quality
-      - test_py35:
-          requires:
-            - quality
       - test_py36:
           requires:
             - quality
@@ -172,6 +140,5 @@ workflows:
             - quality
       - docs:
           requires:
-            - test_py35
             - test_py36
             - test_py37
