@@ -352,7 +352,7 @@ J3_venus = Constant(
 H0_earth = Constant(
     "H0_earth",
     "Earth H0 atmospheric scale height",
-    8500,
+    8_500,
     "m",
     1,
     "de Pater and Lissauer 2010",

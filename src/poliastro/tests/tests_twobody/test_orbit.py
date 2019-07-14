@@ -352,7 +352,7 @@ def test_orbit_representation():
 
 def test_orbit_no_frame_representation():
     date_launch = Time("2011-11-26 15:02", scale="utc")
-    r = [61445.76498656, 24827.93010168, 0.0] * u.km
+    r = [61_445.76498656, 24_827.93010168, 0.0] * u.km
     v = [-0.42581645, -0.18867869, 0.0] * u.km / u.s
     ss = Orbit.from_vectors(Moon, r, v, date_launch)
     expected_str = "106 x -142299 km x 180.0 deg orbit around Moon (\u263E) at epoch 2011-11-26 15:02:00.000 (UTC)"
@@ -373,7 +373,7 @@ def test_sample_numpoints():
 @pytest.mark.parametrize("num_points", [3, 5, 7, 9, 11, 101])
 def test_sample_num_points(num_points):
     # Data from Vallado, example 2.4
-    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    r0 = [1_131.340, -2_282.343, 6_672.423] * u.km
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
     ss0 = Orbit.from_vectors(Earth, r0, v0)
 
@@ -390,7 +390,7 @@ def test_sample_big_orbits():
     # See https://github.com/poliastro/poliastro/issues/265
     ss = Orbit.from_vectors(
         Sun,
-        [-9018878.6, -94116055, 22619059] * u.km,
+        [-9_018_878.6, -94_116_055, 22_619_059] * u.km,
         [-49.950923, -12.948431, -4.2925158] * u.km / u.s,
     )
     positions = ss.sample(15)
@@ -448,7 +448,7 @@ def test_orbit_is_pickable(hyperbolic):
 
 def test_orbit_plot_is_static():
     # Data from Curtis, example 4.3
-    r = [-6045, -3490, 2500] * u.km
+    r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
 
@@ -460,7 +460,7 @@ def test_orbit_plot_is_static():
 
 def test_orbit_plot_static_3d():
     # Data from Curtis, example 4.3
-    r = [-6045, -3490, 2500] * u.km
+    r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
     with pytest.raises(
@@ -475,7 +475,7 @@ def test_orbit_plot_is_not_static(use_3d):
     from plotly.graph_objs import FigureWidget
 
     # Data from Curtis, example 4.3
-    r = [-6045, -3490, 2500] * u.km
+    r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
 
@@ -623,13 +623,13 @@ def test_plane_is_set_in_horizons():
         (
             Earth,
             (2 * np.pi / 23.9345) * u.rad / u.hour,
-            42164205 * u.m,
+            42_164_205 * u.m,
             23.9345 * u.hour,
         ),
         (
             Mars,
             (2 * np.pi / 24.6228) * u.rad / u.hour,
-            20427595 * u.m,
+            20_427_595 * u.m,
             24.6228 * u.hour,
         ),
     ],
@@ -645,8 +645,8 @@ def test_geostationary_creation_from_angular_velocity(
 @pytest.mark.parametrize(
     "attractor,period,expected_a",
     [
-        (Earth, 23.9345 * u.hour, 42164205 * u.m),
-        (Mars, 24.6228 * u.hour, 20427595 * u.m),
+        (Earth, 23.9345 * u.hour, 42_164_205 * u.m),
+        (Mars, 24.6228 * u.hour, 20_427_595 * u.m),
     ],
 )
 def test_geostationary_creation_from_period(attractor, period, expected_a):
@@ -658,8 +658,8 @@ def test_geostationary_creation_from_period(attractor, period, expected_a):
 @pytest.mark.parametrize(
     "attractor,period,hill_radius,expected_a",
     [
-        (Earth, 23.9345 * u.hour, 0.01 * u.AU, 42164205 * u.m),
-        (Mars, 24.6228 * u.hour, 1000000 * u.km, 20427595 * u.m),
+        (Earth, 23.9345 * u.hour, 0.01 * u.AU, 42_164_205 * u.m),
+        (Mars, 24.6228 * u.hour, 1_000_000 * u.km, 20_427_595 * u.m),
     ],
 )
 def test_geostationary_creation_with_Hill_radius(
@@ -684,7 +684,7 @@ def test_geostationary_input(attractor):
 
 
 @pytest.mark.parametrize(
-    "attractor,period,hill_radius", [(Venus, 243.025 * u.day, 1000000 * u.km)]
+    "attractor,period,hill_radius", [(Venus, 243.025 * u.day, 1_000_000 * u.km)]
 )
 def test_geostationary_non_existence_condition(attractor, period, hill_radius):
     with pytest.raises(ValueError) as excinfo:
@@ -714,7 +714,7 @@ def test_expected_mean_anomaly():
     attractor = Earth
 
     _a = 1.0 * u.deg  # Unused angle
-    a = 15300 * u.km
+    a = 15_300 * u.km
     ecc = 0.37255 * u.one
     nu = 120 * u.deg
 
@@ -731,7 +731,7 @@ def test_expected_angular_momentum():
     attractor = Earth
 
     _a = 1.0 * u.deg  # Unused angle
-    a = 15300 * u.km
+    a = 15_300 * u.km
     ecc = 0.37255 * u.one
     nu = 120 * u.deg
 
@@ -748,7 +748,7 @@ def test_expected_last_perifocal_passage():
     attractor = Earth
 
     _a = 1.0 * u.deg  # Unused angle
-    a = 15300 * u.km
+    a = 15_300 * u.km
     ecc = 0.37255 * u.one
     nu = 120 * u.deg
 
@@ -761,13 +761,13 @@ def test_expected_last_perifocal_passage():
 def test_convert_from_rv_to_coe():
     # Data from Vallado, example 2.6
     attractor = Earth
-    p = 11067.790 * u.km
+    p = 11_067.790 * u.km
     ecc = 0.83285 * u.one
     inc = 87.87 * u.deg
     raan = 227.89 * u.deg
     argp = 53.38 * u.deg
     nu = 92.335 * u.deg
-    expected_r = [6525.344, 6861.535, 6449.125] * u.km
+    expected_r = [6_525.344, 6_861.535, 6_449.125] * u.km
     expected_v = [4.902276, 5.533124, -1.975709] * u.km / u.s
 
     r, v = Orbit.from_classical(
@@ -781,10 +781,10 @@ def test_convert_from_rv_to_coe():
 def test_convert_from_coe_to_rv():
     # Data from Vallado, example 2.5
     attractor = Earth
-    r = [6524.384, 6862.875, 6448.296] * u.km
+    r = [6_524.384, 6_862.875, 6_448.296] * u.km
     v = [4.901327, 5.533756, -1.976341] * u.km / u.s
 
-    expected_p = 11067.79 * u.km
+    expected_p = 11_067.79 * u.km
     expected_ecc = 0.832853 * u.one
     expected_inc = 87.870 * u.deg
     expected_raan = 227.89 * u.deg
@@ -814,7 +814,7 @@ def test_perifocal_points_to_perigee():
 
 
 def test_arglat_within_range():
-    r = [3539.08827417, 5310.19903462, 3066.31301457] * u.km
+    r = [3_539.08827417, 5_310.19903462, 3_066.31301457] * u.km
     v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
     assert 0 * u.deg <= ss.arglat <= 360 * u.deg
@@ -833,7 +833,7 @@ def test_pqw_returns_dimensionless():
 
 
 def test_from_coord_fails_if_no_time_differential():
-    pos = [30000, 0, 0] * u.km
+    pos = [30_000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos)
 
     # Method fails if coordinate instance doesn't contain a differential with
@@ -853,7 +853,7 @@ def test_orbit_creation_using_skycoord(attractor):
     vel = [0, 2, 0] * u.km / u.s
     cartdiff = CartesianDifferential(*vel)
 
-    pos = [30000, 0, 0] * u.km
+    pos = [30_000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
 
     coord = SkyCoord(cartrep, frame="icrs")
@@ -881,7 +881,7 @@ def test_orbit_creation_using_frame_obj(attractor, frame, obstime):
     vel = [0, 2, 0] * u.km / u.s
     cartdiff = CartesianDifferential(*vel)
 
-    pos = [30000, 0, 0] * u.km
+    pos = [30_000, 0, 0] * u.km
     cartrep = CartesianRepresentation(*pos, differentials=cartdiff)
 
     coord = frame(cartrep, obstime=obstime)
@@ -1012,7 +1012,7 @@ def test_orbit_change_attractor_closed():
 
 
 def test_orbit_change_attractor_open():
-    r = [-6045, -3490, 2500] * u.km
+    r = [-6_045, -3_490, 2_500] * u.km
     v = [-15.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
 
