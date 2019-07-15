@@ -24,6 +24,7 @@ def test_czml_custom_packet():
     pr_map_url = (
         "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
     )
+    scene = False
     expected_packet = """{
     "id": "custom_properties",
     "properties": {
@@ -37,12 +38,18 @@ def test_czml_custom_packet():
                 ]
             }
         ],
-        "map_url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+        "map_url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg",
+        "scene3D": false
     }
 }"""
 
     extractor = CZMLExtractor(
-        start_epoch, end_epoch, sample_points, ellipsoid=ellipsoidr, pr_map=pr_map_url
+        start_epoch,
+        end_epoch,
+        sample_points,
+        ellipsoid=ellipsoidr,
+        pr_map=pr_map_url,
+        scene3D=scene,
     )
 
     pckt = extractor.packets[-1]
@@ -84,7 +91,8 @@ def test_czml_add_orbit():
         ],
         "map_url": [
             "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
-        ]
+        ],
+        "scene3D": true
     }
 }, {
     "id": 0,
@@ -331,7 +339,8 @@ def test_czml_ground_station():
         ],
         "map_url": [
             "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
-        ]
+        ],
+        "scene3D": true
     }
 }, {
     "id": "GS0",
