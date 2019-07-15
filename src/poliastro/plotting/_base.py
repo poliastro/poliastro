@@ -7,7 +7,7 @@ import numpy as np
 import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from plotly.graph_objs import FigureWidget
+from plotly.graph_objs import Figure
 from plotly.offline import plot as export
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
@@ -24,7 +24,7 @@ class BaseOrbitPlotter:
     """
 
     def __init__(self, figure=None):
-        self._figure = figure or FigureWidget()
+        self._figure = figure or Figure()
         self._layout = None
 
         self._trajectories = []  # type: List[Trajectory]
