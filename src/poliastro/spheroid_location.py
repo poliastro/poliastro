@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class GroundStation(object):
+class SpheroidLocation(object):
     """ Class representing a ground station on an arbitrary ellipsoid.
     """
 
@@ -52,7 +52,7 @@ class GroundStation(object):
 
     @property
     def N(self):
-        """Normal vector of the ellipsoid at the point of the ground station.
+        """Normal vector of the ellipsoid at the given location.
         """
         x, y, z = self.cartesian_cords
         a, b, c = self._a.value, self._b.value, self._c.value
@@ -62,7 +62,7 @@ class GroundStation(object):
 
     @property
     def tangential_vecs(self):
-        """Returns orthonormal vectors tangential to the ellipsoid at the point of the ground station.
+        """Returns orthonormal vectors tangential to the ellipsoid at the given location.
         """
         N = self.N
         u = np.array([1.0, 0, 0])
@@ -73,7 +73,7 @@ class GroundStation(object):
 
     @property
     def radius_of_curvature(self):
-        """Radius of curvature of the meridian at the latitude of the ground station.
+        """Radius of curvature of the meridian at the latitude of the given location.
         """
         e2 = 1 - (self._c / self._a) ** 2
         rc = self._a * (1 - e2) / (1 - e2 * np.sin(self._lat) ** 2) ** 1.5
@@ -81,7 +81,7 @@ class GroundStation(object):
 
     def distance(self, px, py, pz):
         """
-        Calculates the distance from point to ground station.
+        Calculates the distane from an arbitrary point to the given location (Cartesian coordinates).
 
         Parameters
         ----------
@@ -99,7 +99,7 @@ class GroundStation(object):
 
     def is_visible(self, px, py, pz):
         """
-        Determines whether an object located at a given point is visible from the ground station.
+        Determines whether an object located at a given point is visible from the given location.
         Returns true if true, false otherwise.
 
         Parameters
