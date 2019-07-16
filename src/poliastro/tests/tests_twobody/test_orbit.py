@@ -996,6 +996,18 @@ def test_orbit_change_attractor_out_of_SOI():
     assert "ValueError: Orbit is out of new attractor's SOI" in excinfo.exconly()
 
 
+def test_orbit_change_attractor_force():
+    ss = Orbit.from_vectors(
+        Sun,
+        r=[5.98967334e08, 4.09500684e08, 1.60955500e08] * u.km,
+        v=[-13.30694373, 25.15256978, 11.59846936] * u.km / u.s,
+        epoch=J2000,
+    )
+
+    ss_new_attractor = ss.change_attractor(Earth, force=True)
+    assert ss_new_attractor.attractor == Earth
+
+
 def test_orbit_change_attractor_unrelated_body():
     with pytest.raises(ValueError) as excinfo:
         iss.change_attractor(Mars)

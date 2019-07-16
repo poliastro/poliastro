@@ -448,7 +448,7 @@ class Orbit(object):
 
         return ss
 
-    def change_attractor(self, new_attractor):
+    def change_attractor(self, new_attractor, force=False):
         """Changes orbit attractor.
 
         Only changes from attractor to parent or the other way around are allowed.
@@ -457,6 +457,8 @@ class Orbit(object):
         ----------
         new_attractor: poliastro.bodies.Body
             Desired new attractor.
+        force: boolean
+            If `True`, changes attractor even if physically has no-sense.
 
         Returns
         -------
@@ -477,9 +479,11 @@ class Orbit(object):
         else:
             raise ValueError("Cannot change to unrelated attractor")
 
-        if distance > r_soi:
-            raise ValueError("Orbit is out of new attractor's SOI")
-        elif self.ecc < 1.0:
+        if distance > r_soi and not force:
+            raise ValueError(
+                "Orbit is out of new attractor's SOI. If required, use 'force=True'."
+            )
+        elif self.ecc < 1.0 and not force:
             raise ValueError("Orbit will never leave the SOI of its current attractor")
         else:
             warn("Leaving the SOI of the current attractor", PatchedConicsWarning)
