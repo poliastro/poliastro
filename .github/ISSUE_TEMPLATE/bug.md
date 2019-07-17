@@ -1,17 +1,12 @@
-<!--
+---
+name: Bug, problem, error
+about: Bug reports, inconsistent results, unexpected errors
+title: ''
+labels: support
+assignees: ''
+---
 
-WELCOME ABOARD!
-
-Hi and welcome to the poliastro project. We appreciate bug reports, questions
-about documentation, and suggestions for new features.
-
-IMPORTANT: If you are reporting a problem with poliastro, please follow the
-template below. If it's a suggestion, a possible new addition to the library,
-or just want to say "Thank you!", you can remove all this text and start
-from scratch.
-
--->
-<!--- Provide a general summary of the issue in the Title above -->
+<!--- Provide a general summary of the issue in the title above -->
 
 🐞 **Problem**
 
@@ -53,11 +48,6 @@ We will ask you for your installation details in the following sections.
 
 ```
 </details>
-
-🎯 **Goal**
-
-<!--- Why is this change important to you? How would you use it? -->
-<!--- How can it benefit other users? -->
 
 💡 **Possible solutions**
 
