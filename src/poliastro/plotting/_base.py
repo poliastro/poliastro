@@ -1,4 +1,3 @@
-import os.path
 from collections import namedtuple
 from itertools import cycle
 from typing import List
@@ -8,7 +7,6 @@ import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from plotly.graph_objects import Figure
-from plotly.offline import plot as export
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
