@@ -63,7 +63,17 @@ class Body(_Body):
 
     """
 
-    def __init__(self, parent, k, name, symbol=None, R=0 * u.km, **kwargs):
+    def __init__(
+        self,
+        parent,
+        k,
+        name,
+        symbol=None,
+        R=0 * u.km,
+        R_polar=0 * u.km,
+        R_mean=0 * u.km,
+        **kwargs,
+    ):
         """Constructor.
 
         Parameters
@@ -77,14 +87,19 @@ class Body(_Body):
         symbol : str, optional
             Symbol for the body.
         R : ~astropy.units.Quantity, optional
-            Radius of the body.
-
+            Equatorial radius of the body.
+        R_polar: ~astropy.units.Quantity, optional
+            Polar radius of the body
+        R_mean: ~astropy.units.Quantity, optional
+            Mean radius of the body
         """
         self.parent = parent
         self.k = k
         self.name = name
         self.symbol = symbol
         self.R = R
+        self.R_polar = R_polar
+        self.R_mean = R_mean
         self.kwargs = kwargs
 
     @classmethod
@@ -129,6 +144,7 @@ class _Mercury(_Body):
     name = "Mercury"
     symbol = "\u263F"
     R = constants.R_mercury
+    R_mean = constants.R_mean_mercury
     mass = k / G
 
     @staticmethod
@@ -146,6 +162,7 @@ class _Venus(_Body):
     name = "Venus"
     symbol = "\u2640"
     R = constants.R_venus
+    R_mean = constants.R_mean_venus
     mass = k / G
     J2 = constants.J2_venus
     J3 = constants.J3_venus
@@ -166,6 +183,7 @@ class _Earth(_Body):
     name = "Earth"
     symbol = "\u2641"
     R = constants.R_earth
+    R_mean = constants.R_mean_earth
     mass = k / G
     J2 = constants.J2_earth
     J3 = constants.J3_earth
@@ -187,6 +205,7 @@ class _Mars(_Body):
     name = "Mars"
     symbol = "\u2642"
     R = constants.R_mars
+    R_mean = constants.R_mean_mars
     mass = k / G
     J2 = constants.J2_mars
     J3 = constants.J3_mars
@@ -206,6 +225,7 @@ class _Jupiter(_Body):
     name = "Jupiter"
     symbol = "\u2643"
     R = constants.R_jupiter
+    R_mean = constants.R_mean_jupiter
     mass = k / G
 
     @staticmethod
@@ -245,6 +265,7 @@ class _Saturn(_Body):
     name = "Saturn"
     symbol = "\u2644"
     R = constants.R_saturn
+    R_mean = constants.R_mean_saturn
     mass = k / G
 
     @staticmethod
@@ -262,6 +283,7 @@ class _Uranus(_Body):
     name = "Uranus"
     symbol = "\u26E2"
     R = constants.R_uranus
+    R_mean = constants.R_mean_uranus
     mass = k / G
 
     @staticmethod
@@ -279,6 +301,7 @@ class _Neptune(_Body):
     name = "Neptune"
     symbol = "\u2646"
     R = constants.R_neptune
+    R_mean = constants.R_mean_neptune
     mass = k / G
 
     @staticmethod
@@ -298,6 +321,7 @@ class _Pluto(_Body):
     name = "Pluto"
     symbol = "\u2647"
     R = constants.R_pluto
+    R_mean = constants.R_mean_pluto
     mass = k / G
 
     @staticmethod
@@ -327,6 +351,7 @@ class _Moon(_Body):
     name = "Moon"
     symbol = "\u263E"
     R = constants.R_moon
+    R_mean = constants.R_mean_moon
     mass = k / G
 
     @staticmethod
