@@ -1,4 +1,3 @@
-import tempfile
 from unittest import mock
 
 import pytest
@@ -124,20 +123,6 @@ def test_show_calls_prepare_plot(plotter_class):
         m.plot(orbit=earth, label="Object")
         m.show()
 
-        mock_prepare_plot.assert_called_with()
-
-
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
-@mock.patch("poliastro.plotting._base.export")
-def test_savefig_calls_prepare_plot(mock_export, plotter_class):
-    with mock.patch.object(plotter_class, "_prepare_plot") as mock_prepare_plot:
-        m = plotter_class()
-        earth = Orbit.from_body_ephem(Earth)
-        m.plot(orbit=earth, label="Object")
-        with tempfile.NamedTemporaryFile() as fp:
-            m.savefig(filename=fp.name + ".jpeg")
-
-        assert mock_export.call_count == 1
         mock_prepare_plot.assert_called_with()
 
 

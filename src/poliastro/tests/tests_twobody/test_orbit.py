@@ -472,7 +472,7 @@ def test_orbit_plot_static_3d():
 
 @pytest.mark.parametrize("use_3d", [False, True])
 def test_orbit_plot_is_not_static(use_3d):
-    from plotly.graph_objs import Figure
+    from plotly.graph_objects import Figure
 
     # Data from Curtis, example 4.3
     r = [-6_045, -3_490, 2_500] * u.km
