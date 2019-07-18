@@ -237,7 +237,7 @@ R_mean_uranus = Constant(
     "R_mean_uranus",
     "Uranus mean radius",
     2.5362e7,
-    "km",
+    "m",
     7000,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
     system="si",
@@ -247,7 +247,7 @@ R_mean_neptune = Constant(
     "R_mean_neptune",
     "Neptune mean radius",
     2.4622e7,
-    "km",
+    "m",
     19000,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
     system="si",
@@ -257,7 +257,7 @@ R_mean_pluto = Constant(
     "R_mean_pluto",
     "Pluto mean radius",
     1.188e6,
-    "km",
+    "m",
     1600,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
     system="si",
@@ -267,7 +267,7 @@ R_mean_moon = Constant(
     "R_mean_moon",
     "Moon mean radius",
     1.7374e6,
-    "km",
+    "m",
     0,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
     system="si",
@@ -288,7 +288,7 @@ R_earth = Constant(
     "Earth equatorial radius",
     6.3781366e6,
     "m",
-    0.0001,
+    0.1,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
     system="si",
 )
@@ -367,7 +367,7 @@ R_neptune = Constant(
 R_pluto = Constant(
     "R_pluto",
     "Pluto equatorial radius",
-    1.188e6,
+    1.1883e6,
     "m",
     1600,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
@@ -377,6 +377,106 @@ R_pluto = Constant(
 R_moon = Constant(
     "R_moon",
     "Moon equatorial radius",
+    1.7374e6,
+    "m",
+    0,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_earth = Constant(
+    "R_polar_earth",
+    "Earth polar radius",
+    6.3567519e6,
+    "m",
+    0.1,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_mercury = Constant(
+    "R_polar_mercury",
+    "Mercury polar radius",
+    2.43826e6,
+    "m",
+    40,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_venus = Constant(
+    "R_polar_venus",
+    "Venus polar radius",
+    6.0518e6,
+    "m",
+    1000,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_mars = Constant(
+    "R_polar_mars",
+    "Mars polar radius",
+    3.376220e6,
+    "m",
+    100,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_jupiter = Constant(
+    "R_polar_jupiter",
+    "Jupiter polar radius",
+    6.6854,
+    "m",
+    10000,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009",
+    system="si",
+)
+
+R_polar_saturn = Constant(
+    "R_polar_saturn",
+    "Saturn polar radius",
+    5.4364e7,
+    "m",
+    10000,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_uranus = Constant(
+    "R_polar_uranus",
+    "Uranus polar radius",
+    2.4973e7,
+    "m",
+    20000,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_neptune = Constant(
+    "R_polar_neptune",
+    "Neptune polar radius",
+    2.4341e7,
+    "m",
+    30000,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_pluto = Constant(
+    "R_polar_pluto",
+    "Pluto polar radius",
+    1.1883e6,
+    "m",
+    1600,
+    "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
+    system="si",
+)
+
+R_polar_moon = Constant(
+    "R_polar_moon",
+    "Moon polar radius",
     1.7374e6,
     "m",
     0,
