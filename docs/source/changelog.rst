@@ -1,6 +1,168 @@
 What's new
 ==========
 
+poliastro 0.13 (Unreleased)
+---------------------------
+
+This major release is packed with new features, especially the new
+CZML exporting capabilities and miscellaneous additions and important fixes
+on the algorithmic side. It also sets a new high in terms of contributors,
+which makes us extremely proud and thankful!
+
+Highlights
+..........
+
+* **Export Orbit objects to CZML**: There is new experimental functionality to
+  export :py:class:`~poliastro.twobody.orbit.Orbit` to CZML, the JSON format used
+  by the Cesium visualization system. This complements poliastro capabilities
+  and allows users to produce gorgeous visualizations, like the one below.
+  We also kickstarted a new project called `czml3`_ a Python 3 interface to CZML,
+  to support all these new capabilities, and created a `base Cesium application`_
+  so you can quickly start experimenting. Let us know your thoughts!
+* **2D plots are static by default**: Getting Plotly properly installed is
+  a bit more difficult than just a :code:`pip install` nowadays, and
+  it turns out we alienated some of our non-Jupyter users by pushing it too soon
+  (especially those of you that use Spyder). We have tried hard in this release
+  to make the default plotting work everywhere by sticking again to matplotlib,
+  while allowing more proficient users to install all the necessary components
+  to have interactive visualizations going. If you still find issues, tell us!
+* **New Lambert maneuver**: After a long time, Lambert transfers are finally
+  a :py:class:`~poliastro.maneuver.Maneuver`, which means it shares the same API
+  as Hohmann and bielliptic transfers among others, making it easier to use.
+* **Lots of new propagators**: And when we say _lots_, we mean it! Lots of
+  authors claim their propagator is "universal", but to our knowledge this is
+  almost always a slight overstatement. To enrich poliastro with new propagation
+  methods and allow users to test them with all kinds of crazy orbits
+  (especially quasy-parabolic ones) we implemented a ton of new propagators,
+  all sharing the same API. You have more information in this article about
+  `the new propagators`_ in our blog.
+* **Python 3.6+ only**: Python 3.5 has done a great service and will still be
+  supported by Astropy a few more months, but we already wanted to move on
+  and embrace fixed-order dictionaries, f-strings, and decimal separators,
+  among others. This release of poliastro requires Python 3.6 or higher to work.
+  We are also getting ready for Python 3.8!
+
+.. image:: _static/cesium.gif
+   :width: 675px
+   :align: center
+
+.. _`czml3`: https://github.com/poliastro/czml3/
+.. _`base Cesium application`: https://github.com/poliastro/cesium-app
+.. _`the new propagators`: https://blog.poliastro.space/2019/07/16/2019-07-16-new-propagators/
+
+
+New features
+............
+
+* **More orbit creation methods**: Both to interface with external systems
+  (:py:meth:`~poliastro.twobody.orbit.Orbit.from_sbdbs`) and to build new special orbits
+  (:py:meth:`~poliastro.twobody.orbit.Orbit.frozen`).
+* **Non-planar transfer maneuvers**: https://github.com/poliastro/poliastro/pull/599
+* **Arrival velocity contour lines in porkchop plots**: Now porkchop plots are a bit richer
+  and display arrival velocity as well.
+* **Experimental Geocentric Solar Ecliptic frame**: We introduced an experimental
+  implementation of a Geocentric Solar Ecliptic frame, which is used for studies of
+  Near Earth Objects. Please help us validating it!
+* **Plot orbit trails**: Apart from plotting orbits as solid or dashed lines, now
+  it's easier to visualize the actual direction of the orbit using :code:`trail=True`.
+* **New :code:`change_attractor` method**: Now it's easier to translate the origin
+  of an orbit (withing the patched conics framework) to study it from a different perspective
+  using the :py:meth:`~poliastro.twobody.orbit.Orbit.change_attractor` method.
+* **New :code:`SpheroidLocation`**: We also added a experimental
+  :py:class:`poliastro.spheroid_location.SpheroidLocation`, which tries to generalize
+  :py:class:`astropy.coordinates.EarthLocation` to other bodies.
+* **New orbital properties**: Angular momentum, mean anomaly, time of perifocal passage
+  of :py:class:`~poliastro.twobody.orbit.Orbit` are now very easy to compute.
+
+Bugs fixed
+..........
+
+* `Issue #348`_ and `Issue #495`_: Fix Lambert corner case
+* `Issue #530`_: FigureWidget objects are not used anymore
+* `Issue #542`_: Download progress is now shown for DASTCOM5
+* `Issue #548`_ and `Issue #629`_: ipywidgets was not present in requirements
+* `Issue #572`_: documentation CSS is no longer messed up
+* `Issue #585`_: OrbitPlotter classes no longer relayout the figure
+  in Plotly batch mode
+* `Issue #590`_: Confusion between semimajor axis and semilatus rectum
+  in docstring
+* `Issue #609`_: Raise error in :py:meth:`~poliastro.twobody.orbit.Orbit.from_sbdb`
+* `Issue #652`_: Editable installs now work with modern pip
+  when more than one orbit is returned
+* `Issue #654`_: Orbits around custom bodies can be propagated again
+
+.. _`Issue #348`: https://github.com/poliastro/poliastro/issues/348
+.. _`Issue #530`: https://github.com/poliastro/poliastro/issues/530
+.. _`Issue #542`: https://github.com/poliastro/poliastro/issues/542
+.. _`Issue #548`: https://github.com/poliastro/poliastro/issues/548
+.. _`Issue #572`: https://github.com/poliastro/poliastro/issues/572
+.. _`Issue #585`: https://github.com/poliastro/poliastro/issues/585
+.. _`Issue #590`: https://github.com/poliastro/poliastro/issues/590
+.. _`Issue #609`: https://github.com/poliastro/poliastro/issues/609
+.. _`Issue #652`: https://github.com/poliastro/poliastro/issues/652
+.. _`Issue #654`: https://github.com/poliastro/poliastro/issues/654
+
+Backwards incompatible changes
+..............................
+
+* The :py:mod:`poliastro.neos.neows` module is gone, use
+  :py:meth:`~poliastro.twobody.orbit.Orbit.from_horizons`
+  or :py:meth:`~poliastro.twobody.orbit.Orbit.from_sbdb` instead.
+  We were pioneers in implementing it, but now the same functionality
+  can be found elsewhere, with better support.
+* We removed :py:class:`~poliastro.plotting.OrbitPlotter2D.savefig`,
+  check out the `Plotly exporting documentation`_ for the best way
+  of doing the same thing.
+* We removed the :code:`method` parameter from
+  :py:meth:`~poliastro.twobody.orbit.Orbit.sample`,
+  use :py:meth:`poliastro.twobody.propagation.propagate` for lower
+  level control instead.
+  We wanted to simplify the :code:`sample` method to avoid making
+  it a catch-all function.
+
+.. _`Plotly exporting documentation`: https://plot.ly/python/next/static-image-export/
+
+Known outstanding problems
+..........................
+
+* Plotly plots do not show in docs... again!
+  See https://github.com/poliastro/poliastro/issues/281
+
+Other news
+..........
+
+* Updated minimum Astropy version to 3.2 and Plotly to 4.0.
+* Updated planetary :py:mod:`poliastro.constants`, plan to add more.
+* Better development workflow, issue templates on GitHub,
+  tools to reformat the code.
+
+Contributors
+............
+
+This is a complete, alphabetic list of people that contributed to this release,
+with a + sign indicating first contribution.
+Again we had an all-time high number of contributors, thanks everybody ❤️
+
+* Adam Johnson+
+* Ahmada Yusril+
+* Angala+
+* Divyansh Raina+
+* Eleftheria Chatziargyriou+
+* Helge Eichhorn
+* Himanshu Garg
+* Iván Castro+
+* Jesús Jiménez+
+* Jorge Martinez
+* Juan Luis Cano
+* Manuel Kaufmann+
+* María Eugenia Cruz+
+* Ritwik Saha+
+* Shreyas Bapat
+* Siro Moreno+
+* Sky+
+* Vedang Naik+
+* Wil Selwood
+
 poliastro 0.12.0 - 2019-02-21
 -----------------------------
 
