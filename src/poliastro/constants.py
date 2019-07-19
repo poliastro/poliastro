@@ -484,6 +484,7 @@ R_polar_moon = Constant(
     system="si",
 )
 
+
 J2_sun = Constant(
     "J2_sun",
     "Sun J2 oblateness coefficient",

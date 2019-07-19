@@ -150,9 +150,20 @@ class _Mercury(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-        ra = (281.01 - 0.033 * T) * u.deg
+        M1 = (174.7910857 + 4.092335 * d) * u.deg
+        M2 = (349.5821714 + 8.184670 * d) * u.deg
+        M3 = (164.3732571 + 12.277005 * d) * u.deg
+        M4 = (339.1643429 + 16.369340 * d) * u.deg
+        M5 = (153.9554286 + 20.461675 * d) * u.deg
+        ra = (281.0103 - 0.0328 * T) * u.deg
         dec = (61.45 - 0.005 * T) * u.deg
-        W = (329.548 + 6.1385025 * d) * u.deg
+        W = (329.5988 + 6.1385108 * d) * u.deg + (
+            0.01067257 * math.sin(M1.to("rad").value)
+            - 0.00112309 * math.sin(M2.to("rad").value)
+            - 0.00011040 * math.sin(M3.to("rad").value)
+            - 0.00002539 * math.sin(M4.to("rad").value)
+            - 0.00000571 * math.sin(M5.to("rad").value)
+        ) * u.deg
 
         return ra, dec, W
 
@@ -216,9 +227,55 @@ class _Mars(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-        ra = (317.68143 - 0.1061 * T) * u.deg
-        dec = (52.88650 - 0.0609 * T) * u.deg
-        W = (176.630 + 350.89198226 * d) * u.deg
+        M1 = (198.991226 + 19139.4819985 * T) * u.deg
+        M2 = (226.292679 + 38280.8511281 * T) * u.deg
+        M3 = (249.663391 + 57420.7251593 * T) * u.deg
+        M4 = (266.183510 + 76560.6367950 * T) * u.deg
+        M5 = (79.398797 + 0.5042615 * T) * u.deg
+
+        ra = (
+            317.269202
+            - 0.10927547 * T
+            + 0.000068 * math.sin(M1.to("rad").value)
+            + 0.000238 * math.sin(M2.to("rad").value)
+            + 0.000052 * math.sin(M3.to("rad").value)
+            + 0.000009 * math.sin(M4.to("rad").value)
+            + 0.419057 * math.sin(M5.to("rad").value)
+        ) * u.deg
+
+        K1 = (122.433576 + 19139.9407476 * T) * u.deg
+        K2 = (43.058401 + 38280.8753272 * T) * u.deg
+        K3 = (57.663379 + 57420.7517205 * T) * u.deg
+        K4 = (79.476401 + 76560.6495004 * T) * u.deg
+        K5 = (166.325722 + 0.5042615 * T) * u.deg
+
+        dec = (
+            54.432516
+            - 0.05827105 * T
+            + 0.000051 * math.cos(K1.to("rad").value)
+            + 0.000141 * math.cos(K2.to("rad").value)
+            + 0.000031 * math.cos(K3.to("rad").value)
+            + 0.000005 * math.cos(K4.to("rad").value)
+            + 1.591274 * math.cos(K5.to("rad").value)
+        ) * u.deg
+
+        J1 = (129.071773 + 19140.0328244 * T) * u.deg
+        J2 = (36.352167 + 38281.0473591 * T) * u.deg
+        J3 = (56.668646 + 57420.9295360 * T) * u.deg
+        J4 = (67.364003 + 76560.2552215 * T) * u.deg
+        J5 = (104.792680 + 95700.4387578 * T) * u.deg
+        J6 = (95.391654 + 0.5042615 * T) * u.deg
+
+        W = (
+            176.049863
+            + 350.891982443297 * d
+            + 0.000145 * math.sin(J1.to("rad").value)
+            + 0.000157 * math.sin(J2.to("rad").value)
+            + 0.000040 * math.sin(J3.to("rad").value)
+            + 0.000001 * math.sin(J4.to("rad").value)
+            + 0.000001 * math.sin(J5.to("rad").value)
+            + 0.584542 * math.sin(J6.to("rad").value)
+        ) * u.deg
 
         return ra, dec, W
 
@@ -259,7 +316,7 @@ class _Jupiter(_Body):
             - 0.000013 * math.cos(Jd.to("rad").value)
             + 0.000926 * math.cos(Je.to("rad").value)
         ) * u.deg
-        W = (284.95 + 870.5366420 * d) * u.deg
+        W = (284.95 + 870.536 * d) * u.deg
 
         return ra, dec, W
 
@@ -318,7 +375,7 @@ class _Neptune(_Body):
 
         ra = (299.36 + 0.70 * math.sin(N.to("rad").value)) * u.deg
         dec = (43.46 - 0.51 * math.cos(N.to("rad").value)) * u.deg
-        W = (253.18 + 536.3128492 * d - 0.48 * math.sin(N.to("rad").value)) * u.deg
+        W = (249.978 + 541.1397757 * d - 0.48 * math.sin(N.to("rad").value)) * u.deg
 
         return ra, dec, W
 
@@ -335,9 +392,9 @@ class _Pluto(_Body):
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
-        ra = 312.993 * u.deg
-        dec = 6.163 * u.deg
-        W = (190.147 + 360.9856235 * d) * u.deg
+        ra = 132.993 * u.deg
+        dec = -6.163 * u.deg
+        W = (302.695 + 56.3625225 * d) * u.deg
 
         return ra, dec, W
 
