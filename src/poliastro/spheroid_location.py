@@ -5,7 +5,7 @@ class SpheroidLocation(object):
     """ Class representing a ground station on an arbitrary ellipsoid.
     """
 
-    def __init__(self, lon, lat, h, a, c):
+    def __init__(self, lon, lat, h, body):
         """
 
         Parameters
@@ -19,18 +19,17 @@ class SpheroidLocation(object):
         h: ~astropy.units.quantity.Quantity
             geodetic height
 
-        a: ~astropy.units.quantity.Quantity
-            polar semi-major axis
+        body: ~poliastro.bodies.Body
+            Planetary body the spheroid location lies on
 
-        c: ~astropy.units.quantity.Quantity
-            equatorial semi-minor axis
         """
         self._lon = lon
         self._lat = lat
         self._h = h
-        self._a = a
-        self._b = a
-        self._c = c
+        self._body = body
+        self._a = body.R
+        self._b = body.R
+        self._c = body.R_polar
 
     @property
     def cartesian_cords(self):
