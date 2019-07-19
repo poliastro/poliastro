@@ -26,7 +26,6 @@ class SpheroidLocation(object):
         self._lon = lon
         self._lat = lat
         self._h = h
-        self._body = body
         self._a = body.R
         self._b = body.R
         self._c = body.R_polar
