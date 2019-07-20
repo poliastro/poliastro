@@ -92,6 +92,7 @@ Bugs fixed
 * `Issue #654`_: Orbits around custom bodies can be propagated again
 
 .. _`Issue #348`: https://github.com/poliastro/poliastro/issues/348
+.. _`Issue #495`: https://github.com/poliastro/poliastro/issues/495
 .. _`Issue #530`: https://github.com/poliastro/poliastro/issues/530
 .. _`Issue #542`: https://github.com/poliastro/poliastro/issues/542
 .. _`Issue #548`: https://github.com/poliastro/poliastro/issues/548
@@ -99,6 +100,7 @@ Bugs fixed
 .. _`Issue #585`: https://github.com/poliastro/poliastro/issues/585
 .. _`Issue #590`: https://github.com/poliastro/poliastro/issues/590
 .. _`Issue #609`: https://github.com/poliastro/poliastro/issues/609
+.. _`Issue #629`: https://github.com/poliastro/poliastro/issues/629
 .. _`Issue #652`: https://github.com/poliastro/poliastro/issues/652
 .. _`Issue #654`: https://github.com/poliastro/poliastro/issues/654
 
