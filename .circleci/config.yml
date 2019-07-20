@@ -55,7 +55,7 @@ jobs:
   test_py37:
     <<: *test-template
     docker:
-      - image: circleci/python:3.7.3  # https://github.com/numba/numba/issues/4323
+      - image: circleci/python:3.7
 
   coverage:
     docker:
