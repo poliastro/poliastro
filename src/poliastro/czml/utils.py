@@ -49,9 +49,9 @@ def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
     This returns both of the points intersecting the ellipsoid.
     """
     # Get rid of one parameter by translating the line's direction vector
-    k, l = u2 / u1, u3 / u1
+    k, m = u2 / u1, u3 / u1
     t0 = (
-        -a ** 2 * b ** 2 * l * z
+        -a ** 2 * b ** 2 * m * z
         - a ** 2 * c ** 2 * k * y
         - b ** 2 * c ** 2 * x
         + np.sqrt(
@@ -59,23 +59,23 @@ def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
             * b ** 2
             * c ** 2
             * (
-                a ** 2 * b ** 2 * l ** 2
+                a ** 2 * b ** 2 * m ** 2
                 + a ** 2 * c ** 2 * k ** 2
                 - a ** 2 * k ** 2 * z ** 2
-                + 2 * a ** 2 * k * l * y * z
-                - a ** 2 * l ** 2 * y ** 2
+                + 2 * a ** 2 * k * m * y * z
+                - a ** 2 * m ** 2 * y ** 2
                 + b ** 2 * c ** 2
-                - b ** 2 * l ** 2 * x ** 2
-                + 2 * b ** 2 * l * x * z
+                - b ** 2 * m ** 2 * x ** 2
+                + 2 * b ** 2 * m * x * z
                 - b ** 2 * z ** 2
                 - c ** 2 * k ** 2 * x ** 2
                 + 2 * c ** 2 * k * x * y
                 - c ** 2 * y ** 2
             )
         )
-    ) / (a ** 2 * b ** 2 * l ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
+    ) / (a ** 2 * b ** 2 * m ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
     t1 = (
-        a ** 2 * b ** 2 * l * z
+        a ** 2 * b ** 2 * m * z
         + a ** 2 * c ** 2 * k * y
         + b ** 2 * c ** 2 * x
         + np.sqrt(
@@ -83,22 +83,22 @@ def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
             * b ** 2
             * c ** 2
             * (
-                a ** 2 * b ** 2 * l ** 2
+                a ** 2 * b ** 2 * m ** 2
                 + a ** 2 * c ** 2 * k ** 2
                 - a ** 2 * k ** 2 * z ** 2
-                + 2 * a ** 2 * k * l * y * z
-                - a ** 2 * l ** 2 * y ** 2
+                + 2 * a ** 2 * k * m * y * z
+                - a ** 2 * m ** 2 * y ** 2
                 + b ** 2 * c ** 2
-                - b ** 2 * l ** 2 * x ** 2
-                + 2 * b ** 2 * l * x * z
+                - b ** 2 * m ** 2 * x ** 2
+                + 2 * b ** 2 * m * x * z
                 - b ** 2 * z ** 2
                 - c ** 2 * k ** 2 * x ** 2
                 + 2 * c ** 2 * k * x * y
                 - c ** 2 * y ** 2
             )
         )
-    ) / (a ** 2 * b ** 2 * l ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
-    p0, p1 = [x + t0, y + k * t0, z + l * t0], [x - t1, y - t1 * k, z - t1 * l]
+    ) / (a ** 2 * b ** 2 * m ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
+    p0, p1 = [x + t0, y + k * t0, z + m * t0], [x - t1, y - t1 * k, z - t1 * m]
 
     return p0, p1
 
