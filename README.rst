@@ -14,14 +14,14 @@
 :Author: Juan Luis Cano Rodríguez |orcid|
 :Version: 0.13b1
 
-.. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/v0.13.x.svg?style=flat-square&logo=circleci
+.. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/0.13.x.svg?style=flat-square&logo=circleci
    :target: https://circleci.com/gh/poliastro/poliastro
 
-.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/v0.13.x.svg?style=flat-square&logo=appveyor
-   :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/v0.13.x
+.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/0.13.x.svg?style=flat-square&logo=appveyor
+   :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/0.13.x
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
-   :target: https://codecov.io/github/poliastro/poliastro?branch=v0.13.x
+   :target: https://codecov.io/github/poliastro/poliastro?branch=0.13.x
 
 .. |codeclimate| image:: https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability
    :target: https://codeclimate.com/github/poliastro/poliastro/maintainability
@@ -30,7 +30,7 @@
    :target: https://docs.poliastro.space/en/v0.13b1/?badge=v0.13b1
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
-   :target: https://github.com/poliastro/poliastro/raw/v0.13.x/COPYING
+   :target: https://github.com/poliastro/poliastro/raw/0.13.x/COPYING
 
 .. |doi| image:: https://zenodo.org/badge/11178845.svg?style=flat-square
    :target: https://zenodo.org/badge/latestdoi/11178845
@@ -61,7 +61,7 @@ It is released under the MIT license.
 
     molniya.plot()
 
-.. image:: https://github.com/poliastro/poliastro/raw/v0.13.x/docs/source/examples/molniya.png
+.. image:: https://github.com/poliastro/poliastro/raw/0.13.x/docs/source/examples/molniya.png
    :align: center
 
 Documentation
@@ -80,7 +80,7 @@ Examples
 ========
 
 .. |mybinder| image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
-   :target: https://beta.mybinder.org/v2/gh/poliastro/poliastro/v0.13.x?filepath=index.ipynb
+   :target: https://beta.mybinder.org/v2/gh/poliastro/poliastro/0.13.x?filepath=index.ipynb
 
 
 |mybinder|
@@ -89,7 +89,7 @@ In the examples directory you can find several Jupyter notebooks with specific
 applications of poliastro. You can launch a cloud Jupyter server using `binder`_ to edit
 the notebooks without installing anything. Try it out!
 
-https://beta.mybinder.org/v2/gh/poliastro/poliastro/v0.13.x?filepath=index.ipynb
+https://beta.mybinder.org/v2/gh/poliastro/poliastro/0.13.x?filepath=index.ipynb
 
 .. _binder: https://beta.mybinder.org/
 
@@ -163,7 +163,7 @@ Contributing
 poliastro is a community project, hence all contributions are more than
 welcome! For more information, head to `CONTRIBUTING.rst`_.
 
-.. _`CONTRIBUTING.rst`: https://github.com/poliastro/poliastro/blob/v0.13.x/CONTRIBUTING.rst
+.. _`CONTRIBUTING.rst`: https://github.com/poliastro/poliastro/blob/0.13.x/CONTRIBUTING.rst
 
 Support
 =======
