@@ -124,12 +124,6 @@ Backwards incompatible changes
 
 .. _`Plotly exporting documentation`: https://plot.ly/python/next/static-image-export/
 
-Known outstanding problems
-..........................
-
-* Plotly plots do not show in docs... again!
-  See https://github.com/poliastro/poliastro/issues/281
-
 Other news
 ..........
 

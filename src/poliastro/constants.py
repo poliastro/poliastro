@@ -277,8 +277,8 @@ R_sun = Constant(
     "R_sun",
     "Sun equatorial radius",
     6.95700e8,
-    "km",
-    0.1,
+    "m",
+    0,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2015",
     system="si",
 )
