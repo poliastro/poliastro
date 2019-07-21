@@ -307,6 +307,233 @@ def test_czml_add_orbit():
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_groundtrack():
+
+    start_epoch = molniya.epoch
+    end_epoch = molniya.epoch + molniya.period
+
+    sample_points = 10
+
+    expected_doc = """[{
+    "id": "document",
+    "version": "1.0",
+    "name": "document_packet",
+    "clock": {
+        "interval": "2000-01-01T12:00:00.000/2000-01-01T23:59:35.108",
+        "currentTime": "2000-01-01T12:00:00.000",
+        "multiplier": 60,
+        "range": "LOOP_STOP",
+        "step": "SYSTEM_CLOCK_MULTIPLIER"
+    }
+}, {
+    "id": "custom_properties",
+    "properties": {
+        "custom_attractor": true,
+        "ellipsoid": [
+            {
+                "array": [
+                    6378137.0,
+                    6378137.0,
+                    6356752.314245179
+                ]
+            }
+        ],
+        "map_url": [
+            "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+        ],
+        "scene3D": true
+    }
+}, {
+    "id": 0,
+    "availability": "2000-01-01T12:00:00Z/2000-01-01T23:59:35Z",
+    "position": {
+        "epoch": "2000-01-01T12:00:00.000",
+        "interpolationAlgorithm": "LAGRANGE",
+        "interpolationDegree": 5,
+        "referenceFrame": "INERTIAL",
+        "cartesian": [
+            0.0,
+            10140093.6393,
+            -800580.7546,
+            -1598722.8246,
+            4317.5108,
+            17593269.6479,
+            8807305.9945,
+            17587783.6632,
+            8635.0217,
+            15276972.8693,
+            14840949.3322,
+            29636690.9896,
+            12952.5325,
+            10390291.9946,
+            18544487.5609,
+            37032485.9349,
+            17270.0433,
+            4459288.7909,
+            20454288.4376,
+            40846270.159,
+            21587.5541,
+            -1827745.3661,
+            20778744.495,
+            41494193.9337,
+            25905.065,
+            -7974181.1167,
+            19549661.224,
+            39039771.3569,
+            30222.5758,
+            -13412369.429,
+            16641263.6853,
+            33231835.6785,
+            34540.0866,
+            -17116767.3657,
+            11688710.5829,
+            23341815.6655,
+            38857.5975,
+            -15852598.671,
+            3766095.5927,
+            7520719.1144,
+            43175.1083,
+            10140093.6393,
+            -800580.7546,
+            -1598722.8246,
+            47492.6191,
+            17593269.6479,
+            8807305.9945,
+            17587783.6632
+        ]
+    },
+    "billboard": {
+        "show": true,
+        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII="
+    },
+    "label": {
+        "text": "Molniya",
+        "font": "11pt Lucida Console",
+        "style": "FILL",
+        "fillColor": {
+            "rgba": [
+                125,
+                80,
+                120,
+                255
+            ]
+        },
+        "outlineColor": {
+            "rgba": [
+                255,
+                255,
+                0,
+                255
+            ]
+        },
+        "outlineWidth": 1.0
+    },
+    "path": {
+        "resolution": 120,
+        "material": {
+            "solidColor": {
+                "color": {
+                    "rgba": [
+                        255,
+                        255,
+                        0,
+                        255
+                    ]
+                }
+            }
+        }
+    }
+}, {
+    "id": "groundtrack0",
+    "availability": "2000-01-01T12:00:00Z/2000-01-01T23:59:35Z",
+    "position": {
+        "epoch": "2000-01-01T12:00:00.000",
+        "interpolationAlgorithm": "LAGRANGE",
+        "interpolationDegree": 5,
+        "referenceFrame": "INERTIAL",
+        "cartesian": [
+            0.0,
+            6280728.650052842,
+            -495876.0310202439,
+            -990241.6517299684,
+            4317.5108,
+            4245757.090389717,
+            2125453.852544122,
+            4244433.16605073,
+            8635.0217,
+            2663916.0370143135,
+            2587884.609889886,
+            5167886.049854508,
+            12952.5325,
+            1548100.6194718895,
+            2763034.174623665,
+            5517651.648479046,
+            17270.0433,
+            618022.3743442999,
+            2834803.2385849194,
+            5660971.157461388,
+            21587.5541,
+            -250341.4520219223,
+            2846010.9516345025,
+            5683352.443234859,
+            25905.065,
+            -1142958.8856769665,
+            2802101.1102361814,
+            5595666.516165981,
+            30222.5758,
+            -2159933.1837527766,
+            2679915.7933351607,
+            5351668.076502109,
+            34540.0866,
+            -3490752.5841853595,
+            2383767.83897665,
+            4760274.277201323,
+            38857.5975,
+            -5630877.25034594,
+            1337725.4037362342,
+            2671375.803029601,
+            43175.1083,
+            6280728.650052842,
+            -495876.0310202439,
+            -990241.6517299684,
+            47492.6191,
+            4245757.090389717,
+            2125453.852544122,
+            4244433.16605073
+        ]
+    },
+    "path": {
+        "show": true,
+        "width": 2,
+        "resolution": 60,
+        "material": {
+            "solidColor": {
+                "color": {
+                    "rgba": [
+                        255,
+                        255,
+                        0,
+                        255
+                    ]
+                }
+            }
+        }
+    }
+}]"""
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    extractor.add_orbit(
+        molniya,
+        rtol=1e-4,
+        label_text="Molniya",
+        show_groundtrack=True,
+        label_fill_color=[125, 80, 120, 255],
+    )
+
+    assert repr(extractor.packets) == expected_doc
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_ground_station():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -347,9 +574,9 @@ def test_czml_ground_station():
     "availability": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
     "position": {
         "cartesian": [
-            2539356.1623202674,
-            4775834.339416022,
-            3379897.6662185807
+            2536956.641087247,
+            4771321.49632892,
+            3399461.1745119346
         ]
     },
     "billboard": {
@@ -376,9 +603,9 @@ def test_czml_ground_station():
     "availability": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
     "position": {
         "cartesian": [
-            4456924.997008477,
-            1886774.8000006324,
-            4154098.219336245
+            4450567.756252572,
+            1884083.5539814981,
+            4176129.520641576
         ]
     },
     "billboard": {

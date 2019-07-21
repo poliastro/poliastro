@@ -139,7 +139,7 @@ class CZMLExtractor:
             #  This is a hack to ensure that our point lies above the surface of the
             # ellipsoid. An iterative method could be used instead but the error margin
             # is too small to be worth it.
-            _cords = t, pr_p[0] + .1, pr_p[1] + .1, pr_p[2] + .1
+            _cords = t, pr_p[0] + 0.1, pr_p[1] + 0.1, pr_p[2] + 0.1
             cart_cords += _cords
 
         return cart_cords
@@ -239,10 +239,14 @@ class CZMLExtractor:
             and isinstance(pos[0], u.quantity.Quantity)
         ):
             u0, v0 = pos
+
             if self.cust_prop[0]:
-                a, b = self.cust_prop[0][:1]  # get semi-major and semi-minor axises
+                a, b = (
+                    self.cust_prop[0][0],
+                    self.cust_prop[0][2],
+                )  # get semi-major and semi-minor axises
             else:
-                a, b = 6378137.0, 6378137.0
+                a, b = 6378137.0, 6356752.3142451793
             pos = list(map(lambda x: x.value, ellipsoidal_to_cartesian(a, b, u0, v0)))
         else:
             raise TypeError(
@@ -398,6 +402,8 @@ class CZMLExtractor:
             billboard=Billboard(image=PIC_SATELLITE, show=True),
         )
 
+        self.packets.append(pckt)
+
         if show_groundtrack:
             groundtrack_cords = self._init_groundtrack_packet_cords_(self.i, rtol=rtol)
             pckt = Packet(
@@ -416,10 +422,16 @@ class CZMLExtractor:
                     show=True,
                     material=Material(
                         solidColor=SolidColorMaterial(color=Color(rgba=path_color))
+                    )
+                    if path_color is not None
+                    else Material(
+                        solidColor=SolidColorMaterial(
+                            color=Color(rgba=[255, 255, 0, 255])
+                        )
                     ),
                     resolution=60,
-                    width=8
-                )
+                    width=2,
+                ),
             )
             self.packets.append(pckt)
 
