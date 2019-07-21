@@ -135,7 +135,9 @@ class CZMLExtractor:
             # flatten list
             cords = list(map(lambda x: round(x[0], rf), cords.tolist()))
             t, p = cords[0], cords[1:]
-            pr_p = project_point_on_ellipsoid(*p, *ellipsoid)
+            pr_p = project_point_on_ellipsoid(
+                p[0], p[1], p[2], ellipsoid[0], ellipsoid[1], ellipsoid[2]
+            )
             #  This is a hack to ensure that our point lies above the surface of the
             # ellipsoid. An iterative method could be used instead but the error margin
             # is too small to be worth it.
