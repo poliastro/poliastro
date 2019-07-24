@@ -18,7 +18,8 @@ from czml3.properties import (
 )
 from czml3.types import IntervalValue, TimeInterval
 
-from poliastro.czml.utils import ellipsoidal_to_cartesian
+from poliastro.bodies import Earth
+from poliastro.czml.utils import ellipsoidal_to_cartesian, project_point_on_ellipsoid
 from poliastro.twobody.propagation import propagate
 
 PIC_SATELLITE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII="
@@ -29,7 +30,7 @@ class CZMLExtractor:
     """A class for extracting orbitary data to Cesium"""
 
     def __init__(
-        self, start_epoch, end_epoch, N, ellipsoid=None, pr_map=None, scene3D=True
+        self, start_epoch, end_epoch, N, attractor=None, pr_map=None, scene3D=True
     ):
         """
         Orbital constructor
@@ -45,6 +46,8 @@ class CZMLExtractor:
             Unless otherwise specified, the number
             of sampled data points will be N when calling
             add_orbit()
+        attractor: poliastro.Body
+            Attractor of the orbits
         scene3D: bool
             Determines the scene mode. If set to true, the scene
             is set to 3D mode, otherwise it's the orthographic
@@ -52,12 +55,27 @@ class CZMLExtractor:
         """
         self.packets = []  # type: List[Packet]
 
-        self.cust_prop = [ellipsoid, pr_map, scene3D]
-
+        self.attractor = attractor
         self.orbits = []  # type: List[Any]
         self.N = N
         self.i = 0
         self.gs_n = 0
+
+        if not self.attractor:
+            self.attractor = Earth
+        elif not (self.attractor.R and self.attractor.R_polar):
+            raise ValueError(
+                "Invalid ellipsoid of attractor.\n"
+                + "Make sure your body has valid 'R' and 'R_polar' parameters"
+            )
+
+        ellipsoid = (
+            self.attractor.R.to(u.m).value,
+            self.attractor.R.to(u.m).value,
+            self.attractor.R_polar.to(u.m).value,
+        )
+
+        self.cust_prop = [ellipsoid, pr_map, scene3D]
 
         self.start_epoch = Time(start_epoch, format="isot")
         self.end_epoch = Time(end_epoch, format="isot")
@@ -100,6 +118,54 @@ class CZMLExtractor:
 
         return cart_cords
 
+    def _init_groundtrack_packet_cords_(self, i, rtol):
+        """
+
+        Parameters
+        ----------
+        i: int
+            Index of referenced orbit
+        rtol: float
+            Maximum relative error permitted
+
+        Returns
+        -------
+        coordinate list
+        """
+        cart_cords = []  # type: List[float]
+
+        h = (self.end_epoch - self.orbits[i][2]).to(u.second) / self.orbits[i][1]
+
+        # Get rounding factor given the relative tolerance
+        rf = 0
+        while rtol < 1:
+            rtol *= 10
+            rf += 1
+
+        ellipsoid = self.cust_prop[0]
+
+        for k in range(self.orbits[i][1] + 2):
+            position = propagate(self.orbits[i][0], TimeDelta(k * h), rtol=rtol)
+
+            cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
+            cords = np.insert(cords, 0, h.value * k, axis=0)
+
+            # flatten list
+            cords = list(map(lambda x: round(x[0], rf), cords.tolist()))
+            t, p = cords[0], cords[1:]
+            pr_p = project_point_on_ellipsoid(
+                p[0], p[1], p[2], ellipsoid[0], ellipsoid[1], ellipsoid[2]
+            )
+            # Add a small number to ensure that our point lies above the surface of the
+            # ellipsoid. We do this because small losses in precision may cause the point
+            # to lie slightly bellow the surface. An iterative method could be used instead
+            # but the error margin is too small to be worth it.
+
+            _cords = t, pr_p[0] + 0.1, pr_p[1] + 0.1, pr_p[2] + 0.1
+            cart_cords += _cords
+
+        return cart_cords
+
     def _init_czml_(self):
         """
         Only called at the initialization of the extractor
@@ -127,12 +193,11 @@ class CZMLExtractor:
             A URL to the projection of the defined ellipsoid (UV map)
         """
 
-        if ellipsoid is None:
-            ellipsoid = [6378137.0, 6378137.0, 6356752.3142451793]
         if pr_map is None:
             pr_map = (
                 "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg",
             )
+            self.cust_prop[1] = pr_map
 
         custom_props = {
             "custom_attractor": True,
@@ -192,10 +257,14 @@ class CZMLExtractor:
             and isinstance(pos[0], u.quantity.Quantity)
         ):
             u0, v0 = pos
+
             if self.cust_prop[0]:
-                a, b = self.cust_prop[0][:1]  # get semi-major and semi-minor axises
+                a, b = (
+                    self.cust_prop[0][0],
+                    self.cust_prop[0][2],
+                )  # get semi-major and semi-minor axises
             else:
-                a, b = 6378137.0, 6378137.0
+                a, b = Earth.R.to(u.m).value, Earth.R_polar.to(u.m).value
             pos = list(map(lambda x: x.value, ellipsoidal_to_cartesian(a, b, u0, v0)))
         else:
             raise TypeError(
@@ -231,6 +300,7 @@ class CZMLExtractor:
         orbit,
         rtol=1e-10,
         N=None,
+        show_groundtrack=False,
         id_name=None,
         id_description=None,
         path_width=None,
@@ -253,7 +323,9 @@ class CZMLExtractor:
             Maximum relative error permitted
         N: int
             Number of sample points
-
+        show_groundtrack: bool
+            If set to true, the groundtrack is
+            displayed.
         Id parameters:
         -------------
 
@@ -349,5 +421,36 @@ class CZMLExtractor:
         )
 
         self.packets.append(pckt)
+
+        if show_groundtrack:
+            groundtrack_cords = self._init_groundtrack_packet_cords_(self.i, rtol=rtol)
+            pckt = Packet(
+                id="groundtrack" + str(self.i),
+                availability=TimeInterval(
+                    start=self.start_epoch.datetime, end=self.end_epoch.datetime
+                ),
+                position=Position(
+                    interpolationDegree=5,
+                    interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
+                    referenceFrame=ReferenceFrames.INERTIAL,
+                    cartesian=groundtrack_cords,
+                    epoch=start_epoch.value,
+                ),
+                path=Path(
+                    show=True,
+                    material=Material(
+                        solidColor=SolidColorMaterial(color=Color(rgba=path_color))
+                    )
+                    if path_color is not None
+                    else Material(
+                        solidColor=SolidColorMaterial(
+                            color=Color(rgba=[255, 255, 0, 255])
+                        )
+                    ),
+                    resolution=60,
+                    width=2,
+                ),
+            )
+            self.packets.append(pckt)
 
         self.i += 1
