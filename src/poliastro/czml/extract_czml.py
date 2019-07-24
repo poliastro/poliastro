@@ -156,9 +156,11 @@ class CZMLExtractor:
             pr_p = project_point_on_ellipsoid(
                 p[0], p[1], p[2], ellipsoid[0], ellipsoid[1], ellipsoid[2]
             )
-            #  This is a hack to ensure that our point lies above the surface of the
-            # ellipsoid. An iterative method could be used instead but the error margin
-            # is too small to be worth it.
+            # Add a small number to ensure that our point lies above the surface of the
+            # ellipsoid. We do this because small losses in precision may cause the point
+            # to lie slightly bellow the surface. An iterative method could be used instead
+            # but the error margin is too small to be worth it.
+
             _cords = t, pr_p[0] + 0.1, pr_p[1] + 0.1, pr_p[2] + 0.1
             cart_cords += _cords
 
