@@ -1,11 +1,19 @@
 import pytest  # noqa: E402 isort:skip
+import sys
 
 from astropy import units as u  # noqa: E402
 
-from poliastro.czml.extract_czml import CZMLExtractor  # noqa: E402
 from poliastro.examples import iss, molniya  # noqa: E402
 
+try:
+    from poliastro.czml.extract_czml import CZMLExtractor  # noqa: E402
 
+    import czml3  # noqa: F401
+except ImportError:
+    pass
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_custom_packet():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -50,6 +58,7 @@ def test_czml_custom_packet():
     assert repr(pckt) == expected_packet
 
 
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_add_orbit():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -297,6 +306,7 @@ def test_czml_add_orbit():
     assert repr(extractor.packets) == expected_doc
 
 
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_groundtrack():
 
     start_epoch = molniya.epoch
@@ -523,6 +533,7 @@ def test_czml_groundtrack():
     assert repr(extractor.packets) == expected_doc
 
 
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_ground_station():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -621,6 +632,7 @@ def test_czml_ground_station():
     assert repr(extractor.packets) == expected_doc
 
 
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_invalid_orbit_epoch_error():
     start_epoch = molniya.epoch
     end_epoch = molniya.epoch + molniya.period
