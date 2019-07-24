@@ -3,7 +3,7 @@ import sys
 
 from astropy import units as u  # noqa: E402
 
-from poliastro.bodies import Earth, Mars
+from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya  # noqa: E402
 
 try:
@@ -21,7 +21,6 @@ def test_czml_custom_packet():
 
     sample_points = 10
 
-    attr = Mars
     pr_map_url = (
         "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
     )
