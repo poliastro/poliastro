@@ -504,6 +504,8 @@ def test_czml_groundtrack():
     },
     "path": {
         "show": true,
+        "leadTime": 100,
+        "trailTime": 100,
         "width": 2,
         "resolution": 60,
         "material": {
