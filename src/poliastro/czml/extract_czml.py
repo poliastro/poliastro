@@ -301,6 +301,8 @@ class CZMLExtractor:
         rtol=1e-10,
         N=None,
         show_groundtrack=False,
+        groundtrack_lead_time=None,
+        groundtrack_trail_time=None,
         id_name=None,
         id_description=None,
         path_width=None,
@@ -323,9 +325,18 @@ class CZMLExtractor:
             Maximum relative error permitted
         N: int
             Number of sample points
+
+        Groundtrack parameters:
+        -----------------------
+
         show_groundtrack: bool
             If set to true, the groundtrack is
             displayed.
+        groundtrack_lead_time: double
+            The time the animation is ahead of the real-time groundtrack
+        groundtrack_trail_time: double
+            The time the animation is behind the real-time groundtrack
+
         Id parameters:
         -------------
 
@@ -449,6 +460,8 @@ class CZMLExtractor:
                     ),
                     resolution=60,
                     width=2,
+                    leadTime=groundtrack_lead_time if groundtrack_lead_time else 100,
+                    trailTime=groundtrack_trail_time if groundtrack_trail_time else 100,
                 ),
             )
             self.packets.append(pckt)
