@@ -100,6 +100,8 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         gravitational constant, (km^3/s^2)
+    R : float
+        radius of the attractor (km)
     C_D: float
         dimensionless drag coefficient ()
     A: float
