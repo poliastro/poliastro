@@ -1,8 +1,8 @@
 What's new
 ==========
 
-poliastro 0.13 (Unreleased)
----------------------------
+poliastro 0.13.0 - 2019-08-05
+-----------------------------
 
 This major release is packed with new features, especially the new
 CZML exporting capabilities and miscellaneous additions and important fixes
