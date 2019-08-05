@@ -43,6 +43,7 @@ assignees: Juanlu001
 ## Before final release
 
 * [ ] Backport any bugs
+* [ ] Update release date in changelog
 * [ ] Bump version **to X.Y.Z** in:
   - `README.rst`
   - `__init__.py`
@@ -53,7 +54,6 @@ assignees: Juanlu001
 * [ ] Generate sdist and bdist_wheel
 * [ ] `twine upload dist/* --repository-url https://test.pypi.org/legacy/`
 * [ ] Tag
-* [ ] Cherry pick the changelog with the release date
 
 ## Final release
 
@@ -63,4 +63,5 @@ assignees: Juanlu001
 * [ ] Create GitHub release
 * [ ] Add Zenodo badge to GitHub release
 * [ ] Send announcement email
+* [ ] Cherry pick release date to master
 * [ ] Close milestone
