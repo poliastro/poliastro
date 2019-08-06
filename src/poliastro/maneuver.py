@@ -97,8 +97,12 @@ class Maneuver(object):
             Final altitude of the orbit
         """
 
-        if orbit_i.nu is not 0 * u.deg:
+        # Propagate till periapsis
+        if orbit_i.nu != 0 * u.deg:
+            t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
             orbit_i = orbit_i.propagate_to_anomaly(0 * u.deg)
+        else:
+            t_pericenter = 0 * u.s
 
         # Initial orbit data
         k = orbit_i.attractor.k
@@ -141,7 +145,9 @@ class Maneuver(object):
 
         t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
 
-        return cls((0 * u.s, dv_a), (t_trans, dv_b))
+        return cls(
+            (t_pericenter.decompose(), dv_a.decompose()), (t_trans.decompose(), dv_b.decompose())
+        )
 
     @classmethod
     def bielliptic(cls, orbit_i, r_b, r_f):
@@ -184,8 +190,13 @@ class Maneuver(object):
         r_f: astropy.unit.Quantity
             Final altitude of the orbit
         """
-        if orbit_i.nu is not 0 * u.deg:
+
+        # Propagate till periapsis
+        if orbit_i.nu != 0 * u.deg:
+            t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
             orbit_i = orbit_i.propagate_to_anomaly(0 * u.deg)
+        else:
+            t_pericenter = 0 * u.s
 
         # Initial orbit data
         k = orbit_i.attractor.k
@@ -234,7 +245,11 @@ class Maneuver(object):
         t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
         t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
 
-        return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
+        return cls(
+            (t_pericenter.decompose(), dv_a.decompose()),
+            (t_trans1.decompose(), dv_b.decompose()),
+            (t_trans2.decompose(), dv_c.decompose()),
+        )
 
     @classmethod
     def lambert(cls, orbit_i, orbit_f, method=lambert_izzo, short=True, **kwargs):
@@ -269,7 +284,10 @@ class Maneuver(object):
         else:
             dv_a, dv_b = sols[-1]
 
-        return cls((0 * u.s, dv_a - orbit_i.v), (tof.to(u.s), orbit_f.v - dv_b))
+        return cls(
+            (0 * u.s, (dv_a - orbit_i.v).decompose()),
+            (tof.to(u.s), (orbit_f.v - dv_b).decompose()),
+        )
 
     def get_total_time(self):
         """Returns total time of the maneuver.
