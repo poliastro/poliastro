@@ -44,37 +44,53 @@ def test_maneuver_impulse():
     assert man.impulses[0] == (0 * u.s, dv)
 
 
-def test_hohmann_maneuver():
+@pytest.mark.parametrize("nu", [0, 180] * u.deg)
+def test_hohmann_maneuver(nu):
     # Data from Vallado, example 6.1
     alt_i = 191.34411 * u.km
     alt_f = 35781.34857 * u.km
-    ss_i = Orbit.circular(Earth, alt_i)
+    _a = 0 * u.deg
+    ss_i = Orbit.from_classical(
+        Earth, Earth.R + alt_i, ecc=0 * u.one, inc=_a, raan=_a, argp=_a, nu=nu
+    )
+
+    # Expected output
     expected_dv = 3.935224 * u.km / u.s
+    expected_t_pericenter = ss_i.time_to_anomaly(0 * u.deg)
     expected_t_trans = 5.256713 * u.h
+    expected_total_time = expected_t_pericenter + expected_t_trans
 
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
-    assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-5)
+    assert_quantity_allclose(man.get_total_time(), expected_total_time, rtol=1e-5)
 
     assert_quantity_allclose(
         ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-14 * u.one
     )
 
 
-def test_bielliptic_maneuver():
+@pytest.mark.parametrize("nu", [0, 180] * u.deg)
+def test_bielliptic_maneuver(nu):
     # Data from Vallado, example 6.2
     alt_i = 191.34411 * u.km
     alt_b = 503873.0 * u.km
     alt_f = 376310.0 * u.km
-    ss_i = Orbit.circular(Earth, alt_i)
+    _a = 0 * u.deg
+    ss_i = Orbit.from_classical(
+        Earth, Earth.R + alt_i, ecc=0 * u.one, inc=_a, raan=_a, argp=_a, nu=nu
+    )
+
+    # Expected output
     expected_dv = 3.904057 * u.km / u.s
+    expected_t_pericenter = ss_i.time_to_anomaly(0 * u.deg)
     expected_t_trans = 593.919803 * u.h
+    expected_total_time = expected_t_pericenter + expected_t_trans
 
     man = Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_f)
 
     assert_allclose(ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-12 * u.one)
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
-    assert_quantity_allclose(man.get_total_time(), expected_t_trans, rtol=1e-6)
+    assert_quantity_allclose(man.get_total_time(), expected_total_time, rtol=1e-6)
 
 
 def test_apply_maneuver_correct_dimensions():
