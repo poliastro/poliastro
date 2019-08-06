@@ -1025,6 +1025,27 @@ class Orbit(object):
             )
 
     @u.quantity_input(value=u.rad)
+    def time_to_anomaly(self, value):
+        """ Returns time required to be in a specific true anomaly.
+
+        Parameters
+        ----------
+        value : ~astropy.units.Quantity
+
+        Returns
+        -------
+        tof: ~astropy.units.Quantity
+            Time of flight required.
+        """
+
+        # Compute time of flight for correct epoch
+        M = nu_to_M(self.nu, self.ecc)
+        new_M = nu_to_M(value, self.ecc)
+        tof = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
+
+        return tof
+
+    @u.quantity_input(value=u.rad)
     def propagate_to_anomaly(self, value):
         """Propagates an orbit to a specific true anomaly.
 
@@ -1038,25 +1059,17 @@ class Orbit(object):
             Resulting orbit after propagation.
 
         """
-        # TODO: Avoid repeating logic with mean_motion?
-        p, ecc, inc, raan, argp, _ = rv2coe(
-            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-            self.r.to(u.km).value,
-            self.v.to(u.km / u.s).value,
-        )
 
         # Compute time of flight for correct epoch
-        M = nu_to_M(self.nu, self.ecc)
-        new_M = nu_to_M(value, self.ecc)
-        time_of_flight = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
+        time_of_flight = self.time_to_anomaly(value)
 
         return self.from_classical(
             self.attractor,
-            p / (1.0 - ecc ** 2) * u.km,
-            ecc * u.one,
-            inc * u.rad,
-            raan * u.rad,
-            argp * u.rad,
+            self.a,
+            self.ecc,
+            self.inc,
+            self.raan,
+            self.argp,
             value,
             epoch=self.epoch + time_of_flight,
             plane=self.plane,
