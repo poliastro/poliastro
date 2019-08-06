@@ -867,15 +867,14 @@ class Orbit(object):
         ar = self.attractor.r  # equatorial radius
         f = 0  # TODO: flattening
 
-        t0 = 1  # TODO: epoch universal time (rad)
         th0 = 1  # TODO: sidereal station time (rad)
         r_s = 1  # TODO: sidereal rate of change
 
         def Z(E):
             return np.array(
                 [
-                    np.cos(lat) * np.cos(th0 + r_s * ((E - e * np.sin(E)) / n + T - t0)),
-                    np.cos(lat) * np.sin(th0 + r_s * ((E - e * np.sin(E)) / n + T - t0)),
+                    np.cos(lat) * np.cos(th0 + r_s * ((E - e * np.sin(E)) / n)),
+                    np.cos(lat) * np.sin(th0 + r_s * ((E - e * np.sin(E)) / n)),
                     np.sin(lat),
                 ]
             )
