@@ -1033,3 +1033,11 @@ def test_orbit_change_attractor_open():
 
     assert len(record) == 1
     assert "Leaving the SOI of the current attractor" in record[0].message.args[0]
+
+
+def test_time_to_anomaly():
+    expected_tof = iss.period / 2
+    iss_180 = iss.propagate_to_anomaly(180 * u.deg)
+    tof = iss_180.time_to_anomaly(0 * u.deg)
+
+    assert_quantity_allclose(tof, expected_tof)
