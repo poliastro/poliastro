@@ -146,7 +146,8 @@ class Maneuver(object):
         t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
 
         return cls(
-            (t_pericenter.decompose(), dv_a.decompose()), (t_trans.decompose(), dv_b.decompose())
+            (t_pericenter.decompose(), dv_a.decompose()),
+            (t_trans.decompose(), dv_b.decompose()),
         )
 
     @classmethod

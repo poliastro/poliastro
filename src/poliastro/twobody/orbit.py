@@ -17,7 +17,6 @@ from astroquery.jplsbdb import SBDB
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
-from poliastro.core.elements import rv2coe
 from poliastro.frames import Planes, get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
