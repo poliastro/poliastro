@@ -1,7 +1,7 @@
 from warnings import warn
 
 import numpy as np
-from astropy import time, units as u
+from astropy import _erfa as erfa, time, units as u
 from astropy.coordinates import (
     GCRS,
     ICRS,
@@ -867,7 +867,10 @@ class Orbit(object):
         ar = self.attractor.r  # equatorial radius
         f = 0  # TODO: flattening
 
-        th0 = 1  # TODO: sidereal station time (rad)
+        t = time.Time.now()
+        gmst06 = erfa.gmst06(t.ut1.jd1, t.ut1.jd2, t.tt.jd1, t.tt.jd2)
+
+        th0 = long + gmst06 * u.rad # TODO: sidereal station time (rad)
         r_s = 1  # TODO: sidereal rate of change
 
         def Z(E):
