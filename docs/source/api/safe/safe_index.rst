@@ -18,6 +18,7 @@ OOP nature.
     :hidden:
     :maxdepth: 2
 
+    atmosphere/atmosphere_index
     twobody/twobody_index
     threebody/threebody_index
     bodies
