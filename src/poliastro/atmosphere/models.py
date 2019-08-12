@@ -94,9 +94,9 @@ class COESA(object):
             if i < len(self._Hb_table) and H > Hb:
                 pass
             elif H == Hb:
-                return [i]
+                return i
             else:
-                return [i - 1]
+                return i - 1
 
     def _get_base_parameters(self, H):
         """ Returns base layer parameters.
@@ -127,6 +127,124 @@ class COESA(object):
         Lb = self._Lb_table[i]
         pb = self._pb_table[i]
         return Zb, Hb, Tb, Lb, pb
+
+
+# COESA62 TABLES
+# Lower layers (Z < 90km)
+Hb_lower62 = [0.0, 11.0, 20.0, 32.0, 47.0, 52.0, 61.0, 79.0] * u.km
+Zb_lower62 = [
+    geopotential_to_geometric(H, R_earth).to(u.km).value for H in Hb_lower62
+] * u.km
+
+# Upper layers (Z => 90km)
+Zb_upper62 = [
+    90.0,
+    100.0,
+    110.0,
+    120.0,
+    150.0,
+    160.0,
+    170.0,
+    190.0,
+    230.0,
+    300.0,
+    400.0,
+    500.0,
+    600.0,
+    700.0,
+] * u.km
+Hb_upper62 = [
+    geometric_to_geopotential(Z, R_earth).to(u.km).value for Z in Zb_upper62
+] * u.km
+
+# Geopotential and geometric layers
+Hb_table62 = np.append(Hb_lower62, Hb_upper62).value * u.km
+Zb_table62 = np.append(Zb_lower62, Zb_upper62).value * u.km
+
+# Temperature layers (defined by the molecular-scale temperature at each layer)
+Tb_table62 = [
+    288.15,
+    216.650,
+    216.650,
+    228.65,
+    270.65,
+    270.65,
+    252.65,
+    180.65,
+    180.65,
+    210.65,
+    260.65,
+    360.65,
+    960.65,
+    1110.65,
+    1210.65,
+    1350.65,
+    1550.65,
+    1830.65,
+    2160.65,
+    2420.65,
+    2590.65,
+    2700.65,
+] * u.K
+
+# Temperature gradient
+Lb_table62 = (
+    [
+        -6.5,
+        0.0,
+        1.0,
+        2.8,
+        0.0,
+        -2.0,
+        -4.0,
+        0.0,
+        3.0,
+        5.0,
+        10.0,
+        20.0,
+        15.0,
+        10.0,
+        7.0,
+        5.0,
+        4.0,
+        3.3,
+        2.6,
+        1.7,
+        1.1,
+        0.0,
+    ]
+    * u.K
+    / u.km
+)
+
+# Pressure layers
+pb_table62 = [
+    1.01325e3,
+    2.2632e2,
+    5.47487e1,
+    8.68014e0,
+    1.109050,
+    5.90005e-1,
+    1.82099e-1,
+    1.0377e-2,
+    1.6438e-3,
+    3.0075e-4,
+    7.3544e-5,
+    2.5217e-5,
+    5.0617e-6,
+    3.6943e-6,
+    2.7926e-6,
+    1.6852e-6,
+    6.9604e-7,
+    1.8838e-7,
+    4.0304e-8,
+    1.0957e-8,
+    3.4502e-9,
+    1.1918e-9,
+] * u.mbar
+
+# Generate table
+TABLE_COESA62 = [Zb_table62, Hb_table62, Tb_table62, Lb_table62, pb_table62]
 
 
 class COESA62(COESA):
@@ -184,122 +302,7 @@ class COESA62(COESA):
 
     def __init__(self):
 
-        # Lower layers (Z < 90km)
-        Hb_lower = [0.0, 11.0, 20.0, 32.0, 47.0, 52.0, 61.0, 79.0] * u.km
-        Zb_lower = [
-            geopotential_to_geometric(H, R_earth).to(u.km).value for H in Hb_lower
-        ] * u.km
-
-        # Upper layers (Z => 90km)
-        Zb_upper = [
-            90.0,
-            100.0,
-            110.0,
-            120.0,
-            150.0,
-            160.0,
-            170.0,
-            190.0,
-            230.0,
-            300.0,
-            400.0,
-            500.0,
-            600.0,
-            700.0,
-        ] * u.km
-        Hb_upper = [
-            geometric_to_geopotential(Z, R_earth).to(u.km).value for Z in Zb_upper
-        ] * u.km
-
-        # Geopotential and geometric layers
-        Hb_table = np.append(Hb_lower, Hb_upper).value * u.km
-        Zb_table = np.append(Zb_lower, Zb_upper).value * u.km
-
-        # Temperature layers (defined by the molecular-scale temperature at each layer)
-        Tb_table = [
-            288.15,
-            216.650,
-            216.650,
-            228.65,
-            270.65,
-            270.65,
-            252.65,
-            180.65,
-            180.65,
-            210.65,
-            260.65,
-            360.65,
-            960.65,
-            1110.65,
-            1210.65,
-            1350.65,
-            1550.65,
-            1830.65,
-            2160.65,
-            2420.65,
-            2590.65,
-            2700.65,
-        ] * u.K
-
-        # Temperature gradient
-        Lb_table = (
-            [
-                -6.5,
-                0.0,
-                1.0,
-                2.8,
-                0.0,
-                -2.0,
-                -4.0,
-                0.0,
-                3.0,
-                5.0,
-                10.0,
-                20.0,
-                15.0,
-                10.0,
-                7.0,
-                5.0,
-                4.0,
-                3.3,
-                2.6,
-                1.7,
-                1.1,
-                0.0,
-            ]
-            * u.K
-            / u.km
-        )
-
-        # Pressure layers
-        pb_table = [
-            1.01325e3,
-            2.2632e2,
-            5.47487e1,
-            8.68014e0,
-            1.109050,
-            5.90005e-1,
-            1.82099e-1,
-            1.0377e-2,
-            1.6438e-3,
-            3.0075e-4,
-            7.3544e-5,
-            2.5217e-5,
-            5.0617e-6,
-            3.6943e-6,
-            2.7926e-6,
-            1.6852e-6,
-            6.9604e-7,
-            1.8838e-7,
-            4.0304e-8,
-            1.0957e-8,
-            3.4502e-9,
-            1.1918e-9,
-        ] * u.mbar
-
-        # Generate table
-        table_coesa62 = [Zb_table, Hb_table, Tb_table, Lb_table, pb_table]
-        COESA.__init__(self, table_coesa62)
+        super().__init__(TABLE_COESA62)
 
     def temperature(self, alt, geometric=True):
         """ Solves temperature at given altitude.
@@ -421,6 +424,66 @@ class COESA62(COESA):
         return T, p, rho
 
 
+# COESA76 TABLE
+# Lower layers (Z < 86km)
+Hb_lower76 = [0.0, 11.0, 20.0, 32.0, 47.0, 51.0, 71.0] * u.km
+Zb_lower76 = [
+    geopotential_to_geometric(H, R_earth).to(u.km).value for H in Hb_lower76
+] * u.km
+
+# Upper layers (Z >= 86km)
+Zb_upper76 = [86.0, 91.0, 110.0, 120.0, 500.0, 1000.0] * u.km
+Hb_upper76 = [
+    geometric_to_geopotential(Z, R_earth).to(u.km).value for Z in Zb_upper76
+] * u.km
+
+# Geopotential and geometric layers
+Hb_table76 = np.append(Hb_lower76, Hb_upper76).value * u.km
+Zb_table76 = np.append(Zb_lower76, Zb_upper76).value * u.km
+
+# Temperature layer
+Tb_table76 = [
+    288.15,
+    216.65,
+    216.650,
+    228.65,
+    270.65,
+    270.65,
+    214.65,
+    186.95,
+    187.36,
+    254.93,
+    397.91,
+    2019.69,
+    7351.15,
+] * u.K
+
+# Temperature gradient
+Lb_table76 = (
+    [-6.5, 0.0, 1.0, 2.8, 0.0, -2.8, -2.0, 0.0, 0.0, 12.0, 0.0, 0.0, 0.0] * u.K / u.km
+)
+
+# Pressure layer
+pb_table76 = [
+    1.01325e3,
+    2.2632e2,
+    5.4748e1,
+    8.6801e0,
+    1.1090e0,
+    6.6938e-1,
+    3.9564e-2,
+    3.7338e-3,
+    1.5381e-3,
+    7.1042e-5,
+    2.5382e-5,
+    3.0236e-9,
+    7.5138e-11,
+] * u.mbar
+
+# Generate table
+TABLE_COESA76 = [Zb_table76, Hb_table76, Tb_table76, Lb_table76, pb_table76]
+
+
 class COESA76(COESA):
     """ U.S Standard Atmosphere 1976.
 
@@ -458,66 +521,7 @@ class COESA76(COESA):
 
     def __init__(self):
 
-        # Lower layers (Z < 86km)
-        Hb_lower = [0.0, 11.0, 20.0, 32.0, 47.0, 51.0, 71.0] * u.km
-        Zb_lower = [
-            geopotential_to_geometric(H, R_earth).to(u.km).value for H in Hb_lower
-        ] * u.km
-
-        # Upper layers (Z >= 86km)
-        Zb_upper = [86.0, 91.0, 110.0, 120.0, 500.0, 1000.0] * u.km
-        Hb_upper = [
-            geometric_to_geopotential(Z, R_earth).to(u.km).value for Z in Zb_upper
-        ] * u.km
-
-        # Geopotential and geometric layers
-        Hb_table = np.append(Hb_lower, Hb_upper).value * u.km
-        Zb_table = np.append(Zb_lower, Zb_upper).value * u.km
-
-        # Temperature layer
-        Tb_table = [
-            288.15,
-            216.65,
-            216.650,
-            228.65,
-            270.65,
-            270.65,
-            214.65,
-            186.95,
-            187.36,
-            254.93,
-            397.91,
-            2019.69,
-            7351.15,
-        ] * u.K
-
-        # Temperature gradient
-        Lb_table = (
-            [-6.5, 0.0, 1.0, 2.8, 0.0, -2.8, -2.0, 0.0, 0.0, 12.0, 0.0, 0.0, 0.0]
-            * u.K
-            / u.km
-        )
-
-        # Pressure layer
-        pb_table = [
-            1.01325e3,
-            2.2632e2,
-            5.4748e1,
-            8.6801e0,
-            1.1090e0,
-            6.6938e-1,
-            3.9564e-2,
-            3.7338e-3,
-            1.5381e-3,
-            7.1042e-5,
-            2.5382e-5,
-            3.0236e-9,
-            7.5138e-11,
-        ] * u.mbar
-
-        # Generate table
-        table_coesa76 = [Zb_table, Hb_table, Tb_table, Lb_table, pb_table]
-        COESA.__init__(self, table_coesa76)
+        super().__init__(TABLE_COESA76)
 
     def temperature(self, alt, geometric=True):
         """ Returns temperature at given height.
@@ -539,7 +543,7 @@ class COESA76(COESA):
         Zb, Hb, Tb, Lb, _ = self._get_base_parameters(H)
 
         # Different altitudes imply different equations
-        # TODO: Include mean air molecular weight corrections
+        # TODO: Include mean air molecular weight corrections between [80, 86]km
         if Z <= self._Zb_table[7]:
             # Equation (23)
             T = Tb + Lb * (H - Hb)

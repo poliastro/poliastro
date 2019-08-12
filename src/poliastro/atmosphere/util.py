@@ -1,9 +1,8 @@
 """ This script holds several utilities related to atmospheric computations. """
 from astropy import units as u
-from astropy.constants import R as R_u
+from astropy.constants import R as R_u, g0
 
 # ATMOSPHERIC AND AIR PROPETIES
-g0 = 9.80665 * u.m / u.s ** 2
 M0_air = 28.964420 * u.kg / u.kmol
 R_air = R_u / M0_air
 
@@ -46,31 +45,6 @@ def geopotential_to_geometric(H, R_body):
 
     h = R_body * H / (R_body - H)
     return h
-
-
-def get_base_index(H, table):
-    """ Gets corresponding base coefficient for given geopotential altitude.
-
-    Parameters
-    ----------
-    H: ~astropy.units.Quantity
-        Geopotential altitude.
-    table: list
-        List containing geopotential/geometric values.
-
-    Returns
-    -------
-    i: int
-        Index position in table.
-    """
-
-    for i, Hb in enumerate(table):
-        if i < len(table) and H > Hb:
-            pass
-        elif H == Hb:
-            return [i]
-        else:
-            return [i - 1]
 
 
 def gravity(Z, R_body):
