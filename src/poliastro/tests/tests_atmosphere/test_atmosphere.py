@@ -238,27 +238,11 @@ def test_not_implemented_pressure_coesa62():
     )
 
 
-def test_not_implemented_pressure_coesa76():
-    with pytest.raises(NotImplementedError) as excinfo:
-        coesa76.pressure(100 * u.km)
-    assert (
-        "Pressure in COESA76 has just been implemented up to 86km." in excinfo.exconly()
-    )
-
-
 def test_not_implemented_density_coesa62():
     with pytest.raises(NotImplementedError) as excinfo:
         coesa62.density(100 * u.km)
     assert (
         "Density in COESA62 has just been implemented up to 90km." in excinfo.exconly()
-    )
-
-
-def test_not_implemented_density_coesa76():
-    with pytest.raises(NotImplementedError) as excinfo:
-        coesa76.density(100 * u.km)
-    assert (
-        "Density in COESA76 has just been implemented up to 86km." in excinfo.exconly()
     )
 
 
