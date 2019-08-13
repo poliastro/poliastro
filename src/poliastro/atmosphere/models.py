@@ -76,6 +76,17 @@ class COESA(object):
 
         return Z, H
 
+    def _get_index(self, a, n_set):
+        """ Gets index inside array. """
+
+        for i, b in enumerate(n_set):
+            if i < len(n_set) and a > b:
+                pass
+            elif a == b:
+                return i
+            else:
+                return i - 1
+
     def _get_base_index(self, H):
         """ Gets corresponding base coefficient for given geopotential altitude.
 
@@ -90,13 +101,7 @@ class COESA(object):
             Index position in table.
         """
 
-        for i, Hb in enumerate(self._Hb_table):
-            if i < len(self._Hb_table) and H > Hb:
-                pass
-            elif H == Hb:
-                return i
-            else:
-                return i - 1
+        return self._get_index(H, self._Hb_table)
 
     def _get_base_parameters(self, H):
         """ Returns base layer parameters.
@@ -483,6 +488,147 @@ pb_table76 = [
 # Generate table
 TABLE_COESA76 = [Zb_table76, Hb_table76, Tb_table76, Lb_table76, pb_table76]
 
+# Pressure and density coefficients
+Z_coeff = [86, 91, 100, 110, 120, 150, 200, 300, 500, 750, 1000] * u.km
+A_coeff_p = [
+    0,
+    0,
+    0,
+    0,
+    2.283506e-07,
+    1.209434e-08,
+    8.113942e-10,
+    9.814674e-11,
+    -7.835161e-11,
+    2.813255e-11,
+    2.813255e-11,
+]
+B_coeff_p = [
+    2.159582e-06,
+    3.304895e-05,
+    6.693926e-05,
+    -6.539316e-05,
+    -1.343221e-04,
+    -9.692458e-06,
+    -9.822568e-07,
+    -1.654439e-07,
+    1.964589e-07,
+    -1.120689e-07,
+    -1.120689e-07,
+]
+C_coeff_p = [
+    -4.836957e-04,
+    -0.009062730,
+    -0.01945388,
+    0.02485568,
+    0.02999016,
+    0.003002041,
+    4.687616e-04,
+    1.148115e-04,
+    -1.657213e-04,
+    1.695568e-04,
+    1.695568e-04,
+]
+D_coeff_p = [
+    -0.1425192,
+    0.6516698,
+    1.719080,
+    -3.223620,
+    -3.055446,
+    -0.4523015,
+    -0.1231710,
+    -0.05431334,
+    0.04305869,
+    -0.1188941,
+    -0.1188941,
+]
+E_coeff_p = [
+    13.47530,
+    -11.03037,
+    -47.75030,
+    135.9355,
+    113.5764,
+    19.19151,
+    3.067409,
+    -2.011365,
+    -14.77132,
+    14.56718,
+    14.56718,
+]
+
+A_coeff_rho = [
+    0,
+    0,
+    -1.240774e-05,
+    0,
+    3.661771e-07,
+    1.906032e-08,
+    1.199282e-09,
+    1.140564e-10,
+    8.105631e-12,
+    -3.701195e-12,
+    -3.701195e-12,
+]
+
+B_coeff_rho = [
+    -3.322622e-06,
+    2.873405e-05,
+    0.005162063,
+    -8.854164e-05,
+    -2.154344e-04,
+    -1.527799e-05,
+    -1.451051e-06,
+    -2.130756e-07,
+    -2.358417e-09,
+    -8.608611e-09,
+    -8.608611e-09,
+]
+
+C_coeff_rho = [
+    9.111460e-04,
+    -0.008492037,
+    -0.8048342,
+    0.03373254,
+    0.04809214,
+    0.004724294,
+    6.910474e-04,
+    1.570762e-04,
+    -2.635110e-06,
+    5.118829e-05,
+    5.118829e-05,
+]
+
+D_coeff_rho = [
+    -0.2609971,
+    0.6541179,
+    55.55996,
+    -4.390837,
+    -4.884744,
+    -0.6992340,
+    -0.1736220,
+    -0.07029296,
+    -0.01562608,
+    -0.06600998,
+    -0.06600998,
+]
+
+E_coeff_rho = [
+    5.944694,
+    -23.62010,
+    -1443.338,
+    176.5294,
+    172.3597,
+    20.50921,
+    -5.321644,
+    -12.89844,
+    -20.02246,
+    -6.137674,
+    -6.137674,
+]
+
+p_coeff = [A_coeff_p, B_coeff_p, C_coeff_p, D_coeff_p, E_coeff_p]
+rho_coeff = [A_coeff_rho, B_coeff_rho, C_coeff_rho, D_coeff_rho, E_coeff_rho]
+
 
 class COESA76(COESA):
     """ U.S Standard Atmosphere 1976.
@@ -522,6 +668,30 @@ class COESA76(COESA):
     def __init__(self):
 
         super().__init__(TABLE_COESA76)
+
+    def _get_coefficients_avobe_86(self, Z, table_coeff):
+        """ Returns corresponding coefficients for 4th order polynomial approximation.
+
+        Parameters
+        ----------
+        Z: ~astropy.units.Quantity
+            Geometric altitude
+        table_coeff: list
+            List containing different coefficient lists.
+
+        Returns
+        -------
+        coeff_list: list
+            List of corresponding coefficients
+        """
+        # Get corresponding coefficients
+        i = self._get_index(Z, Z_coeff)
+        coeff_list = []
+        for coeff_set in table_coeff:
+            x = coeff_set[i]
+            coeff_list.append(x)
+
+        return coeff_list
 
     def temperature(self, alt, geometric=True):
         """ Returns temperature at given height.
@@ -590,25 +760,27 @@ class COESA76(COESA):
         # Checks are done in temperature function
         Z, H = self._get_heights(alt, geometric=geometric)
 
-        # TODO: implement atmosphere up to 1000km
-        if Z > 86 * u.km:
-            raise NotImplementedError(
-                "Pressure in COESA76 has just been implemented up to 86km."
-            )
-
         T = self.temperature(H, geometric=False)
         Zb, Hb, Tb, Lb, pb = self._get_base_parameters(H)
 
         # Obtain gravity magnitude
         g = gravity(Z, R_earth)
 
-        # If gradient is zero different formulas are applied.
-        if Lb == 0.0:
-            p = pb * np.exp(-g * (H - Hb) / Tb / R_air)
+        # If above 86[km] usual formulation is applied
+        if Z <= 86 * u.km:
+            if Lb == 0.0:
+                p = pb * np.exp(-g * (H - Hb) / Tb / R_air)
+            else:
+                p = pb * (T / Tb) ** (-g / R_air / Lb)
+            return p
         else:
-            p = pb * (T / Tb) ** (-g / R_air / Lb)
+            # A 4th order polynomial is used to approximate pressure.  This was
+            # directly taken from: http://www.braeunig.us/space/atmmodel.htm
+            A, B, C, D, E = self._get_coefficients_avobe_86(Z, p_coeff)
 
-        return p.to(u.kPa)
+            # Solve the polynomial
+            z = Z.to(u.km).value
+            return np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E) * u.Pa
 
     def density(self, alt, geometric=True):
         """ Solves density at given height.
@@ -628,17 +800,24 @@ class COESA76(COESA):
         # Check if valid range
         Z, H = self._get_heights(alt, geometric=geometric)
 
-        # TODO: implement atmosphere up to 1000km
-        if Z > 86 * u.km:
-            raise NotImplementedError(
-                "Density in COESA76 has just been implemented up to 86km."
-            )
-
         # Solve temperature and pressure
-        T = self.temperature(H, geometric=False)
-        p = self.pressure(H, geometric=False)
-        rho = p / R_air / T
-        return rho.to(u.kg / u.m ** 3)
+        if alt <= 86 * u.km:
+            T = self.temperature(H, geometric=False)
+            p = self.pressure(H, geometric=False)
+            rho = p / R_air / T
+            return rho.to(u.kg / u.m ** 3)
+        else:
+            # A 4th order polynomial is used to approximate pressure.  This was
+            # directly taken from: http://www.braeunig.us/space/atmmodel.htm
+            A, B, C, D, E = self._get_coefficients_avobe_86(Z, rho_coeff)
+
+            # Solve the polynomial
+            z = Z.to(u.km).value
+            return (
+                np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E)
+                * u.kg
+                / u.m ** 3
+            )
 
     def properties(self, alt, geometric=True):
         """ Solves density at given height.
