@@ -869,7 +869,7 @@ class Orbit(object):
         t = time.Time.now()
         gmst06 = erfa.gmst06(t.ut1.jd1, t.ut1.jd2, t.tt.jd1, t.tt.jd2)
 
-        th0 = long + gmst06 * u.rad # sidereal station time (rad)
+        th0 = long + gmst06 * u.rad  # sidereal station time (rad)
         r_s = 1  # TODO: sidereal rate of change
 
         def Z(E):
