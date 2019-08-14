@@ -300,9 +300,11 @@ class CZMLExtractor:
         orbit,
         rtol=1e-10,
         N=None,
-        show_groundtrack=False,
+        groundtrack_show=False,
         groundtrack_lead_time=None,
         groundtrack_trail_time=None,
+        groundtrack_width=None,
+        groundtrack_color=None,
         id_name=None,
         id_description=None,
         path_width=None,
@@ -329,16 +331,20 @@ class CZMLExtractor:
         Groundtrack parameters:
         -----------------------
 
-        show_groundtrack: bool
+        groundtrack_show: bool
             If set to true, the groundtrack is
             displayed.
         groundtrack_lead_time: double
             The time the animation is ahead of the real-time groundtrack
         groundtrack_trail_time: double
             The time the animation is behind the real-time groundtrack
+        groundtrack_width: int
+            Groundtrack width
+        groundtrack_color: list (int)
+            Rgba groundtrack color. By default, it is set to the path color
 
         Id parameters:
-        -------------
+        --------------
 
         id_name: str
             Set orbit name
@@ -433,7 +439,10 @@ class CZMLExtractor:
 
         self.packets.append(pckt)
 
-        if show_groundtrack:
+        if groundtrack_show:
+
+            groundtrack_color = path_color
+
             groundtrack_cords = self._init_groundtrack_packet_cords_(self.i, rtol=rtol)
             pckt = Packet(
                 id="groundtrack" + str(self.i),
@@ -450,16 +459,18 @@ class CZMLExtractor:
                 path=Path(
                     show=True,
                     material=Material(
-                        solidColor=SolidColorMaterial(color=Color(rgba=path_color))
+                        solidColor=SolidColorMaterial(
+                            color=Color(rgba=groundtrack_color)
+                        )
                     )
-                    if path_color is not None
+                    if groundtrack_color is not None
                     else Material(
                         solidColor=SolidColorMaterial(
                             color=Color(rgba=[255, 255, 0, 255])
                         )
                     ),
                     resolution=60,
-                    width=2,
+                    width=groundtrack_width,
                     leadTime=groundtrack_lead_time if groundtrack_lead_time else 100,
                     trailTime=groundtrack_trail_time if groundtrack_trail_time else 100,
                 ),

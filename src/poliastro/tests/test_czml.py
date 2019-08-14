@@ -506,7 +506,6 @@ def test_czml_groundtrack():
         "show": true,
         "leadTime": 100,
         "trailTime": 100,
-        "width": 2,
         "resolution": 60,
         "material": {
             "solidColor": {
@@ -528,7 +527,7 @@ def test_czml_groundtrack():
         molniya,
         rtol=1e-4,
         label_text="Molniya",
-        show_groundtrack=True,
+        groundtrack_show=True,
         label_fill_color=[125, 80, 120, 255],
     )
 
