@@ -1,67 +1,69 @@
 """ This script holds several utilities related to atmospheric computations. """
-from astropy import units as u
-from astropy.constants import R as R_u, g0
-
-# ATMOSPHERIC AND AIR PROPETIES
-M0_air = 28.964420 * u.kg / u.kmol
-R_air = R_u / M0_air
 
 
-def geometric_to_geopotential(h, R_body):
+def geometric_to_geopotential(z, r0):
     """ Converts from given geometric altitude to geopotential one.
 
     Parameters
     ----------
-    h: ~astropy.units.Quantity
+    z: ~astropy.units.Quantity
         Geometric altitude.
-    R_body: ~astropy.units.Quantity
+    r0: ~astropy.units.Quantity
         Planet/Natural satellite radius.
 
     Returns
     -------
-    H: ~astropy.units.Quantity
+    h: ~astropy.units.Quantity
         Geopotential altitude.
     """
 
-    H = R_body * h / (R_body + h)
-    return H
+    h = r0 * z / (r0 + z)
+    return h
 
 
-def geopotential_to_geometric(H, R_body):
+z_to_h = geometric_to_geopotential
+
+
+def geopotential_to_geometric(h, r0):
     """ Converts from given geopotential altitude to geometric one.
 
     Parameters
     ----------
-    H: ~astropy.units.Quanity
+    h: ~astropy.units.Quanity
         Geopotential altitude.
-    R_body: ~astropy.units.Quantity
+    r0: ~astropy.units.Quantity
         Planet/Natural satellite radius.
 
     Returns
     -------
-    h: ~astropy.units.Quantity
+    z: ~astropy.units.Quantity
         Geometric altitude.
     """
 
-    h = R_body * H / (R_body - H)
-    return h
+    z = r0 * h / (r0 - h)
+    return z
 
 
-def gravity(Z, R_body):
+h_to_z = geopotential_to_geometric
+
+
+def gravity(z, g0, r0):
     """ Relates Earth gravity field magnitude with the geometric height.
 
     Parameters
     ----------
-    Z: ~astropy.units.Quantity
+    z: ~astropy.units.Quantity
         Geometric height.
-    R_body: ~astropy.units.Quantity
+    g0: ~astropy.units.Quantity
+        Gravity value at sea level.
+    r0: ~astropy.units.Quantity
         Planet/Natural satellite radius.
 
     Returns
     -------
     g: ~astropy.units.Quantity
-        Earth's gravity field magnitude.
+        Gravity value at given geometric altitude.
     """
 
-    g = g0 * (R_body / (R_body + Z)) ** 2
+    g = g0 * (r0 / (r0 + z)) ** 2
     return g
