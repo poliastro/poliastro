@@ -855,7 +855,8 @@ class Orbit(object):
             )
 
     def calculate_pass(self, lat, long, H):
-        a = self.a  # semimajor axis
+        a = self.attractor.R  # semimajor axis
+        b = self.attractor.R_polar #semiminor axis
         e = self.ecc  # eccentricity
         i = self.inc  # equatorial inclination
         O = self.long_asc  # longitude of ascending node
@@ -863,9 +864,7 @@ class Orbit(object):
         T = self.period  # time of perifocal passage
 
         n = self.n  # mean motion
-        ar = self.attractor.r  # equatorial radius
-        f = 0  # TODO: flattening
-
+        f = 1 - b / a
         t = time.Time.now()
         gmst06 = erfa.gmst06(t.ut1.jd1, t.ut1.jd2, t.tt.jd1, t.tt.jd2)
 
