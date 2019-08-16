@@ -1190,6 +1190,47 @@ class Orbit(object):
             )
             return cartesian
 
+    def _sample_attr(self, orbit_attr, time):
+        """ Single attribute sampler.
+
+        Parameters
+        ----------
+        orbit_attr: str
+            String representing Orbit's attribute.
+        time: ~astropy.units.Quantity
+            Time at which property wants to be known.
+
+        Returns
+        -------
+        attr: ~astropy.units.Quantity
+            Attribute value.
+        """
+
+        new_orbit = self.propagate(time)
+        return getattr(new_orbit, orbit_attr)
+
+    def sample_attr(self, orbit_attr, time_span):
+        """ Returns any sampled attribute for a given sampled time span.
+
+        Parameters
+        ----------
+        orbit_attr: str
+            Orbit's attribute name to be sampled.
+        time_span: ~poliastro.util.time_range
+            Time span for sampling the attribute.
+
+        Returns
+        -------
+        attr_sampled: list
+            List containing each value for the attribute along time.
+        """
+
+        vec_sample_attr = np.vectorize(
+            self._sample_attr, otypes=[list], excluded=["orbit_attr"]
+        )
+        attr_sampled = vec_sample_attr(orbit_attr, time_span)
+        return attr_sampled
+
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
         ecc = self.ecc.value

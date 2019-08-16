@@ -52,6 +52,7 @@ from poliastro.twobody.orbit import (
     PatchedConicsWarning,
     TimeScaleWarning,
 )
+from poliastro.util import time_range
 
 
 @pytest.fixture()
@@ -1041,3 +1042,10 @@ def test_time_to_anomaly():
     tof = iss_180.time_to_anomaly(0 * u.deg)
 
     assert_quantity_allclose(tof, expected_tof)
+
+
+def test_orbit_sampler():
+    t_span = time_range(iss.epoch, end=iss.epoch + 24 * u.h)
+    expected_r = [iss.propagate(t).r for t in t_span]
+    r_span = iss.sample_attr("r", t_span)
+    assert_quantity_allclose(r_span[2], expected_r[2])
