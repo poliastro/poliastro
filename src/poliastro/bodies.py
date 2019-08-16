@@ -24,7 +24,6 @@ from astropy import units as u
 from astropy.constants import G
 
 from poliastro import constants
-from poliastro.constants import rotational_elements as const_r
 
 
 class _Body(object):
@@ -73,7 +72,7 @@ class Body(_Body):
         R=0 * u.km,
         R_polar=0 * u.km,
         R_mean=0 * u.km,
-        T=None,
+        rotational_period=None,
         **kwargs,
     ):
         """Constructor.
@@ -94,7 +93,7 @@ class Body(_Body):
             Polar radius of the body
         R_mean: ~astropy.units.Quantity, optional
             Mean radius of the body
-        T: ~astropy.units.Quantity, optional
+        rotational_period: ~astropy.units.Quantity, optional
             Rotational period
         """
         self.parent = parent
@@ -104,12 +103,12 @@ class Body(_Body):
         self.R = R
         self.R_polar = R_polar
         self.R_mean = R_mean
-        self.T = T
+        self.rotational_period = rotational_period
         self.kwargs = kwargs
 
     @property
     def angular_velocity(self):
-        return (2 * math.pi * u.rad) / (self.T).to(u.s)
+        return (2 * math.pi * u.rad) / (self.rotational_period).to(u.s)
 
     @classmethod
     @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
@@ -133,7 +132,7 @@ class _Sun(_Body):
     R = constants.R_sun
     mass = k / G
     J2 = constants.J2_sun
-    T = const_r.T_sun
+    rotational_period = constants.rotational_period_sun
     Wdivc = constants.Wdivc_sun
 
     @staticmethod
@@ -156,7 +155,7 @@ class _Mercury(_Body):
     R = constants.R_mercury
     R_mean = constants.R_mean_mercury
     R_polar = constants.R_polar_mercury
-    T = const_r.T_mercury
+    rotational_period = constants.rotational_period_mercury
     mass = k / G
 
     @staticmethod
@@ -187,7 +186,7 @@ class _Venus(_Body):
     R = constants.R_venus
     R_mean = constants.R_mean_venus
     R_polar = constants.R_polar_venus
-    T = const_r.T_venus
+    rotational_period = constants.rotational_period_venus
     mass = k / G
     J2 = constants.J2_venus
     J3 = constants.J3_venus
@@ -210,7 +209,7 @@ class _Earth(_Body):
     R = constants.R_earth
     R_mean = constants.R_mean_earth
     R_polar = constants.R_polar_earth
-    T = const_r.T_earth
+    rotational_period = constants.rotational_period_earth
     mass = k / G
     J2 = constants.J2_earth
     J3 = constants.J3_earth
@@ -234,7 +233,7 @@ class _Mars(_Body):
     R = constants.R_mars
     R_mean = constants.R_mean_mars
     R_polar = constants.R_polar_mars
-    T = const_r.T_mars
+    rotational_period = constants.rotational_period_mars
     mass = k / G
     J2 = constants.J2_mars
     J3 = constants.J3_mars
@@ -302,7 +301,7 @@ class _Jupiter(_Body):
     R = constants.R_jupiter
     R_mean = constants.R_mean_jupiter
     R_polar = constants.R_polar_jupiter
-    T = const_r.T_jupiter
+    rotational_period = constants.rotational_period_jupiter
     mass = k / G
 
     @staticmethod
@@ -344,7 +343,7 @@ class _Saturn(_Body):
     R = constants.R_saturn
     R_mean = constants.R_mean_saturn
     R_polar = constants.R_polar_saturn
-    T = const_r.T_saturn
+    rotational_period = constants.rotational_period_saturn
     mass = k / G
 
     @staticmethod
@@ -364,7 +363,7 @@ class _Uranus(_Body):
     R = constants.R_uranus
     R_mean = constants.R_mean_uranus
     R_polar = constants.R_polar_uranus
-    T = const_r.T_uranus
+    rotational_period = constants.rotational_period_uranus
     mass = k / G
 
     @staticmethod
@@ -384,7 +383,7 @@ class _Neptune(_Body):
     R = constants.R_neptune
     R_mean = constants.R_mean_neptune
     R_polar = constants.R_polar_neptune
-    T = const_r.T_neptune
+    rotational_period = constants.rotational_period_neptune
     mass = k / G
 
     @staticmethod
@@ -406,7 +405,7 @@ class _Pluto(_Body):
     R = constants.R_pluto
     R_mean = constants.R_mean_pluto
     R_polar = constants.R_polar_pluto
-    T = const_r.T_pluto
+    rotational_period = constants.rotational_period_pluto
     mass = k / G
 
     @staticmethod
@@ -438,7 +437,7 @@ class _Moon(_Body):
     R = constants.R_moon
     R_mean = constants.R_mean_moon
     R_polar = constants.R_polar_moon
-    T = const_r.T_moon
+    rotational_period = constants.rotational_period_moon
     mass = k / G
 
     @staticmethod
