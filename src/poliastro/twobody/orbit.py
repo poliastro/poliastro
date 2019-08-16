@@ -551,7 +551,7 @@ class Orbit(object):
         Examples
         --------
         >>> from poliastro.twobody.orbit import Orbit
-        >>> apophis_orbit = Orbit.from_sbdb('apophis')
+        >>> apophis_orbit = Orbit.from_sbdb('apophis')  # doctest: +REMOTE_DATA
         """
 
         obj = SBDB.query(name, full_precision=True, **kargs)
