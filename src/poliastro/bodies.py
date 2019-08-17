@@ -98,6 +98,7 @@ class Body(_Body):
         """
         self.parent = parent
         self.k = k
+        self.mass = k / G
         self.name = name
         self.symbol = symbol
         self.R = R
@@ -124,16 +125,19 @@ class Body(_Body):
         return cls(parent, k, name, symbol, R, **kwargs)
 
 
-class _Sun(_Body):
-    parent = None
-    k = constants.GM_sun
-    name = "Sun"
-    symbol = "\u2609"
-    R = constants.R_sun
-    mass = k / G
-    J2 = constants.J2_sun
-    rotational_period = constants.rotational_period_sun
-    Wdivc = constants.Wdivc_sun
+class _Sun(Body):
+    def __init__(self):
+        super().__init__(
+            parent=None,
+            k=constants.GM_sun,
+            name="Sun",
+            symbol="\u2609",
+            R=constants.R_sun,
+            rotational_period=constants.rotational_period_sun,
+        )
+
+        self.J2 = constants.J2_sun
+        self.Wdivc = constants.Wdivc_sun
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -147,16 +151,18 @@ class _Sun(_Body):
 Sun = _Sun()
 
 
-class _Mercury(_Body):
-    parent = Sun
-    k = constants.GM_mercury
-    name = "Mercury"
-    symbol = "\u263F"
-    R = constants.R_mercury
-    R_mean = constants.R_mean_mercury
-    R_polar = constants.R_polar_mercury
-    rotational_period = constants.rotational_period_mercury
-    mass = k / G
+class _Mercury(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_mercury,
+            name="Mercury",
+            symbol="\u263F",
+            R=constants.R_mercury,
+            R_mean=constants.R_mean_mercury,
+            R_polar=constants.R_polar_mercury,
+            rotational_period=constants.rotational_period_mercury,
+        )
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -178,19 +184,22 @@ class _Mercury(_Body):
         return ra, dec, W
 
 
-class _Venus(_Body):
-    parent = Sun
-    k = constants.GM_venus
-    name = "Venus"
-    symbol = "\u2640"
-    R = constants.R_venus
-    R_mean = constants.R_mean_venus
-    R_polar = constants.R_polar_venus
-    rotational_period = constants.rotational_period_venus
-    mass = k / G
-    J2 = constants.J2_venus
-    J3 = constants.J3_venus
-    ecc = 0.007 * u.one
+class _Venus(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_venus,
+            name="Venus",
+            symbol="\u2640",
+            R=constants.R_venus,
+            R_mean=constants.R_mean_venus,
+            R_polar=constants.R_polar_venus,
+            rotational_period=constants.rotational_period_venus,
+        )
+
+        self.J2 = constants.J2_venus
+        self.J3 = constants.J3_venus
+        self.ecc = 0.007 * u.one
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -201,20 +210,22 @@ class _Venus(_Body):
         return ra, dec, W
 
 
-class _Earth(_Body):
-    parent = Sun
-    k = constants.GM_earth
-    name = "Earth"
-    symbol = "\u2641"
-    R = constants.R_earth
-    R_mean = constants.R_mean_earth
-    R_polar = constants.R_polar_earth
-    rotational_period = constants.rotational_period_earth
-    mass = k / G
-    J2 = constants.J2_earth
-    J3 = constants.J3_earth
-    H0 = constants.H0_earth
-    rho0 = constants.rho0_earth
+class _Earth(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_earth,
+            name="Earth",
+            symbol="\u2641",
+            R=constants.R_earth,
+            R_mean=constants.R_mean_earth,
+            R_polar=constants.R_polar_earth,
+            rotational_period=constants.rotational_period_earth,
+        )
+        self.J2 = constants.J2_earth
+        self.J3 = constants.J3_earth
+        self.H0 = constants.H0_earth
+        self.rho0 = constants.rho0_earth
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -225,18 +236,20 @@ class _Earth(_Body):
         return ra, dec, W
 
 
-class _Mars(_Body):
-    parent = Sun
-    k = constants.GM_mars
-    name = "Mars"
-    symbol = "\u2642"
-    R = constants.R_mars
-    R_mean = constants.R_mean_mars
-    R_polar = constants.R_polar_mars
-    rotational_period = constants.rotational_period_mars
-    mass = k / G
-    J2 = constants.J2_mars
-    J3 = constants.J3_mars
+class _Mars(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_mars,
+            name="Mars",
+            symbol="\u2642",
+            R=constants.R_mars,
+            R_mean=constants.R_mean_mars,
+            R_polar=constants.R_polar_mars,
+            rotational_period=constants.rotational_period_mars,
+        )
+        self.J2 = constants.J2_mars
+        self.J3 = constants.J3_mars
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -293,16 +306,18 @@ class _Mars(_Body):
         return ra, dec, W
 
 
-class _Jupiter(_Body):
-    parent = Sun
-    k = constants.GM_jupiter
-    name = "Jupiter"
-    symbol = "\u2643"
-    R = constants.R_jupiter
-    R_mean = constants.R_mean_jupiter
-    R_polar = constants.R_polar_jupiter
-    rotational_period = constants.rotational_period_jupiter
-    mass = k / G
+class _Jupiter(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_jupiter,
+            name="Jupiter",
+            symbol="\u2643",
+            R=constants.R_jupiter,
+            R_mean=constants.R_mean_jupiter,
+            R_polar=constants.R_polar_jupiter,
+            rotational_period=constants.rotational_period_jupiter,
+        )
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -335,16 +350,18 @@ class _Jupiter(_Body):
         return ra, dec, W
 
 
-class _Saturn(_Body):
-    parent = Sun
-    k = constants.GM_saturn
-    name = "Saturn"
-    symbol = "\u2644"
-    R = constants.R_saturn
-    R_mean = constants.R_mean_saturn
-    R_polar = constants.R_polar_saturn
-    rotational_period = constants.rotational_period_saturn
-    mass = k / G
+class _Saturn(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_saturn,
+            name="Saturn",
+            symbol="\u2644",
+            R=constants.R_saturn,
+            R_mean=constants.R_mean_saturn,
+            R_polar=constants.R_polar_saturn,
+            rotational_period=constants.rotational_period_saturn,
+        )
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -355,16 +372,18 @@ class _Saturn(_Body):
         return ra, dec, W
 
 
-class _Uranus(_Body):
-    parent = Sun
-    k = constants.GM_uranus
-    name = "Uranus"
-    symbol = "\u26E2"
-    R = constants.R_uranus
-    R_mean = constants.R_mean_uranus
-    R_polar = constants.R_polar_uranus
-    rotational_period = constants.rotational_period_uranus
-    mass = k / G
+class _Uranus(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_uranus,
+            name="Uranus",
+            symbol="\u26E2",
+            R=constants.R_uranus,
+            R_mean=constants.R_mean_uranus,
+            R_polar=constants.R_polar_uranus,
+            rotational_period=constants.rotational_period_uranus,
+        )
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -375,16 +394,18 @@ class _Uranus(_Body):
         return ra, dec, W
 
 
-class _Neptune(_Body):
-    parent = Sun
-    k = constants.GM_neptune
-    name = "Neptune"
-    symbol = "\u2646"
-    R = constants.R_neptune
-    R_mean = constants.R_mean_neptune
-    R_polar = constants.R_polar_neptune
-    rotational_period = constants.rotational_period_neptune
-    mass = k / G
+class _Neptune(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_neptune,
+            name="Neptune",
+            symbol="\u2646",
+            R=constants.R_neptune,
+            R_mean=constants.R_mean_neptune,
+            R_polar=constants.R_polar_neptune,
+            rotational_period=constants.rotational_period_neptune,
+        )
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -397,16 +418,18 @@ class _Neptune(_Body):
         return ra, dec, W
 
 
-class _Pluto(_Body):
-    parent = Sun
-    k = constants.GM_pluto
-    name = "Pluto"
-    symbol = "\u2647"
-    R = constants.R_pluto
-    R_mean = constants.R_mean_pluto
-    R_polar = constants.R_polar_pluto
-    rotational_period = constants.rotational_period_pluto
-    mass = k / G
+class _Pluto(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Sun,
+            k=constants.GM_pluto,
+            name="Pluto",
+            symbol="\u2647",
+            R=constants.R_pluto,
+            R_mean=constants.R_mean_pluto,
+            R_polar=constants.R_polar_pluto,
+            rotational_period=constants.rotational_period_pluto,
+        )
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
@@ -429,16 +452,18 @@ Neptune = _Neptune()
 Pluto = _Pluto()
 
 
-class _Moon(_Body):
-    parent = Earth
-    k = constants.GM_moon
-    name = "Moon"
-    symbol = "\u263E"
-    R = constants.R_moon
-    R_mean = constants.R_mean_moon
-    R_polar = constants.R_polar_moon
-    rotational_period = constants.rotational_period_moon
-    mass = k / G
+class _Moon(Body):
+    def __init__(self):
+        super().__init__(
+            parent=Earth,
+            k=constants.GM_moon,
+            name="Moon",
+            symbol="\u263E",
+            R=constants.R_moon,
+            R_mean=constants.R_mean_moon,
+            R_polar=constants.R_polar_moon,
+            rotational_period=constants.rotational_period_moon,
+        )
 
     @staticmethod
     def _rot_elements_at_epoch(T, d):
