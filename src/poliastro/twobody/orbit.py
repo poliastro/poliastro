@@ -861,7 +861,6 @@ class Orbit(object):
         i = self.inc  # equatorial inclination
         O = self.long_asc  # longitude of ascending node
         o = self.argp  # argument of perigee
-        T = self.period  # time of perifocal passage
 
         n = self.n  # mean motion
         f = 1 - b / a
@@ -902,10 +901,26 @@ class Orbit(object):
 
         Z_av = 0.5 * (Z(2 * np.pi) + Z(0))
 
-        E = a - np.arccos(
+        a1 = np.arccos(
+            np.dot(P, Z_av)
+            / (np.dot(P, Z) ** 2 + np.sqrt(np.dot(Q, Z_av) ** 2 * (1 - e ** 2)))
+        )
+        a2 = (
+            np.dot(Q, Z_av)
+            * np.sqrt(1 - e ** 2)
+            / np.sqrt(np.dot(P, Z_av) ** 2 + np.dot(Q, Z_av) ** 2 * (1 - e ** 2))
+        )
+
+        E1 = a1 - np.arccos(
             (G + a * e * np.dot(P, Z_av))
             / (a * np.sqrt(np.dot(P, Z_av) ** 2 + np.dot(Q, Z_av) ** 2 * (1 - e ** 2)))
         )
+        E2 = a2 - np.arccos(
+            (G + a * e * np.dot(P, Z_av))
+            / (a * np.sqrt(np.dot(P, Z_av) ** 2 + np.dot(Q, Z_av) ** 2 * (1 - e ** 2)))
+        )
+
+        return E1, E2
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
