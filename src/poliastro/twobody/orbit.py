@@ -869,7 +869,7 @@ class Orbit(object):
         gmst06 = erfa.gmst06(t.ut1.jd1, t.ut1.jd2, t.tt.jd1, t.tt.jd2)
 
         th0 = long + gmst06 * u.rad  # sidereal station time (rad)
-        r_s = 1  # TODO: sidereal rate of change
+        r_s = self.attractor.angular_velocity  # sidereal rate of change
 
         def Z(E):
             return np.array(
@@ -880,8 +880,8 @@ class Orbit(object):
                 ]
             )
 
-        G1 = ar / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
-        G2 = (1 - f) ** 2 * ar / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
+        G1 = a / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
+        G2 = (1 - f) ** 2 * a / np.sqrt(1 - (2 * f - f ** 2) * np.sin(lat) ** 2) + H
 
         G = G1 * np.cos(lat) ** 2 + G2 * np.sin(lat) ** 2
 
