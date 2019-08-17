@@ -856,7 +856,7 @@ class Orbit(object):
 
     def calculate_pass(self, lat, long, H):
         a = self.attractor.R  # semimajor axis
-        b = self.attractor.R_polar #semiminor axis
+        b = self.attractor.R_polar  # semiminor axis
         e = self.ecc  # eccentricity
         i = self.inc  # equatorial inclination
         O = self.long_asc  # longitude of ascending node
@@ -901,6 +901,11 @@ class Orbit(object):
         )
 
         Z_av = 0.5 * (Z(2 * np.pi) + Z(0))
+
+        E = a - np.arccos(
+            (G + a * e * np.dot(P, Z_av))
+            / (a * np.sqrt(np.dot(P, Z_av) ** 2 + np.dot(Q, Z_av) ** 2 * (1 - e ** 2)))
+        )
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
