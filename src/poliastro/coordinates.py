@@ -7,15 +7,10 @@ from math import cos, sin, sqrt
 
 import astropy.units as u
 import numpy as np
-from astropy.coordinates import (
-    CartesianDifferential,
-    CartesianRepresentation,
-    get_body_barycentric_posvel,
-)
+from astropy.coordinates import get_body_barycentric_posvel
 
 from poliastro.constants import J2000
 from poliastro.core.elements import rv2coe
-from poliastro.twobody.orbit import Orbit
 from poliastro.util import transform as transform_vector
 
 
@@ -137,44 +132,3 @@ def inertial_body_centered_to_pqw(r, v, source_body):
     v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0]) * sqrt(k / p)).T * u.km / u.s
 
     return r_pqw, v_pqw
-
-
-def transform(orbit, frame_orig, frame_dest):
-    """Transforms Orbit from one frame to another.
-
-    Parameters
-    ----------
-    orbit : ~poliastro.bodies.Orbit
-        Orbit to transform
-    frame_orig : ~astropy.coordinates.BaseCoordinateFrame
-        Initial frame
-    frame_dest : ~astropy.coordinates.BaseCoordinateFrame
-        Final frame
-
-    Returns
-    -------
-    orbit: ~poliastro.bodies.Orbit
-        Orbit in the new frame
-
-    """
-
-    orbit_orig = frame_orig(
-        x=orbit.r[0],
-        y=orbit.r[1],
-        z=orbit.r[2],
-        v_x=orbit.v[0],
-        v_y=orbit.v[1],
-        v_z=orbit.v[2],
-        representation=CartesianRepresentation,
-        differential_type=CartesianDifferential,
-    )
-
-    orbit_dest = orbit_orig.transform_to(frame_dest(obstime=orbit.epoch))
-    orbit_dest.representation = CartesianRepresentation
-
-    return Orbit.from_vectors(
-        orbit.attractor,
-        orbit_dest.data.xyz,
-        orbit_dest.data.differentials["s"].d_xyz,
-        epoch=orbit.epoch,
-    )
