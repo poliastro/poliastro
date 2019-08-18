@@ -920,7 +920,7 @@ class Orbit(object):
             / (a * np.sqrt(np.dot(P, Z_av) ** 2 + np.dot(Q, Z_av) ** 2 * (1 - e ** 2)))
         )
 
-        return E1, E2
+        return E_to_nu(E1), E_to_nu(E2)
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
