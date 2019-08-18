@@ -19,16 +19,43 @@ and a way to define new bodies (:py:class:`~Body` class).
 Data references can be found in :py:mod:`~poliastro.constants`
 """
 import math
+from collections import namedtuple
 
 from astropy import units as u
 from astropy.constants import G
+from astropy.units import Quantity
 
 from poliastro import constants
 
 
-class _Body(object):
-    name: str
-    symbol: str
+# HACK: Constants cannot be pickled
+# (see https://github.com/astropy/astropy/issues/9139)
+# so we will convert them all to normal Quantities
+def _q(c):
+    return Quantity(c)
+
+
+class _Body(
+    namedtuple(
+        "_Body",
+        [
+            "parent",
+            "k",
+            "name",
+            "symbol",
+            "R",
+            "R_polar",
+            "R_mean",
+            "rotational_period",
+            "J2",
+            "J3",
+            "mass",
+        ],
+    )
+):
+    @property
+    def angular_velocity(self):
+        return (2 * math.pi * u.rad) / (self.rotational_period).to(u.s)
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
@@ -36,10 +63,62 @@ class _Body(object):
     def __repr__(self):
         return self.__str__()
 
+    @classmethod
+    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
+    def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
+        return cls(parent, k, name, symbol, R, **kwargs)
+
+    @classmethod
+    def from_relative(
+        cls, reference, parent=None, k=None, name=None, symbol=None, R=None, **kwargs
+    ):
+        k = k * reference.k
+        R = R * reference.R
+        return cls(parent, k, name, symbol, R, **kwargs)
+
+
+# https://stackoverflow.com/a/16721002/554319
+class Body(_Body):
+    __slots__ = ()
+
+    def __new__(
+        cls,
+        parent,
+        k,
+        name,
+        symbol=None,
+        R=0 * u.km,
+        R_polar=0 * u.km,
+        R_mean=0 * u.km,
+        rotational_period=0.0 * u.day,
+        J2=0.0 * u.one,
+        J3=0.0 * u.one,
+        mass=None,
+    ):
+        if mass is None:
+            mass = k / G
+
+        return super().__new__(
+            cls,
+            parent,
+            _q(k),
+            name,
+            symbol,
+            _q(R),
+            _q(R_polar),
+            _q(R_mean),
+            _q(rotational_period),
+            _q(J2),
+            _q(J3),
+            _q(mass),
+        )
+
+
+class SolarSystemBody(Body):
     def rot_elements_at_epoch(self, epoch):
         """Provides rotational elements at epoch.
 
-        Provides north pole of body and angle to prime meridian
+        Provides north pole of body and angle to prime meridian.
 
         Parameters
         ----------
@@ -61,83 +140,7 @@ class _Body(object):
         raise NotImplementedError("Function only defined for some Solar System bodies")
 
 
-class Body(_Body):
-    """Class to represent a generic body.
-
-    """
-
-    def __init__(
-        self,
-        parent,
-        k,
-        name,
-        symbol=None,
-        R=0 * u.km,
-        R_polar=0 * u.km,
-        R_mean=0 * u.km,
-        rotational_period=None,
-        **kwargs,
-    ):
-        """Constructor.
-
-        Parameters
-        ----------
-        parent : Body
-            Central body.
-        k : ~astropy.units.Quantity
-            Standard gravitational parameter.
-        name : str
-            Name of the body.
-        symbol : str, optional
-            Symbol for the body.
-        R : ~astropy.units.Quantity, optional
-            Equatorial radius of the body.
-        R_polar: ~astropy.units.Quantity, optional
-            Polar radius of the body
-        R_mean: ~astropy.units.Quantity, optional
-            Mean radius of the body
-        rotational_period: ~astropy.units.Quantity, optional
-            Rotational period
-        """
-        self.parent = parent
-        self.k = k
-        self.name = name
-        self.symbol = symbol
-        self.R = R
-        self.R_polar = R_polar
-        self.R_mean = R_mean
-        self.rotational_period = rotational_period
-        self.kwargs = kwargs
-
-    @property
-    def angular_velocity(self):
-        return (2 * math.pi * u.rad) / (self.rotational_period).to(u.s)
-
-    @classmethod
-    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
-    def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
-        return cls(parent, k, name, symbol, R, **kwargs)
-
-    @classmethod
-    def from_relative(
-        cls, reference, parent=None, k=None, name=None, symbol=None, R=None, **kwargs
-    ):
-        k = k * reference.k
-        R = R * reference.R
-        return cls(parent, k, name, symbol, R, **kwargs)
-
-
-class _Sun(_Body):
-    parent = None
-    k = constants.GM_sun
-    name = "Sun"
-    symbol = "\u2609"
-    R = constants.R_sun
-    mass = k / G
-    J2 = constants.J2_sun
-    rotational_period = constants.rotational_period_sun
-    Wdivc = constants.Wdivc_sun
-
+class _Sun(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         ra = 286.13 * u.deg
@@ -147,20 +150,19 @@ class _Sun(_Body):
         return ra, dec, W
 
 
-Sun = _Sun()
+Sun = _Sun(
+    parent=None,
+    k=constants.GM_sun,
+    name="Sun",
+    symbol="\u2609",
+    R=constants.R_sun,
+    rotational_period=constants.rotational_period_sun,
+    J2=_q(constants.J2_sun),
+    mass=_q(constants.M_sun),
+)
 
 
-class _Mercury(_Body):
-    parent = Sun
-    k = constants.GM_mercury
-    name = "Mercury"
-    symbol = "\u263F"
-    R = constants.R_mercury
-    R_mean = constants.R_mean_mercury
-    R_polar = constants.R_polar_mercury
-    rotational_period = constants.rotational_period_mercury
-    mass = k / G
-
+class _Mercury(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         M1 = (174.7910857 + 4.092335 * d) * u.deg
@@ -181,20 +183,7 @@ class _Mercury(_Body):
         return ra, dec, W
 
 
-class _Venus(_Body):
-    parent = Sun
-    k = constants.GM_venus
-    name = "Venus"
-    symbol = "\u2640"
-    R = constants.R_venus
-    R_mean = constants.R_mean_venus
-    R_polar = constants.R_polar_venus
-    rotational_period = constants.rotational_period_venus
-    mass = k / G
-    J2 = constants.J2_venus
-    J3 = constants.J3_venus
-    ecc = 0.007 * u.one
-
+class _Venus(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         ra = 272.76 * u.deg
@@ -204,21 +193,7 @@ class _Venus(_Body):
         return ra, dec, W
 
 
-class _Earth(_Body):
-    parent = Sun
-    k = constants.GM_earth
-    name = "Earth"
-    symbol = "\u2641"
-    R = constants.R_earth
-    R_mean = constants.R_mean_earth
-    R_polar = constants.R_polar_earth
-    rotational_period = constants.rotational_period_earth
-    mass = k / G
-    J2 = constants.J2_earth
-    J3 = constants.J3_earth
-    H0 = constants.H0_earth
-    rho0 = constants.rho0_earth
-
+class _Earth(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         ra = (0.00 - 0.641 * T) * u.deg
@@ -228,19 +203,7 @@ class _Earth(_Body):
         return ra, dec, W
 
 
-class _Mars(_Body):
-    parent = Sun
-    k = constants.GM_mars
-    name = "Mars"
-    symbol = "\u2642"
-    R = constants.R_mars
-    R_mean = constants.R_mean_mars
-    R_polar = constants.R_polar_mars
-    rotational_period = constants.rotational_period_mars
-    mass = k / G
-    J2 = constants.J2_mars
-    J3 = constants.J3_mars
-
+class _Mars(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         M1 = (198.991226 + 19139.4819985 * T) * u.deg
@@ -296,17 +259,7 @@ class _Mars(_Body):
         return ra, dec, W
 
 
-class _Jupiter(_Body):
-    parent = Sun
-    k = constants.GM_jupiter
-    name = "Jupiter"
-    symbol = "\u2643"
-    R = constants.R_jupiter
-    R_mean = constants.R_mean_jupiter
-    R_polar = constants.R_polar_jupiter
-    rotational_period = constants.rotational_period_jupiter
-    mass = k / G
-
+class _Jupiter(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         Ja = (99.360714 + 4850.4046 * T) * u.deg
@@ -338,17 +291,7 @@ class _Jupiter(_Body):
         return ra, dec, W
 
 
-class _Saturn(_Body):
-    parent = Sun
-    k = constants.GM_saturn
-    name = "Saturn"
-    symbol = "\u2644"
-    R = constants.R_saturn
-    R_mean = constants.R_mean_saturn
-    R_polar = constants.R_polar_saturn
-    rotational_period = constants.rotational_period_saturn
-    mass = k / G
-
+class _Saturn(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         ra = (40.589 - 0.036 * T) * u.deg
@@ -358,17 +301,7 @@ class _Saturn(_Body):
         return ra, dec, W
 
 
-class _Uranus(_Body):
-    parent = Sun
-    k = constants.GM_uranus
-    name = "Uranus"
-    symbol = "\u26E2"
-    R = constants.R_uranus
-    R_mean = constants.R_mean_uranus
-    R_polar = constants.R_polar_uranus
-    rotational_period = constants.rotational_period_uranus
-    mass = k / G
-
+class _Uranus(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         ra = 257.311 * u.deg
@@ -378,17 +311,7 @@ class _Uranus(_Body):
         return ra, dec, W
 
 
-class _Neptune(_Body):
-    parent = Sun
-    k = constants.GM_neptune
-    name = "Neptune"
-    symbol = "\u2646"
-    R = constants.R_neptune
-    R_mean = constants.R_mean_neptune
-    R_polar = constants.R_polar_neptune
-    rotational_period = constants.rotational_period_neptune
-    mass = k / G
-
+class _Neptune(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         N = (357.85 + 52.316 * T) * u.deg
@@ -400,17 +323,7 @@ class _Neptune(_Body):
         return ra, dec, W
 
 
-class _Pluto(_Body):
-    parent = Sun
-    k = constants.GM_pluto
-    name = "Pluto"
-    symbol = "\u2647"
-    R = constants.R_pluto
-    R_mean = constants.R_mean_pluto
-    R_polar = constants.R_polar_pluto
-    rotational_period = constants.rotational_period_pluto
-    mass = k / G
-
+class _Pluto(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         ra = 132.993 * u.deg
@@ -420,29 +333,109 @@ class _Pluto(_Body):
         return ra, dec, W
 
 
-Mercury = _Mercury()
-Venus = _Venus()
-Earth = _Earth()
-Mars = _Mars()
-Jupiter = _Jupiter()
-Saturn = _Saturn()
-Uranus = _Uranus()
-Neptune = _Neptune()
+Mercury = _Mercury(
+    parent=Sun,
+    k=constants.GM_mercury,
+    name="Mercury",
+    symbol="\u263F",
+    R=constants.R_mercury,
+    R_mean=constants.R_mean_mercury,
+    R_polar=constants.R_polar_mercury,
+    rotational_period=constants.rotational_period_mercury,
+)
 
-Pluto = _Pluto()
+Venus = _Venus(
+    parent=Sun,
+    k=constants.GM_venus,
+    name="Venus",
+    symbol="\u2640",
+    R=constants.R_venus,
+    R_mean=constants.R_mean_venus,
+    R_polar=constants.R_polar_venus,
+    rotational_period=constants.rotational_period_venus,
+    J2=_q(constants.J2_venus),
+    J3=_q(constants.J3_venus),
+)
+Earth = _Earth(
+    parent=Sun,
+    k=constants.GM_earth,
+    name="Earth",
+    symbol="\u2641",
+    R=constants.R_earth,
+    R_mean=constants.R_mean_earth,
+    R_polar=constants.R_polar_earth,
+    rotational_period=constants.rotational_period_earth,
+    mass=_q(constants.M_earth),
+    J2=_q(constants.J2_earth),
+    J3=_q(constants.J3_earth),
+)
+Mars = _Mars(
+    parent=Sun,
+    k=constants.GM_mars,
+    name="Mars",
+    symbol="\u2642",
+    R=constants.R_mars,
+    R_mean=constants.R_mean_mars,
+    R_polar=constants.R_polar_mars,
+    rotational_period=constants.rotational_period_mars,
+    J2=_q(constants.J2_mars),
+    J3=_q(constants.J3_mars),
+)
+Jupiter = _Jupiter(
+    parent=Sun,
+    k=constants.GM_jupiter,
+    name="Jupiter",
+    symbol="\u2643",
+    R=constants.R_jupiter,
+    R_mean=constants.R_mean_jupiter,
+    R_polar=constants.R_polar_jupiter,
+    rotational_period=constants.rotational_period_jupiter,
+    mass=_q(constants.M_jupiter),
+)
+Saturn = _Saturn(
+    parent=Sun,
+    k=constants.GM_saturn,
+    name="Saturn",
+    symbol="\u2644",
+    R=constants.R_saturn,
+    R_mean=constants.R_mean_saturn,
+    R_polar=constants.R_polar_saturn,
+    rotational_period=constants.rotational_period_saturn,
+)
+Uranus = _Uranus(
+    parent=Sun,
+    k=constants.GM_uranus,
+    name="Uranus",
+    symbol="\u26E2",
+    R=constants.R_uranus,
+    R_mean=constants.R_mean_uranus,
+    R_polar=constants.R_polar_uranus,
+    rotational_period=constants.rotational_period_uranus,
+)
+Neptune = _Neptune(
+    parent=Sun,
+    k=constants.GM_neptune,
+    name="Neptune",
+    symbol="\u2646",
+    R=constants.R_neptune,
+    R_mean=constants.R_mean_neptune,
+    R_polar=constants.R_polar_neptune,
+    rotational_period=constants.rotational_period_neptune,
+)
+
+Pluto = _Pluto(
+    parent=Sun,
+    k=constants.GM_pluto,
+    name="Pluto",
+    symbol="\u2647",
+    R=constants.R_pluto,
+    R_mean=constants.R_mean_pluto,
+    R_polar=constants.R_polar_pluto,
+    rotational_period=constants.rotational_period_pluto,
+)
 
 
-class _Moon(_Body):
-    parent = Earth
-    k = constants.GM_moon
-    name = "Moon"
-    symbol = "\u263E"
-    R = constants.R_moon
-    R_mean = constants.R_mean_moon
-    R_polar = constants.R_polar_moon
-    rotational_period = constants.rotational_period_moon
-    mass = k / G
-
+class _Moon(SolarSystemBody):
     @staticmethod
     def _rot_elements_at_epoch(T, d):
         E1 = (125.045 - 0.0529921 * d) * u.deg
@@ -504,4 +497,13 @@ class _Moon(_Body):
         return ra, dec, W
 
 
-Moon = _Moon()
+Moon = _Moon(
+    parent=Earth,
+    k=constants.GM_moon,
+    name="Moon",
+    symbol="\u263E",
+    R=constants.R_moon,
+    R_mean=constants.R_mean_moon,
+    R_polar=constants.R_polar_moon,
+    rotational_period=constants.rotational_period_moon,
+)

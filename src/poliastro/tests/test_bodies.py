@@ -38,16 +38,6 @@ def test_earth_has_k_given_in_literature():
     assert_quantity_allclose(k.decompose([u.km, u.s]), expected_k)
 
 
-def test_body_kwargs():
-    name = "2 Pallas"
-    symbol = u"\u26b4"
-    k = 1.41e10 * u.m ** 3 / u.s ** 2
-    pallas2 = bodies.Body(None, k, name, symbol)
-    assert pallas2.kwargs == {}
-    pallas2 = bodies.Body(None, k, name, symbol, custom="data")
-    assert "custom" in pallas2.kwargs
-
-
 def test_from_relative():
     TRAPPIST1 = bodies.Body.from_relative(
         reference=bodies.Sun,

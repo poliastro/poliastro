@@ -792,6 +792,11 @@ class Orbit(object):
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
+        if attractor.J2 == 0.0 or attractor.J3 == 0.0:
+            raise AttributeError(
+                f"Attractor {attractor.name} has not spherical harmonics implemented"
+            )
+
         critical_argps = [np.pi / 2, 3 * np.pi / 2] * u.rad
         critical_inclinations = [63.4349 * np.pi / 180, 116.5651 * np.pi / 180] * u.rad
         try:
@@ -834,10 +839,6 @@ class Orbit(object):
                 attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
             )
 
-        except AttributeError:
-            raise AttributeError(
-                f"Attractor {attractor.name} has not spherical harmonics implemented"
-            )
         except AssertionError as exc:
             raise ValueError(
                 f"The semimajor axis may not be smaller that {attractor.name}'s radius"
