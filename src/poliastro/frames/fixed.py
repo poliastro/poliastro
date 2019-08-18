@@ -1,4 +1,5 @@
 from astropy.coordinates import (
+    HCRS,
     ITRS,
     BaseRADecFrame,
     CartesianDifferential,
@@ -16,6 +17,7 @@ from poliastro.bodies import (
     Neptune,
     Pluto,
     Saturn,
+    Sun,
     Uranus,
     Venus,
 )
@@ -33,6 +35,7 @@ from .equatorial import (
 )
 
 __all__ = [
+    "SunFixed",
     "MercuryFixed",
     "VenusFixed",
     "ITRS",
@@ -85,6 +88,18 @@ class _PlanetaryFixed(BaseRADecFrame):
         )
         data = CartesianRepresentation(r, differentials=CartesianDifferential(v))
         return fixed_frame.realize_frame(data)
+
+class SunFixed(_PlanetaryFixed):
+    body = Sun
+    equatorial = HCRS
+
+    @staticmethod
+    def _rot_elements_at_epoch(T, d):
+        ra = 286.13 * u.deg
+        dec = 63.87 * u.deg
+        W = (84.176 + 14.1844000 * d) * u.deg
+
+        return ra, dec, W
 
 
 class MercuryFixed(_PlanetaryFixed):
