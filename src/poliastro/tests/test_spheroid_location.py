@@ -12,7 +12,7 @@ def test_cartesian_coordinates():
         3942945.28570563 * u.m,
     ]
 
-    el_cords = [38.43 * u.deg, 41.2 * u.deg, 0 * u.m]
+    el_cords = (38.43 * u.deg, 41.2 * u.deg, 0 * u.m)
 
     p = SpheroidLocation(*el_cords, Earth)
     c_cords = p.cartesian_cords
@@ -21,7 +21,7 @@ def test_cartesian_coordinates():
 
 
 def test_tangential_vectors():
-    el_cords = [38.43 * u.deg, 41.2 * u.deg, 0 * u.m]
+    el_cords = (38.43 * u.deg, 41.2 * u.deg, 0 * u.m)
 
     p = SpheroidLocation(*el_cords, Earth)
 
@@ -33,7 +33,7 @@ def test_tangential_vectors():
 
 
 def test_visible():
-    el_cords = [38.43 * u.deg, 41.2 * u.deg, 0 * u.m]
+    el_cords = (38.43 * u.deg, 41.2 * u.deg, 0 * u.m)
 
     p = SpheroidLocation(*el_cords, Earth)
 
@@ -47,7 +47,7 @@ def test_visible():
 
 
 def test_cartesian_conversion_approximate():
-    el_cords = [0.670680 * u.rad, 0.7190227 * u.rad, 0 * u.m]
+    el_cords = (0.670680 * u.rad, 0.7190227 * u.rad, 0 * u.m)
 
     c_cords = [3764258.64785411 * u.m, 3295359.33856106 * u.m, 3942945.28570563 * u.m]
 
