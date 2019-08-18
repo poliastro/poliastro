@@ -20,6 +20,7 @@ from poliastro.bodies import (
     Jupiter,
     Mars,
     Mercury,
+    Moon,
     Neptune,
     Pluto,
     Saturn,
@@ -138,6 +139,10 @@ class NeptuneICRS(_PlanetaryICRS):
 
 class PlutoICRS(_PlanetaryICRS):
     body = Pluto
+
+
+class MoonICRS(_PlanetaryICRS):
+    body = Moon
 
 
 _NEED_ORIGIN_HINT = (
