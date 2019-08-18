@@ -26,7 +26,7 @@ jobs:
 
   test_py36: &test-template  # See https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462/2
     docker:
-      - image: circleci/python:3.6
+      - image: python:3.6
 
     working_directory: ~/repo
 
@@ -51,7 +51,7 @@ jobs:
   test_py37:
     <<: *test-template
     docker:
-      - image: circleci/python:3.7
+      - image: python:3.7
 
     environment:
       PIP_PREFER_BINARY: true
@@ -60,7 +60,7 @@ jobs:
 
   coverage:
     docker:
-      - image: circleci/python:3.6
+      - image: python:3.6
 
     working_directory: ~/repo
 
