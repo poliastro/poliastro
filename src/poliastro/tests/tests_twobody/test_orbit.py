@@ -931,6 +931,7 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
     assert_quantity_allclose(ss.v, vel * u.km / u.s, rtol=1e-5)
 
 
+@pytest.mark.remote_data
 def test_from_sbdb():
     # Dictionary with structure: 'Object': [a, e, i, raan, argp, nu, epoch]
     # Notice JPL provides Mean anomaly, a conversion is needed to obtain nu
@@ -953,6 +954,7 @@ def test_from_sbdb():
         assert ss_classical == SBDB_DATA[target_name]
 
 
+@pytest.mark.remote_data
 def test_from_sbdb_raise_valueerror():
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_sbdb(name="Halley")
@@ -972,6 +974,7 @@ def test_orbit_wrong_dimensions_fails():
     assert "ValueError: Vectors must have dimension 1, got 2 and 3" in excinfo.exconly()
 
 
+@pytest.mark.remote_data
 def test_orbit_change_attractor():
     Io = 501  # Id for Io moon
     ss_io = Orbit.from_horizons(Io, epoch=J2000, id_type="majorbody")
