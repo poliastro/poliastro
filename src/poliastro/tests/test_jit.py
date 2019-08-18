@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from importlib.abc import MetaPathFinder
 
 from poliastro.core import _jit
 
@@ -9,7 +10,7 @@ def _fake_numba_import():
     # https://stackoverflow.com/a/2484402/554319
     import sys
 
-    class FakeImportFailure:
+    class FakeImportFailure(MetaPathFinder):
         def __init__(self, modules):
             self.modules = modules
 

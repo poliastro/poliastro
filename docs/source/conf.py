@@ -231,7 +231,7 @@ htmlhelp_basename = 'poliastrodoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
+latex_elements = {  # type: ignore
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
 
