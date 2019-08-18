@@ -31,18 +31,33 @@ from .equatorial import (
     UranusICRS,
     VenusICRS,
 )
+from .fixed import (
+    ITRS,
+    JupiterFixed,
+    MarsFixed,
+    MercuryFixed,
+    NeptuneFixed,
+    PlutoFixed,
+    SaturnFixed,
+    UranusFixed,
+    VenusFixed,
+)
 
 _FRAME_MAPPING = {
     Sun: {Planes.EARTH_EQUATOR: HCRS, Planes.EARTH_ECLIPTIC: HeliocentricEclipticJ2000},
-    Mercury: {Planes.EARTH_EQUATOR: MercuryICRS},
-    Venus: {Planes.EARTH_EQUATOR: VenusICRS},
-    Earth: {Planes.EARTH_EQUATOR: GCRS, Planes.EARTH_ECLIPTIC: GeocentricMeanEcliptic},
-    Mars: {Planes.EARTH_EQUATOR: MarsICRS},
-    Jupiter: {Planes.EARTH_EQUATOR: JupiterICRS},
-    Saturn: {Planes.EARTH_EQUATOR: SaturnICRS},
-    Uranus: {Planes.EARTH_EQUATOR: UranusICRS},
-    Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS},
-    Pluto: {Planes.EARTH_EQUATOR: PlutoICRS},
+    Mercury: {Planes.EARTH_EQUATOR: MercuryICRS, Planes.BODY_FIXED: MercuryFixed},
+    Venus: {Planes.EARTH_EQUATOR: VenusICRS, Planes.BODY_FIXED: VenusFixed},
+    Earth: {
+        Planes.EARTH_EQUATOR: GCRS,
+        Planes.EARTH_ECLIPTIC: GeocentricMeanEcliptic,
+        Planes.BODY_FIXED: ITRS,
+    },
+    Mars: {Planes.EARTH_EQUATOR: MarsICRS, Planes.BODY_FIXED: MarsFixed},
+    Jupiter: {Planes.EARTH_EQUATOR: JupiterICRS, Planes.BODY_FIXED: JupiterFixed},
+    Saturn: {Planes.EARTH_EQUATOR: SaturnICRS, Planes.BODY_FIXED: SaturnFixed},
+    Uranus: {Planes.EARTH_EQUATOR: UranusICRS, Planes.BODY_FIXED: UranusFixed},
+    Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS, Planes.BODY_FIXED: NeptuneFixed},
+    Pluto: {Planes.EARTH_EQUATOR: PlutoICRS, Planes.BODY_FIXED: PlutoFixed},
 }  # type: Dict[SolarSystemBody, Dict[Planes, FrameMeta]]
 
 
