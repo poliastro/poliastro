@@ -9,6 +9,7 @@ jobs:
     environment:
       PIP_PREFER_BINARY: true
       PIP_PROGRESS_BAR: "off"
+      TOXENV: "check"
 
     steps:
       - checkout
@@ -21,17 +22,18 @@ jobs:
       - run:
           name: check quality
           command: |
-            tox -e check
+            tox
 
   test_py36: &test-template  # See https://discuss.circleci.com/t/run-tests-on-multiple-versions-of-python/15462/2
     docker:
-      - image: circleci/python:3.6
+      - image: python:3.6
 
     working_directory: ~/repo
 
     environment:
       PIP_PREFER_BINARY: true
       PIP_PROGRESS_BAR: "off"
+      TOXENV: "py36,images"
 
     steps:
       - checkout
@@ -39,33 +41,33 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip
-            pip install .
-            pip install .[dev,cesium]
+            python3 -m pip install tox
 
       - run:
           name: run tests
           command: |
-            . venv/bin/activate
-            MPLBACKEND=Agg pytest -m "not mpl_image_compare" --mypy --doctest-modules -vv  # Test against installed code
-            MPLBACKEND=Agg pytest -m "mpl_image_compare" --mpl
+            MPLBACKEND=Agg tox  # Test against installed code
 
   test_py37:
     <<: *test-template
     docker:
-      - image: circleci/python:3.7
+      - image: python:3.7
+
+    environment:
+      PIP_PREFER_BINARY: true
+      PIP_PROGRESS_BAR: "off"
+      TOXENV: "py37,images"
 
   coverage:
     docker:
-      - image: circleci/python:3.6
+      - image: python:3.6
 
     working_directory: ~/repo
 
     environment:
       PIP_PREFER_BINARY: true
       PIP_PROGRESS_BAR: "off"
+      TOXENV: "coverage"
 
     steps:
       - checkout
@@ -73,22 +75,17 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip
-            pip install --no-use-pep517 --editable .[dev,cesium]
+            python3 -m pip install tox
 
       - run:
           name: run coverage
           command: |
-            . venv/bin/activate
-            MPLBACKEND=Agg NUMBA_DISABLE_JIT=1 pytest --cov  # Test against sources
+            MPLBACKEND=Agg NUMBA_DISABLE_JIT=1 tox   # Test against sources
 
       - run:
           name: publish coverage
           command: |
-            . venv/bin/activate
-            pip install codecov
+            python3 -m pip install codecov
             codecov
 
   docs:
