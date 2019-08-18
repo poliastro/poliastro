@@ -46,8 +46,8 @@ def test_J2_propagation_Earth():
     _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
     _, _, _, raan, argp, _ = rv2coe(k, rr[0].to(u.km).value, vv[0].to(u.km / u.s).value)
 
-    raan_variation_rate = (raan - raan0) / tofs[0].to(u.s).value
-    argp_variation_rate = (argp - argp0) / tofs[0].to(u.s).value
+    raan_variation_rate = (raan - raan0) / tofs[0].to(u.s).value  # type: ignore
+    argp_variation_rate = (argp - argp0) / tofs[0].to(u.s).value  # type: ignore
 
     raan_variation_rate = (raan_variation_rate * u.rad / u.s).to(u.deg / u.h)
     argp_variation_rate = (argp_variation_rate * u.rad / u.s).to(u.deg / u.h)
@@ -513,7 +513,9 @@ def test_solar_pressure():
 
         # averaging over 5 last values in the way Curtis does
         for check in solar_pressure_checks:
-            index = int(1.0 * check["t_days"] / tof.to(u.day).value * 4000)
+            index = int(
+                1.0 * check["t_days"] / tof.to(u.day).value * 4000  # type: ignore
+            )
             delta_ecc, delta_inc, delta_raan, delta_argp = (
                 np.mean(delta_eccs[index - 5 : index]),
                 np.mean(delta_incs[index - 5 : index]),

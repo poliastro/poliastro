@@ -189,7 +189,7 @@ def test_propagation_parabolic(propagator):
 
 def test_propagation_zero_time_returns_same_state():
     # Bug #50
-    r0 = [1131.340, -2282.343, 6672.423] * u.km
+    r0 = [1131.340, -2282.343, 6672.423] * u.km  # type: u.Quantity
     v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 0 * u.s

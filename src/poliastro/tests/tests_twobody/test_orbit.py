@@ -821,7 +821,7 @@ def test_arglat_within_range():
 
 
 def test_pqw_returns_dimensionless():
-    r_0 = ([1, 0, 0] * u.au).to(u.km)
+    r_0 = ([1, 0, 0] * u.au).to(u.km)  # type: ignore
     v_0 = ([0, 6, 0] * u.au / u.year).to(u.km / u.day)
     ss = Orbit.from_vectors(Sun, r_0, v_0)
 

@@ -49,7 +49,7 @@ def test_time_range_spacing_periods():
 
 def test_time_range_requires_keyword_arguments():
     with pytest.raises(TypeError) as excinfo:
-        util.time_range(0, 0)
+        util.time_range(0, 0)  # type: ignore
     assert (
         "TypeError: time_range() takes 1 positional argument but" in excinfo.exconly()
     )
