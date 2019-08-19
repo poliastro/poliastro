@@ -92,28 +92,22 @@ def transform(vec, angle, axis):
 def norm(vec):
     r"""Returns the norm of a 3 dimension vector.
 
-
     .. math::
 
         \left \| \vec{v} \right \| = \sqrt{\sum_{i=1}^{n}v_{i}^2}
 
     Parameters
     ----------
-
     vec: ndarray
         Dimension 3 vector.
 
-
     Examples
     --------
-    >>> from poliastro.core.util import norm
-    >>> from astropy import units as u
-    >>> vec = [1, 1, 1] * u.m
+    >>> vec = np.array([1, 1, 1])
     >>> norm(vec)
     1.7320508075688772
 
     """
-
     vec = 1.0 * vec  # Cast to float
     return np.sqrt(vec.dot(vec))
 
@@ -137,7 +131,6 @@ def cross(a, b):
 
     Parameters
     ----------
-
     a : ndarray
         3 Dimension vector.
     b : ndarray
@@ -145,10 +138,8 @@ def cross(a, b):
 
     Examples
     --------
-    >>> from poliastro.core.util import cross
-    >>> from astropy import units as u
-    >>> i = [1, 0, 0] * u.m
-    >>> j = [0, 1, 0] * u.m
+    >>> i = np.array([1., 0., 0.])
+    >>> j = np.array([0., 1., 0.])
     >>> cross(i, j)
     array([0., 0., 1.])
 
@@ -158,7 +149,6 @@ def cross(a, b):
     https://github.com/numba/numba/issues/2978
 
     """
-
     return np.array(
         (
             a[1] * b[2] - a[2] * b[1],
