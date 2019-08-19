@@ -106,9 +106,7 @@ def norm(vec):
 
     Examples
     --------
-    >>> from poliastro.core.util import norm
-    >>> from astropy import units as u
-    >>> vec = [1, 1, 1] * u.m
+    >>> vec = np.array([1, 1, 1])
     >>> norm(vec)
     1.7320508075688772
 
@@ -145,10 +143,8 @@ def cross(a, b):
 
     Examples
     --------
-    >>> from poliastro.core.util import cross
-    >>> from astropy import units as u
-    >>> i = [1, 0, 0] * u.m
-    >>> j = [0, 1, 0] * u.m
+    >>> i = np.array([1., 0., 0.])
+    >>> j = np.array([0., 1., 0.])
     >>> cross(i, j)
     array([0., 0., 1.])
 
