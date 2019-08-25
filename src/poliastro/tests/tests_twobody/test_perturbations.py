@@ -8,6 +8,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
 from poliastro.bodies import Earth, Moon, Sun
+from poliastro.constants import H0_earth, Wdivc_sun, rho0_earth
 from poliastro.core.elements import rv2coe
 from poliastro.core.perturbations import (
     J2_perturbation,
@@ -20,7 +21,7 @@ from poliastro.core.util import norm
 from poliastro.ephem import build_ephem_interpolant
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
-from poliastro.constants import rho0_earth, H0_earth, Wdivc_sun, Wdivc_sun
+
 
 @pytest.mark.slow
 def test_J2_propagation_Earth():
@@ -196,7 +197,9 @@ def test_atmospheric_drag():
     H0 = H0_earth.value
     tof = 100000  # s
 
-    dr_expected = -B * rho0_earth * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
+    dr_expected = (
+        -B * rho0_earth * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
+    )
     # assuming the atmospheric decay during tof is small,
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
@@ -459,7 +462,7 @@ def normalize_to_Curtis(t0, sun_r):
     return 149600000 * r / norm(r)
 
 
-#@pytest.mark.slow
+# @pytest.mark.slow
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
     with solar_system_ephemeris.set("builtin"):
