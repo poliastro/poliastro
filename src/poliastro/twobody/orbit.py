@@ -20,7 +20,7 @@ from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.frames import Planes, get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
+from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
     find_closest_value,
@@ -687,10 +687,11 @@ class Orbit(object):
         a=None,
         ecc=None,
         inc=None,
-        raan=0 * u.deg,
+        ltan=10.0 * u.hourangle,
         argp=0 * u.deg,
         nu=0 * u.deg,
         epoch=J2000,
+        body=Earth,
         plane=Planes.EARTH_EQUATOR,
     ):
         r""" Solves for a Sun-Synchronous orbit. These orbits make use of the J2
@@ -713,8 +714,8 @@ class Orbit(object):
             Eccentricity.
         inc: ~astropy.units.Quantity
             Inclination.
-        raan : ~astropy.units.Quantity
-            Right ascension of the ascending node.
+        ltan: ~astropy.units.Quantity
+            Local time of the ascending node which will be translated to the Right ascension of the ascending node.
         argp : ~astropy.units.Quantity
             Argument of the pericenter.
         nu : ~astropy.units.Quantity
@@ -727,47 +728,50 @@ class Orbit(object):
 
         # Constants for Sun-Synchronours Orbits (SSO)
         n_sunsync = 1.991063853e-7 * u.one / u.s
-        R_earth = Earth.R
-        k_earth = Earth.k
-        J2_earth = Earth.J2
+        R_SSO = body.R
+        k_SSO = body.k
+        J2_SSO = body.J2
 
-        if (a is None) and (ecc is None) and (inc is None):
-            # We check sufficient number of parameters
-            raise ValueError(
-                "At least two parameters of the set {a, ecc, inc} are required."
-            )
-        elif a is None and (ecc is not None) and (inc is not None):
-            # Semi-major axis is the unknown variable
-            a = (
-                -3
-                * R_earth ** 2
-                * J2_earth
-                * np.sqrt(k_earth)
-                / (2 * n_sunsync * (1 - ecc ** 2) ** 2)
-                * np.cos(inc)
-            ) ** (2 / 7)
-        elif ecc is None and (a is not None) and (inc is not None):
-            # Eccentricity is the unknown variable
-            ecc = np.sqrt(
-                1
-                - np.sqrt(
-                    -3
-                    * R_earth ** 2
-                    * J2_earth
-                    * np.sqrt(k_earth)
-                    * np.cos(inc)
-                    / (2 * a ** (7 / 2) * n_sunsync)
-                )
-            )
-        elif inc is None and (ecc is not None) and (a is not None):
-            # Inclination is the unknown variable
-            inc = np.arccos(
-                -2
-                * a ** (7 / 2)
-                * n_sunsync
-                * (1 - ecc ** 2) ** 2
-                / (3 * R_earth ** 2 * J2_earth * np.sqrt(k_earth))
-            )
+        try:
+            with np.errstate(invalid="raise"):
+                if (a is None) and (ecc is None) and (inc is None):
+                    # We check sufficient number of parameters
+                    raise ValueError(
+                        "At least two parameters of the set {a, ecc, inc} are required."
+                    )
+                elif a is None and (ecc is not None) and (inc is not None):
+                    # Semi-major axis is the unknown variable
+                    a = (
+                        -3
+                        * R_SSO ** 2
+                        * J2_SSO
+                        * np.sqrt(k_SSO)
+                        / (2 * n_sunsync * (1 - ecc ** 2) ** 2)
+                        * np.cos(inc)
+                    ) ** (2 / 7)
+                elif ecc is None and (a is not None) and (inc is not None):
+                    # Eccentricity is the unknown variable
+                    _ecc_0 = np.sqrt(
+                        -3
+                        * R_SSO ** 2
+                        * J2_SSO
+                        * np.sqrt(k_SSO)
+                        * np.cos(inc.to(u.rad))
+                        / (2 * a ** (7 / 2) * n_sunsync)
+                    )
+                    ecc = np.sqrt(1 - _ecc_0)
+                elif inc is None and (ecc is not None) and (a is not None):
+                    # Inclination is the unknown variable
+                    inc = np.arccos(
+                        -2
+                        * a ** (7 / 2)
+                        * n_sunsync
+                        * (1 - ecc ** 2) ** 2
+                        / (3 * R_SSO ** 2 * J2_SSO * np.sqrt(k_SSO))
+                    )
+        except FloatingPointError:
+            raise ValueError("No SSO orbit with given parameters can be found.")
+        raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
             Earth, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
         )
