@@ -45,16 +45,12 @@ And point your browser to http://0.0.0.0:8000.
 Code writing
 ------------
 
-.. image:: https://img.shields.io/waffle/label/poliastro/poliastro/1%20-%20Ready.svg?style=flat-square
-   :target: https://waffle.io/poliastro/poliastro
-   :alt: 'Stories in Ready'
-
 Code contributions are welcome! If you are looking for a place to start,
-help us fixing bugs in poliastro and check out the `"easy" tag`_. Those
-should be easier to fix than the others and require less knowledge about the
-library.
+help us fixing bugs in poliastro and check out the `"good first issue" tag`_.
+Those should be easier to fix than the others and require less knowledge about
+the library.
 
-.. _`"easy" tag`: https://github.com/poliastro/poliastro/issues?q=is%3Aissue+is%3Aopen+label%3Aeasy
+.. _`"good first issue" tag`: https://github.com/poliastro/poliastro/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
 
 If you are hesitant on what IDE or editor to use, just choose one that
 you find comfortable and stick to it while you are learning. People have

@@ -512,7 +512,7 @@ and propagation functions, introduced the new perturbation framework and
 paved the way for the `Python in Astronomy 2018`_ workshop and the
 `Google Summer of Code 2018`_ program.
 
-.. _`Python in Astronomy 2018`: http://openastronomy.org/pyastro/2018/
+.. _`Python in Astronomy 2018`: https://openastronomy.org/pyastro/2018/
 .. _`Google Summer of Code 2018`: https://summerofcode.withgoogle.com/
 
 New features
@@ -539,10 +539,10 @@ Other highlights
 ................
 
 * **poliastro participates in Google Summer of Code thanks to OpenAstronomy!**
-  More information `in the poliastro blog <http://blog.poliastro.space/2018/02/22/2018-02-22-join-poliastro-google-summer-of-code/>`_.
+  More information `in the poliastro blog <https://blog.poliastro.space/2018/02/22/2018-02-22-join-poliastro-google-summer-of-code/>`_.
 * **poliastro will be presented at the Python in Astronomy 2018 workshop** to be held
   at Center for Computational Astrophysics at the Flatiron Institute in New York, USA.
-  You can read `more details about the event here <http://openastronomy.org/pyastro/2018/>`_.
+  You can read `more details about the event here <https://openastronomy.org/pyastro/2018/>`_.
 
 New contributors
 ................
@@ -680,7 +680,7 @@ Other highlights:
   way.
 
 .. _`nbsphinx`: http://nbsphinx.readthedocs.io/en/latest/
-.. _`Open Astronomy`: http://openastronomy.org/members/
+.. _`Open Astronomy`: https://openastronomy.org/members/
 
 New contributors
 ................

@@ -302,8 +302,8 @@ You can also retrieve the individual vectorial impulses::
     >>> tuple(val.decompose([u.km, u.s]) for val in hoh[1])
     (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 
-.. _Hohmann: http://en.wikipedia.org/wiki/Hohmann_transfer_orbit
-.. _bielliptic: http://en.wikipedia.org/wiki/Bi-elliptic_transfer
+.. _Hohmann: https://en.wikipedia.org/wiki/Hohmann_transfer_orbit
+.. _bielliptic: https://en.wikipedia.org/wiki/Bi-elliptic_transfer
 
 To actually retrieve the resulting ``Orbit`` after performing a maneuver, use
 the method :py:meth:`~poliastro.twobody.orbit.Orbit.apply_maneuver`::
@@ -433,7 +433,7 @@ And these are the results::
 
    Mars Science Laboratory orbit.
 
-.. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
+.. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/docs/source/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
 
 
 Fetching Orbits from external sources
