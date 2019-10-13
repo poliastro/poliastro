@@ -274,9 +274,7 @@ class CZMLExtractor:
         pckt = Packet(
             id="GS" + str(self.gs_n),
             description=id_description,
-            availability=TimeInterval(
-                start=self.start_epoch.datetime, end=self.end_epoch.datetime
-            ),
+            availability=TimeInterval(start=self.start_epoch, end=self.end_epoch),
             position=Position(cartesian=pos),
             label=Label(
                 show=label_show,
@@ -401,9 +399,7 @@ class CZMLExtractor:
             id=self.i,
             name=id_name,
             description=id_description,
-            availability=TimeInterval(
-                start=self.start_epoch.datetime, end=self.end_epoch.datetime
-            ),
+            availability=TimeInterval(start=self.start_epoch, end=self.end_epoch),
             position=Position(
                 interpolationDegree=5,
                 interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
@@ -446,9 +442,7 @@ class CZMLExtractor:
             groundtrack_cords = self._init_groundtrack_packet_cords_(self.i, rtol=rtol)
             pckt = Packet(
                 id="groundtrack" + str(self.i),
-                availability=TimeInterval(
-                    start=self.start_epoch.datetime, end=self.end_epoch.datetime
-                ),
+                availability=TimeInterval(start=self.start_epoch, end=self.end_epoch),
                 position=Position(
                     interpolationDegree=5,
                     interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
