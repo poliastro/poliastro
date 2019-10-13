@@ -309,9 +309,9 @@ def rv2coe(k, r, v, tol=1e-8):
     >>> print("raan:", np.rad2deg(raan), "[deg]")
     raan: 255.27928533439618 [deg]
     >>> print("argp:", np.rad2deg(argp), "[deg]")
-    argp: 20.068139973005366 [deg]
+    argp: 20.068139973005394 [deg]
     >>> print("nu:", np.rad2deg(nu), "[deg]")
-    nu: 28.445804984192122 [deg]
+    nu: 28.445804984192073 [deg]
 
     Note
     ----
