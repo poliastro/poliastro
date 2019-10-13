@@ -4,10 +4,10 @@
 import numpy as np
 from astropy import units as u
 from astropy.time import Time
-from numpy.linalg import norm as norm_np
 
 from poliastro.core.util import (
     circular_velocity as circular_velocity_fast,
+    norm as norm_fast,
     rotate as rotate_fast,
 )
 
@@ -78,7 +78,7 @@ def norm(vec):
         Vector with units.
 
     """
-    return norm_np(vec.value) * vec.unit
+    return norm_fast(vec.value) * vec.unit
 
 
 def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=None):
