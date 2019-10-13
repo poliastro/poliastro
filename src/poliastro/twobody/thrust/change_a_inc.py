@@ -1,11 +1,12 @@
 import numpy as np
+from numpy.linalg import norm
 
 from poliastro.core.thrust.change_a_inc import (
     beta,
     compute_parameters,
     extra_quantities,
 )
-from poliastro.core.util import cross, norm
+from poliastro.core.util import cross
 
 
 def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):

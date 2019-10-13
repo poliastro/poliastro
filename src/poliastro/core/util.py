@@ -3,8 +3,6 @@ from numpy import cos, sin
 
 from ._jit import jit
 
-from numpy.linalg import norm
-
 
 @jit
 def circular_velocity(k, a):
