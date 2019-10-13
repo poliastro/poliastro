@@ -7,10 +7,11 @@ References
 """
 import numpy as np
 from astropy import units as u
+from numpy import cross
 
 from poliastro.core.elements import rv2coe
 from poliastro.core.thrust.change_inc_ecc import beta, extra_quantities
-from poliastro.core.util import cross, norm
+from poliastro.core.util import norm
 
 
 def change_inc_ecc(ss_0, ecc_f, inc_f, f):

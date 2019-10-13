@@ -4,10 +4,11 @@
     """
 
 import numpy as np
+from numpy import cross
 from numpy.core.umath import cos, sin, sqrt
 
 from poliastro.core.angles import E_to_nu, F_to_nu
-from poliastro.core.util import cross, norm, rotation_matrix
+from poliastro.core.util import norm, rotation_matrix
 
 from ._jit import jit
 

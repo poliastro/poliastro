@@ -4,7 +4,7 @@ Util module
 .. graphviz::
 
    digraph {
-      "poliastro.core.util" -> "circular_velocity", "rotate", "transform", "norm", "cross" ;
+      "poliastro.core.util" -> "circular_velocity", "rotate", "transform", "norm" ;
    }
 
 \

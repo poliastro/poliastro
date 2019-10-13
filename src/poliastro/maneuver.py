@@ -3,9 +3,9 @@
 """
 import numpy as np
 from astropy import units as u
+from numpy import cross
 
 from poliastro.core.elements import coe_rotation_matrix, rv_pqw
-from poliastro.core.util import cross
 from poliastro.iod.izzo import lambert as lambert_izzo
 from poliastro.util import norm
 
