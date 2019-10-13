@@ -12,7 +12,6 @@ from numpy.linalg import norm
 
 from poliastro.core.elements import rv2coe
 from poliastro.core.thrust.change_inc_ecc import beta, extra_quantities
-from poliastro.core.util import cross
 
 
 def change_inc_ecc(ss_0, ecc_f, inc_f, f):
