@@ -45,7 +45,14 @@ extensions = [
     'sphinx.ext.mathjax',  # Maths visualization
     'sphinx.ext.graphviz',  # Dependency diagrams
     'notfound.extension',
+    'hoverxref.extension',
 ]
+
+# Hoverxref Extension
+hoverxref_auto_ref = True
+hoverxref_mathjax = True
+hoverxref_domains = ['py']
+
 
 # Custom configuration
 autodoc_member_order = 'bysource'
