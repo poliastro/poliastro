@@ -343,6 +343,9 @@ class DOP835(OdeSolver):
     BHH = BHH
     D = D
 
+    t: float
+    y: np.array
+
     def __init__(
         self,
         fun,
