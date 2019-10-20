@@ -21,12 +21,11 @@ branches:
 
 environment:
   matrix:
-    - TOXENV: 'py36'
-      PYTHON: C:\Python36-x64\python.exe
-
     - TOXENV: 'py37'
       PYTHON: C:\Python37-x64\python.exe
 
+    - TOXENV: 'py38'
+      PYTHON: C:\Python38-x64\python.exe
 init:
   - ps: echo $env:TOXENV
   - ps: ls C:\Python*

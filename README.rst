@@ -107,7 +107,7 @@ poliastro requires the following Python packages:
 * SciPy, for root finding and numerical propagation
 
 poliastro is usually tested on Linux and Windows on Python
-3.6 and 3.7 against latest NumPy.
+3.6, 3.7 and 3.8 against latest NumPy.
 It should work on OS X without problems.
 
 ==============  ============  ===================
