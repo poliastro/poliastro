@@ -1,3 +1,4 @@
+from typing import List, Union
 from warnings import warn
 
 import numpy as np
@@ -1215,7 +1216,7 @@ class Orbit(object):
             orbit_new = self.from_vectors(attractor, r, vnew, orbit_new.epoch)
             states.append(orbit_new)
         if intermediate:
-            res = states
+            res = states  # type: Union[Orbit, List[Orbit]]
         else:
             res = orbit_new
         return res
