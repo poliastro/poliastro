@@ -1,7 +1,7 @@
 from poliastro.atmosphere.util import h_to_z, z_to_h
 
 
-class COESA(object):
+class COESA:
     """ Class for U.S Standard Atmosphere models. """
 
     def __init__(self, *tables):
@@ -14,6 +14,30 @@ class COESA(object):
         """
 
         self.tables = tables
+
+    @property
+    def b_levels(self):
+        return self.tables[0]
+
+    @property
+    def zb_levels(self):
+        return self.tables[1]
+
+    @property
+    def hb_levels(self):
+        return self.tables[2]
+
+    @property
+    def Tb_levels(self):
+        return self.tables[3]
+
+    @property
+    def Lb_levels(self):
+        return self.tables[4]
+
+    @property
+    def pb_levels(self):
+        return self.tables[5]
 
     def _check_altitude(self, alt, r0, geometric=True):
         """ Checks if altitude is inside valid range.

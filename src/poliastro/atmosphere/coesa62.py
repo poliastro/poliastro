@@ -94,30 +94,6 @@ class COESA62(COESA):
             b_levels, zb_levels, hb_levels, Tb_levels, Lb_levels, pb_levels
         )
 
-    @property
-    def b_levels(self):
-        return self.tables[0]
-
-    @property
-    def zb_levels(self):
-        return self.tables[1]
-
-    @property
-    def hb_levels(self):
-        return self.tables[2]
-
-    @property
-    def Tb_levels(self):
-        return self.tables[3]
-
-    @property
-    def Lb_levels(self):
-        return self.tables[4]
-
-    @property
-    def pb_levels(self):
-        return self.tables[5]
-
     def temperature(self, alt, geometric=True):
         """ Solves for temperature at given altitude.
 
