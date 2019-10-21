@@ -98,7 +98,7 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
 targetting_vec = np.vectorize(
     _targetting,
     otypes=[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
-    excluded=["departure_body", "target_body"],
+    excluded=[0, 1],
 )
 
 

@@ -8,6 +8,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
 from poliastro.bodies import Earth, Moon, Sun
+from poliastro.constants import H0_earth, Wdivc_sun, rho0_earth
 from poliastro.core.elements import rv2coe
 from poliastro.core.perturbations import (
     J2_perturbation,
@@ -192,11 +193,13 @@ def test_atmospheric_drag():
     B = C_D * A / m
 
     # parameters of the atmosphere
-    rho0 = Earth.rho0.to(u.kg / u.km ** 3).value  # kg/km^3
-    H0 = Earth.H0.to(u.km).value
+    rho0 = rho0_earth.value  # kg/km^3
+    H0 = H0_earth.value
     tof = 100000  # s
 
-    dr_expected = -B * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
+    dr_expected = (
+        -B * rho0_earth * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
+    )
     # assuming the atmospheric decay during tof is small,
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
@@ -216,7 +219,7 @@ def test_atmospheric_drag():
     )
 
     assert_quantity_allclose(
-        norm(rr[0].to(u.km).value) - norm(r0), dr_expected, rtol=1e-2
+        norm(rr[0].to(u.km).value) - norm(r0), dr_expected.value, rtol=1e-2
     )
 
 
@@ -459,7 +462,7 @@ def normalize_to_Curtis(t0, sun_r):
     return 149600000 * r / norm(r)
 
 
-@pytest.mark.slow
+# @pytest.mark.slow
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
     with solar_system_ephemeris.set("builtin"):
@@ -493,7 +496,7 @@ def test_solar_pressure():
             C_R=2.0,
             A=2e-4,
             m=100,
-            Wdivc_s=Sun.Wdivc.value,
+            Wdivc_s=Wdivc_sun.value,
             star=sun_normalized,
         )
 

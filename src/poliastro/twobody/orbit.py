@@ -417,14 +417,14 @@ class Orbit(object):
             )
         try:
             r, v = get_body_barycentric_posvel(body.name, epoch)
-        except KeyError:
+        except KeyError as exc:
             raise RuntimeError(
                 """To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:
 
 >>> from astropy.coordinates import solar_system_ephemeris
 >>> solar_system_ephemeris.set('jpl')
 """
-            )
+            ) from exc
         if body == Moon:
             # TODO: The attractor is in fact the Earth-Moon Barycenter
             icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
@@ -792,6 +792,11 @@ class Orbit(object):
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
+        if attractor.J2 == 0.0 or attractor.J3 == 0.0:
+            raise AttributeError(
+                f"Attractor {attractor.name} has not spherical harmonics implemented"
+            )
+
         critical_argps = [np.pi / 2, 3 * np.pi / 2] * u.rad
         critical_inclinations = [63.4349 * np.pi / 180, 116.5651 * np.pi / 180] * u.rad
         try:
@@ -834,14 +839,10 @@ class Orbit(object):
                 attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
             )
 
-        except AttributeError:
-            raise AttributeError(
-                f"Attractor {attractor.name} has not spherical harmonics implemented"
-            )
-        except AssertionError:
+        except AssertionError as exc:
             raise ValueError(
                 f"The semimajor axis may not be smaller that {attractor.name}'s radius"
-            )
+            ) from exc
 
     def represent_as(self, representation):
         """Converts the orbit to a specific representation.
