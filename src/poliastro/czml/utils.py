@@ -51,7 +51,7 @@ def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
     # Get rid of one parameter by translating the line's direction vector
     k, m = u2 / u1, u3 / u1
     t0 = (
-        -a ** 2 * b ** 2 * m * z
+        -(a ** 2) * b ** 2 * m * z
         - a ** 2 * c ** 2 * k * y
         - b ** 2 * c ** 2 * x
         + np.sqrt(
