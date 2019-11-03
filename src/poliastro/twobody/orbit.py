@@ -20,7 +20,7 @@ from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.frames import Planes, get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M
+from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
 from poliastro.twobody.propagation import mean_motion, propagate
 from poliastro.util import (
     find_closest_value,
@@ -680,6 +680,103 @@ class Orbit(object):
 
         altitude = geo_radius - attractor.R
         return cls.circular(attractor, altitude)
+
+    @classmethod
+    def heliosynchronous(
+        cls,
+        a=None,
+        ecc=None,
+        inc=None,
+        ltan=10.0 * u.hourangle,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
+        epoch=J2000,
+        body=Earth,
+        plane=Planes.EARTH_EQUATOR,
+    ):
+        r""" Solves for a Sun-Synchronous orbit. These orbits make use of the J2
+        perturbation to precess in order to be always towards Sun. At least
+        two parameters of the set {a, ecc, inc} are needed in order to solve
+        for these kind of orbits. Relationships among them are given by:
+
+        .. math::
+            \begin{align}
+                a &= \left (\frac{-3R_{\bigoplus}J_{2}\sqrt{\mu}\cos(i)}{2\dot{\Omega}(1-e^2)^2}  \right ) ^ {\frac{2}{7}}\\
+                e &= \sqrt{1 - \sqrt{\frac{-3R_{\bigoplus}J_{2}\sqrt{\mu}cos(i)}{2a^{\frac{7}{2}}\dot{\Omega}}}}\\
+                i &= \arccos{\left ( \frac{-2a^{\frac{7}{2}}\dot{\Omega}(1-e^2)^2}{3R_{\bigoplus}J_{2}\sqrt{\mu}} \right )}\\
+            \end{align}
+
+        Parameters
+        ----------
+        a: ~astropy.units.Quantity
+            Semi-major axis.
+        ecc: ~astropy.units.Quantity
+            Eccentricity.
+        inc: ~astropy.units.Quantity
+            Inclination.
+        ltan: ~astropy.units.Quantity
+            Local time of the ascending node which will be translated to the Right ascension of the ascending node.
+        argp : ~astropy.units.Quantity
+            Argument of the pericenter.
+        nu : ~astropy.units.Quantity
+            True anomaly.
+        epoch : ~astropy.time.Time, optional
+            Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
+        """
+
+        # Constants for Sun-Synchronours Orbits (SSO)
+        n_sunsync = 1.991063853e-7 * u.one / u.s
+        R_SSO = body.R
+        k_SSO = body.k
+        J2_SSO = body.J2
+
+        try:
+            with np.errstate(invalid="raise"):
+                if (a is None) and (ecc is None) and (inc is None):
+                    # We check sufficient number of parameters
+                    raise ValueError(
+                        "At least two parameters of the set {a, ecc, inc} are required."
+                    )
+                elif a is None and (ecc is not None) and (inc is not None):
+                    # Semi-major axis is the unknown variable
+                    a = (
+                        -3
+                        * R_SSO ** 2
+                        * J2_SSO
+                        * np.sqrt(k_SSO)
+                        / (2 * n_sunsync * (1 - ecc ** 2) ** 2)
+                        * np.cos(inc)
+                    ) ** (2 / 7)
+                elif ecc is None and (a is not None) and (inc is not None):
+                    # Eccentricity is the unknown variable
+                    _ecc_0 = np.sqrt(
+                        -3
+                        * R_SSO ** 2
+                        * J2_SSO
+                        * np.sqrt(k_SSO)
+                        * np.cos(inc.to(u.rad))
+                        / (2 * a ** (7 / 2) * n_sunsync)
+                    )
+                    ecc = np.sqrt(1 - _ecc_0)
+                elif inc is None and (ecc is not None) and (a is not None):
+                    # Inclination is the unknown variable
+                    inc = np.arccos(
+                        -2
+                        * a ** (7 / 2)
+                        * n_sunsync
+                        * (1 - ecc ** 2) ** 2
+                        / (3 * R_SSO ** 2 * J2_SSO * np.sqrt(k_SSO))
+                    )
+        except FloatingPointError:
+            raise ValueError("No SSO orbit with given parameters can be found.")
+        raan = raan_from_ltan(epoch, ltan)
+        ss = cls.from_classical(
+            Earth, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+        )
+
+        return ss
 
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
