@@ -347,7 +347,7 @@ def rv2coe(k, r, v, tol=1e-8):
         ka = k * a
         if a > 0:
             e_se = r.dot(v) / sqrt(ka)
-            e_ce = norm(r) * (norm(v) ** 2) / k - 1
+            e_ce = norm(r) * v.dot(v) / k - 1
             nu = E_to_nu(np.arctan2(e_se, e_ce), ecc)
         else:
             e_sh = r.dot(v) / sqrt(-ka)
