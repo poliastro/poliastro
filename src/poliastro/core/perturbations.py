@@ -1,6 +1,5 @@
 import numpy as np
-
-from poliastro.core.util import norm
+from numpy.linalg import norm
 
 from ._jit import jit
 
