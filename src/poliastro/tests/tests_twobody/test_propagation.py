@@ -371,10 +371,7 @@ def test_sample_custom_body_raises_warning_and_returns_coords():
     # See https://github.com/poliastro/poliastro/issues/649
     orbit = Orbit.circular(Moon, 100 * u.km)
 
-    with pytest.warns(
-        UserWarning, match="returning only cartesian coordinates instead"
-    ):
-        coords = orbit.sample(10)
+    coords = orbit.sample(10)
 
     assert isinstance(coords, CartesianRepresentation)
     assert len(coords) == 10
