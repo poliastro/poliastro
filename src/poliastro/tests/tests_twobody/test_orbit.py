@@ -1068,8 +1068,8 @@ def test_orbit_change_attractor_open():
     with pytest.warns(PatchedConicsWarning) as record:
         ss.change_attractor(Sun)
 
-    assert len(record) == 1
-    assert "Leaving the SOI of the current attractor" in record[0].message.args[0]
+    w = record.pop(PatchedConicsWarning)
+    assert "Leaving the SOI of the current attractor" in w.message.args[0]
 
 
 def test_time_to_anomaly():
