@@ -405,7 +405,12 @@ class Orbit(object):
         """Return osculating `Orbit` of a body at a given time.
 
         """
-        # TODO: https://github.com/poliastro/poliastro/issues/445
+        warn(
+            "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
+            "see https://github.com/poliastro/poliastro/issues/445 for discussion.",
+            DeprecationWarning,
+        )
+
         if not epoch:
             epoch = time.Time.now().tdb
         elif epoch.scale != "tdb":
