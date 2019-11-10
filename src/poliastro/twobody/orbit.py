@@ -15,7 +15,6 @@ from astropy.coordinates import (
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
 
-from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.frames import Planes, get_frame
@@ -405,6 +404,8 @@ class Orbit(object):
         """Return osculating `Orbit` of a body at a given time.
 
         """
+        from poliastro.bodies import Earth, Moon, Sun
+
         warn(
             "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
             "see https://github.com/poliastro/poliastro/issues/445 for discussion.",
@@ -577,7 +578,9 @@ class Orbit(object):
         --------
         >>> from poliastro.twobody.orbit import Orbit
         >>> apophis_orbit = Orbit.from_sbdb('apophis')  # doctest: +REMOTE_DATA
+
         """
+        from poliastro.bodies import Sun
 
         obj = SBDB.query(name, full_precision=True, **kargs)
 
@@ -750,6 +753,7 @@ class Orbit(object):
             Fundamental plane of the frame.
         """
         # TODO: Generalize for other bodies
+        from poliastro.bodies import Earth
 
         # Constants for Sun-Synchronours Orbits (SSO)
         n_sunsync = (
