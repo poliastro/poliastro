@@ -711,7 +711,6 @@ class Orbit(object):
         argp=0 * u.deg,
         nu=0 * u.deg,
         epoch=J2000,
-        body=Earth,
         plane=Planes.EARTH_EQUATOR,
     ):
         r""" Solves for a Sun-Synchronous orbit. These orbits make use of the J2
@@ -745,12 +744,15 @@ class Orbit(object):
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
+        # TODO: Generalize for other bodies
 
         # Constants for Sun-Synchronours Orbits (SSO)
-        n_sunsync = 1.991063853e-7 * u.one / u.s
-        R_SSO = body.R
-        k_SSO = body.k
-        J2_SSO = body.J2
+        n_sunsync = (
+            1.991063853e-7 * u.one / u.s
+        )  # 2 * np.pi * u.rad / (86400 * 365.2421897 * u.s)
+        R_SSO = Earth.R
+        k_SSO = Earth.k
+        J2_SSO = Earth.J2
 
         try:
             with np.errstate(invalid="raise"):
