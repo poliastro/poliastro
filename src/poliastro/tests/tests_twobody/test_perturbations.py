@@ -462,7 +462,7 @@ def normalize_to_Curtis(t0, sun_r):
     return 149600000 * r / norm(r)
 
 
-# @pytest.mark.slow
+@pytest.mark.slow
 def test_solar_pressure():
     # based on example 12.9 from Howard Curtis
     with solar_system_ephemeris.set("builtin"):
