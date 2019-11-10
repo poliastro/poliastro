@@ -254,7 +254,7 @@ class Maneuver(object):
 
     @classmethod
     def lambert(cls, orbit_i, orbit_f, method=lambert_izzo, short=True, **kwargs):
-        """ Computes lambert maneuver between two different points.
+        """Computes Lambert maneuver between two different points.
 
         Parameters
         ----------
@@ -273,10 +273,10 @@ class Maneuver(object):
         r_i = orbit_i.r
         r_f = orbit_f.r
 
-        # Time of flight is solved by substracting both orbit epochs
+        # Time of flight is solved by subtracting both orbit epochs
         tof = orbit_f.epoch - orbit_i.epoch
 
-        # Compute all posible solutions to the Lambert transfer
+        # Compute all possible solutions to the Lambert transfer
         sols = list(method(k, r_i, r_f, tof, **kwargs))
 
         # Return short or long solution

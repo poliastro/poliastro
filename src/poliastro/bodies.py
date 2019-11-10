@@ -55,7 +55,7 @@ class _Body(
 ):
     @property
     def angular_velocity(self):
-        return (2 * math.pi * u.rad) / (self.rotational_period).to(u.s)
+        return (2 * math.pi * u.rad) / self.rotational_period.to(u.s)
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
