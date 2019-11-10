@@ -426,11 +426,11 @@ class CZMLExtractor:
                 show=path_show,
                 width=path_width,
                 material=Material(
-                    solidColor=SolidColorMaterial(color=Color(rgba=path_color))
+                    solidColor=SolidColorMaterial(color=Color.from_list(path_color))
                 )
                 if path_color is not None
                 else Material(
-                    solidColor=SolidColorMaterial(color=Color(rgba=[255, 255, 0, 255]))
+                    solidColor=SolidColorMaterial(color=Color.from_list([255, 255, 0]))
                 ),
                 resolution=120,
             ),
