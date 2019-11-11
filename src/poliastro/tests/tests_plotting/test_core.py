@@ -139,5 +139,4 @@ def test_set_view():
 
 def test_dark_theme():
     frame = OrbitPlotter3D(dark=True)
-    assert frame._layout is not None  # https://github.com/python/mypy/issues/7513
     assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
