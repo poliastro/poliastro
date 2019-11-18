@@ -46,7 +46,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            MPLBACKEND=Agg tox  # Test against installed code
+            FLIT_ROOT_INSTALL=1 MPLBACKEND=Agg tox  # Test against installed code
 
   test_py37:
     <<: *test-template
@@ -80,7 +80,7 @@ jobs:
       - run:
           name: run coverage
           command: |
-            MPLBACKEND=Agg NUMBA_DISABLE_JIT=1 tox   # Test against sources
+            FLIT_ROOT_INSTALL=1 MPLBACKEND=Agg NUMBA_DISABLE_JIT=1 tox   # Test against sources
 
       - run:
           name: publish coverage
