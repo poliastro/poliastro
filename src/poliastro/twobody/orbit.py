@@ -496,7 +496,12 @@ class Orbit(object):
 
     @classmethod
     def from_horizons(
-        cls, name, epoch=None, plane=Planes.EARTH_EQUATOR, id_type="smallbody"
+        cls,
+        name,
+        attractor,
+        epoch=None,
+        plane=Planes.EARTH_EQUATOR,
+        id_type="smallbody",
     ):
         """Return osculating `Orbit` of a body using JPLHorizons module of Astroquery.
 
@@ -520,9 +525,22 @@ class Orbit(object):
         elif plane == Planes.EARTH_ECLIPTIC:
             refplane = "ecliptic"
 
-        obj = Horizons(id=name, epochs=epoch.jd, id_type=id_type).elements(
-            refplane=refplane
-        )
+        bodies_dict = {
+            "sun": 10,
+            "mercury": 199,
+            "venus": 299,
+            "earth": 399,
+            "mars": 499,
+            "jupiter": 599,
+            "saturn": 699,
+            "uranus": 799,
+            "neptune": 899,
+        }
+        location = "500@{}".format(bodies_dict[attractor.name.lower()])
+
+        obj = Horizons(
+            id=name, location=location, epochs=epoch.jd, id_type=id_type
+        ).elements(refplane=refplane)
         a = obj["a"][0] * u.au
         ecc = obj["e"][0] * u.one
         inc = obj["incl"][0] * u.deg
@@ -530,7 +548,7 @@ class Orbit(object):
         argp = obj["w"][0] * u.deg
         nu = obj["nu"][0] * u.deg
         ss = cls.from_classical(
-            Sun, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+            attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
         )
         return ss
 

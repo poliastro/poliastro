@@ -582,7 +582,7 @@ def test_orbit_propagate_retains_plane():
 @pytest.mark.remote_data
 def test_from_horizons_raise_valueerror():
     with pytest.raises(ValueError) as exep:
-        Orbit.from_horizons(name="Dummy")
+        Orbit.from_horizons(name="Dummy", attractor=Sun)
     assert (
         "ValueError: Unknown target (Dummy). Maybe try different id_type?"
         in exep.exconly()
@@ -604,7 +604,7 @@ def test_orbit_from_horizons_has_expected_elements():
         21.28957916690369 * u.deg,
         epoch,
     )
-    ss1 = Orbit.from_horizons(name="Ceres", epoch=epoch)
+    ss1 = Orbit.from_horizons(name="Ceres", attractor=Sun, epoch=epoch)
     assert ss.pqw()[0].value.all() == ss1.pqw()[0].value.all()
     assert ss.r_a == ss1.r_a
     assert ss.a == ss1.a
@@ -613,7 +613,7 @@ def test_orbit_from_horizons_has_expected_elements():
 @pytest.mark.remote_data
 def test_plane_is_set_in_horizons():
     plane = Planes.EARTH_ECLIPTIC
-    ss = Orbit.from_horizons(name="Ceres", plane=plane)
+    ss = Orbit.from_horizons(name="Ceres", attractor=Sun, plane=plane)
     assert ss.plane == plane
 
 
@@ -1011,7 +1011,7 @@ def test_orbit_wrong_dimensions_fails():
 @pytest.mark.remote_data
 def test_orbit_change_attractor():
     Io = 501  # Id for Io moon
-    ss_io = Orbit.from_horizons(Io, epoch=J2000, id_type="majorbody")
+    ss_io = Orbit.from_horizons(Io, Sun, epoch=J2000, id_type="majorbody")
     ss_io = ss_io.change_attractor(Jupiter)
     assert Jupiter == ss_io.attractor
 
