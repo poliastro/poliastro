@@ -1,6 +1,84 @@
 [build-system]
 requires = [
-    "setuptools",
+    "flit_core >=2.0rc3,<3",
     "wheel",
     "numpy",
+]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "poliastro"
+author = "Juan Luis Cano Rodríguez"
+author-email = "hello@juanlu.space"
+description-file = "README.rst"
+home-page = "https://github.com/poliastro/poliastro/"
+keywords = "aero,aerospace,engineering,astrodynamics,orbits,kepler,orbital mechanics"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+requires-python = ">=3.6,<3.8"
+requires = [
+    "astropy ~=3.2",
+    "astroquery >=0.3.9",
+    "jplephem",
+    "matplotlib >=2.0,!=3.0.1",
+    "numba >=0.46 ; implementation_name=='cpython'",
+    "numpy",
+    "pandas",
+    "plotly ~=4.0",
+    "scipy >=1.0",
+]
+
+[tool.flit.metadata.requires-extra]
+jupyter = ["notebook"]
+cesium = ["czml3 ~=0.1.2"]
+dev = [
+    "black",
+    "coverage",
+    "ipykernel",
+    "ipython>=5.0",
+    "isort",
+    "jupyter-client",
+    "mypy>=0.740",
+    "nbsphinx",
+    "pycodestyle",
+    "pytest>=3.2",
+    "pytest-cov<2.6.0",
+    "pytest-doctestplus",
+    "pytest-mpl",
+    "pytest-mypy",
+    "pytest-remotedata",
+    "sphinx",
+    "sphinx_rtd_theme @ https://github.com/Juanlu001/sphinx_rtd_theme/archive/avoid-require-redefinition.zip",
+    "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/master.zip",
+    "sphinx-notfound-page",
+    "tox",
+]
+
+[tool.flit.metadata.urls]
+Source = "https://github.com/poliastro/poliastro"
+Tracker = "https://github.com/poliastro/poliastro/issues"
+
+[tool.flit.entrypoints."console_scripts"]
+poliastro = "poliastro.cli:main"
+
+[tool.flit.sdist]
+include = [
+    "src/poliastro/atmosphere/data/coesa62.dat",
+    "src/poliastro/atmosphere/data/coesa76.dat",
+    "src/poliastro/atmosphere/data/coesa76_p.dat",
+    "src/poliastro/atmosphere/data/coesa76_rho.dat",
 ]
