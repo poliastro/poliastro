@@ -10,11 +10,9 @@ build-backend = "flit_core.buildapi"
 module = "poliastro"
 author = "Juan Luis Cano Rodríguez"
 author-email = "hello@juanlu.space"
-# TODO: No short description?
 description-file = "README.rst"
 home-page = "https://github.com/poliastro/poliastro/"
-# TODO: Keywords cannot contain spaces?
-keywords = "aero aerospace engineering astrodynamics orbits kepler orbital mechanics"
+keywords = "aero,aerospace,engineering,astrodynamics,orbits,kepler,orbital mechanics"
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Development Status :: 4 - Beta",
@@ -64,9 +62,8 @@ dev = [
     "pytest-mypy",
     "pytest-remotedata",
     "sphinx",
-# TODO: PEP 508 URL requirements not supported in extras
-#    "sphinx_rtd_theme @ https://github.com/Juanlu001/sphinx_rtd_theme/archive/avoid-require-redefinition.zip",
-#    "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/master.zip",
+    "sphinx_rtd_theme @ https://github.com/Juanlu001/sphinx_rtd_theme/archive/avoid-require-redefinition.zip",
+    "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/master.zip",
     "sphinx-notfound-page",
     "tox",
 ]
