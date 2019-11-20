@@ -125,11 +125,6 @@ intersphinx_mapping = {
     'matplotlib': ('http://matplotlib.org', None)
 }
 
-#Nbsphinx configuration
-# See https://github.com/jupyter/nbconvert/issues/878#issuecomment-419655951
-# Should not be needed after nbconvert 5.5 is out
-nbsphinx_kernel_name = "python3"
-
 if os.environ.get('READTHEDOCS') == 'True':
     nbsphinx_execute = 'never'
 else:
