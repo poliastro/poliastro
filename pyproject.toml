@@ -53,7 +53,7 @@ dev = [
     "isort",
     "jupyter-client",
     "mypy>=0.740",
-    "nbsphinx",
+    "nbsphinx>=0.5.0",
     "pycodestyle",
     "pytest>=3.2",
     "pytest-cov<2.6.0",
