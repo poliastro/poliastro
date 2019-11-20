@@ -50,6 +50,7 @@ dev = [
     "coverage",
     "ipykernel",
     "ipython>=5.0",
+    "ipywidgets>=7.0",
     "isort",
     "jupyter-client",
     "mypy>=0.740",
