@@ -1,5 +1,4 @@
-import math
-
+import numpy as np
 from astropy import units as u
 from astropy.coordinates import (
     HCRS,
@@ -10,7 +9,6 @@ from astropy.coordinates import (
     FunctionTransform,
     TimeAttribute,
     frame_transform_graph,
-    get_body_barycentric_posvel,
 )
 from astropy.coordinates.builtin_frames.utils import DEFAULT_OBSTIME
 
@@ -70,57 +68,55 @@ class _PlanetaryFixed(BaseRADecFrame):
 
     @staticmethod
     def to_equatorial(fixed_coo, equatorial_frame):
-        assert fixed_coo.body == equatorial_frame.body
+        # TODO replace w/ something smart (Sun/Earth special cased)
+        # assert fixed_coo.body == equatorial_frame.body
 
-        r = fixed_coo.data.xyz
-        v = fixed_coo.data.differentials["s"].d_xyz
+        r = fixed_coo.cartesian.xyz
 
         ra, dec, W = fixed_coo.rot_elements_at_epoch(fixed_coo.obstime)
+        equatorial_frame._obstime = fixed_coo.obstime
 
         r = transform_vector(r, -W, "z")
-        v = transform_vector(v, -W, "z")
 
         r_trans1 = transform_vector(r, -(90 * u.deg - dec), "x")
-        r_trans2 = transform_vector(r_trans1, -(90 * u.deg + ra), "z")
+        r_f = transform_vector(r_trans1, -(90 * u.deg + ra), "z")
 
-        v_trans1 = transform_vector(v, -(90 * u.deg - dec), "x")
-        v_trans2 = transform_vector(v_trans1, -(90 * u.deg + ra), "z")
+        if fixed_coo.data.differentials:
+            v = fixed_coo.differentials["s"].d_xyz
+            v = transform_vector(v, -W, "z")
+            v_trans1 = transform_vector(v, -(90 * u.deg - dec), "x")
+            v_f = transform_vector(v_trans1, -(90 * u.deg + ra), "z")
 
-        icrs_frame_pos_coord, icrs_frame_vel_coord = get_body_barycentric_posvel(
-            fixed_coo.body.name, time=fixed_coo.obstime
-        )
-
-        r_f = icrs_frame_pos_coord.xyz + r_trans2
-        v_f = icrs_frame_vel_coord.xyz + v_trans2
-
-        data = CartesianRepresentation(r_f, differentials=CartesianDifferential(v_f))
+            data = CartesianRepresentation(
+                r_f, differentials=CartesianDifferential(v_f)
+            )
+        else:
+            data = CartesianRepresentation(r_f)
         return equatorial_frame.realize_frame(data)
 
     @staticmethod
     def from_equatorial(equatorial_coo, fixed_frame):
-        assert equatorial_coo.body == fixed_frame.body
+        # TODO replace w/ something smart (Sun/Earth special cased)
+        # assert equatorial_coo.body == fixed_frame.body
 
-        r = equatorial_coo.data.xyz
-        v = equatorial_coo.data.differentials["s"].d_xyz
+        r = equatorial_coo.cartesian.xyz
 
         ra, dec, W = fixed_frame.rot_elements_at_epoch(equatorial_coo.obstime)
 
-        icrs_frame_pos_coord, icrs_frame_vel_coord = get_body_barycentric_posvel(
-            equatorial_coo.body.name, time=equatorial_coo.obstime
-        )
-
-        r_trans1 = r - icrs_frame_pos_coord.xyz
-        r_trans2 = transform_vector(r_trans1, (90 * u.deg + ra), "z")
+        r_trans2 = transform_vector(r, (90 * u.deg + ra), "z")
         r_f = transform_vector(r_trans2, (90 * u.deg - dec), "x")
-
-        v_trans1 = v - icrs_frame_vel_coord.xyz
-        v_trans2 = transform_vector(v_trans1, (90 * u.deg + ra), "z")
-        v_f = transform_vector(v_trans2, (90 * u.deg - dec), "x")
-
         r_f = transform_vector(r_f, W, "z")
-        v_f = transform_vector(v_f, W, "z")
 
-        data = CartesianRepresentation(r_f, differentials=CartesianDifferential(v_f))
+        if equatorial_coo.data.differentials:
+            v = equatorial_coo.data.differentials["s"].d_xyz
+            v_trans1 = transform_vector(v, (90 * u.deg + ra), "z")
+            v_f = transform_vector(v_trans1, (90 * u.deg - dec), "x")
+            v_f = transform_vector(v_f, W, "z")
+            data = CartesianRepresentation(
+                r_f, differentials=CartesianDifferential(v_f)
+            )
+        else:
+            data = CartesianRepresentation(r_f)
         return fixed_frame.realize_frame(data)
 
     @classmethod
@@ -176,11 +172,11 @@ class MercuryFixed(_PlanetaryFixed):
         ra = (281.0103 - 0.0328 * T) * u.deg
         dec = (61.45 - 0.005 * T) * u.deg
         W = (329.5988 + 6.1385108 * d) * u.deg + (
-            0.01067257 * math.sin(M1.to("rad").value)
-            - 0.00112309 * math.sin(M2.to("rad").value)
-            - 0.00011040 * math.sin(M3.to("rad").value)
-            - 0.00002539 * math.sin(M4.to("rad").value)
-            - 0.00000571 * math.sin(M5.to("rad").value)
+            0.01067257 * np.sin(M1.to("rad").value)
+            - 0.00112309 * np.sin(M2.to("rad").value)
+            - 0.00011040 * np.sin(M3.to("rad").value)
+            - 0.00002539 * np.sin(M4.to("rad").value)
+            - 0.00000571 * np.sin(M5.to("rad").value)
         ) * u.deg
 
         return ra, dec, W
@@ -214,11 +210,11 @@ class MarsFixed(_PlanetaryFixed):
         ra = (
             317.269202
             - 0.10927547 * T
-            + 0.000068 * math.sin(M1.to("rad").value)
-            + 0.000238 * math.sin(M2.to("rad").value)
-            + 0.000052 * math.sin(M3.to("rad").value)
-            + 0.000009 * math.sin(M4.to("rad").value)
-            + 0.419057 * math.sin(M5.to("rad").value)
+            + 0.000068 * np.sin(M1.to("rad").value)
+            + 0.000238 * np.sin(M2.to("rad").value)
+            + 0.000052 * np.sin(M3.to("rad").value)
+            + 0.000009 * np.sin(M4.to("rad").value)
+            + 0.419057 * np.sin(M5.to("rad").value)
         ) * u.deg
 
         K1 = (122.433576 + 19139.9407476 * T) * u.deg
@@ -230,11 +226,11 @@ class MarsFixed(_PlanetaryFixed):
         dec = (
             54.432516
             - 0.05827105 * T
-            + 0.000051 * math.cos(K1.to("rad").value)
-            + 0.000141 * math.cos(K2.to("rad").value)
-            + 0.000031 * math.cos(K3.to("rad").value)
-            + 0.000005 * math.cos(K4.to("rad").value)
-            + 1.591274 * math.cos(K5.to("rad").value)
+            + 0.000051 * np.cos(K1.to("rad").value)
+            + 0.000141 * np.cos(K2.to("rad").value)
+            + 0.000031 * np.cos(K3.to("rad").value)
+            + 0.000005 * np.cos(K4.to("rad").value)
+            + 1.591274 * np.cos(K5.to("rad").value)
         ) * u.deg
 
         J1 = (129.071773 + 19140.0328244 * T) * u.deg
@@ -247,12 +243,12 @@ class MarsFixed(_PlanetaryFixed):
         W = (
             176.049863
             + 350.891982443297 * d
-            + 0.000145 * math.sin(J1.to("rad").value)
-            + 0.000157 * math.sin(J2.to("rad").value)
-            + 0.000040 * math.sin(J3.to("rad").value)
-            + 0.000001 * math.sin(J4.to("rad").value)
-            + 0.000001 * math.sin(J5.to("rad").value)
-            + 0.584542 * math.sin(J6.to("rad").value)
+            + 0.000145 * np.sin(J1.to("rad").value)
+            + 0.000157 * np.sin(J2.to("rad").value)
+            + 0.000040 * np.sin(J3.to("rad").value)
+            + 0.000001 * np.sin(J4.to("rad").value)
+            + 0.000001 * np.sin(J5.to("rad").value)
+            + 0.584542 * np.sin(J6.to("rad").value)
         ) * u.deg
 
         return ra, dec, W
@@ -273,20 +269,20 @@ class JupiterFixed(_PlanetaryFixed):
         ra = (
             268.056595
             - 0.006499 * T
-            + 0.000117 * math.sin(Ja.to("rad").value)
-            + 0.000938 * math.sin(Jb.to("rad").value)
-            + 0.001432 * math.sin(Jc.to("rad").value)
-            + 0.000030 * math.sin(Jd.to("rad").value)
-            + 0.002150 * math.sin(Je.to("rad").value)
+            + 0.000117 * np.sin(Ja.to("rad").value)
+            + 0.000938 * np.sin(Jb.to("rad").value)
+            + 0.001432 * np.sin(Jc.to("rad").value)
+            + 0.000030 * np.sin(Jd.to("rad").value)
+            + 0.002150 * np.sin(Je.to("rad").value)
         ) * u.deg
         dec = (
             64.495303
             + 0.002413 * T
-            + 0.000050 * math.cos(Ja.to("rad").value)
-            + 0.000404 * math.cos(Jb.to("rad").value)
-            + 0.000617 * math.cos(Jc.to("rad").value)
-            - 0.000013 * math.cos(Jd.to("rad").value)
-            + 0.000926 * math.cos(Je.to("rad").value)
+            + 0.000050 * np.cos(Ja.to("rad").value)
+            + 0.000404 * np.cos(Jb.to("rad").value)
+            + 0.000617 * np.cos(Jc.to("rad").value)
+            - 0.000013 * np.cos(Jd.to("rad").value)
+            + 0.000926 * np.cos(Je.to("rad").value)
         ) * u.deg
         W = (284.95 + 870.536 * d) * u.deg
 
@@ -327,9 +323,9 @@ class NeptuneFixed(_PlanetaryFixed):
     def _rot_elements_at_epoch(T, d):
         N = (357.85 + 52.316 * T) * u.deg
 
-        ra = (299.36 + 0.70 * math.sin(N.to("rad").value)) * u.deg
-        dec = (43.46 - 0.51 * math.cos(N.to("rad").value)) * u.deg
-        W = (249.978 + 541.1397757 * d - 0.48 * math.sin(N.to("rad").value)) * u.deg
+        ra = (299.36 + 0.70 * np.sin(N.to("rad").value)) * u.deg
+        dec = (43.46 - 0.51 * np.cos(N.to("rad").value)) * u.deg
+        W = (249.978 + 541.1397757 * d - 0.48 * np.sin(N.to("rad").value)) * u.deg
 
         return ra, dec, W
 
@@ -370,43 +366,43 @@ class MoonFixed(_PlanetaryFixed):
         ra = (
             269.9949
             + 0.0031 * T
-            - 3.8787 * math.sin(E1.to("rad").value)
-            - 0.1204 * math.sin(E2.to("rad").value)
-            + 0.0700 * math.sin(E3.to("rad").value)
-            - 0.0172 * math.sin(E4.to("rad").value)
-            + 0.0072 * math.sin(E6.to("rad").value)
-            - 0.0052 * math.sin(E10.to("rad").value)
-            + 0.0043 * math.sin(E13.to("rad").value)
+            - 3.8787 * np.sin(E1.to("rad").value)
+            - 0.1204 * np.sin(E2.to("rad").value)
+            + 0.0700 * np.sin(E3.to("rad").value)
+            - 0.0172 * np.sin(E4.to("rad").value)
+            + 0.0072 * np.sin(E6.to("rad").value)
+            - 0.0052 * np.sin(E10.to("rad").value)
+            + 0.0043 * np.sin(E13.to("rad").value)
         ) * u.deg
         dec = (
             66.5392
             + 0.0130 * T
-            + 1.5419 * math.cos(E1.to("rad").value)
-            + 0.0239 * math.cos(E2.to("rad").value)
-            - 0.0278 * math.cos(E3.to("rad").value)
-            + 0.0068 * math.cos(E4.to("rad").value)
-            - 0.0029 * math.cos(E6.to("rad").value)
-            + 0.0009 * math.cos(E7.to("rad").value)
-            + 0.0008 * math.cos(E10.to("rad").value)
-            - 0.0009 * math.cos(E13.to("rad").value)
+            + 1.5419 * np.cos(E1.to("rad").value)
+            + 0.0239 * np.cos(E2.to("rad").value)
+            - 0.0278 * np.cos(E3.to("rad").value)
+            + 0.0068 * np.cos(E4.to("rad").value)
+            - 0.0029 * np.cos(E6.to("rad").value)
+            + 0.0009 * np.cos(E7.to("rad").value)
+            + 0.0008 * np.cos(E10.to("rad").value)
+            - 0.0009 * np.cos(E13.to("rad").value)
         ) * u.deg
         W = (
             38.321
             + 13.17635815 * d
             - 1.4e-12 * d ** 2
-            + 3.5610 * math.sin(E1.to("rad").value)
-            + 0.1208 * math.sin(E2.to("rad").value)
-            - 0.0642 * math.sin(E3.to("rad").value)
-            + 0.0158 * math.sin(E4.to("rad").value)
-            + 0.0252 * math.sin(E5.to("rad").value)
-            - 0.0066 * math.sin(E6.to("rad").value)
-            - 0.0047 * math.sin(E7.to("rad").value)
-            - 0.0046 * math.sin(E8.to("rad").value)
-            + 0.0028 * math.sin(E9.to("rad").value)
-            + 0.0052 * math.sin(E10.to("rad").value)
-            + 0.0040 * math.sin(E11.to("rad").value)
-            + 0.0019 * math.sin(E12.to("rad").value)
-            - 0.0044 * math.sin(E13.to("rad").value)
+            + 3.5610 * np.sin(E1.to("rad").value)
+            + 0.1208 * np.sin(E2.to("rad").value)
+            - 0.0642 * np.sin(E3.to("rad").value)
+            + 0.0158 * np.sin(E4.to("rad").value)
+            + 0.0252 * np.sin(E5.to("rad").value)
+            - 0.0066 * np.sin(E6.to("rad").value)
+            - 0.0047 * np.sin(E7.to("rad").value)
+            - 0.0046 * np.sin(E8.to("rad").value)
+            + 0.0028 * np.sin(E9.to("rad").value)
+            + 0.0052 * np.sin(E10.to("rad").value)
+            + 0.0040 * np.sin(E11.to("rad").value)
+            + 0.0019 * np.sin(E12.to("rad").value)
+            - 0.0044 * np.sin(E13.to("rad").value)
         ) * u.deg
 
         return ra, dec, W
