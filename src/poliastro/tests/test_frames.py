@@ -35,6 +35,18 @@ from poliastro.frames import (
     UranusICRS,
     VenusICRS,
 )
+from poliastro.frames.fixed import (
+    ITRS,
+    JupiterFixed,
+    MarsFixed,
+    MercuryFixed,
+    NeptuneFixed,
+    PlutoFixed,
+    SaturnFixed,
+    SunFixed,
+    UranusFixed,
+    VenusFixed,
+)
 
 
 @pytest.mark.parametrize(
@@ -111,6 +123,66 @@ def test_icrs_body_position_to_planetary_frame_yields_zeros(body, frame):
         )
 
     assert_quantity_allclose(vector_result.xyz, [0, 0, 0] * u.km, atol=1e-7 * u.km)
+
+
+@pytest.mark.parametrize(
+    "body, fixed_frame, inertial_frame",
+    [
+        (Sun, SunFixed, HCRS),
+        (Mercury, MercuryFixed, MercuryICRS),
+        (Venus, VenusFixed, VenusICRS),
+        (Earth, ITRS, GCRS),
+        (Mars, MarsFixed, MarsICRS),
+        (Jupiter, JupiterFixed, JupiterICRS),
+        (Saturn, SaturnFixed, SaturnICRS),
+        (Uranus, UranusFixed, UranusICRS),
+        (Neptune, NeptuneFixed, NeptuneICRS),
+        (Pluto, PlutoFixed, PlutoICRS),
+    ],
+)
+def test_planetary_fixed_inertial_conversion(body, fixed_frame, inertial_frame):
+    with solar_system_ephemeris.set("builtin"):
+        epoch = J2000
+        fixed_position = fixed_frame(
+            0 * u.deg, 0 * u.deg, body.R, obstime=epoch, representation_type="spherical"
+        )
+        inertial_position = fixed_position.transform_to(inertial_frame)
+        assert_quantity_allclose(
+            fixed_position.spherical.distance, body.R, atol=1e-7 * u.km
+        )
+        assert_quantity_allclose(
+            inertial_position.spherical.distance, body.R, atol=1e-7 * u.km
+        )
+
+
+@pytest.mark.parametrize(
+    "body, fixed_frame, inertial_frame",
+    [
+        (Sun, SunFixed, HCRS),
+        (Mercury, MercuryFixed, MercuryICRS),
+        (Venus, VenusFixed, VenusICRS),
+        (Earth, ITRS, GCRS),
+        (Mars, MarsFixed, MarsICRS),
+        (Jupiter, JupiterFixed, JupiterICRS),
+        (Saturn, SaturnFixed, SaturnICRS),
+        (Uranus, UranusFixed, UranusICRS),
+        (Neptune, NeptuneFixed, NeptuneICRS),
+        (Pluto, PlutoFixed, PlutoICRS),
+    ],
+)
+def test_planetary_inertial_fixed_conversion(body, fixed_frame, inertial_frame):
+    with solar_system_ephemeris.set("builtin"):
+        epoch = J2000
+        inertial_position = inertial_frame(
+            0 * u.deg, 0 * u.deg, body.R, obstime=epoch, representation_type="spherical"
+        )
+        fixed_position = inertial_position.transform_to(fixed_frame)
+        assert_quantity_allclose(
+            fixed_position.spherical.distance, body.R, atol=1e-7 * u.km
+        )
+        assert_quantity_allclose(
+            inertial_position.spherical.distance, body.R, atol=1e-7 * u.km
+        )
 
 
 def test_round_trip_from_GeocentricSolarEcliptic_gives_same_results():
