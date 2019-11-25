@@ -98,7 +98,7 @@ library.
 Development environment
 -----------------------
 
-These are some succint steps to set up a development environment:
+These are some succinct steps to set up a development environment:
 
 1. `Install git <https://git-scm.com/>`_ on your computer.
 2. `Register to GitHub <https://github.com/>`_.
