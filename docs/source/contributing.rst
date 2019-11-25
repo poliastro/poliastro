@@ -118,4 +118,4 @@ These are some succinct steps to set up a development environment:
 For more detailed explanations, please check out the `Astropy development docs`__.
 
 .. _`flit`: https://github.com/takluyver/flit
-.. __: http://docs.astropy.org/en/stable/development/workflow/development_workflow.html
+.. __: https://docs.astropy.org/en/stable/development/workflow/development_workflow.html
