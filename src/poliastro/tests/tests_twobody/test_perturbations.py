@@ -444,44 +444,43 @@ def test_3rd_body_Curtis(test_params):
         )
 
 
-solar_pressure_checks = [
-    {"t_days": 200, "deltas_expected": [3e-3, -8e-3, -0.035, -80.0]},
-    {"t_days": 400, "deltas_expected": [-1.3e-3, 0.01, -0.07, 8.0]},
-    {"t_days": 600, "deltas_expected": [7e-3, 0.03, -0.10, -80.0]},
-]
-"""
-                         {'t_days': 800, 'deltas_expected': [-7.5e-3, 0.02, -0.13, 1.7]},
-                         {'t_days': 1000, 'deltas_expected': [6e-3, 0.065, -0.165, -70.0]},
-                         {'t_days': 1095, 'deltas_expected': [0.0, 0.06, -0.165, -10.0]},
-                         ]
-"""
-
-
 def normalize_to_Curtis(t0, sun_r):
     r = sun_r(t0)
     return 149600000 * r / norm(r)
 
 
 @pytest.mark.slow
-def test_solar_pressure():
+@pytest.mark.parametrize(
+    "t_days,deltas_expected",
+    [
+        (200, [3e-3, -8e-3, -0.035, -80.0]),
+        (400, [-1.3e-3, 0.01, -0.07, 8.0]),
+        (600, [7e-3, 0.03, -0.10, -80.0]),
+        # (800, [-7.5e-3, 0.02, -0.13, 1.7]),
+        # (1000, [6e-3, 0.065, -0.165, -70.0]),
+        # (1095, [0.0, 0.06, -0.165, -10.0]),
+    ],
+)
+def test_solar_pressure(t_days, deltas_expected):
     # based on example 12.9 from Howard Curtis
     with solar_system_ephemeris.set("builtin"):
-        j_date = 2438400.5 * u.day
+        j_date = 2_438_400.5 * u.day
         tof = 600 * u.day
         sun_r = build_ephem_interpolant(
             Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2
         )
         epoch = Time(j_date, format="jd", scale="tdb")
-        drag_force_orbit = [
+
+        initial = Orbit.from_classical(
+            Earth,
             10085.44 * u.km,
             0.025422 * u.one,
             88.3924 * u.deg,
             45.38124 * u.deg,
             227.493 * u.deg,
             343.4268 * u.deg,
-        ]
-
-        initial = Orbit.from_classical(Earth, *drag_force_orbit, epoch=epoch)
+            epoch=epoch,
+        )
         # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
         sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
@@ -503,31 +502,30 @@ def test_solar_pressure():
         delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []
         for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
             orbit_params = rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)
-            delta_eccs.append(orbit_params[1] - drag_force_orbit[1].value)
+            delta_eccs.append(orbit_params[1] - initial.ecc.value)
             delta_incs.append(
-                (orbit_params[2] * u.rad).to(u.deg).value - drag_force_orbit[2].value
+                (orbit_params[2] * u.rad).to(u.deg).value - initial.inc.value
             )
             delta_raans.append(
-                (orbit_params[3] * u.rad).to(u.deg).value - drag_force_orbit[3].value
+                (orbit_params[3] * u.rad).to(u.deg).value - initial.raan.value
             )
             delta_argps.append(
-                (orbit_params[4] * u.rad).to(u.deg).value - drag_force_orbit[4].value
+                (orbit_params[4] * u.rad).to(u.deg).value - initial.argp.value
             )
 
         # averaging over 5 last values in the way Curtis does
-        for check in solar_pressure_checks:
-            index = int(
-                1.0 * check["t_days"] / tof.to(u.day).value * 4000  # type: ignore
-            )
-            delta_ecc, delta_inc, delta_raan, delta_argp = (
-                np.mean(delta_eccs[index - 5 : index]),
-                np.mean(delta_incs[index - 5 : index]),
-                np.mean(delta_raans[index - 5 : index]),
-                np.mean(delta_argps[index - 5 : index]),
-            )
-            assert_quantity_allclose(
-                [delta_ecc, delta_inc, delta_raan, delta_argp],
-                check["deltas_expected"],
-                rtol=1e-1,
-                atol=1e-4,
-            )
+        index = int(
+            1.0 * t_days / tof.to(u.day).value * 4000  # type: ignore
+        )
+        delta_ecc, delta_inc, delta_raan, delta_argp = (
+            np.mean(delta_eccs[index - 5 : index]),
+            np.mean(delta_incs[index - 5 : index]),
+            np.mean(delta_raans[index - 5 : index]),
+            np.mean(delta_argps[index - 5 : index]),
+        )
+        assert_quantity_allclose(
+            [delta_ecc, delta_inc, delta_raan, delta_argp],
+            deltas_expected,
+            rtol=1e-1,
+            atol=1e-4,
+        )
