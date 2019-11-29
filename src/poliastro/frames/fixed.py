@@ -4,13 +4,12 @@ from astropy.coordinates import (
     HCRS,
     ITRS,
     BaseRADecFrame,
-    CartesianDifferential,
-    CartesianRepresentation,
     FunctionTransform,
     TimeAttribute,
     frame_transform_graph,
 )
 from astropy.coordinates.builtin_frames.utils import DEFAULT_OBSTIME
+from astropy.coordinates.matrix_utilities import rotation_matrix
 
 from poliastro.bodies import (
     Jupiter,
@@ -25,7 +24,6 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000
-from poliastro.util import transform as transform_vector
 
 from .equatorial import (
     JupiterICRS,
@@ -69,55 +67,39 @@ class _PlanetaryFixed(BaseRADecFrame):
     @staticmethod
     def to_equatorial(fixed_coo, equatorial_frame):
         # TODO replace w/ something smart (Sun/Earth special cased)
-        # assert fixed_coo.body == equatorial_frame.body
-
-        r = fixed_coo.cartesian.xyz
-
-        ra, dec, W = fixed_coo.rot_elements_at_epoch(fixed_coo.obstime)
-        equatorial_frame._obstime = fixed_coo.obstime
-
-        r = transform_vector(r, -W, "z")
-
-        r_trans1 = transform_vector(r, -(90 * u.deg - dec), "x")
-        r_f = transform_vector(r_trans1, -(90 * u.deg + ra), "z")
-
-        if fixed_coo.data.differentials:
-            v = fixed_coo.differentials["s"].d_xyz
-            v = transform_vector(v, -W, "z")
-            v_trans1 = transform_vector(v, -(90 * u.deg - dec), "x")
-            v_f = transform_vector(v_trans1, -(90 * u.deg + ra), "z")
-
-            data = CartesianRepresentation(
-                r_f, differentials=CartesianDifferential(v_f)
-            )
+        if fixed_coo.body == Sun:
+            assert type(equatorial_frame) == HCRS
         else:
-            data = CartesianRepresentation(r_f)
+            assert fixed_coo.body == equatorial_frame.body
+
+        r = fixed_coo.cartesian
+
+        ra, dec, W = fixed_coo.rot_elements_at_epoch(equatorial_frame.obstime)
+
+        r = r.transform(rotation_matrix(-W, "z"))
+
+        r_trans1 = r.transform(rotation_matrix(-(90 * u.deg - dec), "x"))
+        data = r_trans1.transform(rotation_matrix(-(90 * u.deg + ra), "z"))
+
         return equatorial_frame.realize_frame(data)
 
     @staticmethod
     def from_equatorial(equatorial_coo, fixed_frame):
         # TODO replace w/ something smart (Sun/Earth special cased)
-        # assert equatorial_coo.body == fixed_frame.body
-
-        r = equatorial_coo.cartesian.xyz
-
-        ra, dec, W = fixed_frame.rot_elements_at_epoch(equatorial_coo.obstime)
-
-        r_trans2 = transform_vector(r, (90 * u.deg + ra), "z")
-        r_f = transform_vector(r_trans2, (90 * u.deg - dec), "x")
-        r_f = transform_vector(r_f, W, "z")
-
-        if equatorial_coo.data.differentials:
-            v = equatorial_coo.data.differentials["s"].d_xyz
-            v_trans1 = transform_vector(v, (90 * u.deg + ra), "z")
-            v_f = transform_vector(v_trans1, (90 * u.deg - dec), "x")
-            v_f = transform_vector(v_f, W, "z")
-            data = CartesianRepresentation(
-                r_f, differentials=CartesianDifferential(v_f)
-            )
+        if fixed_frame.body == Sun:
+            assert type(equatorial_coo) == HCRS
         else:
-            data = CartesianRepresentation(r_f)
-        return fixed_frame.realize_frame(data)
+            assert equatorial_coo.body == fixed_frame.body
+
+        r = equatorial_coo.cartesian
+
+        ra, dec, W = fixed_frame.rot_elements_at_epoch(fixed_frame.obstime)
+
+        r_trans2 = r.transform(rotation_matrix(90 * u.deg + ra, "z"))
+        r_f = r_trans2.transform(rotation_matrix(90 * u.deg - dec, "x"))
+        r_f = r_f.transform(rotation_matrix(W, "z"))
+
+        return fixed_frame.realize_frame(r_f)
 
     @classmethod
     def rot_elements_at_epoch(cls, epoch):

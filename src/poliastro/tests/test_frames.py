@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from astropy import units as u
 from astropy.coordinates import (
@@ -146,7 +147,7 @@ def test_planetary_fixed_inertial_conversion(body, fixed_frame, inertial_frame):
         fixed_position = fixed_frame(
             0 * u.deg, 0 * u.deg, body.R, obstime=epoch, representation_type="spherical"
         )
-        inertial_position = fixed_position.transform_to(inertial_frame)
+        inertial_position = fixed_position.transform_to(inertial_frame(obstime=epoch))
         assert_quantity_allclose(
             fixed_position.spherical.distance, body.R, atol=1e-7 * u.km
         )
@@ -176,12 +177,51 @@ def test_planetary_inertial_fixed_conversion(body, fixed_frame, inertial_frame):
         inertial_position = inertial_frame(
             0 * u.deg, 0 * u.deg, body.R, obstime=epoch, representation_type="spherical"
         )
-        fixed_position = inertial_position.transform_to(fixed_frame)
+        fixed_position = inertial_position.transform_to(fixed_frame(obstime=epoch))
         assert_quantity_allclose(
             fixed_position.spherical.distance, body.R, atol=1e-7 * u.km
         )
         assert_quantity_allclose(
             inertial_position.spherical.distance, body.R, atol=1e-7 * u.km
+        )
+
+
+@pytest.mark.parametrize(
+    "body, fixed_frame, inertial_frame",
+    [
+        (Sun, SunFixed, HCRS),
+        (Mercury, MercuryFixed, MercuryICRS),
+        (Venus, VenusFixed, VenusICRS),
+        (Earth, ITRS, GCRS),
+        (Mars, MarsFixed, MarsICRS),
+        (Jupiter, JupiterFixed, JupiterICRS),
+        (Saturn, SaturnFixed, SaturnICRS),
+        (Uranus, UranusFixed, UranusICRS),
+        (Neptune, NeptuneFixed, NeptuneICRS),
+        (Pluto, PlutoFixed, PlutoICRS),
+    ],
+)
+def test_planetary_inertial_roundtrip_vector(body, fixed_frame, inertial_frame):
+    with solar_system_ephemeris.set("builtin"):
+        epoch = J2000
+        sampling_time = 10 * u.s
+        fixed_position = fixed_frame(
+            np.broadcast_to(0 * u.deg, (1000,), subok=True),
+            np.broadcast_to(0 * u.deg, (1000,), subok=True),
+            np.broadcast_to(body.R, (1000,), subok=True),
+            representation_type="spherical",
+            obstime=epoch + np.arange(1000) * sampling_time,
+        )
+        inertial_position = fixed_position.transform_to(
+            inertial_frame(obstime=epoch + np.arange(1000) * sampling_time)
+        )
+        fixed_position_roundtrip = inertial_position.transform_to(
+            fixed_frame(obstime=epoch + np.arange(1000) * sampling_time)
+        )
+        assert_quantity_allclose(
+            fixed_position.cartesian.xyz,
+            fixed_position_roundtrip.cartesian.xyz,
+            atol=1e-7 * u.km,
         )
 
 

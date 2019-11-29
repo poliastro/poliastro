@@ -6,10 +6,7 @@ from astropy import units as u
 from astropy.time import Time
 from numpy.linalg import norm as norm_np
 
-from poliastro.core.util import (
-    circular_velocity as circular_velocity_fast,
-    rotate as rotate_fast,
-)
+from poliastro.core.util import circular_velocity as circular_velocity_fast
 
 u.kms = u.km / u.s
 u.km3s2 = u.km ** 3 / u.s ** 2
@@ -20,53 +17,6 @@ def circular_velocity(k, a):
 
     """
     return circular_velocity_fast(k.to(u.km3s2).value, a.to(u.km).value) * u.kms
-
-
-def rotate(vector, angle, axis="z"):
-    """Rotates a vector around axis a right-handed positive angle.
-
-    This is just a convenience function around
-    :py:func:`astropy.coordinates.matrix_utilities.rotation_matrix`.
-
-    Parameters
-    ----------
-    vector : ~astropy.units.Quantity
-        Dimension 3 vector.
-    angle : ~astropy.units.Quantity
-        Angle of rotation.
-    axis : str, optional
-        Either 'x', 'y' or 'z'.
-
-    Note
-    -----
-    This performs a so-called *active* or *alibi* transformation: rotates the
-    vector while the coordinate system remains unchanged. To do the opposite
-    operation (*passive* or *alias* transformation) call the function as
-    ``rotate(vec, ax, -angle, unit)`` or use the convenience function
-    :py:func:`transform`, see [1]_.
-
-    References
-    ----------
-    .. [1] http://en.wikipedia.org/wiki/Rotation_matrix#Ambiguities
-
-    """
-    return (
-        rotate_fast(vector.value, angle.to(u.rad).value, ["x", "y", "z"].index(axis))
-        * vector.unit
-    )
-
-
-def transform(vector, angle, axis="z"):
-    """Rotates a coordinate system around axis a positive right-handed angle.
-
-    Note
-    -----
-    This is a convenience function, equivalent to
-    ``rotate(vec, -angle, axis, unit)``.
-    Refer to the documentation of :py:func:`rotate` for further information.
-
-    """
-    return rotate(vector, -angle, axis)
 
 
 def norm(vec):
