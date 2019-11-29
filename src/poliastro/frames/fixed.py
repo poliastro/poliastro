@@ -67,7 +67,10 @@ class _PlanetaryFixed(BaseRADecFrame):
     @staticmethod
     def to_equatorial(fixed_coo, equatorial_frame):
         # TODO replace w/ something smart (Sun/Earth special cased)
-        # assert fixed_coo.body == equatorial_frame.body
+        if fixed_coo.body == Sun:
+            assert type(equatorial_frame) == HCRS
+        else:
+            assert fixed_coo.body == equatorial_frame.body
 
         r = fixed_coo.cartesian
 
@@ -83,7 +86,10 @@ class _PlanetaryFixed(BaseRADecFrame):
     @staticmethod
     def from_equatorial(equatorial_coo, fixed_frame):
         # TODO replace w/ something smart (Sun/Earth special cased)
-        # assert equatorial_coo.body == fixed_frame.body
+        if fixed_frame.body == Sun:
+            assert type(equatorial_coo) == HCRS
+        else:
+            assert equatorial_coo.body == fixed_frame.body
 
         r = equatorial_coo.cartesian
 
