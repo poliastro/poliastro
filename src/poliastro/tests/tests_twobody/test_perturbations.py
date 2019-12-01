@@ -444,6 +444,13 @@ def test_3rd_body_Curtis(test_params):
         )
 
 
+@pytest.fixture(scope="module")
+def sun_r():
+    j_date = 2_438_400.5 * u.day
+    tof = 600 * u.day
+    return build_ephem_interpolant(Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2)
+
+
 def normalize_to_Curtis(t0, sun_r):
     r = sun_r(t0)
     return 149600000 * r / norm(r)
@@ -461,14 +468,11 @@ def normalize_to_Curtis(t0, sun_r):
         # (1095, [0.0, 0.06, -0.165, -10.0]),
     ],
 )
-def test_solar_pressure(t_days, deltas_expected):
+def test_solar_pressure(t_days, deltas_expected, sun_r):
     # based on example 12.9 from Howard Curtis
     with solar_system_ephemeris.set("builtin"):
         j_date = 2_438_400.5 * u.day
         tof = 600 * u.day
-        sun_r = build_ephem_interpolant(
-            Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2
-        )
         epoch = Time(j_date, format="jd", scale="tdb")
 
         initial = Orbit.from_classical(
