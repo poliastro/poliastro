@@ -27,7 +27,7 @@ import functools
 import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
-from scipy.integrate import solve_ivp
+from scipy.integrate import DOP853, solve_ivp
 
 from poliastro.core.propagation import (
     danby as danby_fast,
@@ -39,7 +39,6 @@ from poliastro.core.propagation import (
     mikkola as mikkola_fast,
     pimienta as pimienta_fast,
 )
-from poliastro.integrators import DOP835
 
 
 def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
@@ -101,7 +100,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
         u0,
         rtol=rtol,
         atol=1e-12,
-        method=DOP835,
+        method=DOP853,
         dense_output=True,
     )
     if not result.success:

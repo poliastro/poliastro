@@ -39,7 +39,7 @@ requires = [
     "numpy",
     "pandas",
     "plotly ~=4.0",
-    "scipy >=1.0",
+    "scipy >=1.4rc1",
 ]
 
 [tool.flit.metadata.requires-extra]
