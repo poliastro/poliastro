@@ -480,7 +480,7 @@ Specify the starting and ending epoch, as well as the number of sample points (t
 
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
-    N = 10
+    sample_points = 10
 
     extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
 
