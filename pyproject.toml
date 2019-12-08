@@ -44,7 +44,7 @@ requires = [
 
 [tool.flit.metadata.requires-extra]
 jupyter = ["notebook"]
-cesium = ["czml3 ~=0.1.2"]
+cesium = ["czml3 ~=0.4.0"]
 dev = [
     "black",
     "coverage",

@@ -15,7 +15,6 @@ from astropy.coordinates import (
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
 
-from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
 from poliastro.frames import Planes, get_frame
@@ -405,7 +404,14 @@ class Orbit(object):
         """Return osculating `Orbit` of a body at a given time.
 
         """
-        # TODO: https://github.com/poliastro/poliastro/issues/445
+        from poliastro.bodies import Earth, Moon, Sun
+
+        warn(
+            "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
+            "see https://github.com/poliastro/poliastro/issues/445 for discussion.",
+            DeprecationWarning,
+        )
+
         if not epoch:
             epoch = time.Time.now().tdb
         elif epoch.scale != "tdb":
@@ -489,7 +495,9 @@ class Orbit(object):
             warn("Leaving the SOI of the current attractor", PatchedConicsWarning)
 
         new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
-        coords = self.frame.realize_frame(self.represent_as(CartesianRepresentation))
+        coords = self.frame.realize_frame(
+            self.represent_as(CartesianRepresentation, CartesianDifferential)
+        )
         ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
 
         return ss
@@ -570,7 +578,9 @@ class Orbit(object):
         --------
         >>> from poliastro.twobody.orbit import Orbit
         >>> apophis_orbit = Orbit.from_sbdb('apophis')  # doctest: +REMOTE_DATA
+
         """
+        from poliastro.bodies import Sun
 
         obj = SBDB.query(name, full_precision=True, **kargs)
 
@@ -709,7 +719,6 @@ class Orbit(object):
         argp=0 * u.deg,
         nu=0 * u.deg,
         epoch=J2000,
-        body=Earth,
         plane=Planes.EARTH_EQUATOR,
     ):
         r""" Solves for a Sun-Synchronous orbit. These orbits make use of the J2
@@ -743,12 +752,16 @@ class Orbit(object):
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
+        # TODO: Generalize for other bodies
+        from poliastro.bodies import Earth
 
         # Constants for Sun-Synchronours Orbits (SSO)
-        n_sunsync = 1.991063853e-7 * u.one / u.s
-        R_SSO = body.R
-        k_SSO = body.k
-        J2_SSO = body.J2
+        n_sunsync = (
+            1.991063853e-7 * u.one / u.s
+        )  # 2 * np.pi * u.rad / (86400 * 365.2421897 * u.s)
+        R_SSO = Earth.R
+        k_SSO = Earth.k
+        J2_SSO = Earth.J2
 
         try:
             with np.errstate(invalid="raise"):
@@ -959,7 +972,7 @@ class Orbit(object):
                 f"The semimajor axis may not be smaller that {attractor.name}'s radius"
             ) from exc
 
-    def represent_as(self, representation):
+    def represent_as(self, representation, differential_class=None):
         """Converts the orbit to a specific representation.
 
         .. versionadded:: 0.11.0
@@ -968,23 +981,24 @@ class Orbit(object):
         ----------
         representation : ~astropy.coordinates.BaseRepresentation
             Representation object to use. It must be a class, not an instance.
+        differential_class : ~astropy.coordinates.BaseDifferential, optional
+            Class in which the differential should be represented, default to None.
 
         Examples
         --------
         >>> from poliastro.examples import iss
-        >>> from astropy.coordinates import CartesianRepresentation, SphericalRepresentation
+        >>> from astropy.coordinates import SphericalRepresentation
         >>> iss.represent_as(CartesianRepresentation)
         <CartesianRepresentation (x, y, z) in km
-            (859.07256, -4137.20368, 5295.56871)
-         (has differentials w.r.t.: 's')>
+            (859.07256, -4137.20368, 5295.56871)>
         >>> iss.represent_as(CartesianRepresentation).xyz
         <Quantity [  859.07256, -4137.20368,  5295.56871] km>
-        >>> iss.represent_as(CartesianRepresentation).differentials['s']
+        >>> iss.represent_as(CartesianRepresentation, CartesianDifferential).differentials['s']
         <CartesianDifferential (d_x, d_y, d_z) in km / s
             (7.37289205, 2.08223573, 0.43999979)>
-        >>> iss.represent_as(CartesianRepresentation).differentials['s'].d_xyz
+        >>> iss.represent_as(CartesianRepresentation, CartesianDifferential).differentials['s'].d_xyz
         <Quantity [7.37289205, 2.08223573, 0.43999979] km / s>
-        >>> iss.represent_as(SphericalRepresentation)
+        >>> iss.represent_as(SphericalRepresentation, CartesianDifferential)
         <SphericalRepresentation (lon, lat, distance) in (rad, rad, km)
             (4.91712525, 0.89732339, 6774.76995296)
          (has differentials w.r.t.: 's')>
@@ -996,34 +1010,8 @@ class Orbit(object):
         cartesian = CartesianRepresentation(
             *self.r, differentials=CartesianDifferential(*self.v)
         )
-        # See the propagate function for reasoning about the usage of a
-        # protected method
-        coords = self.frame._replicate(cartesian, representation_type="cartesian")
 
-        return coords.represent_as(representation)
-
-    def to_icrs(self):
-        """Creates a new Orbit object with its coordinates transformed to ICRS.
-
-        Notice that, strictly speaking, the center of ICRS is the Solar System Barycenter
-        and not the Sun, and therefore these orbits cannot be propagated in the context
-        of the two body problem. Therefore, this function exists merely for practical
-        purposes.
-
-        .. versionadded:: 0.11.0
-
-        """
-        coords = self.frame.realize_frame(self.represent_as(CartesianRepresentation))
-        coords.representation_type = CartesianRepresentation
-
-        icrs_cart = coords.transform_to(ICRS).represent_as(CartesianRepresentation)
-
-        # TODO: The attractor is in fact the Solar System Barycenter
-        ss = self.from_vectors(
-            Sun, r=icrs_cart.xyz, v=icrs_cart.differentials["s"].d_xyz, epoch=self.epoch
-        )
-        ss._frame = ICRS()  # Hack!
-        return ss
+        return cartesian.represent_as(representation, differential_class)
 
     def rv(self):
         """Position and velocity vectors. """
@@ -1115,12 +1103,15 @@ class Orbit(object):
         cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
         new_epoch = self.epoch + time_of_flight
 
-        # TODO: Unify with sample
         # If the frame supports obstime, set the time values
         try:
             kwargs = {}
             if "obstime" in self.frame.frame_attributes:
                 kwargs["obstime"] = new_epoch
+            else:
+                warn(
+                    f"Frame {self.frame.__class__} does not support 'obstime', time values were not returned"
+                )
 
             # Use of a protected method instead of frame.realize_frame
             # because the latter does not let the user choose the representation type
@@ -1268,9 +1259,9 @@ class Orbit(object):
         >>> from astropy import units as u
         >>> from poliastro.examples import iss
         >>> iss.sample()  # doctest: +ELLIPSIS
-        <GCRS Coordinate ...>
+        <CartesianRepresentation (x, y, z) in km ...
         >>> iss.sample(10)  # doctest: +ELLIPSIS
-        <GCRS Coordinate ...>
+        <CartesianRepresentation (x, y, z) in km ...
 
         """
         if self.ecc < 1:
@@ -1281,31 +1272,7 @@ class Orbit(object):
         time_values = time.TimeDelta(self._generate_time_values(nu_values))
         cartesian = propagate(self, time_values)
 
-        # TODO: Unify with propagate
-        # If the frame supports obstime, set the time values
-        try:
-            kwargs = {}
-            if "obstime" in self.frame.frame_attributes:
-                kwargs["obstime"] = self.epoch + time_values
-            else:
-                warn(
-                    f"Frame {self.frame.__class__} does not support 'obstime', time values were not returned"
-                )
-
-            # Use of a protected method instead of frame.realize_frame
-            # because the latter does not let the user choose the representation type
-            # in one line despite its parameter names, see
-            # https://github.com/astropy/astropy/issues/7784
-            coords = self.frame._replicate(
-                cartesian, representation_type="cartesian", **kwargs
-            )
-            return coords
-
-        except NotImplementedError:
-            warn(
-                f"No frame found for attractor {self.attractor}, returning only cartesian coordinates instead"
-            )
-            return cartesian
+        return cartesian
 
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point

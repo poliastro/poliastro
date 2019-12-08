@@ -35,7 +35,8 @@ def _q(c):
     return Quantity(c)
 
 
-class _Body(
+# https://stackoverflow.com/a/16721002/554319
+class Body(
     namedtuple(
         "_Body",
         [
@@ -53,32 +54,6 @@ class _Body(
         ],
     )
 ):
-    @property
-    def angular_velocity(self):
-        return (2 * math.pi * u.rad) / (self.rotational_period).to(u.s)
-
-    def __str__(self):
-        return f"{self.name} ({self.symbol})"
-
-    def __repr__(self):
-        return self.__str__()
-
-    @classmethod
-    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
-    def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
-        return cls(parent, k, name, symbol, R, **kwargs)
-
-    @classmethod
-    def from_relative(
-        cls, reference, parent=None, k=None, name=None, symbol=None, R=None, **kwargs
-    ):
-        k = k * reference.k
-        R = R * reference.R
-        return cls(parent, k, name, symbol, R, **kwargs)
-
-
-# https://stackoverflow.com/a/16721002/554319
-class Body(_Body):
     __slots__ = ()
 
     def __new__(
@@ -112,6 +87,29 @@ class Body(_Body):
             _q(J3),
             _q(mass),
         )
+
+    @property
+    def angular_velocity(self):
+        return (2 * math.pi * u.rad) / self.rotational_period.to(u.s)
+
+    def __str__(self):
+        return f"{self.name} ({self.symbol})"
+
+    def __repr__(self):
+        return self.__str__()
+
+    @classmethod
+    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
+    def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
+        return cls(parent, k, name, symbol, R, **kwargs)
+
+    @classmethod
+    def from_relative(
+        cls, reference, parent=None, k=None, name=None, symbol=None, R=None, **kwargs
+    ):
+        k = k * reference.k
+        R = R * reference.R
+        return cls(parent, k, name, symbol, R, **kwargs)
 
 
 class SolarSystemBody(Body):

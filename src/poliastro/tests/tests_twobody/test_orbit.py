@@ -400,7 +400,7 @@ def test_sample_big_orbits():
 def test_hyperbolic_nu_value_check(hyperbolic):
     positions = hyperbolic.sample(100)
 
-    assert isinstance(positions, HCRS)
+    assert isinstance(positions, CartesianRepresentation)
     assert len(positions) == 100
 
 
@@ -414,7 +414,7 @@ def test_hyperbolic_modulus_wrapped_nu():
 
     positions = ss.sample(num_values)
 
-    assert_quantity_allclose(positions[0].data.xyz, ss.r)
+    assert_quantity_allclose(positions[0].xyz, ss.r)
 
 
 @pytest.mark.parametrize("min_anomaly", [-30 * u.deg, -10 * u.deg])
@@ -555,7 +555,7 @@ def test_orbit_represent_as_produces_correct_data():
         *r, differentials=CartesianDifferential(*v)
     )
 
-    result = ss.represent_as(CartesianRepresentation)
+    result = ss.represent_as(CartesianRepresentation, CartesianDifferential)
 
     # We can't directly compare the objects, see
     # https://github.com/astropy/astropy/issues/7793
@@ -1068,8 +1068,8 @@ def test_orbit_change_attractor_open():
     with pytest.warns(PatchedConicsWarning) as record:
         ss.change_attractor(Sun)
 
-    assert len(record) == 1
-    assert "Leaving the SOI of the current attractor" in record[0].message.args[0]
+    w = record.pop(PatchedConicsWarning)
+    assert "Leaving the SOI of the current attractor" in w.message.args[0]
 
 
 def test_time_to_anomaly():
