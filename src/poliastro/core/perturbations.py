@@ -110,7 +110,7 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     H0 : float
         atmospheric scale height, (km)
     rho0: float
-        the exponent density pre-factor, (kg / m^3)
+        the exponent density pre-factor, (kg / km^3)
 
     Note
     ----
