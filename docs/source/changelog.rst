@@ -1,6 +1,42 @@
 What's new
 ==========
 
+poliastro 0.13.1 - TBD
+----------------------
+
+This release fixes some bugs found after 0.13.0.
+
+Bugs fixed
+..........
+
+* `Issue #715`_: Fix docs and dependencies for most recent nbsphinx release
+* `Issue #761`_: Fix unnoticed doctest failures due to unit problems
+* `Issue #776`_: Fix typing error in test
+* `Issue #781`_: Fix broken binder embedded hyperlinks
+* `Issue #821`_: Fix timezone issues in CZML extraction
+
+* [No issue number] Avoid looking for tests in virtual environments
+* [No issue number] Remove executable bit from some Python sources
+
+.. _`Issue #715`: https://github.com/poliastro/poliastro/issues/715
+.. _`Issue #761`: https://github.com/poliastro/poliastro/issues/761
+.. _`Issue #776`: https://github.com/poliastro/poliastro/issues/776
+.. _`Issue #781`: https://github.com/poliastro/poliastro/issues/781
+.. _`Issue #821`: https://github.com/poliastro/poliastro/issues/821
+
+Do you want to help with the remaining ones?
+`Check the current list here! <https://github.com/poliastro/poliastro/issues?q=is%3Aopen+is%3Aissue+label%3Abug>`_
+
+Contributors
+............
+
+This is the complete list of the people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Juan Luis Cano
+* Ole Streicher
+* Shreyas Bapat
+
 poliastro 0.13.0 - 2019-08-05
 -----------------------------
 
