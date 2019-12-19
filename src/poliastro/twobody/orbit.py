@@ -1,3 +1,4 @@
+from typing import List, Union
 from warnings import warn
 
 import numpy as np
@@ -551,7 +552,7 @@ class Orbit(object):
         Examples
         --------
         >>> from poliastro.twobody.orbit import Orbit
-        >>> apophis_orbit = Orbit.from_sbdb('apophis')
+        >>> apophis_orbit = Orbit.from_sbdb('apophis')  # doctest: +REMOTE_DATA
         """
 
         obj = SBDB.query(name, full_precision=True, **kargs)
@@ -561,8 +562,8 @@ class Orbit(object):
             # contains all the name of the objects
             objects_name = obj["list"]["name"]
             objects_name_in_str = (
-                ""
-            )  # used to store them in string form each in new line
+                ""  # used to store them in string form each in new line
+            )
             for i in objects_name:
                 objects_name_in_str += i + "\n"
 
@@ -1215,7 +1216,7 @@ class Orbit(object):
             orbit_new = self.from_vectors(attractor, r, vnew, orbit_new.epoch)
             states.append(orbit_new)
         if intermediate:
-            res = states
+            res = states  # type: Union[Orbit, List[Orbit]]
         else:
             res = orbit_new
         return res
