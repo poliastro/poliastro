@@ -40,4 +40,4 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON% -m tox"
+  - "%PYTHON% -m tox -- -m 'not slow'"
