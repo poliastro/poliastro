@@ -209,7 +209,7 @@ class StaticOrbitPlotter:
             x0, y0 = self._project(state[None])
 
             # Plot current position
-            l, = self.ax.plot(
+            (l,) = self.ax.plot(
                 x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=colors[0]
             )
             lines.append(l)

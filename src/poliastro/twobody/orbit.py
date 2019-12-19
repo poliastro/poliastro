@@ -561,8 +561,8 @@ class Orbit(object):
             # contains all the name of the objects
             objects_name = obj["list"]["name"]
             objects_name_in_str = (
-                ""
-            )  # used to store them in string form each in new line
+                ""  # used to store them in string form each in new line
+            )
             for i in objects_name:
                 objects_name_in_str += i + "\n"
 
