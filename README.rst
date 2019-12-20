@@ -182,7 +182,7 @@ Citing
 ======
 
 If you use poliastro on your project, please
-`drop me a line <mailto:juanlu001@gmail.com>`_.
+`drop me a line <mailto:hello@juanlu.space>`_.
 
 You can also use the DOI to cite it in your publications. This is the latest
 one:
