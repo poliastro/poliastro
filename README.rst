@@ -12,7 +12,7 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez |orcid|
-:Version: 0.13.post0.dev0
+:Version: 0.14.post0.dev0
 
 .. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/master.svg?style=flat-square&logo=circleci
    :target: https://circleci.com/gh/poliastro/poliastro
