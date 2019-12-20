@@ -1,8 +1,8 @@
 What's new
 ==========
 
-poliastro 0.13.1 - TBD
-----------------------
+poliastro 0.13.1 - 2019-12-20
+-----------------------------
 
 This release fixes some bugs found after 0.13.0.
 
