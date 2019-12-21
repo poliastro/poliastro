@@ -6,7 +6,6 @@ from astropy import units as u
 from poliastro.bodies import Earth, Mars, Sun
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
-from poliastro.twobody.orbit import Orbit
 
 
 @pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
@@ -92,8 +91,7 @@ def test_plot_3d_trajectory_plots_a_trajectory():
     frame = OrbitPlotter3D()
     assert len(frame.trajectories) == 0
 
-    earth = Orbit.from_body_ephem(Earth)
-    trajectory = earth.sample()
+    trajectory = Earth.get_mean_orbit().sample()
     frame.set_attractor(Sun)
     frame.plot_trajectory(trajectory)
 
@@ -105,7 +103,7 @@ def test_plot_2d_trajectory_plots_a_trajectory():
     frame = OrbitPlotter2D()
     assert len(frame.trajectories) == 0
 
-    earth = Orbit.from_body_ephem(Earth)
+    earth = Earth.get_mean_orbit()
     trajectory = earth.sample()
     frame.set_attractor(Sun)
     frame.set_frame(*earth.pqw())
@@ -119,8 +117,7 @@ def test_plot_2d_trajectory_plots_a_trajectory():
 def test_show_calls_prepare_plot(plotter_class):
     with mock.patch.object(plotter_class, "_prepare_plot") as mock_prepare_plot:
         m = plotter_class()
-        earth = Orbit.from_body_ephem(Earth)
-        m.plot(orbit=earth, label="Object")
+        m.plot(orbit=Earth.get_mean_orbit(), label="Object")
         m.show()
 
         mock_prepare_plot.assert_called_with()

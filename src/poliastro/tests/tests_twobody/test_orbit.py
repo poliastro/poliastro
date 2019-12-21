@@ -618,41 +618,31 @@ def test_plane_is_set_in_horizons():
 
 
 @pytest.mark.parametrize(
-    "attractor,angular_velocity,expected_a,expected_period",
+    "attractor,expected_a,expected_period",
     [
-        (
-            Earth,
-            (2 * np.pi / 23.9345) * u.rad / u.hour,
-            42_164_205 * u.m,
-            23.9345 * u.hour,
-        ),
-        (
-            Mars,
-            (2 * np.pi / 24.6228) * u.rad / u.hour,
-            20_427_595 * u.m,
-            24.6228 * u.hour,
-        ),
+        (Earth, 42_164_205 * u.m, 23.9345 * u.hour),
+        (Mars, 20_427_595 * u.m, 24.6228 * u.hour),
     ],
 )
 def test_geostationary_creation_from_angular_velocity(
-    attractor, angular_velocity, expected_a, expected_period
+    attractor, expected_a, expected_period
 ):
-    ss = Orbit.geostationary(attractor=attractor, angular_velocity=angular_velocity)
+    ss = Orbit.geostationary(attractor=attractor)
     assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
     assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-7)
 
 
 @pytest.mark.parametrize(
-    "attractor,period,expected_a",
+    "attractor,expected_period,expected_a",
     [
         (Earth, 23.9345 * u.hour, 42_164_205 * u.m),
         (Mars, 24.6228 * u.hour, 20_427_595 * u.m),
     ],
 )
-def test_geostationary_creation_from_period(attractor, period, expected_a):
-    ss = Orbit.geostationary(attractor=attractor, period=period)
+def test_geostationary_creation_from_period(attractor, expected_period, expected_a):
+    ss = Orbit.geostationary(attractor=attractor)
     assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, period, rtol=1.0e-7)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-7)
 
 
 @pytest.mark.parametrize(
@@ -665,30 +655,15 @@ def test_geostationary_creation_from_period(attractor, period, expected_a):
 def test_geostationary_creation_with_Hill_radius(
     attractor, period, hill_radius, expected_a
 ):
-    ss = Orbit.geostationary(
-        attractor=attractor, period=period, hill_radius=hill_radius
-    )
+    ss = Orbit.geostationary(attractor=attractor, hill_radius=hill_radius)
     assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
     assert_quantity_allclose(ss.period, period, rtol=1.0e-7)
 
 
-@pytest.mark.parametrize("attractor", [Earth, Mars])
-def test_geostationary_input(attractor):
+@pytest.mark.parametrize("attractor,hill_radius", [(Venus, 1_000_000 * u.km)])
+def test_geostationary_non_existence_condition(attractor, hill_radius):
     with pytest.raises(ValueError) as excinfo:
-        Orbit.geostationary(attractor=attractor)
-
-    assert (
-        "ValueError: At least one among angular_velocity or period must be passed"
-        in excinfo.exconly()
-    )
-
-
-@pytest.mark.parametrize(
-    "attractor,period,hill_radius", [(Venus, 243.025 * u.day, 1_000_000 * u.km)]
-)
-def test_geostationary_non_existence_condition(attractor, period, hill_radius):
-    with pytest.raises(ValueError) as excinfo:
-        Orbit.geostationary(attractor=attractor, period=period, hill_radius=hill_radius)
+        Orbit.geostationary(attractor=attractor, hill_radius=hill_radius)
 
     assert (
         "Geostationary orbit for the given parameters doesn't exist"
@@ -698,7 +673,7 @@ def test_geostationary_non_existence_condition(attractor, period, hill_radius):
 
 def test_heliosynchronous_orbit_enough_arguments():
     with pytest.raises(ValueError) as excinfo:
-        Orbit.heliosynchronous(a=None, ecc=None, inc=None)
+        Orbit.heliosynchronous(Earth, a=None, ecc=None, inc=None)
 
     assert (
         "At least two parameters of the set {a, ecc, inc} are required."
@@ -711,7 +686,7 @@ def test_heliosynchronous_orbit_inc():
     expected_ecc = 0 * u.one
     expected_a = 800 * u.km + Earth.R
     expected_inc = 98.6 * u.deg
-    ss0 = Orbit.heliosynchronous(a=expected_a, ecc=expected_ecc)
+    ss0 = Orbit.heliosynchronous(Earth, a=expected_a, ecc=expected_ecc)
 
     assert_quantity_allclose(ss0.inc, expected_inc, rtol=1e-4)
     assert_quantity_allclose(ss0.a, expected_a)
@@ -723,7 +698,7 @@ def test_heliosynchronous_orbit_a():
     expected_ecc = 0.2 * u.one
     expected_inc = 98.6 * u.deg
     expected_a = 7346.846 * u.km
-    ss0 = Orbit.heliosynchronous(ecc=expected_ecc, inc=expected_inc)
+    ss0 = Orbit.heliosynchronous(Earth, ecc=expected_ecc, inc=expected_inc)
 
     assert_quantity_allclose(ss0.inc, expected_inc, rtol=1e-4)
     assert_quantity_allclose(ss0.a, expected_a, rtol=1e-5)

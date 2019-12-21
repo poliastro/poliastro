@@ -3,7 +3,6 @@ from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import (
-    Body,
     Earth,
     Jupiter,
     Mars,
@@ -39,14 +38,6 @@ def test_laplace_radius(body, expected_r_SOI):
     assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
 
 
-def test_laplace_radius_given_a():
-    parent = Body(None, 1 * u.km ** 3 / u.s ** 2, "Parent")
-    body = Body(parent, 1 * u.km ** 3 / u.s ** 2, "Body")
-    r_SOI = laplace_radius(body, 1 * u.km)
-
-    assert r_SOI == 1 * u.km
-
-
 @pytest.mark.parametrize(
     "body, expected_r_SOI",
     [
@@ -64,14 +55,6 @@ def test_hill_radius(body, expected_r_SOI):
     if expected_r_SOI is not None:
         expected_r_SOI = expected_r_SOI * u.m
 
-    r_SOI = hill_radius(body, e=0 * u.one)
+    r_SOI = hill_radius(body)
 
     assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-1)
-
-
-def test_hill_radius_given_a():
-    parent = Body(None, 1 * u.km ** 3 / u.s ** 2, "Parent")
-    body = Body(parent, 1 * u.km ** 3 / u.s ** 2, "Body")
-    r_SOI = hill_radius(body, 1 * u.km, 0.25 * u.one)
-    expected_r_SOI = 520.02096 * u.m
-    assert_quantity_allclose(r_SOI, expected_r_SOI, rtol=1e-8)

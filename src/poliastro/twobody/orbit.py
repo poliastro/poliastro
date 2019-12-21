@@ -561,6 +561,7 @@ class Orbit(object):
         raan = obj["Omega"][0] * u.deg
         argp = obj["w"][0] * u.deg
         nu = obj["nu"][0] * u.deg
+
         ss = cls.from_classical(
             attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
         )
@@ -671,20 +672,14 @@ class Orbit(object):
         )
 
     @classmethod
-    @u.quantity_input(angular_velocity=u.rad / u.s, period=u.s, hill_radius=u.m)
-    def geostationary(
-        cls, attractor, angular_velocity=None, period=None, hill_radius=None
-    ):
+    @u.quantity_input(angular_velocity=u.rad / u.s, hill_radius=u.m)
+    def geostationary(cls, attractor, hill_radius=None):
         """Return the geostationary orbit for the given attractor and its rotational speed.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
-        angular_velocity : ~astropy.units.Quantity
-            Rotational angular velocity of the attractor.
-        period : ~astropy.units.Quantity
-            Attractor's rotational period, ignored if angular_velocity is passed.
         hill_radius : ~astropy.units.Quantity
             Radius of Hill sphere of the attractor (optional). Hill sphere radius(in
             contrast with Laplace's SOI) is used here to validate the stability of the
@@ -694,18 +689,12 @@ class Orbit(object):
             Hill SOI of parent(if exists) of the attractor is ignored if hill_radius is not provided.
         """
 
-        if angular_velocity is None and period is None:
-            raise ValueError(
-                "At least one among angular_velocity or period must be passed"
-            )
-
-        if angular_velocity is None:
-            angular_velocity = 2 * np.pi / period
-
         # Find out geostationary radius using r = cube_root(GM/(angular
         # velocity)^2)
         with u.set_enabled_equivalencies(u.dimensionless_angles()):
-            geo_radius = np.cbrt(attractor.k / np.square(angular_velocity.to(1 / u.s)))
+            geo_radius = np.cbrt(
+                attractor.k / np.square(attractor.angular_velocity.to(1 / u.s))
+            )
 
         if hill_radius is not None and geo_radius > hill_radius:
             raise ValueError(
@@ -718,6 +707,7 @@ class Orbit(object):
     @classmethod
     def heliosynchronous(
         cls,
+        attractor,
         a=None,
         ecc=None,
         inc=None,
@@ -758,16 +748,11 @@ class Orbit(object):
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
-        # TODO: Generalize for other bodies
-        from poliastro.bodies import Earth
-
         # Constants for Sun-Synchronours Orbits (SSO)
-        n_sunsync = (
-            1.991063853e-7 * u.one / u.s
-        )  # 2 * np.pi * u.rad / (86400 * 365.2421897 * u.s)
-        R_SSO = Earth.R
-        k_SSO = Earth.k
-        J2_SSO = Earth.J2
+        n_sunsync = 2 * np.pi / attractor.get_mean_orbit().period.to(u.s)
+        R_SSO = attractor.R
+        k_SSO = attractor.k
+        J2_SSO = attractor.J2
 
         try:
             with np.errstate(invalid="raise"):
@@ -808,9 +793,11 @@ class Orbit(object):
                     )
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
+
         raan = raan_from_ltan(epoch, ltan)
+
         ss = cls.from_classical(
-            Earth, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+            attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
         )
 
         return ss

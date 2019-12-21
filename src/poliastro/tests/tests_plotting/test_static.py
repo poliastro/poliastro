@@ -5,7 +5,6 @@ import pytest
 from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.examples import iss
 from poliastro.plotting.static import StaticOrbitPlotter
-from poliastro.twobody.orbit import Orbit
 
 
 def test_orbitplotter_has_axes():
@@ -69,8 +68,8 @@ def test_color():
 
 def test_plot_trajectory_sets_label():
     op = StaticOrbitPlotter()
-    earth = Orbit.from_body_ephem(Earth)
-    mars = Orbit.from_body_ephem(Mars)
+    earth = Earth.get_mean_orbit()
+    mars = Mars.get_mean_orbit()
     trajectory = earth.sample()
     op.plot(mars, label="Mars")
     op.plot_trajectory(trajectory, label="Earth")
@@ -95,7 +94,7 @@ def test_redraw_makes_attractor_none():
 def test_set_frame_plots_same_colors():
     # TODO: Review
     op = StaticOrbitPlotter()
-    jupiter = Orbit.from_body_ephem(Jupiter)
+    jupiter = Jupiter.get_mean_orbit()
     op.plot(jupiter)
     colors1 = [orb[2] for orb in op.trajectories]
     op.set_frame(*jupiter.pqw())
@@ -106,8 +105,8 @@ def test_set_frame_plots_same_colors():
 def test_redraw_keeps_trajectories():
     # See https://github.com/poliastro/poliastro/issues/518
     op = StaticOrbitPlotter()
-    earth = Orbit.from_body_ephem(Earth)
-    mars = Orbit.from_body_ephem(Mars)
+    earth = Earth.get_mean_orbit()
+    mars = Mars.get_mean_orbit()
     trajectory = earth.sample()
     op.plot(mars, label="Mars")
     op.plot_trajectory(trajectory, label="Earth")
