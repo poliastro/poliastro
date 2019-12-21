@@ -98,12 +98,12 @@ def D_to_nu(D):
 
     Parameters
     ----------
-    D : ~astropy.units.Quantity
+    D : float
         Eccentric anomaly.
 
     Returns
     -------
-    nu : ~astropy.units.Quantity
+    nu : float
         True anomaly.
 
     Note
@@ -125,12 +125,12 @@ def nu_to_D(nu):
 
     Parameters
     ----------
-    nu : ~astropy.units.Quantity
-        True anomaly.
+    nu : float
+        True anomaly in radians.
 
     Returns
     -------
-    D : ~astropy.units.Quantity
+    D : float
         Hyperbolic eccentric anomaly.
 
     Note
@@ -153,14 +153,14 @@ def nu_to_E(nu, ecc):
 
     Parameters
     ----------
-    nu : ~astropy.units.Quantity
-        True anomaly.
-    ecc : ~astropy.units.Quantity
+    nu : float
+        True anomaly in radians.
+    ecc : float
         Eccentricity.
 
     Returns
     -------
-    E : ~astropy.units.Quantity
+    E : float
         Eccentric anomaly.
 
     """
@@ -179,14 +179,14 @@ def nu_to_F(nu, ecc):
 
     Parameters
     ----------
-    nu : ~astropy.units.Quantity
-        True anomaly.
-    ecc : ~astropy.units.Quantity
+    nu : float
+        True anomaly in radians.
+    ecc : float
         Eccentricity (>1).
 
     Returns
     -------
-    F : ~astropy.units.Quantity
+    F : float
         Hyperbolic eccentric anomaly.
 
     Note
@@ -212,14 +212,14 @@ def E_to_nu(E, ecc):
 
     Parameters
     ----------
-    E : ~astropy.units.Quantity
-        Eccentric anomaly.
-    ecc : ~astropy.units.Quantity
+    E : float
+        Eccentric anomaly in radians.
+    ecc : float
         Eccentricity.
 
     Returns
     -------
-    nu : ~astropy.units.Quantity
+    nu : float
         True anomaly.
 
     """
@@ -234,14 +234,14 @@ def F_to_nu(F, ecc):
 
     Parameters
     ----------
-    F : ~astropy.units.Quantity
+    F : float
         Hyperbolic eccentric anomaly.
-    ecc : ~astropy.units.Quantity
+    ecc : float
         Eccentricity (>1).
 
     Returns
     -------
-    nu : ~astropy.units.Quantity
+    nu : float
         True anomaly.
 
     """
@@ -260,14 +260,14 @@ def M_to_E(M, ecc):
 
     Parameters
     ----------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-    ecc : ~astropy.units.Quantity
+    M : float
+        Mean anomaly in radians.
+    ecc : float
         Eccentricity.
 
     Returns
     -------
-    E : ~astropy.units.Quantity
+    E : float
         Eccentric anomaly.
 
     """
@@ -281,14 +281,14 @@ def M_to_F(M, ecc):
 
     Parameters
     ----------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-    ecc : ~astropy.units.Quantity
+    M : float
+        Mean anomaly in radians.
+    ecc : float
         Eccentricity (>1).
 
     Returns
     -------
-    F : ~astropy.units.Quantity
+    F : float
         Hyperbolic eccentric anomaly.
 
     """
@@ -302,14 +302,14 @@ def M_to_D(M, ecc):
 
     Parameters
     ----------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-    ecc : ~astropy.units.Quantity
+    M : float
+        Mean anomaly in radians.
+    ecc : float
         Eccentricity (>1).
 
     Returns
     -------
-    D : ~astropy.units.Quantity
+    D : float
         Parabolic eccentric anomaly.
 
     """
@@ -328,14 +328,14 @@ def E_to_M(E, ecc):
 
     Parameters
     ----------
-    E : ~astropy.units.Quantity
-        Eccentric anomaly.
-    ecc : ~astropy.units.Quantity
+    E : float
+        Eccentric anomaly in radians.
+    ecc : float
         Eccentricity.
 
     Returns
     -------
-    M : ~astropy.units.Quantity
+    M : float
         Mean anomaly.
 
     """
@@ -349,14 +349,14 @@ def F_to_M(F, ecc):
 
     Parameters
     ----------
-    F : ~astropy.units.Quantity
+    F : float
         Hyperbolic eccentric anomaly.
-    ecc : ~astropy.units.Quantity
+    ecc : float
         Eccentricity (>1).
 
     Returns
     -------
-    M : ~astropy.units.Quantity
+    M : float
         Mean anomaly.
 
     """
@@ -370,14 +370,14 @@ def D_to_M(D, ecc):
 
     Parameters
     ----------
-    D : ~astropy.units.Quantity
+    D : float
         Parabolic eccentric anomaly.
-    ecc : ~astropy.units.Quantity
+    ecc : float
         Eccentricity.
 
     Returns
     -------
-    M : ~astropy.units.Quantity
+    M : float
         Mean anomaly.
 
     """
@@ -393,15 +393,16 @@ def M_to_nu(M, ecc, delta=1e-2):
 
     Parameters
     ----------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-    ecc : ~astropy.units.Quantity
+    M : float
+        Mean anomaly in radians.
+    ecc : float
         Eccentricity.
     delta : float (optional)
         threshold of near-parabolic regime definition (from Davide Farnocchia et al)
+
     Returns
     -------
-    nu : ~astropy.units.Quantity
+    nu : float
         True anomaly.
 
     Examples
@@ -431,16 +432,16 @@ def nu_to_M(nu, ecc, delta=1e-2):
 
     Parameters
     ----------
-    nu : ~astropy.units.Quantity
-        True anomaly.
-    ecc : ~astropy.units.Quantity
+    nu : float
+        True anomaly in radians.
+    ecc : float
         Eccentricity.
     delta : float (optional)
         threshold of near-parabolic regime definition (from Davide Farnocchia et al)
 
     Returns
     -------
-    M : ~astropy.units.Quantity
+    M : float
         Mean anomaly.
 
     """
@@ -465,13 +466,13 @@ def fp_angle(nu, ecc):
 
     Parameters
     ----------
-    nu: ~astropy.units.Quantity
-        True anomaly
-    ecc: ~astropy.units.Quantity
-        Eccentricity
+    nu: float
+        True anomaly in radians.
+    ecc: float
+        Eccentricity.
 
     Returns
-    fp_angle: ~astropy.units.Quantity
+    fp_angle: float
         Flight path angle
 
     Note
