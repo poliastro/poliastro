@@ -111,6 +111,15 @@ class Body(
         R = R * reference.R
         return cls(parent, k, name, symbol, R, **kwargs)
 
+    def get_mean_orbit(self, epoch=None):
+        # TODO: Change structure to avoid circular imports
+        from poliastro.ephem import get_mean_orbit
+
+        if epoch is None:
+            epoch = constants.J2000
+
+        return get_mean_orbit(self, epoch)
+
 
 class SolarSystemBody(Body):
     pass
