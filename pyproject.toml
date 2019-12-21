@@ -33,6 +33,7 @@ requires-python = ">=3.6,<3.8"
 requires = [
     "astropy >=3.2,<5",
     "astroquery >=0.3.9",
+    "cached_property ; python_version<'3.8'",
     "jplephem",
     "matplotlib >=2.0,!=3.0.1",
     "numba >=0.46 ; implementation_name=='cpython'",
