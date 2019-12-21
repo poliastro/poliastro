@@ -4,13 +4,10 @@ from warnings import warn
 import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
-    GCRS,
-    ICRS,
     Angle,
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric,
-    get_body_barycentric_posvel,
 )
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
@@ -404,61 +401,6 @@ class Orbit(object):
         """
         ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L)
         return cls(ss, epoch, plane)
-
-    @classmethod
-    def from_body_ephem(cls, body, epoch=None):
-        """Return osculating `Orbit` of a body at a given time.
-
-        """
-        from poliastro.bodies import Earth, Moon, Sun
-
-        warn(
-            "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
-            "see https://github.com/poliastro/poliastro/issues/445 for discussion.",
-            DeprecationWarning,
-        )
-
-        if not epoch:
-            epoch = time.Time.now().tdb
-        elif epoch.scale != "tdb":
-            epoch = epoch.tdb
-            warn(
-                "Input time was converted to scale='tdb' with value "
-                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
-                TimeScaleWarning,
-            )
-        try:
-            r, v = get_body_barycentric_posvel(body.name, epoch)
-        except KeyError as exc:
-            raise RuntimeError(
-                """To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:
-
->>> from astropy.coordinates import solar_system_ephemeris
->>> solar_system_ephemeris.set('jpl')
-"""
-            ) from exc
-        if body == Moon:
-            # TODO: The attractor is in fact the Earth-Moon Barycenter
-            icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
-            gcrs_cart = (
-                ICRS(icrs_cart)
-                .transform_to(GCRS(obstime=epoch))
-                .represent_as(CartesianRepresentation)
-            )
-            ss = cls.from_vectors(
-                Earth,
-                gcrs_cart.xyz.to(u.km),
-                gcrs_cart.differentials["s"].d_xyz.to(u.km / u.day),
-                epoch,
-            )
-
-        else:
-            # TODO: The attractor is not really the Sun, but the Solar System
-            # Barycenter
-            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
-            ss._frame = ICRS()  # Hack!
-
-        return ss
 
     def change_attractor(self, new_attractor, force=False):
         """Changes orbit attractor.
