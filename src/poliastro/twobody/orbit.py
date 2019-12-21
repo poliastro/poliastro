@@ -1103,33 +1103,13 @@ class Orbit(object):
         cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
         new_epoch = self.epoch + time_of_flight
 
-        # If the frame supports obstime, set the time values
-        try:
-            kwargs = {}
-            if "obstime" in self.frame.frame_attributes:
-                kwargs["obstime"] = new_epoch
-            else:
-                warn(
-                    f"Frame {self.frame.__class__} does not support 'obstime', time values were not returned"
-                )
-
-            # Use of a protected method instead of frame.realize_frame
-            # because the latter does not let the user choose the representation type
-            # in one line despite its parameter names, see
-            # https://github.com/astropy/astropy/issues/7784
-            coords = self.frame._replicate(
-                cartesian, representation_type="cartesian", **kwargs
-            )
-
-            return self.from_coords(self.attractor, coords, plane=self.plane)
-
-        except NotImplementedError:
-            return self.from_vectors(
-                self.attractor,
-                cartesian[0].xyz,
-                cartesian[0].differentials["s"].d_xyz,
-                new_epoch,
-            )
+        return self.from_vectors(
+            self.attractor,
+            cartesian[0].xyz,
+            cartesian[0].differentials["s"].d_xyz,
+            new_epoch,
+            plane=self.plane,
+        )
 
     @u.quantity_input(value=u.rad)
     def time_to_anomaly(self, value):
