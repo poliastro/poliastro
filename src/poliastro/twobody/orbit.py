@@ -32,6 +32,12 @@ from poliastro.util import (
 
 from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
+try:
+    from functools import cached_property  # type: ignore
+except ImportError:
+    from cached_property import cached_property
+
+
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
 # reference frame
@@ -106,52 +112,52 @@ class Orbit(object):
 
         return self._frame
 
-    @property
+    @cached_property
     def r(self):
         """Position vector. """
         return self._state.to_vectors().r
 
-    @property
+    @cached_property
     def v(self):
         """Velocity vector. """
         return self._state.to_vectors().v
 
-    @property
+    @cached_property
     def a(self):
         """Semimajor axis. """
         return self.p / (1 - self.ecc ** 2)
 
-    @property
+    @cached_property
     def p(self):
         """Semilatus rectum. """
         return self._state.to_classical().p
 
-    @property
+    @cached_property
     def r_p(self):
         """Radius of pericenter. """
         return self.a * (1 - self.ecc)
 
-    @property
+    @cached_property
     def r_a(self):
         """Radius of apocenter. """
         return self.a * (1 + self.ecc)
 
-    @property
+    @cached_property
     def ecc(self):
         """Eccentricity. """
         return self._state.to_classical().ecc
 
-    @property
+    @cached_property
     def inc(self):
         """Inclination. """
         return self._state.to_classical().inc
 
-    @property
+    @cached_property
     def raan(self):
         """Right ascension of the ascending node. """
         return self._state.to_classical().raan
 
-    @property
+    @cached_property
     def argp(self):
         """Argument of the perigee. """
         return self._state.to_classical().argp
@@ -161,47 +167,47 @@ class Orbit(object):
         """True anomaly. """
         return self._state.to_classical().nu
 
-    @property
+    @cached_property
     def f(self):
         """Second modified equinoctial element. """
         return self._state.to_equinoctial().f
 
-    @property
+    @cached_property
     def g(self):
         """Third modified equinoctial element. """
         return self._state.to_equinoctial().g
 
-    @property
+    @cached_property
     def h(self):
         """Fourth modified equinoctial element. """
         return self._state.to_equinoctial().h
 
-    @property
+    @cached_property
     def k(self):
         """Fifth modified equinoctial element. """
         return self._state.to_equinoctial().k
 
-    @property
+    @cached_property
     def L(self):
         """True longitude. """
         return self.raan + self.argp + self.nu
 
-    @property
+    @cached_property
     def period(self):
         """Period of the orbit. """
         return 2 * np.pi * u.rad / self.n
 
-    @property
+    @cached_property
     def n(self):
         """Mean motion. """
         return (np.sqrt(self.attractor.k / abs(self.a ** 3)) * u.rad).decompose()
 
-    @property
+    @cached_property
     def energy(self):
         """Specific energy. """
         return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
 
-    @property
+    @cached_property
     def e_vec(self):
         """Eccentricity vector. """
         r, v = self.rv()
@@ -209,30 +215,30 @@ class Orbit(object):
         e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
         return e_vec.decompose()
 
-    @property
+    @cached_property
     def h_vec(self):
         """Specific angular momentum vector. """
         h_vec = np.cross(self.r.to(u.km).value, self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
-    @property
+    @cached_property
     def h_mag(self):
         """Specific angular momentum. """
         h_mag = norm(self.h_vec)
         return h_mag
 
-    @property
+    @cached_property
     def arglat(self):
         """Argument of latitude. """
         arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
 
-    @property
+    @cached_property
     def M(self):
         """Mean anomaly. """
         return nu_to_M(self.nu, self.ecc)
 
-    @property
+    @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage. """
         t_p = self.period * self.M / (360 * u.deg)
