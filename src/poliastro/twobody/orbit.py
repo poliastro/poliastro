@@ -83,7 +83,7 @@ class Orbit:
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
-        self._frame = None
+        self._frame = None  # HACK: Only needed for Orbit.from_body_ephem
 
     @property
     def attractor(self):
@@ -99,18 +99,6 @@ class Orbit:
     def plane(self):
         """Fundamental plane of the frame. """
         return self._state.plane
-
-    @property
-    def frame(self):
-        """Reference frame of the orbit.
-
-        .. versionadded:: 0.11.0
-
-        """
-        if self._frame is None:
-            self._frame = get_frame(self.attractor, self.plane, self.epoch)
-
-        return self._frame
 
     @cached_property
     def r(self):
@@ -462,6 +450,18 @@ class Orbit:
 
         return ss
 
+    def get_frame(self):
+        """Get equivalent reference frame of the orbit.
+
+        .. versionadded:: 0.14.0
+
+        """
+        # HACK: Only needed for Orbit.from_body_ephem
+        if self._frame is not None:
+            return self._frame
+
+        return get_frame(self.attractor, self.plane, self.epoch)
+
     def change_attractor(self, new_attractor, force=False):
         """Changes orbit attractor.
 
@@ -503,7 +503,7 @@ class Orbit:
             warn("Leaving the SOI of the current attractor", PatchedConicsWarning)
 
         new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
-        coords = self.frame.realize_frame(
+        coords = self.get_frame().realize_frame(
             self.represent_as(CartesianRepresentation, CartesianDifferential)
         )
         ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
@@ -1061,7 +1061,7 @@ class Orbit:
                 r_p=self.r_p.to(unit).value,
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
-                frame=self.frame.__class__.__name__,
+                frame=self.get_frame().__class__.__name__,
                 body=self.attractor,
                 epoch=self.epoch,
                 scale=self.epoch.scale.upper(),

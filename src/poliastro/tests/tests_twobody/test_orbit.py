@@ -499,16 +499,17 @@ def test_orbit_plot_is_not_static(use_3d):
         (Pluto, PlutoICRS),
     ],
 )
-def test_orbit_has_proper_frame(attractor, expected_frame_class):
+def test_orbit_get_frame_returns_proper_frame(attractor, expected_frame_class):
     # Dummy data
     r = [1e09, -4e09, -1e09] * u.km
     v = [5e00, -1e01, -4e00] * u.km / u.s
     epoch = Time("2015-07-14 07:59", scale="tdb")
 
     ss = Orbit.from_vectors(attractor, r, v, epoch)
+    frame = ss.get_frame()
 
-    assert ss.frame.is_equivalent_frame(expected_frame_class(obstime=epoch))
-    assert ss.frame.obstime == epoch
+    assert frame.is_equivalent_frame(expected_frame_class(obstime=epoch))
+    assert frame.obstime == epoch
 
 
 def test_orbit_from_custom_body_raises_error_when_asked_frame():
@@ -520,7 +521,7 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
     ss = Orbit.from_vectors(attractor, r, v)
 
     with pytest.raises(NotImplementedError) as excinfo:
-        ss.frame
+        ss.get_frame()
     assert (
         "Frames for orbits around custom bodies are not yet supported"
         in excinfo.exconly()
@@ -533,7 +534,7 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
 def test_orbit_from_ephem_is_in_icrs_frame(body):
     ss = Orbit.from_body_ephem(body)
 
-    assert ss.frame.is_equivalent_frame(ICRS())
+    assert ss.get_frame().is_equivalent_frame(ICRS())
 
 
 def test_orbit_accepts_ecliptic_plane():
@@ -542,7 +543,7 @@ def test_orbit_accepts_ecliptic_plane():
 
     ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
 
-    assert ss.frame.is_equivalent_frame(HeliocentricEclipticJ2000(obstime=J2000))
+    assert ss.get_frame().is_equivalent_frame(HeliocentricEclipticJ2000(obstime=J2000))
 
 
 def test_orbit_represent_as_produces_correct_data():
@@ -571,12 +572,12 @@ def test_orbit_propagate_retains_plane():
 
     ss = Orbit.from_vectors(Sun, r, v, plane=Planes.EARTH_ECLIPTIC)
 
-    orig_frame = ss.frame
+    orig_frame = ss.get_frame()
 
     final_ss = ss.propagate(1 * u.h)
     expected_frame = orig_frame.replicate_without_data(obstime=final_ss.epoch)
 
-    assert final_ss.frame.is_equivalent_frame(expected_frame)
+    assert final_ss.get_frame().is_equivalent_frame(expected_frame)
 
 
 @pytest.mark.remote_data
