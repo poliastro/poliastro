@@ -3,7 +3,7 @@ from astropy import units as u
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
 
 
-class BaseState(object):
+class BaseState:
     """Base State class, meant to be subclassed.
 
     """

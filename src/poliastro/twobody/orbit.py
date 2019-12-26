@@ -58,7 +58,7 @@ class PatchedConicsWarning(UserWarning):
     pass
 
 
-class Orbit(object):
+class Orbit:
     """Position and velocity of a body with respect to an attractor
     at a given time (epoch).
 

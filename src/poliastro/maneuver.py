@@ -10,7 +10,7 @@ from poliastro.iod.izzo import lambert as lambert_izzo
 from poliastro.util import norm
 
 
-class Maneuver(object):
+class Maneuver:
     r"""Class to represent a Maneuver.
 
     Each ``Maneuver`` consists on a list of impulses :math:`\Delta v_i`

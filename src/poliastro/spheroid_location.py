@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class SpheroidLocation(object):
+class SpheroidLocation:
     """ Class representing a ground station on an arbitrary ellipsoid.
     """
 
