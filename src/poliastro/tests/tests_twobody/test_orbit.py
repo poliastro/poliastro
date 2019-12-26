@@ -30,22 +30,22 @@ from poliastro.bodies import (
 )
 from poliastro.constants import J2000, J2000_TDB
 from poliastro.examples import iss
-from poliastro.frames import (
+from poliastro.frames.ecliptic import HeliocentricEclipticJ2000
+from poliastro.frames.enums import Planes
+from poliastro.frames.equatorial import (
     GCRS,
     HCRS,
     ICRS,
-    HeliocentricEclipticJ2000,
     JupiterICRS,
     MarsICRS,
     MercuryICRS,
     NeptuneICRS,
-    Planes,
     PlutoICRS,
     SaturnICRS,
     UranusICRS,
     VenusICRS,
-    get_frame,
 )
+from poliastro.frames.util import get_frame
 from poliastro.twobody.orbit import (
     Orbit,
     OrbitSamplingWarning,
