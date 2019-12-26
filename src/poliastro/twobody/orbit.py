@@ -70,7 +70,7 @@ class Orbit:
 
     """
 
-    def __init__(self, state, epoch, plane):
+    def __init__(self, state, epoch):
         """Constructor.
 
         Parameters
@@ -83,7 +83,6 @@ class Orbit:
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
-        self._plane = plane
         self._frame = None
 
     @property
@@ -99,7 +98,7 @@ class Orbit:
     @property
     def plane(self):
         """Fundamental plane of the frame. """
-        return self._plane
+        return self._state.plane
 
     @property
     def frame(self):
@@ -109,7 +108,7 @@ class Orbit:
 
         """
         if self._frame is None:
-            self._frame = get_frame(self.attractor, self._plane, self.epoch)
+            self._frame = get_frame(self.attractor, self.plane, self.epoch)
 
         return self._frame
 
@@ -271,8 +270,8 @@ class Orbit:
                 f"Vectors must have dimension 1, got {r.ndim} and {v.ndim}"
             )
 
-        ss = RVState(attractor, r, v)
-        return cls(ss, epoch, plane)
+        ss = RVState(attractor, r, v, plane)
+        return cls(ss, epoch)
 
     @classmethod
     def from_coords(cls, attractor, coord, plane=Planes.EARTH_EQUATOR):
@@ -371,8 +370,10 @@ class Orbit:
         if ecc > 1 and a > 0:
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
-        ss = ClassicalState(attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
-        return cls(ss, epoch, plane)
+        ss = ClassicalState(
+            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, plane
+        )
+        return cls(ss, epoch)
 
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
@@ -403,8 +404,8 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
-        ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L)
-        return cls(ss, epoch, plane)
+        ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L, plane)
+        return cls(ss, epoch)
 
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
@@ -843,8 +844,8 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
-        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu)
-        return cls(ss, epoch, plane)
+        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane)
+        return cls(ss, epoch)
 
     @classmethod
     @u.quantity_input(
