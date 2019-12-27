@@ -12,7 +12,7 @@ import pandas as pd
 from astropy.time import Time
 
 from poliastro.bodies import Sun
-from poliastro.frames import HeliocentricEclipticJ2000
+from poliastro.frames.ecliptic import HeliocentricEclipticJ2000
 from poliastro.twobody.angles import M_to_nu
 from poliastro.twobody.orbit import Orbit
 

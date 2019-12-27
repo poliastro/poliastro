@@ -3,21 +3,29 @@ from astropy import units as u
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
 
 
-class BaseState(object):
+class BaseState:
     """Base State class, meant to be subclassed.
 
     """
 
-    def __init__(self, attractor):
+    def __init__(self, attractor, plane):
         """Constructor.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane for the elements.
 
         """
         self._attractor = attractor
+        self._plane = plane
+
+    @property
+    def plane(self):
+        """Fundamental plane of the frame."""
+        return self._plane
 
     @property
     def attractor(self):
@@ -60,8 +68,8 @@ class ClassicalState(BaseState):
 
     """
 
-    def __init__(self, attractor, p, ecc, inc, raan, argp, nu):
-        super().__init__(attractor)
+    def __init__(self, attractor, p, ecc, inc, raan, argp, nu, plane):
+        super().__init__(attractor, plane)
         self._p = p
         self._ecc = ecc
         self._inc = inc
@@ -113,7 +121,7 @@ class ClassicalState(BaseState):
             self.nu.to(u.rad).value,
         )
 
-        return RVState(self.attractor, r * u.km, v * u.km / u.s)
+        return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_classical(self):
         """Converts to classical orbital elements representation.
@@ -142,6 +150,7 @@ class ClassicalState(BaseState):
             h * u.rad,
             k * u.rad,
             L * u.rad,
+            self.plane,
         )
 
 
@@ -150,8 +159,8 @@ class RVState(BaseState):
 
     """
 
-    def __init__(self, attractor, r, v):
-        super().__init__(attractor)
+    def __init__(self, attractor, r, v, plane):
+        super().__init__(attractor, plane)
         self._r = r
         self._v = v
 
@@ -189,12 +198,13 @@ class RVState(BaseState):
             raan * u.rad,
             argp * u.rad,
             nu * u.rad,
+            self.plane,
         )
 
 
 class ModifiedEquinoctialState(BaseState):
-    def __init__(self, attractor, p, f, g, h, k, L):
-        super().__init__(attractor)
+    def __init__(self, attractor, p, f, g, h, k, L, plane):
+        super().__init__(attractor, plane)
         self._p = p
         self._f = f
         self._g = g
@@ -244,4 +254,5 @@ class ModifiedEquinoctialState(BaseState):
             raan * u.rad,
             argp * u.rad,
             nu * u.rad,
+            self.plane,
         )

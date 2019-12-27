@@ -22,11 +22,11 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000
-from poliastro.frames import (
+from poliastro.frames.ecliptic import GeocentricSolarEcliptic
+from poliastro.frames.equatorial import (
     GCRS,
     HCRS,
     ICRS,
-    GeocentricSolarEcliptic,
     JupiterICRS,
     MarsICRS,
     MercuryICRS,

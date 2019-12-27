@@ -17,7 +17,8 @@ from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
 from poliastro.core.angles import nu_to_M as nu_to_M_fast
-from poliastro.frames import Planes, get_frame
+from poliastro.frames import Planes
+from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
 from poliastro.twobody.propagation import mean_motion, propagate
@@ -58,7 +59,7 @@ class PatchedConicsWarning(UserWarning):
     pass
 
 
-class Orbit(object):
+class Orbit:
     """Position and velocity of a body with respect to an attractor
     at a given time (epoch).
 
@@ -69,7 +70,7 @@ class Orbit(object):
 
     """
 
-    def __init__(self, state, epoch, plane):
+    def __init__(self, state, epoch):
         """Constructor.
 
         Parameters
@@ -82,8 +83,7 @@ class Orbit(object):
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
-        self._plane = plane
-        self._frame = None
+        self._frame = None  # HACK: Only needed for Orbit.from_body_ephem
 
     @property
     def attractor(self):
@@ -98,19 +98,7 @@ class Orbit(object):
     @property
     def plane(self):
         """Fundamental plane of the frame. """
-        return self._plane
-
-    @property
-    def frame(self):
-        """Reference frame of the orbit.
-
-        .. versionadded:: 0.11.0
-
-        """
-        if self._frame is None:
-            self._frame = get_frame(self.attractor, self._plane, self.epoch)
-
-        return self._frame
+        return self._state.plane
 
     @cached_property
     def r(self):
@@ -270,8 +258,8 @@ class Orbit(object):
                 f"Vectors must have dimension 1, got {r.ndim} and {v.ndim}"
             )
 
-        ss = RVState(attractor, r, v)
-        return cls(ss, epoch, plane)
+        ss = RVState(attractor, r, v, plane)
+        return cls(ss, epoch)
 
     @classmethod
     def from_coords(cls, attractor, coord, plane=Planes.EARTH_EQUATOR):
@@ -370,8 +358,10 @@ class Orbit(object):
         if ecc > 1 and a > 0:
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
-        ss = ClassicalState(attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu)
-        return cls(ss, epoch, plane)
+        ss = ClassicalState(
+            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, plane
+        )
+        return cls(ss, epoch)
 
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
@@ -402,8 +392,8 @@ class Orbit(object):
             Fundamental plane of the frame.
 
         """
-        ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L)
-        return cls(ss, epoch, plane)
+        ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L, plane)
+        return cls(ss, epoch)
 
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
@@ -460,6 +450,18 @@ class Orbit(object):
 
         return ss
 
+    def get_frame(self):
+        """Get equivalent reference frame of the orbit.
+
+        .. versionadded:: 0.14.0
+
+        """
+        # HACK: Only needed for Orbit.from_body_ephem
+        if self._frame is not None:
+            return self._frame
+
+        return get_frame(self.attractor, self.plane, self.epoch)
+
     def change_attractor(self, new_attractor, force=False):
         """Changes orbit attractor.
 
@@ -501,7 +503,7 @@ class Orbit(object):
             warn("Leaving the SOI of the current attractor", PatchedConicsWarning)
 
         new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
-        coords = self.frame.realize_frame(
+        coords = self.get_frame().realize_frame(
             self.represent_as(CartesianRepresentation, CartesianDifferential)
         )
         ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
@@ -842,8 +844,8 @@ class Orbit(object):
             Fundamental plane of the frame.
 
         """
-        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu)
-        return cls(ss, epoch, plane)
+        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane)
+        return cls(ss, epoch)
 
     @classmethod
     @u.quantity_input(
@@ -1059,7 +1061,7 @@ class Orbit(object):
                 r_p=self.r_p.to(unit).value,
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
-                frame=self.frame.__class__.__name__,
+                frame=self.get_frame().__class__.__name__,
                 body=self.attractor,
                 epoch=self.epoch,
                 scale=self.epoch.scale.upper(),
