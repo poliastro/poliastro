@@ -388,7 +388,7 @@ def mee2coe(p, f, g, h, k, L):
     p: float
         Semi-latus rectum
     f: float
-        Equinoctial parameter p
+        Equinoctial parameter f
     g: float
         Equinoctial parameter g
     h: float
