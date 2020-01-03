@@ -2,7 +2,7 @@
 requires = [
     "flit_core >=2.0,<3",
     "wheel",
-    "numpy",
+    "oldest-supported-numpy",
 ]
 build-backend = "flit_core.buildapi"
 
