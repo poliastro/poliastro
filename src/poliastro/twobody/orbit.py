@@ -36,7 +36,7 @@ from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVStat
 try:
     from functools import cached_property  # type: ignore
 except ImportError:
-    from cached_property import cached_property
+    from cached_property import cached_property  # type: ignore
 
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
