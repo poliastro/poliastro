@@ -58,6 +58,16 @@ jobs:
       PIP_PROGRESS_BAR: "off"
       TOXENV: "py37,images"
 
+  test_py38:
+    <<: *test-template
+    docker:
+      - image: python:3.8
+
+    environment:
+      PIP_PREFER_BINARY: true
+      PIP_PROGRESS_BAR: "off"
+      TOXENV: "py38,images"
+
   coverage:
     docker:
       - image: python:3.6
@@ -130,6 +140,9 @@ workflows:
           requires:
             - quality
       - test_py37:
+          requires:
+            - quality
+      - test_py38:
           requires:
             - quality
       - coverage:
