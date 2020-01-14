@@ -107,17 +107,18 @@ These are some succint steps to set up a development environment:
 2. `Register to GitHub <https://github.com/>`_.
 3. `Fork poliastro <https://help.github.com/articles/fork-a-repo/>`_.
 4. `Clone your fork <https://help.github.com/articles/cloning-a-repository/>`_.
-5. Install it in development mode using
-   :code:`pip install --editable /path/to/poliastro/[dev]` (this means that the
+5. Install `flit` using `pip install flit`. 
+6. Install it in development mode using
+   :code:`flit install`, or alternatively `flit install --symlink` (this means that the
    installed code will change as soon as you change it in the download
    location).
-6. Run `tox -e reformat` to make the format consistent.
-7. Run `tox -e check` to check all the formatting is right.
+7. Run `tox -e reformat` to make the format consistent.
+8. Run `tox -e check` to check all the formatting is right.
    (The reformat command will not deal with un-used imports)
-8. Create a new branch.
-9. Make changes and commit.
-10. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
-11. `Open a pull request! <https://help.github.com/articles/creating-a-pull-request/>`_
+9. Create a new branch.
+10. Make changes and commit.
+11. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
+12. `Open a pull request! <https://help.github.com/articles/creating-a-pull-request/>`_
 
 For more detailed explanations, please check out the `Astropy development docs`__.
 
