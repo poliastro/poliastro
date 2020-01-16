@@ -4,7 +4,7 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
-from czml3.core import Packet, Preamble
+from czml3.core import Packet, Preamble, Document
 from czml3.enums import InterpolationAlgorithms, ReferenceFrames
 from czml3.properties import (
     Billboard,
@@ -21,6 +21,8 @@ from czml3.types import IntervalValue, TimeInterval
 from poliastro.bodies import Earth
 from poliastro.czml.utils import ellipsoidal_to_cartesian, project_point_on_ellipsoid
 from poliastro.twobody.propagation import propagate
+
+
 
 PIC_SATELLITE = (
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAX"
@@ -487,3 +489,6 @@ class CZMLExtractor:
             self.packets.append(pckt)
 
         self.i += 1
+
+    def get_document(self):
+        return Document(self.packets)
