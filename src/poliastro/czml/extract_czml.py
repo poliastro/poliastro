@@ -22,8 +22,6 @@ from poliastro.bodies import Earth
 from poliastro.czml.utils import ellipsoidal_to_cartesian, project_point_on_ellipsoid
 from poliastro.twobody.propagation import propagate
 
-
-
 PIC_SATELLITE = (
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAX"
     "NSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVD"
