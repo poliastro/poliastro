@@ -491,4 +491,7 @@ class CZMLExtractor:
         self.i += 1
 
     def get_document(self):
+        """
+        returns a czml3.core.Document from list of packets of the CZMLExtractor
+        """
         return Document(self.packets)
