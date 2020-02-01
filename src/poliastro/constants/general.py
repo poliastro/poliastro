@@ -489,7 +489,7 @@ R_polar_mars = Constant(
 R_polar_jupiter = Constant(
     "R_polar_jupiter",
     "Jupiter polar radius",
-    6.6854,
+    6.6854e7,
     "m",
     10000,
     "IAU Working Group on Cartographic Coordinates and Rotational Elements: 2009",
