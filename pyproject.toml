@@ -76,6 +76,8 @@ dev = [
 Source = "https://github.com/poliastro/poliastro"
 Tracker = "https://github.com/poliastro/poliastro/issues"
 
+
+
 [tool.flit.entrypoints."console_scripts"]
 poliastro = "poliastro.cli:main"
 
@@ -85,4 +87,5 @@ include = [
     "src/poliastro/atmosphere/data/coesa76.dat",
     "src/poliastro/atmosphere/data/coesa76_p.dat",
     "src/poliastro/atmosphere/data/coesa76_rho.dat",
+    "setup.cfg"
 ]
