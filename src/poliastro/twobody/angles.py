@@ -410,9 +410,7 @@ def raan_from_ltan(epoch, ltan=12.0):
     smlt = salt + eq_time
 
     # Desired angle between sun and ascending node
-    alpha = (coordinates.Angle(ltan).wrap_at(24 * u.hourangle) - 12 * u.hourangle).to(
-        u.rad
-    )
+    alpha = (coordinates.Angle(ltan).wrap_at(24 * u.hourangle)).to(u.rad)
 
     # Use the mean sun local time calculate needed RAAN for given LTAN
     raan = smlt + alpha
