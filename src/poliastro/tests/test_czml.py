@@ -70,8 +70,8 @@ def test_czml_add_orbit():
     "version": "1.0",
     "name": "document_packet",
     "clock": {
-        "interval": "2013-03-18T12:00:00.000/2013-03-18T23:59:35.108",
-        "currentTime": "2013-03-18T12:00:00.000",
+        "interval": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
+        "currentTime": "2013-03-18T12:00:00Z",
         "multiplier": 60,
         "range": "LOOP_STOP",
         "step": "SYSTEM_CLOCK_MULTIPLIER"
@@ -98,7 +98,7 @@ def test_czml_add_orbit():
     "id": 0,
     "availability": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
     "position": {
-        "epoch": "2013-03-18T12:00:00.000",
+        "epoch": "2013-03-18T12:00:00Z",
         "interpolationAlgorithm": "LAGRANGE",
         "interpolationDegree": 5,
         "referenceFrame": "INERTIAL",
@@ -198,7 +198,7 @@ def test_czml_add_orbit():
     "id": 1,
     "availability": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
     "position": {
-        "epoch": "2013-03-18T12:00:00.000",
+        "epoch": "2013-03-18T12:00:00Z",
         "interpolationAlgorithm": "LAGRANGE",
         "interpolationDegree": 5,
         "referenceFrame": "INERTIAL",
@@ -319,8 +319,8 @@ def test_czml_groundtrack():
     "version": "1.0",
     "name": "document_packet",
     "clock": {
-        "interval": "2000-01-01T12:00:00.000/2000-01-01T23:59:35.108",
-        "currentTime": "2000-01-01T12:00:00.000",
+        "interval": "2000-01-01T12:00:00Z/2000-01-01T23:59:35Z",
+        "currentTime": "2000-01-01T12:00:00Z",
         "multiplier": 60,
         "range": "LOOP_STOP",
         "step": "SYSTEM_CLOCK_MULTIPLIER"
@@ -347,7 +347,7 @@ def test_czml_groundtrack():
     "id": 0,
     "availability": "2000-01-01T12:00:00Z/2000-01-01T23:59:35Z",
     "position": {
-        "epoch": "2000-01-01T12:00:00.000",
+        "epoch": "2000-01-01T12:00:00Z",
         "interpolationAlgorithm": "LAGRANGE",
         "interpolationDegree": 5,
         "referenceFrame": "INERTIAL",
@@ -447,7 +447,7 @@ def test_czml_groundtrack():
     "id": "groundtrack0",
     "availability": "2000-01-01T12:00:00Z/2000-01-01T23:59:35Z",
     "position": {
-        "epoch": "2000-01-01T12:00:00.000",
+        "epoch": "2000-01-01T12:00:00Z",
         "interpolationAlgorithm": "LAGRANGE",
         "interpolationDegree": 5,
         "referenceFrame": "INERTIAL",
@@ -546,8 +546,8 @@ def test_czml_ground_station():
     "version": "1.0",
     "name": "document_packet",
     "clock": {
-        "interval": "2013-03-18T12:00:00.000/2013-03-18T23:59:35.108",
-        "currentTime": "2013-03-18T12:00:00.000",
+        "interval": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
+        "currentTime": "2013-03-18T12:00:00Z",
         "multiplier": 60,
         "range": "LOOP_STOP",
         "step": "SYSTEM_CLOCK_MULTIPLIER"
