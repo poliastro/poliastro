@@ -40,6 +40,7 @@ __all__ = [
     "UranusICRS",
     "NeptuneICRS",
     "PlutoICRS",
+    "MoonICRS",
 ]
 
 

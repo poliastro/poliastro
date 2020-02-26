@@ -48,6 +48,7 @@ __all__ = [
     "UranusFixed",
     "NeptuneFixed",
     "PlutoFixed",
+    "MoonFixed",
 ]
 
 
