@@ -88,7 +88,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     >>> v1 = v1*u.km / u.s
     >>> v2 = v2*u.km / u.s
     >>> print(v1, v2)
-    [-5.99249499  1.92536673  3.24563805] km / s [-3.31245847 -4.196619   -0.38528907] km / s
+    [-5.99249503  1.92536671  3.24563805] km / s [-3.31245851 -4.19661901 -0.38528906] km / s
 
     Note
     ----
@@ -115,8 +115,8 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
         raise RuntimeError("Cannot compute orbit, phase angle is 180 degrees")
 
     psi = 0.0
-    psi_low = -4 * np.pi
-    psi_up = 4 * np.pi
+    psi_low = -4 * np.pi ** 2
+    psi_up = 4 * np.pi ** 2
 
     count = 0
 
