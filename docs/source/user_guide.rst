@@ -327,7 +327,7 @@ easily visualize in two dimensions:
 
 .. code-block:: python
 
-    from poliastro.plotting import OrbitPlotter
+    from poliastro.plotting import OrbitPlotter2D
     
     op = OrbitPlotter2D()
     ss_a, ss_f = ss_i.apply_maneuver(hoh, intermediate=True)
