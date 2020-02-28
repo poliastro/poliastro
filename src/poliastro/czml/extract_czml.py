@@ -189,9 +189,9 @@ class CZMLExtractor:
         pckt = Preamble(
             name="document_packet",
             clock=IntervalValue(
-                start=self.start_epoch.value,
-                end=self.end_epoch.value,
-                value=Clock(currentTime=self.start_epoch.value, multiplier=60),
+                start=self.start_epoch,
+                end=self.end_epoch,
+                value=Clock(currentTime=self.start_epoch.datetime, multiplier=60),
             ),
         )
         self.packets.append(pckt)
@@ -420,7 +420,7 @@ class CZMLExtractor:
                 interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
                 referenceFrame=ReferenceFrames.INERTIAL,
                 cartesian=cartesian_cords,
-                epoch=start_epoch.value,
+                epoch=start_epoch.datetime,
             ),
             path=Path(
                 show=path_show,
@@ -463,7 +463,7 @@ class CZMLExtractor:
                     interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
                     referenceFrame=ReferenceFrames.INERTIAL,
                     cartesian=groundtrack_cords,
-                    epoch=start_epoch.value,
+                    epoch=start_epoch.datetime,
                 ),
                 path=Path(
                     show=True,
