@@ -20,11 +20,13 @@ Some of its awesome features are:
 * Conversion between position and velocity vectors and classical orbital
   elements
 * Coordinate frame transformations
-* Hohmann and bielliptic maneuvers computation
-* Trajectory plotting
-* Initial orbit determination (Lambert problem)
+* Hohmann and bi-elliptic maneuvers computation
+* Trajectory plotting: static and interactive
+* Initial orbit determination (Lambert's problem)
 * Planetary ephemerides (using SPICE kernels via Astropy)
 * Computation of Near-Earth Objects (NEOs)
+* Atmospheric models
+* Mission design tools: porkchops generator
 
 And more to come!
 
@@ -36,15 +38,6 @@ and `chat`_.
 .. _`chat`: https://riot.im/app/#/room/#poliastro:matrix.org
 
 .. include:: form.rst
-
-.. figure:: _static/molniya.png
-   :align: right
-   :figwidth: 300
-   :alt: Molniya orbit
-
-   Plot of a `Molniya orbit`_ around the Earth
-   (\\(a = 26600\\,\\mathrm{km}, e = 0.75,
-   i = 63.4 \\mathrm{{}^{\\circ}} \\)).
 
 The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
 contributions and feedback are more than welcome. You can test poliastro in your
@@ -64,16 +57,15 @@ See `benchmarks`_ for the performance analysis of poliastro.
 poliastro works on recent versions of Python and is released under
 the MIT license, hence allowing commercial use of the library.
 
-.. code-block:: python
+One the greatest features of poliastro apart from its accuracy, is its set of
+plotting utilities: static or interactive 3D plotters, porkchop generator...
+Check out a simple transfer orbit between Earth and Mars. For more information
+on how to use this package, refer to the examples gallery.
 
-    from poliastro.examples import molniya
-    molniya.plot()
+.. raw:: html
+    :file: auto_examples/images/sphx_glr_plot_going_to_mars_with_python_using_poliastro_001.html
 
 .. include:: success.rst
-
-----
-
-.. _`Molniya orbit`: https://en.wikipedia.org/wiki/Molniya_orbit
 
 Contents
 --------
@@ -84,7 +76,7 @@ Contents
     about
     getting_started
     user_guide
-    jupyter
+    auto_examples/index
     api/safe/safe_index
     api/core/core_index
     changelog
