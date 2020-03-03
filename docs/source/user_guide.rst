@@ -58,8 +58,8 @@ And that's it! Notice a couple of things:
 * The reference frame of the orbit will be one pseudo-inertial frame around the
   attractor. You can retrieve it using the :py:attr:`~poliastro.twobody.orbit.Orbit.frame` property:
 
-    >>> ss.get_frame
-    <bound method Orbit.get_frame of 7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)>
+    >>> ss.get_frame()
+    <GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
 
 .. _`International Celestial Reference System or ICRS`: http://web.archive.org/web/20170920023932/http://aa.usno.navy.mil:80/faq/docs/ICRS_doc.php
 
