@@ -46,20 +46,20 @@ And that's it! Notice a couple of things:
   pericenter, radius of apocenter, inclination, reference frame and attractor::
 
     >>> ss
-    7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁)
+    7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)
 
 * If no time is specified, then a default value is assigned::
 
     >>> ss.epoch
-    <Time object: scale='utc' format='jyear_str' value=J2000.000>
+    <Time object: scale='tt' format='jyear_str' value=J2000.000>
     >>> ss.epoch.iso
     '2000-01-01 12:00:00.000'
 
 * The reference frame of the orbit will be one pseudo-inertial frame around the
   attractor. You can retrieve it using the :py:attr:`~poliastro.twobody.orbit.Orbit.frame` property:
 
-    >>> ss.frame
-    <GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
+    >>> ss.get_frame
+    <bound method Orbit.get_frame of 7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)>
 
 .. _`International Celestial Reference System or ICRS`: http://web.archive.org/web/20170920023932/http://aa.usno.navy.mil:80/faq/docs/ICRS_doc.php
 
