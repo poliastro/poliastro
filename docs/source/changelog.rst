@@ -462,7 +462,7 @@ Highlights
   using `Airspeed Velocity`_, a Python framework for writing, running, studying and
   publishing benchmarks. Besides, we bought a dedicated machine to run them with
   as much precision as we can.
-  Please `check them out <http://poliastro.github.io/poliastro-benchmarks>`_
+  Please `check them out <https://poliastro.github.io/benchmarks/>`_
   and consider `adding new benchmarks`_ as well!
 * **Several performance improvements**: Now that we are tracking performance, we dedicated
   some time during this release to fix some performance regressions that appeared in
@@ -478,7 +478,7 @@ Highlights
   and prepared the ground for the new interactive widgets that Plotly 3.0 brings.
 
 .. _`Airspeed Velocity`: https://asv.readthedocs.io/
-.. _`adding new benchmarks`: https://github.com/poliastro/poliastro-benchmarks/
+.. _`adding new benchmarks`: https://github.com/poliastro/benchmarks/
 
 New features
 ............
