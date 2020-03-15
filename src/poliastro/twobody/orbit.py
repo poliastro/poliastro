@@ -113,7 +113,7 @@ class Orbit:
     @cached_property
     def a(self):
         """Semimajor axis. """
-        return self.p / (1 - self.ecc ** 2)
+        return self._state.to_classical().a
 
     @cached_property
     def p(self):
