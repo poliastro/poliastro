@@ -114,7 +114,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            sudo apt update && sudo apt install --no-install-recommends pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz
+            sudo apt update && sudo apt install --no-install-recommends pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
