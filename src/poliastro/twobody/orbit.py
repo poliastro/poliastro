@@ -31,7 +31,7 @@ from poliastro.util import (
     norm,
 )
 
-from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
+from .states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 try:
     from functools import cached_property  # type: ignore
