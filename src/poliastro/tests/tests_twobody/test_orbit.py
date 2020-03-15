@@ -699,7 +699,7 @@ def test_geostationary_non_existence_condition(attractor, period, hill_radius):
 
 def test_heliosynchronous_orbit_enough_arguments():
     with pytest.raises(ValueError) as excinfo:
-        Orbit.heliosynchronous(a=None, ecc=None, inc=None)
+        Orbit.heliosynchronous(Earth, a=None, ecc=None, inc=None)
 
     assert (
         "At least two parameters of the set {a, ecc, inc} are required."
@@ -712,7 +712,7 @@ def test_heliosynchronous_orbit_inc():
     expected_ecc = 0 * u.one
     expected_a = 800 * u.km + Earth.R
     expected_inc = 98.6 * u.deg
-    ss0 = Orbit.heliosynchronous(a=expected_a, ecc=expected_ecc)
+    ss0 = Orbit.heliosynchronous(Earth, a=expected_a, ecc=expected_ecc)
 
     assert_quantity_allclose(ss0.inc, expected_inc, rtol=1e-4)
     assert_quantity_allclose(ss0.a, expected_a)
@@ -724,7 +724,7 @@ def test_heliosynchronous_orbit_a():
     expected_ecc = 0.2 * u.one
     expected_inc = 98.6 * u.deg
     expected_a = 7346.846 * u.km
-    ss0 = Orbit.heliosynchronous(ecc=expected_ecc, inc=expected_inc)
+    ss0 = Orbit.heliosynchronous(Earth, ecc=expected_ecc, inc=expected_inc)
 
     assert_quantity_allclose(ss0.inc, expected_inc, rtol=1e-4)
     assert_quantity_allclose(ss0.a, expected_a, rtol=1e-5)

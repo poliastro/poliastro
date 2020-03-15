@@ -83,6 +83,11 @@ class ClassicalState(BaseState):
         return self._p
 
     @property
+    def a(self):
+        """Semimajor axis. """
+        return self.p / (1 - self.ecc ** 2)
+
+    @property
     def ecc(self):
         """Eccentricity. """
         return self._ecc

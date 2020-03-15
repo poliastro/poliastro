@@ -1,7 +1,7 @@
 from astropy import units as u
 
 from poliastro.bodies import Sun
-from poliastro.twobody._states import ClassicalState, RVState
+from poliastro.twobody.states import ClassicalState, RVState
 
 
 def test_state_has_attractor_given_in_constructor():

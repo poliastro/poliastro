@@ -28,8 +28,8 @@ from astropy.units import Quantity
 from poliastro import constants
 
 
-# HACK: Constants cannot be pickled
-# (see https://github.com/astropy/astropy/issues/9139)
+# HACK: Constants cannot be hashed
+# (see https://github.com/astropy/astropy/issues/10043)
 # so we will convert them all to normal Quantities
 def _q(c):
     return Quantity(c)

@@ -31,7 +31,8 @@ from poliastro.util import (
     norm,
 )
 
-from ._states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
+from ..ephem import get_mean_elements
+from .states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 try:
     from functools import cached_property  # type: ignore
@@ -113,7 +114,7 @@ class Orbit:
     @cached_property
     def a(self):
         """Semimajor axis. """
-        return self.p / (1 - self.ecc ** 2)
+        return self._state.to_classical().a
 
     @cached_property
     def p(self):
@@ -720,6 +721,7 @@ class Orbit:
     @classmethod
     def heliosynchronous(
         cls,
+        attractor,
         a=None,
         ecc=None,
         inc=None,
@@ -760,16 +762,14 @@ class Orbit:
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
         """
-        # TODO: Generalize for other bodies
-        from poliastro.bodies import Earth
+        mean_elements = get_mean_elements(attractor)
 
-        # Constants for Sun-Synchronours Orbits (SSO)
         n_sunsync = (
-            1.991063853e-7 * u.one / u.s
-        )  # 2 * np.pi * u.rad / (86400 * 365.2421897 * u.s)
-        R_SSO = Earth.R
-        k_SSO = Earth.k
-        J2_SSO = Earth.J2
+            np.sqrt(mean_elements.attractor.k / abs(mean_elements.a ** 3)) * u.one
+        ).decompose()
+        R_SSO = attractor.R
+        k_SSO = attractor.k
+        J2_SSO = attractor.J2
 
         try:
             with np.errstate(invalid="raise"):
@@ -812,7 +812,7 @@ class Orbit:
             raise ValueError("No SSO orbit with given parameters can be found.")
         raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
-            Earth, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+            attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
         )
 
         return ss
