@@ -968,22 +968,22 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 
 @pytest.mark.remote_data
 def test_from_sbdb():
-    targets = ["Ceres", "Vesta", "Eros"] # Objects in both JPL SBDB and JPL Horizons
+    targets = ["Ceres", "Vesta", "Eros"]  # Objects in both JPL SBDB and JPL Horizons
 
     for target_name in targets:
 
         ss_target = Orbit.from_sbdb(target_name)
         ss_classical = ss_target.classical()
 
-        ss_ref = Orbit.from_horizons(name=target_name, attractor=Sun,plane=Planes.EARTH_ECLIPTIC)
-        ss_ref = ss_ref.propagate_to_anomaly(ss_classical[5]) # Catch reference orbit to same epoch
+        ss_ref = Orbit.from_horizons(name=target_name, attractor=Sun, plane=Planes.EARTH_ECLIPTIC)
+        ss_ref = ss_ref.propagate_to_anomaly(ss_classical[5])  # Catch reference orbit to same epoch
         ss_ref_class = ss_ref.classical()
 
         diff_bw_orbits = [abs(x[1] - x[0]) for x in zip(ss_classical, ss_ref_class)]
 
         # Two DB are not exactly the same because orbits perturb slowly and
         # measurment taken at different epochs in Horizons and SBDB
-        max_err = [0.0005 * y for y in ss_classical] # Maximum error of 0.05% (chosen arbitarily)
+        max_err = [0.0005 * y for y in ss_classical]  # Maximum error of 0.05% (chosen arbitarily)
 
         assert diff_bw_orbits < max_err
 
