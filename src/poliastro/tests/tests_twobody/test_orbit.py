@@ -968,25 +968,25 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 
 @pytest.mark.remote_data
 def test_from_sbdb():
-    # Dictionary with structure: 'Object': [a, e, i, raan, argp, nu, epoch]
-    # Notice JPL provides Mean anomaly, a conversion is needed to obtain nu
-    SBDB_DATA = {
-        "Ceres": (
-            2.76916515450648 * u.AU,
-            0.07600902910070946 * u.one,
-            10.59406704424526 * u.deg,
-            80.30553156826473 * u.deg,
-            73.597694115971 * u.deg,
-            86.01851107780747 * u.deg,
-        )
-    }
+    targets = ["Ceres", "Vesta", "Eros"] # Objects in both JPL SBDB and JPL Horizons
 
-    for target_name in SBDB_DATA.keys():
+    for target_name in targets:
 
         ss_target = Orbit.from_sbdb(target_name)
         ss_classical = ss_target.classical()
 
-        assert ss_classical == SBDB_DATA[target_name]
+        ss_ref = Orbit.from_horizons(name=target_name, attractor=Sun,plane=Planes.EARTH_ECLIPTIC)
+        ss_ref = ss_ref.propagate_to_anomaly(ss_classical[5]) # Catch reference orbit to same epoch
+        ss_ref_class = ss_ref.classical()
+
+        diff_bw_orbits = [abs(x[1] - x[0]) for x in zip(ss_classical, ss_ref_class)]
+
+        # Two DB are not exactly the same because orbits perturb slowly and
+        # measurment taken at different epochs in Horizons and SBDB
+        max_err = [0.0005 * y for y in ss_classical] # Maximum error of 0.05%
+                                                     # Chosen arbitrarily 
+
+        assert diff_bw_orbits < max_err
 
 
 @pytest.mark.remote_data
