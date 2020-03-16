@@ -983,8 +983,7 @@ def test_from_sbdb():
 
         # Two DB are not exactly the same because orbits perturb slowly and
         # measurment taken at different epochs in Horizons and SBDB
-        max_err = [0.0005 * y for y in ss_classical] # Maximum error of 0.05%
-                                                     # Chosen arbitrarily 
+        max_err = [0.0005 * y for y in ss_classical] # Maximum error of 0.05% (chosen arbitarily)
 
         assert diff_bw_orbits < max_err
 
