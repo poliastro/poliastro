@@ -14,18 +14,6 @@ resources:
     name: OpenAstronomy/azure-pipelines-templates
     ref: master
 
-trigger:
-  branches:
-    include:
-    - 'azure'
-  tags:
-    include:
-    - 'v*'
-    exclude:
-    - '*dev*'
-    - '*pre*'
-    - '*post*'
-
 jobs:
 - template: run-tox-env.yml@OpenAstronomy
   parameters:
