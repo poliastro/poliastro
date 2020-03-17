@@ -10,7 +10,7 @@ resources:
   repositories:
   - repository: OpenAstronomy
     type: github
-    endpoint: astrojuanlu
+    endpoint: jains8844
     name: OpenAstronomy/azure-pipelines-templates
     ref: master
 
