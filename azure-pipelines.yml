@@ -2,7 +2,7 @@ name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
 variables:
   CI_NAME: Azure Pipelines
   CI_BUILD_ID: $(Build.BuildId)
-  CI_BUILD_URL: "https://dev.azure.com/jains8844/sample-proj/_build/results?buildId=$(Build.BuildId)"
+  CI_BUILD_URL: "https://dev.azure.com/poliastro/poliastro/_build/results?buildId=$(Build.BuildId)"
   CIBW_BUILD: cp36-* cp37-* cp38-*
   CIBW_SKIP: "*-win32 *-manylinux1_i686"
 
@@ -10,7 +10,7 @@ resources:
   repositories:
   - repository: OpenAstronomy
     type: github
-    endpoint: jains8844
+    endpoint: astrojuanlu
     name: OpenAstronomy/azure-pipelines-templates
     ref: master
 
