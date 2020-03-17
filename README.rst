@@ -14,11 +14,8 @@
 :Author: Juan Luis Cano Rodríguez |orcid|
 :Version: 0.14.post0.dev0
 
-.. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/master.svg?style=flat-square&logo=circleci
-   :target: https://circleci.com/gh/poliastro/poliastro
-
-.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square&logo=appveyor
-   :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
+.. |azure_pipelines| image:: https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=master
+   :target: https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=master
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
@@ -45,7 +42,7 @@
    :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
    :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 
-|circleci| |appveyor| |codecov| |codeclimate|
+|azure_pipelines| |codecov| |codeclimate|
 
 |docs| |license| |doi| |astropy| |mailing| |matrix|
 
@@ -106,16 +103,10 @@ poliastro requires the following Python packages:
 * plotly, for 2D and 3D interactive orbit plotting
 * SciPy, for root finding and numerical propagation
 
-poliastro is usually tested on Linux and Windows on Python
+poliastro is tested on Linux, OS X and Windows on Python
 3.6, 3.7 and 3.8 against latest NumPy.
-It should work on OS X without problems.
 
-==============  ============  ===================
-Platform        Site          Status
-==============  ============  ===================
-Linux           CircleCI      |circleci|
-Windows x64     Appveyor      |appveyor|
-==============  ============  ===================
+|azure_pipelines|
 
 Installation
 ============
