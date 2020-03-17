@@ -10,7 +10,7 @@ resources:
   repositories:
   - repository: OpenAstronomy
     type: github
-    endpoint: jains8844
+    endpoint: poliastro
     name: OpenAstronomy/azure-pipelines-templates
     ref: master
 
