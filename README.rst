@@ -20,6 +20,9 @@
 .. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square&logo=appveyor
    :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
 
+.. |azure_pipelines| image:: https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=master
+   :target: https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=master
+
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
 
@@ -45,7 +48,7 @@
    :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
    :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 
-|circleci| |appveyor| |codecov| |codeclimate|
+|circleci| |appveyor| |azure_pipelines| |codecov| |codeclimate|
 
 |docs| |license| |doi| |astropy| |mailing| |matrix|
 
