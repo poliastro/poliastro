@@ -968,26 +968,26 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize(
-    "targets", ["Ceres", "Vesta", "Eros"]
+    "target_name", ["Ceres", "Vesta", "Eros"]
 )  # Objects in both JPL SBDB and JPL Horizons
-def test_from_sbdb_and_from_horizons_give_similar_results(targets):
+def test_from_sbdb_and_from_horizons_give_similar_results(target_name):
 
-    for target_name in targets:
+    ss_target = Orbit.from_sbdb(target_name)
+    ss_classical = ss_target.classical()
 
-        ss_target = Orbit.from_sbdb(target_name)
-        ss_classical = ss_target.classical()
-
-        ss_ref = Orbit.from_horizons(
-            name=target_name, attractor=Sun, plane=Planes.EARTH_ECLIPTIC
-        )
-        ss_ref = ss_ref.propagate_to_anomaly(
-            ss_classical[5]
-        )  # Catch reference orbit to same epoch
-        ss_ref_class = ss_ref.classical()
-
+    ss_ref = Orbit.from_horizons(
+        name=target_name, attractor=Sun, plane=Planes.EARTH_ECLIPTIC
+    )
+    
+    ss_ref = ss_ref.propagate_to_anomaly(
+        ss_classical[5]
+    )  # Catch reference orbit to same epoch
+    ss_ref_class = ss_ref.classical()
+    
+    for test_elm, ref_elm in zip(ss_classical, ss_ref_class):
         assert_quantity_allclose(
-            ss_classical, ss_ref_class, rtol=5.0e-4
-        )  # Maximum error of 0.05% (chosen arbitarily)
+            test_elm, ref_elm, rtol=1e-2
+        )  # Maximum error of 1% (chosen arbitrarily)
 
 
 @pytest.mark.remote_data
