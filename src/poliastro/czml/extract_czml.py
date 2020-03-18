@@ -421,7 +421,8 @@ class CZMLExtractor:
                 interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
                 referenceFrame=ReferenceFrames.INERTIAL,
                 cartesian=cartesian_cords,
-                epoch=start_epoch.datetime,
+                # Use explicit UTC timezone, rather than the default, which is a local timezone.
+                epoch=start_epoch.datetime.replace(tzinfo=timezone.utc),
             ),
             path=Path(
                 show=path_show,
@@ -464,7 +465,8 @@ class CZMLExtractor:
                     interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
                     referenceFrame=ReferenceFrames.INERTIAL,
                     cartesian=groundtrack_cords,
-                    epoch=start_epoch.datetime,
+                    # Use explicit UTC timezone, rather than the default, which is a local timezone.
+                    epoch=start_epoch.datetime.replace(tzinfo=timezone.utc),
                 ),
                 path=Path(
                     show=True,
