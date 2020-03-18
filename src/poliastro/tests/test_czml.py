@@ -631,6 +631,53 @@ def test_czml_ground_station():
     extractor.add_ground_station([0.70930 * u.rad, 0.40046 * u.rad], label_show=False)
     assert repr(extractor.packets) == expected_doc
 
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_preamble():
+    """
+    This test checks the basic preamble (preamble is the only mandatory
+    packet in CZML format. It's a kind of header that defines the scope of the
+    whole CZML.
+    """
+
+    # We're not using the orbit, just its epoch and period. The sample_points are not used
+    # either, as there's no orbit to sample.
+    start_epoch = molniya.epoch
+    end_epoch = molniya.epoch + molniya.period
+    sample_points = 10
+
+    expected_doc = """[{
+    "id": "document",
+    "version": "1.0",
+    "name": "document_packet",
+    "clock": {
+        "interval": "2000-01-01T12:00:00Z/2000-01-01T23:59:35Z",
+        "currentTime": "2000-01-01T12:00:00Z",
+        "multiplier": 60,
+        "range": "LOOP_STOP",
+        "step": "SYSTEM_CLOCK_MULTIPLIER"
+    }
+}, {
+    "id": "custom_properties",
+    "properties": {
+        "custom_attractor": true,
+        "ellipsoid": [
+            {
+                "array": [
+                    6378136.6,
+                    6378136.6,
+                    6356751.9
+                ]
+            }
+        ],
+        "map_url": [
+            "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+        ],
+        "scene3D": true
+    }
+}]"""
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    assert repr(extractor.packets) == expected_doc
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_invalid_orbit_epoch_error():
