@@ -303,7 +303,7 @@ def test_czml_add_orbit():
     )
     extractor.add_orbit(iss, rtol=1e-4, label_text="ISS", path_show=False)
 
-    repr(extractor.packets) == expected_doc
+    assert repr(extractor.packets) == expected_doc
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
