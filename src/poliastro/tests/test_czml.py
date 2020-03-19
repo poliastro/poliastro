@@ -6,6 +6,9 @@ from astropy import units as u  # noqa: E402
 from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya  # noqa: E402
 
+import pytest  # noqa: E402 isort:skip
+
+
 try:
     from poliastro.czml.extract_czml import CZMLExtractor  # noqa: E402
 
@@ -631,6 +634,7 @@ def test_czml_ground_station():
     extractor.add_ground_station([0.70930 * u.rad, 0.40046 * u.rad], label_show=False)
     assert repr(extractor.packets) == expected_doc
 
+
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_preamble():
     """
@@ -678,6 +682,7 @@ def test_czml_preamble():
     extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
 
     assert repr(extractor.packets) == expected_doc
+
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_invalid_orbit_epoch_error():

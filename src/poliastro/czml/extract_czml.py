@@ -1,3 +1,4 @@
+from datetime import timezone
 from typing import Any, List
 
 import numpy as np
@@ -6,7 +7,6 @@ from astropy.coordinates import CartesianRepresentation
 from astropy.time import Time, TimeDelta
 from czml3.core import Packet, Preamble
 from czml3.enums import InterpolationAlgorithms, ReferenceFrames
-from datetime import timezone
 from czml3.properties import (
     Billboard,
     Clock,
@@ -192,7 +192,10 @@ class CZMLExtractor:
             clock=IntervalValue(
                 start=self.start_epoch,
                 end=self.end_epoch,
-                value=Clock(currentTime=self.start_epoch.datetime.replace(tzinfo=timezone.utc), multiplier=60),
+                value=Clock(
+                    currentTime=self.start_epoch.datetime.replace(tzinfo=timezone.utc),
+                    multiplier=60,
+                ),
             ),
         )
         self.packets.append(pckt)
