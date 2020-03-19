@@ -967,26 +967,27 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 
 
 @pytest.mark.remote_data
-def test_from_sbdb():
-    # Dictionary with structure: 'Object': [a, e, i, raan, argp, nu, epoch]
-    # Notice JPL provides Mean anomaly, a conversion is needed to obtain nu
-    SBDB_DATA = {
-        "Ceres": (
-            2.76916515450648 * u.AU,
-            0.07600902910070946 * u.one,
-            10.59406704424526 * u.deg,
-            80.30553156826473 * u.deg,
-            73.597694115971 * u.deg,
-            86.01851107780747 * u.deg,
-        )
-    }
+@pytest.mark.parametrize(
+    "target_name", ["Ceres", "Vesta", "Eros"]
+)  # Objects in both JPL SBDB and JPL Horizons
+def test_from_sbdb_and_from_horizons_give_similar_results(target_name):
 
-    for target_name in SBDB_DATA.keys():
+    ss_target = Orbit.from_sbdb(target_name)
+    ss_classical = ss_target.classical()
 
-        ss_target = Orbit.from_sbdb(target_name)
-        ss_classical = ss_target.classical()
+    ss_ref = Orbit.from_horizons(
+        name=target_name, attractor=Sun, plane=Planes.EARTH_ECLIPTIC
+    )
 
-        assert ss_classical == SBDB_DATA[target_name]
+    ss_ref = ss_ref.propagate_to_anomaly(
+        ss_classical[5]
+    )  # Catch reference orbit to same epoch
+    ss_ref_class = ss_ref.classical()
+
+    for test_elm, ref_elm in zip(ss_classical, ss_ref_class):
+        assert_quantity_allclose(
+            test_elm, ref_elm, rtol=1e-2
+        )  # Maximum error of 1% (chosen arbitrarily)
 
 
 @pytest.mark.remote_data
