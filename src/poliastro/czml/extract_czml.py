@@ -1,3 +1,4 @@
+from datetime import timezone
 from typing import Any, List
 
 import numpy as np
@@ -191,7 +192,10 @@ class CZMLExtractor:
             clock=IntervalValue(
                 start=self.start_epoch,
                 end=self.end_epoch,
-                value=Clock(currentTime=self.start_epoch.datetime, multiplier=60),
+                value=Clock(
+                    currentTime=self.start_epoch.datetime.replace(tzinfo=timezone.utc),
+                    multiplier=60,
+                ),
             ),
         )
         self.packets.append(pckt)
@@ -420,7 +424,8 @@ class CZMLExtractor:
                 interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
                 referenceFrame=ReferenceFrames.INERTIAL,
                 cartesian=cartesian_cords,
-                epoch=start_epoch.datetime,
+                # Use explicit UTC timezone, rather than the default, which is a local timezone.
+                epoch=start_epoch.datetime.replace(tzinfo=timezone.utc),
             ),
             path=Path(
                 show=path_show,
@@ -463,7 +468,8 @@ class CZMLExtractor:
                     interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
                     referenceFrame=ReferenceFrames.INERTIAL,
                     cartesian=groundtrack_cords,
-                    epoch=start_epoch.datetime,
+                    # Use explicit UTC timezone, rather than the default, which is a local timezone.
+                    epoch=start_epoch.datetime.replace(tzinfo=timezone.utc),
                 ),
                 path=Path(
                     show=True,

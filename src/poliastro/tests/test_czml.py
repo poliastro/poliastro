@@ -59,6 +59,10 @@ def test_czml_custom_packet():
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+@pytest.mark.xfail(
+    sys.platform.lower().startswith("win"),
+    reason="marginally different orbital positions calculated on windows",
+)
 def test_czml_add_orbit():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -104,58 +108,58 @@ def test_czml_add_orbit():
         "referenceFrame": "INERTIAL",
         "cartesian": [
             0.0,
-            -5874061.7735,
+            -5874061.7732,
             20159787.8726,
-            40258166.1202,
+            40258166.1204,
             4317.5108,
-            -11640044.4188,
-            17864068.2606,
-            35673719.9898,
+            -11640044.4185,
+            17864068.2608,
+            35673719.9901,
             8635.0217,
-            -16129541.0199,
-            13690511.4237,
-            27339319.5726,
+            -16129541.0197,
+            13690511.4239,
+            27339319.5732,
             12952.5325,
-            -17354822.809,
-            6974596.3021,
-            13927946.9767,
+            -17354822.8091,
+            6974596.3025,
+            13927946.9776,
             17270.0433,
-            -2602428.8844,
-            -2846586.9794,
-            -5684502.8438,
+            -2602428.8865,
+            -2846586.9792,
+            -5684502.8433,
             21587.5541,
-            17029383.6013,
-            5939060.5902,
-            11860029.9442,
+            17029383.6011,
+            5939060.5897,
+            11860029.9433,
             25905.065,
-            16513858.1069,
-            13042152.6757,
-            26044577.071,
+            16513858.107,
+            13042152.6754,
+            26044577.0704,
             30222.5758,
-            12264870.9449,
-            17472285.3551,
-            34891347.6059,
+            12264870.9451,
+            17472285.3549,
+            34891347.6056,
             34540.0866,
-            6599717.4359,
-            19973508.888,
-            39886175.5838,
+            6599717.4362,
+            19973508.8879,
+            39886175.5836,
             38857.5975,
-            377235.7083,
+            377235.7086,
             20840447.5591,
             41617412.1057,
             43175.1083,
-            -5874061.7735,
+            -5874061.7732,
             20159787.8726,
-            40258166.1202,
+            40258166.1204,
             47492.6191,
-            -11640044.4188,
-            17864068.2606,
-            35673719.9898
+            -11640044.4185,
+            17864068.2608,
+            35673719.9901
         ]
     },
     "billboard": {
-        "show": true,
-        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII="
+        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=",
+        "show": true
     },
     "label": {
         "text": "Molniya",
@@ -254,8 +258,8 @@ def test_czml_add_orbit():
         ]
     },
     "billboard": {
-        "show": true,
-        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII="
+        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=",
+        "show": true
     },
     "label": {
         "text": "ISS",
@@ -303,7 +307,7 @@ def test_czml_add_orbit():
     )
     extractor.add_orbit(iss, rtol=1e-4, label_text="ISS", path_show=False)
 
-    repr(extractor.packets) == expected_doc
+    assert repr(extractor.packets) == expected_doc
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
@@ -629,6 +633,55 @@ def test_czml_ground_station():
     )
 
     extractor.add_ground_station([0.70930 * u.rad, 0.40046 * u.rad], label_show=False)
+    assert repr(extractor.packets) == expected_doc
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_preamble():
+    """
+    This test checks the basic preamble (preamble is the only mandatory
+    packet in CZML format. It's a kind of header that defines the scope of the
+    whole CZML.
+    """
+
+    # We're not using the orbit, just its epoch and period. The sample_points are not used
+    # either, as there's no orbit to sample.
+    start_epoch = molniya.epoch
+    end_epoch = molniya.epoch + molniya.period
+    sample_points = 10
+
+    expected_doc = """[{
+    "id": "document",
+    "version": "1.0",
+    "name": "document_packet",
+    "clock": {
+        "interval": "2000-01-01T12:00:00Z/2000-01-01T23:59:35Z",
+        "currentTime": "2000-01-01T12:00:00Z",
+        "multiplier": 60,
+        "range": "LOOP_STOP",
+        "step": "SYSTEM_CLOCK_MULTIPLIER"
+    }
+}, {
+    "id": "custom_properties",
+    "properties": {
+        "custom_attractor": true,
+        "ellipsoid": [
+            {
+                "array": [
+                    6378136.6,
+                    6378136.6,
+                    6356751.9
+                ]
+            }
+        ],
+        "map_url": [
+            "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+        ],
+        "scene3D": true
+    }
+}]"""
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
     assert repr(extractor.packets) == expected_doc
 
 
