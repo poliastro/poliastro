@@ -59,6 +59,7 @@ def test_czml_custom_packet():
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+@pytest.mark.xfail(sys.platform.lower().startswith("win"), reason="marginally different orbital positions calculated on windows")
 def test_czml_add_orbit():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
