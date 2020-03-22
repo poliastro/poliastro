@@ -1,5 +1,3 @@
-from typing import List
-
 import matplotlib as mpl
 import numpy as np
 from astropy import units as u
