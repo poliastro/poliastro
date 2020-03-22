@@ -72,18 +72,25 @@ class BaseOrbitPlotter:
         if radius < self._attractor_radius:
             self._attractor_radius = radius
 
-        self._plot_sphere(
+        self._draw_sphere(
             self._attractor_radius, color, self._attractor.name,
         )
 
     def _get_colors(self, color, trail):
         raise NotImplementedError
 
-    def _plot_point(self, radius, color, name, center=None):
+    def _draw_point(self, radius, color, name, center=None):
         raise NotImplementedError
 
-    def _plot_sphere(self, radius, color, name, center=None):
+    def _draw_sphere(self, radius, color, name, center=None):
         raise NotImplementedError
+
+    def _plot_trajectory(self, positions, label, colors, dashed):
+        raise NotImplementedError
+
+    def _prepare_plot(self):
+        if self._attractor is not None:
+            self._redraw_attractor()
 
     def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
@@ -113,9 +120,6 @@ class BaseOrbitPlotter:
         trace = self._plot_trajectory(positions, str(label), colors, False)
 
         self._trajectories.append(Trajectory(positions, None, label, colors[0]))
-
-    def _plot_trajectory(self, positions, label, colors, dashed):
-        raise NotImplementedError
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
@@ -150,14 +154,16 @@ class BaseOrbitPlotter:
         radius = min(
             self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5
         )  # Arbitrary thresholds
-        self._plot_point(radius, colors[0], label, center=orbit.r)
-
-    def _prepare_plot(self):
-        if self._attractor is not None:
-            self._redraw_attractor()
+        self._draw_point(radius, colors[0], label, center=orbit.r)
 
 
 class Mixin2D:
+    def _project(self, rr):
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
+        return x, y
+
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.
 
@@ -176,9 +182,3 @@ class Mixin2D:
 
         if self._trajectories:
             self._redraw()
-
-    def _project(self, rr):
-        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
-        x = rr_proj.dot(self._frame[0])
-        y = rr_proj.dot(self._frame[1])
-        return x, y

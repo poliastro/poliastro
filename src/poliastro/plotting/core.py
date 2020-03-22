@@ -27,17 +27,17 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
         # FIXME: Implement
         pass
 
-    def _prepare_plot(self):
-        super()._prepare_plot()
-
-        self._figure.layout.update(self._layout)
-
     def _get_colors(self, color, trail):
         # TODO: Support trail
         if color is None:
             color = next(self._color_cycle)
 
         return [color]
+
+    def _prepare_plot(self):
+        super()._prepare_plot()
+
+        self._figure.layout.update(self._layout)
 
     def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
@@ -110,13 +110,13 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
         if dark:
             self._layout.template = "plotly_dark"
 
-    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
         # We use _plot_sphere here because it's not easy to specify the size of a marker
         # in data units instead of pixels, see
         # https://stackoverflow.com/q/47086547
-        return self._plot_sphere(radius, color, name, center)
+        return self._draw_sphere(radius, color, name, center)
 
-    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         xx, yy, zz = generate_sphere(radius, center)
         sphere = Surface(
             x=xx.to(u.km).value,
@@ -146,6 +146,26 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
         return trace, [trace.line.color]
 
+    def plot(self, orbit, *, label=None, color=None, trail=False):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
+        label : string, optional
+            Label of the orbit.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if trail:
+            raise NotImplementedError("trail not supported yet")
+
+        return super().plot(orbit, label=label, color=color, trail=trail)
+
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
         """Changes 3D view.
@@ -172,26 +192,6 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
         if not self._figure._in_batch_mode:
             return self.show()
 
-    def plot(self, orbit, *, label=None, color=None, trail=False):
-        """Plots state and osculating orbit in their plane.
-
-        Parameters
-        ----------
-        orbit : ~poliastro.twobody.orbit.Orbit
-            Orbit to plot.
-        label : string, optional
-            Label of the orbit.
-        color : string, optional
-            Color of the line and the position.
-        trail : bool, optional
-            Fade the orbit trail, default to False.
-
-        """
-        if trail:
-            raise NotImplementedError("trail not supported yet")
-
-        return super().plot(orbit, label=label, color=color, trail=trail)
-
 
 class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     """OrbitPlotter2D class.
@@ -213,7 +213,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     def _redraw(self):
         raise NotImplementedError("OrbitPlotter2D does not support reprojecting yet")
 
-    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
@@ -229,7 +229,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         return trace
 
-    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension

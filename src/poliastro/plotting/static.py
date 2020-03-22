@@ -54,6 +54,20 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         self._frame = None
 
+    def _redraw(self):
+        for artist in self._ax.lines + self._ax.collections:
+            artist.remove()
+
+        for positions, state, label, colors in self._trajectories:
+            self._plot(positions, state, label, colors)
+
+        self._ax.relim()
+        self._ax.autoscale()
+
+    def _clear_attractor(self):
+        for attractor in self._ax.findobj(match=mpl_patches.Circle):
+            attractor.remove()
+
     def _get_colors(self, color, trail):
         if trail and color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319
@@ -66,15 +80,19 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return colors
 
-    def _redraw(self):
-        for artist in self._ax.lines + self._ax.collections:
-            artist.remove()
+    def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+        x_center, y_center = self._project(
+            center[None]
+        )  # Indexing trick to add one extra dimension
 
-        for positions, state, label, colors in self._trajectories:
-            self._plot(positions, state, label, colors)
-
-        self._ax.relim()
-        self._ax.autoscale()
+        self._ax.add_patch(
+            mpl_patches.Circle(
+                (x_center.to(u.km).value, y_center.to(u.km).value),
+                radius.to(u.km).value,
+                lw=0,
+                color=color,
+            )
+        )
 
     def _plot_trajectory(self, positions, label, colors, dashed):
         if dashed:
@@ -100,6 +118,41 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             lines = self._ax.plot(
                 x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
             )
+
+        return lines
+
+    def _plot(self, positions, state, label, colors):
+        lines = self._plot_trajectory(positions, label, colors, True)
+
+        # Redraw the attractor now to compute the attractor radius
+        self._redraw_attractor()
+
+        if state is not None:
+            x0, y0 = self._project(state[None])
+
+            # Plot current position
+            (l,) = self._ax.plot(
+                x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=colors[0]
+            )
+            lines.append(l)
+
+        if label:
+            if not self._ax.get_legend():
+                size = self._ax.figure.get_size_inches() + [8, 0]
+                self._ax.figure.set_size_inches(size)
+
+            # This will apply the label to either the point or the osculating
+            # orbit depending on the last plotted line
+            # NOTE: What about generating both labels,
+            # indicating that one is the osculating orbit?
+            lines[-1].set_label(label)
+            self._ax.legend(
+                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
+            )
+
+        self._ax.set_xlabel("$x$ (km)")
+        self._ax.set_ylabel("$y$ (km)")
+        self._ax.set_aspect(1)
 
         return lines
 
@@ -143,59 +196,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             )
 
         self._trajectories.append(Trajectory(positions, None, label, colors))
-
-        return lines
-
-    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
-        x_center, y_center = self._project(
-            center[None]
-        )  # Indexing trick to add one extra dimension
-
-        self._ax.add_patch(
-            mpl_patches.Circle(
-                (x_center.to(u.km).value, y_center.to(u.km).value),
-                radius.to(u.km).value,
-                lw=0,
-                color=color,
-            )
-        )
-
-    def _clear_attractor(self):
-        for attractor in self._ax.findobj(match=mpl_patches.Circle):
-            attractor.remove()
-
-    def _plot(self, positions, state, label, colors):
-        lines = self._plot_trajectory(positions, label, colors, True)
-
-        # Redraw the attractor now to compute the attractor radius
-        self._redraw_attractor()
-
-        if state is not None:
-            x0, y0 = self._project(state[None])
-
-            # Plot current position
-            (l,) = self._ax.plot(
-                x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=colors[0]
-            )
-            lines.append(l)
-
-        if label:
-            if not self._ax.get_legend():
-                size = self._ax.figure.get_size_inches() + [8, 0]
-                self._ax.figure.set_size_inches(size)
-
-            # This will apply the label to either the point or the osculating
-            # orbit depending on the last plotted line
-            # NOTE: What about generating both labels,
-            # indicating that one is the osculating orbit?
-            lines[-1].set_label(label)
-            self._ax.legend(
-                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
-            )
-
-        self._ax.set_xlabel("$x$ (km)")
-        self._ax.set_ylabel("$y$ (km)")
-        self._ax.set_aspect(1)
 
         return lines
 
