@@ -20,7 +20,9 @@ class BaseOrbitPlotter:
     Parent Class for the 2D and 3D OrbitPlotter Classes based on Plotly.
     """
 
-    def __init__(self):
+    def __init__(self, num_points=150):
+        self._num_points = num_points
+
         self._trajectories = []  # type: List[Trajectory]
 
         self._attractor = None
@@ -127,7 +129,7 @@ class BaseOrbitPlotter:
         self._set_attractor(orbit.attractor)
 
         label = generate_label(orbit, label)
-        trajectory = orbit.sample()
+        trajectory = orbit.sample(self._num_points)
 
         trace = self._plot_trajectory(trajectory, label, color, True)
 

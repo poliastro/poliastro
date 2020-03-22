@@ -13,8 +13,8 @@ from ._base import BaseOrbitPlotter
 
 
 class _PlotlyOrbitPlotter(BaseOrbitPlotter):
-    def __init__(self, figure=None):
-        super().__init__()
+    def __init__(self, figure=None, *, num_points=150):
+        super().__init__(num_points)
 
         self._figure = figure or Figure()
         self._layout = None
@@ -51,9 +51,8 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
     """
 
-    def __init__(self, figure=None, dark=False):
-        super().__init__(figure)
-
+    def __init__(self, figure=None, dark=False, *, num_points=150):
+        super().__init__(figure, num_points=num_points)
         self._layout = Layout(
             autosize=True,
             scene=dict(
@@ -132,9 +131,8 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter):
     .. versionadded:: 0.9.0
     """
 
-    def __init__(self, figure=None):
-        super().__init__(figure)
-
+    def __init__(self, figure=None, *, num_points=150):
+        super().__init__(figure, num_points=num_points)
         self._layout = Layout(
             autosize=True,
             xaxis=dict(title="x (km)", constrain="domain"),
