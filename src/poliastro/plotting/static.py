@@ -69,7 +69,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             attractor.remove()
 
     def _get_colors(self, color, trail):
-        if trail and color is None:
+        if color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319
             color = next(self._ax._get_lines.prop_cycler)["color"]
 
