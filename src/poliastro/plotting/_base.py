@@ -1,9 +1,7 @@
 from collections import namedtuple
-from itertools import cycle
 from typing import List
 
 import numpy as np
-import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 
@@ -26,9 +24,8 @@ class BaseOrbitPlotter:
         self._trajectories = []  # type: List[Trajectory]
 
         self._attractor = None
-        self._attractor_radius = np.inf * u.km
 
-        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+        self._attractor_radius = np.inf * u.km
 
     @property
     def trajectories(self):
@@ -73,6 +70,9 @@ class BaseOrbitPlotter:
 
         self._attractor_radius = radius
 
+    def _get_colors(self, color):
+        raise NotImplementedError
+
     def _plot_point(self, radius, color, name, center=None):
         raise NotImplementedError
 
@@ -97,17 +97,14 @@ class BaseOrbitPlotter:
                 "An attractor must be set up first, please use "
                 "set_attractor(Major_Body) or plot(orbit)"
             )
-        else:
-            if color is None:
-                color = next(self._color_cycle)
 
-            trace = self._plot_trajectory(trajectory, str(label), color, False)
+        colors = self._get_colors(color)
 
-            self._trajectories.append(
-                Trajectory(trajectory, None, label, trace.line.color)
-            )
+        trace, colors = self._plot_trajectory(trajectory, str(label), colors, False)
 
-    def _plot_trajectory(self, trajectory, label, color, dashed):
+        self._trajectories.append(Trajectory(trajectory, None, label, colors[0]))
+
+    def _plot_trajectory(self, trajectory, label, colors, dashed):
         raise NotImplementedError
 
     def plot(self, orbit, *, label=None, color=None):
@@ -123,19 +120,16 @@ class BaseOrbitPlotter:
             Color of the line and the position.
 
         """
-        if color is None:
-            color = next(self._color_cycle)
+        colors = self._get_colors(color)
 
         self._set_attractor(orbit.attractor)
 
         label = generate_label(orbit, label)
         trajectory = orbit.sample(self._num_points)
 
-        trace = self._plot_trajectory(trajectory, label, color, True)
+        trace, colors = self._plot_trajectory(trajectory, label, colors, True)
 
-        self._trajectories.append(
-            Trajectory(trajectory, orbit.r, label, trace.line.color)
-        )
+        self._trajectories.append(Trajectory(trajectory, orbit.r, label, colors[0]))
 
         # Redraw the attractor now to compute the attractor radius
         self._redraw_attractor()
@@ -144,7 +138,7 @@ class BaseOrbitPlotter:
         radius = min(
             self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5
         )  # Arbitrary thresholds
-        self._plot_point(radius, color, label, center=orbit.r)
+        self._plot_point(radius, colors[0], label, center=orbit.r)
 
     def _prepare_plot(self):
         if self._attractor is not None:

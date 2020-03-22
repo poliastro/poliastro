@@ -1,7 +1,10 @@
 """ Plotting utilities.
 
 """
+from itertools import cycle
+
 import numpy as np
+import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 from plotly.graph_objects import Figure, Layout, Scatter, Scatter3d, Surface
@@ -19,10 +22,18 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
         self._figure = figure or Figure()
         self._layout = None
 
+        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+
     def _prepare_plot(self):
         super()._prepare_plot()
 
         self._figure.layout.update(self._layout)
+
+    def _get_colors(self, color):
+        if color is None:
+            color = next(self._color_cycle)
+
+        return [color]
 
     def plot_trajectory(self, trajectory, *, label=None, color=None):
         super().plot_trajectory(trajectory, label=label, color=color)
@@ -88,18 +99,18 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
         return sphere
 
-    def _plot_trajectory(self, trajectory, label, color, dashed):
+    def _plot_trajectory(self, trajectory, label, colors, dashed):
         trace = Scatter3d(
             x=trajectory.x.to(u.km).value,
             y=trajectory.y.to(u.km).value,
             z=trajectory.z.to(u.km).value,
             name=label,
-            line=dict(color=color, width=5, dash="dash" if dashed else "solid"),
+            line=dict(color=colors[0], width=5, dash="dash" if dashed else "solid"),
             mode="lines",  # Boilerplate
         )
         self._figure.add_trace(trace)
 
-        return trace
+        return trace, [trace.line.color]
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
@@ -186,7 +197,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter):
 
         return shape
 
-    def _plot_trajectory(self, trajectory, label, color, dashed):
+    def _plot_trajectory(self, trajectory, label, colors, dashed):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
@@ -200,13 +211,13 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter):
             x=x.to(u.km).value,
             y=y.to(u.km).value,
             name=label,
-            line=dict(color=color, width=2, dash="dash" if dashed else "solid"),
+            line=dict(color=colors[0], width=2, dash="dash" if dashed else "solid"),
             hoverinfo="none",  # TODO: Review
             mode="lines",  # Boilerplate
         )
         self._figure.add_trace(trace)
 
-        return trace
+        return trace, [trace.line.color]
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.

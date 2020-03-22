@@ -99,7 +99,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter):
         self.ax.relim()
         self.ax.autoscale()
 
-    def _plot_trajectory(self, trajectory, colors=None, linestyle="dashed"):
+    def _plot_trajectory(self, trajectory, label, colors, dashed):
+        if dashed:
+            linestyle = "dashed"
+        else:
+            linestyle = "solid"
+
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
 
@@ -153,7 +158,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter):
         )  # Arbitrary threshold
 
         colors = self._get_colors(color, trail)
-        lines, colors = self._plot_trajectory(trajectory, colors)
+        lines, colors = self._plot_trajectory(trajectory, label, colors, True)
 
         if label:
             lines[0].set_label(label)
@@ -186,7 +191,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter):
         )
 
     def _plot(self, trajectory, state=None, label=None, colors=None):
-        lines, colors = self._plot_trajectory(trajectory, colors)
+        lines, colors = self._plot_trajectory(trajectory, label, colors, True)
 
         if state is not None:
             x0, y0 = self._project(state[None])
