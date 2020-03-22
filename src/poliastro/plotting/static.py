@@ -7,9 +7,8 @@ from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
-from poliastro.util import norm
 
-from ._base import BaseOrbitPlotter, Trajectory
+from ._base import BaseOrbitPlotter, Mixin2D, Trajectory
 
 
 def _segments_from_arrays(x, y):
@@ -21,7 +20,7 @@ def _segments_from_arrays(x, y):
     return segments
 
 
-class StaticOrbitPlotter(BaseOrbitPlotter):
+class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
     """StaticOrbitPlotter class.
 
     This class holds the perifocal plane of the first
@@ -65,12 +64,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter):
             If the vectors are not a set of mutually orthogonal unit vectors.
 
         """
-        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
-            raise ValueError("Vectors must be unit.")
-        elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
-            raise ValueError("Vectors must be mutually orthogonal.")
-        else:
-            self._frame = p_vec, q_vec, w_vec
+        self._set_frame(p_vec, q_vec, w_vec)
 
         if self._trajectories:
             self._redraw()
@@ -168,11 +162,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter):
 
         return lines
 
-    def _project(self, rr):
-        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
-        x = rr_proj.dot(self._frame[0])
-        y = rr_proj.dot(self._frame[1])
-        return x, y
 
     def _redraw_attractor(self, min_radius=0 * u.km):
         radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))

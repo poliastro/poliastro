@@ -10,9 +10,8 @@ from astropy.coordinates import CartesianRepresentation
 from plotly.graph_objects import Figure, Layout, Scatter, Scatter3d, Surface
 
 from poliastro.plotting.util import generate_sphere
-from poliastro.util import norm
 
-from ._base import BaseOrbitPlotter
+from ._base import BaseOrbitPlotter, Mixin2D
 
 
 class _PlotlyOrbitPlotter(BaseOrbitPlotter):
@@ -136,7 +135,7 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
             return self.show()
 
 
-class OrbitPlotter2D(_PlotlyOrbitPlotter):
+class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     """OrbitPlotter2D class.
 
     .. versionadded:: 0.9.0
@@ -152,12 +151,6 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter):
         )
 
         self._frame = None
-
-    def _project(self, rr):
-        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
-        x = rr_proj.dot(self._frame[0])
-        y = rr_proj.dot(self._frame[1])
-        return x, y
 
     def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
@@ -233,12 +226,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter):
                 "OrbitPlotter2D does not support reprojecting yet"
             )
 
-        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
-            raise ValueError("Vectors must be unit.")
-        elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
-            raise ValueError("Vectors must be mutually orthogonal.")
-        else:
-            self._frame = p_vec, q_vec, w_vec
+        self._set_frame(p_vec, q_vec, w_vec)
 
     def plot(self, orbit, *, label=None, color=None):
         """Plots state and osculating orbit in their plane.

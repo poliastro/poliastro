@@ -143,3 +143,19 @@ class BaseOrbitPlotter:
     def _prepare_plot(self):
         if self._attractor is not None:
             self._redraw_attractor()
+
+
+class Mixin2D:
+    def _set_frame(self, p_vec, q_vec, w_vec):
+        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
+            raise ValueError("Vectors must be unit.")
+        elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
+            raise ValueError("Vectors must be mutually orthogonal.")
+        else:
+            self._frame = p_vec, q_vec, w_vec
+
+    def _project(self, rr):
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
+        return x, y
