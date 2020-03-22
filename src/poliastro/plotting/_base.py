@@ -172,7 +172,7 @@ class BaseOrbitPlotter:
         """
         colors = self._get_colors(color, trail)
 
-        self._set_attractor(orbit.attractor)
+        self.set_attractor(orbit.attractor)
         self._set_plane(orbit.plane, fail_if_set=False)
 
         label = generate_label(orbit, label)
