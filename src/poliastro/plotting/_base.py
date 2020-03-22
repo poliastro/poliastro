@@ -88,6 +88,26 @@ class BaseOrbitPlotter:
     def _plot_trajectory(self, positions, label, colors, dashed):
         raise NotImplementedError
 
+    def _plot_r(self, state, label, colors):
+        radius = min(
+            self._attractor_radius * 0.5, (norm(state) - self._attractor.R) * 0.5
+        )  # Arbitrary thresholds
+        self._draw_point(radius, colors[0], label, center=state)
+
+    def _plot(self, positions, state, label, colors):
+        trace_trajectory = self._plot_trajectory(positions, label, colors, True)
+
+        # Redraw the attractor now to compute the attractor radius
+        self._redraw_attractor()
+
+        if state is not None:
+            # Plot required 2D/3D shape in the position of the body
+            trace_r = self._plot_r(state, label, colors)
+        else:
+            trace_r = None
+
+        return trace_trajectory, trace_r
+
     def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
@@ -113,9 +133,9 @@ class BaseOrbitPlotter:
 
         colors = self._get_colors(color, trail)
 
-        trace = self._plot_trajectory(positions, str(label), colors, False)
+        self._plot(positions, None, str(label), colors)
 
-        self._trajectories.append(Trajectory(positions, None, label, colors[0]))
+        self._trajectories.append(Trajectory(positions, None, str(label), colors[0]))
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
@@ -139,18 +159,9 @@ class BaseOrbitPlotter:
         label = generate_label(orbit, label)
         positions = orbit.sample(self._num_points)
 
-        trace = self._plot_trajectory(positions, label, colors, True)
+        self._plot(positions, orbit.r, label, colors)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
-
-        # Redraw the attractor now to compute the attractor radius
-        self._redraw_attractor()
-
-        # Plot required 2D/3D shape in the position of the body
-        radius = min(
-            self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5
-        )  # Arbitrary thresholds
-        self._draw_point(radius, colors[0], label, center=orbit.r)
 
 
 class Mixin2D:

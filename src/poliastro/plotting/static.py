@@ -80,6 +80,17 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return colors
 
+    def _draw_point(self, radius, color, name, center=None):
+        x_center, y_center = self._project(
+            center[None]
+        )  # Indexing trick to add one extra dimension
+
+        (l,) = self._ax.plot(
+            x_center.to(u.km).value, y_center.to(u.km).value, "o", mew=0, color=color
+        )
+
+        return l
+
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
             center[None]
@@ -121,25 +132,21 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return lines
 
+    def _plot_r(self, state, label, colors):
+        # TODO: Compute radius?
+        return self._draw_point(None, colors[0], label, center=state)
+
     def _plot(self, positions, state, label, colors):
-        lines = self._plot_trajectory(positions, label, colors, True)
-
-        # Redraw the attractor now to compute the attractor radius
-        self._redraw_attractor()
-
-        if state is not None:
-            x0, y0 = self._project(state[None])
-
-            # Plot current position
-            (l,) = self._ax.plot(
-                x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=colors[0]
-            )
-            lines.append(l)
+        trace_trajectory, trace_r = super()._plot(positions, state, label, colors)
 
         if label:
             if not self._ax.get_legend():
                 size = self._ax.figure.get_size_inches() + [8, 0]
                 self._ax.figure.set_size_inches(size)
+
+            lines = trace_trajectory[:]
+            if trace_r is not None:
+                lines.append(trace_r)
 
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line
@@ -154,7 +161,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._ax.set_ylabel("$y$ (km)")
         self._ax.set_aspect(1)
 
-        return lines
+        return trace_trajectory, trace_r
 
     def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
@@ -224,7 +231,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         label = generate_label(orbit, label)
         positions = orbit.sample(self._num_points)
 
-        lines = self._plot(positions, orbit.r, label, colors)
+        trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
+
+        lines = trace_trajectory[:]
+        if trace_r is not None:
+            lines.append(trace_r)
+
         return lines
