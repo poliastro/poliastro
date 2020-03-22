@@ -178,7 +178,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         for attractor in self._ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
-    def _plot(self, positions, state=None, label=None, colors=None):
+    def _plot(self, positions, state, label, colors):
         lines = self._plot_trajectory(positions, label, colors, True)
 
         # Redraw the attractor now to compute the attractor radius
