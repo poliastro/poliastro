@@ -120,6 +120,15 @@ def test_redraw_keeps_trajectories():
 
 
 @pytest.mark.mpl_image_compare
+def test_basic_plotting():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(iss)
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
 def test_trail_plotting():
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
