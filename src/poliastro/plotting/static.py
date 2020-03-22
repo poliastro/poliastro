@@ -84,19 +84,19 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         for artist in self._ax.lines + self._ax.collections:
             artist.remove()
 
-        for trajectory, state, label, colors in self._trajectories:
-            self._plot(trajectory, state, label, colors)
+        for positions, state, label, colors in self._trajectories:
+            self._plot(positions, state, label, colors)
 
         self._ax.relim()
         self._ax.autoscale()
 
-    def _plot_trajectory(self, trajectory, label, colors, dashed):
+    def _plot_trajectory(self, positions, label, colors, dashed):
         if dashed:
             linestyle = "dashed"
         else:
             linestyle = "solid"
 
-        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
+        rr = positions.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
 
         if len(colors) > 1:
@@ -118,14 +118,14 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return lines, colors
 
-    def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
+    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        trajectory : ~astropy.coordinates.CartesianRepresentation
+        positions : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
             Label of the trajectory.
@@ -149,7 +149,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._redraw_attractor()
 
         colors = self._get_colors(color, trail)
-        lines, colors = self._plot_trajectory(trajectory, label, colors, True)
+        lines, colors = self._plot_trajectory(positions, label, colors, True)
 
         if label:
             lines[0].set_label(label)
@@ -157,7 +157,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
 
-        self._trajectories.append(Trajectory(trajectory, None, label, colors))
+        self._trajectories.append(Trajectory(positions, None, label, colors))
 
         return lines
 
@@ -179,8 +179,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         for attractor in self._ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
-    def _plot(self, trajectory, state=None, label=None, colors=None):
-        lines, colors = self._plot_trajectory(trajectory, label, colors, True)
+    def _plot(self, positions, state=None, label=None, colors=None):
+        lines, colors = self._plot_trajectory(positions, label, colors, True)
 
         # Redraw the attractor now to compute the attractor radius
         self._redraw_attractor()

@@ -9,7 +9,7 @@ from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
 
 
-class Trajectory(namedtuple("Trajectory", ["trajectory", "state", "label", "color"])):
+class Trajectory(namedtuple("Trajectory", ["positions", "state", "label", "color"])):
     pass
 
 
@@ -58,8 +58,8 @@ class BaseOrbitPlotter:
         # visible for high and very high orbits
         min_radius = min(
             [
-                trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
-                for trajectory, _, _, _ in self._trajectories
+                positions.represent_as(CartesianRepresentation).norm().min() * 0.15
+                for positions, _, _, _ in self._trajectories
             ]
             or [0 * u.m]
         )
@@ -85,14 +85,14 @@ class BaseOrbitPlotter:
     def _plot_sphere(self, radius, color, name, center=None):
         raise NotImplementedError
 
-    def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
+    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        trajectory : ~astropy.coordinates.CartesianRepresentation
+        positions : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
             Label of the trajectory.
@@ -110,11 +110,11 @@ class BaseOrbitPlotter:
 
         colors = self._get_colors(color, trail)
 
-        trace, colors = self._plot_trajectory(trajectory, str(label), colors, False)
+        trace, colors = self._plot_trajectory(positions, str(label), colors, False)
 
-        self._trajectories.append(Trajectory(trajectory, None, label, colors[0]))
+        self._trajectories.append(Trajectory(positions, None, label, colors[0]))
 
-    def _plot_trajectory(self, trajectory, label, colors, dashed):
+    def _plot_trajectory(self, positions, label, colors, dashed):
         raise NotImplementedError
 
     def plot(self, orbit, *, label=None, color=None, trail=False):

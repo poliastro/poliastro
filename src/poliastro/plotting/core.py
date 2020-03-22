@@ -39,14 +39,14 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         return [color]
 
-    def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
+    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        trajectory : ~astropy.coordinates.CartesianRepresentation
+        positions : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
             Label of the trajectory.
@@ -56,7 +56,7 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
             Fade the orbit trail, default to False.
 
         """
-        super().plot_trajectory(trajectory, label=label, color=color, trail=trail)
+        super().plot_trajectory(positions, label=label, color=color, trail=trail)
 
         if not self._figure._in_batch_mode:
             return self.show()
@@ -133,11 +133,11 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
         return sphere
 
-    def _plot_trajectory(self, trajectory, label, colors, dashed):
+    def _plot_trajectory(self, positions, label, colors, dashed):
         trace = Scatter3d(
-            x=trajectory.x.to(u.km).value,
-            y=trajectory.y.to(u.km).value,
-            z=trajectory.z.to(u.km).value,
+            x=positions.x.to(u.km).value,
+            y=positions.y.to(u.km).value,
+            z=positions.z.to(u.km).value,
             name=label,
             line=dict(color=colors[0], width=5, dash="dash" if dashed else "solid"),
             mode="lines",  # Boilerplate
@@ -248,14 +248,14 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         return shape
 
-    def _plot_trajectory(self, trajectory, label, colors, dashed):
+    def _plot_trajectory(self, positions, label, colors, dashed):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
                 "set_frame(*orbit.pqw()) or plot(orbit)"
             )
 
-        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
+        rr = positions.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
 
         trace = Scatter(
