@@ -165,6 +165,11 @@ class BaseOrbitPlotter:
 
 
 class Mixin2D:
+    _trajectories: List[Trajectory]
+
+    def _redraw(self):
+        raise NotImplementedError
+
     def _project(self, rr):
         rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
         x = rr_proj.dot(self._frame[0])

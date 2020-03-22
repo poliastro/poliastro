@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 from astropy import units as u
 
