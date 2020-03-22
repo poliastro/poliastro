@@ -130,6 +130,10 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
             )
 
+        self._ax.set_xlabel("$x$ (km)")
+        self._ax.set_ylabel("$y$ (km)")
+        self._ax.set_aspect(1)
+
         return lines
 
     def _plot_r(self, state, label, colors):
@@ -156,10 +160,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             self._ax.legend(
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
-
-        self._ax.set_xlabel("$x$ (km)")
-        self._ax.set_ylabel("$y$ (km)")
-        self._ax.set_aspect(1)
 
         return trace_trajectory, trace_r
 
@@ -194,6 +194,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._redraw_attractor()
 
         colors = self._get_colors(color, trail)
+
+        # NOTE: We do not call self._plot here to control the labels
         lines = self._plot_trajectory(positions, label, colors, True)
 
         if label:
