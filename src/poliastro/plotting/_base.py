@@ -24,6 +24,7 @@ class BaseOrbitPlotter:
         self._trajectories = []  # type: List[Trajectory]
 
         self._attractor = None
+        self._plane = None
 
         self._attractor_radius = np.inf * u.km
 
@@ -39,6 +40,12 @@ class BaseOrbitPlotter:
                 f"Attractor has already been set to {self._attractor.name}"
             )
 
+    def _set_plane(self, plane, fail_if_set=True):
+        if self._plane is None:
+            self._plane = plane
+        elif plane is not self._plane and fail_if_set:
+            raise NotImplementedError(f"Plane has already been set to {self._plane}")
+
     def set_attractor(self, attractor):
         """Sets plotting attractor.
 
@@ -49,6 +56,17 @@ class BaseOrbitPlotter:
 
         """
         self._set_attractor(attractor)
+
+    def set_plane(self, plane):
+        """Sets reference plane.
+
+        Parameters
+        ----------
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
+
+        """
+        self._set_plane(plane)
 
     def _clear_attractor(self):
         raise NotImplementedError
@@ -155,9 +173,10 @@ class BaseOrbitPlotter:
         colors = self._get_colors(color, trail)
 
         self._set_attractor(orbit.attractor)
+        self._set_plane(orbit.plane, fail_if_set=False)
 
         label = generate_label(orbit, label)
-        positions = orbit.sample(self._num_points)
+        positions = orbit.change_plane(self._plane).sample(self._num_points)
 
         self._plot(positions, orbit.r, label, colors)
 

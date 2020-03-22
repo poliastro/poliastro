@@ -229,11 +229,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         colors = self._get_colors(color, trail)
 
         self.set_attractor(orbit.attractor)
+        self._set_plane(orbit.plane, fail_if_set=False)
 
         if label:
             label = generate_label(orbit, label)
 
-        positions = orbit.sample(self._num_points)
+        positions = orbit.change_plane(self._plane).sample(self._num_points)
 
         trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
 
