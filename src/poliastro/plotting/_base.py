@@ -110,7 +110,7 @@ class BaseOrbitPlotter:
 
         colors = self._get_colors(color, trail)
 
-        trace, colors = self._plot_trajectory(positions, str(label), colors, False)
+        trace = self._plot_trajectory(positions, str(label), colors, False)
 
         self._trajectories.append(Trajectory(positions, None, label, colors[0]))
 
@@ -139,7 +139,7 @@ class BaseOrbitPlotter:
         label = generate_label(orbit, label)
         positions = orbit.sample(self._num_points)
 
-        trace, colors = self._plot_trajectory(positions, label, colors, True)
+        trace = self._plot_trajectory(positions, label, colors, True)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
 

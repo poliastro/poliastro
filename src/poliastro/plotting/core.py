@@ -268,7 +268,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         )
         self._figure.add_trace(trace)
 
-        return trace, [trace.line.color]
+        return trace
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.

@@ -114,9 +114,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             lines = self._ax.plot(
                 x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
             )
-            colors = [lines[0].get_color()]
 
-        return lines, colors
+        return lines
 
     def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
@@ -149,7 +148,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._redraw_attractor()
 
         colors = self._get_colors(color, trail)
-        lines, colors = self._plot_trajectory(positions, label, colors, True)
+        lines = self._plot_trajectory(positions, label, colors, True)
 
         if label:
             lines[0].set_label(label)
@@ -180,7 +179,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             attractor.remove()
 
     def _plot(self, positions, state=None, label=None, colors=None):
-        lines, colors = self._plot_trajectory(positions, label, colors, True)
+        lines = self._plot_trajectory(positions, label, colors, True)
 
         # Redraw the attractor now to compute the attractor radius
         self._redraw_attractor()
@@ -212,7 +211,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._ax.set_ylabel("$y$ (km)")
         self._ax.set_aspect(1)
 
-        return lines, colors
+        return lines
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
@@ -239,7 +238,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         label = generate_label(orbit, label)
         positions = orbit.sample(self._num_points)
 
-        lines, colors = self._plot(positions, orbit.r, label, colors)
+        lines = self._plot(positions, orbit.r, label, colors)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
         return lines
