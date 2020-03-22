@@ -190,7 +190,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
-                "set_frame(*orbit.pqw()) or plot(orbit)."
+                "set_frame(*orbit.pqw()) or plot(orbit)"
             )
 
         rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()

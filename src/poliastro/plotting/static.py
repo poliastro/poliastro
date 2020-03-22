@@ -11,7 +11,7 @@ from matplotlib.colors import LinearSegmentedColormap, to_rgba
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
 
-from ._base import Trajectory
+from ._base import BaseOrbitPlotter, Trajectory
 
 
 def _segments_from_arrays(x, y):
@@ -23,7 +23,7 @@ def _segments_from_arrays(x, y):
     return segments
 
 
-class StaticOrbitPlotter:
+class StaticOrbitPlotter(BaseOrbitPlotter):
     """StaticOrbitPlotter class.
 
     This class holds the perifocal plane of the first
@@ -46,6 +46,8 @@ class StaticOrbitPlotter:
         dark : bool, optional
             If set as True, plots the orbit in Dark mode.
         """
+        super().__init__(num_points)
+
         self.ax = ax
         if not self.ax:
             if dark:
@@ -53,15 +55,8 @@ class StaticOrbitPlotter:
                     _, self.ax = plt.subplots(figsize=(6, 6))
             else:
                 _, self.ax = plt.subplots(figsize=(6, 6))
-        self.num_points = num_points
-        self._frame = None
-        self._attractor = None
-        self._attractor_radius = np.inf * u.km
-        self._trajectories = []  # type: List[Trajectory]
 
-    @property
-    def trajectories(self):
-        return self._trajectories
+        self._frame = None
 
     def set_frame(self, p_vec, q_vec, w_vec):
         """Sets perifocal frame.
@@ -70,6 +65,7 @@ class StaticOrbitPlotter:
         ------
         ValueError
             If the vectors are not a set of mutually orthogonal unit vectors.
+
         """
         if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
             raise ValueError("Vectors must be unit.")
@@ -141,11 +137,15 @@ class StaticOrbitPlotter:
             Plots the Orbit's trail
 
         """
-        if self._attractor is None or self._frame is None:
+        if self._attractor is None:
             raise ValueError(
                 "An attractor and a frame must be set up first, please use "
-                "set_attractor(Major_Body) and set_frame(*orbit.pqw()) "
-                "or plot(orbit)."
+                "set_attractor(Major_Body) or plot(orbit)"
+            )
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_frame(*orbit.pqw()) or plot(orbit)"
             )
 
         self._redraw_attractor(
@@ -164,23 +164,6 @@ class StaticOrbitPlotter:
         self._trajectories.append(Trajectory(trajectory, None, label, colors))
 
         return lines
-
-    def set_attractor(self, attractor):
-        """Sets plotting attractor.
-
-        Parameters
-        ----------
-        attractor : ~poliastro.bodies.Body
-            Central body.
-
-        """
-        if self._attractor is None:
-            self._attractor = attractor
-
-        elif attractor is not self._attractor:
-            raise NotImplementedError(
-                f"Attractor has already been set to {self._attractor.name}."
-            )
 
     def _project(self, rr):
         rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
@@ -244,7 +227,7 @@ class StaticOrbitPlotter:
         self.set_attractor(orbit.attractor)
         self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
 
-        positions = orbit.sample(self.num_points)
+        positions = orbit.sample(self._num_points)
 
         if label:
             label = generate_label(orbit, label)

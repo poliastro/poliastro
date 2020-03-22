@@ -39,7 +39,7 @@ class BaseOrbitPlotter:
             self._attractor = attractor
         elif attractor is not self._attractor:
             raise NotImplementedError(
-                f"Attractor has already been set to {self._attractor.name}."
+                f"Attractor has already been set to {self._attractor.name}"
             )
 
     def set_attractor(self, attractor):
@@ -95,7 +95,7 @@ class BaseOrbitPlotter:
         if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
-                "set_attractor(Major_Body) or plot(orbit)."
+                "set_attractor(Major_Body) or plot(orbit)"
             )
         else:
             if color is None:
