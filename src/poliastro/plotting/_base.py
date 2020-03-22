@@ -50,6 +50,9 @@ class BaseOrbitPlotter:
         """
         self._set_attractor(attractor)
 
+    def _clear_attractor(self):
+        raise NotImplementedError
+
     def _redraw_attractor(self):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
@@ -61,14 +64,17 @@ class BaseOrbitPlotter:
             or [0 * u.m]
         )
         radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
-        # TODO: Remove previously plotted sphere?
-        self._plot_sphere(
-            radius,
-            BODY_COLORS.get(self._attractor.name, "#999999"),
-            self._attractor.name,
-        )
 
-        self._attractor_radius = radius
+        color = BODY_COLORS.get(self._attractor.name, "#999999")
+
+        self._clear_attractor()
+
+        if radius < self._attractor_radius:
+            self._attractor_radius = radius
+
+        self._plot_sphere(
+            self._attractor_radius, color, self._attractor.name,
+        )
 
     def _get_colors(self, color):
         raise NotImplementedError

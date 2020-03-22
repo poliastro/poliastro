@@ -1,12 +1,11 @@
-import matplotlib as mpl
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from matplotlib import pyplot as plt
+from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from poliastro.plotting.util import BODY_COLORS, generate_label
+from poliastro.plotting.util import generate_label
 
 from ._base import BaseOrbitPlotter, Mixin2D, Trajectory
 
@@ -145,9 +144,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 "set_frame(*orbit.pqw()) or plot(orbit)"
             )
 
-        self._redraw_attractor(
-            trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
-        )  # Arbitrary threshold
+        self._redraw_attractor()
 
         colors = self._get_colors(color, trail)
         lines, colors = self._plot_trajectory(trajectory, label, colors, True)
@@ -162,20 +159,23 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return lines
 
-
-    def _redraw_attractor(self, min_radius=0 * u.km):
-        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
-        color = BODY_COLORS.get(self._attractor.name, "#999999")
-
-        for attractor in self.ax.findobj(match=mpl.patches.Circle):
-            attractor.remove()
-
-        if radius < self._attractor_radius:
-            self._attractor_radius = radius
+    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+        x_center, y_center = self._project(
+            center[None]
+        )  # Indexing trick to add one extra dimension
 
         self.ax.add_patch(
-            mpl.patches.Circle((0, 0), self._attractor_radius.value, lw=0, color=color)
+            mpl_patches.Circle(
+                (x_center.to(u.km).value, y_center.to(u.km).value),
+                radius.to(u.km).value,
+                lw=0,
+                color=color,
+            )
         )
+
+    def _clear_attractor(self):
+        for attractor in self.ax.findobj(match=mpl_patches.Circle):
+            attractor.remove()
 
     def _plot(self, trajectory, state=None, label=None, colors=None):
         lines, colors = self._plot_trajectory(trajectory, label, colors, True)
@@ -217,7 +217,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             self.set_frame(*orbit.pqw())
 
         self.set_attractor(orbit.attractor)
-        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
+        self._redraw_attractor()
 
         positions = orbit.sample(self._num_points)
 

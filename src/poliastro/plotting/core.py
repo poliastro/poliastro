@@ -23,6 +23,10 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
 
+    def _clear_attractor(self):
+        # FIXME: Implement
+        pass
+
     def _prepare_plot(self):
         super()._prepare_plot()
 
