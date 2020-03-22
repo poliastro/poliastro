@@ -230,7 +230,9 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         self.set_attractor(orbit.attractor)
 
-        label = generate_label(orbit, label)
+        if label:
+            label = generate_label(orbit, label)
+
         positions = orbit.sample(self._num_points)
 
         trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
