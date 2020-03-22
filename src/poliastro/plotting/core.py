@@ -34,11 +34,6 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         return [color]
 
-    def _prepare_plot(self):
-        super()._prepare_plot()
-
-        self._figure.layout.update(self._layout)
-
     def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
@@ -87,7 +82,10 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
         Updates the layout and returns the underlying figure.
 
         """
-        self._prepare_plot()
+        if self._attractor is not None:
+            self._redraw_attractor()
+
+        self._figure.layout.update(self._layout)
         return self._figure
 
 

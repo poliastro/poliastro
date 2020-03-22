@@ -88,10 +88,6 @@ class BaseOrbitPlotter:
     def _plot_trajectory(self, positions, label, colors, dashed):
         raise NotImplementedError
 
-    def _prepare_plot(self):
-        if self._attractor is not None:
-            self._redraw_attractor()
-
     def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
