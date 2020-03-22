@@ -1,18 +1,15 @@
 from collections import namedtuple
-from itertools import cycle
 from typing import List
 
 import numpy as np
-import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from plotly.graph_objects import Figure
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
 
 
-class Trajectory(namedtuple("Trajectory", ["trajectory", "state", "label", "color"])):
+class Trajectory(namedtuple("Trajectory", ["positions", "state", "label", "color"])):
     pass
 
 
@@ -21,16 +18,14 @@ class BaseOrbitPlotter:
     Parent Class for the 2D and 3D OrbitPlotter Classes based on Plotly.
     """
 
-    def __init__(self, figure=None):
-        self._figure = figure or Figure()
-        self._layout = None
+    def __init__(self, num_points=150):
+        self._num_points = num_points
 
         self._trajectories = []  # type: List[Trajectory]
 
         self._attractor = None
-        self._attractor_radius = np.inf * u.km
 
-        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+        self._attractor_radius = np.inf * u.km
 
     @property
     def trajectories(self):
@@ -41,7 +36,7 @@ class BaseOrbitPlotter:
             self._attractor = attractor
         elif attractor is not self._attractor:
             raise NotImplementedError(
-                f"Attractor has already been set to {self._attractor.name}."
+                f"Attractor has already been set to {self._attractor.name}"
             )
 
     def set_attractor(self, attractor):
@@ -55,67 +50,94 @@ class BaseOrbitPlotter:
         """
         self._set_attractor(attractor)
 
+    def _clear_attractor(self):
+        raise NotImplementedError
+
     def _redraw_attractor(self):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
         min_radius = min(
             [
-                trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
-                for trajectory, _, _, _ in self._trajectories
+                positions.represent_as(CartesianRepresentation).norm().min() * 0.15
+                for positions, _, _, _ in self._trajectories
             ]
             or [0 * u.m]
         )
         radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
-        # TODO: Remove previously plotted sphere?
-        self._plot_sphere(
-            radius,
-            BODY_COLORS.get(self._attractor.name, "#999999"),
-            self._attractor.name,
+
+        color = BODY_COLORS.get(self._attractor.name, "#999999")
+
+        self._clear_attractor()
+
+        if radius < self._attractor_radius:
+            self._attractor_radius = radius
+
+        self._draw_sphere(
+            self._attractor_radius, color, self._attractor.name,
         )
 
-        self._attractor_radius = radius
-
-    def _plot_point(self, radius, color, name, center=None):
+    def _get_colors(self, color, trail):
         raise NotImplementedError
 
-    def _plot_sphere(self, radius, color, name, center=None):
+    def _draw_point(self, radius, color, name, center=None):
         raise NotImplementedError
 
-    def plot_trajectory(self, trajectory, *, label=None, color=None):
+    def _draw_sphere(self, radius, color, name, center=None):
+        raise NotImplementedError
+
+    def _plot_trajectory(self, positions, label, colors, dashed):
+        raise NotImplementedError
+
+    def _plot_r(self, state, label, colors):
+        radius = min(
+            self._attractor_radius * 0.5, (norm(state) - self._attractor.R) * 0.5
+        )  # Arbitrary thresholds
+        self._draw_point(radius, colors[0], label, center=state)
+
+    def _plot(self, positions, state, label, colors):
+        trace_trajectory = self._plot_trajectory(positions, label, colors, True)
+
+        # Redraw the attractor now to compute the attractor radius
+        self._redraw_attractor()
+
+        if state is not None:
+            # Plot required 2D/3D shape in the position of the body
+            trace_r = self._plot_r(state, label, colors)
+        else:
+            trace_r = None
+
+        return trace_trajectory, trace_r
+
+    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        trajectory : ~astropy.coordinates.CartesianRepresentation
+        positions : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
+            Label of the trajectory.
         color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
         if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
-                "set_attractor(Major_Body) or plot(orbit)."
-            )
-        else:
-            if color is None:
-                color = next(self._color_cycle)
-
-            trace = self._plot_trajectory(trajectory, str(label), color, False)
-
-            self._trajectories.append(
-                Trajectory(trajectory, None, label, trace.line.color)
+                "set_attractor(Major_Body) or plot(orbit)"
             )
 
-        if not self._figure._in_batch_mode:
-            return self.show()
+        colors = self._get_colors(color, trail)
 
-    def _plot_trajectory(self, trajectory, label, color, dashed):
-        raise NotImplementedError
+        self._plot(positions, None, str(label), colors)
 
-    def plot(self, orbit, *, label=None, color=None):
+        self._trajectories.append(Trajectory(positions, None, str(label), colors[0]))
+
+    def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
 
         Parameters
@@ -126,45 +148,49 @@ class BaseOrbitPlotter:
             Label of the orbit.
         color : string, optional
             Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
-        if color is None:
-            color = next(self._color_cycle)
+        colors = self._get_colors(color, trail)
 
         self._set_attractor(orbit.attractor)
 
         label = generate_label(orbit, label)
-        trajectory = orbit.sample()
+        positions = orbit.sample(self._num_points)
 
-        trace = self._plot_trajectory(trajectory, label, color, True)
+        self._plot(positions, orbit.r, label, colors)
 
-        self._trajectories.append(
-            Trajectory(trajectory, orbit.r, label, trace.line.color)
-        )
+        self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
 
-        # Redraw the attractor now to compute the attractor radius
-        self._redraw_attractor()
 
-        # Plot required 2D/3D shape in the position of the body
-        radius = min(
-            self._attractor_radius * 0.5, (norm(orbit.r) - orbit.attractor.R) * 0.5
-        )  # Arbitrary thresholds
-        self._plot_point(radius, color, label, center=orbit.r)
+class Mixin2D:
+    _trajectories: List[Trajectory]
 
-        if not self._figure._in_batch_mode:
-            return self.show()
+    def _redraw(self):
+        raise NotImplementedError
 
-    def _prepare_plot(self):
-        if self._attractor is not None:
-            self._redraw_attractor()
+    def _project(self, rr):
+        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
+        x = rr_proj.dot(self._frame[0])
+        y = rr_proj.dot(self._frame[1])
+        return x, y
 
-        self._figure.layout.update(self._layout)
+    def set_frame(self, p_vec, q_vec, w_vec):
+        """Sets perifocal frame.
 
-    def show(self):
-        """Shows the plot in the Notebook.
-
-        Updates the layout and returns the underlying figure.
+        Raises
+        ------
+        ValueError
+            If the vectors are not a set of mutually orthogonal unit vectors.
 
         """
-        self._prepare_plot()
-        return self._figure
+        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
+            raise ValueError("Vectors must be unit.")
+        elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
+            raise ValueError("Vectors must be mutually orthogonal.")
+        else:
+            self._frame = p_vec, q_vec, w_vec
+
+        if self._trajectories:
+            self._redraw()

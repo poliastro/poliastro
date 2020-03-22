@@ -1,17 +1,13 @@
-from typing import List
-
-import matplotlib as mpl
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from matplotlib import pyplot as plt
+from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from poliastro.plotting.util import BODY_COLORS, generate_label
-from poliastro.util import norm
+from poliastro.plotting.util import generate_label
 
-from ._base import Trajectory
+from ._base import BaseOrbitPlotter, Mixin2D, Trajectory
 
 
 def _segments_from_arrays(x, y):
@@ -23,7 +19,7 @@ def _segments_from_arrays(x, y):
     return segments
 
 
-class StaticOrbitPlotter:
+class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
     """StaticOrbitPlotter class.
 
     This class holds the perifocal plane of the first
@@ -46,45 +42,36 @@ class StaticOrbitPlotter:
         dark : bool, optional
             If set as True, plots the orbit in Dark mode.
         """
-        self.ax = ax
-        if not self.ax:
+        super().__init__(num_points)
+
+        self._ax = ax
+        if not self._ax:
             if dark:
                 with plt.style.context("dark_background"):
-                    _, self.ax = plt.subplots(figsize=(6, 6))
+                    _, self._ax = plt.subplots(figsize=(6, 6))
             else:
-                _, self.ax = plt.subplots(figsize=(6, 6))
-        self.num_points = num_points
+                _, self._ax = plt.subplots(figsize=(6, 6))
+
         self._frame = None
-        self._attractor = None
-        self._attractor_radius = np.inf * u.km
-        self._trajectories = []  # type: List[Trajectory]
 
-    @property
-    def trajectories(self):
-        return self._trajectories
+    def _redraw(self):
+        for artist in self._ax.lines + self._ax.collections:
+            artist.remove()
 
-    def set_frame(self, p_vec, q_vec, w_vec):
-        """Sets perifocal frame.
+        for positions, state, label, colors in self._trajectories:
+            self._plot(positions, state, label, colors)
 
-        Raises
-        ------
-        ValueError
-            If the vectors are not a set of mutually orthogonal unit vectors.
-        """
-        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
-            raise ValueError("Vectors must be unit.")
-        elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
-            raise ValueError("Vectors must be mutually orthogonal.")
-        else:
-            self._frame = p_vec, q_vec, w_vec
+        self._ax.relim()
+        self._ax.autoscale()
 
-        if self._trajectories:
-            self._redraw()
+    def _clear_attractor(self):
+        for attractor in self._ax.findobj(match=mpl_patches.Circle):
+            attractor.remove()
 
     def _get_colors(self, color, trail):
-        if trail and color is None:
+        if color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319
-            color = next(self.ax._get_lines.prop_cycler)["color"]
+            color = next(self._ax._get_lines.prop_cycler)["color"]
 
         if trail:
             colors = [color, to_rgba(color, 0)]
@@ -93,18 +80,38 @@ class StaticOrbitPlotter:
 
         return colors
 
-    def _redraw(self):
-        for artist in self.ax.lines + self.ax.collections:
-            artist.remove()
+    def _draw_point(self, radius, color, name, center=None):
+        x_center, y_center = self._project(
+            center[None]
+        )  # Indexing trick to add one extra dimension
 
-        for trajectory, state, label, colors in self._trajectories:
-            self._plot(trajectory, state, label, colors)
+        (l,) = self._ax.plot(
+            x_center.to(u.km).value, y_center.to(u.km).value, "o", mew=0, color=color
+        )
 
-        self.ax.relim()
-        self.ax.autoscale()
+        return l
 
-    def _plot_trajectory(self, trajectory, colors=None, linestyle="dashed"):
-        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
+    def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+        x_center, y_center = self._project(
+            center[None]
+        )  # Indexing trick to add one extra dimension
+
+        self._ax.add_patch(
+            mpl_patches.Circle(
+                (x_center.to(u.km).value, y_center.to(u.km).value),
+                radius.to(u.km).value,
+                lw=0,
+                color=color,
+            )
+        )
+
+    def _plot_trajectory(self, positions, label, colors, dashed):
+        if dashed:
+            linestyle = "dashed"
+        else:
+            linestyle = "solid"
+
+        rr = positions.represent_as(CartesianRepresentation).xyz.transpose()
         x, y = self._project(rr)
 
         if len(colors) > 1:
@@ -115,142 +122,125 @@ class StaticOrbitPlotter:
             lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
             lc.set_array(np.linspace(1, 0, len(x)))
 
-            self.ax.add_collection(lc)
+            self._ax.add_collection(lc)
             lines = [lc]
 
         else:
-            lines = self.ax.plot(
+            lines = self._ax.plot(
                 x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
             )
-            colors = [lines[0].get_color()]
 
-        return lines, colors
-
-    def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
-        """Plots a precomputed trajectory.
-
-        Parameters
-        ----------
-        trajectory : ~astropy.coordinates.BaseRepresentation, ~astropy.coordinates.BaseCoordinateFrame
-            Trajectory to plot.
-        label : str, optional
-            Label.
-        color : str, optional
-            Color string.
-        trail: bool, optional
-            Plots the Orbit's trail
-
-        """
-        if self._attractor is None or self._frame is None:
-            raise ValueError(
-                "An attractor and a frame must be set up first, please use "
-                "set_attractor(Major_Body) and set_frame(*orbit.pqw()) "
-                "or plot(orbit)."
-            )
-
-        self._redraw_attractor(
-            trajectory.represent_as(CartesianRepresentation).norm().min() * 0.15
-        )  # Arbitrary threshold
-
-        colors = self._get_colors(color, trail)
-        lines, colors = self._plot_trajectory(trajectory, colors)
-
-        if label:
-            lines[0].set_label(label)
-            self.ax.legend(
-                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
-            )
-
-        self._trajectories.append(Trajectory(trajectory, None, label, colors))
+        self._ax.set_xlabel("$x$ (km)")
+        self._ax.set_ylabel("$y$ (km)")
+        self._ax.set_aspect(1)
 
         return lines
 
-    def set_attractor(self, attractor):
-        """Sets plotting attractor.
+    def _plot_r(self, state, label, colors):
+        # TODO: Compute radius?
+        return self._draw_point(None, colors[0], label, center=state)
 
-        Parameters
-        ----------
-        attractor : ~poliastro.bodies.Body
-            Central body.
-
-        """
-        if self._attractor is None:
-            self._attractor = attractor
-
-        elif attractor is not self._attractor:
-            raise NotImplementedError(
-                f"Attractor has already been set to {self._attractor.name}."
-            )
-
-    def _project(self, rr):
-        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
-        x = rr_proj.dot(self._frame[0])
-        y = rr_proj.dot(self._frame[1])
-        return x, y
-
-    def _redraw_attractor(self, min_radius=0 * u.km):
-        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
-        color = BODY_COLORS.get(self._attractor.name, "#999999")
-
-        for attractor in self.ax.findobj(match=mpl.patches.Circle):
-            attractor.remove()
-
-        if radius < self._attractor_radius:
-            self._attractor_radius = radius
-
-        self.ax.add_patch(
-            mpl.patches.Circle((0, 0), self._attractor_radius.value, lw=0, color=color)
-        )
-
-    def _plot(self, trajectory, state=None, label=None, colors=None):
-        lines, colors = self._plot_trajectory(trajectory, colors)
-
-        if state is not None:
-            x0, y0 = self._project(state[None])
-
-            # Plot current position
-            (l,) = self.ax.plot(
-                x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=colors[0]
-            )
-            lines.append(l)
+    def _plot(self, positions, state, label, colors):
+        trace_trajectory, trace_r = super()._plot(positions, state, label, colors)
 
         if label:
-            if not self.ax.get_legend():
-                size = self.ax.figure.get_size_inches() + [8, 0]
-                self.ax.figure.set_size_inches(size)
+            if not self._ax.get_legend():
+                size = self._ax.figure.get_size_inches() + [8, 0]
+                self._ax.figure.set_size_inches(size)
+
+            lines = trace_trajectory[:]
+            if trace_r is not None:
+                lines.append(trace_r)
 
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line
             # NOTE: What about generating both labels,
             # indicating that one is the osculating orbit?
             lines[-1].set_label(label)
-            self.ax.legend(
+            self._ax.legend(
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
 
-        self.ax.set_xlabel("$x$ (km)")
-        self.ax.set_ylabel("$y$ (km)")
-        self.ax.set_aspect(1)
+        return trace_trajectory, trace_r
 
-        return lines, colors
+    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
+        """Plots a precomputed trajectory.
 
-    def plot(self, orbit, label=None, color=None, trail=False):
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        positions : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : string, optional
+            Label of the trajectory.
+        color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if self._attractor is None:
+            raise ValueError(
+                "An attractor and a frame must be set up first, please use "
+                "set_attractor(Major_Body) or plot(orbit)"
+            )
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_frame(*orbit.pqw()) or plot(orbit)"
+            )
+
+        self._redraw_attractor()
+
+        colors = self._get_colors(color, trail)
+
+        # NOTE: We do not call self._plot here to control the labels
+        lines = self._plot_trajectory(positions, label, colors, True)
+
+        if label:
+            lines[0].set_label(label)
+            self._ax.legend(
+                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
+            )
+
+        self._trajectories.append(Trajectory(positions, None, label, colors))
+
+        return lines
+
+    def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
+        label : string, optional
+            Label of the orbit.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
         if not self._frame:
             self.set_frame(*orbit.pqw())
 
-        self.set_attractor(orbit.attractor)
-        self._redraw_attractor(orbit.r_p * 0.15)  # Arbitrary threshold
+        colors = self._get_colors(color, trail)
 
-        positions = orbit.sample(self.num_points)
+        self.set_attractor(orbit.attractor)
 
         if label:
             label = generate_label(orbit, label)
 
-        colors = self._get_colors(color, trail)
-        lines, colors = self._plot(positions, orbit.r, label, colors)
+        positions = orbit.sample(self._num_points)
+
+        trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
+
+        lines = trace_trajectory[:]
+        if trace_r is not None:
+            lines.append(trace_r)
+
         return lines

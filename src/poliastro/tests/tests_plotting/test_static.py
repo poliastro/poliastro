@@ -8,12 +8,6 @@ from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody.orbit import Orbit
 
 
-def test_orbitplotter_has_axes():
-    ax = "Unused axes"
-    op = StaticOrbitPlotter(ax)
-    assert op.ax is ax
-
-
 def test_set_frame():
     op = StaticOrbitPlotter()
     p = [1, 0, 0] * u.one
@@ -78,11 +72,12 @@ def test_plot_trajectory_sets_label():
     assert legend.get_texts()[1].get_text() == "Earth"
 
 
-def test_dark_mode_plots_dark_plot():
-    op = StaticOrbitPlotter(dark=True)
-    assert op.ax.get_facecolor() == (0.0, 0.0, 0.0, 1.0)
-    op = StaticOrbitPlotter()
-    assert op.ax.get_facecolor() == (1.0, 1.0, 1.0, 1)
+@pytest.mark.parametrize(
+    "dark, expected_color", [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))]
+)
+def test_dark_mode_plots_dark_plot(dark, expected_color):
+    op = StaticOrbitPlotter(dark=dark)
+    assert op._ax.get_facecolor() == expected_color
 
 
 def test_redraw_makes_attractor_none():
@@ -117,6 +112,15 @@ def test_redraw_keeps_trajectories():
     op.set_frame(*mars.pqw())
 
     assert len(op.trajectories) == 2
+
+
+@pytest.mark.mpl_image_compare
+def test_basic_plotting():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(iss)
+
+    return fig
 
 
 @pytest.mark.mpl_image_compare
