@@ -210,6 +210,9 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         self._frame = None
 
+    def _redraw(self):
+        raise NotImplementedError("OrbitPlotter2D does not support reprojecting yet")
+
     def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
             center[None]
@@ -269,22 +272,6 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         self._figure.add_trace(trace)
 
         return trace
-
-    def set_frame(self, p_vec, q_vec, w_vec):
-        """Sets perifocal frame.
-
-        Raises
-        ------
-        ValueError
-            If the vectors are not a set of mutually orthogonal unit vectors.
-
-        """
-        if self._frame and self.trajectories:
-            raise NotImplementedError(
-                "OrbitPlotter2D does not support reprojecting yet"
-            )
-
-        self._set_frame(p_vec, q_vec, w_vec)
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.

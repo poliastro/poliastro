@@ -54,20 +54,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         self._frame = None
 
-    def set_frame(self, p_vec, q_vec, w_vec):
-        """Sets perifocal frame.
-
-        Raises
-        ------
-        ValueError
-            If the vectors are not a set of mutually orthogonal unit vectors.
-
-        """
-        self._set_frame(p_vec, q_vec, w_vec)
-
-        if self._trajectories:
-            self._redraw()
-
     def _get_colors(self, color, trail):
         if trail and color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319

@@ -158,13 +158,24 @@ class BaseOrbitPlotter:
 
 
 class Mixin2D:
-    def _set_frame(self, p_vec, q_vec, w_vec):
+    def set_frame(self, p_vec, q_vec, w_vec):
+        """Sets perifocal frame.
+
+        Raises
+        ------
+        ValueError
+            If the vectors are not a set of mutually orthogonal unit vectors.
+
+        """
         if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
             raise ValueError("Vectors must be unit.")
         elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
             raise ValueError("Vectors must be mutually orthogonal.")
         else:
             self._frame = p_vec, q_vec, w_vec
+
+        if self._trajectories:
+            self._redraw()
 
     def _project(self, rr):
         rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
