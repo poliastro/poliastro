@@ -6,7 +6,6 @@ import numpy as np
 import plotly.colors
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from plotly.graph_objects import Figure
 
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
@@ -21,10 +20,7 @@ class BaseOrbitPlotter:
     Parent Class for the 2D and 3D OrbitPlotter Classes based on Plotly.
     """
 
-    def __init__(self, figure=None):
-        self._figure = figure or Figure()
-        self._layout = None
-
+    def __init__(self):
         self._trajectories = []  # type: List[Trajectory]
 
         self._attractor = None
@@ -109,9 +105,6 @@ class BaseOrbitPlotter:
                 Trajectory(trajectory, None, label, trace.line.color)
             )
 
-        if not self._figure._in_batch_mode:
-            return self.show()
-
     def _plot_trajectory(self, trajectory, label, color, dashed):
         raise NotImplementedError
 
@@ -151,20 +144,6 @@ class BaseOrbitPlotter:
         )  # Arbitrary thresholds
         self._plot_point(radius, color, label, center=orbit.r)
 
-        if not self._figure._in_batch_mode:
-            return self.show()
-
     def _prepare_plot(self):
         if self._attractor is not None:
             self._redraw_attractor()
-
-        self._figure.layout.update(self._layout)
-
-    def show(self):
-        """Shows the plot in the Notebook.
-
-        Updates the layout and returns the underlying figure.
-
-        """
-        self._prepare_plot()
-        return self._figure

@@ -4,7 +4,7 @@
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
-from plotly.graph_objects import Layout, Scatter, Scatter3d, Surface
+from plotly.graph_objects import Figure, Layout, Scatter, Scatter3d, Surface
 
 from poliastro.plotting.util import generate_sphere
 from poliastro.util import norm
@@ -12,13 +12,48 @@ from poliastro.util import norm
 from ._base import BaseOrbitPlotter
 
 
-class OrbitPlotter3D(BaseOrbitPlotter):
+class _PlotlyOrbitPlotter(BaseOrbitPlotter):
+    def __init__(self, figure=None):
+        super().__init__()
+
+        self._figure = figure or Figure()
+        self._layout = None
+
+    def _prepare_plot(self):
+        super()._prepare_plot()
+
+        self._figure.layout.update(self._layout)
+
+    def plot_trajectory(self, trajectory, *, label=None, color=None):
+        super().plot_trajectory(trajectory, label=label, color=color)
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
+    def plot(self, orbit, *, label=None, color=None):
+        super().plot(orbit, label=label, color=color)
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
+    def show(self):
+        """Shows the plot in the Notebook.
+
+        Updates the layout and returns the underlying figure.
+
+        """
+        self._prepare_plot()
+        return self._figure
+
+
+class OrbitPlotter3D(_PlotlyOrbitPlotter):
     """OrbitPlotter3D class.
 
     """
 
     def __init__(self, figure=None, dark=False):
         super().__init__(figure)
+
         self._layout = Layout(
             autosize=True,
             scene=dict(
@@ -91,7 +126,7 @@ class OrbitPlotter3D(BaseOrbitPlotter):
             return self.show()
 
 
-class OrbitPlotter2D(BaseOrbitPlotter):
+class OrbitPlotter2D(_PlotlyOrbitPlotter):
     """OrbitPlotter2D class.
 
     .. versionadded:: 0.9.0
@@ -99,6 +134,7 @@ class OrbitPlotter2D(BaseOrbitPlotter):
 
     def __init__(self, figure=None):
         super().__init__(figure)
+
         self._layout = Layout(
             autosize=True,
             xaxis=dict(title="x (km)", constrain="domain"),
