@@ -32,20 +32,51 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         self._figure.layout.update(self._layout)
 
-    def _get_colors(self, color):
+    def _get_colors(self, color, trail):
+        # TODO: Support trail
         if color is None:
             color = next(self._color_cycle)
 
         return [color]
 
-    def plot_trajectory(self, trajectory, *, label=None, color=None):
-        super().plot_trajectory(trajectory, label=label, color=color)
+    def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
+        """Plots a precomputed trajectory.
+
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        trajectory : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : string, optional
+            Label of the trajectory.
+        color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        super().plot_trajectory(trajectory, label=label, color=color, trail=trail)
 
         if not self._figure._in_batch_mode:
             return self.show()
 
-    def plot(self, orbit, *, label=None, color=None):
-        super().plot(orbit, label=label, color=color)
+    def plot(self, orbit, *, label=None, color=None, trail=False):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
+        label : string, optional
+            Label of the orbit.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        super().plot(orbit, label=label, color=color, trail=trail)
 
         if not self._figure._in_batch_mode:
             return self.show()
@@ -117,6 +148,9 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
+        """Changes 3D view.
+
+        """
         x = distance * np.cos(elev) * np.cos(azim)
         y = distance * np.cos(elev) * np.sin(azim)
         z = distance * np.sin(elev)
@@ -137,6 +171,26 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
         if not self._figure._in_batch_mode:
             return self.show()
+
+    def plot(self, orbit, *, label=None, color=None, trail=False):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
+        label : string, optional
+            Label of the orbit.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if trail:
+            raise NotImplementedError("trail not supported yet")
+
+        return super().plot(orbit, label=label, color=color, trail=trail)
 
 
 class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
@@ -232,7 +286,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         self._set_frame(p_vec, q_vec, w_vec)
 
-    def plot(self, orbit, *, label=None, color=None):
+    def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
 
         Parameters
@@ -243,9 +297,14 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             Label of the orbit.
         color : string, optional
             Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
+        if trail:
+            raise NotImplementedError("trail not supported yet")
+
         if not self._frame:
             self.set_frame(*orbit.pqw())
 
-        return super().plot(orbit, label=label, color=color)
+        return super().plot(orbit, label=label, color=color, trail=trail)

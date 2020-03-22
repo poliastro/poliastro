@@ -76,7 +76,7 @@ class BaseOrbitPlotter:
             self._attractor_radius, color, self._attractor.name,
         )
 
-    def _get_colors(self, color):
+    def _get_colors(self, color, trail):
         raise NotImplementedError
 
     def _plot_point(self, radius, color, name, center=None):
@@ -85,7 +85,7 @@ class BaseOrbitPlotter:
     def _plot_sphere(self, radius, color, name, center=None):
         raise NotImplementedError
 
-    def plot_trajectory(self, trajectory, *, label=None, color=None):
+    def plot_trajectory(self, trajectory, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
@@ -95,7 +95,11 @@ class BaseOrbitPlotter:
         trajectory : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
+            Label of the trajectory.
         color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
         if self._attractor is None:
@@ -104,7 +108,7 @@ class BaseOrbitPlotter:
                 "set_attractor(Major_Body) or plot(orbit)"
             )
 
-        colors = self._get_colors(color)
+        colors = self._get_colors(color, trail)
 
         trace, colors = self._plot_trajectory(trajectory, str(label), colors, False)
 
@@ -113,7 +117,7 @@ class BaseOrbitPlotter:
     def _plot_trajectory(self, trajectory, label, colors, dashed):
         raise NotImplementedError
 
-    def plot(self, orbit, *, label=None, color=None):
+    def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
 
         Parameters
@@ -124,18 +128,20 @@ class BaseOrbitPlotter:
             Label of the orbit.
         color : string, optional
             Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
-        colors = self._get_colors(color)
+        colors = self._get_colors(color, trail)
 
         self._set_attractor(orbit.attractor)
 
         label = generate_label(orbit, label)
-        trajectory = orbit.sample(self._num_points)
+        positions = orbit.sample(self._num_points)
 
-        trace, colors = self._plot_trajectory(trajectory, label, colors, True)
+        trace, colors = self._plot_trajectory(positions, label, colors, True)
 
-        self._trajectories.append(Trajectory(trajectory, orbit.r, label, colors[0]))
+        self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
 
         # Redraw the attractor now to compute the attractor radius
         self._redraw_attractor()
