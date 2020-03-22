@@ -44,13 +44,13 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         """
         super().__init__(num_points)
 
-        self.ax = ax
-        if not self.ax:
+        self._ax = ax
+        if not self._ax:
             if dark:
                 with plt.style.context("dark_background"):
-                    _, self.ax = plt.subplots(figsize=(6, 6))
+                    _, self._ax = plt.subplots(figsize=(6, 6))
             else:
-                _, self.ax = plt.subplots(figsize=(6, 6))
+                _, self._ax = plt.subplots(figsize=(6, 6))
 
         self._frame = None
 
@@ -71,7 +71,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
     def _get_colors(self, color, trail):
         if trail and color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319
-            color = next(self.ax._get_lines.prop_cycler)["color"]
+            color = next(self._ax._get_lines.prop_cycler)["color"]
 
         if trail:
             colors = [color, to_rgba(color, 0)]
@@ -81,14 +81,14 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         return colors
 
     def _redraw(self):
-        for artist in self.ax.lines + self.ax.collections:
+        for artist in self._ax.lines + self._ax.collections:
             artist.remove()
 
         for trajectory, state, label, colors in self._trajectories:
             self._plot(trajectory, state, label, colors)
 
-        self.ax.relim()
-        self.ax.autoscale()
+        self._ax.relim()
+        self._ax.autoscale()
 
     def _plot_trajectory(self, trajectory, label, colors, dashed):
         if dashed:
@@ -107,11 +107,11 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
             lc.set_array(np.linspace(1, 0, len(x)))
 
-            self.ax.add_collection(lc)
+            self._ax.add_collection(lc)
             lines = [lc]
 
         else:
-            lines = self.ax.plot(
+            lines = self._ax.plot(
                 x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
             )
             colors = [lines[0].get_color()]
@@ -151,7 +151,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         if label:
             lines[0].set_label(label)
-            self.ax.legend(
+            self._ax.legend(
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
 
@@ -164,7 +164,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             center[None]
         )  # Indexing trick to add one extra dimension
 
-        self.ax.add_patch(
+        self._ax.add_patch(
             mpl_patches.Circle(
                 (x_center.to(u.km).value, y_center.to(u.km).value),
                 radius.to(u.km).value,
@@ -174,7 +174,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         )
 
     def _clear_attractor(self):
-        for attractor in self.ax.findobj(match=mpl_patches.Circle):
+        for attractor in self._ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
     def _plot(self, trajectory, state=None, label=None, colors=None):
@@ -184,28 +184,28 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             x0, y0 = self._project(state[None])
 
             # Plot current position
-            (l,) = self.ax.plot(
+            (l,) = self._ax.plot(
                 x0.to(u.km).value, y0.to(u.km).value, "o", mew=0, color=colors[0]
             )
             lines.append(l)
 
         if label:
-            if not self.ax.get_legend():
-                size = self.ax.figure.get_size_inches() + [8, 0]
-                self.ax.figure.set_size_inches(size)
+            if not self._ax.get_legend():
+                size = self._ax.figure.get_size_inches() + [8, 0]
+                self._ax.figure.set_size_inches(size)
 
             # This will apply the label to either the point or the osculating
             # orbit depending on the last plotted line
             # NOTE: What about generating both labels,
             # indicating that one is the osculating orbit?
             lines[-1].set_label(label)
-            self.ax.legend(
+            self._ax.legend(
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
 
-        self.ax.set_xlabel("$x$ (km)")
-        self.ax.set_ylabel("$y$ (km)")
-        self.ax.set_aspect(1)
+        self._ax.set_xlabel("$x$ (km)")
+        self._ax.set_ylabel("$y$ (km)")
+        self._ax.set_aspect(1)
 
         return lines, colors
 
