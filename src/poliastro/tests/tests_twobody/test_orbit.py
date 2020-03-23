@@ -1074,6 +1074,22 @@ def test_orbit_change_attractor_open():
     assert "Leaving the SOI of the current attractor" in w.message.args[0]
 
 
+@pytest.mark.parametrize(
+    "expected_plane", [Planes.EARTH_ECLIPTIC, Planes.EARTH_EQUATOR]
+)
+def test_change_plane_sets_correct_plane(expected_plane):
+    new_ss = iss.change_plane(expected_plane)
+
+    assert new_ss.plane is expected_plane
+
+
+def test_change_plane_twice_restores_original_data():
+    new_ss = iss.change_plane(Planes.EARTH_ECLIPTIC).change_plane(iss.plane)
+
+    assert_quantity_allclose(new_ss.r, iss.r)
+    assert_quantity_allclose(new_ss.v, iss.v)
+
+
 def test_time_to_anomaly():
     expected_tof = iss.period / 2
     iss_180 = iss.propagate_to_anomaly(180 * u.deg)

@@ -511,6 +511,26 @@ class Orbit:
 
         return ss
 
+    def change_plane(self, plane):
+        """Changes fundamental plane.
+
+        Parameters
+        ----------
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
+
+        """
+        coords_orig = self.get_frame().realize_frame(
+            self.represent_as(CartesianRepresentation, CartesianDifferential)
+        )
+
+        dest_frame = get_frame(self.attractor, plane, obstime=self.epoch)
+
+        coords_dest = coords_orig.transform_to(dest_frame)
+        coords_dest.representation_type = CartesianRepresentation
+
+        return Orbit.from_coords(self.attractor, coords_dest, plane=plane)
+
     @classmethod
     def from_horizons(
         cls,
