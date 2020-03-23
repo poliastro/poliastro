@@ -92,22 +92,11 @@ If you face any further issues, you can refer to the `installation guide by Plot
 
 .. _`installation guide by Plotly`: https://github.com/plotly/plotly.py/blob/master/README.md#jupyterlab-support-python-35
 
-Testing
--------
+Problems and suggestions
+------------------------
 
-If you want to test poliastro after installing it, you should also install
-pytest with either ``conda install pytest`` or ``pip install pytest``. Then
-you can run the tests to verify everything is working::
-
-  $ python -c "import poliastro.testing; poliastro.testing.test()"
-  ===================================== test session starts =====================================
-  platform linux -- Python 3.7.1, pytest-4.2.0, py-1.7.0, pluggy-0.8.1
-  rootdir: /home/juanlu/.miniconda36/envs/_test37/lib/python3.7/site-packages/poliastro, inifile:
-  collected 747 items
-  [...]
-  ========= 738 passed, 3 skipped, 5 xfailed, 1 xpassed, 13 warnings in 392.12 seconds ==========
-  $
-
-If for some reason any test fails, please report it with details of your environment in the `issue tracker`_.
+If for any reason you get an unexpected error message or an incorrect result,
+or you want to let the developers know about your use case,
+please open a new issue in the `issue tracker`_ and we will try to answer promptly.
 
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
