@@ -15,7 +15,7 @@ class Trajectory(namedtuple("Trajectory", ["positions", "state", "label", "color
 
 class BaseOrbitPlotter:
     """
-    Parent Class for the 2D and 3D OrbitPlotter Classes based on Plotly.
+    Base class for all the OrbitPlotter classes.
     """
 
     def __init__(self, num_points=150):
