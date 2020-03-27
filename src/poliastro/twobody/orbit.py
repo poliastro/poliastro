@@ -31,7 +31,7 @@ from poliastro.util import (
     norm,
 )
 
-from ..ephem import get_mean_elements
+from ..mean_elements import get_mean_elements
 from .states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 try:
