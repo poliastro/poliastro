@@ -3,8 +3,10 @@ from astropy import units as u
 from astropy.coordinates import (
     GCRS,
     ICRS,
+    CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric,
+    get_body_barycentric_posvel,
 )
 from astropy.time import Time
 from scipy.interpolate import interp1d
@@ -50,3 +52,33 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
 
     t_values = ((t_values - t_span[0]) * u.day).to(u.s).value
     return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
+
+
+class Ephem:
+    def __init__(self, coordinates, epochs):
+        self._epochs = epochs
+        self._coordinates = coordinates
+
+    @property
+    def epochs(self):
+        return self._epochs
+
+    @classmethod
+    def from_body(cls, body, epochs):
+        """Return `Ephem` from a body ephemerides at certain epochs.
+
+        Parameters
+        ----------
+        body: ~poliastro.bodies.Body
+            Body.
+        epochs: ~astropy.time.Time
+            Epochs to sample the body positions.
+
+        """
+        r, v = get_body_barycentric_posvel(body.name, epochs)
+        coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
+
+        return cls(coordinates, epochs)
+
+    def sample(self):
+        return self._coordinates
