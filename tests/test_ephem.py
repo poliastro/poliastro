@@ -7,6 +7,17 @@ from poliastro.bodies import Earth
 from poliastro.ephem import Ephem
 
 
+def assert_coordinates_allclose(actual, desired, *args, **kwargs):
+    assert_quantity_allclose(actual.xyz, desired.xyz, *args, **kwargs)
+    if "s" in desired.differentials:
+        assert_quantity_allclose(
+            actual.differentials["s"].d_xyz,
+            desired.differentials["s"].d_xyz,
+            *args,
+            **kwargs,
+        )
+
+
 def test_ephem_from_body_has_expected_properties():
     epochs = Time(
         ["2020-03-01 12:00:00", "2020-03-17 00:00:00.000", "2020-04-01 12:00:00.000"],
@@ -35,8 +46,4 @@ def test_ephem_from_body_has_expected_properties():
     coordinates = earth.sample()
 
     assert earth.epochs is epochs
-    assert_quantity_allclose(coordinates.xyz, expected_coordinates.xyz)
-    assert_quantity_allclose(
-        coordinates.differentials["s"].d_xyz,
-        expected_coordinates.differentials["s"].d_xyz,
-    )
+    assert_coordinates_allclose(coordinates, expected_coordinates)
