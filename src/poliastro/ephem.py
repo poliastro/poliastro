@@ -55,18 +55,16 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
 
 
 def _interpolate(epochs, reference_epochs, coordinates):
-    # TODO: Use some normalized unit?
-    interpolant_xyz = interp1d(
-        reference_epochs.jd, coordinates.xyz.to(u.km).value, kind="cubic"
-    )
+    xyz_unit = coordinates.xyz.unit
+    d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
+
+    interpolant_xyz = interp1d(reference_epochs.jd, coordinates.xyz.value, kind="cubic")
     interpolant_d_xyz = interp1d(
-        reference_epochs.jd,
-        coordinates.differentials["s"].d_xyz.to(u.km / u.s),
-        kind="cubic",
+        reference_epochs.jd, coordinates.differentials["s"].d_xyz.value, kind="cubic",
     )
 
-    result_xyz = interpolant_xyz(epochs.jd) * u.km
-    result_d_xyz = interpolant_d_xyz(epochs.jd) * (u.km / u.s)
+    result_xyz = interpolant_xyz(epochs.jd) * xyz_unit
+    result_d_xyz = interpolant_d_xyz(epochs.jd) * d_xyz_unit
 
     return CartesianRepresentation(
         result_xyz, differentials=CartesianDifferential(result_d_xyz)
