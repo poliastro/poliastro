@@ -8,13 +8,20 @@ from poliastro.bodies import Earth
 from poliastro.ephem import Ephem
 
 
-def assert_coordinates_allclose(actual, desired, *args, **kwargs):
-    assert_quantity_allclose(actual.xyz, desired.xyz, *args, **kwargs)
+
+def assert_coordinates_allclose(actual, desired, rtol=1e-7, atol_scale=None, **kwargs):
+    if atol_scale is None:
+        atol_scale = 0
+
+    assert_quantity_allclose(
+        actual.xyz, desired.xyz, rtol, atol=atol_scale * desired.xyz.unit, **kwargs
+    )
     if "s" in desired.differentials:
         assert_quantity_allclose(
             actual.differentials["s"].d_xyz,
             desired.differentials["s"].d_xyz,
-            *args,
+            rtol=rtol,
+            atol=atol_scale * desired.differentials["s"].d_xyz.unit,
             **kwargs,
         )
 
