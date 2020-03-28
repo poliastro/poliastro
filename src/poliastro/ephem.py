@@ -54,13 +54,13 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
     return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
 
 
-def _interpolate(epochs, reference_epochs, coordinates):
+def _interpolate(epochs, reference_epochs, coordinates, *, kind="cubic"):
     xyz_unit = coordinates.xyz.unit
     d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
-    interpolant_xyz = interp1d(reference_epochs.jd, coordinates.xyz.value, kind="cubic")
+    interpolant_xyz = interp1d(reference_epochs.jd, coordinates.xyz.value, kind=kind)
     interpolant_d_xyz = interp1d(
-        reference_epochs.jd, coordinates.differentials["s"].d_xyz.value, kind="cubic",
+        reference_epochs.jd, coordinates.differentials["s"].d_xyz.value, kind=kind,
     )
 
     result_xyz = interpolant_xyz(epochs.jd) * xyz_unit
@@ -97,10 +97,10 @@ class Ephem:
 
         return cls(coordinates, epochs)
 
-    def sample(self, epochs=None):
+    def sample(self, epochs=None, **kwargs):
         if epochs is None:
             return self._coordinates
 
         # TODO: Avoid building interpolant every time?
         # Does it have a performance impact?
-        return _interpolate(epochs, self.epochs, self._coordinates)
+        return _interpolate(epochs, self.epochs, self._coordinates, **kwargs)
