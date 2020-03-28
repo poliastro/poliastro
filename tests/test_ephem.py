@@ -5,8 +5,9 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
 from poliastro.bodies import Earth
-from poliastro.ephem import Ephem
+from poliastro.ephem import Ephem, InterpolationMethods
 
+AVAILABLE_INTERPOLATION_METHODS = InterpolationMethods.__members__.values()
 
 
 def assert_coordinates_allclose(actual, desired, rtol=1e-7, atol_scale=None, **kwargs):
@@ -45,40 +46,49 @@ def coordinates():
         [(1, 0, 0), (0.9, 0.1, 0), (0.8, 0.2, 0), (0.7, 0.3, 0)] * u.au,
         xyz_axis=1,
         differentials=CartesianDifferential(
-            [(0, 1, 0), (-0.1, 0.9, 0), (-0.2, 0.8, 0), (-0.3, 0.7, 0)] * (u.au / u.day),
+            [(0, 1, 0), (-0.1, 0.9, 0), (-0.2, 0.8, 0), (-0.3, 0.7, 0)]
+            * (u.au / u.day),
             xyz_axis=1,
         ),
     )
 
 
-def test_ephem_sample_no_arguments_returns_exactly_same_input(epochs, coordinates):
+@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+def test_ephem_sample_no_arguments_returns_exactly_same_input(
+    epochs, coordinates, method
+):
     ephem = Ephem(coordinates, epochs)
 
-    result_coordinates = ephem.sample()
+    result_coordinates = ephem.sample(method=method)
 
     # Exactly the same
     assert result_coordinates == coordinates
 
 
-def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates):
+@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method):
     ephem = Ephem(coordinates, epochs)
 
-    result_coordinates = ephem.sample(epochs)
+    result_coordinates = ephem.sample(epochs, method=method)
 
     # TODO: Should it return exactly the same?
-    assert_coordinates_allclose(result_coordinates, coordinates)
+    assert_coordinates_allclose(result_coordinates, coordinates, atol_scale=1e-17)
 
 
-def test_ephem_sample_existing_epochs_returns_corresponding_input(epochs, coordinates):
+@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+def test_ephem_sample_existing_epochs_returns_corresponding_input(
+    epochs, coordinates, method
+):
     ephem = Ephem(coordinates, epochs)
 
-    result_coordinates = ephem.sample(epochs[::2])
+    result_coordinates = ephem.sample(epochs[::2], method=method)
 
     # Exactly the same
-    assert_coordinates_allclose(result_coordinates, coordinates[::2])
+    assert_coordinates_allclose(result_coordinates, coordinates[::2], atol_scale=1e-17)
 
 
-def test_ephem_from_body_has_expected_properties():
+@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+def test_ephem_from_body_has_expected_properties(method):
     epochs = Time(
         ["2020-03-01 12:00:00", "2020-03-17 00:00:00.000", "2020-04-01 12:00:00.000"],
         scale="tdb",
@@ -103,7 +113,7 @@ def test_ephem_from_body_has_expected_properties():
     )
 
     earth = Ephem.from_body(Earth, epochs)
-    coordinates = earth.sample()
+    coordinates = earth.sample(method=method)
 
     assert earth.epochs is epochs
     assert_coordinates_allclose(coordinates, expected_coordinates)

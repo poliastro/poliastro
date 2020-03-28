@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import (
@@ -10,6 +12,11 @@ from astropy.coordinates import (
 )
 from astropy.time import Time
 from scipy.interpolate import interp1d
+
+
+class InterpolationMethods(Enum):
+    SINC = auto()
+    SPLINES = auto()
 
 
 def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
@@ -54,7 +61,7 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
     return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
 
 
-def _interpolate(epochs, reference_epochs, coordinates, *, kind="cubic"):
+def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic"):
     xyz_unit = coordinates.xyz.unit
     d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
@@ -71,6 +78,49 @@ def _interpolate(epochs, reference_epochs, coordinates, *, kind="cubic"):
     return CartesianRepresentation(
         result_xyz, differentials=CartesianDifferential(result_d_xyz)
     )
+
+
+def _interpolate_sinc(epochs, reference_epochs, coordinates):
+    def _interp_1d(arr):
+        return _sinc_interp(arr, reference_epochs.jd, epochs.jd)
+
+    xyz_unit = coordinates.xyz.unit
+    d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
+
+    x = _interp_1d(coordinates.x.value) * xyz_unit
+    y = _interp_1d(coordinates.y.value) * xyz_unit
+    z = _interp_1d(coordinates.z.value) * xyz_unit
+
+    d_x = _interp_1d(coordinates.differentials["s"].d_x.value) * d_xyz_unit
+    d_y = _interp_1d(coordinates.differentials["s"].d_y.value) * d_xyz_unit
+    d_z = _interp_1d(coordinates.differentials["s"].d_z.value) * d_xyz_unit
+
+    return CartesianRepresentation(
+        x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
+    )
+
+
+# Taken from https://gist.github.com/endolith/1297227
+def _sinc_interp(x, s, u):
+    """Interpolates x, sampled at "s" instants, at "u" instants.
+
+    """
+    if len(x) != len(s):
+        raise ValueError("x and s must be the same length")
+
+    # Find the period and assume it's constant
+    T = s[1] - s[0]
+
+    sincM = np.tile(u, (len(s), 1)) - np.tile(s[:, np.newaxis], (1, len(u)))
+    y = np.dot(x, np.sinc(sincM / T))
+
+    return y
+
+
+_INTERPOLATION_MAPPING = {
+    InterpolationMethods.SINC: _interpolate_sinc,
+    InterpolationMethods.SPLINES: _interpolate_splines,
+}
 
 
 class Ephem:
@@ -99,8 +149,13 @@ class Ephem:
 
         return cls(coordinates, epochs)
 
-    def sample(self, epochs=None, **kwargs):
+    def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):
         if epochs is None:
             return self._coordinates
 
-        return _interpolate(epochs, self.epochs, self._coordinates, **kwargs)
+        # TODO: Proper type annotation
+        coordinates = _INTERPOLATION_MAPPING[method](
+            epochs, self.epochs, self._coordinates, **kwargs
+        )  # type: ignore
+
+        return coordinates
