@@ -54,6 +54,25 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
     return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
 
 
+def _interpolate(epochs, reference_epochs, coordinates):
+    # TODO: Use some normalized unit?
+    interpolant_xyz = interp1d(
+        reference_epochs.jd, coordinates.xyz.to(u.km).value, kind="cubic"
+    )
+    interpolant_d_xyz = interp1d(
+        reference_epochs.jd,
+        coordinates.differentials["s"].d_xyz.to(u.km / u.s),
+        kind="cubic",
+    )
+
+    result_xyz = interpolant_xyz(epochs.jd) * u.km
+    result_d_xyz = interpolant_d_xyz(epochs.jd) * (u.km / u.s)
+
+    return CartesianRepresentation(
+        result_xyz, differentials=CartesianDifferential(result_d_xyz)
+    )
+
+
 class Ephem:
     def __init__(self, coordinates, epochs):
         self._epochs = epochs
@@ -80,5 +99,10 @@ class Ephem:
 
         return cls(coordinates, epochs)
 
-    def sample(self):
-        return self._coordinates
+    def sample(self, epochs=None):
+        if epochs is None:
+            return self._coordinates
+
+        # TODO: Avoid building interpolant every time?
+        # Does it have a performance impact?
+        return _interpolate(epochs, self.epochs, self._coordinates)

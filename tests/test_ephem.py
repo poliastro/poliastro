@@ -1,3 +1,4 @@
+import pytest
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
@@ -16,6 +17,58 @@ def assert_coordinates_allclose(actual, desired, *args, **kwargs):
             *args,
             **kwargs,
         )
+
+
+@pytest.fixture
+def epochs():
+    return Time(
+        [
+            "2020-03-01 12:00:00",
+            "2020-03-02 12:00:00",
+            "2020-03-03 12:00:00",
+            "2020-03-04 12:00:00",
+        ],
+        scale="tdb",
+    )
+
+
+@pytest.fixture
+def coordinates():
+    return CartesianRepresentation(
+        [(1, 0, 0), (0.9, 0.1, 0), (0.8, 0.2, 0), (0.7, 0.3, 0)] * u.au,
+        xyz_axis=1,
+        differentials=CartesianDifferential(
+            [(0, 1, 0), (-0.1, 0.9, 0), (-0.2, 0.8, 0), (-0.3, 0.7, 0)] * (u.au / u.day),
+            xyz_axis=1,
+        ),
+    )
+
+
+def test_ephem_sample_no_arguments_returns_exactly_same_input(epochs, coordinates):
+    ephem = Ephem(coordinates, epochs)
+
+    result_coordinates = ephem.sample()
+
+    # Exactly the same
+    assert result_coordinates == coordinates
+
+
+def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates):
+    ephem = Ephem(coordinates, epochs)
+
+    result_coordinates = ephem.sample(epochs)
+
+    # TODO: Should it return exactly the same?
+    assert_coordinates_allclose(result_coordinates, coordinates)
+
+
+def test_ephem_sample_existing_epochs_returns_corresponding_input(epochs, coordinates):
+    ephem = Ephem(coordinates, epochs)
+
+    result_coordinates = ephem.sample(epochs[::2])
+
+    # Exactly the same
+    assert_coordinates_allclose(result_coordinates, coordinates[::2])
 
 
 def test_ephem_from_body_has_expected_properties():
