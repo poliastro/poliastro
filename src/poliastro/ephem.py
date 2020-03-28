@@ -11,7 +11,10 @@ from astropy.coordinates import (
     get_body_barycentric_posvel,
 )
 from astropy.time import Time
+from astroquery.jplhorizons import Horizons
 from scipy.interpolate import interp1d
+
+from .frames import Planes
 
 
 class InterpolationMethods(Enum):
@@ -147,6 +150,70 @@ class Ephem:
         r, v = get_body_barycentric_posvel(body.name, epochs)
         coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
 
+        return cls(coordinates, epochs)
+
+    @classmethod
+    def from_horizons(
+        cls,
+        name,
+        attractor,
+        epochs=None,
+        plane=Planes.EARTH_EQUATOR,
+        id_type="smallbody",
+    ):
+        """Return `Ephem` for an object using JPLHorizons module of Astroquery.
+
+        Parameters
+        ----------
+        name : string
+            Name of the body to query for.
+        attractor : ~poliastro.bodies.SolarSystemBody
+            Body to use as central location.
+        epochs : ~astropy.time.Time, optional
+            Epochs to sample the ephemerides, default to now.
+        plane : ~poliastro.frames.Planes, optional
+            Fundamental plane of the frame, default to Earth Equator.
+        id_type : string, optional
+            Use "smallbody" for Asteroids and Comets (default), and "majorbody"
+            for Planets and Satellites.
+
+        """
+        if epochs is None:
+            epochs = Time.now()
+
+        refplanes_dict = {
+            Planes.EARTH_EQUATOR: "earth",
+            Planes.EARTH_ECLIPTIC: "ecliptic",
+        }
+        refplane = refplanes_dict[plane]
+
+        bodies_dict = {
+            "sun": 10,
+            "mercury": 199,
+            "venus": 299,
+            "earth": 399,
+            "mars": 499,
+            "jupiter": 599,
+            "saturn": 699,
+            "uranus": 799,
+            "neptune": 899,
+        }
+        location = "500@{}".format(bodies_dict[attractor.name.lower()])
+
+        obj = Horizons(
+            id=name, location=location, epochs=epochs.jd, id_type=id_type
+        ).vectors(refplane=refplane)
+
+        x = obj["x"]
+        y = obj["y"]
+        z = obj["z"]
+        d_x = obj["vx"]
+        d_y = obj["vy"]
+        d_z = obj["vz"]
+
+        coordinates = CartesianRepresentation(
+            x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
+        )
         return cls(coordinates, epochs)
 
     def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):

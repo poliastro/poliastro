@@ -1,11 +1,14 @@
+from unittest import mock
+
 import pytest
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
-from poliastro.bodies import Earth
+from poliastro.bodies import Earth, Venus
 from poliastro.ephem import Ephem, InterpolationMethods
+from poliastro.frames import Planes
 
 AVAILABLE_INTERPOLATION_METHODS = InterpolationMethods.__members__.values()
 
@@ -116,4 +119,43 @@ def test_ephem_from_body_has_expected_properties(method):
     coordinates = earth.sample(method=method)
 
     assert earth.epochs is epochs
+    assert_coordinates_allclose(coordinates, expected_coordinates)
+
+
+@mock.patch("poliastro.ephem.Horizons")
+@pytest.mark.parametrize("body,location_str", [(Earth, "500@399"), (Venus, "500@299")])
+@pytest.mark.parametrize(
+    "plane,refplane_str",
+    [(Planes.EARTH_EQUATOR, "earth"), (Planes.EARTH_ECLIPTIC, "ecliptic")],
+)
+def test_ephem_from_horizons_calls_horizons_with_correct_parameters(
+    horizons_mock, body, location_str, plane, refplane_str
+):
+    unused_name = "Strange Object"
+    unused_id_type = "id_type"
+    epochs = Time(["2020-03-01 12:00:00"], scale="tdb")
+
+    horizons_mock().vectors.return_value = {
+        "x": [1] * u.au,
+        "y": [0] * u.au,
+        "z": [0] * u.au,
+        "vx": [0] * (u.au / u.day),
+        "vy": [1] * (u.au / u.day),
+        "vz": [0] * (u.au / u.day),
+    }
+    expected_coordinates = CartesianRepresentation(
+        [(1, 0, 0)] * u.au,
+        xyz_axis=1,
+        differentials=CartesianDifferential([(0, 1, 0)] * (u.au / u.day), xyz_axis=1),
+    )
+
+    ephem = Ephem.from_horizons(unused_name, body, epochs, plane, unused_id_type)
+
+    horizons_mock.assert_called_with(
+        id=unused_name, location=location_str, epochs=epochs.jd, id_type=unused_id_type
+    )
+    horizons_mock().vectors.assert_called_once_with(refplane=refplane_str)
+
+    coordinates = ephem.sample()
+
     assert_coordinates_allclose(coordinates, expected_coordinates)
