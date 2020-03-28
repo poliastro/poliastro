@@ -58,6 +58,8 @@ def _interpolate(epochs, reference_epochs, coordinates, *, kind="cubic"):
     xyz_unit = coordinates.xyz.unit
     d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
+    # TODO: Avoid building interpolant every time?
+    # Does it have a performance impact?
     interpolant_xyz = interp1d(reference_epochs.jd, coordinates.xyz.value, kind=kind)
     interpolant_d_xyz = interp1d(
         reference_epochs.jd, coordinates.differentials["s"].d_xyz.value, kind=kind,
@@ -101,6 +103,4 @@ class Ephem:
         if epochs is None:
             return self._coordinates
 
-        # TODO: Avoid building interpolant every time?
-        # Does it have a performance impact?
         return _interpolate(epochs, self.epochs, self._coordinates, **kwargs)
