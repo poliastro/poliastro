@@ -23,6 +23,9 @@
 .. |codeclimate| image:: https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability
    :target: https://codeclimate.com/github/poliastro/poliastro/maintainability
 
+.. |binder| image:: https://mybinder.org/badge_logo.svg
+    :target: https://mybinder.org/v2/gh/poliastro/poliastro/master
+
 .. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
    :target: https://docs.poliastro.space/en/latest/?badge=latest
 
@@ -42,7 +45,7 @@
    :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
    :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 
-|azure_pipelines| |codecov| |codeclimate|
+|azure_pipelines| |codecov| |codeclimate| |binder|
 
 |docs| |license| |doi| |astropy| |mailing| |matrix|
 
