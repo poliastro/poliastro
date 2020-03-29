@@ -6,18 +6,6 @@ from astropy import units as u
 from astropy.time import Time
 from numpy.linalg import norm as norm_np
 
-from poliastro.core.util import circular_velocity as circular_velocity_fast
-
-u.kms = u.km / u.s
-u.km3s2 = u.km ** 3 / u.s ** 2
-
-
-def circular_velocity(k, a):
-    """Compute circular velocity for a given body (k) and semimajor axis (a).
-
-    """
-    return circular_velocity_fast(k.to(u.km3s2).value, a.to(u.km).value) * u.kms
-
 
 def norm(vec):
     """Norm of a Quantity vector that respects units.
