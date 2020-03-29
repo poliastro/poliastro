@@ -22,16 +22,15 @@ from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
 from poliastro.twobody.propagation import mean_motion, propagate
-from poliastro.util import (
-    find_closest_value,
+
+from ..mean_elements import get_mean_elements
+from ..util import find_closest_value, norm
+from .elements import (
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
     get_inclination_critical_argp,
     hyp_nu_limit,
-    norm,
 )
-
-from ..mean_elements import get_mean_elements
 from .states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 try:
@@ -926,7 +925,6 @@ class Orbit:
 
             6. if it's not possible to create an orbit with the the argp and the inclination given, both of them are set to the critical values and the eccentricity is calculate with the last formula
 
-
         Parameters
         ----------
         attractor : Body
@@ -947,6 +945,7 @@ class Orbit:
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
+
         """
         if attractor.J2 == 0.0 or attractor.J3 == 0.0:
             raise AttributeError(
@@ -970,11 +969,17 @@ class Orbit:
             if np.isclose(argp, critical_argp, 1e-8, 1e-5 * u.rad):
                 if inc is None and ecc is None:
                     inc = critical_inclinations[0]
-                    ecc = get_eccentricity_critical_argp(attractor, a, inc)
+                    ecc = get_eccentricity_critical_argp(
+                        attractor.R, attractor.J2, attractor.J3, a, inc
+                    )
                 elif ecc is None:
-                    ecc = get_eccentricity_critical_argp(attractor, a, inc)
+                    ecc = get_eccentricity_critical_argp(
+                        attractor.R, attractor.J2, attractor.J3, a, inc
+                    )
                 else:
-                    inc = get_inclination_critical_argp(attractor, a, ecc)
+                    inc = get_inclination_critical_argp(
+                        attractor.R, attractor.J2, attractor.J3, a, ecc
+                    )
                 return cls.from_classical(
                     attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
                 )
@@ -989,7 +994,9 @@ class Orbit:
 
             argp = critical_argps[0]
             inc = critical_inclinations[0]
-            ecc = get_eccentricity_critical_argp(attractor, a, inc)
+            ecc = get_eccentricity_critical_argp(
+                attractor.R, attractor.J2, attractor.J3, a, inc
+            )
 
             return cls.from_classical(
                 attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
