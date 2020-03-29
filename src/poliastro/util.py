@@ -56,13 +56,14 @@ def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=
 
 @u.quantity_input(value=u.rad, values=u.rad)
 def find_closest_value(value, values):
-    """Calculates the closest value in the given values
+    """Calculates the closest value in the given values.
+
     Parameters
     ----------
     value : ~astropy.units.Quantity
-
+        Reference value.
     values : ~astropy.units.Quantity
-
+        Values to search from.
 
     """
     index = np.abs(np.asarray(values) * u.rad - value).argmin()
