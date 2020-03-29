@@ -184,12 +184,12 @@ class Orbit:
     @cached_property
     def period(self):
         """Period of the orbit. """
-        return 2 * np.pi * u.rad / self.n
+        return self._state.period
 
     @cached_property
     def n(self):
         """Mean motion. """
-        return (np.sqrt(self.attractor.k / abs(self.a ** 3)) * u.rad).decompose()
+        return self._state.n
 
     @cached_property
     def energy(self):

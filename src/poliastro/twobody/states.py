@@ -1,6 +1,7 @@
 from astropy import units as u
 
-from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
+from ..core.elements import coe2mee, coe2rv, mee2coe, rv2coe
+from .elements import mean_motion, period
 
 
 class BaseState:
@@ -31,6 +32,16 @@ class BaseState:
     def attractor(self):
         """Main attractor. """
         return self._attractor
+
+    @property
+    def n(self):
+        """Mean motion. """
+        return mean_motion(self.attractor.k, self.to_classical().a)
+
+    @property
+    def period(self):
+        """Period of the orbit. """
+        return period(self.attractor.k, self.to_classical().a)
 
     def to_vectors(self):
         """Converts to position and velocity vector representation.
