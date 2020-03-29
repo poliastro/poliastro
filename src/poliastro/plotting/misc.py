@@ -1,5 +1,7 @@
 from typing import Union
 
+from astropy.time import Time
+
 from poliastro.bodies import (
     Earth,
     Jupiter,
@@ -26,23 +28,23 @@ def _plot_bodies(orbit_plotter, outer=True, epoch=None):
         orbit_plotter.plot(orb, label=str(body))
 
 
-def _plot_solar_system_2d(outer=True, epoch=None, interactive=False):
+def _plot_solar_system_2d(epoch, outer=True, interactive=False):
     pqw = Orbit.from_body_ephem(Earth, epoch).pqw()
     if interactive:
         orbit_plotter = (
             OrbitPlotter2D()
         )  # type: Union[OrbitPlotter2D, StaticOrbitPlotter]
-        orbit_plotter.set_frame(*pqw)
     else:
         orbit_plotter = StaticOrbitPlotter()
-        orbit_plotter.set_frame(*pqw)
+
+    orbit_plotter.set_frame(*pqw)
 
     _plot_bodies(orbit_plotter, outer, epoch)
 
     return orbit_plotter
 
 
-def _plot_solar_system_3d(outer=True, epoch=None):
+def _plot_solar_system_3d(epoch, outer=True):
     orbit_plotter = OrbitPlotter3D()
 
     _plot_bodies(orbit_plotter, outer, epoch)
@@ -69,13 +71,16 @@ def plot_solar_system(outer=True, epoch=None, use_3d=False, interactive=False):
         This option requires Plotly properly installed and configured for your environment.
 
     """
+    if epoch is None:
+        epoch = Time.now().tdb
+
     if not interactive and use_3d:
         raise ValueError(
             "The static plotter does not support 3D, use `interactive=True`"
         )
     elif use_3d:
-        op = _plot_solar_system_3d(outer, epoch)
+        op = _plot_solar_system_3d(epoch, outer)
     else:
-        op = _plot_solar_system_2d(outer, epoch, interactive)
+        op = _plot_solar_system_2d(epoch, outer, interactive)
 
     return op
