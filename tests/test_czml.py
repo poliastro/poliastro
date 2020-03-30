@@ -10,10 +10,28 @@ from poliastro.examples import iss, molniya
 
 try:
     from poliastro.czml.extract_czml import CZMLExtractor
-
     import czml3
+    from czml3.core import Document
 except ImportError:
     pass
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_get_document():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+
+    pr_map_url = (
+        "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+    )
+    scene = False
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+    expected_doc = Document(extractor.packets)
+
+    doc = extractor.get_document()
+    assert repr(doc) == repr(expected_doc)
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
@@ -55,7 +73,6 @@ def test_czml_custom_packet():
     )
 
     pckt = extractor.packets[-1]
-
     # Test that custom packet parameters where set correctly
     assert repr(pckt) == expected_packet
 
