@@ -29,21 +29,21 @@ jobs:
         env:
           - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
-      
+
       - linux: py36
         name: py36_test
         env:
           - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
-      
+
       - linux: py37
         name: py37_test
         env:
           - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
-      
-      - linux: py38
-        name: py38_test
+
+      - linux: py38-fast
+        name: py38_fast_test
         env:
           - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
