@@ -26,53 +26,52 @@ jobs:
       - linux: check
         name : quality
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
       
       - linux: py36
         name: py36_test
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
       
       - linux: py37
         name: py37_test
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
       
       - linux: py38
         name: py38_test
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
 
       - linux: py38-online
         name: py38_online_test
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
 
       - linux: py38-slow
         name: py38_slow
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
 
       - linux: py38-images
         name: py38_images
         env:
-          - FLIT_ROOT_INSTALL: 1 
-          - MPLBACKEND: Agg      
+          - FLIT_ROOT_INSTALL: 1
+          - MPLBACKEND: Agg
 
       - linux: py38-coverage
         name: coverage
         coverage: codecov
         posargs: --cov-report=term-missing
         env:
-          - FLIT_ROOT_INSTALL: 1 
-          - MPLBACKEND: Agg 
-          - NUMBA_DISABLE_JIT: 1
+          - FLIT_ROOT_INSTALL: 1
+          - MPLBACKEND: Agg
 
       - linux: docs
         name: docs_test
@@ -80,11 +79,11 @@ jobs:
       - windows: py38
         name: py38_test_windows
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
 
       - macos: py38
         name: py38_test_macos
         env:
-          - FLIT_ROOT_INSTALL: 1 
+          - FLIT_ROOT_INSTALL: 1
           - MPLBACKEND: Agg
