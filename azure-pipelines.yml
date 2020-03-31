@@ -54,6 +54,15 @@ jobs:
 
       - linux: docs
         name: docs_test
+        libraries:
+          apt:
+            - pandoc
+            - texlive
+            - texlive-latex-extra
+            - texlive-fonts-recommended
+            - dvipng
+            - graphviz
+            - cm-super-minimal
 
       - windows: py38
         name: py38_test_windows
