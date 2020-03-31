@@ -22,6 +22,7 @@ jobs:
     env:
       - PIP_PREFER_BINARY: true
       - PIP_PROGRESS_BAR: "off"
+    posargs: '-vv'
     envs:
       - linux: check
         name : quality
