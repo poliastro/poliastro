@@ -1,15 +1,15 @@
-import pytest  # noqa: E402 isort:skip
 import sys
 
-from astropy import units as u  # noqa: E402
+import pytest
+from astropy import units as u
 
 from poliastro.bodies import Mars
-from poliastro.examples import iss, molniya  # noqa: E402
+from poliastro.examples import iss, molniya
 
 try:
-    from poliastro.czml.extract_czml import CZMLExtractor  # noqa: E402
+    from poliastro.czml.extract_czml import CZMLExtractor
 
-    import czml3  # noqa: F401
+    import czml3
 except ImportError:
     pass
 
