@@ -707,6 +707,12 @@ def test_heliosynchronous_orbit_enough_arguments():
     )
 
 
+def test_heliosynchronous_orbit_without_earth():
+    with pytest.raises(NotImplementedError) as excinfo:
+        Orbit.heliosynchronous(Mars, a=800 * u.km + Mars.R, ecc=0 * u.one)
+    assert "Attractors other than Earth not supported yet" in excinfo.exconly()
+
+
 def test_heliosynchronous_orbit_inc():
     # Vallado, example 11-2a
     expected_ecc = 0 * u.one
@@ -971,7 +977,6 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
     "target_name", ["Ceres", "Vesta", "Eros"]
 )  # Objects in both JPL SBDB and JPL Horizons
 def test_from_sbdb_and_from_horizons_give_similar_results(target_name):
-
     ss_target = Orbit.from_sbdb(target_name)
     ss_classical = ss_target.classical()
 
