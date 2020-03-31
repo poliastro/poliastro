@@ -1,7 +1,9 @@
 import sys
 
+# TODO: Should we have way to handle this configuration without importing numba?
 import pytest
 from astropy import units as u
+from numba import config as numba_config
 
 from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya
@@ -60,8 +62,8 @@ def test_czml_custom_packet():
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 @pytest.mark.xfail(
-    sys.platform.lower().startswith("win"),
-    reason="marginally different orbital positions calculated on windows",
+    sys.platform.lower().startswith("win") or numba_config.DISABLE_JIT != 0,
+    reason="marginally different orbital positions calculated on windows or without numba",
 )
 def test_czml_add_orbit():
     start_epoch = iss.epoch
