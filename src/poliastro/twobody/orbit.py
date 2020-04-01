@@ -406,6 +406,7 @@ class Orbit:
             "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
             "see https://github.com/poliastro/poliastro/issues/445 for discussion.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
         if not epoch:
@@ -416,6 +417,7 @@ class Orbit:
                 "Input time was converted to scale='tdb' with value "
                 f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
                 TimeScaleWarning,
+                stacklevel=2,
             )
         try:
             r, v = get_body_barycentric_posvel(body.name, epoch)
@@ -500,7 +502,11 @@ class Orbit:
         elif self.ecc < 1.0 and not force:
             raise ValueError("Orbit will never leave the SOI of its current attractor")
         else:
-            warn("Leaving the SOI of the current attractor", PatchedConicsWarning)
+            warn(
+                "Leaving the SOI of the current attractor",
+                PatchedConicsWarning,
+                stacklevel=2,
+            )
 
         new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
         coords = self.get_frame().realize_frame(
@@ -1236,7 +1242,7 @@ class Orbit:
         # is outside of the hyperbolic range
         nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
         if not Angle(limits).is_within_bounds(-nu_max, nu_max):
-            warn("anomaly outside range, clipping", OrbitSamplingWarning)
+            warn("anomaly outside range, clipping", OrbitSamplingWarning, stacklevel=2)
             limits = limits.clip(-nu_max, nu_max)
 
         nu_values = np.linspace(*limits, values)
