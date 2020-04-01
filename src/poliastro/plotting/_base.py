@@ -1,3 +1,4 @@
+import warnings
 from collections import namedtuple
 from typing import List
 
@@ -182,6 +183,27 @@ class BaseOrbitPlotter:
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
 
+    def plot_body_orbit(self, body, epoch=None, label=None):
+        """Plots complete revolution of body and current position if given.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time, optional
+            Epoch of current position.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+
+        """
+        from poliastro.twobody import Orbit
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            orbit = Orbit.from_body_ephem(body, epoch)
+
+        self.plot(orbit, label=label or str(body))
+
 
 class Mixin2D:
     _trajectories: List[Trajectory]
@@ -195,15 +217,7 @@ class Mixin2D:
         y = rr_proj.dot(self._frame[1])
         return x, y
 
-    def set_frame(self, p_vec, q_vec, w_vec):
-        """Sets perifocal frame.
-
-        Raises
-        ------
-        ValueError
-            If the vectors are not a set of mutually orthogonal unit vectors.
-
-        """
+    def _set_frame(self, p_vec, q_vec, w_vec):
         if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
             raise ValueError("Vectors must be unit.")
         elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
@@ -213,3 +227,51 @@ class Mixin2D:
 
         if self._trajectories:
             self._redraw()
+
+    def set_frame(self, p_vec, q_vec, w_vec):
+        """Sets perifocal frame.
+
+        Raises
+        ------
+        ValueError
+            If the vectors are not a set of mutually orthogonal unit vectors.
+
+        """
+        warnings.warn(
+            "Method set_frame is deprecated and will be removed in a future release, "
+            "use `set_body_frame` or `set_orbit_frame` instead"
+            "with your use case",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self._set_frame(p_vec, q_vec, w_vec)
+
+    def set_orbit_frame(self, orbit):
+        """Sets perifocal frame based on an orbit.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.Orbit
+            Orbit to use as frame.
+
+        """
+        self._set_frame(*orbit.pqw())
+
+    def set_body_frame(self, body, epoch=None):
+        """Sets perifocal frame based on the orbit of a body at a particular epoch if given.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time, optional
+            Epoch of current position.
+
+        """
+        from poliastro.twobody import Orbit
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            orbit = Orbit.from_body_ephem(body, epoch)
+
+        self.set_orbit_frame(orbit)

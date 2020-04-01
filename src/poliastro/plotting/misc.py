@@ -12,7 +12,6 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.twobody import Orbit
 
 from .core import OrbitPlotter2D, OrbitPlotter3D
 from .static import StaticOrbitPlotter
@@ -24,12 +23,10 @@ def _plot_bodies(orbit_plotter, outer=True, epoch=None):
         bodies.extend([Jupiter, Saturn, Uranus, Neptune])
 
     for body in bodies:
-        orb = Orbit.from_body_ephem(body, epoch)
-        orbit_plotter.plot(orb, label=str(body))
+        orbit_plotter.plot_body_orbit(body, epoch)
 
 
 def _plot_solar_system_2d(epoch, outer=True, interactive=False):
-    pqw = Orbit.from_body_ephem(Earth, epoch).pqw()
     if interactive:
         orbit_plotter = (
             OrbitPlotter2D()
@@ -37,7 +34,7 @@ def _plot_solar_system_2d(epoch, outer=True, interactive=False):
     else:
         orbit_plotter = StaticOrbitPlotter()
 
-    orbit_plotter.set_frame(*pqw)
+    orbit_plotter.set_body_frame(Earth, epoch)
 
     _plot_bodies(orbit_plotter, outer, epoch)
 
