@@ -1,21 +1,10 @@
-import astropy.units as u
 import matplotlib.pyplot as plt
 import pytest
 
 from poliastro.bodies import Earth, Jupiter, Mars
-from poliastro.examples import iss
+from poliastro.examples import churi, iss
 from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody.orbit import Orbit
-
-
-def test_set_frame():
-    op = StaticOrbitPlotter()
-    p = [1, 0, 0] * u.one
-    q = [0, 1, 0] * u.one
-    w = [0, 0, 1] * u.one
-    op.set_frame(p, q, w)
-
-    assert op._frame == (p, q, w)
 
 
 def test_axes_labels_and_title():
@@ -62,14 +51,16 @@ def test_color():
 
 
 def test_plot_trajectory_sets_label():
+    expected_label = "67P"
+
     op = StaticOrbitPlotter()
-    earth = Orbit.from_body_ephem(Earth)
-    mars = Orbit.from_body_ephem(Mars)
-    trajectory = earth.sample()
-    op.plot(mars, label="Mars")
-    op.plot_trajectory(trajectory, label="Earth")
+    trajectory = churi.sample()
+    op.plot_body_orbit(Mars, label="Mars")
+
+    op.plot_trajectory(trajectory, label=expected_label)
+
     legend = plt.gca().get_legend()
-    assert legend.get_texts()[1].get_text() == "Earth"
+    assert legend.get_texts()[1].get_text() == expected_label
 
 
 @pytest.mark.parametrize(
@@ -90,10 +81,9 @@ def test_redraw_makes_attractor_none():
 def test_set_frame_plots_same_colors():
     # TODO: Review
     op = StaticOrbitPlotter()
-    jupiter = Orbit.from_body_ephem(Jupiter)
-    op.plot(jupiter)
+    op.plot_body_orbit(Jupiter)
     colors1 = [orb[2] for orb in op.trajectories]
-    op.set_frame(*jupiter.pqw())
+    op.set_body_frame(Jupiter)
     colors2 = [orb[2] for orb in op.trajectories]
     assert colors1 == colors2
 
@@ -101,15 +91,13 @@ def test_set_frame_plots_same_colors():
 def test_redraw_keeps_trajectories():
     # See https://github.com/poliastro/poliastro/issues/518
     op = StaticOrbitPlotter()
-    earth = Orbit.from_body_ephem(Earth)
-    mars = Orbit.from_body_ephem(Mars)
-    trajectory = earth.sample()
-    op.plot(mars, label="Mars")
-    op.plot_trajectory(trajectory, label="Earth")
+    trajectory = churi.sample()
+    op.plot_body_orbit(Mars, label="Mars")
+    op.plot_trajectory(trajectory, label="67P")
 
     assert len(op.trajectories) == 2
 
-    op.set_frame(*mars.pqw())
+    op.set_body_frame(Mars)
 
     assert len(op.trajectories) == 2
 

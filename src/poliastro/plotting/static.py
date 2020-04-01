@@ -188,7 +188,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
-                "set_frame(*orbit.pqw()) or plot(orbit)"
+                "set_orbit_frame(orbit) or plot(orbit)"
             )
 
         self._redraw_attractor()
@@ -224,7 +224,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         """
         if not self._frame:
-            self.set_frame(*orbit.pqw())
+            self._set_frame(*orbit.pqw())
 
         colors = self._get_colors(color, trail)
 

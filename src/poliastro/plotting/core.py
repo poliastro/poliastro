@@ -253,7 +253,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
-                "set_frame(*orbit.pqw()) or plot(orbit)"
+                "set_orbit_frame(orbit) or plot(orbit)"
             )
 
         rr = positions.represent_as(CartesianRepresentation).xyz.transpose()
@@ -290,6 +290,6 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             raise NotImplementedError("trail not supported yet")
 
         if not self._frame:
-            self.set_frame(*orbit.pqw())
+            self._set_frame(*orbit.pqw())
 
         return super().plot(orbit, label=label, color=color, trail=trail)

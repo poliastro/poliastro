@@ -2,7 +2,7 @@ import pytest
 from astropy import units as u
 
 from poliastro.bodies import Earth, Mars, Sun
-from poliastro.examples import iss
+from poliastro.examples import churi, iss
 from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.twobody.orbit import Orbit
 
@@ -82,7 +82,7 @@ def test_plot_2d_trajectory_without_frame_raises_error():
         frame.plot_trajectory({})
     assert (
         "A frame must be set up first, please use "
-        "set_frame(*orbit.pqw()) or plot(orbit)" in excinfo.exconly()
+        "set_orbit_frame(orbit) or plot(orbit)" in excinfo.exconly()
     )
 
 
@@ -90,8 +90,7 @@ def test_plot_3d_trajectory_plots_a_trajectory():
     frame = OrbitPlotter3D()
     assert len(frame.trajectories) == 0
 
-    earth = Orbit.from_body_ephem(Earth)
-    trajectory = earth.sample()
+    trajectory = churi.sample()
     frame.set_attractor(Sun)
     frame.plot_trajectory(trajectory)
 
@@ -103,10 +102,9 @@ def test_plot_2d_trajectory_plots_a_trajectory():
     frame = OrbitPlotter2D()
     assert len(frame.trajectories) == 0
 
-    earth = Orbit.from_body_ephem(Earth)
-    trajectory = earth.sample()
+    trajectory = churi.sample()
     frame.set_attractor(Sun)
-    frame.set_frame(*earth.pqw())
+    frame.set_orbit_frame(churi)
     frame.plot_trajectory(trajectory)
 
     assert len(frame.trajectories) == 1
