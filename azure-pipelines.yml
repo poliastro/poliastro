@@ -27,13 +27,7 @@ jobs:
     posargs: '-vv'
     libraries:
       apt:
-        - pandoc
-        - texlive
-        - texlive-latex-extra
-        - texlive-fonts-recommended
-        - dvipng
-        - graphviz
-        - cm-super-minimal
+        - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
     envs:
       - linux: check
         name : quality
