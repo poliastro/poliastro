@@ -138,6 +138,10 @@ def porkchop(
 
     Returns
     -------
+    dv_launch: np.ndarray
+        Launch delta v
+    dv_arrival: np.ndarray
+        Arrival delta v
     c3_launch: np.ndarray
         Characteristic launch energy
     c3_arrrival: np.ndarray
