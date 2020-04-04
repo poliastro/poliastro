@@ -1138,6 +1138,7 @@ class Orbit:
         -------
         Orbit
             New orbit after propagation.
+            Propagate an orbit some time and return the cartesian.
 
         """
         if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
@@ -1149,12 +1150,15 @@ class Orbit:
         cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
         new_epoch = self.epoch + time_of_flight
 
-        return self.from_vectors(
-            self.attractor,
-            cartesian[0].xyz,
-            cartesian[0].differentials["s"].d_xyz,
-            new_epoch,
-            plane=self.plane,
+        return (
+            self.from_vectors(
+                self.attractor,
+                cartesian[0].xyz,
+                cartesian[0].differentials["s"].d_xyz,
+                new_epoch,
+                plane=self.plane,
+            ),
+            cartesian,
         )
 
     @u.quantity_input(value=u.rad)
