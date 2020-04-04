@@ -5,6 +5,8 @@ from astropy import units as u
 
 from poliastro.core.iod import izzo as izzo_fast
 
+kms = u.km / u.s
+
 
 def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
     """Solves the Lambert problem using the Izzo algorithm.
@@ -42,4 +44,4 @@ def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
     sols = izzo_fast(k_, r0_, r_, tof_, M, numiter, rtol)
 
     for v0, v in sols:
-        yield v0 * u.km / u.s, v * u.km / u.s
+        yield v0 << kms, v << kms
