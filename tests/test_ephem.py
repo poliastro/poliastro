@@ -2,7 +2,12 @@ from unittest import mock
 
 import pytest
 from astropy import units as u
-from astropy.coordinates import CartesianDifferential, CartesianRepresentation
+from astropy.coordinates import (
+    ICRS,
+    BarycentricMeanEcliptic,
+    CartesianDifferential,
+    CartesianRepresentation,
+)
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
@@ -11,6 +16,7 @@ from poliastro.ephem import Ephem, InterpolationMethods
 from poliastro.frames import Planes
 
 AVAILABLE_INTERPOLATION_METHODS = InterpolationMethods.__members__.values()
+AVAILABLE_PLANES = Planes.__members__.values()
 
 
 def assert_coordinates_allclose(actual, desired, rtol=1e-7, atol_scale=None, **kwargs):
@@ -56,11 +62,18 @@ def coordinates():
     )
 
 
+@pytest.mark.parametrize("plane", AVAILABLE_PLANES)
+def test_ephem_has_given_plane(plane):
+    ephem = Ephem(None, None, plane)
+
+    assert ephem.plane is plane
+
+
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
 def test_ephem_sample_no_arguments_returns_exactly_same_input(
     epochs, coordinates, method
 ):
-    ephem = Ephem(coordinates, epochs)
+    ephem = Ephem(coordinates, epochs, None)
 
     result_coordinates = ephem.sample(method=method)
 
@@ -70,7 +83,7 @@ def test_ephem_sample_no_arguments_returns_exactly_same_input(
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
 def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method):
-    ephem = Ephem(coordinates, epochs)
+    ephem = Ephem(coordinates, epochs, None)
 
     result_coordinates = ephem.sample(epochs, method=method)
 
@@ -82,7 +95,7 @@ def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method
 def test_ephem_sample_existing_epochs_returns_corresponding_input(
     epochs, coordinates, method
 ):
-    ephem = Ephem(coordinates, epochs)
+    ephem = Ephem(coordinates, epochs, None)
 
     result_coordinates = ephem.sample(epochs[::2], method=method)
 
@@ -91,12 +104,19 @@ def test_ephem_sample_existing_epochs_returns_corresponding_input(
 
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
-def test_ephem_from_body_has_expected_properties(method):
+@pytest.mark.parametrize(
+    "plane, FrameClass, rtol",
+    [
+        (Planes.EARTH_EQUATOR, ICRS, 1e-7),
+        (Planes.EARTH_ECLIPTIC, BarycentricMeanEcliptic, 1e-5),
+    ],
+)
+def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol):
     epochs = Time(
         ["2020-03-01 12:00:00", "2020-03-17 00:00:00.000", "2020-04-01 12:00:00.000"],
         scale="tdb",
     )
-    expected_coordinates = CartesianRepresentation(
+    equatorial_coordinates = CartesianRepresentation(
         [
             (-1.40892271e08, 45067626.83900666, 19543510.68386639),
             (-1.4925067e08, 9130104.71634121, 3964948.59999307),
@@ -115,11 +135,17 @@ def test_ephem_from_body_has_expected_properties(method):
         ),
     )
 
-    earth = Ephem.from_body(Earth, epochs)
+    expected_coordinates = (
+        ICRS(equatorial_coordinates)
+        .transform_to(FrameClass)
+        .represent_as(CartesianRepresentation, CartesianDifferential)
+    )
+
+    earth = Ephem.from_body(Earth, epochs, plane)
     coordinates = earth.sample(method=method)
 
     assert earth.epochs is epochs
-    assert_coordinates_allclose(coordinates, expected_coordinates)
+    assert_coordinates_allclose(coordinates, expected_coordinates, rtol=rtol)
 
 
 @mock.patch("poliastro.ephem.Horizons")

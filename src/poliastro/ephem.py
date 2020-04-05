@@ -5,6 +5,7 @@ from astropy import units as u
 from astropy.coordinates import (
     GCRS,
     ICRS,
+    BarycentricMeanEcliptic,
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric,
@@ -127,16 +128,21 @@ _INTERPOLATION_MAPPING = {
 
 
 class Ephem:
-    def __init__(self, coordinates, epochs):
+    def __init__(self, coordinates, epochs, plane):
         self._epochs = epochs
         self._coordinates = coordinates
+        self._plane = plane
 
     @property
     def epochs(self):
         return self._epochs
 
+    @property
+    def plane(self):
+        return self._plane
+
     @classmethod
-    def from_body(cls, body, epochs):
+    def from_body(cls, body, epochs, plane=Planes.EARTH_EQUATOR):
         """Return `Ephem` from a body ephemerides at certain epochs.
 
         Parameters
@@ -145,12 +151,21 @@ class Ephem:
             Body.
         epochs: ~astropy.time.Time
             Epochs to sample the body positions.
+        plane : ~poliastro.frames.Planes, optional
+            Fundamental plane of the frame, default to Earth Equator.
 
         """
         r, v = get_body_barycentric_posvel(body.name, epochs)
         coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
 
-        return cls(coordinates, epochs)
+        if plane is not Planes.EARTH_EQUATOR:
+            coordinates = (
+                ICRS(coordinates)
+                .transform_to(BarycentricMeanEcliptic)
+                .represent_as(CartesianRepresentation, CartesianDifferential)
+            )
+
+        return cls(coordinates, epochs, plane)
 
     @classmethod
     def from_horizons(
@@ -214,7 +229,7 @@ class Ephem:
         coordinates = CartesianRepresentation(
             x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
         )
-        return cls(coordinates, epochs)
+        return cls(coordinates, epochs, plane)
 
     def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):
         if epochs is None:
