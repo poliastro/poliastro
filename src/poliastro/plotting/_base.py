@@ -6,10 +6,11 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 
-from poliastro.plotting.util import BODY_COLORS, generate_label
-from poliastro.util import norm
-
+from ..ephem import Ephem
 from ..frames import Planes
+from ..twobody.mean_elements import get_mean_elements
+from ..util import norm, time_range
+from .util import BODY_COLORS, generate_label
 
 
 class Trajectory(
@@ -162,13 +163,23 @@ class BaseOrbitPlotter:
         if color is None:
             color = BODY_COLORS.get(body.name)
 
-        from poliastro.twobody import Orbit
+        colors = self._get_colors(color, trail)
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            orbit = Orbit.from_body_ephem(body, epoch)
+        self.set_attractor(body.parent)
 
-        return self._plot(orbit, label=label or str(body), color=color, trail=trail)
+        # Get approximate, mean value for the period
+        period = get_mean_elements(body, epoch).period
+
+        label = generate_label(epoch, label or str(body))
+        epochs = time_range(
+            epoch, periods=self._num_points, end=epoch + period, scale="tdb"
+        )
+        coordinates = Ephem.from_body(body, epochs, self._plane).sample()
+        r0 = coordinates[0].xyz
+
+        return self.__add_trajectory(
+            coordinates, r0, label=label, colors=colors, dashed=False,
+        )
 
     def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
