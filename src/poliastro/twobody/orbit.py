@@ -23,7 +23,6 @@ from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
 from poliastro.twobody.propagation import mean_motion, propagate
 
-from ..mean_elements import get_mean_elements
 from ..util import find_closest_value, norm
 from .elements import (
     get_eccentricity_critical_argp,
@@ -31,6 +30,7 @@ from .elements import (
     get_inclination_critical_argp,
     hyp_nu_limit,
 )
+from .mean_elements import get_mean_elements
 from .states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 try:

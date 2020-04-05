@@ -31,7 +31,7 @@ is:
     a\\left(\\frac{m}{3M}\\right)^{\\frac{1}{3}}
 
 """
-from ..mean_elements import get_mean_elements
+from ..twobody.mean_elements import get_mean_elements
 
 
 def laplace_radius(body):
