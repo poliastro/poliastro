@@ -177,7 +177,7 @@ class BaseOrbitPlotter:
         # If plane is already set, we will use the current one to reproject
         self._set_plane(orbit.plane, fail_if_set=False)
 
-        label = generate_label(orbit, label)
+        label = generate_label(orbit.epoch, label)
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 
         self._plot(positions, orbit.r, label, colors)

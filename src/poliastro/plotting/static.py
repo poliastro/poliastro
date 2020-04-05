@@ -232,7 +232,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._set_plane(orbit.plane, fail_if_set=False)
 
         if label:
-            label = generate_label(orbit, label)
+            label = generate_label(orbit.epoch, label)
 
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 

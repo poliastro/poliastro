@@ -3,8 +3,8 @@ import numpy as np
 BODY_COLORS = {"Sun": "#ffcc00", "Earth": "#204a87", "Jupiter": "#ba3821"}
 
 
-def generate_label(orbit, label):
-    epoch = orbit.epoch.copy()
+def generate_label(epoch, label):
+    epoch = epoch.copy()
     epoch.out_subfmt = "date_hm"
     label_ = f"{epoch.iso}"
     if label:
