@@ -65,7 +65,7 @@ dev = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
-    "sphinx",
+    "sphinx<3", # Temporary, see https://github.com/readthedocs/sphinx-hoverxref/issues/45
     "sphinx_rtd_theme @ https://github.com/Juanlu001/sphinx_rtd_theme/archive/avoid-require-redefinition.zip",
     "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/master.zip",
     "sphinx-notfound-page",
