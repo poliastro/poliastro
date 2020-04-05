@@ -486,9 +486,15 @@ class Orbit:
             return self
         elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
             r_soi = laplace_radius(new_attractor)
-            distance = norm(
-                self.r - get_body_barycentric(new_attractor.name, self.epoch).xyz
+            barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
+            # transforming new_attractor's frame into frame of attractor
+            new_attractor_r = (
+                ICRS(barycentric_position)
+                .transform_to(self.get_frame())
+                .represent_as(CartesianRepresentation)
+                .xyz
             )
+            distance = norm(self.r - new_attractor_r)
         elif self.attractor.parent == new_attractor:  # "Earth -> Sun"
             r_soi = laplace_radius(self.attractor)
             distance = norm(self.r)

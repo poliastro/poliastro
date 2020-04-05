@@ -1101,3 +1101,13 @@ def test_time_to_anomaly():
     tof = iss_180.time_to_anomaly(0 * u.deg)
 
     assert_quantity_allclose(tof, expected_tof)
+
+
+@pytest.mark.xfail
+def test_issue_798():
+    epoch = Time("2019-11-10 12:00:00")
+    iss = Orbit.from_horizons(
+        "International Space Station", Sun, epoch=epoch, id_type="majorbody"
+    )
+    iss = iss.change_attractor(Earth)
+    assert iss.attractor == Earth
