@@ -103,6 +103,32 @@ def test_ephem_sample_existing_epochs_returns_corresponding_input(
     assert_coordinates_allclose(result_coordinates, coordinates[::2], atol_scale=1e-17)
 
 
+def test_rv_no_parameters_returns_input_vectors(coordinates, epochs):
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem(coordinates, epochs, unused_plane)
+
+    expected_r = coordinates.get_xyz(xyz_axis=1)
+    expected_v = coordinates.differentials["s"].get_d_xyz(xyz_axis=1)
+
+    r, v = ephem.rv()
+
+    assert_quantity_allclose(r, expected_r)
+    assert_quantity_allclose(v, expected_v)
+
+
+def test_rv_scalar_epoch_returns_scalar_vectors(coordinates, epochs):
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem(coordinates, epochs, unused_plane)
+
+    expected_r = coordinates.get_xyz(xyz_axis=1)[0]
+    expected_v = coordinates.differentials["s"].get_d_xyz(xyz_axis=1)[0]
+
+    r, v = ephem.rv(epochs[0])
+
+    assert_quantity_allclose(r, expected_r)
+    assert_quantity_allclose(v, expected_v)
+
+
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
 @pytest.mark.parametrize(
     "plane, FrameClass, rtol",

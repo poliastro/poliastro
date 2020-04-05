@@ -241,3 +241,22 @@ class Ephem:
         )  # type: ignore
 
         return coordinates
+
+    def rv(self, epochs=None, **kwargs):
+        """Position and velocity vectors at given epochs.
+
+        Parameters
+        ----------
+        epochs : ~astropy.time.Time, optional
+            Epochs to sample the ephemerides, default to now.
+
+        """
+        coordinates = self.sample(epochs, **kwargs)
+
+        r = coordinates.get_xyz(xyz_axis=1)
+        v = coordinates.differentials["s"].get_d_xyz(xyz_axis=1)
+
+        if epochs is not None and epochs.isscalar:
+            return r[0], v[0]
+        else:
+            return r, v
