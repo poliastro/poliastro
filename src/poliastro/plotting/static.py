@@ -246,9 +246,9 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
 
-        trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
-
         self._redraw_attractor()
+
+        trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
 
         lines = trace_trajectory[:]
         if trace_r is not None:

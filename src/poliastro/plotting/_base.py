@@ -77,21 +77,18 @@ class BaseOrbitPlotter:
     def _redraw_attractor(self):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
-        min_radius = min(
+        min_distance = min(
             [
-                positions.represent_as(CartesianRepresentation).norm().min() * 0.15
+                positions.represent_as(CartesianRepresentation).norm().min()
                 for positions, _, _, _ in self._trajectories
             ]
             or [0 * u.m]
         )
-        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
+        self._attractor_radius = max(self._attractor.R.to(u.km), min_distance.to(u.km) * 0.15)
 
         color = BODY_COLORS.get(self._attractor.name, "#999999")
 
         self._clear_attractor()
-
-        if radius < self._attractor_radius:
-            self._attractor_radius = radius
 
         self._draw_sphere(
             self._attractor_radius, color, self._attractor.name,
@@ -117,10 +114,6 @@ class BaseOrbitPlotter:
 
     def _plot(self, positions, state, label, colors):
         trace_trajectory = self._plot_trajectory(positions, label, colors, True)
-
-        # Redraw the attractor now to compute the attractor radius
-        # with the trajectory we just added
-        self._redraw_attractor()
 
         if state is not None:
             # Plot required 2D/3D shape in the position of the body
@@ -184,6 +177,8 @@ class BaseOrbitPlotter:
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
+
+        self._redraw_attractor()
 
         self._plot(positions, orbit.r, label, colors)
 
