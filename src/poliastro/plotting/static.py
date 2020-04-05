@@ -106,6 +106,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         )
 
     def _plot_trajectory(self, positions, label, colors, dashed):
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
         if dashed:
             linestyle = "dashed"
         else:
