@@ -7,6 +7,7 @@ from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
 from poliastro.plotting.util import generate_label
 
+from ..frames import Planes
 from ._base import BaseOrbitPlotter, Mixin2D, Trajectory
 
 
@@ -251,3 +252,38 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             lines.append(trace_r)
 
         return lines
+
+    def plot_body_orbit(
+        self,
+        body,
+        epoch=None,
+        plane=Planes.EARTH_ECLIPTIC,
+        *,
+        label=None,
+        color=None,
+        trail=False,
+    ):
+        """Plots complete revolution of body and current position.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time, optional
+            Epoch of current position.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if self._frame is None:
+            self.set_body_frame(body, epoch)
+
+        super().plot_body_orbit(
+            body, epoch, plane, label=label, color=color, trail=trail
+        )
