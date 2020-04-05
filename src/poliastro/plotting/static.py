@@ -42,6 +42,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             Number of points to use in plots, default to 150.
         dark : bool, optional
             If set as True, plots the orbit in Dark mode.
+
         """
         super().__init__(num_points)
 

@@ -13,22 +13,22 @@ from scipy.interpolate import interp1d
 def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
     """Interpolates ephemerides data
 
-       Parameters
-       ----------
-       body : Body
-           Source body.
-       period : ~astropy.units.Quantity
-           Orbital period.
-       t_span : list(~astropy.units.Quantity)
-           Initial and final epochs.
-       rtol : float, optional
-           Relative tolerance. Controls the number of sampled data points,
-           defaults to 1e-5.
+    Parameters
+    ----------
+    body : Body
+        Source body.
+    period : ~astropy.units.Quantity
+        Orbital period.
+    t_span : list(~astropy.units.Quantity)
+        Initial and final epochs.
+    rtol : float, optional
+        Relative tolerance. Controls the number of sampled data points,
+        defaults to 1e-5.
 
-       Returns
-       -------
-       intrp : ~scipy.interpolate.interpolate.interp1d
-           Interpolated function.
+    Returns
+    -------
+    intrp : ~scipy.interpolate.interpolate.interp1d
+        Interpolated function.
 
     """
     h = (period * rtol).to(u.day).value

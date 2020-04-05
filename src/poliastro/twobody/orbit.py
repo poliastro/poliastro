@@ -606,7 +606,7 @@ class Orbit:
 
         Parameters
         ----------
-        body_name: string
+        name: string
             Name of the body to make the request.
 
         Returns
@@ -762,10 +762,14 @@ class Orbit:
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
     ):
-        r""" Solves for a Sun-Synchronous orbit. These orbits make use of the J2
+        r"""Creates a Sun-Synchronous orbit.
+
+        These orbits make use of the J2
         perturbation to precess in order to be always towards Sun. At least
         two parameters of the set {a, ecc, inc} are needed in order to solve
-        for these kind of orbits. Relationships among them are given by:
+        for these kind of orbits.
+
+        Relationships among them are given by:
 
         .. math::
             \begin{align}
@@ -1165,7 +1169,7 @@ class Orbit:
 
     @u.quantity_input(value=u.rad)
     def time_to_anomaly(self, value):
-        """ Returns time required to be in a specific true anomaly.
+        """Returns time required to be in a specific true anomaly.
 
         Parameters
         ----------
@@ -1349,7 +1353,7 @@ class Orbit:
         return res
 
     def plot(self, label=None, use_3d=False, interactive=False):
-        """Plots the orbit as an interactive widget.
+        """Plots the orbit.
 
         Parameters
         ----------
@@ -1360,6 +1364,7 @@ class Orbit:
         interactive : bool, optional
             Produce an interactive (rather than static) image of the orbit, default to False.
             This option requires Plotly properly installed and configured for your environment.
+
         """
         if not interactive and use_3d:
             raise ValueError(
