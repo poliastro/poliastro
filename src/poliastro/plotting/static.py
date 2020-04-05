@@ -7,6 +7,7 @@ from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
 from poliastro.plotting.util import generate_label
 
+from ..frames import Planes
 from ._base import BaseOrbitPlotter, Mixin2D, Trajectory
 
 
@@ -41,6 +42,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             Number of points to use in plots, default to 150.
         dark : bool, optional
             If set as True, plots the orbit in Dark mode.
+
         """
         super().__init__(num_points)
 
@@ -106,6 +108,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         )
 
     def _plot_trajectory(self, positions, label, colors, dashed):
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
         if dashed:
             linestyle = "dashed"
         else:
@@ -232,7 +240,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._set_plane(orbit.plane, fail_if_set=False)
 
         if label:
-            label = generate_label(orbit, label)
+            label = generate_label(orbit.epoch, label)
 
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 
@@ -245,3 +253,38 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             lines.append(trace_r)
 
         return lines
+
+    def plot_body_orbit(
+        self,
+        body,
+        epoch=None,
+        plane=Planes.EARTH_ECLIPTIC,
+        *,
+        label=None,
+        color=None,
+        trail=False,
+    ):
+        """Plots complete revolution of body and current position.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time, optional
+            Epoch of current position.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if self._frame is None:
+            self.set_body_frame(body, epoch)
+
+        super().plot_body_orbit(
+            body, epoch, plane, label=label, color=color, trail=trail
+        )

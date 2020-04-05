@@ -31,7 +31,7 @@ is:
     a\\left(\\frac{m}{3M}\\right)^{\\frac{1}{3}}
 
 """
-from ..mean_elements import get_mean_elements
+from ..twobody.mean_elements import get_mean_elements
 
 
 def laplace_radius(body):
@@ -40,14 +40,12 @@ def laplace_radius(body):
     Parameters
     ----------
     body : `~poliastro.bodies.Body`
-           Astronomical body which the SOI's radius is computed for.
-    a : float, optional
-        Semimajor axis of the body's orbit, default to None (will be computed from ephemerides).
+        Astronomical body which the SOI's radius is computed for.
 
     Returns
     -------
     astropy.units.quantity.Quantity
-        Approximated radius of the Sphere of Influence (SOI) [m]
+        Approximated radius of the Laplace Sphere of Influence
 
     """
     a = get_mean_elements(body).a
@@ -62,12 +60,12 @@ def hill_radius(body):
     Parameters
     ----------
     body : `~poliastro.bodies.Body`
-           Astronomical body which the SOI's radius is computed for.
+        Astronomical body which the SOI's radius is computed for.
 
     Returns
     -------
     astropy.units.quantity.Quantity
-        Approximated radius of the Sphere of Influence (SOI) [m]
+        Approximated radius of the Hill Sphere of Influence
 
     """
     mean_elements = get_mean_elements(body)

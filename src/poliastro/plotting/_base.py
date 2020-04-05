@@ -9,6 +9,8 @@ from astropy.coordinates import CartesianRepresentation
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.util import norm
 
+from ..frames import Planes
+
 
 class Trajectory(namedtuple("Trajectory", ["positions", "state", "label", "color"])):
     pass
@@ -174,17 +176,27 @@ class BaseOrbitPlotter:
         colors = self._get_colors(color, trail)
 
         self.set_attractor(orbit.attractor)
+        # If plane is already set, we will use the current one to reproject
         self._set_plane(orbit.plane, fail_if_set=False)
 
-        label = generate_label(orbit, label)
+        label = generate_label(orbit.epoch, label)
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 
         self._plot(positions, orbit.r, label, colors)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
 
-    def plot_body_orbit(self, body, epoch=None, label=None):
-        """Plots complete revolution of body and current position if given.
+    def plot_body_orbit(
+        self,
+        body,
+        epoch=None,
+        plane=Planes.EARTH_ECLIPTIC,
+        *,
+        label=None,
+        color=None,
+        trail=False,
+    ):
+        """Plots complete revolution of body and current position.
 
         Parameters
         ----------
@@ -192,8 +204,14 @@ class BaseOrbitPlotter:
             Body.
         epoch : astropy.time.Time, optional
             Epoch of current position.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
         label : str, optional
             Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
         from poliastro.twobody import Orbit
@@ -202,7 +220,7 @@ class BaseOrbitPlotter:
             warnings.simplefilter("ignore", DeprecationWarning)
             orbit = Orbit.from_body_ephem(body, epoch)
 
-        self.plot(orbit, label=label or str(body))
+        self.plot(orbit, label=label or str(body), color=color, trail=trail)
 
 
 class Mixin2D:

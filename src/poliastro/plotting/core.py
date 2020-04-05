@@ -11,6 +11,7 @@ from plotly.graph_objects import Figure, Layout, Scatter, Scatter3d, Surface
 
 from poliastro.plotting.util import generate_sphere
 
+from ..frames import Planes
 from ._base import BaseOrbitPlotter, Mixin2D
 
 
@@ -293,3 +294,38 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             self._set_frame(*orbit.pqw())
 
         return super().plot(orbit, label=label, color=color, trail=trail)
+
+    def plot_body_orbit(
+        self,
+        body,
+        epoch=None,
+        plane=Planes.EARTH_ECLIPTIC,
+        *,
+        label=None,
+        color=None,
+        trail=False,
+    ):
+        """Plots complete revolution of body and current position.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time, optional
+            Epoch of current position.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if self._frame is None:
+            self.set_body_frame(body, epoch)
+
+        super().plot_body_orbit(
+            body, epoch, plane, label=label, color=color, trail=trail
+        )
