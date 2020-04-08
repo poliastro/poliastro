@@ -4,7 +4,6 @@ from astropy import units as u
 from poliastro.bodies import Earth, Mars, Sun
 from poliastro.examples import churi, iss
 from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
-from poliastro.twobody.orbit import Orbit
 
 
 @pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
