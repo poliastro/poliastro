@@ -7,7 +7,7 @@ from .states import RVState
 
 
 def get_mean_elements(body, epoch=J2000):
-    """Get mean elements of body.
+    """Get ecliptic mean elements of body.
 
     """
     # Internally, erfa.plan94 has a table of classical elements,
