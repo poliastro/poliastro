@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import pytest
+from astropy.time import Time
 
-from poliastro.bodies import Jupiter, Mars
+from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.examples import churi, iss
 from poliastro.plotting.static import StaticOrbitPlotter
 
@@ -117,3 +118,12 @@ def test_trail_plotting():
     plotter.plot(iss, trail=True)
 
     return fig
+
+
+@pytest.mark.mpl_image_compare
+def test_body_plotting():
+    from poliastro.twobody import Orbit
+    earth = Orbit.from_body_ephem(Earth, Time("2020-04-08 12:00:00", scale="tdb"))
+    earth.plot(label=Earth)
+
+    return plt.gcf()
