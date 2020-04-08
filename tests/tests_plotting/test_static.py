@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import pytest
 
-from poliastro.bodies import Earth, Jupiter, Mars
+from poliastro.bodies import Jupiter, Mars
 from poliastro.examples import churi, iss
 from poliastro.plotting.static import StaticOrbitPlotter
-from poliastro.twobody.orbit import Orbit
 
 
 def test_axes_labels_and_title():
