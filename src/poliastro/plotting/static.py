@@ -199,8 +199,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        self._redraw_attractor()
-
         colors = self._get_colors(color, trail)
 
         # NOTE: We do not call self._plot here to control the labels
@@ -213,6 +211,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             )
 
         self._trajectories.append(Trajectory(positions, None, label, colors))
+
+        self._redraw_attractor()
 
         return lines
 
@@ -244,9 +244,11 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 
+        self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
+
         trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
 
-        self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
+        self._redraw_attractor()
 
         lines = trace_trajectory[:]
         if trace_r is not None:
