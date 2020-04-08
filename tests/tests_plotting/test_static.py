@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import pytest
+from astropy.time import Time
 
 from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.examples import churi, iss
 from poliastro.plotting.static import StaticOrbitPlotter
-from poliastro.twobody.orbit import Orbit
 
 
 def test_axes_labels_and_title():
@@ -118,3 +118,10 @@ def test_trail_plotting():
     plotter.plot(iss, trail=True)
 
     return fig
+
+
+@pytest.mark.mpl_image_compare
+def test_body_plotting():
+    Earth.plot(Time("2020-04-08 12:00:00", scale="tdb"))
+
+    return plt.gcf()

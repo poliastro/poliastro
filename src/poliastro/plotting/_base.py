@@ -119,6 +119,7 @@ class BaseOrbitPlotter:
         trace_trajectory = self._plot_trajectory(positions, label, colors, True)
 
         # Redraw the attractor now to compute the attractor radius
+        # with the trajectory we just added
         self._redraw_attractor()
 
         if state is not None:
@@ -182,9 +183,9 @@ class BaseOrbitPlotter:
         label = generate_label(orbit.epoch, label)
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 
-        self._plot(positions, orbit.r, label, colors)
-
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
+
+        self._plot(positions, orbit.r, label, colors)
 
     def plot_body_orbit(
         self,

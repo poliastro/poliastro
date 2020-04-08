@@ -10,7 +10,6 @@ from poliastro.examples import iss, molniya
 
 try:
     from poliastro.czml.extract_czml import CZMLExtractor
-    import czml3
     from czml3.core import Document
 except ImportError:
     pass
@@ -23,10 +22,6 @@ def test_czml_get_document():
 
     sample_points = 10
 
-    pr_map_url = (
-        "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
-    )
-    scene = False
     extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
     expected_doc = Document(extractor.packets)
 

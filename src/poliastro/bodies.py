@@ -113,7 +113,38 @@ class Body(
 
 
 class SolarSystemBody(Body):
-    pass
+    def plot(self, epoch=None, label=None, use_3d=False, interactive=False):
+        """Plots the body orbit.
+
+        Parameters
+        ----------
+        epoch : astropy.time.Time, optional
+            Epoch of current position.
+        label : str, optional
+            Label for the orbit, defaults to empty.
+        use_3d : bool, optional
+            Produce a 3D plot, default to False.
+        interactive : bool, optional
+            Produce an interactive (rather than static) image of the orbit, default to False.
+            This option requires Plotly properly installed and configured for your environment.
+
+        """
+        if not interactive and use_3d:
+            raise ValueError(
+                "The static plotter does not support 3D, use `interactive=True`"
+            )
+        elif not interactive:
+            from poliastro.plotting.static import StaticOrbitPlotter
+
+            return StaticOrbitPlotter().plot_body_orbit(self, epoch, label=label)
+        elif use_3d:
+            from poliastro.plotting.core import OrbitPlotter3D
+
+            return OrbitPlotter3D().plot_body_orbit(self, epoch, label=label)
+        else:
+            from poliastro.plotting.core import OrbitPlotter2D
+
+            return OrbitPlotter2D().plot_body_orbit(self, epoch, label=label)
 
 
 Sun = SolarSystemBody(
