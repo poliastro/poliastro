@@ -120,7 +120,7 @@ class BaseOrbitPlotter:
 
         trace_coordinates = self._plot_coordinates(coordinates, label, colors, False)
 
-        return trace_coordinates[:]
+        return trace_coordinates
 
     def _plot(self, orbit, *, label=None, color=None, trail=False):
         colors = self._get_colors(color, trail)
@@ -142,10 +142,7 @@ class BaseOrbitPlotter:
         trace_coordinates = self._plot_coordinates(coordinates, label, colors, True)
         trace_position = self._plot_position(orbit.r, label, colors)
 
-        lines = trace_coordinates[:]
-        lines.append(trace_position)
-
-        return lines
+        return trace_coordinates, trace_position
 
     def _plot_body_orbit(
         self,

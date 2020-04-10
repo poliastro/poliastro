@@ -215,6 +215,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             self.set_orbit_frame(orbit)
 
         lines = self._plot(orbit, label=label, color=color, trail=trail)
+        lines = lines[0] + [lines[1]]
 
         # Set legend using label from last added trajectory
         self._set_legend(lines, self._trajectories[-1].label)
