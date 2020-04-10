@@ -239,9 +239,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self.set_attractor(orbit.attractor)
         self._set_plane(orbit.plane, fail_if_set=False)
 
-        if label:
-            label = generate_label(orbit.epoch, label)
-
+        label = generate_label(orbit.epoch, label)
         positions = orbit.change_plane(self._plane).sample(self._num_points)
 
         self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
