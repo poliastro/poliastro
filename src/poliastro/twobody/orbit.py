@@ -604,7 +604,7 @@ class Orbit:
         return ss
 
     @classmethod
-    def from_sbdb(cls, name, **kargs):
+    def from_sbdb(cls, name, **kwargs):
         """Return osculating `Orbit` by using `SBDB` from Astroquery.
 
         Parameters
@@ -625,7 +625,7 @@ class Orbit:
         """
         from poliastro.bodies import Sun
 
-        obj = SBDB.query(name, full_precision=True, **kargs)
+        obj = SBDB.query(name, full_precision=True, **kwargs)
 
         if "count" in obj:
             # no error till now ---> more than one object has been found
