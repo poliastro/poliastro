@@ -174,7 +174,9 @@ class BaseOrbitPlotter:
         epochs = time_range(
             epoch, periods=self._num_points, end=epoch + period, scale="tdb"
         )
-        coordinates = Ephem.from_body(body, epochs, self._plane).sample()
+        coordinates = Ephem.from_body(
+            body, epochs, attractor=body.parent, plane=self._plane
+        ).sample()
         r0 = coordinates[0].xyz
 
         return self.__add_trajectory(

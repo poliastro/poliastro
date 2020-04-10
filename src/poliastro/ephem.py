@@ -143,7 +143,7 @@ class Ephem:
         return self._plane
 
     @classmethod
-    def from_body(cls, body, epochs, plane=Planes.EARTH_EQUATOR):
+    def from_body(cls, body, epochs, *, attractor=None, plane=Planes.EARTH_EQUATOR):
         """Return `Ephem` for a `SolarSystemBody` at certain epochs.
 
         Parameters
@@ -152,6 +152,9 @@ class Ephem:
             Body.
         epochs: ~astropy.time.Time
             Epochs to sample the body positions.
+        attractor : ~poliastro.bodies.SolarSystemBody, optional
+            Body to use as central location,
+            if not given the Solar System Barycenter will be used.
         plane : ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
 
@@ -162,10 +165,17 @@ class Ephem:
         r, v = get_body_barycentric_posvel(body.name, epochs)
         coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
 
-        if plane is not Planes.EARTH_EQUATOR:
+        if attractor is not None:
+            destination_frame = get_frame(attractor, plane, epochs)
+        elif plane is Planes.EARTH_ECLIPTIC:
+            destination_frame = BarycentricMeanEcliptic
+        else:
+            destination_frame = None
+
+        if destination_frame is not None:
             coordinates = (
                 ICRS(coordinates)
-                .transform_to(BarycentricMeanEcliptic)
+                .transform_to(destination_frame)
                 .represent_as(CartesianRepresentation, CartesianDifferential)
             )
 
@@ -177,7 +187,7 @@ class Ephem:
         name,
         epochs,
         *,
-        attractor,
+        attractor=None,
         plane=Planes.EARTH_EQUATOR,
         id_type="smallbody",
     ):
@@ -189,8 +199,9 @@ class Ephem:
             Name of the body to query for.
         epochs: ~astropy.time.Time
             Epochs to sample the body positions.
-        attractor : ~poliastro.bodies.SolarSystemBody
-            Body to use as central location.
+        attractor : ~poliastro.bodies.SolarSystemBody, optional
+            Body to use as central location,
+            if not given the Solar System Barycenter will be used.
         plane : ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
         id_type : string, optional
@@ -207,18 +218,21 @@ class Ephem:
         }
         refplane = refplanes_dict[plane]
 
-        bodies_dict = {
-            "sun": 10,
-            "mercury": 199,
-            "venus": 299,
-            "earth": 399,
-            "mars": 499,
-            "jupiter": 599,
-            "saturn": 699,
-            "uranus": 799,
-            "neptune": 899,
-        }
-        location = "500@{}".format(bodies_dict[attractor.name.lower()])
+        if attractor is not None:
+            bodies_dict = {
+                "sun": 10,
+                "mercury": 199,
+                "venus": 299,
+                "earth": 399,
+                "mars": 499,
+                "jupiter": 599,
+                "saturn": 699,
+                "uranus": 799,
+                "neptune": 899,
+            }
+            location = "500@{}".format(bodies_dict[attractor.name.lower()])
+        else:
+            location = "@ssb"
 
         obj = Horizons(
             id=name, location=location, epochs=epochs.jd, id_type=id_type

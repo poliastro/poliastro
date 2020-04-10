@@ -167,7 +167,7 @@ def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol
         .represent_as(CartesianRepresentation, CartesianDifferential)
     )
 
-    earth = Ephem.from_body(Earth, epochs, plane)
+    earth = Ephem.from_body(Earth, epochs, plane=plane)
     coordinates = earth.sample(method=method)
 
     assert earth.epochs is epochs
@@ -185,13 +185,15 @@ def test_from_body_scalar_epoch_uses_reshaped_epochs():
 
 
 @mock.patch("poliastro.ephem.Horizons")
-@pytest.mark.parametrize("body,location_str", [(Earth, "500@399"), (Venus, "500@299")])
+@pytest.mark.parametrize(
+    "attractor,location_str", [(None, "@ssb"), (Earth, "500@399"), (Venus, "500@299")]
+)
 @pytest.mark.parametrize(
     "plane,refplane_str",
     [(Planes.EARTH_EQUATOR, "earth"), (Planes.EARTH_ECLIPTIC, "ecliptic")],
 )
 def test_ephem_from_horizons_calls_horizons_with_correct_parameters(
-    horizons_mock, body, location_str, plane, refplane_str
+    horizons_mock, attractor, location_str, plane, refplane_str
 ):
     unused_name = "Strange Object"
     unused_id_type = "id_type"
@@ -211,7 +213,9 @@ def test_ephem_from_horizons_calls_horizons_with_correct_parameters(
         differentials=CartesianDifferential([(0, 1, 0)] * (u.au / u.day), xyz_axis=1),
     )
 
-    ephem = Ephem.from_horizons(unused_name, body, epochs, plane, unused_id_type)
+    ephem = Ephem.from_horizons(
+        unused_name, epochs, attractor=attractor, plane=plane, id_type=unused_id_type
+    )
 
     horizons_mock.assert_called_with(
         id=unused_name, location=location_str, epochs=epochs.jd, id_type=unused_id_type
