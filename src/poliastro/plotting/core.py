@@ -325,6 +325,6 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         if self._frame is None:
             self.set_body_frame(body, epoch)
 
-        super().plot_body_orbit(
+        return super().plot_body_orbit(
             body, epoch, plane, label=label, color=color, trail=trail
         )
