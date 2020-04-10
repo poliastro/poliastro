@@ -58,7 +58,11 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             artist.remove()
 
         for coordinates, position, label, colors in self._trajectories:
-            self._plot_coordinates_and_position(coordinates, position, label, colors)
+            if position is not None:
+                self._plot_coordinates(coordinates, label, colors, True)
+                self._plot_position(position, label, colors)
+            else:
+                self._plot_coordinates(coordinates, label, colors, True)
 
         self._ax.relim()
         self._ax.autoscale()
@@ -145,30 +149,20 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         # TODO: Compute radius?
         return self._draw_point(None, colors[0], label, center=position)
 
-    def _plot_coordinates_and_position(self, coordinates, position, label, colors):
-        trace_trajectory, trace_r = super()._plot_coordinates_and_position(
-            coordinates, position, label, colors
+    def _set_legend(self, lines, label):
+        if not self._ax.get_legend():
+            size = self._ax.figure.get_size_inches() + [8, 0]
+            self._ax.figure.set_size_inches(size)
+
+        # This will apply the label to either the point or the osculating
+        # orbit depending on the last plotted line
+        lines[-1].set_label(label)
+        self._ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1.05, 1.015),
+            title="Names and epochs",
+            numpoints=1,
         )
-
-        if label:
-            if not self._ax.get_legend():
-                size = self._ax.figure.get_size_inches() + [8, 0]
-                self._ax.figure.set_size_inches(size)
-
-            lines = trace_trajectory[:]
-            if trace_r is not None:
-                lines.append(trace_r)
-
-            # This will apply the label to either the point or the osculating
-            # orbit depending on the last plotted line
-            # NOTE: What about generating both labels,
-            # indicating that one is the osculating orbit?
-            lines[-1].set_label(label)
-            self._ax.legend(
-                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
-            )
-
-        return trace_trajectory, trace_r
 
     def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
@@ -193,16 +187,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        # TODO: Check if this is correct
         lines = self._plot_trajectory(
             coordinates, label=label, color=color, trail=trail
         )
 
         if label:
-            lines[0].set_label(label)
-            self._ax.legend(
-                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
-            )
+            self._set_legend(lines, label)
 
         return lines
 
@@ -224,7 +214,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         if not self._frame:
             self._set_frame(*orbit.pqw())
 
-        return self._plot(orbit, label=label, color=color, trail=trail)
+        lines = self._plot(orbit, label=label, color=color, trail=trail)
+
+        # Set legend using label from last added trajectory
+        self._set_legend(lines, self._trajectories[-1].label)
+
+        return lines
 
     def plot_body_orbit(
         self,
@@ -257,6 +252,11 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         if self._frame is None:
             self.set_body_frame(body, epoch)
 
-        return self._plot_body_orbit(
+        lines = self._plot_body_orbit(
             body, epoch, plane, label=label, color=color, trail=trail
         )
+
+        # Set legend using label from last added trajectory
+        self._set_legend(lines, self._trajectories[-1].label)
+
+        return lines

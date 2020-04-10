@@ -113,17 +113,6 @@ class BaseOrbitPlotter:
         )  # Arbitrary thresholds
         self._draw_point(radius, colors[0], label, center=position)
 
-    def _plot_coordinates_and_position(self, coordinates, position, label, colors):
-        trace_trajectory = self._plot_coordinates(coordinates, label, colors, True)
-
-        if position is not None:
-            # Plot required 2D/3D shape in the position of the body
-            trace_r = self._plot_position(position, label, colors)
-        else:
-            trace_r = None
-
-        return trace_trajectory, trace_r
-
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         if self._attractor is None:
             raise ValueError(
@@ -141,9 +130,7 @@ class BaseOrbitPlotter:
 
         self._redraw_attractor()
 
-        trace_coordinates, _ = self._plot_coordinates_and_position(
-            coordinates, None, str(label), colors
-        )
+        trace_coordinates = self._plot_coordinates(coordinates, label, colors, False)
 
         return trace_coordinates[:]
 
@@ -159,12 +146,10 @@ class BaseOrbitPlotter:
 
         self._redraw_attractor()
 
-        trace_coordinates, trace_position = self._plot_coordinates_and_position(
-            coordinates, orbit.r, label, colors
-        )
+        trace_coordinates = self._plot_coordinates(coordinates, label, colors, True)
+        trace_position = self._plot_position(orbit.r, label, colors)
 
         lines = trace_coordinates[:]
-        assert trace_position is not None
         lines.append(trace_position)
 
         return lines
