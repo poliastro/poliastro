@@ -294,7 +294,9 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        return super().plot_trajectory(coordinates, label=label, color=color, trail=trail)
+        return super().plot_trajectory(
+            coordinates, label=label, color=color, trail=trail
+        )
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
