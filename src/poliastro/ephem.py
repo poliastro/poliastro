@@ -174,8 +174,9 @@ class Ephem:
     def from_horizons(
         cls,
         name,
+        epochs,
+        *,
         attractor,
-        epochs=None,
         plane=Planes.EARTH_EQUATOR,
         id_type="smallbody",
     ):
@@ -185,10 +186,10 @@ class Ephem:
         ----------
         name : string
             Name of the body to query for.
+        epochs: ~astropy.time.Time
+            Epochs to sample the body positions.
         attractor : ~poliastro.bodies.SolarSystemBody
             Body to use as central location.
-        epochs : ~astropy.time.Time, optional
-            Epochs to sample the ephemerides, default to now.
         plane : ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
         id_type : string, optional
@@ -196,9 +197,6 @@ class Ephem:
             for Planets and Satellites.
 
         """
-        if epochs is None:
-            epochs = Time.now()
-
         if epochs.isscalar:
             epochs = epochs.reshape(1)
 
