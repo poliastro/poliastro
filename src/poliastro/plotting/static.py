@@ -1,14 +1,11 @@
 import numpy as np
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation
 from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from poliastro.plotting.util import generate_label
-
 from ..frames import Planes
-from ._base import BaseOrbitPlotter, Mixin2D, Trajectory
+from ._base import BaseOrbitPlotter, Mixin2D
 
 
 def _segments_from_arrays(x, y):
@@ -60,8 +57,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         for artist in self._ax.lines + self._ax.collections:
             artist.remove()
 
-        for positions, state, label, colors in self._trajectories:
-            self._plot(positions, state, label, colors)
+        for coordinates, position, label, colors in self._trajectories:
+            if position is not None:
+                self._plot_coordinates(coordinates, label, colors, True)
+                self._plot_position(position, label, colors)
+            else:
+                self._plot_coordinates(coordinates, label, colors, True)
 
         self._ax.relim()
         self._ax.autoscale()
@@ -107,7 +108,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             )
         )
 
-    def _plot_trajectory(self, positions, label, colors, dashed):
+    def _plot_coordinates(self, coordinates, label, colors, dashed):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
@@ -119,7 +120,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         else:
             linestyle = "solid"
 
-        rr = positions.represent_as(CartesianRepresentation).xyz.transpose()
+        rr = coordinates.xyz.transpose()
         x, y = self._project(rr)
 
         if len(colors) > 1:
@@ -144,41 +145,33 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return lines
 
-    def _plot_r(self, state, label, colors):
+    def _plot_position(self, position, label, colors):
         # TODO: Compute radius?
-        return self._draw_point(None, colors[0], label, center=state)
+        return self._draw_point(None, colors[0], label, center=position)
 
-    def _plot(self, positions, state, label, colors):
-        trace_trajectory, trace_r = super()._plot(positions, state, label, colors)
+    def _set_legend(self, lines, label):
+        if not self._ax.get_legend():
+            size = self._ax.figure.get_size_inches() + [8, 0]
+            self._ax.figure.set_size_inches(size)
 
-        if label:
-            if not self._ax.get_legend():
-                size = self._ax.figure.get_size_inches() + [8, 0]
-                self._ax.figure.set_size_inches(size)
+        # This will apply the label to either the point or the osculating
+        # orbit depending on the last plotted line
+        lines[-1].set_label(label)
+        self._ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1.05, 1.015),
+            title="Names and epochs",
+            numpoints=1,
+        )
 
-            lines = trace_trajectory[:]
-            if trace_r is not None:
-                lines.append(trace_r)
-
-            # This will apply the label to either the point or the osculating
-            # orbit depending on the last plotted line
-            # NOTE: What about generating both labels,
-            # indicating that one is the osculating orbit?
-            lines[-1].set_label(label)
-            self._ax.legend(
-                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
-            )
-
-        return trace_trajectory, trace_r
-
-    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        positions : ~astropy.coordinates.CartesianRepresentation
+        coordinates : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
             Label of the trajectory.
@@ -188,31 +181,18 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             Fade the orbit trail, default to False.
 
         """
-        if self._attractor is None:
-            raise ValueError(
-                "An attractor and a frame must be set up first, please use "
-                "set_attractor(Major_Body) or plot(orbit)"
-            )
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        colors = self._get_colors(color, trail)
-
-        # NOTE: We do not call self._plot here to control the labels
-        lines = self._plot_trajectory(positions, label, colors, True)
+        lines = self._plot_trajectory(
+            coordinates, label=label, color=color, trail=trail
+        )
 
         if label:
-            lines[0].set_label(label)
-            self._ax.legend(
-                loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
-            )
-
-        self._trajectories.append(Trajectory(positions, None, label, colors))
-
-        self._redraw_attractor()
+            self._set_legend(lines, label)
 
         return lines
 
@@ -232,34 +212,20 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         """
         if not self._frame:
-            self._set_frame(*orbit.pqw())
+            self.set_orbit_frame(orbit)
 
-        colors = self._get_colors(color, trail)
+        lines = self._plot(orbit, label=label, color=color, trail=trail)
+        lines = lines[0] + [lines[1]]
 
-        self.set_attractor(orbit.attractor)
-        self._set_plane(orbit.plane, fail_if_set=False)
-
-        if label:
-            label = generate_label(orbit.epoch, label)
-
-        positions = orbit.change_plane(self._plane).sample(self._num_points)
-
-        self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
-
-        trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
-
-        self._redraw_attractor()
-
-        lines = trace_trajectory[:]
-        if trace_r is not None:
-            lines.append(trace_r)
+        # Set legend using label from last added trajectory
+        self._set_legend(lines, self._trajectories[-1].label)
 
         return lines
 
     def plot_body_orbit(
         self,
         body,
-        epoch=None,
+        epoch,
         plane=Planes.EARTH_ECLIPTIC,
         *,
         label=None,
@@ -272,7 +238,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         ----------
         body : poliastro.bodies.SolarSystemBody
             Body.
-        epoch : astropy.time.Time, optional
+        epoch : astropy.time.Time
             Epoch of current position.
         plane : ~poliastro.frames.enums.Planes
             Reference plane.
@@ -285,8 +251,13 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         """
         if self._frame is None:
-            self.set_body_frame(body, epoch)
+            self.set_body_frame(body, epoch, plane)
 
-        super().plot_body_orbit(
+        lines = self._plot_body_orbit(
             body, epoch, plane, label=label, color=color, trail=trail
         )
+
+        # Set legend using label from last added trajectory
+        self._set_legend(lines, self._trajectories[-1].label)
+
+        return lines

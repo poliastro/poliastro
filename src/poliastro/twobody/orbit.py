@@ -531,6 +531,9 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        if plane is self.plane:
+            return self
+
         coords_orig = self.get_frame().realize_frame(
             self.represent_as(CartesianRepresentation, CartesianDifferential)
         )
@@ -1086,6 +1089,12 @@ class Orbit:
 
     def pqw(self):
         """Perifocal frame (PQW) vectors. """
+        warn(
+            "Orbit.pqw is deprecated and will be removed in a future release",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         if self.ecc < 1e-8:
             if abs(self.inc.to(u.rad).value) > 1e-8:
                 node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
@@ -1281,8 +1290,8 @@ class Orbit:
 
         Returns
         -------
-        positions: ~astropy.coordinates.BaseCoordinateFrame
-            Array of x, y, z positions, with proper times as the frame attributes if supported.
+        positions: ~astropy.coordinates.CartesianRepresentation
+            Array of x, y, z positions.
 
         Notes
         -----

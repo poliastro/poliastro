@@ -51,7 +51,15 @@ extensions = [
 hoverxref_auto_ref = True
 hoverxref_mathjax = True
 hoverxref_domains = ['py']
-
+hoverxref_role_types = {
+    'hoverxref': 'modal',
+    'ref': 'modal',  # for hoverxref_auto_ref config
+    'confval': 'tooltip',  # for custom object
+    'mod': 'tooltip',  # for Python Sphinx Domain
+    'class': 'tooltip',  # for Python Sphinx Domain
+    'meth': 'tooltip',
+    'obj': 'tooltip',
+}
 
 # Custom configuration
 autodoc_member_order = 'bysource'

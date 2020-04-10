@@ -6,7 +6,6 @@ from itertools import cycle
 import numpy as np
 import plotly.colors
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation
 from plotly.graph_objects import Figure, Layout, Scatter, Scatter3d, Surface
 
 from poliastro.plotting.util import generate_sphere
@@ -35,14 +34,14 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         return [color]
 
-    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        positions : ~astropy.coordinates.CartesianRepresentation
+        coordinates : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
             Label of the trajectory.
@@ -52,7 +51,7 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
             Fade the orbit trail, default to False.
 
         """
-        super().plot_trajectory(positions, label=label, color=color, trail=trail)
+        super().plot_trajectory(coordinates, label=label, color=color, trail=trail)
 
         if not self._figure._in_batch_mode:
             return self.show()
@@ -132,11 +131,11 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
         return sphere
 
-    def _plot_trajectory(self, positions, label, colors, dashed):
+    def _plot_coordinates(self, coordinates, label, colors, dashed):
         trace = Scatter3d(
-            x=positions.x.to(u.km).value,
-            y=positions.y.to(u.km).value,
-            z=positions.z.to(u.km).value,
+            x=coordinates.x.to(u.km).value,
+            y=coordinates.y.to(u.km).value,
+            z=coordinates.z.to(u.km).value,
             name=label,
             line=dict(color=colors[0], width=5, dash="dash" if dashed else "solid"),
             mode="lines",  # Boilerplate
@@ -250,14 +249,14 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         return shape
 
-    def _plot_trajectory(self, positions, label, colors, dashed):
+    def _plot_coordinates(self, coordinates, label, colors, dashed):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        rr = positions.represent_as(CartesianRepresentation).xyz.transpose()
+        rr = coordinates.xyz.transpose()
         x, y = self._project(rr)
 
         trace = Scatter(
@@ -271,6 +270,33 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         self._figure.add_trace(trace)
 
         return trace
+
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+        """Plots a precomputed trajectory.
+
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        coordinates : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : string, optional
+            Label of the trajectory.
+        color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
+        return super().plot_trajectory(
+            coordinates, label=label, color=color, trail=trail
+        )
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
@@ -291,14 +317,14 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             raise NotImplementedError("trail not supported yet")
 
         if not self._frame:
-            self._set_frame(*orbit.pqw())
+            self.set_orbit_frame(orbit)
 
         return super().plot(orbit, label=label, color=color, trail=trail)
 
     def plot_body_orbit(
         self,
         body,
-        epoch=None,
+        epoch,
         plane=Planes.EARTH_ECLIPTIC,
         *,
         label=None,
@@ -311,7 +337,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         ----------
         body : poliastro.bodies.SolarSystemBody
             Body.
-        epoch : astropy.time.Time, optional
+        epoch : astropy.time.Time
             Epoch of current position.
         plane : ~poliastro.frames.enums.Planes
             Reference plane.
@@ -326,6 +352,6 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         if self._frame is None:
             self.set_body_frame(body, epoch)
 
-        super().plot_body_orbit(
+        return super().plot_body_orbit(
             body, epoch, plane, label=label, color=color, trail=trail
         )

@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import pytest
-from astropy.time import Time
 
 from poliastro.bodies import Earth, Jupiter, Mars
-from poliastro.examples import churi, iss
+from poliastro.constants import J2000
+from poliastro.examples import churi, iss, molniya
+from poliastro.frames import Planes
 from poliastro.plotting.static import StaticOrbitPlotter
 
 
@@ -55,7 +56,7 @@ def test_plot_trajectory_sets_label():
 
     op = StaticOrbitPlotter()
     trajectory = churi.sample()
-    op.plot_body_orbit(Mars, label="Mars")
+    op.plot_body_orbit(Mars, J2000, label="Mars")
 
     op.plot_trajectory(trajectory, label=expected_label)
 
@@ -81,7 +82,7 @@ def test_redraw_makes_attractor_none():
 def test_set_frame_plots_same_colors():
     # TODO: Review
     op = StaticOrbitPlotter()
-    op.plot_body_orbit(Jupiter)
+    op.plot_body_orbit(Jupiter, J2000)
     colors1 = [orb[2] for orb in op.trajectories]
     op.set_body_frame(Jupiter)
     colors2 = [orb[2] for orb in op.trajectories]
@@ -92,7 +93,7 @@ def test_redraw_keeps_trajectories():
     # See https://github.com/poliastro/poliastro/issues/518
     op = StaticOrbitPlotter()
     trajectory = churi.sample()
-    op.plot_body_orbit(Mars, label="Mars")
+    op.plot_body_orbit(Mars, J2000, label="Mars")
     op.plot_trajectory(trajectory, label="67P")
 
     assert len(op.trajectories) == 2
@@ -112,6 +113,27 @@ def test_basic_plotting():
 
 
 @pytest.mark.mpl_image_compare
+def test_basic_trajectory_plotting():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.set_attractor(Earth)
+    plotter.set_orbit_frame(iss)
+    plotter.plot_trajectory(iss.sample())
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
+def test_basic_orbit_and_trajectory_plotting():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(iss)
+    plotter.plot_trajectory(molniya.sample())
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
 def test_trail_plotting():
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
@@ -121,7 +143,17 @@ def test_trail_plotting():
 
 
 @pytest.mark.mpl_image_compare
-def test_body_plotting():
-    Earth.plot(Time("2020-04-08 12:00:00", scale="tdb"))
+def test_plot_different_planes():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(iss)
+    plotter.plot(molniya.change_plane(Planes.EARTH_ECLIPTIC))
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
+def test_body_plotting(earth_perihelion):
+    Earth.plot(earth_perihelion)
 
     return plt.gcf()

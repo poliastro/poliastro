@@ -12,7 +12,9 @@ from poliastro.util import norm
 from ..frames import Planes
 
 
-class Trajectory(namedtuple("Trajectory", ["positions", "state", "label", "color"])):
+class Trajectory(
+    namedtuple("Trajectory", ["coordinates", "position", "label", "color"])
+):
     pass
 
 
@@ -27,6 +29,11 @@ class BaseOrbitPlotter:
         self._trajectories = []  # type: List[Trajectory]
 
         self._attractor = None
+
+        # This plane is used as a reference
+        # to conceal orbits in different planes,
+        # but it is not exposed as public API
+        # because it can be confusing with the 2D frames
         self._plane = None
 
         self._attractor_radius = np.inf * u.km
@@ -43,12 +50,6 @@ class BaseOrbitPlotter:
                 f"Attractor has already been set to {self._attractor.name}"
             )
 
-    def _set_plane(self, plane, fail_if_set=True):
-        if self._plane is None:
-            self._plane = plane
-        elif plane is not self._plane and fail_if_set:
-            raise NotImplementedError(f"Plane has already been set to {self._plane}")
-
     def set_attractor(self, attractor):
         """Sets plotting attractor.
 
@@ -60,38 +61,23 @@ class BaseOrbitPlotter:
         """
         self._set_attractor(attractor)
 
-    def set_plane(self, plane):
-        """Sets reference plane.
-
-        Parameters
-        ----------
-        plane : ~poliastro.frames.enums.Planes
-            Reference plane.
-
-        """
-        self._set_plane(plane)
-
     def _clear_attractor(self):
         raise NotImplementedError
 
     def _redraw_attractor(self):
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
-        min_radius = min(
-            [
-                positions.represent_as(CartesianRepresentation).norm().min() * 0.15
-                for positions, _, _, _ in self._trajectories
-            ]
+        min_distance = min(
+            [coordinates.norm().min() for coordinates, _, _, _ in self._trajectories]
             or [0 * u.m]
         )
-        radius = max(self._attractor.R.to(u.km), min_radius.to(u.km))
+        self._attractor_radius = max(
+            self._attractor.R.to(u.km), min_distance.to(u.km) * 0.15
+        )
 
         color = BODY_COLORS.get(self._attractor.name, "#999999")
 
         self._clear_attractor()
-
-        if radius < self._attractor_radius:
-            self._attractor_radius = radius
 
         self._draw_sphere(
             self._attractor_radius, color, self._attractor.name,
@@ -106,38 +92,90 @@ class BaseOrbitPlotter:
     def _draw_sphere(self, radius, color, name, center=None):
         raise NotImplementedError
 
-    def _plot_trajectory(self, positions, label, colors, dashed):
+    def _plot_coordinates(self, coordinates, label, colors, dashed):
         raise NotImplementedError
 
-    def _plot_r(self, state, label, colors):
+    def _plot_position(self, position, label, colors):
         radius = min(
-            self._attractor_radius * 0.5, (norm(state) - self._attractor.R) * 0.5
+            self._attractor_radius * 0.5, (norm(position) - self._attractor.R) * 0.5
         )  # Arbitrary thresholds
-        self._draw_point(radius, colors[0], label, center=state)
+        self._draw_point(radius, colors[0], label, center=position)
 
-    def _plot(self, positions, state, label, colors):
-        trace_trajectory = self._plot_trajectory(positions, label, colors, True)
+    def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+        if self._attractor is None:
+            raise ValueError(
+                "An attractor must be set up first, please use "
+                "set_attractor(Major_Body) or plot(orbit)"
+            )
 
-        # Redraw the attractor now to compute the attractor radius
-        # with the trajectory we just added
+        colors = self._get_colors(color, trail)
+
+        # Ensure that the coordinates are cartesian just in case,
+        # to avoid weird errors later
+        coordinates = coordinates.represent_as(CartesianRepresentation)
+
+        self._trajectories.append(Trajectory(coordinates, None, str(label), colors))
+
         self._redraw_attractor()
 
-        if state is not None:
-            # Plot required 2D/3D shape in the position of the body
-            trace_r = self._plot_r(state, label, colors)
-        else:
-            trace_r = None
+        trace_coordinates = self._plot_coordinates(coordinates, label, colors, False)
 
-        return trace_trajectory, trace_r
+        return trace_coordinates
 
-    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
+    def _plot(self, orbit, *, label=None, color=None, trail=False):
+        colors = self._get_colors(color, trail)
+
+        self.set_attractor(orbit.attractor)
+
+        if self._plane is None:
+            self._plane = orbit.plane
+        elif orbit.plane is not self._plane:
+            orbit = orbit.change_plane(self._plane)
+
+        label = generate_label(orbit.epoch, label)
+        coordinates = orbit.sample(self._num_points)
+
+        self._trajectories.append(Trajectory(coordinates, orbit.r, str(label), colors))
+
+        self._redraw_attractor()
+
+        trace_coordinates = self._plot_coordinates(coordinates, label, colors, True)
+        trace_position = self._plot_position(orbit.r, label, colors)
+
+        return trace_coordinates, trace_position
+
+    def _plot_body_orbit(
+        self,
+        body,
+        epoch,
+        plane=Planes.EARTH_ECLIPTIC,
+        *,
+        label=None,
+        color=None,
+        trail=False,
+    ):
+        if self._plane is None:
+            self._plane = plane
+
+        if color is None:
+            color = BODY_COLORS.get(body.name)
+
+        from poliastro.twobody import Orbit
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            orbit = Orbit.from_body_ephem(body, epoch)
+
+        return self._plot(orbit, label=label or str(body), color=color, trail=trail)
+
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        positions : ~astropy.coordinates.CartesianRepresentation
+        coordinates : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
             Label of the trajectory.
@@ -147,17 +185,9 @@ class BaseOrbitPlotter:
             Fade the orbit trail, default to False.
 
         """
-        if self._attractor is None:
-            raise ValueError(
-                "An attractor must be set up first, please use "
-                "set_attractor(Major_Body) or plot(orbit)"
-            )
-
-        colors = self._get_colors(color, trail)
-
-        self._plot(positions, None, str(label), colors)
-
-        self._trajectories.append(Trajectory(positions, None, str(label), colors[0]))
+        # Do not return the result of self._plot
+        # This behavior might be overriden by subclasses
+        self._plot_trajectory(coordinates, label=label, color=color, trail=trail)
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
@@ -174,23 +204,14 @@ class BaseOrbitPlotter:
             Fade the orbit trail, default to False.
 
         """
-        colors = self._get_colors(color, trail)
-
-        self.set_attractor(orbit.attractor)
-        # If plane is already set, we will use the current one to reproject
-        self._set_plane(orbit.plane, fail_if_set=False)
-
-        label = generate_label(orbit.epoch, label)
-        positions = orbit.change_plane(self._plane).sample(self._num_points)
-
-        self._trajectories.append(Trajectory(positions, orbit.r, label, colors[0]))
-
-        self._plot(positions, orbit.r, label, colors)
+        # Do not return the result of self._plot
+        # This behavior might be overriden by subclasses
+        self._plot(orbit, label=label, color=color, trail=trail)
 
     def plot_body_orbit(
         self,
         body,
-        epoch=None,
+        epoch,
         plane=Planes.EARTH_ECLIPTIC,
         *,
         label=None,
@@ -203,7 +224,7 @@ class BaseOrbitPlotter:
         ----------
         body : poliastro.bodies.SolarSystemBody
             Body.
-        epoch : astropy.time.Time, optional
+        epoch : astropy.time.Time
             Epoch of current position.
         plane : ~poliastro.frames.enums.Planes
             Reference plane.
@@ -215,13 +236,9 @@ class BaseOrbitPlotter:
             Fade the orbit trail, default to False.
 
         """
-        from poliastro.twobody import Orbit
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            orbit = Orbit.from_body_ephem(body, epoch)
-
-        self.plot(orbit, label=label or str(body), color=color, trail=trail)
+        # Do not return the result of self._plot
+        # This behavior might be overriden by subclasses
+        self._plot_body_orbit(body, epoch, plane, label=label, color=color, trail=trail)
 
 
 class Mixin2D:
@@ -274,9 +291,11 @@ class Mixin2D:
             Orbit to use as frame.
 
         """
-        self._set_frame(*orbit.pqw())
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self._set_frame(*orbit.pqw())
 
-    def set_body_frame(self, body, epoch=None):
+    def set_body_frame(self, body, epoch=None, plane=Planes.EARTH_ECLIPTIC):
         """Sets perifocal frame based on the orbit of a body at a particular epoch if given.
 
         Parameters
@@ -285,12 +304,14 @@ class Mixin2D:
             Body.
         epoch : astropy.time.Time, optional
             Epoch of current position.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
 
         """
         from poliastro.twobody import Orbit
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
-            orbit = Orbit.from_body_ephem(body, epoch)
+            orbit = Orbit.from_body_ephem(body, epoch).change_plane(plane)
 
         self.set_orbit_frame(orbit)
