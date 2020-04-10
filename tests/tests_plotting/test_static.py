@@ -113,6 +113,27 @@ def test_basic_plotting():
 
 
 @pytest.mark.mpl_image_compare
+def test_basic_trajectory_plotting():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.set_attractor(Earth)
+    plotter.set_frame(*iss.pqw())
+    plotter.plot_trajectory(iss.sample())
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
+def test_basic_orbit_and_trajectory_plotting():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(iss)
+    plotter.plot_trajectory(molniya.sample())
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
 def test_trail_plotting():
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
