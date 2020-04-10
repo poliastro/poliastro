@@ -1,14 +1,11 @@
 import numpy as np
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation
 from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from poliastro.plotting.util import generate_label
-
 from ..frames import Planes
-from ._base import BaseOrbitPlotter, Mixin2D, Trajectory
+from ._base import BaseOrbitPlotter, Mixin2D
 
 
 def _segments_from_arrays(x, y):
@@ -60,8 +57,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         for artist in self._ax.lines + self._ax.collections:
             artist.remove()
 
-        for positions, state, label, colors in self._trajectories:
-            self._plot(positions, state, label, colors)
+        for coordinates, position, label, colors in self._trajectories:
+            self._plot_coordinates_and_position(coordinates, position, label, colors)
 
         self._ax.relim()
         self._ax.autoscale()
@@ -107,7 +104,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             )
         )
 
-    def _plot_trajectory(self, positions, label, colors, dashed):
+    def _plot_coordinates(self, coordinates, label, colors, dashed):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
@@ -119,7 +116,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         else:
             linestyle = "solid"
 
-        rr = positions.represent_as(CartesianRepresentation).xyz.transpose()
+        rr = coordinates.xyz.transpose()
         x, y = self._project(rr)
 
         if len(colors) > 1:
@@ -144,12 +141,14 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return lines
 
-    def _plot_r(self, state, label, colors):
+    def _plot_position(self, position, label, colors):
         # TODO: Compute radius?
-        return self._draw_point(None, colors[0], label, center=state)
+        return self._draw_point(None, colors[0], label, center=position)
 
-    def _plot(self, positions, state, label, colors):
-        trace_trajectory, trace_r = super()._plot(positions, state, label, colors)
+    def _plot_coordinates_and_position(self, coordinates, position, label, colors):
+        trace_trajectory, trace_r = super()._plot_coordinates_and_position(
+            coordinates, position, label, colors
+        )
 
         if label:
             if not self._ax.get_legend():
@@ -171,14 +170,14 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return trace_trajectory, trace_r
 
-    def plot_trajectory(self, positions, *, label=None, color=None, trail=False):
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
 
         Parameters
         ----------
-        positions : ~astropy.coordinates.CartesianRepresentation
+        coordinates : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
         label : string, optional
             Label of the trajectory.
@@ -188,31 +187,22 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             Fade the orbit trail, default to False.
 
         """
-        if self._attractor is None:
-            raise ValueError(
-                "An attractor and a frame must be set up first, please use "
-                "set_attractor(Major_Body) or plot(orbit)"
-            )
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        colors = self._get_colors(color, trail)
-
-        # NOTE: We do not call self._plot here to control the labels
-        lines = self._plot_trajectory(positions, label, colors, True)
+        # TODO: Check if this is correct
+        lines = self._plot_trajectory(
+            coordinates, label=label, color=color, trail=trail
+        )
 
         if label:
             lines[0].set_label(label)
             self._ax.legend(
                 loc="upper left", bbox_to_anchor=(1.05, 1.015), title="Names and epochs"
             )
-
-        self._trajectories.append(Trajectory(positions, None, label, colors))
-
-        self._redraw_attractor()
 
         return lines
 
@@ -234,25 +224,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         if not self._frame:
             self._set_frame(*orbit.pqw())
 
-        colors = self._get_colors(color, trail)
-
-        self.set_attractor(orbit.attractor)
-        self._set_plane(orbit.plane, fail_if_set=False)
-
-        label = generate_label(orbit.epoch, label)
-        positions = orbit.change_plane(self._plane).sample(self._num_points)
-
-        self._trajectories.append(Trajectory(positions, orbit.r, label, colors))
-
-        self._redraw_attractor()
-
-        trace_trajectory, trace_r = self._plot(positions, orbit.r, label, colors)
-
-        lines = trace_trajectory[:]
-        if trace_r is not None:
-            lines.append(trace_r)
-
-        return lines
+        return self._plot(orbit, label=label, color=color, trail=trail)
 
     def plot_body_orbit(
         self,
@@ -285,6 +257,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         if self._frame is None:
             self.set_body_frame(body, epoch)
 
-        super().plot_body_orbit(
+        return self._plot_body_orbit(
             body, epoch, plane, label=label, color=color, trail=trail
         )
