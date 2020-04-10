@@ -150,7 +150,7 @@ class BaseOrbitPlotter:
     def _plot_body_orbit(
         self,
         body,
-        epoch=None,
+        epoch,
         plane=Planes.EARTH_ECLIPTIC,
         *,
         label=None,
@@ -211,7 +211,7 @@ class BaseOrbitPlotter:
     def plot_body_orbit(
         self,
         body,
-        epoch=None,
+        epoch,
         plane=Planes.EARTH_ECLIPTIC,
         *,
         label=None,
@@ -224,7 +224,7 @@ class BaseOrbitPlotter:
         ----------
         body : poliastro.bodies.SolarSystemBody
             Body.
-        epoch : astropy.time.Time, optional
+        epoch : astropy.time.Time
             Epoch of current position.
         plane : ~poliastro.frames.enums.Planes
             Reference plane.

@@ -224,7 +224,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
     def plot_body_orbit(
         self,
         body,
-        epoch=None,
+        epoch,
         plane=Planes.EARTH_ECLIPTIC,
         *,
         label=None,
@@ -237,7 +237,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         ----------
         body : poliastro.bodies.SolarSystemBody
             Body.
-        epoch : astropy.time.Time, optional
+        epoch : astropy.time.Time
             Epoch of current position.
         plane : ~poliastro.frames.enums.Planes
             Reference plane.
