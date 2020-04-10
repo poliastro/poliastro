@@ -1281,8 +1281,8 @@ class Orbit:
 
         Returns
         -------
-        positions: ~astropy.coordinates.BaseCoordinateFrame
-            Array of x, y, z positions, with proper times as the frame attributes if supported.
+        positions: ~astropy.coordinates.CartesianRepresentation
+            Array of x, y, z positions.
 
         Notes
         -----

@@ -439,6 +439,11 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
     rtol : float, optional
         Relative tolerance, default to 1e-10.
 
+    Returns
+    -------
+    astropy.coordinates.CartesianRepresentation
+        Propagation coordinates.
+
     """
 
     # Check if propagator fulfills orbit requirements
