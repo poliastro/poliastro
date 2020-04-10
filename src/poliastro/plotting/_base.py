@@ -157,6 +157,9 @@ class BaseOrbitPlotter:
         color=None,
         trail=False,
     ):
+        if color is None:
+            color = BODY_COLORS.get(body.name)
+
         from poliastro.twobody import Orbit
 
         with warnings.catch_warnings():
