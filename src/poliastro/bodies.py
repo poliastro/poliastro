@@ -249,7 +249,7 @@ Neptune = SolarSystemBody(
     rotational_period=constants.rotational_period_neptune,
 )
 
-Pluto = SolarSystemBody(
+Pluto = Body(
     parent=Sun,
     k=constants.GM_pluto,
     name="Pluto",
@@ -260,8 +260,7 @@ Pluto = SolarSystemBody(
     rotational_period=constants.rotational_period_pluto,
 )
 
-
-Moon = SolarSystemBody(
+Moon = Body(
     parent=Earth,
     k=constants.GM_moon,
     name="Moon",
