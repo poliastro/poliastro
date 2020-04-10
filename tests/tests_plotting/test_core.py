@@ -66,6 +66,7 @@ def test_plot_trajectory_without_attractor_raises_error(plotter_class):
     frame = plotter_class()
 
     with pytest.raises(ValueError) as excinfo:
+        frame._frame = 1  # Set it to something not None to skip frame check
         frame.plot_trajectory({})
     assert (
         "An attractor must be set up first, please use "
