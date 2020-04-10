@@ -3,7 +3,8 @@ import pytest
 from astropy.time import Time
 
 from poliastro.bodies import Earth, Jupiter, Mars
-from poliastro.examples import churi, iss
+from poliastro.examples import churi, iss, molniya
+from poliastro.frames import Planes
 from poliastro.plotting.static import StaticOrbitPlotter
 
 
@@ -116,6 +117,16 @@ def test_trail_plotting():
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
     plotter.plot(iss, trail=True)
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
+def test_plot_different_planes():
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(iss)
+    plotter.plot(molniya.change_plane(Planes.EARTH_ECLIPTIC))
 
     return fig
 
