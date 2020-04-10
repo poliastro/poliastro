@@ -16,6 +16,7 @@ from astroquery.jplhorizons import Horizons
 from scipy.interpolate import interp1d
 
 from .frames import Planes
+from .frames.util import get_frame
 
 
 class InterpolationMethods(Enum):
@@ -143,11 +144,11 @@ class Ephem:
 
     @classmethod
     def from_body(cls, body, epochs, plane=Planes.EARTH_EQUATOR):
-        """Return `Ephem` from a body ephemerides at certain epochs.
+        """Return `Ephem` for a `SolarSystemBody` at certain epochs.
 
         Parameters
         ----------
-        body: ~poliastro.bodies.Body
+        body: ~poliastro.bodies.SolarSystemBody
             Body.
         epochs: ~astropy.time.Time
             Epochs to sample the body positions.
