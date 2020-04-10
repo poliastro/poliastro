@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import pytest
-from astropy.time import Time
 
 from poliastro.bodies import Earth, Jupiter, Mars
 from poliastro.constants import J2000
@@ -154,7 +153,7 @@ def test_plot_different_planes():
 
 
 @pytest.mark.mpl_image_compare
-def test_body_plotting():
-    Earth.plot(Time("2020-04-08 12:00:00", scale="tdb"))
+def test_body_plotting(earth_perihelion):
+    Earth.plot(earth_perihelion)
 
     return plt.gcf()

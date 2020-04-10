@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import pytest
-from astropy.time import Time
 
 from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.plotting.misc import plot_solar_system
@@ -19,14 +18,14 @@ def test_plot_solar_system_uses_expected_orbitplotter(use_3d, plotter_class):
 
 
 @pytest.mark.mpl_image_compare
-def test_plot_inner_solar_system_static():
-    plot_solar_system(outer=False, epoch=Time("2020-03-29 12:00:00", scale="tdb"))
+def test_plot_inner_solar_system_static(earth_perihelion):
+    plot_solar_system(outer=False, epoch=earth_perihelion)
 
     return plt.gcf()
 
 
 @pytest.mark.mpl_image_compare
-def test_plot_outer_solar_system_static():
-    plot_solar_system(outer=True, epoch=Time("2020-03-29 12:00:00", scale="tdb"))
+def test_plot_outer_solar_system_static(earth_perihelion):
+    plot_solar_system(outer=True, epoch=earth_perihelion)
 
     return plt.gcf()
