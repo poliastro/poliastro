@@ -154,6 +154,9 @@ class BaseOrbitPlotter:
         color=None,
         trail=False,
     ):
+        if self._plane is None:
+            self._plane = plane
+
         if color is None:
             color = BODY_COLORS.get(body.name)
 
@@ -292,7 +295,7 @@ class Mixin2D:
             warnings.simplefilter("ignore", DeprecationWarning)
             self._set_frame(*orbit.pqw())
 
-    def set_body_frame(self, body, epoch=None):
+    def set_body_frame(self, body, epoch=None, plane=Planes.EARTH_ECLIPTIC):
         """Sets perifocal frame based on the orbit of a body at a particular epoch if given.
 
         Parameters
@@ -301,12 +304,14 @@ class Mixin2D:
             Body.
         epoch : astropy.time.Time, optional
             Epoch of current position.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
 
         """
         from poliastro.twobody import Orbit
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
-            orbit = Orbit.from_body_ephem(body, epoch)
+            orbit = Orbit.from_body_ephem(body, epoch).change_plane(plane)
 
         self.set_orbit_frame(orbit)

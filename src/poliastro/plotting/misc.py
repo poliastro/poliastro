@@ -13,6 +13,7 @@ from poliastro.bodies import (
     Venus,
 )
 
+from ..frames import Planes
 from .core import OrbitPlotter2D, OrbitPlotter3D
 from .static import StaticOrbitPlotter
 
@@ -34,7 +35,7 @@ def _plot_solar_system_2d(epoch, outer=True, interactive=False):
     else:
         orbit_plotter = StaticOrbitPlotter()
 
-    orbit_plotter.set_body_frame(Earth, epoch)
+    orbit_plotter.set_body_frame(Earth, epoch, Planes.EARTH_ECLIPTIC)
 
     _plot_bodies(orbit_plotter, outer, epoch)
 

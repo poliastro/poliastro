@@ -251,7 +251,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         """
         if self._frame is None:
-            self.set_body_frame(body, epoch)
+            self.set_body_frame(body, epoch, plane)
 
         lines = self._plot_body_orbit(
             body, epoch, plane, label=label, color=color, trail=trail
