@@ -1088,6 +1088,12 @@ def test_change_plane_sets_correct_plane(expected_plane):
     assert new_ss.plane is expected_plane
 
 
+def test_change_plane_same_returns_self():
+    same_iss = iss.change_plane(iss.plane)
+
+    assert same_iss is iss
+
+
 def test_change_plane_twice_restores_original_data():
     new_ss = iss.change_plane(Planes.EARTH_ECLIPTIC).change_plane(iss.plane)
 

@@ -531,6 +531,9 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        if plane is self.plane:
+            return self
+
         coords_orig = self.get_frame().realize_frame(
             self.represent_as(CartesianRepresentation, CartesianDifferential)
         )
