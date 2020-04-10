@@ -174,6 +174,16 @@ def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol
     assert_coordinates_allclose(coordinates, expected_coordinates, rtol=rtol)
 
 
+def test_from_body_scalar_epoch_uses_reshaped_epochs():
+    expected_epochs = Time(["2020-03-01 12:00:00"], scale="tdb")
+    epochs = expected_epochs[0]
+
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem.from_body(Earth, epochs, plane=unused_plane)
+
+    assert ephem.epochs == expected_epochs
+
+
 @mock.patch("poliastro.ephem.Horizons")
 @pytest.mark.parametrize("body,location_str", [(Earth, "500@399"), (Venus, "500@299")])
 @pytest.mark.parametrize(
@@ -211,3 +221,39 @@ def test_ephem_from_horizons_calls_horizons_with_correct_parameters(
     coordinates = ephem.sample()
 
     assert_coordinates_allclose(coordinates, expected_coordinates)
+
+
+@mock.patch("poliastro.ephem.Horizons")
+def test_from_horizons_scalar_epoch_uses_reshaped_epochs(horizons_mock):
+    unused_name = "Strange Object"
+    unused_id_type = "id_type"
+    unused_plane = Planes.EARTH_EQUATOR
+    unused_location_str = "500@399"
+    unused_attractor = Earth
+
+    expected_epochs = Time(["2020-03-01 12:00:00"], scale="tdb")
+    epochs = expected_epochs[0]
+
+    horizons_mock().vectors.return_value = {
+        "x": [1] * u.au,
+        "y": [0] * u.au,
+        "z": [0] * u.au,
+        "vx": [0] * (u.au / u.day),
+        "vy": [1] * (u.au / u.day),
+        "vz": [0] * (u.au / u.day),
+    }
+
+    Ephem.from_horizons(
+        unused_name,
+        epochs,
+        attractor=unused_attractor,
+        plane=unused_plane,
+        id_type=unused_id_type,
+    )
+
+    horizons_mock.assert_called_with(
+        id=unused_name,
+        location=unused_location_str,
+        epochs=expected_epochs.jd,
+        id_type=unused_id_type,
+    )

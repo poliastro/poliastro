@@ -155,6 +155,9 @@ class Ephem:
             Fundamental plane of the frame, default to Earth Equator.
 
         """
+        if epochs.isscalar:
+            epochs = epochs.reshape(1)
+
         r, v = get_body_barycentric_posvel(body.name, epochs)
         coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
 
@@ -195,6 +198,9 @@ class Ephem:
         """
         if epochs is None:
             epochs = Time.now()
+
+        if epochs.isscalar:
+            epochs = epochs.reshape(1)
 
         refplanes_dict = {
             Planes.EARTH_EQUATOR: "earth",
