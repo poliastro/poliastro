@@ -17,7 +17,6 @@ from poliastro.bodies import (
     Mercury,
     Moon,
     Neptune,
-    Pluto,
     Saturn,
     Sun,
     Uranus,
@@ -31,7 +30,6 @@ from .equatorial import (
     MercuryICRS,
     MoonICRS,
     NeptuneICRS,
-    PlutoICRS,
     SaturnICRS,
     UranusICRS,
     VenusICRS,
@@ -47,7 +45,6 @@ __all__ = [
     "SaturnFixed",
     "UranusFixed",
     "NeptuneFixed",
-    "PlutoFixed",
 ]
 
 
@@ -308,19 +305,6 @@ class NeptuneFixed(_PlanetaryFixed):
         ra = (299.36 + 0.70 * np.sin(N.to("rad").value)) * u.deg
         dec = (43.46 - 0.51 * np.cos(N.to("rad").value)) * u.deg
         W = (249.978 + 541.1397757 * d - 0.48 * np.sin(N.to("rad").value)) * u.deg
-
-        return ra, dec, W
-
-
-class PlutoFixed(_PlanetaryFixed):
-    body = Pluto
-    equatorial = PlutoICRS
-
-    @staticmethod
-    def _rot_elements_at_epoch(T, d):
-        ra = 132.993 * u.deg
-        dec = -6.163 * u.deg
-        W = (302.695 + 56.3625225 * d) * u.deg
 
         return ra, dec, W
 

@@ -40,7 +40,6 @@ from poliastro.frames.equatorial import (
     MarsICRS,
     MercuryICRS,
     NeptuneICRS,
-    PlutoICRS,
     SaturnICRS,
     UranusICRS,
     VenusICRS,
@@ -496,7 +495,6 @@ def test_orbit_plot_is_not_static(use_3d):
         (Saturn, SaturnICRS),
         (Uranus, UranusICRS),
         (Neptune, NeptuneICRS),
-        (Pluto, PlutoICRS),
     ],
 )
 def test_orbit_get_frame_returns_proper_frame(attractor, expected_frame_class):

@@ -8,7 +8,6 @@ from poliastro.bodies import (
     Mars,
     Mercury,
     Neptune,
-    Pluto,
     Saturn,
     SolarSystemBody,
     Sun,
@@ -26,7 +25,6 @@ from .equatorial import (
     MarsICRS,
     MercuryICRS,
     NeptuneICRS,
-    PlutoICRS,
     SaturnICRS,
     UranusICRS,
     VenusICRS,
@@ -37,7 +35,6 @@ from .fixed import (
     MarsFixed,
     MercuryFixed,
     NeptuneFixed,
-    PlutoFixed,
     SaturnFixed,
     UranusFixed,
     VenusFixed,
@@ -57,7 +54,6 @@ _FRAME_MAPPING = {
     Saturn: {Planes.EARTH_EQUATOR: SaturnICRS, Planes.BODY_FIXED: SaturnFixed},
     Uranus: {Planes.EARTH_EQUATOR: UranusICRS, Planes.BODY_FIXED: UranusFixed},
     Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS, Planes.BODY_FIXED: NeptuneFixed},
-    Pluto: {Planes.EARTH_EQUATOR: PlutoICRS, Planes.BODY_FIXED: PlutoFixed},
 }  # type: Dict[SolarSystemBody, Dict[Planes, FrameMeta]]
 
 
