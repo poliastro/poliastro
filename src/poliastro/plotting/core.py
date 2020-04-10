@@ -271,6 +271,31 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         return trace
 
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+        """Plots a precomputed trajectory.
+
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        coordinates : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : string, optional
+            Label of the trajectory.
+        color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
+        return super().plot_trajectory(coordinates, label=label, color=color, trail=trail)
+
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
 
