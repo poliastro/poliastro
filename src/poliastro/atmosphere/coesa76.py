@@ -267,7 +267,7 @@ class COESA76(COESA):
         return rho.to(u.kg / u.m ** 3)
 
     def properties(self, alt, geometric=True):
-        """ Solves density at given height.
+        """ Solves temperature, pressure, density at given height.
 
         Parameters
         ----------
@@ -290,3 +290,30 @@ class COESA76(COESA):
         rho = self.density(alt, geometric=geometric)
 
         return T, p, rho
+
+    def thermal_conductivity(self, alt_or_temp, geometric=True):
+        """ Solves coefficient of thermal conductivity at given height or temperature.
+
+        Parameters
+        ----------
+        alt_or_temp: ~astropy.units.Quantity
+            Geometric/Geopotential height or temperature.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        k: ~astropy.units.Quantity
+            coefficient of thermal conductivity at given height or temperature.
+        """
+        if alt_or_temp.unit is u.K:
+            T = alt_or_temp.to(u.K).value
+        else:
+            T = (self.temperature(alt_or_temp,geometric)).value
+
+        k = (2.64638e-3 * T**1.5 / (T + 245.4 * (10**(-12./T)))) * (u.J / u.m / u.s / u.K)
+
+        return k
+
+
+
