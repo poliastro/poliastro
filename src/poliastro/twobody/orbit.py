@@ -1086,6 +1086,12 @@ class Orbit:
 
     def pqw(self):
         """Perifocal frame (PQW) vectors. """
+        warn(
+            "Orbit.pqw is deprecated and will be removed in a future release",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         if self.ecc < 1e-8:
             if abs(self.inc.to(u.rad).value) > 1e-8:
                 node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)

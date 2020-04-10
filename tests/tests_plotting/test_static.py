@@ -117,7 +117,7 @@ def test_basic_trajectory_plotting():
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
     plotter.set_attractor(Earth)
-    plotter.set_frame(*iss.pqw())
+    plotter.set_orbit_frame(iss)
     plotter.plot_trajectory(iss.sample())
 
     return fig

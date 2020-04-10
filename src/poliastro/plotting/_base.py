@@ -295,7 +295,9 @@ class Mixin2D:
             Orbit to use as frame.
 
         """
-        self._set_frame(*orbit.pqw())
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self._set_frame(*orbit.pqw())
 
     def set_body_frame(self, body, epoch=None):
         """Sets perifocal frame based on the orbit of a body at a particular epoch if given.

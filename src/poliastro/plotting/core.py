@@ -290,7 +290,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             raise NotImplementedError("trail not supported yet")
 
         if not self._frame:
-            self._set_frame(*orbit.pqw())
+            self.set_orbit_frame(orbit)
 
         return super().plot(orbit, label=label, color=color, trail=trail)
 

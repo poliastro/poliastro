@@ -212,7 +212,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         """
         if not self._frame:
-            self._set_frame(*orbit.pqw())
+            self.set_orbit_frame(orbit)
 
         lines = self._plot(orbit, label=label, color=color, trail=trail)
 
