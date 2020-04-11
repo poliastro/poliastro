@@ -117,6 +117,18 @@ class BaseOrbitPlotter:
 
         return trace_coordinates, trace_position
 
+    def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
+        trajectory = Trajectory(coordinates, position, label, colors, dashed)
+        self._trajectories.append(trajectory)
+
+        self._redraw_attractor()
+
+        trace_coordinates, trace_position = self.__plot_coordinates_and_position(
+            trajectory
+        )
+
+        return trace_coordinates, trace_position
+
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         if self._attractor is None:
             raise ValueError(
@@ -130,13 +142,9 @@ class BaseOrbitPlotter:
         # to avoid weird errors later
         coordinates = coordinates.represent_as(CartesianRepresentation)
 
-        self._trajectories.append(Trajectory(coordinates, None, str(label), colors, False))
-
-        self._redraw_attractor()
-
-        trace_coordinates = self._plot_coordinates(coordinates, label, colors, False)
-
-        return trace_coordinates
+        return self.__add_trajectory(
+            coordinates, None, label=str(label), colors=colors, dashed=False
+        )
 
     def _plot(self, orbit, *, label=None, color=None, trail=False):
         colors = self._get_colors(color, trail)
@@ -151,14 +159,9 @@ class BaseOrbitPlotter:
         label = generate_label(orbit.epoch, label)
         coordinates = orbit.sample(self._num_points)
 
-        self._trajectories.append(Trajectory(coordinates, orbit.r, str(label), colors, True))
-
-        self._redraw_attractor()
-
-        trace_coordinates = self._plot_coordinates(coordinates, label, colors, True)
-        trace_position = self._plot_position(orbit.r, label, colors)
-
-        return trace_coordinates, trace_position
+        return self.__add_trajectory(
+            coordinates, orbit.r, label=label, colors=colors, dashed=True
+        )
 
     def _plot_body_orbit(
         self,
