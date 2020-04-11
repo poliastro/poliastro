@@ -132,9 +132,14 @@ _INTERPOLATION_MAPPING = {
 
 class Ephem:
     def __init__(self, coordinates, epochs, plane):
+        if coordinates.ndim != 1 or epochs.ndim != 1:
+            raise ValueError(
+                f"Coordinates and epochs must have dimension 1, got {coordinates.ndim} and {epochs.ndim}"
+            )
+
         self._epochs = epochs
         self._coordinates = coordinates
-        self._plane = plane
+        self._plane = Planes(plane)
 
     @property
     def epochs(self):

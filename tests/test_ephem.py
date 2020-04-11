@@ -64,17 +64,27 @@ def coordinates():
 
 
 @pytest.mark.parametrize("plane", AVAILABLE_PLANES)
-def test_ephem_has_given_plane(plane):
-    ephem = Ephem(None, None, plane)
+def test_ephem_has_given_plane(epochs, coordinates, plane):
+    ephem = Ephem(epochs, coordinates, plane)
 
     assert ephem.plane is plane
+
+
+def test_ephem_fails_if_dimensions_are_not_correct(epochs, coordinates):
+    unused_plane = Planes.EARTH_EQUATOR
+    with pytest.raises(ValueError) as excinfo:
+        Ephem(epochs[0], coordinates, unused_plane)
+    assert (
+        "Coordinates and epochs must have dimension 1, got 0 and 1" in excinfo.exconly()
+    )
 
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
 def test_ephem_sample_no_arguments_returns_exactly_same_input(
     epochs, coordinates, method
 ):
-    ephem = Ephem(coordinates, epochs, None)
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem(coordinates, epochs, unused_plane)
 
     result_coordinates = ephem.sample(method=method)
 
@@ -84,7 +94,8 @@ def test_ephem_sample_no_arguments_returns_exactly_same_input(
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
 def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method):
-    ephem = Ephem(coordinates, epochs, None)
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem(coordinates, epochs, unused_plane)
 
     result_coordinates = ephem.sample(epochs, method=method)
 
@@ -96,7 +107,8 @@ def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method
 def test_ephem_sample_existing_epochs_returns_corresponding_input(
     epochs, coordinates, method
 ):
-    ephem = Ephem(coordinates, epochs, None)
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem(coordinates, epochs, unused_plane)
 
     result_coordinates = ephem.sample(epochs[::2], method=method)
 
