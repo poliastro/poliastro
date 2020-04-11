@@ -64,6 +64,8 @@ T0 = 288.15 * u.K
 Tinf = 1000 * u.K
 gamma = 1.4
 alpha = 34.1632 * u.K / u.km
+beta = 1.458e-6 * (u.kg / u.s / u.m / (u.K) ** 0.5)
+S = 110.4 * u.K
 
 # Reading layer parameters file
 coesa76_data = ascii.read(get_pkg_data_filename("data/coesa76.dat"))
@@ -306,14 +308,42 @@ class COESA76(COESA):
         k: ~astropy.units.Quantity
             coefficient of thermal conductivity at given height or temperature.
         """
+        # checks if parameter is temperature
         if alt_or_temp.unit is u.K:
             T = alt_or_temp.to(u.K).value
+        # if parameter is geometric/geopotential height
         else:
-            T = (self.temperature(alt_or_temp,geometric)).value
+            T = (self.temperature(alt_or_temp, geometric)).value
 
-        k = (2.64638e-3 * T**1.5 / (T + 245.4 * (10**(-12./T)))) * (u.J / u.m / u.s / u.K)
+        # using eqn-(53)
+        k = (2.64638e-3 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
+            u.J / u.m / u.s / u.K
+        )
 
         return k
 
+    def viscosity(self, alt_or_temp, geometric=True):
+        """ Solves dynamic viscosity at given height or temperature.
 
+        Parameters
+        ----------
+        alt_or_temp: ~astropy.units.Quantity
+            Geometric/Geopotential height or temperature.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
 
+        Returns
+        -------
+        k: ~astropy.units.Quantity
+            Dynamic viscosity at given height or temperature.
+        """
+        # checks if parameter is temperature
+        if alt_or_temp.unit is u.K:
+            T = alt_or_temp.to(u.K).value
+        # if parameter is geometric/geopotential height
+        else:
+            T = (self.temperature(alt_or_temp, geometric)).value
+
+        viscosity = (beta.value * T ** 1.5 / (T + S.value)) * (u.N * u.s / (u.m) ** 2)
+
+        return viscosity
