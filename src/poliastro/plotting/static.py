@@ -57,12 +57,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         for artist in self._ax.lines + self._ax.collections:
             artist.remove()
 
-        for coordinates, position, label, colors in self._trajectories:
-            if position is not None:
-                self._plot_coordinates(coordinates, label, colors, True)
-                self._plot_position(position, label, colors)
-            else:
-                self._plot_coordinates(coordinates, label, colors, True)
+        super()._redraw()
 
         self._ax.relim()
         self._ax.autoscale()

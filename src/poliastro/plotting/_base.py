@@ -13,7 +13,7 @@ from ..frames import Planes
 
 
 class Trajectory(
-    namedtuple("Trajectory", ["coordinates", "position", "label", "color"])
+    namedtuple("Trajectory", ["coordinates", "position", "label", "colors", "dashed"])
 ):
     pass
 
@@ -68,7 +68,7 @@ class BaseOrbitPlotter:
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
         min_distance = min(
-            [coordinates.norm().min() for coordinates, _, _, _ in self._trajectories]
+            [coordinates.norm().min() for coordinates, *_ in self._trajectories]
             or [0 * u.m]
         )
         self._attractor_radius = max(
@@ -82,6 +82,10 @@ class BaseOrbitPlotter:
         self._draw_sphere(
             self._attractor_radius, color, self._attractor.name,
         )
+
+    def _redraw(self):
+        for trajectory in self._trajectories:
+            self.__plot_coordinates_and_position(trajectory)
 
     def _get_colors(self, color, trail):
         raise NotImplementedError
@@ -101,6 +105,18 @@ class BaseOrbitPlotter:
         )  # Arbitrary thresholds
         self._draw_point(radius, colors[0], label, center=position)
 
+    def __plot_coordinates_and_position(self, trajectory):
+        coordinates, position, label, colors, dashed = trajectory
+
+        trace_coordinates = self._plot_coordinates(coordinates, label, colors, dashed)
+
+        if position is not None:
+            trace_position = self._plot_position(position, label, colors)
+        else:
+            trace_position = None
+
+        return trace_coordinates, trace_position
+
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         if self._attractor is None:
             raise ValueError(
@@ -114,7 +130,7 @@ class BaseOrbitPlotter:
         # to avoid weird errors later
         coordinates = coordinates.represent_as(CartesianRepresentation)
 
-        self._trajectories.append(Trajectory(coordinates, None, str(label), colors))
+        self._trajectories.append(Trajectory(coordinates, None, str(label), colors, False))
 
         self._redraw_attractor()
 
@@ -135,7 +151,7 @@ class BaseOrbitPlotter:
         label = generate_label(orbit.epoch, label)
         coordinates = orbit.sample(self._num_points)
 
-        self._trajectories.append(Trajectory(coordinates, orbit.r, str(label), colors))
+        self._trajectories.append(Trajectory(coordinates, orbit.r, str(label), colors, True))
 
         self._redraw_attractor()
 
