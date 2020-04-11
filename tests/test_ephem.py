@@ -14,6 +14,7 @@ from astropy.time import Time
 from poliastro.bodies import Earth, Venus
 from poliastro.ephem import Ephem, InterpolationMethods
 from poliastro.frames import Planes
+from poliastro.warnings import TimeScaleWarning
 
 AVAILABLE_INTERPOLATION_METHODS = InterpolationMethods.__members__.values()
 AVAILABLE_PLANES = Planes.__members__.values()
@@ -172,6 +173,18 @@ def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol
 
     assert earth.epochs is epochs
     assert_coordinates_allclose(coordinates, expected_coordinates, rtol=rtol)
+
+
+def test_from_body_non_tdb_epochs_warning(epochs):
+    unused_body = Earth
+    epochs = Time.now()  # This uses UTC scale
+
+    with pytest.warns(TimeScaleWarning) as record:
+        Ephem.from_body(unused_body, epochs)
+
+    assert len(record) == 1
+    assert "Input time was converted to scale='tdb'" in record[0].message.args[0]
+    assert "Use Time(..., scale='tdb') instead" in record[0].message.args[0]
 
 
 def test_from_body_scalar_epoch_uses_reshaped_epochs():

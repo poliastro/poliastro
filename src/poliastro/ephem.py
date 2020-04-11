@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from warnings import warn
 
 import numpy as np
 from astropy import units as u
@@ -17,6 +18,7 @@ from scipy.interpolate import interp1d
 
 from .frames import Planes
 from .frames.util import get_frame
+from .warnings import TimeScaleWarning
 
 
 class InterpolationMethods(Enum):
@@ -161,6 +163,15 @@ class Ephem:
         """
         if epochs.isscalar:
             epochs = epochs.reshape(1)
+
+        if epochs.scale != "tdb":
+            epochs = epochs.tdb
+            warn(
+                "Input time was converted to scale='tdb' with value "
+                f"{epochs.tdb.value}. Use Time(..., scale='tdb') instead.",
+                TimeScaleWarning,
+                stacklevel=2,
+            )
 
         r, v = get_body_barycentric_posvel(body.name, epochs)
         coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
