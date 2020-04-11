@@ -85,9 +85,7 @@ def get_frame(attractor, plane, obstime=J2000):
         frame_class = frames[plane]
     except KeyError:
         raise NotImplementedError(
-            "A frame with plane {} around body {} is not yet implemented".format(
-                plane, attractor
-            )
+            f"A frame with plane {plane} around body {attractor} is not yet implemented"
         )
 
     return frame_class(obstime=obstime)

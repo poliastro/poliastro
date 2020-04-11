@@ -580,7 +580,7 @@ class Orbit:
             "uranus": 799,
             "neptune": 899,
         }
-        location = "500@{}".format(bodies_dict[attractor.name.lower()])
+        location = f"500@{bodies_dict[attractor.name.lower()]}"
 
         obj = Horizons(
             id=name, location=location, epochs=epoch.jd, id_type=id_type

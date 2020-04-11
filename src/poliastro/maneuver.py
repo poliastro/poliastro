@@ -49,9 +49,7 @@ class Maneuver:
             raise ValueError("Delta-V must be three dimensions vectors")
 
     def __repr__(self):
-        return "Number of impulses: {}, Total cost: {:.6f}".format(
-            len(self.impulses), self.get_total_cost()
-        )
+        return f"Number of impulses: {len(self.impulses)}, Total cost: {self.get_total_cost():.6f}"
 
     @u.quantity_input(dts=u.s, dvs=u.m / u.s)
     def _initialize(self, dts, dvs):
