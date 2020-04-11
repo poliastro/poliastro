@@ -76,6 +76,30 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
         if not self._figure._in_batch_mode:
             return self.show()
 
+    def plot_body_orbit(
+        self, body, epoch, *, label=None, color=None, trail=False,
+    ):
+        """Plots complete revolution of body and current position.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time
+            Epoch of current position.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        super().plot_body_orbit(body, epoch, label=label, color=color, trail=trail)
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
     def show(self):
         """Shows the plot in the Notebook.
 
