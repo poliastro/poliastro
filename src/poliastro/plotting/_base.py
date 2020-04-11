@@ -163,8 +163,6 @@ class BaseOrbitPlotter:
         if color is None:
             color = BODY_COLORS.get(body.name)
 
-        colors = self._get_colors(color, trail)
-
         self.set_attractor(body.parent)
 
         # Get approximate, mean value for the period
@@ -174,13 +172,35 @@ class BaseOrbitPlotter:
         epochs = time_range(
             epoch, periods=self._num_points, end=epoch + period, scale="tdb"
         )
-        coordinates = Ephem.from_body(
-            body, epochs, attractor=body.parent, plane=self._plane
-        ).sample()
-        r0 = coordinates[0].xyz
+        ephem = Ephem.from_body(body, epochs, attractor=body.parent, plane=self.plane)
+
+        return self._plot_ephem(ephem, epoch, label=label, color=color, trail=trail)
+
+    def _plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+        if self._attractor is None:
+            raise ValueError(
+                "An attractor must be set up first, please use "
+                "set_attractor(Major_Body) or plot(orbit)"
+            )
+
+        if ephem.plane is not self.plane:
+            raise ValueError(
+                f"The ephemerides reference plane is {ephem.plane} "
+                f"while the plotter is using {self.plane}, "
+                "sample the ephemerides using a different plane "
+                "or create a new plotter"
+            )
+
+        colors = self._get_colors(color, trail)
+
+        coordinates = ephem.sample()
+        if epoch is not None:
+            r0 = ephem.rv(epoch)[0]
+        else:
+            r0 = None
 
         return self.__add_trajectory(
-            coordinates, r0, label=label, colors=colors, dashed=False,
+            coordinates, r0, label=str(label), colors=colors, dashed=False
         )
 
     def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
@@ -245,6 +265,27 @@ class BaseOrbitPlotter:
         # Do not return the result of self._plot
         # This behavior might be overriden by subclasses
         self._plot_body_orbit(body, epoch, label=label, color=color, trail=trail)
+
+    def plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+        """Plots Ephem object over its sampling period.
+
+        Parameters
+        ----------
+        ephem : ~poliastro.ephem.Ephem
+            Ephemerides to plot.
+        epoch : astropy.time.Time, optional
+            Epoch of the current position, none will be used if not given.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        # Do not return the result of self._plot
+        # This behavior might be overriden by subclasses
+        self._plot_ephem(ephem, epoch, label=label, color=color, trail=trail)
 
 
 class Mixin2D:
