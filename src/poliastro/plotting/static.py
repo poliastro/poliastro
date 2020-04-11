@@ -4,7 +4,6 @@ from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from ..frames import Planes
 from ._base import BaseOrbitPlotter, Mixin2D
 
 
@@ -28,7 +27,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
     """
 
-    def __init__(self, ax=None, num_points=150, dark=False):
+    def __init__(self, ax=None, num_points=150, dark=False, *, plane=None):
         """Constructor.
 
         Parameters
@@ -41,7 +40,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             If set as True, plots the orbit in Dark mode.
 
         """
-        super().__init__(num_points)
+        super().__init__(num_points=num_points, plane=plane)
 
         self._ax = ax
         if not self._ax:
@@ -57,12 +56,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         for artist in self._ax.lines + self._ax.collections:
             artist.remove()
 
-        for coordinates, position, label, colors in self._trajectories:
-            if position is not None:
-                self._plot_coordinates(coordinates, label, colors, True)
-                self._plot_position(position, label, colors)
-            else:
-                self._plot_coordinates(coordinates, label, colors, True)
+        super()._redraw()
 
         self._ax.relim()
         self._ax.autoscale()
@@ -149,14 +143,18 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         # TODO: Compute radius?
         return self._draw_point(None, colors[0], label, center=position)
 
-    def _set_legend(self, lines, label):
+    def _set_legend(self, label, line_coordinates, line_position=None):
         if not self._ax.get_legend():
             size = self._ax.figure.get_size_inches() + [8, 0]
             self._ax.figure.set_size_inches(size)
 
         # This will apply the label to either the point or the osculating
         # orbit depending on the last plotted line
-        lines[-1].set_label(label)
+        if line_position is not None:
+            line_position.set_label(label)
+        else:
+            line_coordinates[0].set_label(label)
+
         self._ax.legend(
             loc="upper left",
             bbox_to_anchor=(1.05, 1.015),
@@ -192,7 +190,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         )
 
         if label:
-            self._set_legend(lines, label)
+            self._set_legend(label, *lines)
 
         return lines
 
@@ -218,19 +216,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         lines = lines[0] + [lines[1]]
 
         # Set legend using label from last added trajectory
-        self._set_legend(lines, self._trajectories[-1].label)
+        self._set_legend(self._trajectories[-1].label, *lines)
 
         return lines
 
     def plot_body_orbit(
-        self,
-        body,
-        epoch,
-        plane=Planes.EARTH_ECLIPTIC,
-        *,
-        label=None,
-        color=None,
-        trail=False,
+        self, body, epoch, *, label=None, color=None, trail=False,
     ):
         """Plots complete revolution of body and current position.
 
@@ -240,8 +231,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             Body.
         epoch : astropy.time.Time
             Epoch of current position.
-        plane : ~poliastro.frames.enums.Planes
-            Reference plane.
         label : str, optional
             Label of the orbit, default to the name of the body.
         color : string, optional
@@ -251,13 +240,13 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         """
         if self._frame is None:
-            self.set_body_frame(body, epoch, plane)
+            self.set_body_frame(body, epoch)
 
         lines = self._plot_body_orbit(
-            body, epoch, plane, label=label, color=color, trail=trail
+            body, epoch, label=label, color=color, trail=trail
         )
 
         # Set legend using label from last added trajectory
-        self._set_legend(lines, self._trajectories[-1].label)
+        self._set_legend(self._trajectories[-1].label, *lines)
 
         return lines

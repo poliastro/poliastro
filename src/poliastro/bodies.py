@@ -25,7 +25,8 @@ from astropy import units as u
 from astropy.constants import G
 from astropy.units import Quantity
 
-from poliastro import constants
+from . import constants
+from .frames import Planes
 
 
 # HACK: Constants cannot be hashed
@@ -113,7 +114,14 @@ class Body(
 
 
 class SolarSystemBody(Body):
-    def plot(self, epoch=None, label=None, use_3d=False, interactive=False):
+    def plot(
+        self,
+        epoch=None,
+        label=None,
+        use_3d=False,
+        interactive=False,
+        plane=Planes.EARTH_ECLIPTIC,
+    ):
         """Plots the body orbit.
 
         Parameters
@@ -136,15 +144,17 @@ class SolarSystemBody(Body):
         elif not interactive:
             from poliastro.plotting.static import StaticOrbitPlotter
 
-            return StaticOrbitPlotter().plot_body_orbit(self, epoch, label=label)
+            return StaticOrbitPlotter(plane=plane).plot_body_orbit(
+                self, epoch, label=label
+            )
         elif use_3d:
             from poliastro.plotting.core import OrbitPlotter3D
 
-            return OrbitPlotter3D().plot_body_orbit(self, epoch, label=label)
+            return OrbitPlotter3D(plane=plane).plot_body_orbit(self, epoch, label=label)
         else:
             from poliastro.plotting.core import OrbitPlotter2D
 
-            return OrbitPlotter2D().plot_body_orbit(self, epoch, label=label)
+            return OrbitPlotter2D(plane=plane).plot_body_orbit(self, epoch, label=label)
 
 
 Sun = SolarSystemBody(
@@ -249,7 +259,7 @@ Neptune = SolarSystemBody(
     rotational_period=constants.rotational_period_neptune,
 )
 
-Pluto = SolarSystemBody(
+Pluto = Body(
     parent=Sun,
     k=constants.GM_pluto,
     name="Pluto",
@@ -260,8 +270,7 @@ Pluto = SolarSystemBody(
     rotational_period=constants.rotational_period_pluto,
 )
 
-
-Moon = SolarSystemBody(
+Moon = Body(
     parent=Earth,
     k=constants.GM_moon,
     name="Moon",

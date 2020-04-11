@@ -22,7 +22,6 @@ from poliastro.bodies import (
     Mercury,
     Moon,
     Neptune,
-    Pluto,
     Saturn,
     Uranus,
     Venus,
@@ -39,7 +38,6 @@ __all__ = [
     "SaturnICRS",
     "UranusICRS",
     "NeptuneICRS",
-    "PlutoICRS",
 ]
 
 
@@ -135,10 +133,6 @@ class UranusICRS(_PlanetaryICRS):
 
 class NeptuneICRS(_PlanetaryICRS):
     body = Neptune
-
-
-class PlutoICRS(_PlanetaryICRS):
-    body = Pluto
 
 
 class MoonICRS(_PlanetaryICRS):

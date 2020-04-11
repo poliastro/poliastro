@@ -24,6 +24,7 @@ from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
 from poliastro.twobody.propagation import mean_motion, propagate
 
 from ..util import find_closest_value, norm
+from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
 from .elements import (
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
@@ -45,18 +46,6 @@ ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} 
 ORBIT_NO_FRAME_FORMAT = (
     "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 )
-
-
-class TimeScaleWarning(UserWarning):
-    pass
-
-
-class OrbitSamplingWarning(UserWarning):
-    pass
-
-
-class PatchedConicsWarning(UserWarning):
-    pass
 
 
 class Orbit:
@@ -253,7 +242,7 @@ class Orbit:
         """
         assert np.any(r.value), "Position vector must be non zero"
 
-        if r.ndim > 1 or v.ndim > 1:
+        if r.ndim != 1 or v.ndim != 1:
             raise ValueError(
                 f"Vectors must have dimension 1, got {r.ndim} and {v.ndim}"
             )
@@ -349,6 +338,10 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        for element in a, ecc, inc, raan, argp, nu, epoch:
+            if not element.isscalar:
+                raise ValueError(f"Elements must be scalar, got {element}")
+
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use Orbit.parabolic instead")
 
@@ -587,7 +580,7 @@ class Orbit:
             "uranus": 799,
             "neptune": 899,
         }
-        location = "500@{}".format(bodies_dict[attractor.name.lower()])
+        location = f"500@{bodies_dict[attractor.name.lower()]}"
 
         obj = Horizons(
             id=name, location=location, epochs=epoch.jd, id_type=id_type
@@ -604,7 +597,7 @@ class Orbit:
         return ss
 
     @classmethod
-    def from_sbdb(cls, name, **kargs):
+    def from_sbdb(cls, name, **kwargs):
         """Return osculating `Orbit` by using `SBDB` from Astroquery.
 
         Parameters
@@ -625,7 +618,7 @@ class Orbit:
         """
         from poliastro.bodies import Sun
 
-        obj = SBDB.query(name, full_precision=True, **kargs)
+        obj = SBDB.query(name, full_precision=True, **kwargs)
 
         if "count" in obj:
             # no error till now ---> more than one object has been found

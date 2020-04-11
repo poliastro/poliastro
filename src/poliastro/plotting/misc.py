@@ -29,13 +29,13 @@ def _plot_bodies(orbit_plotter, outer=True, epoch=None):
 
 def _plot_solar_system_2d(epoch, outer=True, interactive=False):
     if interactive:
-        orbit_plotter = (
-            OrbitPlotter2D()
+        orbit_plotter = OrbitPlotter2D(
+            plane=Planes.EARTH_ECLIPTIC
         )  # type: Union[OrbitPlotter2D, StaticOrbitPlotter]
     else:
-        orbit_plotter = StaticOrbitPlotter()
+        orbit_plotter = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
 
-    orbit_plotter.set_body_frame(Earth, epoch, Planes.EARTH_ECLIPTIC)
+    orbit_plotter.set_body_frame(Earth, epoch)
 
     _plot_bodies(orbit_plotter, outer, epoch)
 
@@ -43,7 +43,7 @@ def _plot_solar_system_2d(epoch, outer=True, interactive=False):
 
 
 def _plot_solar_system_3d(epoch, outer=True):
-    orbit_plotter = OrbitPlotter3D()
+    orbit_plotter = OrbitPlotter3D(plane=Planes.EARTH_ECLIPTIC)
 
     _plot_bodies(orbit_plotter, outer, epoch)
 

@@ -15,7 +15,6 @@ from poliastro.bodies import (
     Mars,
     Mercury,
     Neptune,
-    Pluto,
     Saturn,
     Sun,
     Uranus,
@@ -31,7 +30,6 @@ from poliastro.frames.equatorial import (
     MarsICRS,
     MercuryICRS,
     NeptuneICRS,
-    PlutoICRS,
     SaturnICRS,
     UranusICRS,
     VenusICRS,
@@ -42,7 +40,6 @@ from poliastro.frames.fixed import (
     MarsFixed,
     MercuryFixed,
     NeptuneFixed,
-    PlutoFixed,
     SaturnFixed,
     SunFixed,
     UranusFixed,
@@ -60,7 +57,6 @@ from poliastro.frames.fixed import (
         (Saturn, SaturnICRS),
         (Uranus, UranusICRS),
         (Neptune, NeptuneICRS),
-        (Pluto, PlutoICRS),
     ],
 )
 def test_planetary_frames_have_proper_string_representations(body, frame):
@@ -138,7 +134,6 @@ def test_icrs_body_position_to_planetary_frame_yields_zeros(body, frame):
         (Saturn, SaturnFixed, SaturnICRS),
         (Uranus, UranusFixed, UranusICRS),
         (Neptune, NeptuneFixed, NeptuneICRS),
-        (Pluto, PlutoFixed, PlutoICRS),
     ],
 )
 def test_planetary_fixed_inertial_conversion(body, fixed_frame, inertial_frame):
@@ -168,7 +163,6 @@ def test_planetary_fixed_inertial_conversion(body, fixed_frame, inertial_frame):
         (Saturn, SaturnFixed, SaturnICRS),
         (Uranus, UranusFixed, UranusICRS),
         (Neptune, NeptuneFixed, NeptuneICRS),
-        (Pluto, PlutoFixed, PlutoICRS),
     ],
 )
 def test_planetary_inertial_fixed_conversion(body, fixed_frame, inertial_frame):
@@ -198,7 +192,6 @@ def test_planetary_inertial_fixed_conversion(body, fixed_frame, inertial_frame):
         (Saturn, SaturnFixed, SaturnICRS),
         (Uranus, UranusFixed, UranusICRS),
         (Neptune, NeptuneFixed, NeptuneICRS),
-        (Pluto, PlutoFixed, PlutoICRS),
     ],
 )
 def test_planetary_inertial_roundtrip_vector(body, fixed_frame, inertial_frame):
