@@ -29,6 +29,7 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000, J2000_TDB
+from poliastro.ephem import Ephem
 from poliastro.examples import iss
 from poliastro.frames.ecliptic import HeliocentricEclipticJ2000
 from poliastro.frames.enums import Planes
@@ -1002,6 +1003,19 @@ def test_from_sbdb_raise_valueerror():
         str(excinfo.value)
         == "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley\n"
     )
+
+
+def test_from_ephem_has_expected_properties():
+    epoch = J2000_TDB
+    ephem = Ephem.from_body(Earth, epoch, attractor=Sun)
+    expected_r, expected_v = ephem.rv(epoch)
+
+    ss = Orbit.from_ephem(Sun, ephem, epoch)
+
+    assert ss.plane is ephem.plane
+    assert ss.epoch == epoch
+    assert_quantity_allclose(ss.r, expected_r)
+    assert_quantity_allclose(ss.v, expected_v)
 
 
 def test_from_vectors_wrong_dimensions_fails():
