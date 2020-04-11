@@ -344,6 +344,33 @@ class COESA76(COESA):
         else:
             T = (self.temperature(alt_or_temp, geometric)).value
 
+        # using eqn-(51)
         viscosity = (beta.value * T ** 1.5 / (T + S.value)) * (u.N * u.s / (u.m) ** 2)
 
         return viscosity
+
+    def sound_speed(self, alt_or_temp, geometric=True):
+        """ Solves speed of sound at given height or temperature.
+
+        Parameters
+        ----------
+        alt_or_temp: ~astropy.units.Quantity
+            Geometric/Geopotential height or temperature.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        k: ~astropy.units.Quantity
+            Speed of Sound at given height or temperature.
+        """
+        # checks if parameter is temperature
+        if alt_or_temp.unit is u.K:
+            T = alt_or_temp.to(u.K).value
+        # if parameter is geometric/geopotential height
+        else:
+            T = (self.temperature(alt_or_temp, geometric)).value
+
+        Cs = ((gamma * R_air.value * T) ** 0.5) * (u.m / u.s)
+
+        return Cs
