@@ -45,8 +45,8 @@ from poliastro.frames.equatorial import (
     VenusICRS,
 )
 from poliastro.frames.util import get_frame
-from poliastro.twobody.orbit import (
-    Orbit,
+from poliastro.twobody.orbit import Orbit
+from poliastro.warnings import (
     OrbitSamplingWarning,
     PatchedConicsWarning,
     TimeScaleWarning,

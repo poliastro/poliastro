@@ -24,6 +24,7 @@ from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
 from poliastro.twobody.propagation import mean_motion, propagate
 
 from ..util import find_closest_value, norm
+from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
 from .elements import (
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
@@ -45,18 +46,6 @@ ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} 
 ORBIT_NO_FRAME_FORMAT = (
     "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 )
-
-
-class TimeScaleWarning(UserWarning):
-    pass
-
-
-class OrbitSamplingWarning(UserWarning):
-    pass
-
-
-class PatchedConicsWarning(UserWarning):
-    pass
 
 
 class Orbit:
