@@ -59,3 +59,98 @@ def test_properties_coesa76(z):
     assert_quantity_allclose(T, expected_T, rtol=1e-4)
     assert_quantity_allclose(p, expected_p, rtol=1e-4)
     assert_quantity_allclose(rho, expected_rho, rtol=1e-3)
+
+
+# DATA DIRECTLY TAKEN FROM TABLE-III COESA76 REPORT
+sound_speed_viscosity_conductivity = {
+    0.5
+    * u.km: [
+        338.37 * (u.m / u.s),
+        1.7737e-5 * (u.N * u.s / (u.m) ** 2),
+        2.5106e-2 * (u.J / u.m / u.s / u.K),
+    ],
+    10
+    * u.km: [
+        299.53 * (u.m / u.s),
+        1.4577e-5 * (u.N * u.s / (u.m) ** 2),
+        2.0088e-2 * (u.J / u.m / u.s / u.K),
+    ],
+    24
+    * u.km: [
+        297.72 * (u.m / u.s),
+        1.4430e-5 * (u.N * u.s / (u.m) ** 2),
+        1.9862e-2 * (u.J / u.m / u.s / u.K),
+    ],
+    41
+    * u.km: [
+        318.94 * (u.m / u.s),
+        1.6151e-5 * (u.N * u.s / (u.m) ** 2),
+        2.2556e-2 * (u.J / u.m / u.s / u.K),
+    ],
+    50
+    * u.km: [
+        329.80 * (u.m / u.s),
+        1.7037e-5 * (u.N * u.s / (u.m) ** 2),
+        2.3973e-2 * (u.J / u.m / u.s / u.K),
+    ],
+    67
+    * u.km: [
+        302.57 * (u.m / u.s),
+        1.4823e-5 * (u.N * u.s / (u.m) ** 2),
+        2.0469e-2 * (u.J / u.m / u.s / u.K),
+    ],
+    85
+    * u.km: [
+        275.52 * (u.m / u.s),
+        1.2647e-5 * (u.N * u.s / (u.m) ** 2),
+        1.7162e-2 * (u.J / u.m / u.s / u.K),
+    ],
+}
+
+
+@pytest.mark.parametrize("z", sound_speed_viscosity_conductivity.keys())
+def test_sound_speed_viscosity_conductivity(z):
+    expected_Cs = sound_speed_viscosity_conductivity[z][0]
+    expected_mu = sound_speed_viscosity_conductivity[z][1]
+    expected_k = sound_speed_viscosity_conductivity[z][2]
+
+    Cs = coesa76.sound_speed(z)
+    mu = coesa76.viscosity(z)
+    k = coesa76.thermal_conductivity(z)
+
+    assert_quantity_allclose(Cs, expected_Cs, rtol=1e-4)
+    assert_quantity_allclose(mu, expected_mu, rtol=1e-4)
+    assert_quantity_allclose(k, expected_k, rtol=1e-2)
+
+
+def test_sound_speed_over_86km():
+    z = 87 * u.km
+    # test speed of sound over 86 km
+    with pytest.raises(ValueError) as excinfo:
+        coesa76.sound_speed(z)
+    assert (
+        "ValueError: Speed of sound in COESA76 has just been implemented up to 86km."
+        in excinfo.exconly()
+    )
+
+
+def test_viscosity_over_86km():
+    z = 87 * u.km
+    # test viscosity over 86 km
+    with pytest.raises(ValueError) as excinfo:
+        coesa76.viscosity(z)
+    assert (
+        "ValueError: Dynamic Viscosity in COESA76 has just been implemented up to 86km."
+        in excinfo.exconly()
+    )
+
+
+def test_conductivity_over_86km():
+    z = 87 * u.km
+    # test thermal conductivity over 86 km
+    with pytest.raises(ValueError) as excinfo:
+        coesa76.thermal_conductivity(z)
+    assert (
+        "ValueError: Thermal conductivity in COESA76 has just been implemented up to 86km."
+        in excinfo.exconly()
+    )
