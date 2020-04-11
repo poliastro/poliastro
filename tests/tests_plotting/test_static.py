@@ -128,7 +128,7 @@ def test_basic_orbit_and_trajectory_plotting():
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
     plotter.plot(iss)
-    plotter.plot_trajectory(molniya.sample())
+    plotter.plot_trajectory(molniya.sample(), label="Molniya")
 
     return fig
 
