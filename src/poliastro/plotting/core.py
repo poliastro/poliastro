@@ -15,8 +15,8 @@ from ._base import BaseOrbitPlotter, Mixin2D
 
 
 class _PlotlyOrbitPlotter(BaseOrbitPlotter):
-    def __init__(self, figure=None, *, num_points=150):
-        super().__init__(num_points)
+    def __init__(self, figure=None, *, num_points=150, plane=None):
+        super().__init__(num_points=num_points, plane=plane)
 
         self._figure = figure or Figure()
         self._layout = None
@@ -94,8 +94,8 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
     """
 
-    def __init__(self, figure=None, dark=False, *, num_points=150):
-        super().__init__(figure, num_points=num_points)
+    def __init__(self, figure=None, dark=False, *, num_points=150, plane=None):
+        super().__init__(figure, num_points=num_points, plane=plane)
         self._layout = Layout(
             autosize=True,
             scene=dict(
@@ -197,8 +197,8 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     .. versionadded:: 0.9.0
     """
 
-    def __init__(self, figure=None, *, num_points=150):
-        super().__init__(figure, num_points=num_points)
+    def __init__(self, figure=None, *, num_points=150, plane=None):
+        super().__init__(figure, num_points=num_points, plane=plane)
         self._layout = Layout(
             autosize=True,
             xaxis=dict(title="x (km)", constrain="domain"),
@@ -353,5 +353,5 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             self.set_body_frame(body, epoch)
 
         return super().plot_body_orbit(
-            body, epoch, plane, label=label, color=color, trail=trail
+            body, epoch, label=label, color=color, trail=trail
         )

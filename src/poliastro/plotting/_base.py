@@ -23,24 +23,20 @@ class BaseOrbitPlotter:
     Base class for all the OrbitPlotter classes.
     """
 
-    def __init__(self, num_points=150):
+    def __init__(self, num_points=150, *, plane=None):
         self._num_points = num_points
-
         self._trajectories = []  # type: List[Trajectory]
-
         self._attractor = None
-
-        # This plane is used as a reference
-        # to conceal orbits in different planes,
-        # but it is not exposed as public API
-        # because it can be confusing with the 2D frames
-        self._plane = None
-
+        self._plane = plane or Planes.EARTH_EQUATOR
         self._attractor_radius = np.inf * u.km
 
     @property
     def trajectories(self):
         return self._trajectories
+
+    @property
+    def plane(self):
+        return self._plane
 
     def _set_attractor(self, attractor):
         if self._attractor is None:
@@ -151,10 +147,7 @@ class BaseOrbitPlotter:
 
         self.set_attractor(orbit.attractor)
 
-        if self._plane is None:
-            self._plane = orbit.plane
-        elif orbit.plane is not self._plane:
-            orbit = orbit.change_plane(self._plane)
+        orbit = orbit.change_plane(self.plane)
 
         label = generate_label(orbit.epoch, label)
         coordinates = orbit.sample(self._num_points)
@@ -164,18 +157,8 @@ class BaseOrbitPlotter:
         )
 
     def _plot_body_orbit(
-        self,
-        body,
-        epoch,
-        plane=Planes.EARTH_ECLIPTIC,
-        *,
-        label=None,
-        color=None,
-        trail=False,
+        self, body, epoch, *, label=None, color=None, trail=False,
     ):
-        if self._plane is None:
-            self._plane = plane
-
         if color is None:
             color = BODY_COLORS.get(body.name)
 
@@ -228,14 +211,7 @@ class BaseOrbitPlotter:
         self._plot(orbit, label=label, color=color, trail=trail)
 
     def plot_body_orbit(
-        self,
-        body,
-        epoch,
-        plane=Planes.EARTH_ECLIPTIC,
-        *,
-        label=None,
-        color=None,
-        trail=False,
+        self, body, epoch, *, label=None, color=None, trail=False,
     ):
         """Plots complete revolution of body and current position.
 
@@ -245,8 +221,6 @@ class BaseOrbitPlotter:
             Body.
         epoch : astropy.time.Time
             Epoch of current position.
-        plane : ~poliastro.frames.enums.Planes
-            Reference plane.
         label : str, optional
             Label of the orbit, default to the name of the body.
         color : string, optional
@@ -257,7 +231,7 @@ class BaseOrbitPlotter:
         """
         # Do not return the result of self._plot
         # This behavior might be overriden by subclasses
-        self._plot_body_orbit(body, epoch, plane, label=label, color=color, trail=trail)
+        self._plot_body_orbit(body, epoch, label=label, color=color, trail=trail)
 
 
 class Mixin2D:
@@ -314,7 +288,7 @@ class Mixin2D:
             warnings.simplefilter("ignore", DeprecationWarning)
             self._set_frame(*orbit.pqw())
 
-    def set_body_frame(self, body, epoch=None, plane=Planes.EARTH_ECLIPTIC):
+    def set_body_frame(self, body, epoch=None):
         """Sets perifocal frame based on the orbit of a body at a particular epoch if given.
 
         Parameters
@@ -323,14 +297,12 @@ class Mixin2D:
             Body.
         epoch : astropy.time.Time, optional
             Epoch of current position.
-        plane : ~poliastro.frames.enums.Planes
-            Reference plane.
 
         """
         from poliastro.twobody import Orbit
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
-            orbit = Orbit.from_body_ephem(body, epoch).change_plane(plane)
+            orbit = Orbit.from_body_ephem(body, epoch).change_plane(self.plane)  # type: ignore
 
         self.set_orbit_frame(orbit)
