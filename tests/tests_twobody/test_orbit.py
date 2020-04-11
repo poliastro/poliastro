@@ -1004,13 +1004,23 @@ def test_from_sbdb_raise_valueerror():
     )
 
 
-def test_orbit_wrong_dimensions_fails():
+def test_from_vectors_wrong_dimensions_fails():
     bad_r = [[1000, 0, 0]] * u.km
     bad_v = [[[0, 10, 0]]] * u.km / u.s
 
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_vectors(Earth, bad_r, bad_v)
     assert "ValueError: Vectors must have dimension 1, got 2 and 3" in excinfo.exconly()
+
+
+def test_from_classical_wrong_dimensions_fails():
+    bad_a = [1.0] * u.AU
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+
+    with pytest.raises(ValueError) as excinfo:
+        Orbit.from_classical(Earth, bad_a, _, _a, _a, _a, _a)
+    assert "ValueError: Elements must be scalar, got [1.] AU" in excinfo.exconly()
 
 
 @pytest.mark.remote_data

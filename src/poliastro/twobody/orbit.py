@@ -242,7 +242,7 @@ class Orbit:
         """
         assert np.any(r.value), "Position vector must be non zero"
 
-        if r.ndim > 1 or v.ndim > 1:
+        if r.ndim != 1 or v.ndim != 1:
             raise ValueError(
                 f"Vectors must have dimension 1, got {r.ndim} and {v.ndim}"
             )
@@ -338,6 +338,10 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        for element in a, ecc, inc, raan, argp, nu, epoch:
+            if not element.isscalar:
+                raise ValueError(f"Elements must be scalar, got {element}")
+
         if ecc == 1.0 * u.one:
             raise ValueError("For parabolic orbits use Orbit.parabolic instead")
 
