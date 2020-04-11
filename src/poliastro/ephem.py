@@ -267,7 +267,7 @@ class Ephem:
         return cls(coordinates, epochs, plane)
 
     def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):
-        if epochs is None:
+        if epochs is None or epochs.isscalar and (epochs == self.epochs).all():
             return self._coordinates
 
         # TODO: Proper type annotation

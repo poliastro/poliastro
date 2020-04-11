@@ -106,6 +106,21 @@ def test_ephem_sample_scalar_epoch_returns_1_dimensional_coordinates(
 
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+def test_ephem_sample_scalar_epoch_and_coordinates_returns_exactly_same_input(
+    epochs, coordinates, method
+):
+    unused_plane = Planes.EARTH_EQUATOR
+    coordinates = coordinates[0].reshape(-1)
+    epochs = epochs[0].reshape(-1)
+    ephem = Ephem(coordinates, epochs, unused_plane)
+
+    result_coordinates = ephem.sample(epochs[0], method=method)
+
+    # Exactly the same
+    assert result_coordinates == coordinates
+
+
+@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
 def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method):
     unused_plane = Planes.EARTH_EQUATOR
     ephem = Ephem(coordinates, epochs, unused_plane)
