@@ -272,7 +272,7 @@ class Ephem:
 
         # TODO: Proper type annotation
         coordinates = _INTERPOLATION_MAPPING[method](
-            epochs, self.epochs, self._coordinates, **kwargs
+            epochs.reshape(-1), self.epochs, self._coordinates, **kwargs
         )  # type: ignore
 
         return coordinates
