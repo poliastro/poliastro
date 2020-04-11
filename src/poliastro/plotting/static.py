@@ -144,14 +144,18 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         # TODO: Compute radius?
         return self._draw_point(None, colors[0], label, center=position)
 
-    def _set_legend(self, lines, label):
+    def _set_legend(self, label, line_coordinates, line_position=None):
         if not self._ax.get_legend():
             size = self._ax.figure.get_size_inches() + [8, 0]
             self._ax.figure.set_size_inches(size)
 
         # This will apply the label to either the point or the osculating
         # orbit depending on the last plotted line
-        lines[-1].set_label(label)
+        if line_position is not None:
+            line_position.set_label(label)
+        else:
+            line_coordinates[0].set_label(label)
+
         self._ax.legend(
             loc="upper left",
             bbox_to_anchor=(1.05, 1.015),
@@ -187,7 +191,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         )
 
         if label:
-            self._set_legend(lines, label)
+            self._set_legend(label, *lines)
 
         return lines
 
@@ -213,7 +217,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         lines = lines[0] + [lines[1]]
 
         # Set legend using label from last added trajectory
-        self._set_legend(lines, self._trajectories[-1].label)
+        self._set_legend(self._trajectories[-1].label, *lines)
 
         return lines
 
@@ -253,6 +257,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         )
 
         # Set legend using label from last added trajectory
-        self._set_legend(lines, self._trajectories[-1].label)
+        self._set_legend(self._trajectories[-1].label, *lines)
 
         return lines
