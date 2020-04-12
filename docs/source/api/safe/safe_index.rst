@@ -10,7 +10,7 @@ OOP nature.
     
     digraph {
         "poliastro" -> "twobody", "threebody", "bodies", "neos", "plotting", "iod", "constants", "coordinates", "examples", "frames",
-                       "maneuver"
+                       "maneuver", "ephem"
 
     }
 
@@ -20,6 +20,7 @@ OOP nature.
 
     atmosphere/atmosphere_index
     twobody/twobody_index
+    ephem
     threebody/threebody_index
     bodies
     neos/neos_index
