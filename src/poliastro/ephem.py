@@ -130,6 +130,17 @@ _INTERPOLATION_MAPPING = {
 }
 
 
+def _get_destination_frame(attractor, plane, epochs):
+    if attractor is not None:
+        destination_frame = get_frame(attractor, plane, epochs)
+    elif plane is Planes.EARTH_ECLIPTIC:
+        destination_frame = BarycentricMeanEcliptic
+    else:
+        destination_frame = None
+
+    return destination_frame
+
+
 class Ephem:
     def __init__(self, coordinates, epochs, plane):
         if coordinates.ndim != 1 or epochs.ndim != 1:
@@ -181,12 +192,7 @@ class Ephem:
         r, v = get_body_barycentric_posvel(body.name, epochs)
         coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
 
-        if attractor is not None:
-            destination_frame = get_frame(attractor, plane, epochs)
-        elif plane is Planes.EARTH_ECLIPTIC:
-            destination_frame = BarycentricMeanEcliptic
-        else:
-            destination_frame = None
+        destination_frame = _get_destination_frame(attractor, plane, epochs)
 
         if destination_frame is not None:
             coordinates = (
