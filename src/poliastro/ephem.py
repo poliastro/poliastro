@@ -314,9 +314,9 @@ class Ephem:
             return self._coordinates
 
         # TODO: Proper type annotation
-        coordinates = _INTERPOLATION_MAPPING[method](
+        coordinates = _INTERPOLATION_MAPPING[method](  # type: ignore
             epochs.reshape(-1), self.epochs, self._coordinates, **kwargs
-        )  # type: ignore
+        )
 
         return coordinates
 
