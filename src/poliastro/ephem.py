@@ -22,6 +22,8 @@ from .warnings import TimeScaleWarning
 
 
 class InterpolationMethods(Enum):
+    """Interpolation methods to sample the ephemerides."""
+
     SINC = auto()
     SPLINES = auto()
 
@@ -142,6 +144,22 @@ def _get_destination_frame(attractor, plane, epochs):
 
 
 class Ephem:
+    """Time history of position and velocity of some object at particular epochs.
+
+    Instead of creating Ephem objects directly,
+    you are encouraged to use the available classmethods.
+
+    Parameters
+    ----------
+    coordinates : astropy.coordinates.CartesianRepresentation
+        Coordinates with velocities.
+    epochs : astropy.time.Time
+        Epochs corresponding to the coordinates.
+    plane : ~poliastro.frames.Planes
+        Reference plane of the coordinates.
+
+    """
+
     def __init__(self, coordinates, epochs, plane):
         if coordinates.ndim != 1 or epochs.ndim != 1:
             raise ValueError(
@@ -154,10 +172,12 @@ class Ephem:
 
     @property
     def epochs(self):
+        """Epochs at which the ephemerides was originally sampled."""
         return self._epochs
 
     @property
     def plane(self):
+        """Reference plane of the ephemerides."""
         return self._plane
 
     @classmethod
@@ -273,6 +293,23 @@ class Ephem:
         return cls(coordinates, epochs, plane)
 
     def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):
+        """Returns coordinates at specified epochs.
+
+        Parameters
+        ----------
+        epochs: ~astropy.time.Time, optional
+            Epochs to sample the ephemerides,
+            if not given the original one from the object will be used.
+        method : ~poliastro.ephem.InterpolationMethods, optional
+            Interpolation method to use for epochs outside of the original ones,
+            default to splines.
+
+        Returns
+        -------
+        CartesianRepresentation
+            Sampled coordinates with velocities.
+
+        """
         if epochs is None or epochs.isscalar and (epochs == self.epochs).all():
             return self._coordinates
 
