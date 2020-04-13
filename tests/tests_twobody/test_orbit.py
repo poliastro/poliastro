@@ -1132,7 +1132,8 @@ def test_time_to_anomaly():
 
 
 @pytest.mark.xfail
-def test_issue_798():
+def test_can_set_iss_attractor_to_earth():
+    # See https://github.com/poliastro/poliastro/issues/798
     epoch = Time("2019-11-10 12:00:00")
     iss = Orbit.from_horizons(
         "International Space Station", Sun, epoch=epoch, id_type="majorbody"
