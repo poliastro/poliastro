@@ -73,7 +73,7 @@ def rv_pqw(k, p, ecc, nu):
     example proposed is 2.11 of Curtis 3rd Edition book.
     """
     r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
-    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0 * nu])*sqrt(k / p)).T
+    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0 * nu]) * sqrt(k / p)).T
     return r_pqw, v_pqw
 
 
