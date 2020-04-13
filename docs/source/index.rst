@@ -59,7 +59,7 @@ browser using binder, a cloud Jupyter notebook server:
 
 See `benchmarks`_ for the performance analysis of poliastro.
 
-.. _`benchmarks`: https://blog.poliastro.space/benchmarks/
+.. _`benchmarks`: https://benchmarks.poliastro.space/
 
 poliastro works on recent versions of Python and is released under
 the MIT license, hence allowing commercial use of the library.
