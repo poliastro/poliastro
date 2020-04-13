@@ -437,7 +437,7 @@ def nu_to_M(nu, ecc, delta=1e-2):
     ecc : float
         Eccentricity.
     delta : float (optional)
-        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
+        Threshold of near-parabolic regime definition (from Davide Farnocchia et al)
 
     Returns
     -------
