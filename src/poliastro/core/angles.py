@@ -36,6 +36,7 @@ def _kepler_equation_prime_parabolic(D, M, ecc):
 @jit
 def M_parabolic(ecc, D, tolerance=1e-16):
     x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
+    assert abs(x) < 1
     small_term = False
     S = 0.0
     k = 0
