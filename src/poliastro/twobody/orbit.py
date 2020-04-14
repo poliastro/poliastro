@@ -445,6 +445,25 @@ class Orbit:
 
         return ss
 
+    @classmethod
+    def from_ephem(cls, attractor, ephem, epoch):
+        """Create osculating orbit from ephemerides at a given epoch.
+
+        This will assume that the `Ephem` coordinates
+        are expressed with respect the given body.
+
+        Parameters
+        ----------
+        ephem : ~poliastro.ephem.Ephem
+            Ephemerides object to use.
+        attractor : ~poliastro.bodies.Body
+            Body to use as attractor.
+        epoch : ~astropy.time.Time
+            Epoch to retrieve the osculating orbit at.
+
+        """
+        return cls.from_vectors(attractor, *ephem.rv(epoch), epoch, ephem.plane)
+
     def get_frame(self):
         """Get equivalent reference frame of the orbit.
 

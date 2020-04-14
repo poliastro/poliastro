@@ -1,11 +1,17 @@
 import matplotlib.pyplot as plt
 import pytest
+from astropy import units as u
+from astropy.coordinates import CartesianDifferential, CartesianRepresentation
+from astropy.time import Time
 
-from poliastro.bodies import Earth, Jupiter, Mars
+from poliastro.bodies import Earth, Jupiter, Mars, Sun
 from poliastro.constants import J2000
+from poliastro.ephem import Ephem
 from poliastro.examples import churi, iss, molniya
 from poliastro.frames import Planes
 from poliastro.plotting.static import StaticOrbitPlotter
+from poliastro.twobody import Orbit
+from poliastro.util import time_range
 
 
 def test_axes_labels_and_title():
@@ -103,6 +109,26 @@ def test_redraw_keeps_trajectories():
     assert len(op.trajectories) == 2
 
 
+def test_plot_ephem_different_plane_raises_error():
+    unused_epochs = Time.now().reshape(-1)
+    unused_coordinates = CartesianRepresentation(
+        [(1, 0, 0)] * u.au,
+        xyz_axis=1,
+        differentials=CartesianDifferential([(0, 1, 0)] * (u.au / u.day), xyz_axis=1),
+    )
+
+    op = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
+    op.set_attractor(Sun)
+    op.set_body_frame(Earth)
+    with pytest.raises(ValueError) as excinfo:
+        op.plot_ephem(Ephem(unused_epochs, unused_coordinates, Planes.EARTH_EQUATOR))
+
+    assert (
+        "sample the ephemerides using a different plane or create a new plotter"
+        in excinfo.exconly()
+    )
+
+
 @pytest.mark.mpl_image_compare
 def test_basic_plotting():
     fig, ax = plt.subplots()
@@ -157,3 +183,41 @@ def test_body_plotting(earth_perihelion):
     Earth.plot(earth_perihelion)
 
     return plt.gcf()
+
+
+@pytest.mark.mpl_image_compare
+def test_plot_ephem_epoch():
+    epoch = Time("2020-02-14 00:00:00")
+    ephem = Ephem.from_horizons(
+        "2020 CD3",
+        time_range(Time("2020-02-13 12:00:00"), end=Time("2020-02-14 12:00:00")),
+        attractor=Earth,
+    )
+
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.set_attractor(Earth)
+    plotter.set_orbit_frame(Orbit.from_ephem(Earth, ephem, epoch))
+
+    plotter.plot_ephem(ephem, epoch, label="2020 CD3 Minimoon", color="k")
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare
+def test_plot_ephem_no_epoch():
+    epoch = Time("2020-02-14 00:00:00")
+    ephem = Ephem.from_horizons(
+        "2020 CD3",
+        time_range(Time("2020-02-13 12:00:00"), end=Time("2020-02-14 12:00:00")),
+        attractor=Earth,
+    )
+
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.set_attractor(Earth)
+    plotter.set_orbit_frame(Orbit.from_ephem(Earth, ephem, epoch))
+
+    plotter.plot_ephem(ephem, label="2020 CD3 Minimoon", color="k")
+
+    return fig
