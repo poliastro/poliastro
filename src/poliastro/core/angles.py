@@ -307,7 +307,8 @@ def M_to_E(M, ecc):
         Eccentric anomaly.
 
     """
-    E = newton("elliptic", M, args=(M, ecc))
+    E0 = M
+    E = newton("elliptic", E0, args=(M, ecc))
     return E
 
 
@@ -328,20 +329,47 @@ def M_to_F(M, ecc):
         Hyperbolic eccentric anomaly.
 
     """
-    F = newton("hyperbolic", np.arcsinh(M / ecc), args=(M, ecc), maxiter=100)
+    F0 = np.arcsinh(M / ecc)
+    F = newton("hyperbolic", F0, args=(M, ecc), maxiter=100)
     return F
 
 
 @jit
-def M_to_D(M, ecc):
+def M_to_D(M):
     """Parabolic eccentric anomaly from mean anomaly.
 
     Parameters
     ----------
     M : float
         Mean anomaly in radians.
+
+    Returns
+    -------
+    D : float
+        Parabolic eccentric anomaly.
+
+    Notes
+    -----
+    This uses the analytical solution of Barker's equation,
+    see Battin, 1987.
+
+    """
+    B = 3.0 * M / 2.0
+    A = (B + (1.0 + B ** 2) ** 0.5) ** (2.0 / 3.0)
+    D = 2 * A * B / (1 + A + A ** 2)
+    return D
+
+
+@jit
+def M_to_D_near_parabolic(M, ecc):
+    """Parabolic eccentric anomaly from mean anomaly, near parabolic case.
+
+    Parameters
+    ----------
+    M : float
+        Mean anomaly in radians.
     ecc : float
-        Eccentricity (>1).
+        Eccentricity (~1).
 
     Returns
     -------
@@ -349,10 +377,8 @@ def M_to_D(M, ecc):
         Parabolic eccentric anomaly.
 
     """
-    B = 3.0 * M / 2.0
-    A = (B + (1.0 + B ** 2) ** 0.5) ** (2.0 / 3.0)
-    guess = 2 * A * B / (1 + A + A ** 2)
-    D = newton("parabolic", guess, args=(M, ecc), maxiter=100)
+    D0 = M_to_D(M)
+    D = newton("parabolic", D0, args=(M, ecc), maxiter=100)
     return D
 
 
@@ -455,7 +481,7 @@ def M_to_nu(M, ecc, delta=1e-2):
         E = M_to_E(M, ecc)
         nu = E_to_nu(E, ecc)
     else:
-        D = M_to_D(M, ecc)
+        D = M_to_D_near_parabolic(M, ecc)
         nu = D_to_nu(D)
     return nu
 
