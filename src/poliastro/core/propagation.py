@@ -81,20 +81,17 @@ def mean_motion(k, r0, v0, tof):
 
     # get the initial mean anomaly
     M0 = nu_to_M(nu0, ecc)
-    # strong elliptic or strong hyperbolic orbits
     if np.abs(ecc - 1.0) > 1e-2:
+        # strong elliptic or strong hyperbolic orbits
         a = p / (1.0 - ecc ** 2)
-        # given the initial mean anomaly, calculate mean anomaly
-        # at the end, mean motion (n) equals sqrt(mu / |a^3|)
-        M = M0 + tof * np.sqrt(k / np.abs(a ** 3))
-        nu = M_to_nu(M, ecc)
-
-    # near-parabolic orbit
+        n = np.sqrt(k / np.abs(a ** 3))
     else:
-        q = p * np.abs(1.0 - ecc) / np.abs(1.0 - ecc ** 2)
-        # mean motion n = sqrt(mu / 2 q^3) for parabolic orbit
-        M = M0 + tof * np.sqrt(k / 2.0 / (q ** 3))
-        nu = M_to_nu(M, ecc)
+        # near-parabolic orbit
+        q = p / np.abs(1.0 + ecc)
+        n = np.sqrt(k / 2.0 / (q ** 3))
+
+    M = M0 + tof * n
+    nu = M_to_nu(M, ecc)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
