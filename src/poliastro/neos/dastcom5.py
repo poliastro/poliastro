@@ -392,7 +392,7 @@ def record_from_name(name):
     records = []
     lines = string_record_from_name(name)
     for line in lines:
-        records.append(int(line[:6].lstrip()))
+        records.append(int(line[:8].lstrip()))
     return records
 
 
