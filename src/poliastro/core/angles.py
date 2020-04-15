@@ -25,12 +25,15 @@ def _kepler_equation_prime_hyper(F, M, ecc):
 
 @jit
 def _kepler_equation_parabolic(D, M, ecc):
-    return M_parabolic(ecc, D) - M
+    return D_to_M_near_parabolic(ecc, D) - M
 
 
 @jit
 def _kepler_equation_prime_parabolic(D, M, ecc):
-    return M_parabolic_prime(ecc, D)
+    x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
+    assert abs(x) < 1
+    S = dS_x_alt(ecc, x)
+    return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S
 
 
 @jit
@@ -85,21 +88,13 @@ def d2S_x_alt(ecc, x, atol=1e-12, maxiter=100):
 
 
 @jit
-def M_parabolic(ecc, D, tolerance=1e-16):
+def D_to_M_near_parabolic(ecc, D):
     x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
     assert abs(x) < 1
-    S = S_x(ecc, x, tolerance)
+    S = S_x(ecc, x)
     return (
         np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
     )
-
-
-@jit
-def M_parabolic_prime(ecc, D, tolerance=1e-16):
-    x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
-    assert abs(x) < 1
-    S = dS_x_alt(ecc, x, tolerance)
-    return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S
 
 
 @jit
@@ -427,8 +422,27 @@ def F_to_M(F, ecc):
 
 
 @jit
-def D_to_M(D, ecc):
+def D_to_M(D):
     """Mean anomaly from eccentric anomaly.
+
+    Parameters
+    ----------
+    D : float
+        Parabolic eccentric anomaly.
+
+    Returns
+    -------
+    M : float
+        Mean anomaly.
+
+    """
+    M = D + D ** 3 / 3
+    return M
+
+
+@jit
+def D_to_M_near_parabolic_alt(D, ecc):
+    """Mean anomaly from eccentric anomaly in the near parabolic region.
 
     Parameters
     ----------
@@ -515,7 +529,11 @@ def nu_to_M(nu, ecc, delta=1e-2):
         M = E_to_M(E, ecc)
     else:
         D = nu_to_D(nu)
-        M = D_to_M(D, ecc)
+        # FIXME: This should be
+        # M = D_to_M_near_parabolic(D, ecc)
+        # but the discrimination of near-parabolic regions here
+        # is not correct and the function might not converge
+        M = D_to_M_near_parabolic_alt(D, ecc)
     return M
 
 
