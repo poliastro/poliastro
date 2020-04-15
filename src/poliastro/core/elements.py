@@ -72,9 +72,10 @@ def rv_pqw(k, p, ecc, nu):
     These formulas can be checked at Curtis 3rd. Edition, page 110. Also the
     example proposed is 2.11 of Curtis 3rd Edition book.
     """
-    r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
-    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0 * nu]) * sqrt(k / p)).T
-    return r_pqw, v_pqw
+    pqw = np.array([[cos(nu), sin(nu), 0], [-sin(nu), ecc + cos(nu), 0]]) * np.array(
+        [[p / (1 + ecc * cos(nu))], [sqrt(k / p)]]
+    )
+    return pqw
 
 
 @jit
@@ -140,13 +141,12 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     v_ijk: np.array
         Velocity vector in basis ijk
     """
-    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
+    pqw = rv_pqw(k, p, ecc, nu)
     rm = coe_rotation_matrix(inc, raan, argp)
 
-    r_ijk = rm @ r_pqw
-    v_ijk = rm @ v_pqw
+    ijk = pqw @ rm.T
 
-    return r_ijk, v_ijk
+    return ijk
 
 
 @jit
