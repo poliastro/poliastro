@@ -4,9 +4,9 @@ different propagators available at poliastro:
 +-------------+------------+-----------------+-----------------+
 |  Propagator | Elliptical |    Parabolic    |    Hyperbolic   |
 +-------------+------------+-----------------+-----------------+
-| mean_motion |      ✓     |        ✓        |        ✓        |
+|  farnocchia |      ✓     |        ✓        |        ✓        |
 +-------------+------------+-----------------+-----------------+
-|    kepler   |      ✓     |        ✓        |        ✓        |
+|   vallado   |      ✓     |        ✓        |        ✓        |
 +-------------+------------+-----------------+-----------------+
 |   mikkola   |      ✓     | NOT IMPLEMENTED |        ✓        |
 +-------------+------------+-----------------+-----------------+
@@ -31,13 +31,13 @@ from scipy.integrate import DOP853, solve_ivp
 
 from poliastro.core.propagation import (
     danby as danby_fast,
+    farnocchia as farnocchia_fast,
     func_twobody,
     gooding as gooding_fast,
-    kepler as kepler_fast,
     markley as markley_fast,
-    mean_motion as mean_motion_fast,
     mikkola as mikkola_fast,
     pimienta as pimienta_fast,
+    vallado as vallado_fast,
 )
 
 
@@ -116,8 +116,8 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
     return rrs * u.km, vvs * u.km / u.s
 
 
-def mean_motion(k, r, v, tofs, **kwargs):
-    """Propagates orbit using Cowell's formulation.
+def farnocchia(k, r, v, tofs, **kwargs):
+    """Propagates orbit.
 
     Parameters
     ----------
@@ -143,7 +143,7 @@ def mean_motion(k, r, v, tofs, **kwargs):
     v0 = v.to(u.km / u.s).value
     tofs = tofs.to(u.s).value
 
-    results = [mean_motion_fast(k, r0, v0, tof) for tof in tofs]
+    results = [farnocchia_fast(k, r0, v0, tof) for tof in tofs]
     # TODO: Rewrite to avoid iterating twice
     return (
         [result[0] for result in results] * u.km,
@@ -151,7 +151,7 @@ def mean_motion(k, r, v, tofs, **kwargs):
     )
 
 
-def kepler(k, r, v, tofs, numiter=350, **kwargs):
+def vallado(k, r, v, tofs, numiter=350, **kwargs):
     """Propagates Keplerian orbit.
 
     Parameters
@@ -202,7 +202,7 @@ def kepler(k, r, v, tofs, numiter=350, **kwargs):
 
 def _kepler(k, r0, v0, tof, *, numiter):
     # Compute Lagrange coefficients
-    f, g, fdot, gdot = kepler_fast(k, r0, v0, tof, numiter)
+    f, g, fdot, gdot = vallado_fast(k, r0, v0, tof, numiter)
 
     assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
 
@@ -425,7 +425,7 @@ def danby(k, r, v, tofs, rtol=1e-8):
     )
 
 
-def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs):
+def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
 
     Parameters
@@ -435,7 +435,7 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
     time_of_flight : ~astropy.time.TimeDelta
         Time of propagation.
     method : callable, optional
-        Propagation method, default to mean_motion.
+        Propagation method, default to farnocchia.
     rtol : float, optional
         Relative tolerance, default to 1e-10.
 
@@ -484,8 +484,8 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
 
 
 ELLIPTIC_PROPAGATORS = [
-    mean_motion,
-    kepler,
+    farnocchia,
+    vallado,
     mikkola,
     markley,
     pimienta,
@@ -493,12 +493,12 @@ ELLIPTIC_PROPAGATORS = [
     danby,
     cowell,
 ]
-PARABOLIC_PROPAGATORS = [mean_motion, kepler, mikkola, pimienta, gooding, cowell]
+PARABOLIC_PROPAGATORS = [farnocchia, vallado, mikkola, pimienta, gooding, cowell]
 HYPERBOLIC_PROPAGATORS = [
-    mean_motion,
-    kepler,
+    farnocchia,
+    vallado,
     mikkola,
-    kepler,
+    vallado,
     pimienta,
     gooding,
     danby,

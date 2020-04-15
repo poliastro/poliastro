@@ -44,10 +44,10 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
 
 
 @jit
-def mean_motion(k, r0, v0, tof):
-    r"""Propagates orbit using mean motion. This algorithm depends on the geometric shape of the
-    orbit.
+def farnocchia(k, r0, v0, tof):
+    r"""Propagates orbit using mean motion.
 
+    This algorithm depends on the geometric shape of the orbit.
     For the case of the strong elliptic or strong hyperbolic orbits:
 
     ..  math::
@@ -55,7 +55,6 @@ def mean_motion(k, r0, v0, tof):
         M = M_{0} + \frac{\mu^{2}}{h^{3}}\left ( 1 -e^{2}\right )^{\frac{3}{2}}t
 
     .. versionadded:: 0.9.0
-
 
     Parameters
     ----------
@@ -97,7 +96,7 @@ def mean_motion(k, r0, v0, tof):
 
 
 @jit
-def kepler(k, r0, v0, tof, numiter):
+def vallado(k, r0, v0, tof, numiter):
     r"""Solves Kepler's Equation by applying a Newton-Raphson method.
 
     If the position of a body along its orbit wants to be computed
@@ -160,6 +159,7 @@ def kepler(k, r0, v0, tof, numiter):
     ----
     The theoretical procedure is explained in section 3.7 of Curtis in really
     deep detail. For analytical example, check in the same book for example 3.6.
+
     """
 
     # Cache some results

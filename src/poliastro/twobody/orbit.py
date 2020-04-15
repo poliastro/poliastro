@@ -21,7 +21,7 @@ from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
-from poliastro.twobody.propagation import mean_motion, propagate
+from poliastro.twobody.propagation import farnocchia, propagate
 
 from ..util import find_closest_value, norm
 from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
@@ -1148,7 +1148,7 @@ class Orbit:
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
+    def propagate(self, value, method=farnocchia, rtol=1e-10, **kwargs):
         """Propagates an orbit a specified time.
 
         If value is true anomaly, propagate orbit to this anomaly and return the result.

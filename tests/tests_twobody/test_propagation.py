@@ -19,12 +19,12 @@ from poliastro.twobody.propagation import (
     PARABOLIC_PROPAGATORS,
     cowell,
     danby,
+    farnocchia,
     gooding,
-    kepler,
     markley,
-    mean_motion,
     mikkola,
     pimienta,
+    vallado,
 )
 from poliastro.util import norm
 
@@ -33,7 +33,7 @@ from poliastro.util import norm
 @pytest.mark.parametrize("propagator", ELLIPTIC_PROPAGATORS)
 def test_elliptic_near_parabolic(ecc, propagator):
     # 'kepler fails if really close to parabolic'. Refer to issue #714.
-    if propagator in [kepler] and ecc > 0.99:
+    if propagator in [vallado] and ecc > 0.99:
         pytest.xfail()
 
     _a = 0.0 * u.rad
@@ -319,10 +319,10 @@ def test_propagate_long_times_keeps_geometry(propagator):
 
 
 @pytest.mark.filterwarnings("ignore::astropy._erfa.core.ErfaWarning")
-def test_long_propagations_kepler_agrees_mean_motion():
+def test_long_propagations_vallado_agrees_farnocchia():
     tof = 100 * u.year
-    r_mm, v_mm = iss.propagate(tof, method=mean_motion).rv()
-    r_k, v_k = iss.propagate(tof, method=kepler).rv()
+    r_mm, v_mm = iss.propagate(tof, method=farnocchia).rv()
+    r_k, v_k = iss.propagate(tof, method=vallado).rv()
     assert_quantity_allclose(r_mm, r_k)
     assert_quantity_allclose(v_mm, v_k)
 
@@ -330,13 +330,13 @@ def test_long_propagations_kepler_agrees_mean_motion():
     v_halleys = [-49.95092305, -12.94843055, -4.29251577]  # km/s
     halleys = Orbit.from_vectors(Sun, r_halleys * u.km, v_halleys * u.km / u.s)
 
-    r_mm, v_mm = halleys.propagate(tof, method=mean_motion).rv()
-    r_k, v_k = halleys.propagate(tof, method=kepler).rv()
+    r_mm, v_mm = halleys.propagate(tof, method=farnocchia).rv()
+    r_k, v_k = halleys.propagate(tof, method=vallado).rv()
     assert_quantity_allclose(r_mm, r_k)
     assert_quantity_allclose(v_mm, v_k)
 
 
-@pytest.mark.parametrize("method", [mean_motion, kepler])
+@pytest.mark.parametrize("method", [farnocchia, vallado])
 def test_long_propagation_preserves_orbit_elements(method):
     tof = 100 * u.year
     r_halleys = np.array(
