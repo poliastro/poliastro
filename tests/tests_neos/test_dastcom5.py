@@ -33,17 +33,6 @@ def test_orbit_from_name(mock_record_from_name, mock_orbit_from_record):
     mock_record_from_name.assert_called_with(name)
 
 
-@mock.patch("poliastro.neos.dastcom5.orbit_from_record")
-@mock.patch("poliastro.neos.dastcom5.record_from_name")
-def test_record_from_name(mock_record_from_name, mock_orbit_from_record):
-    name = "example_name"
-    mock_orbit_from_record.return_value = iss
-    mock_record_from_name.return_value = [1]
-
-    assert dastcom5.orbit_from_name(name) == [iss]
-    mock_record_from_name.assert_called_with(name)
-
-
 @mock.patch("poliastro.neos.dastcom5.np.fromfile")
 @mock.patch("poliastro.neos.dastcom5.open")
 def test_read_headers(mock_open, mock_np_fromfile):
@@ -126,9 +115,14 @@ def test_download_dastcom5_downloads_file(mock_request, mock_isdir, mock_zipfile
     )
 
 
-def test_issue_902():
-    try:
-        dastcom5.orbit_from_name("1P")
-        dastcom5.orbit_from_name("europa")
-    except (OSError, ValueError):
-        pytest.fail()
+@mock.patch("poliastro.neos.dastcom5.string_record_from_name")
+def test_issue_902(mock_string_record_from_name):
+    name = "1P"
+    mock_string_record_from_name.return_value = [
+        "90000001 Halley",
+        "90000002 Halley",
+    ]
+    assert dastcom5.record_from_name(name) == [
+        90000001,
+        90000002,
+    ]
