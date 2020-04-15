@@ -201,15 +201,13 @@ def M_to_F(M, ecc):
 
 
 @u.quantity_input(M=u.rad, ecc=u.one)
-def M_to_D(M, ecc):
+def M_to_D(M):
     """Parabolic eccentric anomaly from mean anomaly.
 
     Parameters
     ----------
     M : ~astropy.units.Quantity
         Mean anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity (>1).
 
     Returns
     -------
@@ -217,7 +215,7 @@ def M_to_D(M, ecc):
         Parabolic eccentric anomaly.
 
     """
-    return (M_to_D_fast(M.to(u.rad).value, ecc.value) * u.rad).to(M.unit)
+    return (M_to_D_fast(M.to(u.rad).value) * u.rad).to(M.unit)
 
 
 @u.quantity_input(E=u.rad, ecc=u.one)
@@ -263,15 +261,13 @@ def F_to_M(F, ecc):
 
 
 @u.quantity_input(D=u.rad, ecc=u.one)
-def D_to_M(D, ecc):
+def D_to_M(D):
     """Mean anomaly from eccentric anomaly.
 
     Parameters
     ----------
     D : ~astropy.units.Quantity
         Parabolic eccentric anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity.
 
     Returns
     -------
@@ -279,7 +275,7 @@ def D_to_M(D, ecc):
         Mean anomaly.
 
     """
-    return (D_to_M_fast(D.to(u.rad).value, ecc.value) * u.rad).to(D.unit)
+    return (D_to_M_fast(D.to(u.rad).value) * u.rad).to(D.unit)
 
 
 @u.quantity_input(M=u.rad, ecc=u.one)

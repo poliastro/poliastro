@@ -54,27 +54,26 @@ def rv_pqw(k, p, ecc, nu):
     Examples
     --------
     >>> from poliastro.constants import GM_earth
-    >>> k = GM_earth #Earth gravitational parameter
-
-    >>> ecc = 0.3 #Eccentricity
-    >>> h = 60000e6 #Angular momentum of the orbit [m^2]/[s]
-    >>> nu = np.deg2rad(120) #True Anomaly [rad]
-    >>> p = h**2 / k #Parameter of the orbit
+    >>> k = GM_earth.value  # Earth gravitational parameter
+    >>> ecc = 0.3  # Eccentricity
+    >>> h = 60000e6  # Angular momentum of the orbit (m**2 / s)
+    >>> nu = np.deg2rad(120)  # True Anomaly (rad)
+    >>> p = h**2 / k  # Parameter of the orbit
     >>> r, v = rv_pqw(k, p, ecc, nu)
-
-    >>> #Printing the results
+    >>> # Printing the results
     r = [-5312706.25105345  9201877.15251336    0] [m]
     v = [-5753.30180931 -1328.66813933  0] [m]/[s]
 
-    Note
-    ----
-
+    Notes
+    -----
     These formulas can be checked at Curtis 3rd. Edition, page 110. Also the
     example proposed is 2.11 of Curtis 3rd Edition book.
+
     """
-    r_pqw = (np.array([cos(nu), sin(nu), 0 * nu]) * p / (1 + ecc * cos(nu))).T
-    v_pqw = (np.array([-sin(nu), (ecc + cos(nu)), 0 * nu]) * sqrt(k / p)).T
-    return r_pqw, v_pqw
+    pqw = np.array([[cos(nu), sin(nu), 0], [-sin(nu), ecc + cos(nu), 0]]) * np.array(
+        [[p / (1 + ecc * cos(nu))], [sqrt(k / p)]]
+    )
+    return pqw
 
 
 @jit
@@ -140,13 +139,12 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     v_ijk: np.array
         Velocity vector in basis ijk
     """
-    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
+    pqw = rv_pqw(k, p, ecc, nu)
     rm = coe_rotation_matrix(inc, raan, argp)
 
-    r_ijk = rm @ r_pqw
-    v_ijk = rm @ v_pqw
+    ijk = pqw @ rm.T
 
-    return r_ijk, v_ijk
+    return ijk
 
 
 @jit

@@ -21,7 +21,7 @@ from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
-from poliastro.twobody.propagation import mean_motion, propagate
+from poliastro.twobody.propagation import farnocchia, propagate
 
 from ..util import find_closest_value, norm
 from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
@@ -1148,7 +1148,7 @@ class Orbit:
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, value, method=mean_motion, rtol=1e-10, **kwargs):
+    def propagate(self, value, method=farnocchia, rtol=1e-10, **kwargs):
         """Propagates an orbit a specified time.
 
         If value is true anomaly, propagate orbit to this anomaly and return the result.
@@ -1326,6 +1326,14 @@ class Orbit:
         else:
             nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
+        # FIXME: Refactor this insanity to remove a lot of back and forth
+        # 1. Convert to classical to extract nu values (either 1 or 3 are no ops)
+        # 2. Sample values of nu -> M -> times
+        # 3. Convert to cartesian to call the farnocchia propagator harcoded here (either 1 or 3 are no ops)
+        # 4. For each time, convert to classical to retain "slow" elements
+        # 5. For each time, compute nu0 -> M0 (same value always)
+        # 6. For each time, t -> M -> nu
+        # 7. For each time, convert classical to cartesian and assemble orbit
         time_values = time.TimeDelta(self._generate_time_values(nu_values))
         cartesian = propagate(self, time_values)
 
