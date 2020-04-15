@@ -55,6 +55,14 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
     # Still not implemented. Refer to issue #714.
     if propagator in [pimienta, gooding]:
         pytest.skip()
+    elif propagator is farnocchia and ecc == 1.01:
+        pytest.xfail(
+            "This belongs to the strong hyperbolic region "
+            "which gives nu_to_M(1.0, 1.0100000000000002) = 0.0008482321477948918 "
+            "but it is entering the near parabolic code path "
+            "which gives nu_to_M(1.0, 1.01) = 0.5997907037261884, "
+            "therefore the function is not smooth!"
+        )
 
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
