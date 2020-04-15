@@ -5,7 +5,7 @@ from ._jit import jit
 
 @jit
 def _kepler_equation(E, M, ecc):
-    return E - ecc * np.sin(E) - M
+    return E_to_M(E, ecc) - M
 
 
 @jit
@@ -15,7 +15,7 @@ def _kepler_equation_prime(E, M, ecc):
 
 @jit
 def _kepler_equation_hyper(F, M, ecc):
-    return -F + ecc * np.sinh(F) - M
+    return F_to_M(F, ecc) - M
 
 
 @jit
@@ -375,7 +375,7 @@ def E_to_M(E, ecc):
         Mean anomaly.
 
     """
-    M = _kepler_equation(E, 0.0, ecc)
+    M = E - ecc * np.sin(E)
     return M
 
 
@@ -396,7 +396,7 @@ def F_to_M(F, ecc):
         Mean anomaly.
 
     """
-    M = _kepler_equation_hyper(F, 0.0, ecc)
+    M = ecc * np.sinh(F) - F
     return M
 
 
