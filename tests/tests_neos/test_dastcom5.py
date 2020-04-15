@@ -124,3 +124,11 @@ def test_download_dastcom5_downloads_file(mock_request, mock_isdir, mock_zipfile
         os.path.join(dastcom5.POLIASTRO_LOCAL_PATH, "dastcom5.zip"),
         dastcom5._show_download_progress,
     )
+
+
+def test_issue_902():
+    try:
+        dastcom5.orbit_from_name("1P")
+        dastcom5.orbit_from_name("europa")
+    except (OSError, ValueError):
+        pytest.fail()
