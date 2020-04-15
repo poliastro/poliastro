@@ -24,13 +24,14 @@ Installation
 The easiest and fastest way to get the package up and running is to
 install poliastro using `conda <https://conda.io/docs/>`_::
 
-  $ conda install poliastro --channel conda-forge
+  $ conda install -c conda-forge poliastro=0.14
 
 .. note::
 
     We encourage users to use conda and the
     `conda-forge <https://conda-forge.org/>`_ packages for convenience,
     especially when developing on Windows.
+    It is recommended to create a new environment.
 
 If the installation fails for any reason, please open an issue in the
 `issue tracker`_.

@@ -26,6 +26,7 @@ OOP nature.
     neos/neos_index
     plotting/plotting_index
     iod/iod_index
+    czml/czml_index
     constants
     coordinates
     examples
