@@ -70,7 +70,7 @@ class CZMLExtractor:
             projection.
         """
         self.packets = []  # type: List[Packet]
-
+        self.trajectories = [] #type: List[Any]
         self.attractor = attractor
         self.orbits = []  # type: List[Any]
         self.N = N
@@ -466,6 +466,137 @@ class CZMLExtractor:
                 ),
             )
             self.packets.append(pckt)
+
+        self.i += 1
+
+    def add_trajectory(
+        self,
+        positions,
+        groundtrack_show=False,
+        groundtrack_lead_time=None,
+        groundtrack_trail_time=None,
+        groundtrack_width=None,
+        groundtrack_color=None,
+        id_name=None,
+        id_description=None,
+        path_width=None,
+        path_show=None,
+        path_color=None,
+        label_fill_color=None,
+        label_outline_color=None,
+        label_font=None,
+        label_text=None,
+        label_show=None,
+    ):
+        """
+        Adds trajectory
+
+        Parameters
+        ----------
+        positions: ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+
+        Groundtrack parameters:
+        -----------------------
+
+        groundtrack_show: bool
+            If set to true, the groundtrack is
+            displayed.
+        groundtrack_lead_time: double
+            The time the animation is ahead of the real-time groundtrack
+        groundtrack_trail_time: double
+            The time the animation is behind the real-time groundtrack
+        groundtrack_width: int
+            Groundtrack width
+        groundtrack_color: list (int)
+            Rgba groundtrack color. By default, it is set to the path color
+
+        Id parameters:
+        --------------
+
+        id_name: str
+            Set orbit name
+        id_description: str
+            Set orbit description
+
+        Path parameters
+        ---------------
+
+        path_width: int
+            Path width
+        path_show: bool
+            Indicates whether the path is visible
+        path_color: list (int)
+            Rgba path color
+
+        Label parameters
+        ----------
+
+        label_fill_color: list (int)
+            Fill Color in rgba format
+        label_outline_color: list (int)
+            Outline Color in rgba format
+        label_font: str
+            Set label font style and size (CSS syntax)
+        label_text: str
+            Set label text
+        label_show: bool
+            Indicates whether the label is visible
+
+        """
+
+        if self.attractor is None:
+            raise ValueError(
+                "An attractor must be set up first."
+            )
+
+        self.trajectories.append([positions, None, label_text,path_color])
+
+        start_epoch = Time(self.start_epoch, format="isot")
+
+        pckt = Packet(
+            id=self.i,
+            name=id_name,
+            description=id_description,
+            availability=TimeInterval(start=self.start_epoch, end=self.end_epoch),
+            position=Position(
+                interpolationDegree=5,
+                interpolationAlgorithm=InterpolationAlgorithms.LAGRANGE,
+                referenceFrame=ReferenceFrames.INERTIAL,
+                cartesian=positions,
+                # Use explicit UTC timezone, rather than the default, which is a local timezone.
+                epoch=start_epoch.datetime.replace(tzinfo=timezone.utc),
+            ),
+            path=Path(
+                show=path_show,
+                width=path_width,
+                material=Material(
+                    solidColor=SolidColorMaterial(color=Color.from_list(path_color))
+                )
+                if path_color is not None
+                else Material(
+                    solidColor=SolidColorMaterial(color=Color.from_list([255, 255, 0]))
+                ),
+                resolution=120,
+            ),
+            label=Label(
+                text=label_text,
+                font=label_font if label_font is not None else "11pt Lucida Console",
+                show=label_show,
+                fillColor=Color(rgba=label_fill_color)
+                if label_fill_color is not None
+                else Color(rgba=[255, 255, 0, 255]),
+                outlineColor=Color(rgba=label_outline_color)
+                if label_outline_color is not None
+                else Color(rgba=[255, 255, 0, 255]),
+            ),
+            billboard=Billboard(image=PIC_SATELLITE, show=True),
+        )
+
+        self.packets.append(pckt)
+
+        if groundtrack_show:
+            raise NotImplementedError("Ground tracking for trajectory not implemented yet")
 
         self.i += 1
 

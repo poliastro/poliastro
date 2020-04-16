@@ -324,6 +324,121 @@ def test_czml_add_orbit():
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_add_trajectory():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10   
+    color = [255, 255, 0]
+
+    positions = [
+        0.0, 1.0, 2.0, 3.0,
+        60.0, 4.0, 5.0, 6.0,
+        120.0, 7.0, 8.0, 9.0
+    ]
+
+    expected_doc = """[{
+    "id": "document",
+    "version": "1.0",
+    "name": "document_packet",
+    "clock": {
+        "interval": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
+        "currentTime": "2013-03-18T12:00:00Z",
+        "multiplier": 60,
+        "range": "LOOP_STOP",
+        "step": "SYSTEM_CLOCK_MULTIPLIER"
+    }
+}, {
+    "id": "custom_properties",
+    "properties": {
+        "custom_attractor": true,
+        "ellipsoid": [
+            {
+                "array": [
+                    6378136.6,
+                    6378136.6,
+                    6356751.9
+                ]
+            }
+        ],
+        "map_url": [
+            "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+        ],
+        "scene3D": true
+    }
+}, {
+    "id": 0,
+    "availability": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
+    "position": {
+        "epoch": "2013-03-18T12:00:00Z",
+        "interpolationAlgorithm": "LAGRANGE",
+        "interpolationDegree": 5,
+        "referenceFrame": "INERTIAL",
+        "cartesian": [
+            0.0,
+            1.0,
+            2.0,
+            3.0,
+            60.0,
+            4.0,
+            5.0,
+            6.0,
+            120.0,
+            7.0,
+            8.0,
+            9.0
+        ]
+    },
+    "billboard": {
+        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=",
+        "show": true
+    },
+    "label": {
+        "text": "Test",
+        "font": "11pt Lucida Console",
+        "style": "FILL",
+        "fillColor": {
+            "rgba": [
+                255,
+                255,
+                0,
+                255
+            ]
+        },
+        "outlineColor": {
+            "rgba": [
+                255,
+                255,
+                0,
+                255
+            ]
+        },
+        "outlineWidth": 1.0
+    },
+    "path": {
+        "resolution": 120,
+        "material": {
+            "solidColor": {
+                "color": {
+                    "rgba": [
+                        255,
+                        255,
+                        0,
+                        255
+                    ]
+                }
+            }
+        }
+    }
+}]"""
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+    
+    extractor.add_trajectory(positions,label_text="Test",path_color=color)
+
+    assert repr(extractor.packets) == expected_doc
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_groundtrack():
 
     start_epoch = molniya.epoch
