@@ -3,6 +3,9 @@ import sys
 # TODO: Should we have way to handle this configuration without importing numba?
 import pytest
 from astropy import units as u
+from astropy.coordinates.representation import CartesianRepresentation
+from astropy.time import Time
+from numba import config as numba_config
 
 from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya
@@ -328,14 +331,16 @@ def test_czml_add_trajectory():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
 
-    sample_points = 10   
+    sample_points = 10
     color = [255, 255, 0]
 
-    positions = [
-        0.0, 1.0, 2.0, 3.0,
-        60.0, 4.0, 5.0, 6.0,
-        120.0, 7.0, 8.0, 9.0
-    ]
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
+    epochs = Time(time, format="isot")
 
     expected_doc = """[{
     "id": "document",
@@ -377,15 +382,15 @@ def test_czml_add_trajectory():
         "cartesian": [
             0.0,
             1.0,
-            2.0,
-            3.0,
-            60.0,
             4.0,
-            5.0,
-            6.0,
-            120.0,
             7.0,
+            30.0,
+            2.0,
+            5.0,
             8.0,
+            60.0,
+            3.0,
+            6.0,
             9.0
         ]
     },
@@ -432,8 +437,8 @@ def test_czml_add_trajectory():
     }
 }]"""
     extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
-    
-    extractor.add_trajectory(positions,label_text="Test",path_color=color)
+
+    extractor.add_trajectory(positions, epochs, label_text="Test", path_color=color)
 
     assert repr(extractor.packets) == expected_doc
 

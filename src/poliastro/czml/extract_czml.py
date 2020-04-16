@@ -70,7 +70,7 @@ class CZMLExtractor:
             projection.
         """
         self.packets = []  # type: List[Packet]
-        self.trajectories = [] #type: List[Any]
+        self.trajectories = []  # type: List[Any]
         self.attractor = attractor
         self.orbits = []  # type: List[Any]
         self.N = N
@@ -472,6 +472,7 @@ class CZMLExtractor:
     def add_trajectory(
         self,
         positions,
+        epochs,
         groundtrack_show=False,
         groundtrack_lead_time=None,
         groundtrack_trail_time=None,
@@ -495,10 +496,8 @@ class CZMLExtractor:
         ----------
         positions: ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-
-        Groundtrack parameters:
-        -----------------------
-
+        epochs: ~astropy.time.core.Time
+            Epochs for positions.
         groundtrack_show: bool
             If set to true, the groundtrack is
             displayed.
@@ -510,28 +509,16 @@ class CZMLExtractor:
             Groundtrack width
         groundtrack_color: list (int)
             Rgba groundtrack color. By default, it is set to the path color
-
-        Id parameters:
-        --------------
-
         id_name: str
             Set orbit name
         id_description: str
             Set orbit description
-
-        Path parameters
-        ---------------
-
         path_width: int
             Path width
         path_show: bool
             Indicates whether the path is visible
         path_color: list (int)
             Rgba path color
-
-        Label parameters
-        ----------
-
         label_fill_color: list (int)
             Fill Color in rgba format
         label_outline_color: list (int)
@@ -546,11 +533,27 @@ class CZMLExtractor:
         """
 
         if self.attractor is None:
-            raise ValueError(
-                "An attractor must be set up first."
-            )
+            raise ValueError("An attractor must be set up first.")
 
-        self.trajectories.append([positions, None, label_text,path_color])
+        positions = (
+            positions.represent_as(CartesianRepresentation).get_xyz(1).to(u.meter).value
+        )
+
+        epochs = Time(epochs, format="isot")
+
+        if len(epochs) != len(positions):
+            raise ValueError("Number of Points and Epochs must be equal.")
+
+        epochs = np.fromiter(
+            map(lambda epoch: (epoch - epochs[0]).to(u.second).value, epochs),
+            dtype=np.float,
+        )
+
+        positions = np.around(
+            np.concatenate([epochs[..., None], positions], axis=1).ravel(), 1
+        ).tolist()
+
+        self.trajectories.append([positions, None, label_text, path_color])
 
         start_epoch = Time(self.start_epoch, format="isot")
 
@@ -596,7 +599,9 @@ class CZMLExtractor:
         self.packets.append(pckt)
 
         if groundtrack_show:
-            raise NotImplementedError("Ground tracking for trajectory not implemented yet")
+            raise NotImplementedError(
+                "Ground tracking for trajectory not implemented yet"
+            )
 
         self.i += 1
 
