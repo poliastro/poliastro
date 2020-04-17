@@ -9,7 +9,7 @@ Propagation module
 
 \
 \
-The main purpose of :py:mod:`polaistro.core.propagation` is to propagate a body
+The main purpose of :py:mod:`poliastro.core.propagation` is to propagate a body
 along its orbit.
 
 

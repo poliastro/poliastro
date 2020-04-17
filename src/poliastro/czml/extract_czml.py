@@ -247,18 +247,10 @@ class CZMLExtractor:
         orbit: poliastro.Orbit
             Orbit to be added
         pos: list [~astropy.units]
-            coordinates of ground station
+            coordinates of ground station,
             [u v] ellipsoidal coordinates (0 elevation)
-
-        Id parameters:
-        -------------
-
         id_description: str
             Set ground station description
-
-        Label parameters
-        ----------
-
         label_fill_color: list (int)
             Fill Color in rgba format
         label_outline_color: list (int)
@@ -344,10 +336,6 @@ class CZMLExtractor:
             Maximum relative error permitted
         N: int
             Number of sample points
-
-        Groundtrack parameters:
-        -----------------------
-
         groundtrack_show: bool
             If set to true, the groundtrack is
             displayed.
@@ -359,28 +347,16 @@ class CZMLExtractor:
             Groundtrack width
         groundtrack_color: list (int)
             Rgba groundtrack color. By default, it is set to the path color
-
-        Id parameters:
-        --------------
-
         id_name: str
             Set orbit name
         id_description: str
             Set orbit description
-
-        Path parameters
-        ---------------
-
         path_width: int
             Path width
         path_show: bool
             Indicates whether the path is visible
         path_color: list (int)
             Rgba path color
-
-        Label parameters
-        ----------
-
         label_fill_color: list (int)
             Fill Color in rgba format
         label_outline_color: list (int)
@@ -391,7 +367,6 @@ class CZMLExtractor:
             Set label text
         label_show: bool
             Indicates whether the label is visible
-
         """
 
         if N is None:
