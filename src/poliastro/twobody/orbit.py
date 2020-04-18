@@ -214,14 +214,10 @@ class Orbit:
         return arglat
 
     @cached_property
-    def M(self):
-        """Mean anomaly. """
-        return nu_to_M_fast(self.nu.to_value(u.rad), self.ecc.value) * u.rad
-
-    @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage. """
-        t_p = self.period * self.M / (360 * u.deg)
+        M = nu_to_M_fast(self.nu.to_value(u.rad), self.ecc.value) * u.rad
+        t_p = self.period * M / (360 * u.deg)
         return t_p
 
     @classmethod

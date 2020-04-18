@@ -48,6 +48,7 @@ from poliastro.frames.equatorial import (
     VenusICRS,
 )
 from poliastro.frames.util import get_frame
+from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
 from poliastro.warnings import (
     OrbitSamplingWarning,
@@ -761,7 +762,7 @@ def test_expected_mean_anomaly():
     nu = 120 * u.deg
 
     orbit = Orbit.from_classical(attractor, a, ecc, _a, _a, _a, nu)
-    orbit_M = orbit.M
+    orbit_M = E_to_M(nu_to_E(orbit.nu, orbit.ecc), orbit.ecc)
 
     assert_quantity_allclose(orbit_M, expected_mean_anomaly, rtol=1e-2)
 
