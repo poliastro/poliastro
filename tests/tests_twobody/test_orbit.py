@@ -1140,3 +1140,9 @@ def test_can_set_iss_attractor_to_earth():
     )
     iss = iss.change_attractor(Earth)
     assert iss.attractor == Earth
+
+
+def test_issue_916():
+    with pytest.raises(ValueError) as excinfo:
+        Orbit.from_sbdb("67/P")
+    assert "ValueError: Object 67/P not found" in excinfo.exconly()

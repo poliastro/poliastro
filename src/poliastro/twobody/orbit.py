@@ -653,6 +653,9 @@ class Orbit:
                 str(obj["count"]) + " different objects found: \n" + objects_name_in_str
             )
 
+        if "object" not in obj.keys():
+            raise ValueError("Object {} not found".format(name))
+
         a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
         ecc = float(obj["orbit"]["elements"]["e"]) * u.one
         inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
