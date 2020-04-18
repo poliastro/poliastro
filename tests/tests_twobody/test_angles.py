@@ -110,7 +110,7 @@ def test_true_to_eccentric():
 
 
 def test_true_to_eccentric_hyperbolic():
-    # Data from Curtis, H. (2013). *Orbital mechanics for engineering students*.
+    # Data from Curtis, H. (2013). "Orbital mechanics for engineering students".
     # Example 3.5
     nu = 100 * u.deg
     ecc = 2.7696 * u.one
@@ -146,7 +146,7 @@ def test_true_to_mean():
 
 
 def test_true_to_mean_hyperbolic():
-    # Data from Curtis, H. (2013). *Orbital mechanics for engineering students*.
+    # Data from Curtis, H. (2013). "Orbital mechanics for engineering students".
     # Example 3.5
     nu = 100 * u.deg
     ecc = 2.7696 * u.one
@@ -158,7 +158,7 @@ def test_true_to_mean_hyperbolic():
 
 
 def test_mean_to_true_hyperbolic():
-    # Data from Curtis, H. (2013). *Orbital mechanics for engineering students*.
+    # Data from Curtis, H. (2013). "Orbital mechanics for engineering students".
     # Example 3.5
     M = 11.279 * u.rad
     ecc = 2.7696 * u.one
