@@ -206,7 +206,7 @@ def M_to_nu(M, ecc, delta=1e-2):
     --------
     >>> from numpy import radians, degrees
     >>> degrees(M_to_nu(radians(30.0), 0.06))
-    33.67328493021166
+    33.673284930211665
 
     """
     if ecc > 1 + delta:

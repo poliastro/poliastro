@@ -194,16 +194,8 @@ def test_mean_to_true_hyperbolic_highecc(expected_nu, ecc):
 @pytest.mark.parametrize("ecc", np.linspace(0.1, 0.9, num=10) * u.one)
 def test_eccentric_to_true_range(E, ecc):
     nu = angles.E_to_nu(E, ecc)
-    E1 = angles.nu_to_E(nu, ecc)
-    assert_quantity_allclose(E1, E, rtol=1e-8)
-
-
-@pytest.mark.parametrize("E", np.linspace(0, 2, num=10) * np.pi * u.rad)
-@pytest.mark.parametrize("ecc", np.linspace(0.1, 0.9, num=10) * u.one)
-def test_eccentric_to_true_range2pi(E, ecc):
-    nu = angles.E_to_nu(E, ecc)
-    E1 = angles.nu_to_E(nu, ecc)
-    assert_quantity_allclose(E1, E, rtol=1e-8)
+    E_result = angles.nu_to_E(nu, ecc)
+    assert_quantity_allclose(E_result, E, rtol=1e-8)
 
 
 def test_convert_between_coe_and_rv_is_transitive(classical):
