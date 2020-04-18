@@ -345,19 +345,19 @@ def orbit_from_name(name):
 def orbit_from_record(record):
     """Return :py:class:`~poliastro.twobody.orbit.Orbit` given a record.
 
-        Retrieve info from JPL DASTCOM5 database.
+    Retrieve info from JPL DASTCOM5 database.
 
-        Parameters
-        ----------
-        record : int
-            Object record.
+    Parameters
+    ----------
+    record : int
+        Object record.
 
-        Returns
-        -------
-        orbit : ~poliastro.twobody.orbit.Orbit
-            NEO orbit.
+    Returns
+    -------
+    orbit : ~poliastro.twobody.orbit.Orbit
+        NEO orbit.
 
-        """
+    """
     body_data = read_record(record)
     a = body_data["A"].item() * u.au
     ecc = body_data["EC"].item() * u.one
