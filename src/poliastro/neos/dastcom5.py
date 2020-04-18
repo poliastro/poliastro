@@ -13,7 +13,7 @@ from astropy.time import Time
 
 from poliastro.bodies import Sun
 from poliastro.frames.ecliptic import HeliocentricEclipticJ2000
-from poliastro.twobody.angles import M_to_nu
+from poliastro.twobody.angles import D_to_nu, E_to_nu, F_to_nu, M_to_D, M_to_E, M_to_F
 from poliastro.twobody.orbit import Orbit
 
 AST_DTYPE = np.dtype(
@@ -364,9 +364,17 @@ def orbit_from_record(record):
     inc = body_data["IN"].item() * u.deg
     raan = body_data["OM"].item() * u.deg
     argp = body_data["W"].item() * u.deg
-    m = body_data["MA"].item() * u.deg
-    nu = M_to_nu(m, ecc)
+    M = body_data["MA"].item() * u.deg
     epoch = Time(body_data["EPOCH"].item(), format="jd", scale="tdb")
+
+    # NOTE: It is unclear how this conversion should happen,
+    # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
+    if ecc < 1:
+        nu = E_to_nu(M_to_E(M, ecc), ecc)
+    elif ecc == 1:
+        nu = D_to_nu(M_to_D(M))
+    else:
+        nu = F_to_nu(M_to_F(M, ecc), ecc)
 
     orbit = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu, epoch)
     orbit._frame = HeliocentricEclipticJ2000(obstime=epoch)

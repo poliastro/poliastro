@@ -763,7 +763,7 @@ def test_expected_mean_anomaly():
     orbit = Orbit.from_classical(attractor, a, ecc, _a, _a, _a, nu)
     orbit_M = orbit.M
 
-    assert_quantity_allclose(orbit_M.value, expected_mean_anomaly.value, rtol=1e-2)
+    assert_quantity_allclose(orbit_M, expected_mean_anomaly, rtol=1e-2)
 
 
 def test_expected_angular_momentum():
@@ -797,7 +797,7 @@ def test_expected_last_perifocal_passage():
     orbit = Orbit.from_classical(attractor, a, ecc, _a, _a, _a, nu)
     orbit_t_p = orbit.t_p
 
-    assert_quantity_allclose(orbit_t_p.value, expected_t_p.value, rtol=1e-2)
+    assert_quantity_allclose(orbit_t_p, expected_t_p, rtol=1e-2)
 
 
 def test_convert_from_rv_to_coe():
