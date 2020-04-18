@@ -1,7 +1,7 @@
 import numpy as np
 
-from ._jit import jit
-from .angles import (
+from .._jit import jit
+from ..angles import (
     D_to_nu,
     E_to_M,
     E_to_nu,
@@ -14,8 +14,8 @@ from .angles import (
     nu_to_E,
     nu_to_F,
 )
-from .elements import coe2rv, rv2coe
-from .stumpff import c2, c3
+from ..elements import coe2rv, rv2coe
+from ..stumpff import c2, c3
 
 
 def func_twobody(t0, u_, k, ad, ad_kwargs):
