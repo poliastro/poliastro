@@ -1,18 +1,21 @@
 import numpy as np
 
-from poliastro.core.angles import (
+from ._jit import jit
+from .angles import (
     D_to_nu,
+    E_to_M,
     E_to_nu,
+    F_to_M,
     F_to_nu,
     M_to_nu,
     _kepler_equation,
     _kepler_equation_prime,
     nu_to_M,
+    nu_to_E,
+    nu_to_F,
 )
-from poliastro.core.elements import coe2rv, rv2coe
-from poliastro.core.stumpff import c2, c3
-
-from ._jit import jit
+from .elements import coe2rv, rv2coe
+from .stumpff import c2, c3
 
 
 def func_twobody(t0, u_, k, ad, ad_kwargs):
@@ -259,18 +262,19 @@ def mikkola(k, r0, v0, tof, rtol=None):
 
     # Solving for the classical elements
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    M0 = nu_to_M(nu, ecc, delta=0)
     a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(a) ** 3)
-    M = M0 + n * tof
 
     # Solve for specific geometrical case
     if ecc < 1.0:
         # Equation (9a)
         alpha = (1 - ecc) / (4 * ecc + 1 / 2)
+        M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     else:
         alpha = (ecc - 1) / (4 * ecc + 1 / 2)
+        M0 = F_to_M(nu_to_F(nu, ecc), ecc)
 
+    M = M0 + n * tof
     beta = M / 2 / (4 * ecc + 1 / 2)
 
     # Equation (9b)
@@ -363,12 +367,12 @@ def markley(k, r0, v0, tof):
     Note
     ----
     The following algorithm was taken from http://dx.doi.org/10.1007/BF00691917.
-    """
 
+    """
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
 
-    M0 = nu_to_M(nu, ecc, delta=0)
+    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     a = p / (1 - ecc ** 2)
     n = np.sqrt(k / a ** 3)
     M = M0 + n * tof
@@ -449,7 +453,7 @@ def pimienta(k, r0, v0, tof):
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
 
-    M0 = nu_to_M(nu, ecc, delta=0)
+    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
     M = M0 + n * tof
@@ -816,7 +820,7 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
             "Parabolic/Hyperbolic cases still not implemented in gooding."
         )
 
-    M0 = nu_to_M(nu, ecc, delta=0)
+    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
     M = M0 + n * tof
@@ -874,25 +878,28 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    M0 = nu_to_M(nu, ecc, delta=0)
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
-    M = M0 + n * tof
-
-    # Range mean anomaly
-    xma = M - 2 * np.pi * np.floor(M / 2 / np.pi)
 
     if ecc == 0:
         # Solving for circular orbit
-        nu = xma
+        M0 = E_to_M(nu_to_E(nu, ecc), ecc)
+        M = M0 + n * tof
+        nu = M - 2 * np.pi * np.floor(M / 2 / np.pi)
         return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
     elif ecc < 1.0:
         # For elliptical orbit
+        M0 = E_to_M(nu_to_E(nu, ecc), ecc)
+        M = M0 + n * tof
+        xma = M - 2 * np.pi * np.floor(M / 2 / np.pi)
         E = xma + 0.85 * np.sign(np.sin(xma)) * ecc
 
     else:
         # For parabolic and hyperbolic
+        M0 = F_to_M(nu_to_F(nu, ecc), ecc)
+        M = M0 + n * tof
+        xma = M - 2 * np.pi * np.floor(M / 2 / np.pi)
         E = np.log(2 * xma / ecc + 1.8)
 
     # Iterations begin
