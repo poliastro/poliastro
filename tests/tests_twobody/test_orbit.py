@@ -1,4 +1,6 @@
 import pickle
+from collections import OrderedDict
+from unittest import mock
 
 import matplotlib
 import numpy as np
@@ -1142,7 +1144,16 @@ def test_can_set_iss_attractor_to_earth():
     assert iss.attractor == Earth
 
 
-def test_issue_916():
+@mock.patch("astroquery.jplsbdb.SBDB.query")
+def test_issue_916(mock_query):
+    name = "67/P"
+    mock_query.return_value = OrderedDict(
+        [
+            ("moreInfo", "https://ssd-api.jpl.nasa.gov/doc/sbdb.html"),
+            ("message", "specified object was not found"),
+            ("code", "200"),
+        ]
+    )
     with pytest.raises(ValueError) as excinfo:
-        Orbit.from_sbdb("67/P")
-    assert "ValueError: Object 67/P not found" in excinfo.exconly()
+        Orbit.from_sbdb(name)
+    assert "ValueError: Object {} not found".format(name) in excinfo.exconly()
