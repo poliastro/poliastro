@@ -31,54 +31,51 @@ def _kepler_equation_prime_near_parabolic(D, M, ecc):
 
 
 @jit
-def S_x(ecc, x, atol=1e-12, maxiter=100):
+def S_x(ecc, x, atol=1e-12):
+    assert abs(x) < 1
     S = 0
     k = 0
-    while k < maxiter:
+    while True:
         S_old = S
         S += (ecc - 1 / (2 * k + 3)) * x ** k
         k += 1
         if abs(S - S_old) < atol:
             return S
-    else:
-        raise RuntimeError("Function did not converge")
 
 
 @jit
-def dS_x_alt(ecc, x, atol=1e-12, maxiter=100):
+def dS_x_alt(ecc, x, atol=1e-12):
     # Notice that this is not exactly
     # the partial derivative of S with respect to D,
     # but the result of arranging the terms
     # in section 4.2 of Farnocchia et al. 2013
+    assert abs(x) < 1
     S = 0
     k = 0
-    while k < maxiter:
+    while True:
         S_old = S
         S += (ecc - 1 / (2 * k + 3)) * (2 * k + 3) * x ** k
         k += 1
         if abs(S - S_old) < atol:
             return S
-    else:
-        raise RuntimeError("Function did not converge")
 
 
 @jit
-def d2S_x_alt(ecc, x, atol=1e-12, maxiter=100):
+def d2S_x_alt(ecc, x, atol=1e-12):
     # Notice that this is not exactly
     # the second partial derivative of S with respect to D,
     # but the result of arranging the terms
     # in section 4.2 of Farnocchia et al. 2013
     # Also, notice that we are not using this function yet
+    assert abs(x) < 1
     S = 0
     k = 0
-    while k < maxiter:
+    while True:
         S_old = S
         S += (ecc - 1 / (2 * k + 3)) * (2 * k + 3) * (2 * k + 2) * x ** k
         k += 1
         if abs(S - S_old) < atol:
             return S
-    else:
-        raise RuntimeError("Function did not converge")
 
 
 @jit
