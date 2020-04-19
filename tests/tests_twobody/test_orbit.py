@@ -69,6 +69,14 @@ def hyperbolic():
     return Orbit.from_vectors(Sun, r, v, epoch)
 
 
+@pytest.fixture()
+def near_parabolic():
+    r = [8.0e3, 1.0e3, 0.0] * u.km
+    v = [-0.5, -0.5, 0.0] * u.km / u.s
+
+    return Orbit.from_vectors(Earth, r, v)
+
+
 def test_default_time_for_new_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -1135,10 +1143,22 @@ def test_change_plane_twice_restores_original_data():
     assert_quantity_allclose(new_ss.v, iss.v)
 
 
-def test_time_to_anomaly():
-    expected_tof = iss.period / 2
-    iss_180 = iss.propagate_to_anomaly(180 * u.deg)
-    tof = iss_180.time_to_anomaly(0 * u.deg)
+@pytest.mark.xfail(reason="Need to wrap angles")
+@pytest.mark.parametrize("fraction", [1 / 4, 1 / 2, 3 / 4])
+def test_time_to_anomaly(fraction):
+    expected_tof = (1 - fraction) * iss.period
+    iss_step = iss.propagate_to_anomaly(360 * fraction * u.deg)
+    tof = iss_step.time_to_anomaly(0 * u.deg)
+
+    assert_quantity_allclose(tof, expected_tof)
+
+
+@pytest.mark.xfail(reason="Need to recompute expected time of flight")
+@pytest.mark.parametrize("fraction", [-1 / 4, -1 / 2, 1 / 4])
+def test_time_to_anomaly_negative(fraction):
+    expected_tof = (1 - fraction) * iss.period
+    iss_step = iss.propagate_to_anomaly(360 * fraction * u.deg)
+    tof = iss_step.time_to_anomaly(0 * u.deg)
 
     assert_quantity_allclose(tof, expected_tof)
 
@@ -1167,3 +1187,32 @@ def test_issue_916(mock_query):
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_sbdb(name)
     assert "ValueError: Object {} not found".format(name) in excinfo.exconly()
+
+
+def test_near_parabolic_M_does_not_hang(near_parabolic):
+    # See https://github.com/poliastro/poliastro/issues/907
+    expected_nu = -168.65 * u.deg
+    orb = near_parabolic.propagate_to_anomaly(expected_nu)
+
+    assert_quantity_allclose(orb.nu, expected_nu)
+
+
+def test_propagation_near_parabolic_orbits_zero_seconds_gives_same_anomaly(
+    near_parabolic,
+):
+    orb_final = near_parabolic.propagate(0 * u.s)
+
+    # Smoke test
+    assert_quantity_allclose(orb_final.nu, near_parabolic.nu)
+    assert orb_final.epoch == near_parabolic.epoch
+
+
+def test_propagation_near_parabolic_orbits_does_not_hang(near_parabolic):
+    # See https://github.com/poliastro/poliastro/issues/475
+    orb_final = near_parabolic.propagate(near_parabolic.period)
+
+    # Smoke test
+    assert_quantity_allclose(orb_final.nu, near_parabolic.nu)
+    assert_quantity_allclose(
+        (orb_final.epoch - near_parabolic.epoch).to(u.s), near_parabolic.period
+    )

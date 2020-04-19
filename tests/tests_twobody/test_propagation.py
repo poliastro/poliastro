@@ -55,14 +55,6 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
     # Still not implemented. Refer to issue #714.
     if propagator in [pimienta, gooding]:
         pytest.skip()
-    elif propagator is farnocchia and ecc == 1.01:
-        pytest.xfail(
-            "This belongs to the strong hyperbolic region "
-            "which gives nu_to_M(1.0, 1.0100000000000002) = 0.0008482321477948918 "
-            "but it is entering the near parabolic code path "
-            "which gives nu_to_M(1.0, 1.01) = 0.5997907037261884, "
-            "therefore the function is not smooth!"
-        )
 
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
@@ -131,8 +123,8 @@ def test_propagating_to_certain_nu_is_correct():
     assert elliptic_at_aphelion.epoch > elliptic.epoch
 
     # test 10 random true anomaly values
-    for _ in range(10):
-        nu = np.random.uniform(low=0.0, high=2 * np.pi)
+    # TODO: Rework this test
+    for nu in np.random.uniform(low=-np.pi, high=np.pi, size=10):
         elliptic = elliptic.propagate_to_anomaly(nu * u.rad)
         r, _ = elliptic.rv()
         assert_quantity_allclose(norm(r), a * (1.0 - ecc ** 2) / (1 + ecc * np.cos(nu)))

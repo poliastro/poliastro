@@ -2,6 +2,7 @@ import numpy as np
 
 from .._jit import jit
 from ..angles import (
+    D_to_M,
     D_to_nu,
     E_to_M,
     E_to_nu,
@@ -19,7 +20,7 @@ from ..elements import coe2rv, rv2coe
 
 @jit
 def _kepler_equation_near_parabolic(D, M, ecc):
-    return D_to_M_near_parabolic(ecc, D) - M
+    return D_to_M_near_parabolic(D, ecc) - M
 
 
 @jit
@@ -79,7 +80,7 @@ def d2S_x_alt(ecc, x, atol=1e-12):
 
 
 @jit
-def D_to_M_near_parabolic(ecc, D):
+def D_to_M_near_parabolic(D, ecc):
     x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
     assert abs(x) < 1
     S = S_x(ecc, x)
@@ -122,99 +123,159 @@ def M_to_D_near_parabolic(M, ecc, tol=1.48e-08, maxiter=50):
 
 
 @jit
-def D_to_M_near_parabolic_alt(D, ecc):
-    """Mean anomaly from eccentric anomaly in the near parabolic region.
-
-    Parameters
-    ----------
-    D : float
-        Parabolic eccentric anomaly.
-    ecc : float
-        Eccentricity.
-
-    Returns
-    -------
-    M : float
-        Mean anomaly.
-
-    """
-    M = _kepler_equation_near_parabolic(D, 0.0, ecc)
-    return M
-
-
-@jit
-def nu_to_M(nu, ecc, delta=1e-2):
-    """Mean anomaly from true anomaly.
-
-    .. versionadded:: 0.4.0
+def delta_t_from_nu(nu, ecc, k=1.0, q=1.0, delta=1e-2):
+    """Time elapsed since periapsis for given true anomaly.
 
     Parameters
     ----------
     nu : float
-        True anomaly in radians.
+        True anomaly.
     ecc : float
         Eccentricity.
-    delta : float (optional)
-        Threshold of near-parabolic regime definition (from Davide Farnocchia et al)
+    k : float
+        Gravitational parameter.
+    q : float
+        Periapsis distance.
+    delta : float
+        Parameter that controls the size of the near parabolic region.
 
     Returns
     -------
-    M : float
-        Mean anomaly.
+    delta_t : float
+        Time elapsed since periapsis.
 
     """
-    if ecc > 1 + delta:
-        F = nu_to_F(nu, ecc)
-        M = F_to_M(F, ecc)
-    elif ecc < 1 - delta:
-        E = nu_to_E(nu, ecc)
-        M = E_to_M(E, ecc)
+    assert -np.pi <= nu < np.pi
+    if ecc < 1 - delta:
+        # Strong elliptic
+        E = nu_to_E(nu, ecc)  # (-pi, pi]
+        M = E_to_M(E, ecc)  # (-pi, pi]
+        n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
+    elif 1 - delta <= ecc < 1:
+        E = nu_to_E(nu, ecc)  # (-pi, pi]
+        if delta <= 1 - ecc * np.cos(E):
+            # Strong elliptic
+            M = E_to_M(E, ecc)  # (-pi, pi]
+            n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
+        else:
+            # Near parabolic
+            D = nu_to_D(nu)  # (-∞, ∞)
+            # If |nu| is far from pi this result is bounded
+            # because the near parabolic region shrinks in its vicinity,
+            # otherwise the eccentricity is very close to 1
+            # and we are really far away
+            M = D_to_M_near_parabolic(D, ecc)
+            n = np.sqrt(k / (2 * q ** 3))
+    elif ecc == 1:
+        # Parabolic
+        D = nu_to_D(nu)  # (-∞, ∞)
+        M = D_to_M(D)  # (-∞, ∞)
+        n = np.sqrt(k / (2 * q ** 3))
+    elif 1 + ecc * np.cos(nu) < 0:
+        # Unfeasible region
+        return np.nan
+    elif 1 < ecc <= 1 + delta:
+        # NOTE: Do we need to wrap nu here?
+        # For hyperbolic orbits, it should anyway be in
+        # (-arccos(-1 / ecc), +arccos(-1 / ecc))
+        F = nu_to_F(nu, ecc)  # (-∞, ∞)
+        if delta <= ecc * np.cosh(F) - 1:
+            # Strong hyperbolic
+            M = F_to_M(F, ecc)  # (-∞, ∞)
+            n = np.sqrt(k * (ecc - 1) ** 3 / q ** 3)
+        else:
+            # Near parabolic
+            D = nu_to_D(nu)  # (-∞, ∞)
+            M = D_to_M_near_parabolic(D, ecc)  # (-∞, ∞)
+            n = np.sqrt(k / (2 * q ** 3))
+    elif 1 + delta < ecc:
+        # Strong hyperbolic
+        F = nu_to_F(nu, ecc)  # (-∞, ∞)
+        M = F_to_M(F, ecc)  # (-∞, ∞)
+        n = np.sqrt(k * (ecc - 1) ** 3 / q ** 3)
     else:
-        D = nu_to_D(nu)
-        # FIXME: This should be
-        # M = D_to_M_near_parabolic(D, ecc)
-        # but the discrimination of near-parabolic regions here
-        # is not correct and the function might not converge
-        M = D_to_M_near_parabolic_alt(D, ecc)
-    return M
+        raise RuntimeError
+
+    return M / n
 
 
 @jit
-def M_to_nu(M, ecc, delta=1e-2):
-    """True anomaly from mean anomaly.
-
-    .. versionadded:: 0.4.0
+def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
+    """True anomaly for given elapsed time since periapsis.
 
     Parameters
     ----------
-    M : float
-        Mean anomaly in radians.
+    delta_t : float
+        Time elapsed since periapsis.
     ecc : float
         Eccentricity.
-    delta : float (optional)
-        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
+    k : float
+        Gravitational parameter.
+    q : float
+        Periapsis distance.
+    delta : float
+        Parameter that controls the size of the near parabolic region.
 
     Returns
     -------
     nu : float
         True anomaly.
 
-    Examples
-    --------
-    >>> from numpy import radians, degrees
-    >>> degrees(M_to_nu(radians(30.0), 0.06))
-    33.673284930211665
-
     """
-    if ecc > 1 + delta:
-        F = M_to_F(M, ecc)
-        nu = F_to_nu(F, ecc)
-    elif ecc < 1 - delta:
+    if ecc < 1 - delta:
+        # Strong elliptic
+        n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
+        M = n * delta_t
         E = M_to_E(M, ecc)
         nu = E_to_nu(E, ecc)
-    else:
-        D = M_to_D_near_parabolic(M, ecc)
+    elif 1 - delta <= ecc < 1:
+        E_delta = np.arccos((1 - delta) / ecc)
+        # We compute M assuming we are in the strong elliptic case
+        # and verify later
+        n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
+        M = n * delta_t
+        # We check against abs(M) because E_delta could also be negative
+        if E_to_M(E_delta, ecc) <= abs(M):
+            # Strong elliptic, proceed
+            E = M_to_E(M, ecc)
+            nu = E_to_nu(E, ecc)
+        else:
+            # Near parabolic, recompute M
+            n = np.sqrt(k / (2 * q ** 3))
+            M = n * delta_t
+            D = M_to_D_near_parabolic(M, ecc)
+            nu = D_to_nu(D)
+    elif ecc == 1:
+        # Parabolic
+        n = np.sqrt(k / (2 * q ** 3))
+        M = n * delta_t
+        D = M_to_D(M)
         nu = D_to_nu(D)
+    elif 1 < ecc <= 1 + delta:
+        F_delta = np.arccosh((1 + delta) / ecc)
+        # We compute M assuming we are in the strong hyperbolic case
+        # and verify later
+        n = np.sqrt(k * (ecc - 1) ** 3 / q ** 3)
+        M = n * delta_t
+        # We check against abs(M) because F_delta could also be negative
+        if F_to_M(F_delta, ecc) <= abs(M):
+            # Strong hyperbolic, proceed
+            F = M_to_F(M, ecc)
+            nu = F_to_nu(F, ecc)
+        else:
+            # Near parabolic, recompute M
+            n = np.sqrt(k / (2 * q ** 3))
+            M = n * delta_t
+            D = M_to_D_near_parabolic(M, ecc)
+            nu = D_to_nu(D)
+    # elif 1 + delta < ecc:
+    else:
+        # Strong hyperbolic
+        n = np.sqrt(k * (ecc - 1) ** 3 / q ** 3)
+        M = n * delta_t
+        F = M_to_F(M, ecc)
+        nu = F_to_nu(F, ecc)
+
     return nu
 
 
@@ -252,19 +313,11 @@ def farnocchia(k, r0, v0, tof):
 
     # get the initial true anomaly and orbit parameters that are constant over time
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
+    q = p / (1 + ecc)
 
-    # get the initial mean anomaly
-    M0 = nu_to_M(nu0, ecc)
-    if np.abs(ecc - 1.0) > 1e-2:
-        # strong elliptic or strong hyperbolic orbits
-        a = p / (1.0 - ecc ** 2)
-        n = np.sqrt(k / np.abs(a ** 3))
-    else:
-        # near-parabolic orbit
-        q = p / np.abs(1.0 + ecc)
-        n = np.sqrt(k / 2.0 / (q ** 3))
+    delta_t0 = delta_t_from_nu(nu0, ecc, k, q)
+    delta_t = delta_t0 + tof
 
-    M = M0 + tof * n
-    nu = M_to_nu(M, ecc)
+    nu = nu_from_delta_t(delta_t, ecc, k, q)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
