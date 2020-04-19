@@ -410,10 +410,12 @@ def pimienta(k, r0, v0, tof):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    q = p / (1 + ecc)
 
+    # TODO: Do something to increase parabolic accuracy?
+    n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
-    semi_axis_a = p / (1 - ecc ** 2)
-    n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
+
     M = M0 + n * tof
 
     # Equation (32a), (32b), (32c) and (32d)
