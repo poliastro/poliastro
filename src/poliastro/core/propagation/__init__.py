@@ -1,18 +1,31 @@
 import numpy as np
 
-from poliastro.core.angles import (
+from .._jit import jit
+from ..angles import (
     D_to_nu,
+    E_to_M,
     E_to_nu,
+    F_to_M,
     F_to_nu,
-    M_to_nu,
     _kepler_equation,
     _kepler_equation_prime,
-    nu_to_M,
+    nu_to_E,
+    nu_to_F,
 )
-from poliastro.core.elements import coe2rv, rv2coe
-from poliastro.core.stumpff import c2, c3
+from ..elements import coe2rv, rv2coe
+from ..stumpff import c2, c3
+from .farnocchia import farnocchia
 
-from ._jit import jit
+__all__ = [
+    "func_twobody",
+    "farnocchia",
+    "vallado",
+    "mikkola",
+    "markley",
+    "pimienta",
+    "gooding",
+    "danby",
+]
 
 
 def func_twobody(t0, u_, k, ad, ad_kwargs):
@@ -41,58 +54,6 @@ def func_twobody(t0, u_, k, ad, ad_kwargs):
 
     du = np.array([vx, vy, vz, -k * x / r3 + ax, -k * y / r3 + ay, -k * z / r3 + az])
     return du
-
-
-@jit
-def farnocchia(k, r0, v0, tof):
-    r"""Propagates orbit using mean motion.
-
-    This algorithm depends on the geometric shape of the orbit.
-    For the case of the strong elliptic or strong hyperbolic orbits:
-
-    ..  math::
-
-        M = M_{0} + \frac{\mu^{2}}{h^{3}}\left ( 1 -e^{2}\right )^{\frac{3}{2}}t
-
-    .. versionadded:: 0.9.0
-
-    Parameters
-    ----------
-    k : float
-        Standar Gravitational parameter
-    r0 : ~astropy.units.Quantity
-        Initial position vector wrt attractor center.
-    v0 : ~astropy.units.Quantity
-        Initial velocity vector.
-    tof : float
-        Time of flight (s).
-
-    Note
-    ----
-    This method takes initial :math:`\vec{r}, \vec{v}`, calculates classical orbit parameters,
-    increases mean anomaly and performs inverse transformation to get final :math:`\vec{r}, \vec{v}`
-    The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9
-
-    """
-
-    # get the initial true anomaly and orbit parameters that are constant over time
-    p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
-
-    # get the initial mean anomaly
-    M0 = nu_to_M(nu0, ecc)
-    if np.abs(ecc - 1.0) > 1e-2:
-        # strong elliptic or strong hyperbolic orbits
-        a = p / (1.0 - ecc ** 2)
-        n = np.sqrt(k / np.abs(a ** 3))
-    else:
-        # near-parabolic orbit
-        q = p / np.abs(1.0 + ecc)
-        n = np.sqrt(k / 2.0 / (q ** 3))
-
-    M = M0 + tof * n
-    nu = M_to_nu(M, ecc)
-
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
@@ -259,18 +220,19 @@ def mikkola(k, r0, v0, tof, rtol=None):
 
     # Solving for the classical elements
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    M0 = nu_to_M(nu, ecc, delta=0)
     a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(a) ** 3)
-    M = M0 + n * tof
 
     # Solve for specific geometrical case
     if ecc < 1.0:
         # Equation (9a)
         alpha = (1 - ecc) / (4 * ecc + 1 / 2)
+        M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     else:
         alpha = (ecc - 1) / (4 * ecc + 1 / 2)
+        M0 = F_to_M(nu_to_F(nu, ecc), ecc)
 
+    M = M0 + n * tof
     beta = M / 2 / (4 * ecc + 1 / 2)
 
     # Equation (9b)
@@ -363,12 +325,12 @@ def markley(k, r0, v0, tof):
     Note
     ----
     The following algorithm was taken from http://dx.doi.org/10.1007/BF00691917.
-    """
 
+    """
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
 
-    M0 = nu_to_M(nu, ecc, delta=0)
+    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     a = p / (1 - ecc ** 2)
     n = np.sqrt(k / a ** 3)
     M = M0 + n * tof
@@ -448,10 +410,12 @@ def pimienta(k, r0, v0, tof):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    q = p / (1 + ecc)
 
-    M0 = nu_to_M(nu, ecc, delta=0)
-    semi_axis_a = p / (1 - ecc ** 2)
-    n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
+    # TODO: Do something to increase parabolic accuracy?
+    n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
+    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
+
     M = M0 + n * tof
 
     # Equation (32a), (32b), (32c) and (32d)
@@ -816,7 +780,7 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
             "Parabolic/Hyperbolic cases still not implemented in gooding."
         )
 
-    M0 = nu_to_M(nu, ecc, delta=0)
+    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
     M = M0 + n * tof
@@ -874,25 +838,28 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    M0 = nu_to_M(nu, ecc, delta=0)
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
-    M = M0 + n * tof
-
-    # Range mean anomaly
-    xma = M - 2 * np.pi * np.floor(M / 2 / np.pi)
 
     if ecc == 0:
         # Solving for circular orbit
-        nu = xma
+        M0 = E_to_M(nu_to_E(nu, ecc), ecc)
+        M = M0 + n * tof
+        nu = M - 2 * np.pi * np.floor(M / 2 / np.pi)
         return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
     elif ecc < 1.0:
         # For elliptical orbit
+        M0 = E_to_M(nu_to_E(nu, ecc), ecc)
+        M = M0 + n * tof
+        xma = M - 2 * np.pi * np.floor(M / 2 / np.pi)
         E = xma + 0.85 * np.sign(np.sin(xma)) * ecc
 
     else:
         # For parabolic and hyperbolic
+        M0 = F_to_M(nu_to_F(nu, ecc), ecc)
+        M = M0 + n * tof
+        xma = M - 2 * np.pi * np.floor(M / 2 / np.pi)
         E = np.log(2 * xma / ecc + 1.8)
 
     # Iterations begin

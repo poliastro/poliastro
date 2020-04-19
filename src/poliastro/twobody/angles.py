@@ -15,12 +15,10 @@ from poliastro.core.angles import (
     M_to_D as M_to_D_fast,
     M_to_E as M_to_E_fast,
     M_to_F as M_to_F_fast,
-    M_to_nu as M_to_nu_fast,
     fp_angle as fp_angle_fast,
     nu_to_D as nu_to_D_fast,
     nu_to_E as nu_to_E_fast,
     nu_to_F as nu_to_F_fast,
-    nu_to_M as nu_to_M_fast,
 )
 
 
@@ -276,58 +274,6 @@ def D_to_M(D):
 
     """
     return (D_to_M_fast(D.to(u.rad).value) * u.rad).to(D.unit)
-
-
-@u.quantity_input(M=u.rad, ecc=u.one)
-def M_to_nu(M, ecc, delta=1e-2):
-    """True anomaly from mean anomaly.
-
-    .. versionadded:: 0.4.0
-
-    Parameters
-    ----------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity.
-    delta : float (optional)
-        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
-    Returns
-    -------
-    nu : ~astropy.units.Quantity
-        True anomaly.
-
-    Examples
-    --------
-    >>> M_to_nu(30.0 * u.deg, 0.06 * u.one)
-    <Quantity 33.67328493 deg>
-
-    """
-    return (M_to_nu_fast(M.to(u.rad).value, ecc.value, delta) * u.rad).to(M.unit)
-
-
-@u.quantity_input(nu=u.rad, ecc=u.one)
-def nu_to_M(nu, ecc, delta=1e-2):
-    """Mean anomaly from true anomaly.
-
-    .. versionadded:: 0.4.0
-
-    Parameters
-    ----------
-    nu : ~astropy.units.Quantity
-        True anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity.
-    delta : float (optional)
-        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
-
-    Returns
-    -------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-
-    """
-    return (nu_to_M_fast(nu.to(u.rad).value, ecc.value, delta) * u.rad).to(nu.unit)
 
 
 @u.quantity_input(nu=u.rad, ecc=u.one)

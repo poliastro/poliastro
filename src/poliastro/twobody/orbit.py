@@ -16,11 +16,14 @@ from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
-from poliastro.core.angles import nu_to_M as nu_to_M_fast
+from poliastro.core.propagation.farnocchia import (
+    M_to_nu as M_to_nu_fast,
+    nu_to_M as nu_to_M_fast,
+)
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import E_to_nu, M_to_nu, nu_to_M, raan_from_ltan
+from poliastro.twobody.angles import E_to_nu, raan_from_ltan
 from poliastro.twobody.propagation import farnocchia, propagate
 
 from ..util import find_closest_value, norm
@@ -211,14 +214,10 @@ class Orbit:
         return arglat
 
     @cached_property
-    def M(self):
-        """Mean anomaly. """
-        return nu_to_M(self.nu, self.ecc)
-
-    @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage. """
-        t_p = self.period * self.M / (360 * u.deg)
+        M = nu_to_M_fast(self.nu.to_value(u.rad), self.ecc.value) * u.rad
+        t_p = self.period * M / (360 * u.deg)
         return t_p
 
     @classmethod
@@ -664,7 +663,7 @@ class Orbit:
 
         # Since JPL provides Mean Anomaly (M) we need to make
         # the conversion to the true anomaly (\nu)
-        nu = M_to_nu(obj["orbit"]["elements"]["ma"].to(u.deg) * u.deg, ecc)
+        nu = M_to_nu_fast(obj["orbit"]["elements"]["ma"].to(u.rad), ecc.value) * u.rad
 
         epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
@@ -1203,11 +1202,11 @@ class Orbit:
         -------
         tof: ~astropy.units.Quantity
             Time of flight required.
-        """
 
+        """
         # Compute time of flight for correct epoch
-        M = nu_to_M(self.nu, self.ecc)
-        new_M = nu_to_M(value, self.ecc)
+        M = nu_to_M_fast(self.nu.to_value(u.rad), self.ecc.value) * u.rad
+        new_M = nu_to_M_fast(value.to_value(u.rad), self.ecc.value) * u.rad
         tof = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
 
         return tof

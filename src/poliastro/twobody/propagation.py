@@ -498,7 +498,6 @@ HYPERBOLIC_PROPAGATORS = [
     farnocchia,
     vallado,
     mikkola,
-    vallado,
     pimienta,
     gooding,
     danby,
