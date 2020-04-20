@@ -446,7 +446,6 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
 
     """
 
-
     # Check if propagator fulfills orbit requirements
     if orbit.ecc < 1.0 and method not in ELLIPTIC_PROPAGATORS:
         raise ValueError(
