@@ -462,12 +462,6 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
     else:
         pass
 
-    # Use the highest precision we can afford
-    # np.atleast_1d does not work directly on TimeDelta objects
-    jd1 = np.atleast_1d(time_of_flight.jd1)
-    jd2 = np.atleast_1d(time_of_flight.jd2)
-    time_of_flight = time.TimeDelta(jd1, jd2, format="jd", scale=time_of_flight.scale)
-
     rr, vv = method(
         orbit.attractor.k, orbit.r, orbit.v, time_of_flight.to(u.s), rtol=rtol, **kwargs
     )
