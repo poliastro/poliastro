@@ -1,8 +1,10 @@
 """Angles and anomalies.
 
 """
-from astropy import units as u
+import numpy as np
+from astropy import coordinates, units as u
 
+from poliastro import constants
 from poliastro.core.angles import (
     D_to_M as D_to_M_fast,
     D_to_nu as D_to_nu_fast,
@@ -13,12 +15,10 @@ from poliastro.core.angles import (
     M_to_D as M_to_D_fast,
     M_to_E as M_to_E_fast,
     M_to_F as M_to_F_fast,
-    M_to_nu as M_to_nu_fast,
     fp_angle as fp_angle_fast,
     nu_to_D as nu_to_D_fast,
     nu_to_E as nu_to_E_fast,
     nu_to_F as nu_to_F_fast,
-    nu_to_M as nu_to_M_fast,
 )
 
 
@@ -199,15 +199,13 @@ def M_to_F(M, ecc):
 
 
 @u.quantity_input(M=u.rad, ecc=u.one)
-def M_to_D(M, ecc):
+def M_to_D(M):
     """Parabolic eccentric anomaly from mean anomaly.
 
     Parameters
     ----------
     M : ~astropy.units.Quantity
         Mean anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity (>1).
 
     Returns
     -------
@@ -215,7 +213,7 @@ def M_to_D(M, ecc):
         Parabolic eccentric anomaly.
 
     """
-    return (M_to_D_fast(M.to(u.rad).value, ecc.value) * u.rad).to(M.unit)
+    return (M_to_D_fast(M.to(u.rad).value) * u.rad).to(M.unit)
 
 
 @u.quantity_input(E=u.rad, ecc=u.one)
@@ -261,15 +259,13 @@ def F_to_M(F, ecc):
 
 
 @u.quantity_input(D=u.rad, ecc=u.one)
-def D_to_M(D, ecc):
+def D_to_M(D):
     """Mean anomaly from eccentric anomaly.
 
     Parameters
     ----------
     D : ~astropy.units.Quantity
         Parabolic eccentric anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity.
 
     Returns
     -------
@@ -277,59 +273,7 @@ def D_to_M(D, ecc):
         Mean anomaly.
 
     """
-    return (D_to_M_fast(D.to(u.rad).value, ecc.value) * u.rad).to(D.unit)
-
-
-@u.quantity_input(M=u.rad, ecc=u.one)
-def M_to_nu(M, ecc, delta=1e-2):
-    """True anomaly from mean anomaly.
-
-    .. versionadded:: 0.4.0
-
-    Parameters
-    ----------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity.
-    delta : float (optional)
-        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
-    Returns
-    -------
-    nu : ~astropy.units.Quantity
-        True anomaly.
-
-    Examples
-    --------
-    >>> M_to_nu(30.0 * u.deg, 0.06 * u.one)
-    <Quantity 33.67328493 deg>
-
-    """
-    return (M_to_nu_fast(M.to(u.rad).value, ecc.value, delta) * u.rad).to(M.unit)
-
-
-@u.quantity_input(nu=u.rad, ecc=u.one)
-def nu_to_M(nu, ecc, delta=1e-2):
-    """Mean anomaly from true anomaly.
-
-    .. versionadded:: 0.4.0
-
-    Parameters
-    ----------
-    nu : ~astropy.units.Quantity
-        True anomaly.
-    ecc : ~astropy.units.Quantity
-        Eccentricity.
-    delta : float (optional)
-        threshold of near-parabolic regime definition (from Davide Farnocchia et al)
-
-    Returns
-    -------
-    M : ~astropy.units.Quantity
-        Mean anomaly.
-
-    """
-    return (nu_to_M_fast(nu.to(u.rad).value, ecc.value, delta) * u.rad).to(nu.unit)
+    return (D_to_M_fast(D.to(u.rad).value) * u.rad).to(D.unit)
 
 
 @u.quantity_input(nu=u.rad, ecc=u.one)
@@ -351,3 +295,65 @@ def fp_angle(nu, ecc):
 
     """
     return (fp_angle_fast(nu.to(u.rad).value, ecc.value) * u.rad).to(nu.unit)
+
+
+@u.quantity_input(ltan=u.hourangle)
+def raan_from_ltan(epoch, ltan=12.0):
+    """RAAN angle from LTAN for SSO around the earth
+
+    Parameters
+    ----------
+    epoch : ~astropy.time.Time
+         Value of time to calculate the RAAN for
+    ltan: ~astropy.units.Quantity
+         Decimal hour between 0 and 24
+
+    Returns
+    -------
+    RAAN: ~astropy.units.Quantity
+        Right ascension of the ascending node angle in GCRS
+
+    Note
+    ----
+    Calculations of the sun mean longitude and equation of time
+    follow "Fundamentals of Astrodynamics and Applications"
+    Fourth edition by Vallado, David A.
+    """
+
+    T_UT1 = ((epoch.ut1 - constants.J2000).value / 36525.0) * u.deg
+    T_TDB = ((epoch.tdb - constants.J2000).value / 36525.0) * u.deg
+
+    # Apparent sun position
+    sun_position = coordinates.get_sun(epoch)
+
+    # Calculate the sun apparent local time
+    salt = sun_position.ra + 12 * u.hourangle
+
+    # Use the equation of time to calculate the mean sun local time (fictional sun without anomalies)
+
+    # sun mean anomaly
+    M_sun = 357.5291092 * u.deg + 35999.05034 * T_TDB
+
+    # sun mean longitude
+    l_sun = 280.460 * u.deg + 36000.771 * T_UT1
+    l_ecliptic_part2 = 1.914666471 * u.deg * np.sin(
+        M_sun
+    ) + 0.019994643 * u.deg * np.sin(2 * M_sun)
+    l_ecliptic = l_sun + l_ecliptic_part2
+
+    eq_time = (
+        -l_ecliptic_part2
+        + 2.466 * u.deg * np.sin(2 * l_ecliptic)
+        - 0.0053 * u.deg * np.sin(4 * l_ecliptic)
+    )
+
+    # Calculate sun mean local time
+
+    smlt = salt + eq_time
+
+    # Desired angle between sun and ascending node
+    alpha = (coordinates.Angle(ltan).wrap_at(24 * u.hourangle)).to(u.rad)
+
+    # Use the mean sun local time calculate needed RAAN for given LTAN
+    raan = smlt + alpha
+    return raan

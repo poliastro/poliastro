@@ -5,6 +5,8 @@ from astropy import units as u
 
 from poliastro.core.iod import vallado as vallado_fast
 
+kms = u.km / u.s
+
 
 def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     """Solves the Lambert problem.
@@ -47,4 +49,4 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
 
     v0, v = vallado_fast(k_, r0_, r_, tof_, short, numiter, rtol)
 
-    yield v0 * u.km / u.s, v * u.km / u.s
+    yield v0 << kms, v << kms

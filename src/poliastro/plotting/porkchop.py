@@ -19,7 +19,8 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-from poliastro.iod import lambert
+from poliastro.maneuver import Maneuver
+from poliastro.twobody.orbit import Orbit
 from poliastro.util import norm
 
 
@@ -48,29 +49,36 @@ def _get_state(body, time):
         rr = coord.CartesianRepresentation(rr)
         vv = coord.CartesianRepresentation(vv)
 
-    return rr, vv
+    return rr.xyz, vv.xyz
 
 
 def _targetting(departure_body, target_body, t_launch, t_arrival):
-    """This function returns the increment in departure and arrival velocities.
+    """This function returns the increment in departure and arrival velocities."""
 
-    """
-
+    # Get position and velocities for departure and arrival
     rr_dpt_body, vv_dpt_body = _get_state(departure_body, t_launch)
     rr_arr_body, vv_arr_body = _get_state(target_body, t_arrival)
 
-    # Compute time of flight
-    tof = t_arrival - t_launch
+    # Transform into Orbit objects
+    attractor = departure_body.parent
+    ss_dpt = Orbit.from_vectors(attractor, rr_dpt_body, vv_dpt_body, epoch=t_launch)
+    ss_arr = Orbit.from_vectors(attractor, rr_arr_body, vv_arr_body, epoch=t_arrival)
+
+    # Define time of flight
+    tof = ss_arr.epoch - ss_dpt.epoch
 
     if tof <= 0:
         return None, None, None, None, None
 
     try:
-        (v_dpt, v_arr), = lambert(Sun.k, rr_dpt_body.xyz, rr_arr_body.xyz, tof)
+        # Lambert is now a Maneuver object
+        man_lambert = Maneuver.lambert(ss_dpt, ss_arr)
+
+        # Get norm delta velocities
+        dv_dpt = norm(man_lambert.impulses[0][1])
+        dv_arr = norm(man_lambert.impulses[1][1])
 
         # Compute all the output variables
-        dv_dpt = norm(v_dpt - vv_dpt_body.xyz)
-        dv_arr = norm(v_arr - vv_arr_body.xyz)
         c3_launch = dv_dpt ** 2
         c3_arrival = dv_arr ** 2
 
@@ -90,7 +98,7 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
 targetting_vec = np.vectorize(
     _targetting,
     otypes=[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
-    excluded=["departure_body", "target_body"],
+    excluded=[0, 1],
 )
 
 
@@ -130,6 +138,10 @@ def porkchop(
 
     Returns
     -------
+    dv_launch: np.ndarray
+        Launch delta v
+    dv_arrival: np.ndarray
+        Arrival delta v
     c3_launch: np.ndarray
         Characteristic launch energy
     c3_arrrival: np.ndarray
@@ -218,19 +230,14 @@ def porkchop(
     fig.autofmt_xdate()
 
     if not hasattr(target_body, "name"):
-
         ax.set_title(
-            "{} - {} for year {}, C3 Launch".format(
-                departure_body.name, "Target Body", launch_span[0].datetime.year
-            ),
+            f"{departure_body.name} - Target Body for year {launch_span[0].datetime.year}, C3 Launch",
             fontsize=14,
             fontweight="bold",
         )
     else:
         ax.set_title(
-            "{} - {} for year {}, C3 Launch".format(
-                departure_body.name, target_body.name, launch_span[0].datetime.year
-            ),
+            f"{departure_body.name} - {target_body.name} for year {launch_span[0].datetime.year}, C3 Launch",
             fontsize=14,
             fontweight="bold",
         )

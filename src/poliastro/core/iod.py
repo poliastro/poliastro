@@ -1,9 +1,9 @@
 import numpy as np
-from numpy import pi
+from numpy import cross, pi
+from numpy.linalg import norm
 
 from poliastro.core.hyper import hyp2f1b
 from poliastro.core.stumpff import c2, c3
-from poliastro.core.util import cross, norm
 
 from ._jit import jit
 
@@ -88,7 +88,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     >>> v1 = v1*u.km / u.s
     >>> v2 = v2*u.km / u.s
     >>> print(v1, v2)
-    [-5.99249499  1.92536673  3.24563805] km / s [-3.31245847 -4.196619   -0.38528907] km / s
+    [-5.99249503  1.92536671  3.24563805] km / s [-3.31245851 -4.19661901 -0.38528906] km / s
 
     Note
     ----
@@ -115,8 +115,8 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
         raise RuntimeError("Cannot compute orbit, phase angle is 180 degrees")
 
     psi = 0.0
-    psi_low = -4 * np.pi
-    psi_up = 4 * np.pi
+    psi_low = -4 * np.pi ** 2
+    psi_up = 4 * np.pi ** 2
 
     count = 0
 
@@ -315,8 +315,16 @@ def _compute_psi(x, y, ll):
 
 
 @jit
-def _tof_equation(x, y, T0, ll, M):
+def _tof_equation(x, T0, ll, M):
     """Time of flight equation.
+
+    """
+    return _tof_equation_y(x, _compute_y(x, ll), T0, ll, M)
+
+
+@jit
+def _tof_equation_y(x, y, T0, ll, M):
+    """Time of flight equation with externally computated y.
 
     """
     if M == 0 and np.sqrt(0.6) < x < np.sqrt(1.4):
@@ -359,7 +367,7 @@ def _compute_T_min(ll, M, numiter, rtol):
     """
     if ll == 1:
         x_T_min = 0.0
-        T_min = _tof_equation(x_T_min, _compute_y(x_T_min, ll), 0.0, ll, M)
+        T_min = _tof_equation(x_T_min, 0.0, ll, M)
     else:
         if M == 0:
             x_T_min = np.inf
@@ -367,10 +375,9 @@ def _compute_T_min(ll, M, numiter, rtol):
         else:
             # Set x_i > 0 to avoid problems at ll = -1
             x_i = 0.1
-            y = _compute_y(x_i, ll)
-            T_i = _tof_equation(x_i, y, 0.0, ll, M)
-            x_T_min = _halley(0.1, T_i, ll, rtol, numiter)
-            T_min = _tof_equation(x_T_min, y, 0.0, ll, M)
+            T_i = _tof_equation(x_i, 0.0, ll, M)
+            x_T_min = _halley(x_i, T_i, ll, rtol, numiter)
+            T_min = _tof_equation(x_T_min, 0.0, ll, M)
 
     return [x_T_min, T_min]
 
@@ -446,7 +453,7 @@ def _householder(p0, T0, ll, M, tol, maxiter):
     """
     for ii in range(maxiter):
         y = _compute_y(p0, ll)
-        fval = _tof_equation(p0, y, T0, ll, M)
+        fval = _tof_equation_y(p0, y, T0, ll, M)
         T = fval + T0
         fder = _tof_equation_p(p0, y, T, ll)
         fder2 = _tof_equation_p2(p0, y, T, fder, ll)

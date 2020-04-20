@@ -9,7 +9,7 @@ Initial Orbit Determination (IOD) module
 
 \
 \
-The :py:mod:`polaistro.core.iod` deals with the problem of determining an orbit
+The :py:mod:`poliastro.core.iod` deals with the problem of determining an orbit
 being given two position vectors along it and the that the body takes to travel from
 one to another. 
 

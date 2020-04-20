@@ -51,7 +51,7 @@ contributions and feedback are more than welcome. You can test poliastro in your
 browser using binder, a cloud Jupyter notebook server:
 
 .. image:: https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square
-   :target: https://beta.mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb
+   :target: https://mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb
 
 .. _`source code`: https://github.com/poliastro/poliastro
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
@@ -59,7 +59,7 @@ browser using binder, a cloud Jupyter notebook server:
 
 See `benchmarks`_ for the performance analysis of poliastro.
 
-.. _`benchmarks`: https://blog.poliastro.space/poliastro-benchmarks/
+.. _`benchmarks`: https://benchmarks.poliastro.space/
 
 poliastro works on recent versions of Python and is released under
 the MIT license, hence allowing commercial use of the library.
@@ -73,7 +73,7 @@ the MIT license, hence allowing commercial use of the library.
 
 ----
 
-.. _`Molniya orbit`: http://en.wikipedia.org/wiki/Molniya_orbit
+.. _`Molniya orbit`: https://en.wikipedia.org/wiki/Molniya_orbit
 
 Contents
 --------
@@ -88,6 +88,7 @@ Contents
     api/safe/safe_index
     api/core/core_index
     changelog
+    contributing
     references
 
 

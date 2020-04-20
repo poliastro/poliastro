@@ -41,7 +41,7 @@ for my whole academic life.
   `DOI:10.1109/MCSE.2011.37 <http://dx.doi.org/10.1109/MCSE.2011.37>`_
 * Jones, Eric, Travis Oliphant, and Pearu Peterson.
   "SciPy: Open Source Scientific Tools for Python",
-  2001-, http://www.scipy.org/ [Online; accessed 2015-12-12].
+  2001-, https://www.scipy.org/ [Online; accessed 2015-12-12].
 * Hunter✝, John D. "Matplotlib: A 2D graphics environment."
   *Computing in science and engineering* 9, no. 3 (2007): 90-95.
   `DOI:10.1109/MCSE.2007.55 <http://dx.doi.org/10.1109/MCSE.2007.55>`_

@@ -3,13 +3,14 @@
 """
 import numpy as np
 from astropy import units as u
+from numpy import cross
 
-from poliastro.core.elements import pqw2ijk, rv_pqw
-from poliastro.core.util import cross
+from poliastro.core.elements import coe_rotation_matrix, rv_pqw
+from poliastro.iod.izzo import lambert as lambert_izzo
 from poliastro.util import norm
 
 
-class Maneuver(object):
+class Maneuver:
     r"""Class to represent a Maneuver.
 
     Each ``Maneuver`` consists on a list of impulses :math:`\Delta v_i`
@@ -46,6 +47,9 @@ class Maneuver(object):
                 raise TypeError
         except TypeError:
             raise ValueError("Delta-V must be three dimensions vectors")
+
+    def __repr__(self):
+        return f"Number of impulses: {len(self.impulses)}, Total cost: {self.get_total_cost():.6f}"
 
     @u.quantity_input(dts=u.s, dvs=u.m / u.s)
     def _initialize(self, dts, dvs):
@@ -96,8 +100,12 @@ class Maneuver(object):
             Final altitude of the orbit
         """
 
-        if orbit_i.nu is not 0 * u.deg:
+        # Propagate till periapsis
+        if orbit_i.nu != 0 * u.deg:
+            t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
             orbit_i = orbit_i.propagate_to_anomaly(0 * u.deg)
+        else:
+            t_pericenter = 0 * u.s
 
         # Initial orbit data
         k = orbit_i.attractor.k
@@ -129,30 +137,21 @@ class Maneuver(object):
         dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
 
         # Transform to IJK frame
-        dv_a = (
-            pqw2ijk(
-                dv_a,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
+        rot_matrix = coe_rotation_matrix(
+            orbit_i.inc.to(u.rad).value,
+            orbit_i.raan.to(u.rad).value,
+            orbit_i.argp.to(u.rad).value,
         )
-        dv_b = (
-            pqw2ijk(
-                dv_b,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
+
+        dv_a = (rot_matrix @ dv_a) * u.m / u.s
+        dv_b = (rot_matrix @ dv_b) * u.m / u.s
 
         t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
 
-        return cls((0 * u.s, dv_a), (t_trans, dv_b))
+        return cls(
+            (t_pericenter.decompose(), dv_a.decompose()),
+            (t_trans.decompose(), dv_b.decompose()),
+        )
 
     @classmethod
     def bielliptic(cls, orbit_i, r_b, r_f):
@@ -195,8 +194,13 @@ class Maneuver(object):
         r_f: astropy.unit.Quantity
             Final altitude of the orbit
         """
-        if orbit_i.nu is not 0 * u.deg:
+
+        # Propagate till periapsis
+        if orbit_i.nu != 0 * u.deg:
+            t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
             orbit_i = orbit_i.propagate_to_anomaly(0 * u.deg)
+        else:
+            t_pericenter = 0 * u.s
 
         # Initial orbit data
         k = orbit_i.attractor.k
@@ -230,43 +234,64 @@ class Maneuver(object):
         dv_b = np.array([0, -dv_b.to(u.m / u.s).value, 0])
         dv_c = np.array([0, dv_c.to(u.m / u.s).value, 0])
 
+        rot_matrix = coe_rotation_matrix(
+            orbit_i.inc.to(u.rad).value,
+            orbit_i.raan.to(u.rad).value,
+            orbit_i.argp.to(u.rad).value,
+        )
+
         # Transform to IJK frame
-        dv_a = (
-            pqw2ijk(
-                dv_a,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
-        dv_b = (
-            pqw2ijk(
-                dv_b,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
-        dv_c = (
-            pqw2ijk(
-                dv_c,
-                orbit_i.inc.to(u.rad).value,
-                orbit_i.raan.to(u.rad).value,
-                orbit_i.argp.to(u.rad).value,
-            )
-            * u.m
-            / u.s
-        )
+        dv_a = (rot_matrix @ dv_a) * u.m / u.s
+        dv_b = (rot_matrix @ dv_b) * u.m / u.s
+        dv_c = (rot_matrix @ dv_c) * u.m / u.s
 
         # Compute time for maneuver
         t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
         t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
 
-        return cls((0 * u.s, dv_a), (t_trans1, dv_b), (t_trans2, dv_c))
+        return cls(
+            (t_pericenter.decompose(), dv_a.decompose()),
+            (t_trans1.decompose(), dv_b.decompose()),
+            (t_trans2.decompose(), dv_c.decompose()),
+        )
+
+    @classmethod
+    def lambert(cls, orbit_i, orbit_f, method=lambert_izzo, short=True, **kwargs):
+        """Computes Lambert maneuver between two different points.
+
+        Parameters
+        ----------
+        orbit_i: ~poliastro.twobody.Orbit
+            Initial orbit
+        orbit_f: ~poliastro.twobody.Orbit
+            Final orbit
+        method: function
+            Method for solving Lambert's problem
+        short: keyword, boolean
+            Selects between short and long solution
+        """
+
+        # Get initial algorithm conditions
+        k = orbit_i.attractor.k
+        r_i = orbit_i.r
+        r_f = orbit_f.r
+
+        # Time of flight is solved by subtracting both orbit epochs
+        tof = orbit_f.epoch - orbit_i.epoch
+
+        # Compute all possible solutions to the Lambert transfer
+        sols = list(method(k, r_i, r_f, tof, **kwargs))
+
+        # Return short or long solution
+        if short:
+            dv_a, dv_b = sols[0]
+        else:
+            dv_a, dv_b = sols[-1]
+
+        return cls(
+            (0 * u.s, (dv_a - orbit_i.v).decompose()),
+            (tof.to(u.s), (orbit_f.v - dv_b).decompose()),
+        )
 
     def get_total_time(self):
         """Returns total time of the maneuver.

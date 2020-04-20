@@ -72,7 +72,7 @@ served as inspiration:
   although there are others.
 
 .. _astropy: http://www.astropy.org/
-.. _Skyfield: http://rhodesmill.org/skyfield/
+.. _Skyfield: https://rhodesmill.org/skyfield/
 .. _Plyades: https://plyades.readthedocs.io/
 .. _orbital: https://pythonhosted.org/OrbitalPy/
 .. _orekit-python-wrapper: https://www.orekit.org/forge/projects/orekit-python-wrapper/wiki

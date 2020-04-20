@@ -46,19 +46,19 @@ And that's it! Notice a couple of things:
   pericenter, radius of apocenter, inclination, reference frame and attractor::
 
     >>> ss
-    7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁)
+    7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)
 
 * If no time is specified, then a default value is assigned::
 
     >>> ss.epoch
-    <Time object: scale='utc' format='jyear_str' value=J2000.000>
+    <Time object: scale='tt' format='jyear_str' value=J2000.000>
     >>> ss.epoch.iso
     '2000-01-01 12:00:00.000'
 
 * The reference frame of the orbit will be one pseudo-inertial frame around the
   attractor. You can retrieve it using the :py:attr:`~poliastro.twobody.orbit.Orbit.frame` property:
 
-    >>> ss.frame
+    >>> ss.get_frame()
     <GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
 
 .. _`International Celestial Reference System or ICRS`: http://web.archive.org/web/20170920023932/http://aa.usno.navy.mil:80/faq/docs/ICRS_doc.php
@@ -106,7 +106,7 @@ orbit.
 From classical orbital elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We can also define a :py:class:`~poliastro.twobody.orbit.Orbit` using a set of
+We can also define an :py:class:`~poliastro.twobody.orbit.Orbit` using a set of
 six parameters called orbital elements. Although there are several of
 these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
@@ -133,7 +133,7 @@ In this case, we'd use the method
     
     ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
-Notice that whether we create a ``Orbit`` from :math:`(r)` and :math:`(v)` or from
+Notice that whether we create an ``Orbit`` from :math:`(r)` and :math:`(v)` or from
 elements we can access many mathematical properties of the orbit::
 
     >>> ss.period.to(u.day)
@@ -302,8 +302,8 @@ You can also retrieve the individual vectorial impulses::
     >>> tuple(val.decompose([u.km, u.s]) for val in hoh[1])
     (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 
-.. _Hohmann: http://en.wikipedia.org/wiki/Hohmann_transfer_orbit
-.. _bielliptic: http://en.wikipedia.org/wiki/Bi-elliptic_transfer
+.. _Hohmann: https://en.wikipedia.org/wiki/Hohmann_transfer_orbit
+.. _bielliptic: https://en.wikipedia.org/wiki/Bi-elliptic_transfer
 
 To actually retrieve the resulting ``Orbit`` after performing a maneuver, use
 the method :py:meth:`~poliastro.twobody.orbit.Orbit.apply_maneuver`::
@@ -327,7 +327,7 @@ easily visualize in two dimensions:
 
 .. code-block:: python
 
-    from poliastro.plotting import OrbitPlotter
+    from poliastro.plotting import OrbitPlotter2D
     
     op = OrbitPlotter2D()
     ss_a, ss_f = ss_i.apply_maneuver(hoh, intermediate=True)
@@ -393,11 +393,17 @@ flight is known in celestial mechanics as **Lambert's problem**, also
 known as two point boundary value problem. This contrasts with Kepler's
 problem or propagation, which is rather an initial value problem.
 
-The package :py:obj:`poliastro.iod` allows as to solve Lambert's problem,
-provided the main attractor's gravitational constant, the two position
-vectors and the time of flight. As you can imagine, being able to compute
-the positions of the planets as we saw in the previous section is the
+The package :py:obj:`poliastro.iod` holds the different raw algorithms to solve
+Lambert's problem, provided the main attractor's gravitational constant, the
+two position vectors and the time of flight. As you can imagine, being able to
+compute the positions of the planets as we saw in the previous section is the
 perfect complement to this feature!
+
+Since poliastro version 0.13 it is possible to solve Lambert's problem by making
+use of the :py:obj:`poliastro.maneuver` module. We just need to pass as
+arguments the initial and final orbits and the output will be a
+:py:obj:`poliastro.maneuver.Maneuver` instance. Time of flight is computed
+internally since orbits epochs are known.
 
 For instance, this is a simplified version of the example
 `Going to Mars with Python using poliastro`_, where the orbit of the
@@ -407,20 +413,19 @@ Mars Science Laboratory mission (rover Curiosity) is determined:
 
     date_launch = time.Time('2011-11-26 15:02', scale='utc')
     date_arrival = time.Time('2012-08-06 05:17', scale='utc')
-    tof = date_arrival - date_launch
 
     ss0 = Orbit.from_body_ephem(Earth, date_launch)
     ssf = Orbit.from_body_ephem(Mars, date_arrival)
 
-    from poliastro import iod
-    (v0, v), = iod.lambert(Sun.k, ss0.r, ssf.r, tof)
+    man_lambert = Maneuver.lambert(ss0, ssf)
+    dv_a, dv_b = man_lambert.impulses
 
 And these are the results::
 
-    >>> v0
-    <Quantity [-29.29150998, 14.53326521,  5.41691336] km / s>
-    >>> v
-    <Quantity [ 17.6154992 ,-10.99830723, -4.20796062] km / s>
+    >>> dv_a
+    (<Quantity 0. s>, <Quantity [-2.06420561,  2.58796837,  0.23911543] km / s>)
+    >>> dv_b
+    (<Quantity 21910501.00019529 s>, <Quantity [287832.91384349,  58935.96079319, -94156.93383463] km / d>)
 
 .. figure:: _static/msl.png
    :align: center
@@ -428,42 +433,63 @@ And these are the results::
 
    Mars Science Laboratory orbit.
 
-.. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
+.. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/docs/source/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
 
-Working with NEOs
------------------
 
-`NEOs (Near Earth Objects)`_ are asteroids and comets whose orbits are near to earth (obvious, isn't it?).
-More correctly, their perihelion (closest approach to the Sun) is less than 1.3 astronomical units (≈ 200 * 10\ :sup:`6` km).
-Currently, they are being an important subject of study for scientists around the world, due to their status as the relatively
-unchanged remains from the solar system formation process.
+Fetching Orbits from external sources
+-------------------------------------
 
-Because of that, a new module related to NEOs has been added to ``poliastro``
-as part of `SOCIS 2017 project`_.
+As of now, poliastro supports fetching orbits from 2 online databases from Jet Propulsion Laboratory,
+SBDB and Horizons.
 
-For the moment, it is possible to search NEOs by name (also using wildcards),
-and get their orbits straight from NASA APIs, using :py:func:`~poliastro.neos.orbit_from_name`.
-For example, we can get `Apophis asteroid (99942 Apophis)`_ orbit with one command, and plot it:
+JPL Horizons can be used to generate ephemerides for solar-system bodies. And JPL SBDB (Small-Body Database Browser)
+provides data for all known asteroids and many comets.
+
+The data is fetched using the wrappers to these services provided by `astroquery`_ .
 
 .. code-block:: python
 
-    from poliastro.neos import neows
+    from poliastro.twobody import Orbit
 
-    apophis_orbit = neows.orbit_from_name('apophis')  # Also '99942' or '99942 apophis' works
-    earth_orbit =  Orbit.from_body_ephem(Earth)
+    Orbit.from_horizons('Ceres')
 
-    op = OrbitPlotter()
-    op.plot(earth_orbit, label='Earth')
-    op.plot(apophis_orbit, label='Apophis')
+    Orbit.from_sbdb('apophis')
 
-.. figure:: _static/neos.png
-   :align: center
-   :alt: Apophis asteroid orbit
-   
-   Apophis asteroid orbit compared to Earth orbit.
+And both of them will return :py:obj:`poliastro.twobody.Orbit` objects!
 
-.. _`SOCIS 2017 project`: https://github.com/poliastro/poliastro/wiki/SOCIS-2017
-.. _`NEOs (Near Earth Objects)`: https://en.wikipedia.org/wiki/Near-Earth_object
-.. _`Apophis asteroid (99942 Apophis)`: https://en.wikipedia.org/wiki/99942_Apophis
+.. _`astroquery`: https://astroquery.readthedocs.io/
+
+Creating a CZML packets
+-----------------------
+
+Poliastro allows users to create czml packets which can then be visualized with the help of Cesium.
+
+:Note: This feature requires the czml3_ library which requires Python 3.6 or higher.
+
+
+First load up the orbital data and the CZML Extractor:
+
+.. code-block:: python
+
+    from poliastro.examples import molniya, iss
+    from poliastro.czml.extract_czml import CZMLExtractor
+
+Specify the starting and ending epoch, as well as the number of sample points (the higher the number, the more accurate the trajectory).
+
+.. code-block:: python
+
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+    sample_points = 10
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    extractor.add_orbit(molniya, label_text="Molniya")
+    extractor.add_orbit(iss, label_text="ISS")
+
+You can find the generated CZML file by calling ``extractor.packets``. After copying the CZML document contents, follow the directions  here_ to run the application.
+
+.. _`czml3`: https://github.com/poliastro/czml3
+.. _`here`: https://github.com/poliastro/cesium-app/blob/master/README.md
 
 *Per Python ad astra* ;)

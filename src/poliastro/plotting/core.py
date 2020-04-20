@@ -1,24 +1,147 @@
 """ Plotting utilities.
 
 """
+from itertools import cycle
+
 import numpy as np
+import plotly.colors
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation
-from plotly.graph_objs import Layout, Scatter, Scatter3d, Surface
+from plotly.graph_objects import Figure, Layout, Scatter, Scatter3d, Surface
 
 from poliastro.plotting.util import generate_sphere
-from poliastro.util import norm
 
-from ._base import BaseOrbitPlotter
+from ..frames import Planes
+from ._base import BaseOrbitPlotter, Mixin2D
 
 
-class OrbitPlotter3D(BaseOrbitPlotter):
+class _PlotlyOrbitPlotter(BaseOrbitPlotter):
+    def __init__(self, figure=None, *, num_points=150, plane=None):
+        super().__init__(num_points=num_points, plane=plane)
+
+        self._figure = figure or Figure()
+        self._layout = None
+
+        self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+
+    def _clear_attractor(self):
+        # FIXME: Implement
+        pass
+
+    def _get_colors(self, color, trail):
+        # TODO: Support trail
+        if color is None:
+            color = next(self._color_cycle)
+
+        return [color]
+
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+        """Plots a precomputed trajectory.
+
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        coordinates : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : string, optional
+            Label of the trajectory.
+        color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        super().plot_trajectory(coordinates, label=label, color=color, trail=trail)
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
+    def plot(self, orbit, *, label=None, color=None, trail=False):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
+        label : string, optional
+            Label of the orbit.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        super().plot(orbit, label=label, color=color, trail=trail)
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
+    def plot_body_orbit(
+        self, body, epoch, *, label=None, color=None, trail=False,
+    ):
+        """Plots complete revolution of body and current position.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time
+            Epoch of current position.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        super().plot_body_orbit(body, epoch, label=label, color=color, trail=trail)
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
+    def plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+        """Plots Ephem object over its sampling period.
+
+        Parameters
+        ----------
+        ephem : ~poliastro.ephem.Ephem
+            Ephemerides to plot.
+        epoch : astropy.time.Time, optional
+            Epoch of the current position, none will be used if not given.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        super().plot_ephem(ephem, epoch, label=label, color=color, trail=trail)
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
+    def show(self):
+        """Shows the plot in the Notebook.
+
+        Updates the layout and returns the underlying figure.
+
+        """
+        if self._attractor is not None:
+            self._redraw_attractor()
+
+        self._figure.layout.update(self._layout)
+        return self._figure
+
+
+class OrbitPlotter3D(_PlotlyOrbitPlotter):
     """OrbitPlotter3D class.
 
     """
 
-    def __init__(self, figure=None, dark=False):
-        super().__init__(figure)
+    def __init__(self, figure=None, dark=False, *, num_points=150, plane=None):
+        super().__init__(figure, num_points=num_points, plane=plane)
         self._layout = Layout(
             autosize=True,
             scene=dict(
@@ -31,13 +154,13 @@ class OrbitPlotter3D(BaseOrbitPlotter):
         if dark:
             self._layout.template = "plotly_dark"
 
-    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
         # We use _plot_sphere here because it's not easy to specify the size of a marker
         # in data units instead of pixels, see
         # https://stackoverflow.com/q/47086547
-        return self._plot_sphere(radius, color, name, center)
+        return self._draw_sphere(radius, color, name, center)
 
-    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         xx, yy, zz = generate_sphere(radius, center)
         sphere = Surface(
             x=xx.to(u.km).value,
@@ -54,21 +177,44 @@ class OrbitPlotter3D(BaseOrbitPlotter):
 
         return sphere
 
-    def _plot_trajectory(self, trajectory, label, color, dashed):
+    def _plot_coordinates(self, coordinates, label, colors, dashed):
         trace = Scatter3d(
-            x=trajectory.x.to(u.km).value,
-            y=trajectory.y.to(u.km).value,
-            z=trajectory.z.to(u.km).value,
+            x=coordinates.x.to(u.km).value,
+            y=coordinates.y.to(u.km).value,
+            z=coordinates.z.to(u.km).value,
             name=label,
-            line=dict(color=color, width=5, dash="dash" if dashed else "solid"),
+            line=dict(color=colors[0], width=5, dash="dash" if dashed else "solid"),
             mode="lines",  # Boilerplate
         )
         self._figure.add_trace(trace)
 
-        return trace
+        return trace, [trace.line.color]
+
+    def plot(self, orbit, *, label=None, color=None, trail=False):
+        """Plots state and osculating orbit in their plane.
+
+        Parameters
+        ----------
+        orbit : ~poliastro.twobody.orbit.Orbit
+            Orbit to plot.
+        label : string, optional
+            Label of the orbit.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if trail:
+            raise NotImplementedError("trail not supported yet")
+
+        return super().plot(orbit, label=label, color=color, trail=trail)
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
+        """Changes 3D view.
+
+        """
         x = distance * np.cos(elev) * np.cos(azim)
         y = distance * np.cos(elev) * np.sin(azim)
         z = distance * np.sin(elev)
@@ -91,14 +237,14 @@ class OrbitPlotter3D(BaseOrbitPlotter):
             return self.show()
 
 
-class OrbitPlotter2D(BaseOrbitPlotter):
+class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     """OrbitPlotter2D class.
 
     .. versionadded:: 0.9.0
     """
 
-    def __init__(self, figure=None):
-        super().__init__(figure)
+    def __init__(self, figure=None, *, num_points=150, plane=None):
+        super().__init__(figure, num_points=num_points, plane=plane)
         self._layout = Layout(
             autosize=True,
             xaxis=dict(title="x (km)", constrain="domain"),
@@ -108,13 +254,10 @@ class OrbitPlotter2D(BaseOrbitPlotter):
 
         self._frame = None
 
-    def _project(self, rr):
-        rr_proj = rr - rr.dot(self._frame[2])[:, None] * self._frame[2]
-        x = rr_proj.dot(self._frame[0])
-        y = rr_proj.dot(self._frame[1])
-        return x, y
+    def _redraw(self):
+        raise NotImplementedError("OrbitPlotter2D does not support reprojecting yet")
 
-    def _plot_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
@@ -130,7 +273,7 @@ class OrbitPlotter2D(BaseOrbitPlotter):
 
         return trace
 
-    def _plot_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
@@ -152,21 +295,21 @@ class OrbitPlotter2D(BaseOrbitPlotter):
 
         return shape
 
-    def _plot_trajectory(self, trajectory, label, color, dashed):
+    def _plot_coordinates(self, coordinates, label, colors, dashed):
         if self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
-                "set_frame(*orbit.pqw()) or plot(orbit)."
+                "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        rr = trajectory.represent_as(CartesianRepresentation).xyz.transpose()
+        rr = coordinates.xyz.transpose()
         x, y = self._project(rr)
 
         trace = Scatter(
             x=x.to(u.km).value,
             y=y.to(u.km).value,
             name=label,
-            line=dict(color=color, width=2, dash="dash" if dashed else "solid"),
+            line=dict(color=colors[0], width=2, dash="dash" if dashed else "solid"),
             hoverinfo="none",  # TODO: Review
             mode="lines",  # Boilerplate
         )
@@ -174,28 +317,34 @@ class OrbitPlotter2D(BaseOrbitPlotter):
 
         return trace
 
-    def set_frame(self, p_vec, q_vec, w_vec):
-        """Sets perifocal frame.
+    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+        """Plots a precomputed trajectory.
 
-        Raises
-        ------
-        ValueError
-            If the vectors are not a set of mutually orthogonal unit vectors.
+        An attractor must be set first.
+
+        Parameters
+        ----------
+        coordinates : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : string, optional
+            Label of the trajectory.
+        color : string, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
-        if self._frame and self.trajectories:
-            raise NotImplementedError(
-                "OrbitPlotter2D does not support reprojecting yet"
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
-            raise ValueError("Vectors must be unit.")
-        elif not np.allclose([p_vec.dot(q_vec), q_vec.dot(w_vec), w_vec.dot(p_vec)], 0):
-            raise ValueError("Vectors must be mutually orthogonal.")
-        else:
-            self._frame = p_vec, q_vec, w_vec
+        return super().plot_trajectory(
+            coordinates, label=label, color=color, trail=trail
+        )
 
-    def plot(self, orbit, *, label=None, color=None):
+    def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
 
         Parameters
@@ -206,9 +355,49 @@ class OrbitPlotter2D(BaseOrbitPlotter):
             Label of the orbit.
         color : string, optional
             Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
 
         """
-        if not self._frame:
-            self.set_frame(*orbit.pqw())
+        if trail:
+            raise NotImplementedError("trail not supported yet")
 
-        return super().plot(orbit, label=label, color=color)
+        if not self._frame:
+            self.set_orbit_frame(orbit)
+
+        return super().plot(orbit, label=label, color=color, trail=trail)
+
+    def plot_body_orbit(
+        self,
+        body,
+        epoch,
+        plane=Planes.EARTH_ECLIPTIC,
+        *,
+        label=None,
+        color=None,
+        trail=False,
+    ):
+        """Plots complete revolution of body and current position.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemBody
+            Body.
+        epoch : astropy.time.Time
+            Epoch of current position.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane.
+        label : str, optional
+            Label of the orbit, default to the name of the body.
+        color : string, optional
+            Color of the line and the position.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        if self._frame is None:
+            self.set_body_frame(body, epoch)
+
+        return super().plot_body_orbit(
+            body, epoch, label=label, color=color, trail=trail
+        )

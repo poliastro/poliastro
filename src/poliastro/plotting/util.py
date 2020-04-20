@@ -1,13 +1,26 @@
 import numpy as np
 
-BODY_COLORS = {"Sun": "#ffcc00", "Earth": "#204a87", "Jupiter": "#ba3821"}
+# Inspired by https://astronomiac.com/color-of-each-planet-in-the-solarsystem/
+BODY_COLORS = {
+    "Sun": "#ffcc00",
+    "Mercury": "#8c8680",
+    "Venus": "#e6db67",
+    "Earth": "#2a7bd1",
+    "Moon": "#999999",
+    "Mars": "#cc653f",
+    "Jupiter": "#bf8f5c",
+    "Saturn": "#decf83",
+    "Uranus": "#7ebec2",
+    "Neptune": "#3b66d4",
+}
 
 
-def generate_label(orbit, label):
-    orbit.epoch.out_subfmt = "date_hm"
-    label_ = "{}".format(orbit.epoch.iso)
+def generate_label(epoch, label):
+    epoch = epoch.copy()
+    epoch.out_subfmt = "date_hm"
+    label_ = f"{epoch.iso}"
     if label:
-        label_ += " ({})".format(label)
+        label_ += f" ({label})"
 
     return label_
 

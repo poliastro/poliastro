@@ -12,16 +12,10 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez |orcid|
-:Version: 0.13.dev0
+:Version: 0.14.post0.dev0
 
-.. |circleci| image:: https://img.shields.io/circleci/project/github/poliastro/poliastro/master.svg?style=flat-square&logo=circleci
-   :target: https://circleci.com/gh/poliastro/poliastro
-
-.. |travisci| image:: https://img.shields.io/travis/poliastro/poliastro/master.svg?style=flat-square&logo=travis
-   :target: https://travis-ci.org/poliastro/poliastro
-
-.. |appveyor| image:: https://img.shields.io/appveyor/ci/Juanlu001/poliastro/master.svg?style=flat-square&logo=appveyor
-   :target: https://ci.appveyor.com/project/Juanlu001/poliastro/branch/master
+.. |azure_pipelines| image:: https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=master
+   :target: https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=master
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=master
@@ -48,7 +42,7 @@
    :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
    :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
 
-|circleci| |travisci| |appveyor| |codecov| |codeclimate|
+|azure_pipelines| |codecov| |codeclimate|
 
 |docs| |license| |doi| |astropy| |mailing| |matrix|
 
@@ -109,16 +103,10 @@ poliastro requires the following Python packages:
 * plotly, for 2D and 3D interactive orbit plotting
 * SciPy, for root finding and numerical propagation
 
-poliastro is usually tested on Linux, Windows and OS X on Python
-3.5, 3.6 and 3.7 against latest NumPy.
+poliastro is tested on Linux, OS X and Windows on Python
+3.6, 3.7 and 3.8 against latest NumPy.
 
-==============  ============  ===================
-Platform        Site          Status
-==============  ============  ===================
-Linux           CircleCI      |circleci|
-OS X            Travis CI     |travisci|
-Windows x64     Appveyor      |appveyor|
-==============  ============  ===================
+|azure_pipelines|
 
 Installation
 ============
@@ -132,27 +120,12 @@ Please check out the `documentation for alternative installation methods`_.
 
 .. _`documentation for alternative installation methods`: https://docs.poliastro.space/en/latest/getting_started.html#alternative-installation-methods
 
-Testing
-=======
+Problems and suggestions
+========================
 
-|codecov|
-
-If installed correctly, the tests can be run using pytest::
-
-  $ python -c "import poliastro.testing; poliastro.testing.test()"
-  ===================================== test session starts =====================================
-  platform linux -- Python 3.7.1, pytest-4.2.0, py-1.7.0, pluggy-0.8.1
-  rootdir: /home/juanlu/.miniconda36/envs/_test37/lib/python3.7/site-packages/poliastro, inifile:
-  collected 747 items
-  [...]
-  ========= 738 passed, 3 skipped, 5 xfailed, 1 xpassed, 13 warnings in 392.12 seconds ==========
-  $
-
-Problems
-========
-
-If the installation fails or you find something that doesn't work as expected,
-please open an issue in the `issue tracker`_.
+If for any reason you get an unexpected error message or an incorrect result,
+or you want to let the developers know about your use case,
+please open a new issue in the `issue tracker`_ and we will try to answer promptly.
 
 .. _`issue tracker`: https://github.com/poliastro/poliastro/issues
 
@@ -185,7 +158,7 @@ Citing
 ======
 
 If you use poliastro on your project, please
-`drop me a line <mailto:juanlu001@gmail.com>`_.
+`drop me a line <mailto:hello@juanlu.space>`_.
 
 You can also use the DOI to cite it in your publications. This is the latest
 one:

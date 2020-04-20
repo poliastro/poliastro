@@ -10,5 +10,8 @@ checks:
   argument-count:
     config:
       threshold: 9
+  file-lines:
+    config:
+      threshold: 350
 exclude_patterns:
   - "docs/source"
