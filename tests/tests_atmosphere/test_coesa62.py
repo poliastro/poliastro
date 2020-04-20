@@ -1,6 +1,7 @@
 import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.units import imperial
 
 from poliastro.atmosphere import COESA62
 
@@ -58,3 +59,98 @@ def test_properties_coesa62(z):
     assert_quantity_allclose(T, expected_T, rtol=1e-4)
     assert_quantity_allclose(p, expected_p, rtol=1e-3)
     assert_quantity_allclose(rho, expected_rho, rtol=1e-3)
+
+
+# DATA DIRECTLY TAKEN FROM TABLE-III COESA62 REPORT
+sound_speed_viscosity_conductivity = {
+    0.5
+    * u.km: [
+        338.37 * (u.m / u.s),
+        1.7737e-5 * (u.kg / u.m / u.s),
+        5.9919e-6 * (imperial.kcal / u.m / u.s / u.K),
+    ],
+    10
+    * u.km: [
+        299.532 * (u.m / u.s),
+        1.4577e-5 * (u.kg / u.m / u.s),
+        4.7942e-6 * (imperial.kcal / u.m / u.s / u.K),
+    ],
+    24
+    * u.km: [
+        297.72 * (u.m / u.s),
+        1.4430e-5 * (u.kg / u.m / u.s),
+        4.7403e-6 * (imperial.kcal / u.m / u.s / u.K),
+    ],
+    41
+    * u.km: [
+        318.936 * (u.m / u.s),
+        1.6151e-5 * (u.kg / u.m / u.s),
+        5.3833e-6 * (imperial.kcal / u.m / u.s / u.K),
+    ],
+    50
+    * u.km: [
+        329.799 * (u.m / u.s),
+        1.7037e-5 * (u.kg / u.m / u.s),
+        5.7214e-6 * (imperial.kcal / u.m / u.s / u.K),
+    ],
+    67
+    * u.km: [
+        304.979 * (u.m / u.s),
+        1.5018e-5 * (u.kg / u.m / u.s),
+        4.9575e-6 * (imperial.kcal / u.m / u.s / u.K),
+    ],
+    89
+    * u.km: [
+        269.44 * (u.m / u.s),
+        1.216e-5 * (u.kg / u.m / u.s),
+        3.925e-6 * (imperial.kcal / u.m / u.s / u.K),
+    ],
+}
+
+
+@pytest.mark.parametrize("z", sound_speed_viscosity_conductivity.keys())
+def test_sound_speed_viscosity_conductivity(z):
+    expected_Cs = sound_speed_viscosity_conductivity[z][0]
+    expected_mu = sound_speed_viscosity_conductivity[z][1]
+    expected_k = sound_speed_viscosity_conductivity[z][2]
+
+    Cs = coesa62.sound_speed(z)
+    mu = coesa62.viscosity(z)
+    k = coesa62.thermal_conductivity(z)
+
+    assert_quantity_allclose(Cs, expected_Cs, rtol=1e-4)
+    assert_quantity_allclose(mu, expected_mu, rtol=1e-3)
+    assert_quantity_allclose(k, expected_k, rtol=1e-4)
+
+
+def test_sound_speed_over_90km():
+    z = 91 * u.km
+    # test speed of sound over 90 km
+    with pytest.raises(ValueError) as excinfo:
+        coesa62.sound_speed(z)
+    assert (
+        "ValueError: Speed of sound in COESA62 has just been implemented up to 90km."
+        in excinfo.exconly()
+    )
+
+
+def test_viscosity_over_90km():
+    z = 91 * u.km
+    # test viscosity over 90 km
+    with pytest.raises(ValueError) as excinfo:
+        coesa62.viscosity(z)
+    assert (
+        "ValueError: Dynamic Viscosity in COESA62 has just been implemented up to 90km."
+        in excinfo.exconly()
+    )
+
+
+def test_conductivity_over_90km():
+    z = 91 * u.km
+    # test thermal conductivity over 90 km
+    with pytest.raises(ValueError) as excinfo:
+        coesa62.thermal_conductivity(z)
+    assert (
+        "ValueError: Thermal conductivity in COESA62 has just been implemented up to 90km."
+        in excinfo.exconly()
+    )

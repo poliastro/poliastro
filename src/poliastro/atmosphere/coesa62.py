@@ -54,8 +54,8 @@ sunspot minimum and sunspot maximum.
 
 import numpy as np
 from astropy import units as u
-from astropy.units import imperial
 from astropy.io import ascii
+from astropy.units import imperial
 from astropy.utils.data import get_pkg_data_filename
 from scipy.integrate import quad
 
@@ -260,9 +260,9 @@ class COESA62(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 86 * u.km:
+        if z > 90 * u.km:
             raise ValueError(
-                "Speed of sound in COESA76 has just been implemented up to 86km."
+                "Speed of sound in COESA62 has just been implemented up to 90km."
             )
         T = self.temperature(alt, geometric).value
         # using eqn-1.3.7-(1)
@@ -288,13 +288,13 @@ class COESA62(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 86 * u.km:
+        if z > 90 * u.km:
             raise ValueError(
-                "Dynamic Viscosity in COESA76 has just been implemented up to 86km."
+                "Dynamic Viscosity in COESA62 has just been implemented up to 90km."
             )
         T = self.temperature(alt, geometric).value
-        # using eqn-(51)
-        mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.kg * u.m / u.s)
+        # using eqn-1.3.8-(1)
+        mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.kg / u.m / u.s)
 
         return mu
 
@@ -316,16 +316,15 @@ class COESA62(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 86 * u.km:
+        if z > 90 * u.km:
             raise ValueError(
-                "Thermal conductivity in COESA76 has just been implemented up to 86km."
+                "Thermal conductivity in COESA62 has just been implemented up to 90km."
             )
 
         T = self.temperature(alt, geometric=geometric).value
-        # using eqn-(53)
+        # using eqn-1.3.10-(1)
         k = (6.325e-7 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
-                imperial.kcal / u.m / u.s / u.K
+            imperial.kcal / u.m / u.s / u.K
         )
 
         return k
-
