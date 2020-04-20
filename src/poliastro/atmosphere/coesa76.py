@@ -305,7 +305,7 @@ class COESA76(COESA):
 
         Returns
         -------
-        k: ~astropy.units.Quantity
+        Cs: ~astropy.units.Quantity
             Speed of Sound at given height.
         """
         # Check if valid range and convert to geopotential
@@ -333,7 +333,7 @@ class COESA76(COESA):
 
         Returns
         -------
-        k: ~astropy.units.Quantity
+        mu: ~astropy.units.Quantity
             Dynamic viscosity at given height.
         """
         # Check if valid range and convert to geopotential
