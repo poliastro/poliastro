@@ -5,7 +5,7 @@ import functools
 from warnings import warn
 
 import numpy as np
-from astropy import time, units as u
+from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from scipy.integrate import solve_ivp
 
@@ -204,11 +204,6 @@ def propagate(orbit, time_of_flight, *, method=mean_motion, rtol=1e-10, **kwargs
         Relative tolerance, default to 1e-10.
 
     """
-    # Use the highest precision we can afford
-    # np.atleast_1d does not work directly on TimeDelta objects
-    jd1 = np.atleast_1d(time_of_flight.jd1)
-    jd2 = np.atleast_1d(time_of_flight.jd2)
-    time_of_flight = time.TimeDelta(jd1, jd2, format="jd", scale=time_of_flight.scale)
 
     rr, vv = method(
         orbit.attractor.k, orbit.r, orbit.v, time_of_flight.to(u.s), rtol=rtol, **kwargs
