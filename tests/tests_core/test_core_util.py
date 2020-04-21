@@ -1,10 +1,15 @@
-import numpy as np
+from functools import partial
 
-from poliastro.core import util
+import hypothesis.strategies as st
+import numpy as np
+import pytest
+from hypothesis import given, settings
+
+from poliastro.core.util import alinspace, rotation_matrix
 
 
 def test_rotation_matrix_x():
-    result = util.rotation_matrix(0.218, 0)
+    result = rotation_matrix(0.218, 0)
     expected = np.array(
         [[1.0, 0.0, 0.0], [0.0, 0.97633196, -0.21627739], [0.0, 0.21627739, 0.97633196]]
     )
@@ -12,7 +17,7 @@ def test_rotation_matrix_x():
 
 
 def test_rotation_matrix_y():
-    result = util.rotation_matrix(0.218, 1)
+    result = rotation_matrix(0.218, 1)
     expected = np.array(
         [[0.97633196, 0.0, 0.21627739], [0.0, 1.0, 0.0], [0.21627739, 0.0, 0.97633196]]
     )
@@ -20,8 +25,46 @@ def test_rotation_matrix_y():
 
 
 def test_rotation_matrix_z():
-    result = util.rotation_matrix(0.218, 2)
+    result = rotation_matrix(0.218, 2)
     expected = np.array(
         [[0.97633196, -0.21627739, 0.0], [0.21627739, 0.97633196, 0.0], [0.0, 0.0, 1.0]]
     )
     assert np.allclose(expected, result)
+
+
+angles = partial(st.floats, min_value=-2 * np.pi, max_value=2 * np.pi)
+
+
+@pytest.mark.xfail(
+    reason=(
+        "At the moment the function assumes that "
+        "the maximum difference between min and max angles is 2 pi"
+    )
+)
+@settings(deadline=None)
+@given(
+    x=angles(), y=st.one_of(angles(), st.none()),
+)
+def test_alinspace_is_always_increasing(x, y):
+    result = alinspace(x, y)
+
+    assert (np.diff(result) >= 0).all()
+
+
+@settings(deadline=None)
+@given(
+    x=st.floats(min_value=-np.pi, max_value=np.pi),
+    y=st.one_of(st.floats(min_value=-np.pi, max_value=np.pi), st.none()),
+)
+def test_alinspace_is_always_increasing_with_angles_inside_anomaly_range(x, y):
+    result = alinspace(x, y)
+
+    assert (np.diff(result) >= 0).all()
+
+
+@settings(deadline=None)
+@given(x=angles())
+def test_alinspace_no_max_value_uses_full_circle(x):
+    result = alinspace(x)
+
+    assert result.max() - result.min() == pytest.approx(2 * np.pi)

@@ -36,3 +36,19 @@ def rotation_matrix(angle, axis):
         return np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
     else:
         raise ValueError("Invalid axis: must be one of 'x', 'y' or 'z'")
+
+
+@jit
+def alinspace(start, stop=None, num=50, endpoint=True):
+    """Return increasing, evenly spaced angular values over a specified interval.
+
+    """
+    if stop is None:
+        stop = start + 2 * np.pi
+    elif stop <= start:
+        stop += 2 * np.pi
+
+    if endpoint:
+        return np.linspace(start, stop, num)
+    else:
+        return np.linspace(start, stop, num + 1)[:-1]
