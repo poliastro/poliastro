@@ -463,7 +463,12 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         pass
 
     rr, vv = method(
-        orbit.attractor.k, orbit.r, orbit.v, time_of_flight.to(u.s), rtol=rtol, **kwargs
+        orbit.attractor.k,
+        orbit.r,
+        orbit.v,
+        time_of_flight.reshape(-1).to(u.s),
+        rtol=rtol,
+        **kwargs
     )
 
     # TODO: Turn these into unit tests
