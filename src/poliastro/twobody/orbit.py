@@ -16,18 +16,15 @@ from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
-from poliastro.core.propagation.farnocchia import (
-    M_to_nu as M_to_nu_fast,
-    nu_to_M as nu_to_M_fast,
-)
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import raan_from_ltan
 from poliastro.twobody.propagation import farnocchia, propagate
 
+from ..core.propagation.farnocchia import delta_t_from_nu as delta_t_from_nu_fast
 from ..util import find_closest_value, norm
 from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
+from .angles import D_to_nu, E_to_nu, F_to_nu, M_to_D, M_to_E, M_to_F, raan_from_ltan
 from .elements import (
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
@@ -217,8 +214,15 @@ class Orbit:
     @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage. """
-        M = nu_to_M_fast(self.nu.to_value(u.rad), self.ecc.value) * u.rad
-        t_p = self.period * M / (360 * u.deg)
+        t_p = (
+            delta_t_from_nu_fast(
+                self.nu.to_value(u.rad),
+                self.ecc.value,
+                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+                self.r_p.to_value(u.km),
+            )
+            * u.s
+        )
         return t_p
 
     @classmethod
@@ -669,8 +673,16 @@ class Orbit:
         argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
 
         # Since JPL provides Mean Anomaly (M) we need to make
-        # the conversion to the true anomaly (\nu)
-        nu = M_to_nu_fast(obj["orbit"]["elements"]["ma"].to(u.rad), ecc.value) * u.rad
+        # the conversion to the true anomaly (nu)
+        M = obj["orbit"]["elements"]["ma"].to(u.rad) * u.rad
+        # NOTE: It is unclear how this conversion should happen,
+        # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
+        if ecc < 1:
+            nu = E_to_nu(M_to_E(M, ecc), ecc)
+        elif ecc == 1:
+            nu = D_to_nu(M_to_D(M))
+        else:
+            nu = F_to_nu(M_to_F(M, ecc), ecc)
 
         epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
@@ -1211,11 +1223,19 @@ class Orbit:
             Time of flight required.
 
         """
-        # Compute time of flight for correct epoch
-        M = nu_to_M_fast(self.nu.to_value(u.rad), self.ecc.value) * u.rad
-        new_M = nu_to_M_fast(value.to_value(u.rad), self.ecc.value) * u.rad
-        tof = Angle(new_M - M).wrap_at(360 * u.deg) / self.n
+        # Silently wrap anomaly
+        nu = (value + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
 
+        delta_t = (
+            delta_t_from_nu_fast(
+                nu.to_value(u.rad),
+                self.ecc.value,
+                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+                self.r_p.to_value(u.km),
+            )
+            * u.s
+        )
+        tof = delta_t - self.t_p
         return tof
 
     @u.quantity_input(value=u.rad)
@@ -1345,14 +1365,13 @@ class Orbit:
     def _generate_time_values(self, nu_vals):
         # Subtract current anomaly to start from the desired point
         ecc = self.ecc.value
-        nu = self.nu.to(u.rad).value
+        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+        q = self.r_p.to_value(u.km)
 
-        M_vals = [
-            nu_to_M_fast(nu_val, ecc) - nu_to_M_fast(nu, ecc)
+        time_values = [
+            delta_t_from_nu_fast(nu_val, ecc, k, q)
             for nu_val in nu_vals.to(u.rad).value
-        ] * u.rad
-
-        time_values = (M_vals / self.n).decompose()
+        ] * u.s - self.t_p
         return time_values
 
     def apply_maneuver(self, maneuver, intermediate=False):
