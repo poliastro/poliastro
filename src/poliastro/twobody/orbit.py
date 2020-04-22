@@ -23,7 +23,7 @@ from poliastro.core.propagation.farnocchia import (
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import E_to_nu, raan_from_ltan
+from poliastro.twobody.angles import raan_from_ltan
 from poliastro.twobody.propagation import farnocchia, propagate
 
 from ..util import find_closest_value, norm
@@ -35,6 +35,7 @@ from .elements import (
     hyp_nu_limit,
 )
 from .mean_elements import get_mean_elements
+from .sampling import sample_closed
 from .states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
 
 try:
@@ -1241,27 +1242,6 @@ class Orbit:
             plane=self.plane,
         )
 
-    def _sample_closed(self, values, min_anomaly, max_anomaly):
-        min_anomaly = (
-            min_anomaly.to(u.rad).value
-            if min_anomaly is not None
-            else self.nu.to(u.rad).value
-        )
-        max_anomaly = (
-            max_anomaly.to(u.rad).value
-            if max_anomaly is not None
-            else self.nu.to(u.rad).value + 2 * np.pi
-        )
-        limits = [min_anomaly, max_anomaly] * u.rad
-
-        # First sample eccentric anomaly, then transform into true anomaly
-        # to minimize error in the apocenter, see
-        # http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
-        # Start from pericenter
-        E_values = np.linspace(*limits, values)
-        nu_values = E_to_nu(E_values, self.ecc)
-        return nu_values
-
     def _sample_open(self, values, min_anomaly, max_anomaly):
         # Select a sensible limiting value for non-closed orbits
         # This corresponds to max(r = 3p, r = self.r)
@@ -1324,7 +1304,12 @@ class Orbit:
 
         """
         if self.ecc < 1:
-            nu_values = self._sample_closed(values, min_anomaly, max_anomaly)
+            nu_values = sample_closed(
+                min_anomaly if min_anomaly is not None else self.nu,
+                self.ecc,
+                max_anomaly,
+                values,
+            )
         else:
             nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 

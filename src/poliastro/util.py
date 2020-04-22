@@ -6,6 +6,8 @@ from astropy import units as u
 from astropy.time import Time
 from numpy.linalg import norm as norm_np
 
+from .core.util import alinspace as alinspace_fast
+
 
 def norm(vec):
     """Norm of a Quantity vector that respects units.
@@ -68,3 +70,17 @@ def find_closest_value(value, values):
     """
     index = np.abs(np.asarray(values) * u.rad - value).argmin()
     return values[index]
+
+
+@u.quantity_input(start=u.rad, stop=u.rad)
+def alinspace(start, stop=None, *, num=50, endpoint=True):
+    """Return increasing, evenly spaced angular values over a specified interval.
+
+    """
+    if stop is None:
+        stop = start + 2 * np.pi * u.rad
+
+    return (
+        alinspace_fast(start.to_value(u.rad), stop.to_value(u.rad), num, endpoint)
+        * u.rad
+    )

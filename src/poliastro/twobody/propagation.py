@@ -25,7 +25,7 @@ different propagators available at poliastro:
 import functools
 
 import numpy as np
-from astropy import time, units as u
+from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from scipy.integrate import DOP853, solve_ivp
 
@@ -462,14 +462,13 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
     else:
         pass
 
-    # Use the highest precision we can afford
-    # np.atleast_1d does not work directly on TimeDelta objects
-    jd1 = np.atleast_1d(time_of_flight.jd1)
-    jd2 = np.atleast_1d(time_of_flight.jd2)
-    time_of_flight = time.TimeDelta(jd1, jd2, format="jd", scale=time_of_flight.scale)
-
     rr, vv = method(
-        orbit.attractor.k, orbit.r, orbit.v, time_of_flight.to(u.s), rtol=rtol, **kwargs
+        orbit.attractor.k,
+        orbit.r,
+        orbit.v,
+        time_of_flight.reshape(-1).to(u.s),
+        rtol=rtol,
+        **kwargs
     )
 
     # TODO: Turn these into unit tests
