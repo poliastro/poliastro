@@ -40,7 +40,7 @@ def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
             return p
         p0 = p
 
-    return 1.0
+    return np.nan
 
 
 @jit
@@ -282,7 +282,10 @@ def M_to_E(M, ecc):
     This uses a Newton iteration on the Kepler equation.
 
     """
-    E0 = M
+    if ecc < 0.8:
+        E0 = M
+    else:
+        E0 = np.pi
     E = newton("elliptic", E0, args=(M, ecc))
     return E
 
