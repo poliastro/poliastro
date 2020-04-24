@@ -92,6 +92,15 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
     )
 
 
+def test_orbit_from_classical_wraps_out_of_range_anomaly_and_warns():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    out_angle = np.pi * u.rad
+    with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
+        Orbit.from_classical(Sun, _d, _, _a, _a, _a, out_angle)
+
+
 def test_state_raises_unitserror_if_rv_units_are_wrong():
     _d = [1.0, 0.0, 0.0] * u.AU
     wrong_v = [0.0, 1.0e-6, 0.0] * u.AU

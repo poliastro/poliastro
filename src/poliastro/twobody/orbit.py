@@ -351,6 +351,12 @@ class Orbit:
         if ecc > 1 and a > 0:
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
+        if not -np.pi * u.rad <= nu < np.pi * u.rad:
+            warn("Wrapping true anomaly to -π <= nu < π", stacklevel=2)
+            nu = ((nu + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad).to(
+                nu.unit
+            )
+
         ss = ClassicalState(
             attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, plane
         )
