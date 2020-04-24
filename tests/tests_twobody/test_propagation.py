@@ -130,6 +130,15 @@ def test_propagating_to_certain_nu_is_correct():
         assert_quantity_allclose(norm(r), a * (1.0 - ecc ** 2) / (1 + ecc * np.cos(nu)))
 
 
+def test_propagate_to_anomaly_in_the_past_fails_for_open_orbits():
+    r0 = [Earth.R.to(u.km).value + 300, 0, 0] * u.km
+    v0 = [0, 15, 0] * u.km / u.s
+    orb = Orbit.from_vectors(Earth, r0, v0)
+
+    with pytest.raises(ValueError, match="True anomaly -0.02 rad not reachable"):
+        orb.propagate_to_anomaly(orb.nu - 1 * u.deg)
+
+
 def test_propagate_accepts_timedelta():
     # Data from Vallado, example 2.4
     r0 = [1131.340, -2282.343, 6672.423] * u.km
