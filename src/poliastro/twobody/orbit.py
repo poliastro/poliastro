@@ -1226,9 +1226,11 @@ class Orbit:
             Resulting orbit after propagation.
 
         """
+        # Silently wrap anomaly
+        nu = (value + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
 
         # Compute time of flight for correct epoch
-        time_of_flight = self.time_to_anomaly(value)
+        time_of_flight = self.time_to_anomaly(nu)
 
         return self.from_classical(
             self.attractor,
@@ -1237,7 +1239,7 @@ class Orbit:
             self.inc,
             self.raan,
             self.argp,
-            value,
+            nu,
             epoch=self.epoch + time_of_flight,
             plane=self.plane,
         )
