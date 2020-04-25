@@ -44,7 +44,7 @@ def test_maneuver_impulse():
     assert man.impulses[0] == (0 * u.s, dv)
 
 
-@pytest.mark.parametrize("nu", [0, 180] * u.deg)
+@pytest.mark.parametrize("nu", [0, -180] * u.deg)
 def test_hohmann_maneuver(nu):
     # Data from Vallado, example 6.1
     alt_i = 191.34411 * u.km
@@ -69,7 +69,7 @@ def test_hohmann_maneuver(nu):
     )
 
 
-@pytest.mark.parametrize("nu", [0, 180] * u.deg)
+@pytest.mark.parametrize("nu", [0, -180] * u.deg)
 def test_bielliptic_maneuver(nu):
     # Data from Vallado, example 6.2
     alt_i = 191.34411 * u.km

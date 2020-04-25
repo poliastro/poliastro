@@ -1,8 +1,10 @@
+import hypothesis.strategies as st
 import numpy as np
 import pytest
 from astropy import time, units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
+from hypothesis import given, settings
 from numpy.testing import assert_allclose
 from pytest import approx
 
@@ -27,6 +29,15 @@ from poliastro.twobody.propagation import (
     vallado,
 )
 from poliastro.util import norm
+
+
+@pytest.fixture
+def halley():
+    return Orbit.from_vectors(
+        Sun,
+        [-9018878.63569932, -94116054.79839276, 22619058.69943215] * u.km,
+        [-49.95092305, -12.94843055, -4.29251577] * u.km / u.s,
+    )
 
 
 @pytest.mark.parametrize("ecc", [0.9, 0.99, 0.999, 0.9999, 0.99999])
@@ -55,14 +66,6 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
     # Still not implemented. Refer to issue #714.
     if propagator in [pimienta, gooding]:
         pytest.skip()
-    elif propagator is farnocchia and ecc == 1.01:
-        pytest.xfail(
-            "This belongs to the strong hyperbolic region "
-            "which gives nu_to_M(1.0, 1.0100000000000002) = 0.0008482321477948918 "
-            "but it is entering the near parabolic code path "
-            "which gives nu_to_M(1.0, 1.01) = 0.5997907037261884, "
-            "therefore the function is not smooth!"
-        )
 
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
@@ -131,11 +134,20 @@ def test_propagating_to_certain_nu_is_correct():
     assert elliptic_at_aphelion.epoch > elliptic.epoch
 
     # test 10 random true anomaly values
-    for _ in range(10):
-        nu = np.random.uniform(low=0.0, high=2 * np.pi)
+    # TODO: Rework this test
+    for nu in np.random.uniform(low=-np.pi, high=np.pi, size=10):
         elliptic = elliptic.propagate_to_anomaly(nu * u.rad)
         r, _ = elliptic.rv()
         assert_quantity_allclose(norm(r), a * (1.0 - ecc ** 2) / (1 + ecc * np.cos(nu)))
+
+
+def test_propagate_to_anomaly_in_the_past_fails_for_open_orbits():
+    r0 = [Earth.R.to(u.km).value + 300, 0, 0] * u.km
+    v0 = [0, 15, 0] * u.km / u.s
+    orb = Orbit.from_vectors(Earth, r0, v0)
+
+    with pytest.raises(ValueError, match="True anomaly -0.02 rad not reachable"):
+        orb.propagate_to_anomaly(orb.nu - 1 * u.deg)
 
 
 def test_propagate_accepts_timedelta():
@@ -344,23 +356,29 @@ def test_long_propagations_vallado_agrees_farnocchia():
     assert_quantity_allclose(v_mm, v_k)
 
 
-@pytest.mark.parametrize("method", [farnocchia, vallado])
-def test_long_propagation_preserves_orbit_elements(method):
-    tof = 100 * u.year
-    r_halleys = np.array(
-        [-9018878.63569932, -94116054.79839276, 22619058.69943215]
-    )  # km
-    v_halleys = np.array([-49.95092305, -12.94843055, -4.29251577])  # km/s
-    halleys = Orbit.from_vectors(Sun, r_halleys * u.km, v_halleys * u.km / u.s)
+@st.composite
+def with_units(draw, elements, unit):
+    value = draw(elements)
+    return value * unit
 
-    params_ini = rv2coe(Sun.k.to(u.km ** 3 / u.s ** 2).value, r_halleys, v_halleys)[:-1]
-    r_new, v_new = halleys.propagate(tof, method=method).rv()
-    params_final = rv2coe(
-        Sun.k.to(u.km ** 3 / u.s ** 2).value,
-        r_new.to(u.km).value,
-        v_new.to(u.km / u.s).value,
-    )[:-1]
-    assert_quantity_allclose(params_ini, params_final)
+
+@settings(deadline=None)
+@given(
+    tof=with_units(
+        elements=st.floats(
+            min_value=80, max_value=120, allow_nan=False, allow_infinity=False
+        ),
+        unit=u.year,
+    )
+)
+@pytest.mark.parametrize("method", [farnocchia, vallado])
+def test_long_propagation_preserves_orbit_elements(tof, method, halley):
+    expected_slow_classical = halley.classical()[:-1]
+
+    slow_classical = halley.propagate(tof, method=method).classical()[:-1]
+
+    for element, expected_element in zip(slow_classical, expected_slow_classical):
+        assert_quantity_allclose(element, expected_element)
 
 
 def test_propagation_sets_proper_epoch():

@@ -1,7 +1,9 @@
 import pickle
 from collections import OrderedDict
+from functools import partial
 from unittest import mock
 
+import hypothesis.strategies as st
 import matplotlib
 import numpy as np
 import pytest
@@ -14,6 +16,7 @@ from astropy.coordinates import (
 )
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+from hypothesis import example, given, settings
 from numpy.testing import assert_allclose, assert_array_equal
 
 from poliastro.bodies import (
@@ -69,6 +72,14 @@ def hyperbolic():
     return Orbit.from_vectors(Sun, r, v, epoch)
 
 
+@pytest.fixture()
+def near_parabolic():
+    r = [8.0e3, 1.0e3, 0.0] * u.km
+    v = [-0.5, -0.5, 0.0] * u.km / u.s
+
+    return Orbit.from_vectors(Earth, r, v)
+
+
 def test_default_time_for_new_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -90,6 +101,15 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
         "UnitsError: Argument 'nu' to function 'from_classical' must be in units convertible to 'rad'."
         in excinfo.exconly()
     )
+
+
+def test_orbit_from_classical_wraps_out_of_range_anomaly_and_warns():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    out_angle = np.pi * u.rad
+    with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
+        Orbit.from_classical(Sun, _d, _, _a, _a, _a, out_angle)
 
 
 def test_state_raises_unitserror_if_rv_units_are_wrong():
@@ -1126,12 +1146,24 @@ def test_change_plane_twice_restores_original_data():
     assert_quantity_allclose(new_ss.v, iss.v)
 
 
-def test_time_to_anomaly():
-    expected_tof = iss.period / 2
-    iss_180 = iss.propagate_to_anomaly(180 * u.deg)
-    tof = iss_180.time_to_anomaly(0 * u.deg)
+@st.composite
+def with_units(draw, elements, unit):
+    value = draw(elements)
+    return value * unit
 
-    assert_quantity_allclose(tof, expected_tof)
+
+angles = partial(st.floats, min_value=-np.pi, max_value=np.pi, exclude_max=True)
+angles_q = partial(with_units, elements=angles(), unit=u.rad)
+
+
+@settings(deadline=None)
+@given(expected_nu=angles_q())
+@example(1e-13 * u.rad)
+def test_time_to_anomaly(expected_nu):
+    tof = iss.time_to_anomaly(expected_nu)
+    iss_propagated = iss.propagate(tof)
+
+    assert_quantity_allclose(iss_propagated.nu, expected_nu, atol=1e-12 * u.rad)
 
 
 @pytest.mark.xfail
@@ -1158,3 +1190,32 @@ def test_issue_916(mock_query):
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_sbdb(name)
     assert "ValueError: Object {} not found".format(name) in excinfo.exconly()
+
+
+def test_near_parabolic_M_does_not_hang(near_parabolic):
+    # See https://github.com/poliastro/poliastro/issues/907
+    expected_nu = -168.65 * u.deg
+    orb = near_parabolic.propagate_to_anomaly(expected_nu)
+
+    assert_quantity_allclose(orb.nu, expected_nu)
+
+
+def test_propagation_near_parabolic_orbits_zero_seconds_gives_same_anomaly(
+    near_parabolic,
+):
+    orb_final = near_parabolic.propagate(0 * u.s)
+
+    # Smoke test
+    assert_quantity_allclose(orb_final.nu, near_parabolic.nu)
+    assert orb_final.epoch == near_parabolic.epoch
+
+
+def test_propagation_near_parabolic_orbits_does_not_hang(near_parabolic):
+    # See https://github.com/poliastro/poliastro/issues/475
+    orb_final = near_parabolic.propagate(near_parabolic.period)
+
+    # Smoke test
+    assert_quantity_allclose(orb_final.nu, near_parabolic.nu)
+    assert_quantity_allclose(
+        (orb_final.epoch - near_parabolic.epoch).to(u.s), near_parabolic.period
+    )
