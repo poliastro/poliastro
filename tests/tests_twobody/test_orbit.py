@@ -1,7 +1,9 @@
 import pickle
 from collections import OrderedDict
+from functools import partial
 from unittest import mock
 
+import hypothesis.strategies as st
 import matplotlib
 import numpy as np
 import pytest
@@ -14,6 +16,7 @@ from astropy.coordinates import (
 )
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+from hypothesis import example, given, settings
 from numpy.testing import assert_allclose, assert_array_equal
 
 from poliastro.bodies import (
@@ -1143,24 +1146,24 @@ def test_change_plane_twice_restores_original_data():
     assert_quantity_allclose(new_ss.v, iss.v)
 
 
-@pytest.mark.xfail(reason="Need to wrap angles")
-@pytest.mark.parametrize("fraction", [1 / 4, 1 / 2, 3 / 4])
-def test_time_to_anomaly(fraction):
-    expected_tof = (1 - fraction) * iss.period
-    iss_step = iss.propagate_to_anomaly(360 * fraction * u.deg)
-    tof = iss_step.time_to_anomaly(0 * u.deg)
-
-    assert_quantity_allclose(tof, expected_tof)
+@st.composite
+def with_units(draw, elements, unit):
+    value = draw(elements)
+    return value * unit
 
 
-@pytest.mark.xfail(reason="Need to recompute expected time of flight")
-@pytest.mark.parametrize("fraction", [-1 / 4, -1 / 2, 1 / 4])
-def test_time_to_anomaly_negative(fraction):
-    expected_tof = (1 - fraction) * iss.period
-    iss_step = iss.propagate_to_anomaly(360 * fraction * u.deg)
-    tof = iss_step.time_to_anomaly(0 * u.deg)
+angles = partial(st.floats, min_value=-np.pi, max_value=np.pi, exclude_max=True)
+angles_q = partial(with_units, elements=angles(), unit=u.rad)
 
-    assert_quantity_allclose(tof, expected_tof)
+
+@settings(deadline=None)
+@given(expected_nu=angles_q())
+@example(1e-13 * u.rad)
+def test_time_to_anomaly(expected_nu):
+    tof = iss.time_to_anomaly(expected_nu)
+    iss_propagated = iss.propagate(tof)
+
+    assert_quantity_allclose(iss_propagated.nu, expected_nu, atol=1e-12 * u.rad)
 
 
 @pytest.mark.xfail
