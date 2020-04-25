@@ -226,7 +226,9 @@ def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
         # Strong elliptic
         n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
         M = n * delta_t
-        E = M_to_E(M, ecc)
+        # This might represent several revolutions,
+        # so we wrap the true anomaly
+        E = M_to_E((M + np.pi) % (2 * np.pi) - np.pi, ecc)
         nu = E_to_nu(E, ecc)
     elif 1 - delta <= ecc < 1:
         E_delta = np.arccos((1 - delta) / ecc)
@@ -237,7 +239,9 @@ def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
         # We check against abs(M) because E_delta could also be negative
         if E_to_M(E_delta, ecc) <= abs(M):
             # Strong elliptic, proceed
-            E = M_to_E(M, ecc)
+            # This might represent several revolutions,
+            # so we wrap the true anomaly
+            E = M_to_E((M + np.pi) % (2 * np.pi) - np.pi, ecc)
             nu = E_to_nu(E, ecc)
         else:
             # Near parabolic, recompute M

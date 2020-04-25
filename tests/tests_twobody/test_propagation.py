@@ -1,8 +1,10 @@
+import hypothesis.strategies as st
 import numpy as np
 import pytest
 from astropy import time, units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
+from hypothesis import given, settings
 from numpy.testing import assert_allclose
 from pytest import approx
 
@@ -27,6 +29,15 @@ from poliastro.twobody.propagation import (
     vallado,
 )
 from poliastro.util import norm
+
+
+@pytest.fixture
+def halley():
+    return Orbit.from_vectors(
+        Sun,
+        [-9018878.63569932, -94116054.79839276, 22619058.69943215] * u.km,
+        [-49.95092305, -12.94843055, -4.29251577] * u.km / u.s,
+    )
 
 
 @pytest.mark.parametrize("ecc", [0.9, 0.99, 0.999, 0.9999, 0.99999])
@@ -345,23 +356,29 @@ def test_long_propagations_vallado_agrees_farnocchia():
     assert_quantity_allclose(v_mm, v_k)
 
 
-@pytest.mark.parametrize("method", [farnocchia, vallado])
-def test_long_propagation_preserves_orbit_elements(method):
-    tof = 100 * u.year
-    r_halleys = np.array(
-        [-9018878.63569932, -94116054.79839276, 22619058.69943215]
-    )  # km
-    v_halleys = np.array([-49.95092305, -12.94843055, -4.29251577])  # km/s
-    halleys = Orbit.from_vectors(Sun, r_halleys * u.km, v_halleys * u.km / u.s)
+@st.composite
+def with_units(draw, elements, unit):
+    value = draw(elements)
+    return value * unit
 
-    params_ini = rv2coe(Sun.k.to(u.km ** 3 / u.s ** 2).value, r_halleys, v_halleys)[:-1]
-    r_new, v_new = halleys.propagate(tof, method=method).rv()
-    params_final = rv2coe(
-        Sun.k.to(u.km ** 3 / u.s ** 2).value,
-        r_new.to(u.km).value,
-        v_new.to(u.km / u.s).value,
-    )[:-1]
-    assert_quantity_allclose(params_ini, params_final)
+
+@settings(deadline=None)
+@given(
+    tof=with_units(
+        elements=st.floats(
+            min_value=80, max_value=120, allow_nan=False, allow_infinity=False
+        ),
+        unit=u.year,
+    )
+)
+@pytest.mark.parametrize("method", [farnocchia, vallado])
+def test_long_propagation_preserves_orbit_elements(tof, method, halley):
+    expected_slow_classical = halley.classical()[:-1]
+
+    slow_classical = halley.propagate(tof, method=method).classical()[:-1]
+
+    for element, expected_element in zip(slow_classical, expected_slow_classical):
+        assert_quantity_allclose(element, expected_element)
 
 
 def test_propagation_sets_proper_epoch():

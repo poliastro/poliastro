@@ -282,6 +282,7 @@ def M_to_E(M, ecc):
     This uses a Newton iteration on the Kepler equation.
 
     """
+    assert -np.pi <= M <= np.pi
     if ecc < 0.8:
         E0 = M
     else:
