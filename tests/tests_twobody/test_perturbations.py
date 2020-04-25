@@ -239,14 +239,28 @@ def test_atmospheric_demise():
 
     tofs = [365] * u.d  # actually hits the ground a bit after day 48
 
-    def event_lithobrake(R, t, u):
-        # search for where H - R crosses zero, and then terminate
-        H = norm(u[:3])
-        return H - R
+    class LithobrakeEvent:
+        def __init__(self, R):
+            self._R = R
+            self._last_t = None
 
-    event_lithobrake_r = functools.partial(event_lithobrake, R)
-    event_lithobrake_r.terminal = True
-    events = [event_lithobrake_r]
+        @property
+        def terminal(self):
+            # tell scipy to stop the integration at H = R (impact)
+            return True
+
+        @property
+        def last_t(self):
+            return self._last_t * u.s
+
+        def __call__(self, t, u):
+            self._last_t = t
+            H = norm(u[:3])
+            # scipy will search for H - R = 0
+            return H - self._R
+
+    lithobrake_event = LithobrakeEvent(R)
+    events = [lithobrake_event]
 
     rr, _ = cowell(
         Earth.k,
@@ -264,6 +278,9 @@ def test_atmospheric_demise():
     )
 
     assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
+
+    # last_t is not an analytic value
+    assert_quantity_allclose(lithobrake_event.last_t.to(u.d).value, 48.2179, rtol=1e-2)
 
 
 @pytest.mark.slow
