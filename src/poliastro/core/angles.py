@@ -285,7 +285,7 @@ def M_to_E(M, ecc):
     if ecc < 0.8:
         E0 = M
     else:
-        E0 = np.pi
+        E0 = np.pi * np.sign(M)
     E = newton("elliptic", E0, args=(M, ecc))
     return E
 
