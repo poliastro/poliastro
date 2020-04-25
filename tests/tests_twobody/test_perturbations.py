@@ -193,13 +193,11 @@ def test_atmospheric_drag():
     B = C_D * A / m
 
     # parameters of the atmosphere
-    rho0 = rho0_earth.to(u.kg / u.km**3).value  # kg/km^3
+    rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
     H0 = H0_earth.to(u.km).value  # km
     tof = 100000  # s
 
-    dr_expected = (
-        -B * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
-    )
+    dr_expected = -B * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
     # assuming the atmospheric decay during tof is small,
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
