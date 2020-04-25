@@ -222,6 +222,51 @@ def test_atmospheric_drag():
 
 
 @pytest.mark.slow
+def test_atmospheric_demise():
+    # Test an orbital decay that hits Earth. No analytic solution.
+    R = Earth.R.to(u.km).value
+
+    orbit = Orbit.circular(Earth, 230 * u.km)
+
+    # parameters of a body
+    C_D = 2.2  # dimentionless (any value would do)
+    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value  # km^2
+    m = 100  # kg
+
+    # parameters of the atmosphere
+    rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
+    H0 = H0_earth.to(u.km).value  # km
+
+    tofs = [365] * u.d  # actually hits the ground a bit after day 48
+
+    def event_lithobrake(R, t, u):
+        # search for where H - R crosses zero, and then terminate
+        H = norm(u[:3])
+        return H - R
+
+    event_lithobrake_r = functools.partial(event_lithobrake, R)
+    event_lithobrake_r.terminal = True
+    events = [event_lithobrake_r]
+
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        ad=atmospheric_drag,
+        R=R,
+        C_D=C_D,
+        A=A,
+        m=m,
+        H0=H0,
+        rho0=rho0,
+        events=events,
+    )
+
+    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
+
+
+@pytest.mark.slow
 def test_cowell_works_with_small_perturbations():
     r0 = [-2384.46, 5729.01, 3050.46] * u.km
     v0 = [-7.36138, -2.98997, 1.64354] * u.km / u.s
