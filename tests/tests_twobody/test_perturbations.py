@@ -21,6 +21,7 @@ from poliastro.core.perturbations import (
 from poliastro.ephem import build_ephem_interpolant
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
+from poliastro.twobody.events import LithobrakeEvent
 
 
 @pytest.mark.slow
@@ -219,6 +220,48 @@ def test_atmospheric_drag():
     assert_quantity_allclose(
         norm(rr[0].to(u.km).value) - norm(r0), dr_expected, rtol=1e-2
     )
+
+
+@pytest.mark.slow
+def test_atmospheric_demise():
+    # Test an orbital decay that hits Earth. No analytic solution.
+    R = Earth.R.to(u.km).value
+
+    orbit = Orbit.circular(Earth, 230 * u.km)
+
+    # parameters of a body
+    C_D = 2.2  # dimentionless (any value would do)
+    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value  # km^2
+    m = 100  # kg
+
+    # parameters of the atmosphere
+    rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
+    H0 = H0_earth.to(u.km).value  # km
+
+    tofs = [365] * u.d  # actually hits the ground a bit after day 48
+
+    lithobrake_event = LithobrakeEvent(R)
+    events = [lithobrake_event]
+
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        ad=atmospheric_drag,
+        R=R,
+        C_D=C_D,
+        A=A,
+        m=m,
+        H0=H0,
+        rho0=rho0,
+        events=events,
+    )
+
+    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
+
+    # last_t is not an analytic value
+    assert_quantity_allclose(lithobrake_event.last_t.to(u.d).value, 48.2179, rtol=1e-2)
 
 
 @pytest.mark.slow

@@ -41,7 +41,7 @@ from poliastro.core.propagation import (
 )
 
 
-def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
+def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, ad=None, **ad_kwargs):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -56,6 +56,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
         Array of times to propagate.
     rtol : float, optional
         Maximum relative error permitted, default to 1e-10.
+    events : function(t, u(t)), optional
+        passed to solve_ivp: integration stops when this function
+        returns <= 0., assuming you set events.terminal=True
     ad : function(t0, u, k), optional
          Non Keplerian acceleration (km/s2), default to None.
 
@@ -102,14 +105,20 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, ad=None, **ad_kwargs):
         atol=1e-12,
         method=DOP853,
         dense_output=True,
+        events=events,
     )
     if not result.success:
         raise RuntimeError("Integration failed")
 
+    t_end = min(result.t_events[0]) if result.t_events else None
+
     rrs = []
     vvs = []
     for i in range(len(tofs)):
-        y = result.sol(tofs[i])
+        t = tofs[i]
+        if t_end is not None and t > t_end:
+            t = t_end
+        y = result.sol(t)
         rrs.append(y[:3])
         vvs.append(y[3:])
 
