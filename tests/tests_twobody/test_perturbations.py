@@ -21,6 +21,7 @@ from poliastro.core.perturbations import (
 from poliastro.ephem import build_ephem_interpolant
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
+from poliastro.twobody.events import LithobrakeEvent
 
 
 @pytest.mark.slow
@@ -238,26 +239,6 @@ def test_atmospheric_demise():
     H0 = H0_earth.to(u.km).value  # km
 
     tofs = [365] * u.d  # actually hits the ground a bit after day 48
-
-    class LithobrakeEvent:
-        def __init__(self, R):
-            self._R = R
-            self._last_t = None
-
-        @property
-        def terminal(self):
-            # tell scipy to stop the integration at H = R (impact)
-            return True
-
-        @property
-        def last_t(self):
-            return self._last_t * u.s
-
-        def __call__(self, t, u):
-            self._last_t = t
-            H = norm(u[:3])
-            # scipy will search for H - R = 0
-            return H - self._R
 
     lithobrake_event = LithobrakeEvent(R)
     events = [lithobrake_event]
