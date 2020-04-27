@@ -1,4 +1,5 @@
 import numpy as np
+from astropy import units as u
 from numpy.linalg import norm
 
 from ._jit import jit
@@ -125,6 +126,23 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     v = norm(v_vec)
     B = C_D * A / m
     rho = rho0 * np.exp(-(H - R) / H0)
+
+    return -(1.0 / 2.0) * rho * B * v * v_vec
+
+
+def atmospheric_drag_model(t0, state, k, R, C_D, A, m, model):
+    H = norm(state[:3])
+
+    v_vec = state[3:]
+    v = norm(v_vec)
+    B = C_D * A / m
+
+    if H < R:
+        # the model doesn't want to see a negative altitude
+        # the integration will go a little negative searching for H = R
+        H = R
+
+    rho = model.density((H - R) * u.km).to(u.kg / u.km ** 3).value
 
     return -(1.0 / 2.0) * rho * B * v * v_vec
 
