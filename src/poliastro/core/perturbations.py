@@ -139,7 +139,7 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A, m, model):
         \vec{p} = -\frac{1}{2}\rho v_{rel}\left ( \frac{C_{d}A}{m} \right )\vec{v_{rel}}
 
 
-    .. versionadded:: 0.9.0
+    .. versionadded:: 1.14
 
     Parameters
     ----------
