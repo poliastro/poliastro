@@ -64,6 +64,8 @@ T0 = 288.15 * u.K
 Tinf = 1000 * u.K
 gamma = 1.4
 alpha = 34.1632 * u.K / u.km
+beta = 1.458e-6 * (u.kg / u.s / u.m / (u.K) ** 0.5)
+S = 110.4 * u.K
 
 # Reading layer parameters file
 coesa76_data = ascii.read(get_pkg_data_filename("data/coesa76.dat"))
@@ -267,7 +269,7 @@ class COESA76(COESA):
         return rho.to(u.kg / u.m ** 3)
 
     def properties(self, alt, geometric=True):
-        """ Solves density at given height.
+        """ Solves temperature, pressure, density at given height.
 
         Parameters
         ----------
@@ -290,3 +292,89 @@ class COESA76(COESA):
         rho = self.density(alt, geometric=geometric)
 
         return T, p, rho
+
+    def sound_speed(self, alt, geometric=True):
+        """ Solves speed of sound at given height.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential height.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        Cs: ~astropy.units.Quantity
+            Speed of Sound at given height.
+        """
+        # Check if valid range and convert to geopotential
+        z, h = self._check_altitude(alt, r0, geometric=geometric)
+
+        if z > 86 * u.km:
+            raise ValueError(
+                "Speed of sound in COESA76 has just been implemented up to 86km."
+            )
+        T = self.temperature(alt, geometric).value
+        # using eqn-(50)
+        Cs = ((gamma * R_air.value * T) ** 0.5) * (u.m / u.s)
+
+        return Cs
+
+    def viscosity(self, alt, geometric=True):
+        """ Solves dynamic viscosity at given height.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential height.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        mu: ~astropy.units.Quantity
+            Dynamic viscosity at given height.
+        """
+        # Check if valid range and convert to geopotential
+        z, h = self._check_altitude(alt, r0, geometric=geometric)
+
+        if z > 86 * u.km:
+            raise ValueError(
+                "Dynamic Viscosity in COESA76 has just been implemented up to 86km."
+            )
+        T = self.temperature(alt, geometric).value
+        # using eqn-(51)
+        mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.N * u.s / (u.m) ** 2)
+
+        return mu
+
+    def thermal_conductivity(self, alt, geometric=True):
+        """ Solves coefficient of thermal conductivity at given height.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential height.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        k: ~astropy.units.Quantity
+            coefficient of thermal conductivity at given height.
+        """
+        # Check if valid range and convert to geopotential
+        z, h = self._check_altitude(alt, r0, geometric=geometric)
+
+        if z > 86 * u.km:
+            raise ValueError(
+                "Thermal conductivity in COESA76 has just been implemented up to 86km."
+            )
+        T = self.temperature(alt, geometric=geometric).value
+        # using eqn-(53)
+        k = (2.64638e-3 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
+            u.J / u.m / u.s / u.K
+        )
+
+        return k

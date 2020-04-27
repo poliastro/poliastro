@@ -55,7 +55,9 @@ sunspot minimum and sunspot maximum.
 import numpy as np
 from astropy import units as u
 from astropy.io import ascii
+from astropy.units import imperial
 from astropy.utils.data import get_pkg_data_filename
+from scipy.integrate import quad
 
 from poliastro.atmosphere.base import COESA
 
@@ -73,6 +75,7 @@ sigma = 3.65e-10 * u.m
 N = 6.02257e26 * (u.kg * u.mol) ** -1
 R = 8314.32 * u.J / u.kg / u.K
 R_air = 287.053 * u.J / u.kg / u.K
+alpha = 34.1632 * u.K / u.km
 
 # Reading layer parameters file
 coesa_file = get_pkg_data_filename("data/coesa62.dat")
@@ -149,24 +152,42 @@ class COESA62(COESA):
 
         # Get base parameters
         i = self._get_index(z, self.zb_levels)
+        zb = self.zb_levels[i]
         hb = self.hb_levels[i]
         Tb = self.Tb_levels[i]
         Lb = self.Lb_levels[i]
         pb = self.pb_levels[i]
 
-        # If Z > 90km, different formulas apply
+        # if z <= 90km then apply eqn 1.2.10-(3)
         if z <= 90 * u.km:
-            print(z, hb, Tb, Lb, pb)
+            # If Lb is zero then apply eqn 1.2.10-(4)
             if Lb == 0.0:
                 p = pb * np.exp(-g0 * (h - hb) / Tb / R_air)
             else:
                 T = self.temperature(z)
                 p = pb * (T / Tb) ** (-g0 / R_air / Lb)
+
+        # if 90 < Z < 700 km then eqn 1.2.10-(5) is applied
         else:
-            # TODO: Equation (1.2.10) should be applied avobe 90km
-            raise NotImplementedError(
-                "Pressure in COESA62 has just been implemented up to 90km."
+            # Converting all the units into SI unit and taking their magnitude
+            Lb_v = Lb.to(u.K / u.m).value
+            r0_v = r0.to(u.m).value
+            z_v = z.to(u.m).value
+            zb_v = zb.to(u.m).value
+            Tb_v = Tb.value
+            g0_v = g0.value
+            R_air_v = R_air.value
+
+            # Putting g = (g0*(r0/(r0 +z))**2) in (g * dz / z - zb + Tb/Lb)
+            # and integrating it.
+            integrand = quad(
+                lambda x: (g0_v * (r0_v / (r0_v + x)) ** 2) / (x - zb_v + Tb_v / Lb_v),
+                zb_v,
+                z_v,
             )
+
+            pb = pb.to(u.Pa)
+            p = (pb * np.exp((-1 / R_air_v / Lb_v) * integrand[0])).to(u.mbar)
 
         return p
 
@@ -188,12 +209,6 @@ class COESA62(COESA):
 
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
-
-        # TODO: implement atmosphere up to 1000km
-        if z > 90 * u.km:
-            raise NotImplementedError(
-                "Density in COESA62 has just been implemented up to 90km."
-            )
 
         # Solve temperature and pressure
         T = self.temperature(z)
@@ -226,3 +241,90 @@ class COESA62(COESA):
         rho = self.density(alt, geometric=geometric)
 
         return T, p, rho
+
+    def sound_speed(self, alt, geometric=True):
+        """ Solves speed of sound at given height.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential height.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        Cs: ~astropy.units.Quantity
+            Speed of Sound at given height.
+        """
+        # Check if valid range and convert to geopotential
+        z, h = self._check_altitude(alt, r0, geometric=geometric)
+
+        if z > 90 * u.km:
+            raise ValueError(
+                "Speed of sound in COESA62 has just been implemented up to 90km."
+            )
+        T = self.temperature(alt, geometric).value
+        # using eqn-1.3.7-(1)
+        Cs = ((_gamma * R_air.value * T) ** 0.5) * (u.m / u.s)
+
+        return Cs
+
+    def viscosity(self, alt, geometric=True):
+        """ Solves dynamic viscosity at given height.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential height.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        mu: ~astropy.units.Quantity
+            Dynamic viscosity at given height.
+        """
+        # Check if valid range and convert to geopotential
+        z, h = self._check_altitude(alt, r0, geometric=geometric)
+
+        if z > 90 * u.km:
+            raise ValueError(
+                "Dynamic Viscosity in COESA62 has just been implemented up to 90km."
+            )
+        T = self.temperature(alt, geometric).value
+        # using eqn-1.3.8-(1)
+        mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.kg / u.m / u.s)
+
+        return mu
+
+    def thermal_conductivity(self, alt, geometric=True):
+        """ Solves coefficient of thermal conductivity at given height.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential height.
+        geometric: boolean
+            If `True`, assumes that `alt` argument is geometric kind.
+
+        Returns
+        -------
+        k: ~astropy.units.Quantity
+            coefficient of thermal conductivity at given height.
+        """
+        # Check if valid range and convert to geopotential
+        z, h = self._check_altitude(alt, r0, geometric=geometric)
+
+        if z > 90 * u.km:
+            raise ValueError(
+                "Thermal conductivity in COESA62 has just been implemented up to 90km."
+            )
+
+        T = self.temperature(alt, geometric=geometric).value
+        # using eqn-1.3.10-(1)
+        k = (6.325e-7 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
+            imperial.kcal / u.m / u.s / u.K
+        )
+
+        return k
