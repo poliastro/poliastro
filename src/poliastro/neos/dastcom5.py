@@ -594,6 +594,6 @@ def entire_db():
     )
     df = ast_database.append(com_database, ignore_index=True)
     df[["NAME", "DESIG", "IREF"]] = df[["NAME", "DESIG", "IREF"]].apply(
-        lambda x: x.str.strip().str.decode("utf-8")
+        lambda x: x.str.decode("utf-8").str.strip()
     )
     return df
