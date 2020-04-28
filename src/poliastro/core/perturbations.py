@@ -1,4 +1,5 @@
 import numpy as np
+from astropy import units as u
 from numpy.linalg import norm
 
 from ._jit import jit
@@ -114,7 +115,8 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
 
     Note
     ----
-    This function provides the acceleration due to atmospheric drag. We follow
+    This function provides the acceleration due to atmospheric drag
+    using an overly-simplistic exponential atmosphere model. We follow
     Howard Curtis, section 12.4
     the atmospheric density model is rho(H) = rho0 x exp(-H / H0)
 
@@ -125,6 +127,56 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
     v = norm(v_vec)
     B = C_D * A / m
     rho = rho0 * np.exp(-(H - R) / H0)
+
+    return -(1.0 / 2.0) * rho * B * v * v_vec
+
+
+def atmospheric_drag_model(t0, state, k, R, C_D, A, m, model):
+    r"""Calculates atmospheric drag acceleration (km/s2)
+
+    .. math::
+
+        \vec{p} = -\frac{1}{2}\rho v_{rel}\left ( \frac{C_{d}A}{m} \right )\vec{v_{rel}}
+
+
+    .. versionadded:: 1.14
+
+    Parameters
+    ----------
+    t0 : float
+        Current time (s)
+    state : numpy.ndarray
+        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+    k : float
+        gravitational constant, (km^3/s^2)
+    R : float
+        radius of the attractor (km)
+    C_D: float
+        dimensionless drag coefficient ()
+    A: float
+        frontal area of the spacecraft (km^2)
+    m: float
+        mass of the spacecraft (kg)
+    model: a callable model from poliastro.atmosphere
+
+    Note
+    ----
+    This function provides the acceleration due to atmospheric drag, as
+    computed by a model from poliastro.atmosphere
+
+    """
+    H = norm(state[:3])
+
+    v_vec = state[3:]
+    v = norm(v_vec)
+    B = C_D * A / m
+
+    if H < R:
+        # the model doesn't want to see a negative altitude
+        # the integration will go a little negative searching for H = R
+        H = R
+
+    rho = model.density((H - R) * u.km).to(u.kg / u.km ** 3).value
 
     return -(1.0 / 2.0) * rho * B * v * v_vec
 

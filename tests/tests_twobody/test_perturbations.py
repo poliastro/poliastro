@@ -8,6 +8,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.linalg import norm
 
+from poliastro.atmosphere import COESA76
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import H0_earth, Wdivc_sun, rho0_earth
 from poliastro.core.elements import rv2coe
@@ -15,13 +16,14 @@ from poliastro.core.perturbations import (
     J2_perturbation,
     J3_perturbation,
     atmospheric_drag,
+    atmospheric_drag_model,
     radiation_pressure,
     third_body,
 )
 from poliastro.ephem import build_ephem_interpolant
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import cowell
 from poliastro.twobody.events import LithobrakeEvent
+from poliastro.twobody.propagation import cowell
 
 
 @pytest.mark.slow
@@ -228,6 +230,7 @@ def test_atmospheric_demise():
     R = Earth.R.to(u.km).value
 
     orbit = Orbit.circular(Earth, 230 * u.km)
+    t_decay = 48.2179 * u.d
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
@@ -261,7 +264,46 @@ def test_atmospheric_demise():
     assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
 
     # last_t is not an analytic value
-    assert_quantity_allclose(lithobrake_event.last_t.to(u.d).value, 48.2179, rtol=1e-2)
+    assert_quantity_allclose(lithobrake_event.last_t, t_decay, rtol=1e-2)
+
+
+@pytest.mark.slow
+def test_atmospheric_demise_coesa76():
+    # Test an orbital decay that hits Earth. No analytic solution.
+    R = Earth.R.to(u.km).value
+
+    orbit = Orbit.circular(Earth, 250 * u.km)
+    t_decay = 7.17 * u.d
+
+    # parameters of a body
+    C_D = 2.2  # dimentionless (any value would do)
+    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value  # km^2
+    m = 100  # kg
+
+    tofs = [365] * u.d
+
+    lithobrake_event = LithobrakeEvent(R)
+    events = [lithobrake_event]
+
+    coesa76 = COESA76()
+
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        ad=atmospheric_drag_model,
+        R=R,
+        C_D=C_D,
+        A=A,
+        m=m,
+        model=coesa76,
+        events=events,
+    )
+
+    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
+
+    assert_quantity_allclose(lithobrake_event.last_t, t_decay, rtol=1e-2)
 
 
 @pytest.mark.slow
