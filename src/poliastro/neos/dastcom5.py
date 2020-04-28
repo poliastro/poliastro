@@ -370,6 +370,7 @@ def orbit_from_record(record):
     # NOTE: It is unclear how this conversion should happen,
     # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
     if ecc < 1:
+        M = (M + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
         nu = E_to_nu(M_to_E(M, ecc), ecc)
     elif ecc == 1:
         nu = D_to_nu(M_to_D(M))
