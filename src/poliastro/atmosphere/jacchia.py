@@ -175,8 +175,10 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
                                 + G0 * self.E5M[iz - 91] / self.T[iz - 1]
                             )
                         )
+
                     self.x = self.E5M[iz - 90] / wm0
                     self.y = self.E6P[iz - 90] / self.T[iz]
+
                     self.CN2[iz] = qN2 * self.y * self.x
                     self.CO[iz] = 2.0 * (1.0 - self.x) * self.y
                     self.CO2[iz] = (self.x * (1.0 + qO2) - 1.0) * self.y
@@ -186,6 +188,7 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
                 else:
                     G0 = (1 + self.Z[iz - 1] / 6356.766) ** (-2)
                     G1 = (1 + self.Z[iz] / 6356.766) ** (-2)
+
                     self.x = 0.5897446 * (G1 / self.T[iz] + G0 / self.T[iz - 1])
                     self.y = self.T[iz - 1] / self.T[iz]
                     self.CN2[iz] = self.CN2[iz - 1] * self.y * np.exp(-wmN2 * self.x)
@@ -196,14 +199,33 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
                         self.CHe[iz - 1] * (self.y ** 0.62) * np.exp(-wmHe * self.x)
                     )
                     self.CH[iz] = 0
+
                 # goto500(alt, Tinf) #These are not needed since they are continues
                 continue
             # goto500(alt, Tinf) #These are not needed since they are continues
             # continue
 
         # return
-        alt_properties = self.goto500(alt, Tinf)
-        return [last for *_, last in alt_properties]
+        # alt_properties = self.goto500(alt, Tinf)
+        # return [last for *_, last in alt_properties]
+        # if 150 <= alt < 500:
+        #     alt_properties = self.goto500(500, Tinf)
+        #     dd = [last[alt] for last in alt_properties]
+        #     return dd
+        #
+        #
+        #
+        # else:
+        return self.goto500(alt, Tinf)
+
+    def jprop(self, alt, Tinf):
+        if 150 <= alt < 500:
+            alt_properties = self.properties(500, Tinf)
+        else:
+            alt_properties = self.properties(alt, Tinf)
+
+        return [last[alt] for last in alt_properties]
+
 
     def goto110(self, iz):
         self.T[iz] = self.tbase + self.tgrad * (self.h - self.hbase)
@@ -230,6 +252,64 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
         self.CAr[iz] = qAr * self.CM[iz]
         self.CHe[iz] = qHe * self.CM[iz]
         self.CH[iz] = 0
+
+    def H_correction(self, alt, Tinf):
+        phid00 = 10.0 ** (6.9 + 28.9 * Tinf ** (-0.25)) / 2.0e20
+        phid00 = phid00 * 5.24e2
+        H_500 = 10.0 ** (-0.06 + 28.9 * Tinf ** (-0.25))
+        # print(alt)
+        for iz in range(150, alt):
+            phid0 = phid00 / np.sqrt(self.T[iz])
+            self.WM[iz] = (
+                    wmH
+                    * 0.5897446
+                    * ((1.0 + self.Z[iz] / 6356.766) ** (-2))
+                    / self.T[iz]
+                    + phid0
+            )
+            self.CM[iz] = self.CM[iz] * phid0
+
+        self.y = self.WM[150]
+        self.WM[150] = 0
+
+        for iz in range(151, alt):
+            self.x = self.WM[iz - 1] + (self.y + self.WM[iz])
+            self.y = self.WM[iz]
+            self.WM[iz] = self.x
+
+        for iz in range(150, alt):
+            self.WM[iz] = np.exp(self.WM[iz]) * (self.T[iz] / self.T[150]) ** 0.75
+            self.CM[iz] = self.WM[iz] * self.CM[iz]
+
+        self.y = self.CM[150]
+        self.CM[150] = 0
+
+        for iz in range(151, alt):
+            self.x = self.CM[iz - 1] + 0.5 * (self.y + self.CM[iz])
+            self.y = self.CM[iz]
+            self.CM[iz] = self.x
+
+        for iz in range(150, alt):
+            self.CH[iz] = (self.WM[500] / self.WM[iz]) * (
+                    H_500 - (self.CM[iz] - self.CM[500])
+            )
+
+        for iz in range(150, alt):
+            self.CM[iz] = (
+                    self.CN2[iz]
+                    + self.CO2[iz]
+                    + self.CO[iz]
+                    + self.CAr[iz]
+                    + self.CHe[iz]
+                    + self.CH[iz]
+            )
+            self.WM[iz] = (wmN2 * self.CN2[iz]
+                           + wmO2 * self.CO2[iz]
+                           + wmO * self.CO[iz]
+                           + wmAr * self.CAr[iz]
+                           + wmHe * self.CHe[iz]
+                           + wmH * self.CH[iz]
+                           ) / self.CM[iz]
 
     def goto500(self, alt, Tinf):
 
@@ -260,57 +340,10 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
 
         # Calculate [H] from Jacchia 1997 formulas if alt > 500.
         if alt >= 500:
-            phid00 = 10.0 ** (6.9 + 28.9 * Tinf ** (-0.25)) / 2.0e20
-            phid00 = phid00 * 5.24e2
-            H_500 = 10.0 ** (-0.06 + 28.9 * Tinf ** (-0.25))
-            for iz in range(150, alt):
-                phid0 = phid00 / np.sqrt(self.T[iz])
-                self.WM[iz] = (
-                    wmH
-                    * 0.5897446
-                    * ((1.0 + self.Z[iz] / 6356.766) ** (-2))
-                    / self.T[iz]
-                    + phid0
-                )
-                self.CM[iz] = self.CM[iz] * phid0
-            self.y = self.WM[150]
-            self.WM[150] = 0
-            for iz in range(151, alt):
-                self.x = self.WM[iz - 1] + (self.y + self.WM[iz])
-                self.y = self.WM[iz]
-                self.WM[iz] = self.x
-            for iz in range(150, alt):
-                self.WM[iz] = np.exp(self.WM[iz]) * (self.T[iz] / self.T[150]) ** 0.75
-                self.CM[iz] = self.WM[iz] * self.CM[iz]
-            self.y = self.CM[150]
-            self.CM[150] = 0
-            for iz in range(151, alt):
-                self.x = self.CM[iz - 1] + 0.5 * (self.y + self.CM[iz])
-                self.y = self.CM[iz]
-                self.CM[iz] = self.x
+            self.H_correction(alt, Tinf)
+        # else:
+        #     self.H_correction(500,Tinf)
 
-            for iz in range(150, alt):
-                self.CH[iz] = (self.WM[500] / self.WM[iz]) * (
-                    H_500 - (self.CM[iz] - self.CM[500])
-                )
-
-            for iz in range(150, alt):
-                self.CM[iz] = (
-                    self.CN2[iz]
-                    + self.CO2[iz]
-                    + self.CO[iz]
-                    + self.CAr[iz]
-                    + self.CHe[iz]
-                    + self.CH[iz]
-                )
-                self.WM[iz] = (
-                    wmN2 * self.CN2[iz]
-                    + wmO2 * self.CO2[iz]
-                    + wmO * self.CO[iz]
-                    + wmAr * self.CAr[iz]
-                    + wmHe * self.CHe[iz]
-                    + wmH * self.CH[iz]
-                ) / self.CM[iz]
         return (
             self.Z,
             self.T,
@@ -323,3 +356,5 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
             self.CM,
             self.WM,
         )
+
+
