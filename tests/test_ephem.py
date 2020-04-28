@@ -105,6 +105,18 @@ def test_ephem_sample_scalar_epoch_returns_1_dimensional_coordinates(
     assert result_coordinates.ndim == 1
 
 
+def test_ephem_str_matches_expected_representation(epochs, coordinates):
+    plane = Planes.EARTH_EQUATOR
+    ephem = Ephem(coordinates, epochs, plane)
+
+    expected_str = (
+        "Ephemerides at 4 epochs "
+        "from 2020-03-01 12:00:00.000 (TDB) to 2020-03-04 12:00:00.000 (TDB)"
+    )
+
+    assert repr(ephem) == str(ephem) == expected_str
+
+
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
 def test_ephem_sample_scalar_epoch_and_coordinates_returns_exactly_same_input(
     epochs, coordinates, method
