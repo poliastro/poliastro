@@ -1,6 +1,29 @@
+"""
+Given an exospheric temperature, Jacchia77 returns model
+atmospheric altitude profiles of temperature, the number
+densities of N2, O2, O, Ar, He, H, the sum thereof, and the
+molecular weight.
+
+For altitudes of 90 km and above, we use the 1977 model of
+Jacchia [Ja77].  H-atom densities are returned as non-zero
+for altitudes of 150 km and above if the maximum altitude
+requested is 500 km or more.
+
+REFERENCES:
+
+Ja77    L. G. Jacchia, "Thermospheric Temperature, Density
+        and Composition: New Models," SAO Special Report No.
+        375 (Smithsonian Institution Astrophysical
+        Observatory, Cambridge, MA, March 15, 1977).
+
+Fortran Implementation:
+https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/jacchia/jacchia-77/
+
+"""
 import numpy as np
 from astropy import units as u
 
+# Following constants have been taken from the fortran implementation
 pi2 = 1.57079632679
 wm0 = 28.96
 wmN2 = 28.0134
@@ -21,6 +44,8 @@ R = 8314.32 * u.J / kmol / u.K
 
 
 class Jacchia77:
+    """ Holds the model for U.S Standard Atmosphere 1962."""
+
     def __init__(self):
         self.E5M = [0.0 for _ in range(11)]
         self.E6P = [0.0 for _ in range(11)]
@@ -28,12 +53,15 @@ class Jacchia77:
         self.y = 0.0
 
     def _altitude_profile(self, alt, Texo):
+        # Raise Value Error if alt < 90 or alt > 2500 km.
         if alt < 90 or alt > 2500:
-            raise NotImplementedError(
-                "Jaccchia77 has been implemented in range 90km - 2500km."
-            )
+            raise ValueError("Jacchia77 has been implemented in range 90km - 2500km.")
 
-        alt = alt + 1  # in fortran the upper limits are included. in python are not.
+        alt = int(
+            alt + 1
+        )  # in fortran the upper limits are included. in python are not.
+        Texo = int(Texo)
+
         self.Z = [0.0 for _ in range(alt)]
         self.T = [0.0 for _ in range(alt)]
         self.CN2 = [0.0 for _ in range(alt)]
@@ -49,7 +77,6 @@ class Jacchia77:
             self.Z[iz] = iz
             self.CH[iz] = 0
 
-            # For alt < 86, use U.S. Standard Atmosphere 1976.
             if iz <= 90:
                 self.T[iz] = 188
             elif Texo < 188.1:
@@ -63,9 +90,8 @@ class Jacchia77:
                         (Gx / (Tx - 188.0))
                         * (self.Z[iz] - 125.0)
                         * (
-                                1.0
-                                + 1.7
-                                * ((self.Z[iz] - 125.0) / (self.Z[iz] - 90.0)) ** 2
+                            1.0
+                            + 1.7 * ((self.Z[iz] - 125.0) / (self.Z[iz] - 90.0)) ** 2
                         )
                     )
                 else:
@@ -77,16 +103,16 @@ class Jacchia77:
             if iz <= 100:
                 self.x = iz - 90
                 self.E5M[iz - 90] = 28.89122 + self.x * (
-                        -2.83071e-2
+                    -2.83071e-2
+                    + self.x
+                    * (
+                        -6.59924e-3
                         + self.x
                         * (
-                                -6.59924e-3
-                                + self.x
-                                * (
-                                        -3.39574e-4
-                                        + self.x * (+6.19256e-5 + self.x * (-1.84796e-6))
-                                )
+                            -3.39574e-4
+                            + self.x * (+6.19256e-5 + self.x * (-1.84796e-6))
                         )
+                    )
                 )
                 if iz <= 90:
                     self.E6P[0] = 7.145e13 * self.T[90]
@@ -96,8 +122,8 @@ class Jacchia77:
                     self.E6P[iz - 90] = self.E6P[iz - 91] * np.exp(
                         -0.5897446
                         * (
-                                G1 * self.E5M[iz - 90] / self.T[iz]
-                                + G0 * self.E5M[iz - 91] / self.T[iz - 1]
+                            G1 * self.E5M[iz - 90] / self.T[iz]
+                            + G0 * self.E5M[iz - 91] / self.T[iz - 1]
                         )
                     )
 
@@ -121,7 +147,7 @@ class Jacchia77:
                 self.CO[iz] = self.CO[iz - 1] * self.y * np.exp(-wmO * self.x)
                 self.CAr[iz] = self.CAr[iz - 1] * self.y * np.exp(-wmAr * self.x)
                 self.CHe[iz] = (
-                        self.CHe[iz - 1] * (self.y ** 0.62) * np.exp(-wmHe * self.x)
+                    self.CHe[iz - 1] * (self.y ** 0.62) * np.exp(-wmHe * self.x)
                 )
                 self.CH[iz] = 0
 
@@ -144,6 +170,8 @@ class Jacchia77:
         )
 
     def _H_correction(self, alt, Texo):
+        """Calculate [H] from Jacchia 1977 formulas"""
+
         phid00 = 10.0 ** (6.9 + 28.9 * Texo ** (-0.25)) / 2.0e20
         phid00 = phid00 * 5.24e2
         H_500 = 10.0 ** (-0.06 + 28.9 * Texo ** (-0.25))
@@ -151,11 +179,7 @@ class Jacchia77:
         for iz in range(150, alt):
             phid0 = phid00 / np.sqrt(self.T[iz])
             self.WM[iz] = (
-                    wmH
-                    * 0.5897446
-                    * ((1.0 + self.Z[iz] / R0) ** (-2))
-                    / self.T[iz]
-                    + phid0
+                wmH * 0.5897446 * ((1.0 + self.Z[iz] / R0) ** (-2)) / self.T[iz] + phid0
             )
             self.CM[iz] = self.CM[iz] * phid0
 
@@ -181,69 +205,119 @@ class Jacchia77:
 
         for iz in range(150, alt):
             self.CH[iz] = (self.WM[500] / self.WM[iz]) * (
-                    H_500 - (self.CM[iz] - self.CM[500])
+                H_500 - (self.CM[iz] - self.CM[500])
             )
 
         for iz in range(150, alt):
             self.CM[iz] = (
-                    self.CN2[iz]
-                    + self.CO2[iz]
-                    + self.CO[iz]
-                    + self.CAr[iz]
-                    + self.CHe[iz]
-                    + self.CH[iz]
-            )
-            self.WM[iz] = (wmN2 * self.CN2[iz]
-                           + wmO2 * self.CO2[iz]
-                           + wmO * self.CO[iz]
-                           + wmAr * self.CAr[iz]
-                           + wmHe * self.CHe[iz]
-                           + wmH * self.CH[iz]
-                           ) / self.CM[iz]
-
-    def _O_and_O2_correction(self, alt, Texo):
-
-        # Add Jacchia 1977 empirical corrections to [O] and [O2]
-        for iz in range(90, alt):
-            self.CO2[iz] = self.CO2[iz] * (
-                    10.0 ** (-0.07 * (1.0 + np.tanh(0.18 * (self.Z[iz] - 111.0))))
-            )
-            self.CO[iz] = self.CO[iz] * (
-                    10.0 ** (-0.24 * np.exp(-0.009 * (self.Z[iz] - 97.7) ** 2))
-            )
-            self.CM[iz] = (
-                    self.CN2[iz]
-                    + self.CO2[iz]
-                    + self.CO[iz]
-                    + self.CAr[iz]
-                    + self.CHe[iz]
-                    + self.CH[iz]
+                self.CN2[iz]
+                + self.CO2[iz]
+                + self.CO[iz]
+                + self.CAr[iz]
+                + self.CHe[iz]
+                + self.CH[iz]
             )
             self.WM[iz] = (
-                                  wmN2 * self.CN2[iz]
-                                  + wmO2 * self.CO2[iz]
-                                  + wmO * self.CO[iz]
-                                  + wmAr * self.CAr[iz]
-                                  + wmHe * self.CHe[iz]
-                                  + wmH * self.CH[iz]
-                          ) / self.CM[iz]
+                wmN2 * self.CN2[iz]
+                + wmO2 * self.CO2[iz]
+                + wmO * self.CO[iz]
+                + wmAr * self.CAr[iz]
+                + wmHe * self.CHe[iz]
+                + wmH * self.CH[iz]
+            ) / self.CM[iz]
 
-    def static_profile(self, alt, Texo):
-        if 150 <= alt < 500:
-            alt_properties = self._altitude_profile(500, Texo)
+    def _O_and_O2_correction(self, alt, Texo):
+        """Add Jacchia 1977 empirical corrections to [O] and [O2]"""
+
+        for iz in range(90, alt):
+            self.CO2[iz] = self.CO2[iz] * (
+                10.0 ** (-0.07 * (1.0 + np.tanh(0.18 * (self.Z[iz] - 111.0))))
+            )
+            self.CO[iz] = self.CO[iz] * (
+                10.0 ** (-0.24 * np.exp(-0.009 * (self.Z[iz] - 97.7) ** 2))
+            )
+            self.CM[iz] = (
+                self.CN2[iz]
+                + self.CO2[iz]
+                + self.CO[iz]
+                + self.CAr[iz]
+                + self.CHe[iz]
+                + self.CH[iz]
+            )
+            self.WM[iz] = (
+                wmN2 * self.CN2[iz]
+                + wmO2 * self.CO2[iz]
+                + wmO * self.CO[iz]
+                + wmAr * self.CAr[iz]
+                + wmHe * self.CHe[iz]
+                + wmH * self.CH[iz]
+            ) / self.CM[iz]
+
+    def altitude_profile(self, alt, Texo):
+        """ Solves for atmospheric altitude profile at given altitude and exospheric temperature.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential altitude.
+        Texo: ~astropy.units.Quantity
+            Exospheric temperature
+
+        Returns
+        -------
+        altitude_profile: list
+            [altitude(Z), T, N2, O2, O, Ar, He, H, Total number density, Mean Molecular weight]
+        """
+
+        if 150 <= alt.value < 500:
+            alt_properties = self._altitude_profile(500, Texo.value)
         else:
-            alt_properties = self._altitude_profile(alt, Texo)
+            alt_properties = self._altitude_profile(alt.value, Texo.value)
 
-        return [last[alt] for last in alt_properties]
+        return [last[int(alt.value)] for last in alt_properties]
+
+    def temperature(self, alt, Texo):
+        """ Solves for temperature at given altitude and exospheric temperature.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential altitude.
+        Texo: ~astropy.units.Quantity
+            Exospheric temperature
+
+        Returns
+        -------
+        T: ~astropy.units.Quantity
+            Absolute temeperature  and exospheric temperature
+        """
+        T = self.altitude_profile(alt, Texo)[1]
+        return T
 
     def pressure(self, alt, Texo):
-        alt_profile = self.static_profile(alt, Texo)
+        """ Solves pressure at given altitude and exospheric temperature.
+
+        Parameters
+        ----------
+        alt: ~astropy.units.Quantity
+            Geometric/Geopotential altitude.
+        Texo: ~astropy.units.Quantity
+            Exospheric temperature
+
+        Returns
+        -------
+        p: ~astropy.units.Quantity
+            Pressure at given altitude  and exospheric temperature.
+        """
+        alt_profile = self.altitude_profile(alt, Texo)
         T, number_density = alt_profile[1], alt_profile[8]
+
+        # using eqn(42) of COESA76
         pressure = number_density * k * T
         return pressure
 
     def density(self, alt, Texo):
-        """ Solves density at given altitude.
+        """ Solves density at given altitude and exospheric temperature.
 
         Parameters
         ----------
@@ -255,9 +329,11 @@ class Jacchia77:
         Returns
         -------
         rho: ~astropy.units.Quantity
-            Density at given altitude.
+            Density at given altitude and exospheric temperature.
         """
-        alt_profile = self.static_profile(alt, Texo)
+        alt_profile = self.altitude_profile(alt, Texo)
         P = self.pressure(alt, Texo)
+
+        # using eqn(42) of COESA76
         rho = P * alt_profile[9] / (R * alt_profile[1])
         return rho
