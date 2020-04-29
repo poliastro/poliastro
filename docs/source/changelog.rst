@@ -1,6 +1,93 @@
 What's new
 ==========
 
+poliastro 0.14.1 - TBD
+----------------------
+
+This major release contains crucial new features and bug fixes that have
+been years in the making, and is by far the most exciting release
+in the history of the project.
+
+Highlights
+..........
+
+New features
+............
+
+* Mean elements https://github.com/poliastro/poliastro/issues/790 (https://github.com/poliastro/poliastro/pull/864)
+* New plotting methods https://github.com/poliastro/poliastro/pull/891, https://github.com/poliastro/poliastro/pull/898
+* New body palette!
+* New document https://github.com/poliastro/poliastro/issues/818 (https://github.com/poliastro/poliastro/pull/886)
+* Ephem objects! https://github.com/poliastro/poliastro/pull/882
+* Events https://github.com/poliastro/poliastro/pull/932
+* Extended atmospheric properties beyond 90 kilometers https://github.com/poliastro/poliastro/pull/899
+
+Bugs fixed
+..........
+
+* https://github.com/poliastro/poliastro/issues/829 (https://github.com/poliastro/poliastro/pull/830)
+* https://github.com/poliastro/poliastro/issues/837 (https://github.com/poliastro/poliastro/pull/838)
+* https://github.com/poliastro/poliastro/issues/841 (https://github.com/poliastro/poliastro/pull/842)
+* https://github.com/poliastro/poliastro/issues/840 (https://github.com/poliastro/poliastro/pull/845)
+* https://github.com/poliastro/poliastro/issues/817 (https://github.com/poliastro/poliastro/pull/844)
+* https://github.com/poliastro/poliastro/issues/850 (https://github.com/poliastro/poliastro/pull/851)
+* https://github.com/poliastro/poliastro/issues/852 (https://github.com/poliastro/poliastro/pull/853)
+* https://github.com/poliastro/poliastro/issues/849 (https://github.com/poliastro/poliastro/pull/855)
+* https://github.com/poliastro/poliastro/issues/862 (https://github.com/poliastro/poliastro/pull/872)
+* https://github.com/poliastro/poliastro/issues/824 (https://github.com/poliastro/poliastro/pull/877)
+* https://github.com/poliastro/poliastro/issues/859 (https://github.com/poliastro/poliastro/pull/879)
+* https://github.com/poliastro/poliastro/issues/861 (https://github.com/poliastro/poliastro/pull/867)
+* https://github.com/poliastro/poliastro/issues/892 (https://github.com/poliastro/poliastro/pull/893)
+* https://github.com/poliastro/poliastro/issues/716 (https://github.com/poliastro/poliastro/pull/903)
+* https://github.com/poliastro/poliastro/issues/902 (https://github.com/poliastro/poliastro/pull/910)
+* https://github.com/poliastro/poliastro/issues/911 (https://github.com/poliastro/poliastro/pull/912)
+* https://github.com/poliastro/poliastro/issues/916 (https://github.com/poliastro/poliastro/pull/919)
+* https://github.com/poliastro/poliastro/issues/901 (https://github.com/poliastro/poliastro/pull/926)
+* https://github.com/poliastro/poliastro/issues/726
+* https://github.com/poliastro/poliastro/issues/475 !!! (https://github.com/poliastro/poliastro/pull/908)
+* https://github.com/poliastro/poliastro/issues/907
+
+Backwards incompatible changes
+..............................
+
+* Frames moved https://github.com/poliastro/poliastro/pull/827/files
+* Renamed "kepler" to "vallado" and "mean_motion" to "farnocchia" https://github.com/poliastro/poliastro/pull/913/
+* Removed "nu_to_M" and "M_to_nu" https://github.com/poliastro/poliastro/pull/918
+* Renamed "SolarSystemBody" to "SolarSystemPlanet"
+* Removed unused coordinates module
+
+Other news
+..........
+
+* Support for Python 3.8 https://github.com/poliastro/poliastro/pull/786
+* benchmarks redirected!
+* azure pipelines https://github.com/poliastro/poliastro/issues/822 (https://github.com/poliastro/poliastro/pull/846)
+* Huge internal refactor of orbit plotters (https://github.com/poliastro/poliastro/pull/876
+* We do not ship tests anymore https://github.com/poliastro/poliastro/issues/863 (https://github.com/poliastro/poliastro/pull/878)
+
+Contributors
+............
+
+This is a complete, alphabetic list of people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Abdallah+
+* Abhishek Chaurasia+
+* Andrej Rode+
+* Greg Lindahl+
+* Ian DesJardin+
+* Jorge Martínez
+* Jos van 't Hof+
+* Juan Luis Cano Rodríguez
+* María Eugenia Cruz
+* Nanubala Gnana Sai+
+* Sarthak Jain+
+* Shreyas Bapat
+* Sundesh Gupta+
+* Syed Osama Hussain+
+* Tomek Mrugalski+
+* Priyanshu Rohilla+
+
 poliastro 0.13.1 - 2019-12-20
 -----------------------------
 
