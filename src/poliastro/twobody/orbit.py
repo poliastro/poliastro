@@ -407,7 +407,7 @@ class Orbit:
 
         warn(
             "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
-            "see https://github.com/poliastro/poliastro/issues/445 for discussion.",
+            "use Ephem.from_body instead",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -591,6 +591,13 @@ class Orbit:
             for Planets and Satellites.
 
         """
+        warn(
+            "Orbit.from_horizons is deprecated and will be removed in a future release, "
+            "use Ephem.from_horizons instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         if not epoch:
             epoch = time.Time.now()
         if plane == Planes.EARTH_EQUATOR:
@@ -1265,7 +1272,7 @@ class Orbit:
             else:
                 # For a closed orbit, instead of moving backwards
                 # we need to do another revolution
-                time_of_flight = self.period - time_of_flight
+                time_of_flight = self.period + time_of_flight
 
         return self.from_classical(
             self.attractor,

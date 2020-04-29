@@ -20,6 +20,10 @@ from .frames import Planes
 from .frames.util import get_frame
 from .warnings import TimeScaleWarning
 
+EPHEM_FORMAT = (
+    "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
+)
+
 
 class InterpolationMethods(Enum):
     """Interpolation methods to sample the ephemerides."""
@@ -169,6 +173,18 @@ class Ephem:
         self._epochs = epochs
         self._coordinates = coordinates
         self._plane = Planes(plane)
+
+    def __str__(self):
+        return EPHEM_FORMAT.format(
+            num=len(self.epochs),
+            start=self.epochs[0],
+            start_scale=self.epochs[0].scale.upper(),
+            end=self.epochs[-1],
+            end_scale=self.epochs[-1].scale.upper(),
+        )
+
+    def __repr__(self):
+        return self.__str__()
 
     @property
     def epochs(self):

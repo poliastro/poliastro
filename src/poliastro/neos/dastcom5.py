@@ -370,6 +370,7 @@ def orbit_from_record(record):
     # NOTE: It is unclear how this conversion should happen,
     # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
     if ecc < 1:
+        M = (M + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
         nu = E_to_nu(M_to_E(M, ecc), ecc)
     elif ecc == 1:
         nu = D_to_nu(M_to_D(M))
@@ -593,6 +594,6 @@ def entire_db():
     )
     df = ast_database.append(com_database, ignore_index=True)
     df[["NAME", "DESIG", "IREF"]] = df[["NAME", "DESIG", "IREF"]].apply(
-        lambda x: x.str.strip().str.decode("utf-8")
+        lambda x: x.str.decode("utf-8").str.strip()
     )
     return df
