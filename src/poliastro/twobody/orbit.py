@@ -1272,7 +1272,7 @@ class Orbit:
             else:
                 # For a closed orbit, instead of moving backwards
                 # we need to do another revolution
-                time_of_flight = self.period - time_of_flight
+                time_of_flight = self.period + time_of_flight
 
         return self.from_classical(
             self.attractor,
