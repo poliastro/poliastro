@@ -83,7 +83,7 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         Parameters
         ----------
-        body : poliastro.bodies.SolarSystemBody
+        body : poliastro.bodies.SolarSystemPlanet
             Body.
         epoch : astropy.time.Time
             Epoch of current position.
@@ -381,7 +381,7 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         Parameters
         ----------
-        body : poliastro.bodies.SolarSystemBody
+        body : poliastro.bodies.SolarSystemPlanet
             Body.
         epoch : astropy.time.Time
             Epoch of current position.

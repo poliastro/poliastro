@@ -113,7 +113,7 @@ class Body(
         return cls(parent, k, name, symbol, R, **kwargs)
 
 
-class SolarSystemBody(Body):
+class SolarSystemPlanet(Body):
     def plot(
         self,
         epoch=None,
@@ -157,7 +157,7 @@ class SolarSystemBody(Body):
             return OrbitPlotter2D(plane=plane).plot_body_orbit(self, epoch, label=label)
 
 
-Sun = SolarSystemBody(
+Sun = SolarSystemPlanet(
     parent=None,
     k=constants.GM_sun,
     name="Sun",
@@ -169,7 +169,7 @@ Sun = SolarSystemBody(
 )
 
 
-Mercury = SolarSystemBody(
+Mercury = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_mercury,
     name="Mercury",
@@ -180,7 +180,7 @@ Mercury = SolarSystemBody(
     rotational_period=constants.rotational_period_mercury,
 )
 
-Venus = SolarSystemBody(
+Venus = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_venus,
     name="Venus",
@@ -192,7 +192,7 @@ Venus = SolarSystemBody(
     J2=_q(constants.J2_venus),
     J3=_q(constants.J3_venus),
 )
-Earth = SolarSystemBody(
+Earth = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_earth,
     name="Earth",
@@ -205,7 +205,7 @@ Earth = SolarSystemBody(
     J2=_q(constants.J2_earth),
     J3=_q(constants.J3_earth),
 )
-Mars = SolarSystemBody(
+Mars = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_mars,
     name="Mars",
@@ -217,7 +217,7 @@ Mars = SolarSystemBody(
     J2=_q(constants.J2_mars),
     J3=_q(constants.J3_mars),
 )
-Jupiter = SolarSystemBody(
+Jupiter = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_jupiter,
     name="Jupiter",
@@ -228,7 +228,7 @@ Jupiter = SolarSystemBody(
     rotational_period=constants.rotational_period_jupiter,
     mass=_q(constants.M_jupiter),
 )
-Saturn = SolarSystemBody(
+Saturn = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_saturn,
     name="Saturn",
@@ -238,7 +238,7 @@ Saturn = SolarSystemBody(
     R_polar=constants.R_polar_saturn,
     rotational_period=constants.rotational_period_saturn,
 )
-Uranus = SolarSystemBody(
+Uranus = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_uranus,
     name="Uranus",
@@ -248,7 +248,7 @@ Uranus = SolarSystemBody(
     R_polar=constants.R_polar_uranus,
     rotational_period=constants.rotational_period_uranus,
 )
-Neptune = SolarSystemBody(
+Neptune = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_neptune,
     name="Neptune",

@@ -11,7 +11,7 @@ def get_mean_elements(body, epoch=J2000):
 
     Parameters
     ----------
-    body : ~poliastro.bodies.SolarSystemBody
+    body : ~poliastro.bodies.SolarSystemPlanet
         Body.
     epoch : astropy.time.Time
         Epoch.
