@@ -5,7 +5,6 @@ import pytest
 from astropy import units as u
 from astropy.coordinates.representation import CartesianRepresentation
 from astropy.time import Time
-from numba import config as numba_config
 
 from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya
