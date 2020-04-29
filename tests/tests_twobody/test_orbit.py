@@ -1017,6 +1017,21 @@ def test_from_sbdb_and_from_horizons_give_similar_results(target_name):
         )  # Maximum error of 1% (chosen arbitrarily)
 
 
+def test_propagate_to_anomaly_gives_expected_result():
+    # From "Going to Jupiter with Python using Jupyter and poliastro.ipynb"
+    ic1 = Orbit.from_vectors(
+        Sun,
+        [1.02465527e08, -1.02313505e08, -4.43533465e07] * u.km,
+        [2198705.82621226, 1897186.74383856, 822370.88977487] * u.km / u.day,
+        Time("2011-08-05 16:26:06.183", scale="tdb"),
+    )
+    ic1_end = ic1.propagate_to_anomaly(180.0 * u.deg)
+
+    assert_quantity_allclose(
+        (ic1_end.epoch - ic1.epoch).to(u.s), ic1.period / 2, rtol=1e-2
+    )
+
+
 @pytest.mark.remote_data
 def test_from_sbdb_raise_valueerror():
     with pytest.raises(ValueError) as excinfo:
