@@ -4,7 +4,7 @@ Perturbations module
 .. graphviz::
 
    digraph {
-      "poliastro.core.perturbations" -> "J2_perturbation", "J3_perturbation", "atmospheric_drag", "shadow_function", "third_body", "radiation_pressure";
+      "poliastro.core.perturbations" -> "J2_perturbation", "J3_perturbation", "atmospheric_drag_exponential", "shadow_function", "third_body", "radiation_pressure";
    }
 
 \
