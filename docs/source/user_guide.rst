@@ -35,7 +35,7 @@ position and velocity vectors we can use
     r = [-6045, -3490, 2500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
 
-    ss = Orbit.from_vectors(Earth, r, v)
+    orb = Orbit.from_vectors(Earth, r, v)
 
 And that's it! Notice a couple of things:
 
@@ -45,30 +45,21 @@ And that's it! Notice a couple of things:
 * If we display the orbit we just created, we get a string with the radius of
   pericenter, radius of apocenter, inclination, reference frame and attractor::
 
-    >>> ss
+    >>> orb
     7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)
 
 * If no time is specified, then a default value is assigned::
 
-    >>> ss.epoch
+    >>> orb.epoch
     <Time object: scale='tt' format='jyear_str' value=J2000.000>
-    >>> ss.epoch.iso
+    >>> orb.epoch.iso
     '2000-01-01 12:00:00.000'
 
 * The reference frame of the orbit will be one pseudo-inertial frame around the
   attractor. You can retrieve it using the :py:attr:`~poliastro.twobody.orbit.Orbit.frame` property:
 
-    >>> ss.get_frame()
+    >>> orb.get_frame()
     <GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
-
-.. _`International Celestial Reference System or ICRS`: http://web.archive.org/web/20170920023932/http://aa.usno.navy.mil:80/faq/docs/ICRS_doc.php
-
-.. note::
-
-  At the moment, there is no explicit way to set the reference system of an orbit. This
-  is the focus of our next releases, so we will likely introduce changes in the near
-  future. Please subscribe to `this issue <https://github.com/poliastro/poliastro/issues/257>`_
-  to receive updates in your inbox.
 
 Intermezzo: quick visualization of the orbit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,7 +72,7 @@ Intermezzo: quick visualization of the orbit
 If we're working on interactive mode (for example, using the wonderful Jupyter
 notebook) we can immediately plot the current orbit::
 
-    ss.plot()
+    orb.plot()
 
 This plot is made in the so called *perifocal frame*, which means:
 
@@ -95,11 +86,10 @@ the instantaneous Keplerian orbit at that point. This is relevant in the
 context of perturbations, when the object shall deviate from its Keplerian
 orbit.
 
-
 .. note::
 
   This visualization uses Plotly under the hood and works best in a Jupyter notebook.
-  To use the old interface based on matplotlib,
+  To use the static interface based on matplotlib,
   which might be more useful for batch jobs and publication-quality plots,
   check out the :py:class:`poliastro.plotting.static.StaticOrbitPlotter`.
 
@@ -131,25 +121,18 @@ In this case, we'd use the method
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
     
-    ss = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
+    orb = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
 Notice that whether we create an ``Orbit`` from :math:`(r)` and :math:`(v)` or from
 elements we can access many mathematical properties of the orbit::
 
-    >>> ss.period.to(u.day)
+    >>> orb.period.to(u.day)
     <Quantity 686.9713888628166 d>
-    >>> ss.v
+    >>> orb.v
     <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
 
 To see a complete list of properties, check out the
 :py:class:`poliastro.twobody.orbit.Orbit` class on the API reference.
-
-.. warning::
-
-  Due to limitations in the internal design of poliastro,
-  most orbital properties are not documented.
-  Please subscribe to `this GitHub issue <https://github.com/poliastro/poliastro/issues/435>`_
-  to receive updates about it in your inbox.
 
 Moving forward in time: propagation
 -----------------------------------
@@ -418,7 +401,7 @@ arguments the initial and final orbits and the output will be a
 internally since orbits epochs are known.
 
 For instance, this is a simplified version of the example
-`Going to Mars with Python using poliastro`_, where the orbit of the
+"Going to Mars with Python using poliastro", where the orbit of the
 Mars Science Laboratory mission (rover Curiosity) is determined:
 
 .. code-block:: python
@@ -445,9 +428,6 @@ And these are the results::
 
    Mars Science Laboratory orbit.
 
-.. _`Going to Mars with Python using poliastro`: http://nbviewer.ipython.org/github/poliastro/poliastro/blob/master/docs/source/examples/Going%20to%20Mars%20with%20Python%20using%20poliastro.ipynb
-
-
 Fetching Orbits from external sources
 -------------------------------------
 
@@ -466,22 +446,22 @@ The data is fetched using the wrappers to these services provided by `astroquery
 
 .. _`astroquery`: https://astroquery.readthedocs.io/
 
-Creating a CZML packets
------------------------
+Creating a CZML document
+------------------------
 
-Poliastro allows users to create czml packets which can then be visualized with the help of Cesium.
+We can create CZML documents which can then be visualized with the help of Cesium.
 
-:Note: This feature requires the czml3_ library which requires Python 3.6 or higher.
+.. note:: This feature requires the czml3_ library which requires Python 3.6 or higher.
 
-
-First load up the orbital data and the CZML Extractor:
+First we load the orbital data and the CZML Extractor:
 
 .. code-block:: python
 
     from poliastro.examples import molniya, iss
     from poliastro.czml.extract_czml import CZMLExtractor
 
-Specify the starting and ending epoch, as well as the number of sample points (the higher the number, the more accurate the trajectory).
+Then we specify the starting and ending epoch, as well as the number of sample points
+(the higher the number, the more accurate the trajectory):
 
 .. code-block:: python
 
@@ -494,9 +474,10 @@ Specify the starting and ending epoch, as well as the number of sample points (t
     extractor.add_orbit(molniya, label_text="Molniya")
     extractor.add_orbit(iss, label_text="ISS")
 
-You can find the generated CZML file by calling ``extractor.packets``. After copying the CZML document contents, follow the directions  here_ to run the application.
+We can find the generated CZML file by calling ``extractor.packets``.
+There is more information in `this sample Cesium application`_.
 
 .. _`czml3`: https://github.com/poliastro/czml3
-.. _`here`: https://github.com/poliastro/cesium-app/blob/master/README.md
+.. _`this sample Cesium application`: https://github.com/poliastro/cesium-app/blob/master/README.md
 
 *Per Python ad astra* ;)
