@@ -191,7 +191,9 @@ def test_atmospheric_drag_exponential():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100 * u.kg  # km^2/kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
+        u.km ** 2 / u.kg
+    )  # km^2/kg
     B = C_D * A_over_m
 
     # parameters of the atmosphere
@@ -232,7 +234,9 @@ def test_atmospheric_demise():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100 * u.kg  # km^2/kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
+        u.km ** 2 / u.kg
+    )  # km^2/kg
 
     # parameters of the atmosphere
     rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
@@ -273,7 +277,9 @@ def test_atmospheric_demise_coesa76():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100 * u.kg  # km^2/kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
+        u.km ** 2 / u.kg
+    )  # km^2/kg
 
     tofs = [365] * u.d
 
