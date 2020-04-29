@@ -3,6 +3,8 @@ import sys
 # TODO: Should we have way to handle this configuration without importing numba?
 import pytest
 from astropy import units as u
+from astropy.coordinates.representation import CartesianRepresentation
+from astropy.time import Time
 
 from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya
@@ -319,6 +321,123 @@ def test_czml_add_orbit():
         molniya, rtol=1e-4, label_text="Molniya", label_fill_color=[125, 80, 120, 255]
     )
     extractor.add_orbit(iss, rtol=1e-4, label_text="ISS", path_show=False)
+
+    assert repr(extractor.packets) == expected_doc
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_add_trajectory():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+    color = [255, 255, 0]
+
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
+    epochs = Time(time, format="isot")
+
+    expected_doc = """[{
+    "id": "document",
+    "version": "1.0",
+    "name": "document_packet",
+    "clock": {
+        "interval": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
+        "currentTime": "2013-03-18T12:00:00Z",
+        "multiplier": 60,
+        "range": "LOOP_STOP",
+        "step": "SYSTEM_CLOCK_MULTIPLIER"
+    }
+}, {
+    "id": "custom_properties",
+    "properties": {
+        "custom_attractor": true,
+        "ellipsoid": [
+            {
+                "array": [
+                    6378136.6,
+                    6378136.6,
+                    6356751.9
+                ]
+            }
+        ],
+        "map_url": [
+            "https://upload.wikimedia.org/wikipedia/commons/c/c4/Earthmap1000x500compac.jpg"
+        ],
+        "scene3D": true
+    }
+}, {
+    "id": 0,
+    "availability": "2013-03-18T12:00:00Z/2013-03-18T23:59:35Z",
+    "position": {
+        "epoch": "2013-03-18T12:00:00Z",
+        "interpolationAlgorithm": "LAGRANGE",
+        "interpolationDegree": 5,
+        "referenceFrame": "INERTIAL",
+        "cartesian": [
+            0.0,
+            1.0,
+            4.0,
+            7.0,
+            30.0,
+            2.0,
+            5.0,
+            8.0,
+            60.0,
+            3.0,
+            6.0,
+            9.0
+        ]
+    },
+    "billboard": {
+        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=",
+        "show": true
+    },
+    "label": {
+        "text": "Test",
+        "font": "11pt Lucida Console",
+        "style": "FILL",
+        "fillColor": {
+            "rgba": [
+                255,
+                255,
+                0,
+                255
+            ]
+        },
+        "outlineColor": {
+            "rgba": [
+                255,
+                255,
+                0,
+                255
+            ]
+        },
+        "outlineWidth": 1.0
+    },
+    "path": {
+        "resolution": 120,
+        "material": {
+            "solidColor": {
+                "color": {
+                    "rgba": [
+                        255,
+                        255,
+                        0,
+                        255
+                    ]
+                }
+            }
+        }
+    }
+}]"""
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    extractor.add_trajectory(positions, epochs, label_text="Test", path_color=color)
 
     assert repr(extractor.packets) == expected_doc
 
