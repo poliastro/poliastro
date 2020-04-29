@@ -202,7 +202,7 @@ def shadow_function(r_sat, r_sun, R):
     return theta < theta_1 + theta_2
 
 
-def third_body(t0, state, k, k_third, third_body):
+def third_body(t0, state, k, k_third, perturbation_body):
     r"""Calculates 3rd body acceleration (km/s2)
 
     .. math::
@@ -217,8 +217,7 @@ def third_body(t0, state, k, k_third, third_body):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         gravitational constant, (km^3/s^2)
-    third_body: a callable object returning the position of 3rd body
-        third body that causes the perturbation
+    perturbation_body: a callable object returning the position of the pertubation body that causes the perturbation
 
     Note
     ----
@@ -227,7 +226,7 @@ def third_body(t0, state, k, k_third, third_body):
 
     """
 
-    body_r = third_body(t0)
+    body_r = perturbation_body(t0)
     delta_r = body_r - state[:3]
     return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
 
