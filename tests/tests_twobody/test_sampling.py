@@ -43,7 +43,7 @@ def test_sample_closed_is_always_between_minus_pi_and_pi(min_nu, ecc, max_nu):
 def test_sample_closed_starts_at_min_anomaly_if_in_range(min_nu, ecc, max_nu):
     result = sample_closed(min_nu, ecc, max_nu)
 
-    assert_quantity_allclose(result[0], min_nu)
+    assert_quantity_allclose(result[0], min_nu, atol=1e-15 * u.rad)
 
 
 @settings(deadline=None)
