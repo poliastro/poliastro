@@ -1,4 +1,5 @@
 import numpy as np
+from astropy import units as u
 
 pi2 = 1.57079632679
 wm0 = 28.96
@@ -12,6 +13,9 @@ qN2 = 0.78110
 qO2 = 0.20955
 qAr = 0.009343
 qHe = 0.000005242
+R = 8314.32 #* u.J / u.kg / u.K
+k = 1.380622e-23
+# Na = 6.022169e-26 / u.kmol
 
 
 class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
@@ -40,12 +44,13 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
         self.CM = [0.0 for _ in range(alt)]
         self.WM = [0.0 for _ in range(alt)]
 
-        for iz in range(alt):
+        for iz in range(90, alt):
             self.Z[iz] = iz
             self.CH[iz] = 0
 
             # For alt < 86, use U.S. Standard Atmosphere 1976 with added [O].
-            if iz <= 85:
+            if iz < 90:
+                print("abhi")
                 self.h = self.Z[iz] * 6369.0 / (self.Z[iz] + 6369.0)
                 if iz <= 32:
                     if iz <= 11:
@@ -218,7 +223,7 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
         # else:
         return self.goto500(alt, Tinf)
 
-    def jprop(self, alt, Tinf):
+    def static_profile(self, alt, Tinf):
         if 150 <= alt < 500:
             alt_properties = self.properties(500, Tinf)
         else:
@@ -341,8 +346,6 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
         # Calculate [H] from Jacchia 1997 formulas if alt > 500.
         if alt >= 500:
             self.H_correction(alt, Tinf)
-        # else:
-        #     self.H_correction(500,Tinf)
 
         return (
             self.Z,
@@ -356,5 +359,22 @@ class Jacchia77:  # , Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
             self.CM,
             self.WM,
         )
+
+    def pressure(self, alt, Tinf):
+        alt_profile = self.static_profile(alt, Tinf)
+        T, number_density = alt_profile[1], alt_profile[8]
+        pressure = number_density * k * T
+        return pressure#, np.log10(pressure)
+
+    def density(self, alt, Tinf):
+        alt_profile = self.static_profile(alt, Tinf)
+        P = self.pressure(alt, Tinf)
+        rho = P * alt_profile[9] / (R * alt_profile[1])
+        return rho, np.log10(rho)
+
+
+
+
+
 
 
