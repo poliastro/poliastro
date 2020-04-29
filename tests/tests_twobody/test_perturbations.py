@@ -191,7 +191,7 @@ def test_atmospheric_drag_exponential():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100  # km^2/kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100 * u.kg  # km^2/kg
     B = C_D * A_over_m
 
     # parameters of the atmosphere
@@ -232,7 +232,7 @@ def test_atmospheric_demise():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100  # km^2/kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100 * u.kg  # km^2/kg
 
     # parameters of the atmosphere
     rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
@@ -273,7 +273,7 @@ def test_atmospheric_demise_coesa76():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100  # km^2/kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100 * u.kg  # km^2/kg
 
     tofs = [365] * u.d
 
@@ -490,7 +490,7 @@ def test_3rd_body_Curtis(test_params):
             rtol=1e-10,
             ad=third_body,
             k_third=body.k.to(u.km ** 3 / u.s ** 2).value,
-            third_body=body_r,
+            perturbation_body=body_r,
         )
 
         incs, raans, argps = [], [], []
