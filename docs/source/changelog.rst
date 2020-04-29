@@ -193,7 +193,7 @@ Again we had an all-time high number of contributors, thanks everybody ❤️
 * Siro Moreno+
 * Sky+
 * Vedang Naik+
-* Wil Selwood
+* Emily Selwood
 
 poliastro 0.12.0 - 2019-02-21
 -----------------------------
@@ -434,7 +434,7 @@ This is the complete list of the people that contributed to this release, with a
 * Nikita Astrakhantsev
 * Shreyas Bapat
 * Daniel Lubián+
-* Wil Selwood+
+* Emily Selwood+
 
 poliastro 0.10.0 - 2018-07-21
 -----------------------------
