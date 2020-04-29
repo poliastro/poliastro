@@ -346,26 +346,27 @@ Which produces this beautiful plot:
 Where are the planets? Computing ephemerides
 --------------------------------------------
 
-.. versionadded:: 0.3.0
+.. versionadded:: 0.14.0
 
-Thanks to Astropy and jplephem, poliastro can now read Satellite
+Thanks to Astropy and jplephem, poliastro can read Satellite
 Planet Kernel (SPK) files, part of NASA's SPICE toolkit. This means that
 we can query the position and velocity of the planets of the Solar System.
 
-The method :py:meth:`~poliastro.twobody.orbit.Orbit.get_body_ephem` will return
+The :py:class:`poliastro.twobody.ephem.Ephem` class allows us to retrieve
 a planetary orbit using low precision ephemerides available in
 Astropy and an :py:mod:`astropy.time.Time`:
 
 .. code-block:: python
 
     from astropy import time
-    epoch = time.Time("2015-05-09 10:43")  # UTC by default
+    epoch = time.Time("2020-04-29 10:43")  # UTC by default
 
-And finally, retrieve the planet orbit::
+And finally, retrieve the planet ephemerides::
 
-    >>> from poliastro import ephem
-    >>> Orbit.from_body_ephem(Earth, epoch)
-    1 x 1 AU x 23.4 deg (ICRS) orbit around Sun (☉)
+    >>> from poliastro.ephem import Ephem
+    >>> earth = Ephem.from_body(Earth, epoch.tdb)
+    >>> earth
+    Ephemerides at 1 epochs from 2020-04-29 10:44:09.186 (TDB) to 2020-04-29 10:44:09.186 (TDB)
 
 This does not require any external download. If on the other hand we want
 to use higher precision ephemerides, we can tell Astropy to do so::
@@ -379,11 +380,22 @@ This in turn will download the ephemerides files from NASA and use them
 for future computations. For more information, check out
 `Astropy documentation on ephemerides`_.
 
-.. _Astropy documentation on ephemerides: http://docs.astropy.org/en/v2.0.4/coordinates/solarsystem.html
+.. _Astropy documentation on ephemerides: https://docs.astropy.org/en/stable/coordinates/solarsystem.html
 
-.. note:: The position and velocity vectors are given with respect to the
-    Solar System Barycenter in the **International Celestial Reference Frame**
-    (ICRF), which means approximately equatorial coordinates.
+.. warning::
+
+    This is the preferred method over :py:meth:`poliastro.twobody.orbit.Orbit.from_body_ephem`,
+    which is now deprecated and will be removed in the next release.
+
+If we want to retrieve the **osculating orbit** at a given epoch,
+we can do so using :py:meth:`~poliastro.twobody.Orbit.from_ephem`::
+
+    >>> Orbit.from_ephem(Sun, earth, epoch)
+    1 x 1 AU x 23.4 deg (HCRS) orbit around Sun (☉) at epoch 2020-04-29 10:43:00.000 (UTC)
+
+.. note:: Notice that the position and velocity vectors are given with respect to the
+    **Heliocentric Celestial Reference System** (HCRS)
+    which means equatorial coordinates centered on the Sun.
 
 Traveling through space: solving the Lambert problem
 ----------------------------------------------------
@@ -414,8 +426,8 @@ Mars Science Laboratory mission (rover Curiosity) is determined:
     date_launch = time.Time('2011-11-26 15:02', scale='utc')
     date_arrival = time.Time('2012-08-06 05:17', scale='utc')
 
-    ss0 = Orbit.from_body_ephem(Earth, date_launch)
-    ssf = Orbit.from_body_ephem(Mars, date_arrival)
+    ss0 = Orbit.from_ephem(Sun, Ephem.from_body(Earth, date_launch), date_launch)
+    ssf = Orbit.from_ephem(Sun, Ephem.from_body(Mars, date_arrival), date_arrival)
 
     man_lambert = Maneuver.lambert(ss0, ssf)
     dv_a, dv_b = man_lambert.impulses
@@ -439,23 +451,18 @@ And these are the results::
 Fetching Orbits from external sources
 -------------------------------------
 
-As of now, poliastro supports fetching orbits from 2 online databases from Jet Propulsion Laboratory,
+As of now, poliastro supports fetching orbits from 2 online databases from Jet Propulsion Laboratory:
 SBDB and Horizons.
 
-JPL Horizons can be used to generate ephemerides for solar-system bodies. And JPL SBDB (Small-Body Database Browser)
-provides data for all known asteroids and many comets.
+JPL Horizons can be used to generate ephemerides for solar-system bodies,
+while JPL SBDB (Small-Body Database Browser) provides model orbits for all known asteroids and many comets.
 
-The data is fetched using the wrappers to these services provided by `astroquery`_ .
+The data is fetched using the wrappers to these services provided by `astroquery`_.
 
 .. code-block:: python
 
-    from poliastro.twobody import Orbit
-
-    Orbit.from_horizons('Ceres')
-
-    Orbit.from_sbdb('apophis')
-
-And both of them will return :py:obj:`poliastro.twobody.Orbit` objects!
+    Ephem.from_horizons("Ceres")
+    Orbit.from_sbdb("Apophis")
 
 .. _`astroquery`: https://astroquery.readthedocs.io/
 
