@@ -82,7 +82,7 @@ def J3_perturbation(t0, state, k, J3, R):
 
 
 @jit
-def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
+def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
     r"""Calculates atmospheric drag acceleration (km/s2)
 
     .. math::
@@ -104,10 +104,8 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
         radius of the attractor (km)
     C_D: float
         dimensionless drag coefficient ()
-    A: float
-        frontal area of the spacecraft (km^2)
-    m: float
-        mass of the spacecraft (kg)
+    A_over_m: float
+        frontal area/mass of the spacecraft (km^2/kg)
     H0 : float
         atmospheric scale height, (km)
     rho0: float
@@ -125,13 +123,13 @@ def atmospheric_drag(t0, state, k, R, C_D, A, m, H0, rho0):
 
     v_vec = state[3:]
     v = norm(v_vec)
-    B = C_D * A / m
+    B = C_D * A_over_m
     rho = rho0 * np.exp(-(H - R) / H0)
 
     return -(1.0 / 2.0) * rho * B * v * v_vec
 
 
-def atmospheric_drag_model(t0, state, k, R, C_D, A, m, model):
+def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
     r"""Calculates atmospheric drag acceleration (km/s2)
 
     .. math::
@@ -153,10 +151,8 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A, m, model):
         radius of the attractor (km)
     C_D: float
         dimensionless drag coefficient ()
-    A: float
-        frontal area of the spacecraft (km^2)
-    m: float
-        mass of the spacecraft (kg)
+    A_over_m: float
+        frontal area/mass of the spacecraft (km^2/kg)
     model: a callable model from poliastro.atmosphere
 
     Note
@@ -169,7 +165,7 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A, m, model):
 
     v_vec = state[3:]
     v = norm(v_vec)
-    B = C_D * A / m
+    B = C_D * A_over_m
 
     if H < R:
         # the model doesn't want to see a negative altitude
@@ -236,7 +232,7 @@ def third_body(t0, state, k, k_third, third_body):
     return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
 
 
-def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
+def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
     r"""Calculates radiation pressure acceleration (km/s2)
 
     .. math::
@@ -255,10 +251,8 @@ def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
         radius of the attractor
     C_R: float
         dimensionless radiation pressure coefficient, 1 < C_R < 2 ()
-    A: float
-        effective spacecraft area (km^2)
-    m: float
-        mass of the spacecraft (kg)
+    A_over_m: float
+        effective spacecraft area/mass of the spacecraft (km^2/kg)
     Wdivc_s : float
         total star emitted power divided by the speed of light (W * s / km)
     star: a callable object returning the position of star in attractor frame
@@ -276,4 +270,4 @@ def radiation_pressure(t0, state, k, R, C_R, A, m, Wdivc_s, star):
     P_s = Wdivc_s / (norm(r_star) ** 2)
 
     nu = float(shadow_function(r_sat, r_star, R))
-    return -nu * P_s * (C_R * A / m) * r_star / norm(r_star)
+    return -nu * P_s * (C_R * A_over_m) * r_star / norm(r_star)

@@ -15,7 +15,7 @@ from poliastro.core.elements import rv2coe
 from poliastro.core.perturbations import (
     J2_perturbation,
     J3_perturbation,
-    atmospheric_drag,
+    atmospheric_drag_exponential,
     atmospheric_drag_model,
     radiation_pressure,
     third_body,
@@ -177,7 +177,7 @@ def test_J3_propagation_Earth(test_params):
 
 
 @pytest.mark.slow
-def test_atmospheric_drag():
+def test_atmospheric_drag_exponential():
     # http://farside.ph.utexas.edu/teaching/celestial/Celestialhtml/node94.html#sair (10.148)
     # given the expression for \dot{r} / r, aproximate \Delta r \approx F_r * \Delta t
 
@@ -191,9 +191,8 @@ def test_atmospheric_drag():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value  # km^2
-    m = 100  # kg
-    B = C_D * A / m
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100  # km^2/kg
+    B = C_D * A_over_m
 
     # parameters of the atmosphere
     rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
@@ -210,11 +209,10 @@ def test_atmospheric_drag():
         orbit.r,
         orbit.v,
         [tof] * u.s,
-        ad=atmospheric_drag,
+        ad=atmospheric_drag_exponential,
         R=R,
         C_D=C_D,
-        A=A,
-        m=m,
+        A_over_m=A_over_m,
         H0=H0,
         rho0=rho0,
     )
@@ -234,8 +232,7 @@ def test_atmospheric_demise():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value  # km^2
-    m = 100  # kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100  # km^2/kg
 
     # parameters of the atmosphere
     rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
@@ -251,11 +248,10 @@ def test_atmospheric_demise():
         orbit.r,
         orbit.v,
         tofs,
-        ad=atmospheric_drag,
+        ad=atmospheric_drag_exponential,
         R=R,
         C_D=C_D,
-        A=A,
-        m=m,
+        A_over_m=A_over_m,
         H0=H0,
         rho0=rho0,
         events=events,
@@ -277,8 +273,7 @@ def test_atmospheric_demise_coesa76():
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value  # km^2
-    m = 100  # kg
+    A_over_m = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2).value / 100  # km^2/kg
 
     tofs = [365] * u.d
 
@@ -295,8 +290,7 @@ def test_atmospheric_demise_coesa76():
         ad=atmospheric_drag_model,
         R=R,
         C_D=C_D,
-        A=A,
-        m=m,
+        A_over_m=A_over_m,
         model=coesa76,
         events=events,
     )
@@ -580,8 +574,7 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
             ad=radiation_pressure,
             R=Earth.R.to(u.km).value,
             C_R=2.0,
-            A=2e-4,
-            m=100,
+            A_over_m=2e-4 / 100,
             Wdivc_s=Wdivc_sun.value,
             star=sun_normalized,
         )
