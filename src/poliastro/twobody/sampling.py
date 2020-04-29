@@ -1,3 +1,4 @@
+import numpy as np
 from astropy import units as u
 
 from ..util import alinspace
@@ -34,4 +35,5 @@ def sample_closed(min_nu, ecc, max_nu=None, num_values=100):
     # It will do the right thing
     nu_values = E_to_nu(E_values, ecc)
 
-    return nu_values
+    # We wrap the angles on return
+    return (nu_values + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
