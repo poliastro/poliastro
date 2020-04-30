@@ -6,7 +6,7 @@ from ._jit import jit
 
 
 @jit
-def J2_perturbation(t0, state, k, J2, R):
+def J2_perturbation(t0, state, k, *, J2, R):
     r"""Calculates J2_perturbation acceleration (km/s2)
 
     .. math::
@@ -46,7 +46,7 @@ def J2_perturbation(t0, state, k, J2, R):
 
 
 @jit
-def J3_perturbation(t0, state, k, J3, R):
+def J3_perturbation(t0, state, k, *, J3, R):
     r"""Calculates J3_perturbation acceleration (km/s2)
 
     Parameters
@@ -82,7 +82,7 @@ def J3_perturbation(t0, state, k, J3, R):
 
 
 @jit
-def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
+def atmospheric_drag_exponential(t0, state, k, *, R, C_D, A_over_m, H0, rho0):
     r"""Calculates atmospheric drag acceleration (km/s2)
 
     .. math::
@@ -129,7 +129,7 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
     return -(1.0 / 2.0) * rho * B * v * v_vec
 
 
-def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
+def atmospheric_drag_model(t0, state, k, *, R, C_D, A_over_m, model):
     r"""Calculates atmospheric drag acceleration (km/s2)
 
     .. math::
@@ -202,7 +202,7 @@ def shadow_function(r_sat, r_sun, R):
     return theta < theta_1 + theta_2
 
 
-def third_body(t0, state, k, k_third, perturbation_body):
+def third_body(t0, state, k, *, k_third, perturbation_body):
     r"""Calculates 3rd body acceleration (km/s2)
 
     .. math::
@@ -231,7 +231,7 @@ def third_body(t0, state, k, k_third, perturbation_body):
     return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
 
 
-def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
+def radiation_pressure(t0, state, k, *, R, C_R, A_over_m, Wdivc_s, star):
     r"""Calculates radiation pressure acceleration (km/s2)
 
     .. math::
