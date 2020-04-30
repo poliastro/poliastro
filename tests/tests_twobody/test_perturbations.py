@@ -228,7 +228,7 @@ def test_atmospheric_demise():
     R = Earth.R.to(u.km).value
 
     orbit = Orbit.circular(Earth, 230 * u.km)
-    t_decay = 48.2179 * u.d
+    t_decay = 48.2179 * u.d  # not an analytic value
 
     # parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
@@ -259,8 +259,28 @@ def test_atmospheric_demise():
 
     assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
 
-    # last_t is not an analytic value
     assert_quantity_allclose(lithobrake_event.last_t, t_decay, rtol=1e-2)
+
+    # make sure having the event not firing is ok
+    tofs = [1] * u.d
+    lithobrake_event = LithobrakeEvent(R)
+    events = [lithobrake_event]
+
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        ad=atmospheric_drag_exponential,
+        R=R,
+        C_D=C_D,
+        A_over_m=A_over_m,
+        H0=H0,
+        rho0=rho0,
+        events=events,
+    )
+
+    assert lithobrake_event.last_t == tofs[-1]
 
 
 @pytest.mark.slow

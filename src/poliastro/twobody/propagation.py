@@ -110,7 +110,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, ad=None, **ad_kwargs):
     if not result.success:
         raise RuntimeError("Integration failed")
 
-    t_end = min(result.t_events[0]) if result.t_events else None
+    t_end = min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
 
     rrs = []
     vvs = []
