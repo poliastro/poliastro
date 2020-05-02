@@ -490,7 +490,7 @@ class CZMLExtractor:
         label_show=None,
     ):
         """
-        Adds trajectory
+        Adds trajectory.
 
         Parameters
         ----------
@@ -606,4 +606,5 @@ class CZMLExtractor:
         self.i += 1
 
     def get_document(self):
+        """Retrieves CZML document."""
         return Document(self.packets)
