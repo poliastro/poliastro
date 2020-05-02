@@ -198,15 +198,15 @@ class Ephem:
 
     @classmethod
     def from_body(cls, body, epochs, *, attractor=None, plane=Planes.EARTH_EQUATOR):
-        """Return `Ephem` for a `SolarSystemBody` at certain epochs.
+        """Return `Ephem` for a `SolarSystemPlanet` at certain epochs.
 
         Parameters
         ----------
-        body: ~poliastro.bodies.SolarSystemBody
+        body: ~poliastro.bodies.SolarSystemPlanet
             Body.
         epochs: ~astropy.time.Time
             Epochs to sample the body positions.
-        attractor : ~poliastro.bodies.SolarSystemBody, optional
+        attractor : ~poliastro.bodies.SolarSystemPlanet, optional
             Body to use as central location,
             if not given the Solar System Barycenter will be used.
         plane : ~poliastro.frames.Planes, optional
@@ -257,7 +257,7 @@ class Ephem:
             Name of the body to query for.
         epochs: ~astropy.time.Time
             Epochs to sample the body positions.
-        attractor : ~poliastro.bodies.SolarSystemBody, optional
+        attractor : ~poliastro.bodies.SolarSystemPlanet, optional
             Body to use as central location,
             if not given the Solar System Barycenter will be used.
         plane : ~poliastro.frames.Planes, optional

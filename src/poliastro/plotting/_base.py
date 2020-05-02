@@ -250,7 +250,7 @@ class BaseOrbitPlotter:
 
         Parameters
         ----------
-        body : poliastro.bodies.SolarSystemBody
+        body : poliastro.bodies.SolarSystemPlanet
             Body.
         epoch : astropy.time.Time
             Epoch of current position.
@@ -347,7 +347,7 @@ class Mixin2D:
 
         Parameters
         ----------
-        body : poliastro.bodies.SolarSystemBody
+        body : poliastro.bodies.SolarSystemPlanet
             Body.
         epoch : astropy.time.Time, optional
             Epoch of current position.

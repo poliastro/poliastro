@@ -9,7 +9,7 @@ from poliastro.bodies import (
     Mercury,
     Neptune,
     Saturn,
-    SolarSystemBody,
+    SolarSystemPlanet,
     Sun,
     Uranus,
     Venus,
@@ -54,7 +54,7 @@ _FRAME_MAPPING = {
     Saturn: {Planes.EARTH_EQUATOR: SaturnICRS, Planes.BODY_FIXED: SaturnFixed},
     Uranus: {Planes.EARTH_EQUATOR: UranusICRS, Planes.BODY_FIXED: UranusFixed},
     Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS, Planes.BODY_FIXED: NeptuneFixed},
-}  # type: Dict[SolarSystemBody, Dict[Planes, FrameMeta]]
+}  # type: Dict[SolarSystemPlanet, Dict[Planes, FrameMeta]]
 
 
 def get_frame(attractor, plane, obstime=J2000):

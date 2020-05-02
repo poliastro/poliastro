@@ -1,6 +1,168 @@
 What's new
 ==========
 
+poliastro 0.14.1 - TBD
+----------------------
+
+This major release contains crucial new features and bug fixes that have
+been years in the making, and is by far the most exciting release
+in the history of the project.
+
+Highlights
+..........
+
+* **New API to retrieve ephemerides**: After a lot of iteration we introduced
+  a new object, :py:class:`poliastro.ephem.Ephem`, to retrieve and represent
+  **ephemerides**, as opposed to osculating orbits. Besides, we added convenience
+  methods to plot them so they can be combined with
+  :py:class:`~poliastro.twobody.orbit.Orbit` objects.
+* **Simple API to retrieve mean elements of Solar System planets**: There are
+  many use cases for approximate, mean Keplerian elements for planet orbits:
+  computing Spheres of Influence, designing specialized orbits... We introduced
+  a new function :py:meth:`poliastro.twobody.mean_elements.get_mean_elements`
+  that makes it way easier.
+* **Avoid mixing ephemerides and osculating orbits**: The ``Orbit.from_body_ephem``
+  method was very convenient and it was used everywhere
+  in poliastro examples because it was the simplest way to plot and analyze
+  the orbits of the planets. However, it introduced a lot of confusion about the
+  nature of osculating orbits and planetary ephemerides. With the introduction of
+  :py:class:`~poliastro.ephem.Ephem` objects and
+  :py:meth:`~poliastro.twobody.mean_elements.get_mean_elements`, this convenience
+  method is no longer necessary, we removed almost all references to it
+  (both in source code and examples) and we will remove it in the next release.
+* **Robust propagation in all eccentricity regimes**: Two years ago we started
+  working on improving our propagators for near parabolic orbits, which occur
+  naturally when studying comets and reentry trajectories. Unfortunately, there were
+  still problems we could not identify and we tried to compensate by adding
+  other propagation algorithms, but none of them worked correctly in all
+  eccentricity regimes. With a big effort and a few sleepless nights
+  we finally fixed the implementation of our default propagator
+  :py:meth:`poliastro.twobody.propagation.farnocchia`, and is now working
+  correctly for very extreme cases and long term propagations. Give it a try!
+* **New color palette**: We introduced a new color palette to improve the
+  appearance of plots that include the orbits of the planets of the Solar System.
+  We hope you love it as much as we do!
+
+.. image:: _static/solar_system.png
+   :align: center
+
+New features
+............
+
+* **New plotting methods**: Check out
+  :py:meth:`~poliastro.plotting.static.StaticOrbitPlotter.plot_body_orbit` and
+  :py:meth:`~poliastro.plotting.static.StaticOrbitPlotter.plot_ephem`,
+  available in all orbit plotter classes (both static and interactive).
+* **New CZML methods**: Simple API to retrieve the document
+  :py:meth:`poliastro.czml.extract_czml.CZMLExtractor.get_document` and method to add
+  trajectories :py:meth:`~poliastro.czml.extract_czml.CZMLExtractor.add_trajectory`
+* **Propagation events**: We added basic support for event detection when propagation
+  with the Cowell method and created a :py:class:`~poliastro.twobody.events.LithobrakeEvent`
+  that detects impact with the surface of an attractor. We will be adding more events
+  in the future.
+* **Extended atmospheric properties beyond 90 kilometers**: We completed the
+  implementation of our atmospheric models,
+  :py:class:`poliastro.atmosphere.coesa62.COESA62` and
+  :py:class:`~poliastro.atmosphere.coesa76.COESA76`, to compute physical properties
+  beyond 90 kilometers, and tested them up to approximately 700 kilometers.
+
+Bugs fixed
+..........
+
+* `Issue #475`_: 🎉 Propagator mean_motion hangs for some r, v vectors around Earth
+  (see the gory details at the `Farnocchia propagator pull request`_)
+* `Issue #716`_: Prevent Orbit creation with non scalar quantities
+* `Issue #726`_: Strange behaviour when plotting some orbits
+* `Issue #817`_: CZML extractor: timezone issues (clock.Interval and currentTime not tz-aware)
+* `Issue #824`_: Properly plot orbits in different planes
+* `Issue #829`_: Long standing typo in equinoctial elements documentation
+* `Issue #837`_: Fix :py:const:`R_polar_jupiter` value
+* `Issue #840`_: vallado.lambert fails for long way transfers
+* `Issue #841`_: RAAN from LTAN calculation off by 180 degrees
+* `Issue #849`_: Changed ss.frame to ss.get_frame in documentation
+* `Issue #850`_: Duplicated sphinx extension
+* `Issue #859`_: Fix Binder
+* `Issue #861`_: Make from_sbdb tests more robust against external changes
+* `Issue #862`_: CZML tests failing locally because of non-UTC timezones
+* `Issue #892`_: Error in porkchop docstrings
+* `Issue #901`_: Fix sampling logic for closed orbits
+* `Issue #902`_: Error while reading Halley's comet from DASTCOM5
+* `Issue #907`_: Orbit.propagate_to_anomaly freezes
+* `Issue #911`_: CZMLExtractor has no API documentation
+* `Issue #916`_: Orbit.from_sbdb raises unhelpful error if no object was found
+
+.. _`Issue #475`: https://github.com/poliastro/poliastro/issues/475
+.. _`Farnocchia propagator pull request`: https://github.com/poliastro/poliastro/pull/908
+.. _`Issue #716`: https://github.com/poliastro/poliastro/issues/716
+.. _`Issue #726`: https://github.com/poliastro/poliastro/issues/726
+.. _`Issue #817`: https://github.com/poliastro/poliastro/issues/817
+.. _`Issue #824`: https://github.com/poliastro/poliastro/issues/824
+.. _`Issue #829`: https://github.com/poliastro/poliastro/issues/829
+.. _`Issue #837`: https://github.com/poliastro/poliastro/issues/837
+.. _`Issue #840`: https://github.com/poliastro/poliastro/issues/840
+.. _`Issue #841`: https://github.com/poliastro/poliastro/issues/841
+.. _`Issue #849`: https://github.com/poliastro/poliastro/issues/849
+.. _`Issue #850`: https://github.com/poliastro/poliastro/issues/850
+.. _`Issue #859`: https://github.com/poliastro/poliastro/issues/859
+.. _`Issue #861`: https://github.com/poliastro/poliastro/issues/861
+.. _`Issue #862`: https://github.com/poliastro/poliastro/issues/862
+.. _`Issue #892`: https://github.com/poliastro/poliastro/issues/892
+.. _`Issue #901`: https://github.com/poliastro/poliastro/issues/901
+.. _`Issue #902`: https://github.com/poliastro/poliastro/issues/902
+.. _`Issue #907`: https://github.com/poliastro/poliastro/issues/907
+.. _`Issue #911`: https://github.com/poliastro/poliastro/issues/911
+.. _`Issue #916`: https://github.com/poliastro/poliastro/issues/916
+
+Backwards incompatible changes
+..............................
+
+* poliastro :ref:`frames`  now must be imported from the specific submodule.
+* Renamed ``kepler`` to :py:meth:`poliastro.twobody.propagation.vallado`
+  and ``mean_motion`` to :py:meth:`poliastro.twobody.propagation.farnocchia`.
+* Removed ``nu_to_M`` and ``M_to_nu`` functions, see the
+  `Farnocchia propagator pull request`_ for discussion. We recommend users to
+  use the mean anomaly only for elliptic orbits using
+  :py:meth:`~poliastro.twobody.angles.E_to_M`, :py:meth:`~poliastro.twobody.angles.nu_to_E`
+  and the converse functions.
+* Renamed ``SolarSystemBody`` to :py:class:`poliastro.bodies.SolarSystemPlanet`.
+* Removed unused ``poliastro.coordinates`` module.
+
+Other news
+..........
+
+* Support for Python 3.8! The next release will add support for Python 3.9
+  and remove support for 3.6, following `NEP 29`_.
+* `Benchmarks <https://benchmarks.poliastro.space/>`_ moved to a new location!
+* Switched to Azure Pipelines, so we are again testing in all operative systems.
+* `Huge internal refactor of orbit plotters <https://github.com/poliastro/poliastro/pull/876>`_.
+* We do not ship tests anymore! To run the tests, you will now need to
+  `clone poliastro repository <https://github.com/poliastro/poliastro/>`_.
+
+.. _`NEP 29`: https://numpy.org/neps/nep-0029-deprecation_policy.html
+
+Contributors
+............
+
+This is a complete, alphabetic list of people that contributed to this release,
+with a + sign indicating first contribution.
+
+* Abdallah+
+* Abhishek Chaurasia+
+* Andrej Rode+
+* Greg Lindahl+
+* Ian DesJardin+
+* Jorge Martínez
+* Jos van 't Hof+
+* Juan Luis Cano Rodríguez
+* María Eugenia Cruz
+* Nanubala Gnana Sai+
+* Sarthak Jain+
+* Shreyas Bapat
+* Sundesh Gupta+
+* Syed Osama Hussain+
+* Tomek Mrugalski+
+* Priyanshu Rohilla+
+
 poliastro 0.13.1 - 2019-12-20
 -----------------------------
 
@@ -193,7 +355,7 @@ Again we had an all-time high number of contributors, thanks everybody ❤️
 * Siro Moreno+
 * Sky+
 * Vedang Naik+
-* Wil Selwood
+* Emily Selwood
 
 poliastro 0.12.0 - 2019-02-21
 -----------------------------
@@ -434,7 +596,7 @@ This is the complete list of the people that contributed to this release, with a
 * Nikita Astrakhantsev
 * Shreyas Bapat
 * Daniel Lubián+
-* Wil Selwood+
+* Emily Selwood+
 
 poliastro 0.10.0 - 2018-07-21
 -----------------------------
