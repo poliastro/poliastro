@@ -61,7 +61,7 @@ dev = [
     "nbconvert>=5.5",
     "pycodestyle",
     "pytest>=3.2",
-    "pytest-cov<2.6.0",  https://github.com/pytest-dev/pytest-cov/issues/222
+    "pytest-cov<2.6.0",  # https://github.com/pytest-dev/pytest-cov/issues/222
     "pytest-doctestplus",
     "pytest-mpl",
     "pytest-mypy",
