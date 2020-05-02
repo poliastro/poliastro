@@ -12,7 +12,7 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez |orcid|
-:Version: 0.14.post0.dev0
+:Version: 0.15.dev0
 
 .. |azure_pipelines| image:: https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=master
    :target: https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=master
