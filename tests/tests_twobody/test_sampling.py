@@ -53,6 +53,7 @@ def test_sample_closed_starts_at_min_anomaly_if_in_range(min_nu, ecc, max_nu):
     ),
     ecc=eccentricities_q(),
 )
+@example(1e-16 * u.rad, 0 * u.one)
 @example(0 * u.rad, 0 * u.one)
 @example(0 * u.rad, 0.88680956 * u.one)
 def test_sample_closed_starts_and_ends_at_min_anomaly_if_in_range_and_no_max_given(
@@ -60,5 +61,5 @@ def test_sample_closed_starts_and_ends_at_min_anomaly_if_in_range_and_no_max_giv
 ):
     result = sample_closed(min_nu, ecc)
 
-    assert_quantity_allclose(result[0], min_nu)
+    assert_quantity_allclose(result[0], min_nu, atol=1e-14 * u.rad)
     assert_quantity_allclose(result[-1], min_nu, atol=1e-14 * u.rad)
