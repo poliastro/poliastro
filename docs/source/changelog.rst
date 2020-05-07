@@ -1,7 +1,7 @@
 What's new
 ==========
 
-poliastro 0.14.1 - TBD
+poliastro 0.14.0 - TBD
 ----------------------
 
 This major release contains crucial new features and bug fixes that have
