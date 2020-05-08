@@ -12,7 +12,7 @@
 :Name: poliastro
 :Website: https://poliastro.github.io/
 :Author: Juan Luis Cano Rodríguez |orcid|
-:Version: 0.14b1
+:Version: 0.14.0
 
 .. |azure_pipelines| image:: https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.14.x
    :target: https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.14.x
@@ -23,8 +23,8 @@
 .. |codeclimate| image:: https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability
    :target: https://codeclimate.com/github/poliastro/poliastro/maintainability
 
-.. |docs| image:: https://img.shields.io/badge/docs-v0.14b1-brightgreen.svg?style=flat-square
-   :target: https://docs.poliastro.space/en/v0.14b1/?badge=v0.14b1
+.. |docs| image:: https://img.shields.io/badge/docs-v0.14.0-brightgreen.svg?style=flat-square
+   :target: https://docs.poliastro.space/en/v0.14.0/?badge=v0.14.0
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/poliastro/poliastro/raw/0.14.x/COPYING
@@ -118,7 +118,7 @@ install poliastro using `conda <http://conda.io>`_::
 
 Please check out the `documentation for alternative installation methods`_.
 
-.. _`documentation for alternative installation methods`: https://docs.poliastro.space/en/v0.14b1/getting_started.html#alternative-installation-methods
+.. _`documentation for alternative installation methods`: https://docs.poliastro.space/en/v0.14.0/getting_started.html#alternative-installation-methods
 
 Problems and suggestions
 ========================
@@ -194,7 +194,7 @@ poliastro is focused on interplanetary applications. This has two consequences:
 * It leaves out certain features that would be too Earth-specific, such as
   TLE reading, SGP4 propagation, groundtrack plotting and others.
 
-.. _`Related software`: https://docs.poliastro.space/en/v0.14b1/about.html#related-software
+.. _`Related software`: https://docs.poliastro.space/en/v0.14.0/about.html#related-software
 
 What's the future of the project?
 ---------------------------------
