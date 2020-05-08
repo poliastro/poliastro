@@ -8,7 +8,7 @@ from poliastro.core.iod import vallado as vallado_fast
 kms = u.km / u.s
 
 
-def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
+def lambert(k, r0, r, tof, num_rev=0, short=True, numiter=35, rtol=1e-8):
     """Solves the Lambert problem.
 
     .. versionadded:: 0.3.0
@@ -23,6 +23,8 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
         Final position (km).
     tof : ~astropy.units.Quantity
         Time of flight (s).
+    num_rev : int, optional
+        Number of full revolutions, default to 0.
     short : boolean, optional
         Find out the short path, default to True. If False, find long path.
     numiter : int, optional
@@ -47,6 +49,6 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     r_ = r.to(u.km).value
     tof_ = tof.to(u.s).value
 
-    v0, v = vallado_fast(k_, r0_, r_, tof_, short, numiter, rtol)
+    v0, v = vallado_fast(k_, r0_, r_, tof_, num_rev, short, numiter, rtol)
 
     yield v0 << kms, v << kms

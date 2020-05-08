@@ -48,11 +48,11 @@ def test_curtis53(lambert):
     # ERRATA: j component is positive
     expected_va = [-2.4356, 0.26741, 0.0] * u.km / u.s
 
-    va, vb = next(lambert(k, r0, r, tof, numiter=numiter))
+    va, _ = next(lambert(k, r0, r, tof, numiter=numiter))
     assert_quantity_allclose(va, expected_va, rtol=1e-4)
 
 
-@pytest.mark.parametrize("lambert", [izzo.lambert])
+@pytest.mark.parametrize("lambert", [izzo.lambert, vallado.lambert])
 def test_molniya_der_zero_full_revolution(lambert):
     k = Earth.k
     r0 = [22592.145603, -1599.915239, -19783.950506] * u.km
@@ -62,12 +62,12 @@ def test_molniya_der_zero_full_revolution(lambert):
     expected_va = [2.000652697, 0.387688615, -2.666947760] * u.km / u.s
     expected_vb = [-3.79246619, -1.77707641, 6.856814395] * u.km / u.s
 
-    va, vb = next(lambert(k, r0, r, tof, M=0))
+    va, vb = next(lambert(k, r0, r, tof, num_rev=0))
     assert_quantity_allclose(va, expected_va, rtol=1e-6)
     assert_quantity_allclose(vb, expected_vb, rtol=1e-6)
 
 
-@pytest.mark.parametrize("lambert", [izzo.lambert])
+@pytest.mark.parametrize("lambert", [izzo.lambert, vallado.lambert])
 def test_molniya_der_one_full_revolution(lambert):
     k = Earth.k
     r0 = [22592.145603, -1599.915239, -19783.950506] * u.km
@@ -80,7 +80,7 @@ def test_molniya_der_one_full_revolution(lambert):
     expected_va_r = [-2.45759553, 1.16945801, 0.43161258] * u.km / u.s
     expected_vb_r = [-5.53841370, 0.01822220, 5.49641054] * u.km / u.s
 
-    (va_l, vb_l), (va_r, vb_r) = lambert(k, r0, r, tof, M=1)
+    (va_l, vb_l), (va_r, vb_r) = lambert(k, r0, r, tof, num_rev=1)
 
     assert_quantity_allclose(va_l, expected_va_l, rtol=1e-5)
     assert_quantity_allclose(vb_l, expected_vb_l, rtol=1e-5)
@@ -96,8 +96,8 @@ def test_raises_exception_for_non_feasible_solution(lambert):
     tof = 5 * u.h
 
     with pytest.raises(ValueError) as excinfo:
-        next(lambert(k, r0, r, tof, M=1))
-    assert "ValueError: No feasible solution, try lower M" in excinfo.exconly()
+        next(lambert(k, r0, r, tof, num_rev=1))
+    assert "ValueError: No feasible solution, try lower num_rev" in excinfo.exconly()
 
 
 @pytest.mark.parametrize("lambert", [izzo.lambert])
@@ -108,19 +108,21 @@ def test_collinear_vectors_input(lambert):
     tof = 5 * u.h
 
     with pytest.raises(ValueError) as excinfo:
-        next(lambert(k, r0, r, tof, M=0))
+        next(lambert(k, r0, r, tof, num_rev=0))
     assert (
         "ValueError: Lambert solution cannot be computed for collinear vectors"
         in excinfo.exconly()
     )
 
 
-@pytest.mark.parametrize("M", [1, 2, 3])
-def test_minimum_time_of_flight_convergence(M):
+@pytest.mark.parametrize("num_rev", [1, 2, 3])
+def test_minimum_time_of_flight_convergence(num_rev):
     ll = -1
-    x_T_min_expected, T_min_expected = iod._compute_T_min(ll, M, numiter=10, rtol=1e-8)
+    x_T_min_expected, T_min_expected = iod._compute_T_min(
+        ll, num_rev, numiter=10, rtol=1e-8
+    )
     y = iod._compute_y(x_T_min_expected, ll)
-    T_min = iod._tof_equation_y(x_T_min_expected, y, 0.0, ll, M)
+    T_min = iod._tof_equation_y(x_T_min_expected, y, 0.0, ll, num_rev)
     assert T_min_expected == T_min
 
 

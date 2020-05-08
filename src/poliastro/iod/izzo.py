@@ -8,7 +8,7 @@ from poliastro.core.iod import izzo as izzo_fast
 kms = u.km / u.s
 
 
-def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
+def lambert(k, r0, r, tof, num_rev=0, numiter=35, rtol=1e-8):
     """Solves the Lambert problem using the Izzo algorithm.
 
     .. versionadded:: 0.5.0
@@ -23,7 +23,7 @@ def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
         Final position (km).
     tof : ~astropy.units.Quantity
         Time of flight (s).
-    M : int, optional
+    num_rev : int, optional
         Number of full revolutions, default to 0.
     numiter : int, optional
         Maximum number of iterations, default to 35.
@@ -41,7 +41,7 @@ def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
     r_ = r.to(u.km).value
     tof_ = tof.to(u.s).value
 
-    sols = izzo_fast(k_, r0_, r_, tof_, M, numiter, rtol)
+    sols = izzo_fast(k_, r0_, r_, tof_, num_rev, numiter, rtol)
 
     for v0, v in sols:
         yield v0 << kms, v << kms

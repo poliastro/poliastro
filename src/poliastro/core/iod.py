@@ -1,3 +1,5 @@
+from math import gamma
+
 import numpy as np
 from numpy import cross, pi
 from numpy.linalg import norm
@@ -9,7 +11,7 @@ from ._jit import jit
 
 
 @jit
-def vallado(k, r0, r, tof, short, numiter, rtol):
+def vallado(k, r0, r, tof, num_rev, short, numiter, rtol):
     r"""Solves the Lambert's problem.
 
     The algorithm returns the initial velocity vector and the final one, these are
@@ -61,10 +63,13 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
         Final position vector
     tof: ~float
         Time of flight
+    num_rev: int
+        Number of revolutions
     numiter: int
         Number of iterations to
-    rtol: int
-        Number of revolutions
+    rtol: float
+        Error tolerance
+
 
     Returns
     -------
@@ -114,39 +119,73 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     if A == 0.0:
         raise RuntimeError("Cannot compute orbit, phase angle is 180 degrees")
 
-    psi = 0.0
-    psi_low = -4 * np.pi ** 2
-    psi_up = 4 * np.pi ** 2
+    psi = 0
+
+    if num_rev == 0:  # Usual num_rev == 0 case
+        psi_low = -4.0 * np.pi ** 2
+        psi_up = 4.0 * np.pi ** 2
+
+    else:
+        psi_low = 4.0 * num_rev ** 2 * np.pi ** 2
+        psi_up = 4.0 * (num_rev + 1.0) ** 2 * np.pi ** 2
+
+    psi = _initial_guess_vallado(psi, psi_low, psi_up, num_rev, tof, short)
 
     count = 0
+    tof_new = -10
 
     while count < numiter:
-        y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi) ** 0.5
-        if A > 0.0:
+
+        if np.abs(c2(psi) > rtol):
+            y = norm_r0_plus_norm_r + A * (1.0 - psi * c3(psi)) / c2(psi) ** 0.5
+        else:
+            y = norm_r0_plus_norm_r
+
+        if short:
             # Readjust xi_low until y > 0.0
             # Translated directly from Vallado
-            while y < 0.0:
-                psi_low = psi
+            neg_y_max_iter = 1
+
+            while y < 0.0 and neg_y_max_iter < 10:
                 psi = (
                     0.8
                     * (1.0 / c3(psi))
                     * (1.0 - norm_r0_times_norm_r * np.sqrt(c2(psi)) / A)
                 )
-                y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1) / c2(psi) ** 0.5
+                psi_low = psi
+                if np.abs(c2(psi)) > rtol:
+                    y = norm_r0_plus_norm_r + A * (
+                        (1.0 - psi * c3(psi)) / c2(psi) ** 0.5
+                    )
+                else:
+                    y = norm_r0_plus_norm_r
+                neg_y_max_iter = neg_y_max_iter + 1
 
-        xi = np.sqrt(y / c2(psi))
-        tof_new = (xi ** 3 * c3(psi) + A * np.sqrt(y)) / np.sqrt(k)
+            break  # Break out of count < numiter loop
 
-        # Convergence check
-        if np.abs((tof_new - tof) / tof) < rtol:
-            break
-        count += 1
-        # Bisection check
-        condition = tof_new <= tof
-        psi_low = psi_low + (psi - psi_low) * condition
-        psi_up = psi_up + (psi - psi_up) * (not condition)
+        else:
+            if np.abs(c2(psi)) > rtol:
+                xi = np.sqrt(y / c2(psi))
+            else:
+                xi = 0.0
 
-        psi = (psi_up + psi_low) / 2
+            tof_new = (xi ** 3 * c3(psi) + A * np.sqrt(y)) / np.sqrt(k)
+            psi_new = _newton_rhapson(psi, A, xi, y, k, tof, tof_new)
+            psi_new, psi_low, psi_up = _check_bounds(
+                psi, psi_new, psi_up, psi_low, tof_new, tof
+            )
+            psi = psi_new
+            count += 1
+
+            converged = np.abs((tof_new - tof) / tof) < rtol
+
+            # Convergence check
+            if converged:
+                # make sure the first guess isn't too close
+                if count == 1:
+                    tof_new = tof - 1.0
+                else:
+                    break  # Break out of count < numiter loop
     else:
         raise RuntimeError("Maximum number of iterations reached")
 
@@ -162,8 +201,8 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
 
 
 @jit
-def izzo(k, r1, r2, tof, M, numiter, rtol):
-    """ Aplies izzo algorithm to solve Lambert's problem.
+def izzo(k, r1, r2, tof, num_rev, numiter, rtol):
+    """ Applies izzo algorithm to solve Lambert's problem.
 
     Parameters
     ----------
@@ -175,7 +214,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
         Final position vector
     tof: float
         Time of flight between both positions
-    M: int
+    num_rev: int
         Number of revolutions
     numiter: int
         Numbert of iterations
@@ -225,7 +264,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     T = np.sqrt(2 * k / s ** 3) * tof
 
     # Find solutions
-    xy = _find_xy(ll, T, M, numiter, rtol)
+    xy = _find_xy(ll, T, num_rev, numiter, rtol)
 
     # Reconstruct
     gamma = np.sqrt(k * s / 2)
@@ -254,7 +293,7 @@ def _reconstruct(x, y, r1, r2, ll, gamma, rho, sigma):
 
 
 @jit
-def _find_xy(ll, T, M, numiter, rtol):
+def _find_xy(ll, T, num_rev, numiter, rtol):
     """Computes all x, y for given number of revolutions.
 
     """
@@ -262,24 +301,24 @@ def _find_xy(ll, T, M, numiter, rtol):
     assert abs(ll) < 1
     assert T > 0  # Mistake on original paper
 
-    M_max = np.floor(T / pi)
+    num_rev_max = np.floor(T / pi)
     T_00 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # T_xM
 
     # Refine maximum number of revolutions if necessary
-    if T < T_00 + M_max * pi and M_max > 0:
-        _, T_min = _compute_T_min(ll, M_max, numiter, rtol)
+    if T < T_00 + num_rev_max * pi and num_rev_max > 0:
+        _, T_min = _compute_T_min(ll, num_rev_max, numiter, rtol)
         if T < T_min:
-            M_max -= 1
+            num_rev_max -= 1
 
     # Check if a feasible solution exist for the given number of revolutions
     # This departs from the original paper in that we do not compute all solutions
-    if M > M_max:
-        raise ValueError("No feasible solution, try lower M")
+    if num_rev > num_rev_max:
+        raise ValueError("No feasible solution, try lower num_rev")
 
     # Initial guess
-    for x_0 in _initial_guess(T, ll, M):
+    for x_0 in _initial_guess(T, ll, num_rev):
         # Start Householder iterations from x_0 and find x, y
-        x = _householder(x_0, T, ll, M, rtol, numiter)
+        x = _householder(x_0, T, ll, num_rev, rtol, numiter)
         y = _compute_y(x, ll)
 
         yield x, y
@@ -291,6 +330,99 @@ def _compute_y(x, ll):
 
     """
     return np.sqrt(1 - ll ** 2 * (1 - x ** 2))
+
+
+@jit
+def _check_bounds(psi, psi_new, psi_up, psi_low, tof_new, tof):
+    """Updates psi_new, psi_up, psi_low
+
+    "Check if newton guess for psi is outside bounds (too steep a slope)
+     and update values accordingly"
+
+    """
+    if np.abs(psi_new) > psi_up or psi_new < psi_low:
+        # lower_bound
+        steep_condition_1 = tof_new < tof and psi > psi_low
+        psi_low = psi_low + (psi - psi_low) * steep_condition_1
+
+        # upper_bound
+        steep_condition_2 = tof_new > tof and psi < psi_up
+        psi_up = psi_up + (psi - psi_up) * steep_condition_2
+
+        psi_new = (psi_up + psi_low) / 2
+
+    return psi_new, psi_low, psi_up
+
+
+@jit
+def _c2dot(psi, c2, c3):
+    return 0.5 / psi * (1.0 - psi * c3(psi) - 2.0 * c2(psi))
+
+
+@jit
+def _c3dot(psi, c2, c3):
+    return 0.5 / psi * (c2(psi) - 3.0 * c3(psi))
+
+
+@jit
+def _c2dot_para(psi):
+    return (
+        -1.0 / gamma(4 + 1)
+        + 2.0 * psi / gamma(6 + 1)
+        - 3.0 * psi ** 2 / gamma(8 + 1)
+        + 4.0 * psi ** 3 / gamma(10 + 1)
+        - 5.0 * psi ** 4 / gamma(12 + 1)
+    )
+
+
+@jit
+def _c3dot_para(psi):
+    return (
+        -1.0 / gamma(5 + 1)
+        + 2.0 * psi / gamma(7 + 1)
+        - 3.0 * psi ** 2 / gamma(9 + 1)
+        + 4.0 * psi ** 3 / gamma(11 + 1)
+        - 5.0 * psi ** 4 / gamma(13 + 1)
+    )
+
+
+@jit
+def _newton_rhapson(psi, A, xi, y, k, tof, tof_new):
+
+    """Newton-Rhapson iteration to update psi
+
+    """
+    # Newton rhapson iteration
+    if np.abs(psi) > 1e-5:
+        c2dot = _c2dot(psi, c2, c3)
+        c3dot = _c3dot(psi, c2, c3)
+
+    else:  # for parabolic orbit
+        c2dot = _c2dot_para(psi)
+        c3dot = _c3dot_para(psi)
+
+    dtdpsi = xi ** 3 * (c3dot - 3.0 * c3(psi) * c2dot / (2.0 * c2(psi))) + 0.125 * A * (
+        3.0 * c3(psi) * np.sqrt(y) / c2(psi) + A / xi
+    ) * 1 / np.sqrt(k)
+
+    psi_new = psi - (tof_new - tof) / dtdpsi
+    return psi_new
+
+
+@jit
+def _initial_guess_vallado(psi, psi_low, psi_up, num_rev, tof, short):
+    # Insert logarithm initial guess for psi
+    if num_rev == 0:  # Single revolution
+        psi = (np.log(tof) - 9.61202327) / 0.10918231
+        if psi > psi_up:
+            psi = psi_up - np.pi
+
+    else:  # Multiple revolution
+        if short:
+            psi = psi_low + (psi_up - psi_low) * 0.3
+        else:
+            psi = psi_low + (psi_up - psi_low) * 0.6
+    return psi
 
 
 @jit
@@ -315,19 +447,19 @@ def _compute_psi(x, y, ll):
 
 
 @jit
-def _tof_equation(x, T0, ll, M):
+def _tof_equation(x, T0, ll, num_rev):
     """Time of flight equation.
 
     """
-    return _tof_equation_y(x, _compute_y(x, ll), T0, ll, M)
+    return _tof_equation_y(x, _compute_y(x, ll), T0, ll, num_rev)
 
 
 @jit
-def _tof_equation_y(x, y, T0, ll, M):
+def _tof_equation_y(x, y, T0, ll, num_rev):
     """Time of flight equation with externally computated y.
 
     """
-    if M == 0 and np.sqrt(0.6) < x < np.sqrt(1.4):
+    if num_rev == 0 and np.sqrt(0.6) < x < np.sqrt(1.4):
         eta = y - ll * x
         S_1 = (1 - ll - x * eta) * 0.5
         Q = 4 / 3 * hyp2f1b(S_1)
@@ -335,7 +467,7 @@ def _tof_equation_y(x, y, T0, ll, M):
     else:
         psi = _compute_psi(x, y, ll)
         T_ = np.divide(
-            np.divide(psi + M * pi, np.sqrt(np.abs(1 - x ** 2))) - x + ll * y,
+            np.divide(psi + num_rev * pi, np.sqrt(np.abs(1 - x ** 2))) - x + ll * y,
             (1 - x ** 2),
         )
 
@@ -361,35 +493,35 @@ def _tof_equation_p3(x, y, _, dT, ddT, ll):
 
 
 @jit
-def _compute_T_min(ll, M, numiter, rtol):
+def _compute_T_min(ll, num_rev, numiter, rtol):
     """Compute minimum T.
 
     """
     if ll == 1:
         x_T_min = 0.0
-        T_min = _tof_equation(x_T_min, 0.0, ll, M)
+        T_min = _tof_equation(x_T_min, 0.0, ll, num_rev)
     else:
-        if M == 0:
+        if num_rev == 0:
             x_T_min = np.inf
             T_min = 0.0
         else:
             # Set x_i > 0 to avoid problems at ll = -1
             x_i = 0.1
-            T_i = _tof_equation(x_i, 0.0, ll, M)
+            T_i = _tof_equation(x_i, 0.0, ll, num_rev)
             x_T_min = _halley(x_i, T_i, ll, rtol, numiter)
-            T_min = _tof_equation(x_T_min, 0.0, ll, M)
+            T_min = _tof_equation(x_T_min, 0.0, ll, num_rev)
 
     return [x_T_min, T_min]
 
 
 @jit
-def _initial_guess(T, ll, M):
+def _initial_guess(T, ll, num_rev):
     """Initial guess.
 
     """
-    if M == 0:
+    if num_rev == 0:
         # Single revolution
-        T_0 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2) + M * pi  # Equation 19
+        T_0 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2) + num_rev * pi  # Equation 19
         T_1 = 2 * (1 - ll ** 3) / 3  # Equation 21
         if T >= T_0:
             x_0 = (T_0 / T) ** (2 / 3) - 1
@@ -403,11 +535,11 @@ def _initial_guess(T, ll, M):
         return [x_0]
     else:
         # Multiple revolution
-        x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (
-            ((M * pi + pi) / (8 * T)) ** (2 / 3) + 1
+        x_0l = (((num_rev * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (
+            ((num_rev * pi + pi) / (8 * T)) ** (2 / 3) + 1
         )
-        x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (
-            ((8 * T) / (M * pi)) ** (2 / 3) + 1
+        x_0r = (((8 * T) / (num_rev * pi)) ** (2 / 3) - 1) / (
+            ((8 * T) / (num_rev * pi)) ** (2 / 3) + 1
         )
 
         return [x_0l, x_0r]
@@ -442,7 +574,7 @@ def _halley(p0, T0, ll, tol, maxiter):
 
 
 @jit
-def _householder(p0, T0, ll, M, tol, maxiter):
+def _householder(p0, T0, ll, num_rev, tol, maxiter):
     """Find a zero of time of flight equation using the Householder method.
 
     Note
@@ -453,7 +585,7 @@ def _householder(p0, T0, ll, M, tol, maxiter):
     """
     for ii in range(maxiter):
         y = _compute_y(p0, ll)
-        fval = _tof_equation_y(p0, y, T0, ll, M)
+        fval = _tof_equation_y(p0, y, T0, ll, num_rev)
         T = fval + T0
         fder = _tof_equation_p(p0, y, T, ll)
         fder2 = _tof_equation_p2(p0, y, T, fder, ll)
