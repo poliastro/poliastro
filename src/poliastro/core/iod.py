@@ -137,7 +137,7 @@ def vallado(k, r0, r, tof, num_rev, short, numiter, rtol):
     while count < numiter:
 
         if np.abs(c2(psi) > rtol):
-            y = norm_r0_plus_norm_r + A * (1.0 - psi * c3(psi)) / c2(psi) ** 0.5
+            y = norm_r0_plus_norm_r + A * (psi * c3(psi) - 1.0) / c2(psi) ** 0.5
         else:
             y = norm_r0_plus_norm_r
 
@@ -155,7 +155,7 @@ def vallado(k, r0, r, tof, num_rev, short, numiter, rtol):
                 psi_low = psi
                 if np.abs(c2(psi)) > rtol:
                     y = norm_r0_plus_norm_r + A * (
-                        (1.0 - psi * c3(psi)) / c2(psi) ** 0.5
+                        (psi * c3(psi) - 1.0) / c2(psi) ** 0.5
                     )
                 else:
                     y = norm_r0_plus_norm_r
