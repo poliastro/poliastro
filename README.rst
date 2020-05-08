@@ -15,7 +15,7 @@
 :Version: 0.14b1
 
 .. |azure_pipelines| image:: https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.14.x
-   :target: https://dev.azure.com/poliastro/poliastro/_build/v0.14b1?definitionId=1&branchName=0.14.x
+   :target: https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.14.x
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square
    :target: https://codecov.io/github/poliastro/poliastro?branch=0.14.x
