@@ -1,8 +1,8 @@
 What's new
 ==========
 
-poliastro 0.14.0 - TBD
-----------------------
+poliastro 0.14.0 - 2020-05-08
+-----------------------------
 
 This major release contains crucial new features and bug fixes that have
 been years in the making, and is by far the most exciting release
