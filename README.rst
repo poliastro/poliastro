@@ -132,10 +132,6 @@ please open a new issue in the `issue tracker`_ and we will try to answer prompt
 Contributing
 ============
 
-.. image:: https://img.shields.io/waffle/label/poliastro/poliastro/1%20-%20Ready.svg?style=flat-square
-   :target: https://waffle.io/poliastro/poliastro
-   :alt: 'Stories in Ready'
-
 poliastro is a community project, hence all contributions are more than
 welcome! For more information, head to `CONTRIBUTING.rst`_.
 
