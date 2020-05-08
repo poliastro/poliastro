@@ -68,7 +68,7 @@ dev = [
     "pytest-remotedata",
     "sphinx",
     "sphinx_rtd_theme==0.5.0rc1",
-    "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/master.zip",
+    "sphinx-hoverxref==0.3b1",
     "sphinx-notfound-page",
     "tox",
 ]
