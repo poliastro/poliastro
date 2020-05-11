@@ -23,12 +23,11 @@ assignees: Juanlu001
   - `README.rst`
   - `__init__.py`
   - Sphinx `conf.py`
-  - AppVeyor CI script
 * [ ] Check that the release branch will be tested on CI
 * [ ] Check all the badges in `README` point to the appropriate git **branch** (replace `master` by new branch `sed -i 's/master/.../g' README.rst`)
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `latest` by new tag, without sed!)
 * [ ] Commit
-* [ ] Generate sdist and bdist_wheel
+* [ ] Generate sdist and bdist_wheel with `flit build`
 * [ ] `twine upload dist/* --repository-url https://test.pypi.org/legacy/`
 * [ ] Tag
 * [ ] Bump master to next development version
@@ -38,7 +37,7 @@ assignees: Juanlu001
 * [ ] Push branch to GitHub **and tags**
 * [ ] Check on Test PyPI that the badges will work
 * [ ] Upload sdist and bdist_wheel to PyPI - *this step cannot be undone if the release is removed!* `twine upload dist/* --repository-url https://upload.pypi.org/legacy/`
-* [ ] Check Read the Docs (check https://docs.readthedocs.io/en/latest/webhooks.html#github first)
+* [ ] Check Read the Docs
 
 ## Before final release
 
@@ -48,7 +47,6 @@ assignees: Juanlu001
   - `README.rst`
   - `__init__.py`
   - Sphinx `conf.py`
-  - AppVeyor CI script
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `vX.Yb1` by `vX.Y.Z`)
 * [ ] Commit
 * [ ] Generate sdist and bdist_wheel
@@ -59,9 +57,9 @@ assignees: Juanlu001
 
 * [ ] Push tag to GitHub
 * [ ] Upload sdist and bdist_wheel to PyPI - *this step cannot be undone if the release is removed!* `twine upload dist/* --repository-url https://upload.pypi.org/legacy/`
-* [ ] Check Read the Docs (check https://docs.readthedocs.io/en/latest/webhooks.html#github first)
+* [ ] Check Read the Docs
 * [ ] Create GitHub release
 * [ ] Add Zenodo badge to GitHub release
-* [ ] Send announcement email
+* [ ] Send announcement email with subject "ANN: poliastro X.Y.Z released 🚀"
 * [ ] Cherry pick release date to master
 * [ ] Close milestone
