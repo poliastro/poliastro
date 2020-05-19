@@ -186,6 +186,7 @@ def test_body_plotting(earth_perihelion):
 
 
 @pytest.mark.mpl_image_compare
+@pytest.mark.remote_data
 def test_plot_ephem_epoch():
     epoch = Time("2020-02-14 00:00:00")
     ephem = Ephem.from_horizons(
@@ -205,6 +206,7 @@ def test_plot_ephem_epoch():
 
 
 @pytest.mark.mpl_image_compare
+@pytest.mark.remote_data
 def test_plot_ephem_no_epoch():
     epoch = Time("2020-02-14 00:00:00")
     ephem = Ephem.from_horizons(
