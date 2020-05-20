@@ -749,48 +749,89 @@ class Orbit:
         )
 
     @classmethod
-    @u.quantity_input(angular_velocity=u.rad / u.s, period=u.s, hill_radius=u.m)
-    def geostationary(
-        cls, attractor, angular_velocity=None, period=None, hill_radius=None
-    ):
-        """Return the geostationary orbit for the given attractor and its rotational speed.
+    def stationary(cls, attractor):
+        r"""Return the stationary orbit for the given attractor and its rotational speed.
 
-        Parameters
+         Parameters
+        ----------
+        attractor : Body
+        Main attractor.
+        """
+        return cls.synchronous(attractor)
+
+    @classmethod
+    @u.quantity_input(
+        a=u.km,
+        ecc=u.one,
+        inc=u.deg,
+        argp=u.deg,
+        arglat=u.deg,
+        raan=u.deg,
+        period_mul=u.one,
+    )
+    def synchronous(
+        cls,
+        attractor,
+        a=None,
+        ecc=0 * u.one,
+        inc=0 * u.deg,
+        argp=0 * u.deg,
+        arglat=0 * u.deg,
+        raan=0 * u.deg,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
+        period_mul=1 * u.one,
+    ):
+        r""" Returns an orbit where the orbital period equals the rotation rate of the orbited body.
+        The synchronous altitude for any central body can directly be obtained from Kepler's Third Law by setting
+        the orbit period P\ :sub:`sync`, equal to the rotation period of the central body relative to the
+        fixed stars D\ :sup:`*`.
+        In order to obtain this, it's important to match orbital period with sidereal rotation period.
+        Thus:
+        .. math::
+
+                P_{s y n c}=D^{*} \\
+
+                a_{s y n c}=\left(\mu / 4 \pi^{2}\right)^{1 / 3}\left(D^{*}\right)^{2 / 3}\\
+
+                H_{s y n c}=a_{s y n c} - R_{p l a n e t}\\
+
+       Parameters
         ----------
         attractor : Body
             Main attractor.
-        angular_velocity : ~astropy.units.Quantity
-            Rotational angular velocity of the attractor.
-        period : ~astropy.units.Quantity
-            Attractor's rotational period, ignored if angular_velocity is passed.
-        hill_radius : ~astropy.units.Quantity
-            Radius of Hill sphere of the attractor (optional). Hill sphere radius(in
-            contrast with Laplace's SOI) is used here to validate the stability of the
-            geostationary orbit, that is to make sure that the orbital radius required
-            for the geostationary orbit is not outside of the gravitational sphere of
-            influence of the attractor.
-            Hill SOI of parent(if exists) of the attractor is ignored if hill_radius is not provided.
+        a : ~astropy.units.Quantity
+            Semi-major axis.
+        ecc : ~astropy.units.Quantity
+            Eccentricity,default to 0 as a stationary orbit.
+        inc : ~astropy.units.Quantity
+            Inclination,default to 0 deg.
+        raan : ~astropy.units.Quantity
+            Right ascension of the ascending node,default to 0 deg.
+        argp : ~astropy.units.Quantity
+            Argument of the pericenter,default to 0 deg.
+        arglat : ~astropy.units.Quantity, optional
+            Argument of latitude, default to 0 deg.
+        epoch : ~astropy.time.Time, optional
+            Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
+        period_mul : ~astropy.units.Quantity
+            Multiplier, default to 1 to indicate that the period of the body is equal to the sidereal rotational period of the body being orbited, 0.5 a period equal to half the average rotational period of the body being orbited, indicates a semi-synchronous orbit.
+
         """
+        period_sync = attractor.rotational_period * period_mul
+        a_sync = (attractor.k * (period_sync / (2 * np.pi)) ** 2) ** (1 / 3)
 
-        if angular_velocity is None and period is None:
-            raise ValueError(
-                "At least one among angular_velocity or period must be passed"
+        r_pericenter = (1 - ecc) * a_sync
+        if r_pericenter < attractor.R:
+            raise ValueError("The orbit for the given parameters doesn't exist")
+
+        if inc != 0 or ecc != 0:
+            return cls.from_classical(
+                attractor, a_sync, ecc, inc, raan, argp, arglat, epoch, plane
             )
-
-        if angular_velocity is None:
-            angular_velocity = 2 * np.pi / period
-
-        # Find out geostationary radius using r = cube_root(GM/(angular
-        # velocity)^2)
-        with u.set_enabled_equivalencies(u.dimensionless_angles()):
-            geo_radius = np.cbrt(attractor.k / np.square(angular_velocity.to(1 / u.s)))
-
-        if hill_radius is not None and geo_radius > hill_radius:
-            raise ValueError(
-                "Geostationary orbit for the given parameters doesn't exist"
-            )
-
-        altitude = geo_radius - attractor.R
+        altitude = a_sync - attractor.R
         return cls.circular(attractor, altitude)
 
     @classmethod
