@@ -1,5 +1,8 @@
 from astropy.constants import Constant
 
+"""
+Rotational_period_ refers to the sidereal period, relative to the stars it's the time it takes for a planet to complete one orbit.
+"""
 rotational_period_earth = Constant(
     "rotational_period_earth",
     "Earth rotational period",
