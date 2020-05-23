@@ -649,8 +649,8 @@ def test_plane_is_set_in_horizons():
 )
 def test_stationary_orbit(attractor, expected_a, expected_period):
     ss = Orbit.stationary(attractor=attractor)
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-4)  # SEMIMAJOR AXIS ASSERT
-    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-4)  # PERIOD ASSERT
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-4)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-4)
 
 
 @pytest.mark.parametrize(
@@ -664,8 +664,8 @@ def test_synchronous_orbit_without_ecc_and_inclination_given(
     attractor, expected_a, expected_period
 ):
     ss = Orbit.synchronous(attractor=attractor)
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-4)  # SEMIMAJOR AXIS ASSERT
-    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-4)  # PERIOD ASSERT
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-4)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-4)
 
 
 @pytest.mark.parametrize(
@@ -684,9 +684,9 @@ def test_synchronous_orbit_without_inclination_given(
     attractor, ecc, expected_a, expected_period
 ):
     ss = Orbit.synchronous(attractor=attractor, ecc=ecc)
-    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)  # ECC ASSERT
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)  # SEMIMAJOR AXIS ASSERT
-    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)  # PERIOD ASSERT
+    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)
 
 
 @pytest.mark.parametrize(
@@ -723,9 +723,9 @@ def test_synchronous_orbit_supersynchronous(
     attractor, ecc, expected_a, expected_period
 ):
     ss = Orbit.synchronous(attractor=attractor, ecc=ecc, period_mul=2 * u.one)
-    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)  # ECC ASSERT
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)  # SEMIMAJOR AXIS ASSERT
-    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)  # PERIOD ASSERT
+    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)
 
 
 @pytest.mark.parametrize(
@@ -747,9 +747,9 @@ def test_synchronous_orbit_supersynchronous(
 )
 def test_synchronous_orbit_semisynchronous(attractor, ecc, expected_a, expected_period):
     ss = Orbit.synchronous(attractor=attractor, ecc=ecc, period_mul=0.5 * u.one)
-    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)  # ECC ASSERT
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)  # SEMIMAJOR AXIS ASSERT
-    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)  # PERIOD ASSERT
+    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)
 
 
 def test_heliosynchronous_orbit_enough_arguments():

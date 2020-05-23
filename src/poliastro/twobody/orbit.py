@@ -750,29 +750,30 @@ class Orbit:
 
     @classmethod
     def stationary(cls, attractor):
-        r"""Return the stationary orbit for the given attractor and its rotational speed.
+        """Return the stationary orbit for the given attractor and its rotational speed.
 
-         Parameters
+        Parameters
         ----------
         attractor : Body
-        Main attractor.
+            Main attractor.
+
+        Returns
+        -------
+        Orbit
+            New orbit.
+
+
         """
         return cls.synchronous(attractor)
 
     @classmethod
     @u.quantity_input(
-        a=u.km,
-        ecc=u.one,
-        inc=u.deg,
-        argp=u.deg,
-        arglat=u.deg,
-        raan=u.deg,
-        period_mul=u.one,
+        ecc=u.one, inc=u.deg, argp=u.deg, arglat=u.deg, raan=u.deg, period_mul=u.one,
     )
     def synchronous(
         cls,
         attractor,
-        a=None,
+        period_mul=1 * u.one,
         ecc=0 * u.one,
         inc=0 * u.deg,
         argp=0 * u.deg,
@@ -780,28 +781,19 @@ class Orbit:
         raan=0 * u.deg,
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
-        period_mul=1 * u.one,
     ):
         r""" Returns an orbit where the orbital period equals the rotation rate of the orbited body.
         The synchronous altitude for any central body can directly be obtained from Kepler's Third Law by setting
         the orbit period P\ :sub:`sync`, equal to the rotation period of the central body relative to the
         fixed stars D\ :sup:`*`.
         In order to obtain this, it's important to match orbital period with sidereal rotation period.
-        Thus:
-        .. math::
 
-                P_{s y n c}=D^{*} \\
-
-                a_{s y n c}=\left(\mu / 4 \pi^{2}\right)^{1 / 3}\left(D^{*}\right)^{2 / 3}\\
-
-                H_{s y n c}=a_{s y n c} - R_{p l a n e t}\\
-
-       Parameters
+        Parameters
         ----------
         attractor : Body
             Main attractor.
-        a : ~astropy.units.Quantity
-            Semi-major axis.
+        period_mul : ~astropy.units.Quantity
+            Multiplier, default to 1 to indicate that the period of the body is equal to the sidereal rotational period of the body being orbited, 0.5 a period equal to half the average rotational period of the body being orbited, indicates a semi-synchronous orbit.
         ecc : ~astropy.units.Quantity
             Eccentricity,default to 0 as a stationary orbit.
         inc : ~astropy.units.Quantity
@@ -816,23 +808,40 @@ class Orbit:
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
-        period_mul : ~astropy.units.Quantity
-            Multiplier, default to 1 to indicate that the period of the body is equal to the sidereal rotational period of the body being orbited, 0.5 a period equal to half the average rotational period of the body being orbited, indicates a semi-synchronous orbit.
+
+        Returns
+        -------
+        Orbit
+            New orbit.
+
+        Raises
+        ------
+        ValueError
+            If the pericenter is smaller than the attractor's radius.
+
+        Notes
+        -----
+
+        Thus:
+        .. math::
+
+                P_{s y n c}=D^{*} \\
+
+                a_{s y n c}=\left(\mu / 4 \pi^{2}\right)^{1 / 3}\left(D^{*}\right)^{2 / 3}\\
+
+                H_{s y n c}=a_{s y n c} - R_{p l a n e t}\\
 
         """
         period_sync = attractor.rotational_period * period_mul
         a_sync = (attractor.k * (period_sync / (2 * np.pi)) ** 2) ** (1 / 3)
-
+        nu = arglat - argp
         r_pericenter = (1 - ecc) * a_sync
         if r_pericenter < attractor.R:
             raise ValueError("The orbit for the given parameters doesn't exist")
 
-        if inc != 0 or ecc != 0:
-            return cls.from_classical(
-                attractor, a_sync, ecc, inc, raan, argp, arglat, epoch, plane
-            )
-        altitude = a_sync - attractor.R
-        return cls.circular(attractor, altitude)
+        return cls.from_classical(
+            attractor, a_sync, ecc, inc, raan, argp, nu, epoch, plane
+        )
 
     @classmethod
     def heliosynchronous(
@@ -881,6 +890,7 @@ class Orbit:
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
+
         """
         mean_elements = get_mean_elements(attractor)
 
