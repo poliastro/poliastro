@@ -641,82 +641,115 @@ def test_plane_is_set_in_horizons():
 
 
 @pytest.mark.parametrize(
-    "attractor,angular_velocity,expected_a,expected_period",
+    "attractor,expected_a,expected_period",
+    [
+        (Earth, Earth.R + 35786 * u.km, Earth.rotational_period,),
+        (Mars, Mars.R + 17031 * u.km, Mars.rotational_period,),
+    ],
+)
+def test_stationary_orbit(attractor, expected_a, expected_period):
+    ss = Orbit.stationary(attractor=attractor)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-4)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-4)
+
+
+@pytest.mark.parametrize(
+    "attractor,expected_a,expected_period",
+    [
+        (Earth, Earth.R + 35786 * u.km, Earth.rotational_period,),
+        (Mars, Mars.R + 17031 * u.km, Mars.rotational_period,),
+    ],
+)
+def test_synchronous_orbit_without_ecc_and_inclination_given(
+    attractor, expected_a, expected_period
+):
+    ss = Orbit.synchronous(attractor=attractor)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-4)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-4)
+
+
+@pytest.mark.parametrize(
+    "attractor,ecc,expected_a,expected_period",
     [
         (
-            Earth,
-            (2 * np.pi / 23.9345) * u.rad / u.hour,
-            42_164_205 * u.m,
-            23.9345 * u.hour,
+            Mercury,
+            0.0167 * u.one,
+            Mercury.R + 240453 * u.km,
+            Mercury.rotational_period,
+        ),
+        (Jupiter, 0.0934 * u.one, Jupiter.R + 88565 * u.km, Jupiter.rotational_period,),
+    ],
+)
+def test_synchronous_orbit_without_inclination_given(
+    attractor, ecc, expected_a, expected_period
+):
+    ss = Orbit.synchronous(attractor=attractor, ecc=ecc)
+    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)
+
+
+@pytest.mark.parametrize(
+    "attractor,ecc,expected_a,expected_period",
+    [(Mercury, 1 * u.one, Mercury.R + 240453 * u.km, Mercury.rotational_period,)],
+)
+def test_synchronous_orbit_pericenter_smaller_than_atractor_radius(
+    attractor, ecc, expected_a, expected_period
+):
+    with pytest.raises(ValueError) as excinfo:
+        Orbit.synchronous(attractor=attractor, ecc=ecc)
+    assert excinfo.type == ValueError
+    assert str(excinfo.value) == "The orbit for the given parameters doesn't exist"
+
+
+@pytest.mark.parametrize(
+    "attractor,ecc,expected_a,expected_period",
+    [
+        (
+            Mercury,
+            0.0167 * u.one,
+            2 ** (2 / 3) * (Mercury.R + 240453 * u.km),
+            2 * Mercury.rotational_period,
         ),
         (
-            Mars,
-            (2 * np.pi / 24.6228) * u.rad / u.hour,
-            20_427_595 * u.m,
-            24.6228 * u.hour,
+            Jupiter,
+            0.0934 * u.one,
+            2 ** (2 / 3) * (Jupiter.R + 88565 * u.km),
+            2 * Jupiter.rotational_period,
         ),
     ],
 )
-def test_geostationary_creation_from_angular_velocity(
-    attractor, angular_velocity, expected_a, expected_period
+def test_synchronous_orbit_supersynchronous(
+    attractor, ecc, expected_a, expected_period
 ):
-    ss = Orbit.geostationary(attractor=attractor, angular_velocity=angular_velocity)
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-7)
+    ss = Orbit.synchronous(attractor=attractor, ecc=ecc, period_mul=2 * u.one)
+    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)
 
 
 @pytest.mark.parametrize(
-    "attractor,period,expected_a",
+    "attractor,ecc,expected_a,expected_period",
     [
-        (Earth, 23.9345 * u.hour, 42_164_205 * u.m),
-        (Mars, 24.6228 * u.hour, 20_427_595 * u.m),
+        (
+            Mercury,
+            0.0167 * u.one,
+            0.5 ** (2 / 3) * (Mercury.R + 240453 * u.km),
+            0.5 * Mercury.rotational_period,
+        ),
+        (
+            Jupiter,
+            0.0934 * u.one,
+            0.5 ** (2 / 3) * (Jupiter.R + 88565 * u.km),
+            0.5 * Jupiter.rotational_period,
+        ),
     ],
 )
-def test_geostationary_creation_from_period(attractor, period, expected_a):
-    ss = Orbit.geostationary(attractor=attractor, period=period)
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, period, rtol=1.0e-7)
-
-
-@pytest.mark.parametrize(
-    "attractor,period,hill_radius,expected_a",
-    [
-        (Earth, 23.9345 * u.hour, 0.01 * u.AU, 42_164_205 * u.m),
-        (Mars, 24.6228 * u.hour, 1_000_000 * u.km, 20_427_595 * u.m),
-    ],
-)
-def test_geostationary_creation_with_Hill_radius(
-    attractor, period, hill_radius, expected_a
-):
-    ss = Orbit.geostationary(
-        attractor=attractor, period=period, hill_radius=hill_radius
-    )
-    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-7)
-    assert_quantity_allclose(ss.period, period, rtol=1.0e-7)
-
-
-@pytest.mark.parametrize("attractor", [Earth, Mars])
-def test_geostationary_input(attractor):
-    with pytest.raises(ValueError) as excinfo:
-        Orbit.geostationary(attractor=attractor)
-
-    assert (
-        "ValueError: At least one among angular_velocity or period must be passed"
-        in excinfo.exconly()
-    )
-
-
-@pytest.mark.parametrize(
-    "attractor,period,hill_radius", [(Venus, 243.025 * u.day, 1_000_000 * u.km)]
-)
-def test_geostationary_non_existence_condition(attractor, period, hill_radius):
-    with pytest.raises(ValueError) as excinfo:
-        Orbit.geostationary(attractor=attractor, period=period, hill_radius=hill_radius)
-
-    assert (
-        "Geostationary orbit for the given parameters doesn't exist"
-        in excinfo.exconly()
-    )
+def test_synchronous_orbit_semisynchronous(attractor, ecc, expected_a, expected_period):
+    ss = Orbit.synchronous(attractor=attractor, ecc=ecc, period_mul=0.5 * u.one)
+    assert_quantity_allclose(ss.ecc, ecc, rtol=1.0e-3)
+    assert_quantity_allclose(ss.a, expected_a, rtol=1.0e-3)
+    assert_quantity_allclose(ss.period, expected_period, rtol=1.0e-3)
 
 
 def test_heliosynchronous_orbit_enough_arguments():
