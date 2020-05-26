@@ -1046,6 +1046,7 @@ def test_from_sbdb_and_from_horizons_give_similar_results(target_name):
             test_elm, ref_elm, rtol=1e-3
         )  # Maximum error of 0.1% (chosen arbitrarily)
 
+
 def test_propagate_to_anomaly_gives_expected_result():
     # From "Going to Jupiter with Python using Jupyter and poliastro.ipynb"
     ic1 = Orbit.from_vectors(
