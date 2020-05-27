@@ -629,8 +629,8 @@ def test_orbit_from_horizons_has_expected_elements():
     )
     ss1 = Orbit.from_horizons(name="Ceres", attractor=Sun, epoch=epoch)
     assert ss.pqw()[0].value.all() == ss1.pqw()[0].value.all()
-    assert ss.r_a == ss1.r_a
-    assert ss.a == ss1.a
+    assert_quantity_allclose(ss.r_a, ss1.r_a, rtol=1.0e-4)
+    assert_quantity_allclose(ss.a, ss1.a, rtol=1.0e-4)
 
 
 @pytest.mark.remote_data
@@ -1034,20 +1034,17 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
 def test_from_sbdb_and_from_horizons_give_similar_results(target_name):
     ss_target = Orbit.from_sbdb(target_name)
     ss_classical = ss_target.classical()
-
-    ss_ref = Orbit.from_horizons(
-        name=target_name, attractor=Sun, plane=Planes.EARTH_ECLIPTIC
-    )
-
-    ss_ref = ss_ref.propagate_to_anomaly(
-        ss_classical[5]
-    )  # Catch reference orbit to same epoch
-    ss_ref_class = ss_ref.classical()
+    ss_ref_class = Orbit.from_horizons(
+        name=target_name,
+        attractor=Sun,
+        plane=Planes.EARTH_ECLIPTIC,
+        epoch=ss_target.epoch,
+    ).classical()
 
     for test_elm, ref_elm in zip(ss_classical, ss_ref_class):
         assert_quantity_allclose(
-            test_elm, ref_elm, rtol=1e-2
-        )  # Maximum error of 1% (chosen arbitrarily)
+            test_elm, ref_elm, rtol=1e-3
+        )  # Maximum error of 0.1% (chosen arbitrarily)
 
 
 def test_propagate_to_anomaly_gives_expected_result():
