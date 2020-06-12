@@ -80,15 +80,36 @@ Contents
 
 .. toctree::
     :maxdepth: 2
+    :caption: Welcome to poliastro
 
     about
+    changelog
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Install, use and contribute
+
     getting_started
     user_guide
+    contributing
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Tutorials
+
     jupyter
+
+.. toctree::
+    :maxdepth: 2
+    :caption: API Docs
+
     api/safe/safe_index
     api/core/core_index
-    changelog
-    contributing
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Bibliography
+
     references
 
 
