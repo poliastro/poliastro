@@ -43,12 +43,16 @@ def alinspace(start, stop=None, num=50, endpoint=True):
     """Return increasing, evenly spaced angular values over a specified interval.
 
     """
+    # Create a new variable to avoid numba crash,
+    # see https://github.com/numba/numba/issues/5661
     if stop is None:
-        stop = start + 2 * np.pi
+        stop_ = start + 2 * np.pi
     elif stop <= start:
-        stop += 2 * np.pi
+        stop_ = stop + 2 * np.pi
+    else:
+        stop_ = stop
 
     if endpoint:
-        return np.linspace(start, stop, num)
+        return np.linspace(start, stop_, num)
     else:
-        return np.linspace(start, stop, num + 1)[:-1]
+        return np.linspace(start, stop_, num + 1)[:-1]
