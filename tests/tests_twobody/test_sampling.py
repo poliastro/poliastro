@@ -35,7 +35,8 @@ def test_sample_closed_is_always_between_minus_pi_and_pi(min_nu, ecc, max_nu):
 @settings(deadline=None)
 @given(
     min_nu=with_units(
-        elements=st.floats(min_value=-np.pi, max_value=np.pi), unit=u.rad
+        elements=st.floats(min_value=-np.pi, max_value=np.pi, exclude_max=True),
+        unit=u.rad,
     ),
     ecc=eccentricities_q(),
     max_nu=st.one_of(angles_q(), st.none()),
