@@ -40,6 +40,7 @@ def test_sample_closed_is_always_between_minus_pi_and_pi(min_nu, ecc, max_nu):
     ecc=eccentricities_q(),
     max_nu=st.one_of(angles_q(), st.none()),
 )
+@example(0 * u.rad, 0 * u.one, 0 * u.rad)
 def test_sample_closed_starts_at_min_anomaly_if_in_range(min_nu, ecc, max_nu):
     result = sample_closed(min_nu, ecc, max_nu)
 

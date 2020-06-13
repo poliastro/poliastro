@@ -48,7 +48,7 @@ def alinspace(start, stop=None, num=50, endpoint=True):
     if stop is None:
         stop_ = start + 2 * np.pi
     elif stop <= start:
-        stop_ += 2 * np.pi
+        stop_ = stop + 2 * np.pi
     else:
         stop_ = stop
 
