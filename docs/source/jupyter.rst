@@ -1,8 +1,14 @@
 Jupyter notebooks
 =================
 
-.. toctree::
-   :maxdepth: 1
+The following page contains a collection of practical examples and problem
+solutions solved with **poliastro**. From interplanetary transfers, to asteroid
+catching missions or even propagation under external perturbations. In addition,
+user might find other kind of tutorials related on how to use and customize
+plotting utilities, API capabilities and many other orbital mechanics topics.
+
+
+.. nbgallery::
 
    /examples/Analyzing the Parker Solar Probe flybys.ipynb
    /examples/Atmospheric models.ipynb

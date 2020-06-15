@@ -40,6 +40,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.intersphinx',
     'nbsphinx',
+    'sphinx_gallery.load_style',
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.mathjax',  # Maths visualization
     'sphinx.ext.graphviz',  # Dependency diagrams
@@ -310,3 +311,11 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# Thumnail selection for nbsphinx gallery
+nbsphinx_thumbnails = {
+    'examples/Going to Mars with Python using poliastro': '_static/thumbnails/going_to_mars_thumbnail.png',
+    'examples/Plotting in 3D': '_static/thumbnails/3d_plotting_thumbnail.png',
+    'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
+    'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
+}
