@@ -9,7 +9,6 @@ plotting utilities, API capabilities and many other orbital mechanics topics.
 
 
 .. nbgallery::
-   :caption: Examples gallery
 
    /examples/Analyzing the Parker Solar Probe flybys.ipynb
    /examples/Atmospheric models.ipynb
