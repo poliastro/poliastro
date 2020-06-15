@@ -145,7 +145,7 @@ class EarthSatellite:
         if atmosphere is not None and A_over_m is not None:
             perturbations[atmospheric_drag_model] = {
                 "R": Earth.R.to(u.km).value,
-                "C_D": 2.2,  # dimensionless (any value would do)
+                "C_D": 2.2,  # FIXME, add C_D as a parameter of the EarthSatellite object
                 "A_over_m": A_over_m,
                 "model": atmosphere,
             }
