@@ -62,8 +62,8 @@ New features
   in the future.
 * **Extended atmospheric properties beyond 90 kilometers**: We completed the
   implementation of our atmospheric models,
-  :py:class:`poliastro.atmosphere.coesa62.COESA62` and
-  :py:class:`~poliastro.atmosphere.coesa76.COESA76`, to compute physical properties
+  :py:class:`poliastro.earth.atmosphere.coesa62.COESA62` and
+  :py:class:`~poliastro.earth.atmosphere.coesa76.COESA76`, to compute physical properties
   beyond 90 kilometers, and tested them up to approximately 700 kilometers.
 
 Bugs fixed

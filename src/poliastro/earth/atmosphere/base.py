@@ -1,4 +1,4 @@
-from poliastro.atmosphere.util import h_to_z, z_to_h
+from poliastro.earth.atmosphere.util import h_to_z, z_to_h
 
 
 class COESA:

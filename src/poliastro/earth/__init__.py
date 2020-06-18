@@ -6,6 +6,7 @@ from astropy import units as u
 from poliastro.bodies import Earth
 from poliastro.core.perturbations import J2_perturbation, atmospheric_drag_model
 from poliastro.earth.enums import EarthGravity
+from poliastro.spacecraft import Spacecraft
 from poliastro.twobody.orbit import Orbit
 from poliastro.twobody.propagation import cowell
 
@@ -17,7 +18,7 @@ class EarthSatellite:
     at a given time
     """
 
-    def __init__(self, orbit):
+    def __init__(self, orbit, spacecraft):
         """Constructor.
 
         Parameters
@@ -25,6 +26,7 @@ class EarthSatellite:
         orbit : Orbit
             Position and velocity of a body with respect to an attractor
             at a given time (epoch).
+        spacecraft: Spacecraft
 
         Raises
         ------
@@ -37,68 +39,20 @@ class EarthSatellite:
             raise ValueError("The attractor must be Earth")
 
         self._orbit = orbit  # type: Orbit
+        self._spacecraft = spacecraft  # type: Spacecraft
 
     @property
     def orbit(self):
         """Orbit of the EarthSatellite. """
         return self._orbit
 
-    @classmethod
-    @u.quantity_input(r=u.m, v=u.m / u.s)
-    def from_vectors(cls, r, v):
-        """Return EarthSatellite with the `Orbit` from position and velocity vectors.
+    @property
+    def spacecraft(self):
+        """Spacecraft of the EarthSatellite. """
+        return self._spacecraft
 
-        Parameters
-        ----------
-        r : ~astropy.units.Quantity
-            Position vector wrt attractor center.
-        v : ~astropy.units.Quantity
-            Velocity vector.
-
-        Returns
-        -------
-        EarthSatellite
-            New EarthSatellite with the'Orbit' position and velocity vectors.
-
-
-        """
-
-        orbit = Orbit.from_vectors(Earth, r, v)
-        return cls(orbit)
-
-    @classmethod
-    @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
-    def from_classical(
-        cls, a, ecc, inc, raan, argp, nu,
-    ):
-        """Return EarthSatellite with the 'Orbit' from classical orbital elements.
-
-        Parameters
-        ----------
-        a : ~astropy.units.Quantity
-            Semi-major axis.
-        ecc : ~astropy.units.Quantity
-            Eccentricity.
-        inc : ~astropy.units.Quantity
-            Inclination
-        raan : ~astropy.units.Quantity
-            Right ascension of the ascending node.
-        argp : ~astropy.units.Quantity
-            Argument of the pericenter.
-        nu : ~astropy.units.Quantity
-            True anomaly.
-
-        Returns
-        -------
-        EarthSatellite
-            New EarthSatellite with the 'Orbit' from classical orbital elements.
-
-        """
-
-        orbit = Orbit.from_classical(Earth, a, ecc, inc, raan, argp, nu)
-        return cls(orbit)
-
-    def propagate(self, tof, atmosphere=None, gravity=None, A_over_m=None, *args):
+    @u.quantity_input(tof=u.min)
+    def propagate(self, tof, atmosphere=None, gravity=None, *args):
         """Propagates an 'EarthSatellite Orbit' at a specified time.
 
         If value is true anomaly, propagate orbit to this anomaly and return the result.
@@ -110,11 +64,9 @@ class EarthSatellite:
         tof : ~astropy.units.Quantity, ~astropy.time.Time, ~astropy.time.TimeDelta
             Scalar time to propagate.
         atmosphere:
-            a callable model from poliastro.atmosphere
+            a callable model from poliastro.earth.atmosphere
         gravity: EarthGravity
             There are two possible values, SPHERICAL and J2. Only J2 is implemented at the moment. Default value is None.
-        A_over_m: float
-            frontal area/mass of the spacecraft (km^2/kg)
         *args:
             parameters used in perturbation models.
 
@@ -142,13 +94,13 @@ class EarthSatellite:
                 "J2": Earth.J2.value,
                 "R": Earth.R.to(u.km).value,
             }
-        if atmosphere is not None and A_over_m is not None:
+        if atmosphere is not None:
             perturbations[atmospheric_drag_model] = {
                 "R": Earth.R.to(u.km).value,
-                "C_D": 2.2,  # FIXME, add C_D as a parameter of the EarthSatellite object
-                "A_over_m": A_over_m,
+                "C_D": self.spacecraft.C_D,
+                "A_over_m": (self.spacecraft.A / self.spacecraft.m),
                 "model": atmosphere,
             }
         ad_kwargs.update(perturbations=perturbations)
         new_orbit = self.orbit.propagate(value=tof, method=cowell, ad=ad, **ad_kwargs)
-        return EarthSatellite(new_orbit)
+        return EarthSatellite(new_orbit, self.spacecraft)
