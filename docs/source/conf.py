@@ -319,3 +319,10 @@ nbsphinx_thumbnails = {
     'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
 }
+
+# Custom nbsphinx format for Jupytext markdown notebooks
+import jupytext
+
+nbsphinx_custom_formats = {
+   '.md': lambda s: jupytext.reads(s, '.md'),
+}
