@@ -89,6 +89,12 @@ The main DASTCOM5 advantage over NeoWs is that you can use it to search not only
 
 ```python
 from poliastro.neos import dastcom5
+
+# We might require to download the database if not already downloaded
+try:
+    dastcom5.download_dastcom5()
+except:
+    print("Download is not required as file already exists.")
 ```
 
 ```python
