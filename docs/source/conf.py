@@ -140,6 +140,7 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org', None)
 }
 
+"""
 if os.environ.get('READTHEDOCS') == 'True':
     nbsphinx_execute = 'never'
 else:
@@ -147,6 +148,7 @@ else:
 
     # Controls when a cell will time out (defaults to 30; use -1 for no timeout):
     nbsphinx_timeout = 60
+"""
 
 # -- Options for HTML output ----------------------------------------------
 
