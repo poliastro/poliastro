@@ -323,8 +323,7 @@ nbsphinx_thumbnails = {
 }
 
 # Custom nbsphinx format for Jupytext markdown notebooks
-import jupytext
 
 nbsphinx_custom_formats = {
-   '.md': lambda s: jupytext.reads(s, '.md'),
+    '.md': ['jupytext.reads', {'fmt': 'md'}],
 }
