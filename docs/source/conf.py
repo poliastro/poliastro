@@ -140,6 +140,7 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org', None)
 }
 
+"""
 if os.environ.get('READTHEDOCS') == 'True':
     nbsphinx_execute = 'never'
 else:
@@ -147,6 +148,7 @@ else:
 
     # Controls when a cell will time out (defaults to 30; use -1 for no timeout):
     nbsphinx_timeout = 60
+"""
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -318,4 +320,11 @@ nbsphinx_thumbnails = {
     'examples/Plotting in 3D': '_static/thumbnails/3d_plotting_thumbnail.png',
     'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
+}
+
+# Custom nbsphinx format for Jupytext markdown notebooks
+import jupytext
+
+nbsphinx_custom_formats = {
+   '.md': lambda s: jupytext.reads(s, '.md'),
 }
