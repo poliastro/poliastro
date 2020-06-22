@@ -33,7 +33,7 @@ Along history different models have been developed:
 Since some of them are implemented in `poliastro`, let us compare the differences among them.
 
 ```python
-from poliastro.atmosphere import COESA62, COESA76
+from poliastro.earth.atmosphere import COESA62, COESA76
 from astropy import units as u
 import numpy as np
 import matplotlib.pyplot as plt

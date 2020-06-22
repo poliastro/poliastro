@@ -48,9 +48,9 @@ from astropy import units as u
 from astropy.io import ascii
 from astropy.utils.data import get_pkg_data_filename
 
-from poliastro.atmosphere.base import COESA
+from poliastro.earth.atmosphere.base import COESA
 
-# Following constans come from original U.S Atmosphere 1962 paper so a pure
+# Following constants come from original U.S Atmosphere 1962 paper so a pure
 # model of this atmosphere can be implemented
 R = 8314.32 * u.J / u.kg / u.K
 R_air = 287.053 * u.J / u.kg / u.K

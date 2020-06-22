@@ -153,12 +153,12 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
         dimensionless drag coefficient ()
     A_over_m: float
         frontal area/mass of the spacecraft (km^2/kg)
-    model: a callable model from poliastro.atmosphere
+    model: a callable model from poliastro.earth.atmosphere
 
     Note
     ----
     This function provides the acceleration due to atmospheric drag, as
-    computed by a model from poliastro.atmosphere
+    computed by a model from poliastro.earth.atmosphere
 
     """
     H = norm(state[:3])

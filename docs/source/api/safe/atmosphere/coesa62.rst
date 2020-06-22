@@ -1,6 +1,6 @@
 COESA62
 =======
 
-.. automodule:: poliastro.atmosphere.coesa62
+.. automodule:: poliastro.earth.atmosphere.coesa62
     :members:
 

@@ -2,8 +2,8 @@ import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-from poliastro.atmosphere import COESA76
-from poliastro.atmosphere.coesa76 import p_coeff, rho_coeff
+from poliastro.earth.atmosphere import COESA76
+from poliastro.earth.atmosphere.coesa76 import p_coeff, rho_coeff
 
 coesa76 = COESA76()
 

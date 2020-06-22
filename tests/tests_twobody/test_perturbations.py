@@ -8,7 +8,6 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.linalg import norm
 
-from poliastro.atmosphere import COESA76
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import H0_earth, Wdivc_sun, rho0_earth
 from poliastro.core.elements import rv2coe
@@ -20,6 +19,7 @@ from poliastro.core.perturbations import (
     radiation_pressure,
     third_body,
 )
+from poliastro.earth.atmosphere import COESA76
 from poliastro.ephem import build_ephem_interpolant
 from poliastro.twobody import Orbit
 from poliastro.twobody.events import LithobrakeEvent

@@ -3,7 +3,7 @@ from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.units import imperial
 
-from poliastro.atmosphere import COESA62
+from poliastro.earth.atmosphere import COESA62
 
 coesa62 = COESA62()
 

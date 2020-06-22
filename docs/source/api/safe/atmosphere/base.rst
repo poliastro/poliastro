@@ -1,6 +1,6 @@
 Base
 ====
 
-.. automodule:: poliastro.atmosphere.base
+.. automodule:: poliastro.earth.atmosphere.base
     :members:
 
