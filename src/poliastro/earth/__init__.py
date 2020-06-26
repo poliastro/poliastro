@@ -4,6 +4,7 @@ import numpy as np
 from astropy import units as u
 
 from poliastro.bodies import Earth
+from poliastro.constants import GM_earth
 from poliastro.core.perturbations import J2_perturbation, atmospheric_drag_model
 from poliastro.earth.enums import EarthGravity
 from poliastro.spacecraft import Spacecraft
@@ -104,3 +105,66 @@ class EarthSatellite:
         ad_kwargs.update(perturbations=perturbations)
         new_orbit = self.orbit.propagate(value=tof, method=cowell, ad=ad, **ad_kwargs)
         return EarthSatellite(new_orbit, self.spacecraft)
+
+    def rgt(self, ndays, norbits, atol=1e-10, iter=float("+inf")):
+        """Calculates the orbit required for a repeating ground track orbit.
+
+        Parameters
+        ----------
+        ndays: int
+            Number of days.
+        norbits: int
+            Number of orbits in the repeat cycle.
+        atol: float, optional
+            Tolerance for the semi-major axis computation, default to 1e-8.
+        iter: int
+            Number of maximum desired iterations to obtain the most precise semi-major axis, default to infinite.
+
+        Returns
+        -------
+        Orbit
+            A new ground track orbit.
+
+        Notes
+        -----
+        The algorithm was obtained from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David
+        A. Vallado. For further information, please refer to pages from 875 to 879.
+        This iterative numerical method is also described in “A Prograde Geosat Exact Repeat Mission?”,
+        The Journal of the Astronautical Sciences, Vol. 39, No. 3, July-September 1991, pp. 313-326.
+
+        """
+        µ = GM_earth.to(u.km ** 3 / u.s ** 2)
+        a = self.orbit.a
+        e = self.orbit.ecc
+        J2 = Earth.J2.value
+        R = Earth.R.to(u.km)
+        i = self.orbit.inc
+        we = 7.292115855306589e-5 * (1 / u.s)
+
+        ndays = int(ndays)
+        norbits = int(norbits)
+        k = norbits / ndays
+        n = k * we
+
+        atol = atol * u.km
+        a_new = (µ / n ** 2) ** (1 / 3)
+        e_new = e
+
+        itt = 0
+        while abs(a_new - a) >= atol and itt <= iter:
+            a = a_new
+            e = e_new
+            p = a * (1 - e ** 2)
+            factor = 1.5 * n * J2 * (R / p) ** 2
+            dΩ = -factor * np.cos(i)
+            dw = 0.5 * factor * (4 - 5 * np.sin(i) ** 2)
+            dm = 0.5 * factor * (1 - e ** 2) ** 0.5 * (2 - 3 * np.sin(i) ** 2)
+            n = k * (we - dΩ) - (dm + dw)
+            a_new = (µ / n ** 2) ** (1 / 3)
+            e_new = 1 - a / a_new * (1 - e)  # equivalent (new_a - rp)/new_a
+            itt += 1
+
+        new_orbit = Orbit.from_classical(
+            Earth, a, e, i, self.orbit.raan, self.orbit.argp, self.orbit.nu
+        )
+        return new_orbit

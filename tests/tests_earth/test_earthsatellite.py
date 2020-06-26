@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth, Mars
 from poliastro.earth import EarthSatellite
@@ -59,3 +60,22 @@ def test_propagate_instance():
     assert isinstance(orbit_with_j2, EarthSatellite)
     assert isinstance(orbit_with_atmosphere_and_j2, EarthSatellite)
     assert isinstance(orbit_without_perturbation, EarthSatellite)
+
+
+# Examples taken from 'Space Mission Analysis and Design', Third Edition, page 156"
+@pytest.mark.parametrize(
+    "ndays, norbits, inclination, expected_a, expected_ecc",
+    [
+        (3, 43, 108 * u.deg, 7169 * u.km, 0.004 * u.one),
+        (16, 233, 98.2 * u.deg, 7077.7 * u.km, 0.001 * u.one),
+        (17, 244, 108.05 * u.deg, 7162.7 * u.km, 0.004 * u.one),
+    ],
+)
+def test_ground_track(ndays, norbits, inclination, expected_a, expected_ecc):
+    ss0 = Orbit.from_classical(
+        Earth, 5000 * u.km, 0 * u.one, inclination, 0 * u.deg, 0 * u.deg, 0 * u.deg,
+    )
+    earth_satellite = EarthSatellite(ss0, None)
+    orbit = earth_satellite.rgt(ndays, norbits)
+    assert_quantity_allclose(orbit.a, expected_a, atol=5e-2 * u.km, rtol=1e-5)
+    assert_quantity_allclose(orbit.ecc, expected_ecc, atol=1e-3 * u.one)
