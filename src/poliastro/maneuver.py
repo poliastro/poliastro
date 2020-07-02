@@ -306,3 +306,68 @@ class Maneuver:
         """
         dvs = [norm(dv) for dv in self._dvs]
         return sum(dvs, 0 * u.km / u.s)
+
+    @classmethod
+    @u.quantity_input(max_delta_r=u.km)
+    def correct_pericenter(cls, orbit, max_delta_r):
+        """ Returns a Maneuver with the time before burning and the velocity vector in direction of the burn.
+
+        Parameters
+        ----------
+        orbit : Orbit
+            Position and velocity of a body with respect to an attractor
+            at a given time (epoch).
+        max_delta_r: ~astropy.units.Quantity
+            Maximum satellite’s geocentric distance
+
+        Returns
+        -------
+        maneuver: Maneuver
+            Maneuver with the maximum time before we do an orbit-adjustment burn to restore the perigee to its
+            nominal value and the velocity vector of the spacecraft to achieve the desired correction.
+
+        Raises
+        ------
+        NotImplementedError
+            - If the correction maneuver is not implemented for the attractor.
+            - if the eccentricity is greater than 0.001.
+
+        Notes
+        -----
+        The algorithm was obtained from "Fundamentals of Astrodynamics and Applications, 4th ed (2013)" by David A.
+        Vallado, page 885.
+        Given a max_delta_r, we determine the maximum perigee drift before we do an orbit-adjustment burn
+        to restore the perigee to its nominal value. We estimate the time until this burn using the allowable drift
+        delta_w and the drift rate :math:`|dw|`.
+        For positive delta_v, the change in the eccentricity is positive for perigee burns and negative for apogee burns.
+        The opposite holds for a delta_v applied against the velocity vector, which decreases the satellite’s velocity.
+        Perigee drift are mainly due to the zonal harmonics, which cause variations in the altitude by changing the
+        argument of perigee.
+        Please note that ecc ≈ 0.001, so the error incurred by assuming a small eccentricity is on the order of 0.1%.
+        This is smaller than typical variations in thruster performance between burns.
+
+        """
+        J2 = orbit.attractor.J2.value
+        if J2 == 0.0:
+            raise NotImplementedError(
+                f"The correction maneuver is not yet supported for {orbit.attractor}"
+            )
+        elif orbit.ecc > 0.001:
+            raise NotImplementedError(
+                f"The correction maneuver is not yet supported with {orbit.ecc},it should be less than or equal to 0.001"
+            )
+
+        R = orbit.attractor.R.to(u.km)
+        µ = orbit.attractor.k.to(u.km ** 3 / u.s ** 2)
+        p = orbit.a * (1 - orbit.ecc ** 2)
+        n = (µ / orbit.a ** 3) ** 0.5
+
+        dw = ((3 * n * R ** 2 * J2) / (4 * p ** 2)) * (4 - 5 * np.sin(orbit.inc) ** 2)
+        delta_w = 2 * (1 + orbit.ecc) * max_delta_r
+        delta_w /= orbit.a * orbit.ecc * (1 - orbit.ecc)
+        delta_w **= 0.5
+        delta_t = abs(delta_w / dw)
+        delta_v = 0.5 * n * orbit.a * orbit.ecc * abs(delta_w)
+        vf_ = orbit.v / norm(orbit.v) * delta_v
+
+        return cls((delta_t, vf_))
