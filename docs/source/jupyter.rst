@@ -28,4 +28,5 @@ plotting utilities, API capabilities and many other orbital mechanics topics.
    /examples/Natural and artificial perturbations.md
    /examples/Porkchops with poliastro.md
    /examples/Multirevolutions solution in Lamberts problem.md
+   /examples/Tisserand.md
 
