@@ -90,3 +90,6 @@ include = [
     "src/poliastro/atmosphere/data/coesa76_rho.dat",
     "setup.cfg"
 ]
+exclude = [
+    "docs/"
+]
