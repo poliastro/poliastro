@@ -1,5 +1,5 @@
-Contributing
-============
+Contribute
+==========
 
 poliastro is a community project, hence all contributions are more than
 welcome!
