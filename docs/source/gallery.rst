@@ -1,5 +1,5 @@
-Jupyter notebooks
-=================
+Gallery
+=======
 
 The following page contains a collection of practical examples and problem
 solutions solved with **poliastro**. From interplanetary transfers, to asteroid
