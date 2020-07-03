@@ -305,23 +305,23 @@ def rv2coe(k, r, v, tol=1e-8):
 
     Examples
     --------
-    >>> from poliastro.constants import GM_earth
+    >>> from poliastro.bodies import Earth
     >>> from astropy import units as u
-    >>> k = GM_earth.to(u.km ** 3 / u.s ** 2).value  # Earth gravitational parameter
+    >>> k = Earth.k.to_value(u.km ** 3 / u.s ** 2)
     >>> r = np.array([-6045., -3490., 2500.])
     >>> v = np.array([-3.457, 6.618, 2.533])
     >>> p, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
-    >>> print("p:", p, "[km]")
+    >>> print("p:", p, "[km]")  # doctest: +FLOAT_CMP
     p: 8530.47436396927 [km]
-    >>> print("ecc:", ecc)
+    >>> print("ecc:", ecc)  # doctest: +FLOAT_CMP
     ecc: 0.17121118195416898
-    >>> print("inc:", np.rad2deg(inc), "[deg]")
+    >>> print("inc:", np.rad2deg(inc), "[deg]")  # doctest: +FLOAT_CMP
     inc: 153.2492285182475 [deg]
-    >>> print("raan:", np.rad2deg(raan), "[deg]")
+    >>> print("raan:", np.rad2deg(raan), "[deg]")  # doctest: +FLOAT_CMP
     raan: 255.27928533439618 [deg]
-    >>> print("argp:", np.rad2deg(argp), "[deg]")
+    >>> print("argp:", np.rad2deg(argp), "[deg]")  # doctest: +FLOAT_CMP
     argp: 20.068139973005362 [deg]
-    >>> print("nu:", np.rad2deg(nu), "[deg]")
+    >>> print("nu:", np.rad2deg(nu), "[deg]")  # doctest: +FLOAT_CMP
     nu: 28.445804984192122 [deg]
 
     """
