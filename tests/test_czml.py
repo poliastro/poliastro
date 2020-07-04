@@ -10,8 +10,9 @@ from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya
 
 try:
-    from poliastro.czml.extract_czml import CZMLExtractor
     from czml3.core import Document
+
+    from poliastro.czml.extract_czml import CZMLExtractor
 except ImportError:
     pass
 

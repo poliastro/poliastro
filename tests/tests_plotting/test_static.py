@@ -1,8 +1,8 @@
-import matplotlib.pyplot as plt
 import pytest
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from astropy.time import Time
+from matplotlib import pyplot as plt
 
 from poliastro.bodies import Earth, Jupiter, Mars, Sun
 from poliastro.constants import J2000

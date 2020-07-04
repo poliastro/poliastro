@@ -1,6 +1,6 @@
-import astropy.units as u
-import matplotlib.pyplot as plt
 import pytest
+from astropy import units as u
+from matplotlib import pyplot as plt
 
 from poliastro.bodies import Earth, Mars, Venus
 from poliastro.plotting._base import BODY_COLORS

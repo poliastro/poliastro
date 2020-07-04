@@ -1,10 +1,9 @@
 """
 This is the script for porkchop plotting
 """
-
-import matplotlib.pyplot as plt
 import numpy as np
 from astropy import coordinates as coord, units as u
+from matplotlib import pyplot as plt
 
 from poliastro.bodies import (
     Earth,

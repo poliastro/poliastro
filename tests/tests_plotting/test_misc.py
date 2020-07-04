@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import pytest
+from matplotlib import pyplot as plt
 
 from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.plotting.misc import plot_solar_system

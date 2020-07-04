@@ -6,9 +6,9 @@ import re
 import urllib.request
 import zipfile
 
-import astropy.units as u
 import numpy as np
 import pandas as pd
+from astropy import units as u
 from astropy.time import Time
 
 from poliastro.bodies import Sun

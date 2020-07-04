@@ -3,7 +3,6 @@ from collections import OrderedDict
 from functools import partial
 from unittest import mock
 
-import hypothesis.strategies as st
 import matplotlib
 import numpy as np
 import pytest
@@ -16,7 +15,7 @@ from astropy.coordinates import (
 )
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
-from hypothesis import example, given, settings
+from hypothesis import example, given, settings, strategies as st
 from numpy.testing import assert_allclose, assert_array_equal
 
 from poliastro.bodies import (

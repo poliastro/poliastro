@@ -1,10 +1,9 @@
-import hypothesis.strategies as st
 import numpy as np
 import pytest
 from astropy import time, units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
-from hypothesis import given, settings
+from hypothesis import given, settings, strategies as st
 from numpy.testing import assert_allclose
 from pytest import approx
 
