@@ -5,7 +5,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.testing import assert_allclose
 
-from poliastro.bodies import Earth, Moon
+from poliastro.bodies import Earth, Mercury, Moon
 from poliastro.maneuver import Maneuver
 from poliastro.twobody import Orbit
 
@@ -123,4 +123,57 @@ def test_repr_maneuver():
     assert (
         repr(Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_fi))
         == expected_bielliptic_maneuver
+    )
+
+
+# Similar Example obtained from "Fundamentals of Astrodynamics and Applications, 4th ed (2013)" by David A. Vallado, page 895
+@pytest.mark.parametrize(
+    "attractor, max_delta_r, a, ecc, inc, expected_t, expected_v",
+    [
+        (
+            Earth,
+            30 * u.km,
+            6570 * u.km,
+            0.001 * u.one,
+            0.7855682278773197 * u.rad,
+            2224141.03634 * u.s,
+            np.array([0, 0.0083290328315531, 0.00833186625871848]) * (u.km / u.s),
+        ),
+    ],
+)
+def test_correct_pericenter(
+    attractor, max_delta_r, a, ecc, inc, expected_t, expected_v
+):
+    ss0 = Orbit.from_classical(attractor, a, ecc, inc, 0 * u.deg, 0 * u.deg, 0 * u.deg,)
+
+    maneuver = Maneuver.correct_pericenter(ss0, max_delta_r)
+    assert_quantity_allclose(maneuver[0][0], expected_t)
+    assert_quantity_allclose(maneuver[0][1].value.tolist(), expected_v.value.tolist())
+
+
+def test_correct_pericenter_J2_exception():
+    ss0 = Orbit.from_classical(
+        Mercury, 1000 * u.km, 0 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg,
+    )
+    max_delta_r = 30 * u.km
+    with pytest.raises(NotImplementedError) as excinfo:
+        Maneuver.correct_pericenter(ss0, max_delta_r)
+    assert excinfo.type == NotImplementedError
+    assert (
+        str(excinfo.value)
+        == f"The correction maneuver is not yet supported for {ss0.attractor}"
+    )
+
+
+def test_correct_pericenter_ecc_exception():
+    ss0 = Orbit.from_classical(
+        Earth, 1000 * u.km, 0.5 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg,
+    )
+    max_delta_r = 30 * u.km
+    with pytest.raises(NotImplementedError) as excinfo:
+        Maneuver.correct_pericenter(ss0, max_delta_r)
+    assert excinfo.type == NotImplementedError
+    assert (
+        str(excinfo.value)
+        == f"The correction maneuver is not yet supported with {ss0.ecc},it should be less than or equal to 0.001"
     )
