@@ -1,10 +1,9 @@
 """ Generates Tisserand plots """
-
 from enum import Enum
 
-import matplotlib.pyplot as plt
 import numpy as np
 from astropy import units as u
+from matplotlib import pyplot as plt
 
 from poliastro.plotting._base import BODY_COLORS
 from poliastro.twobody.mean_elements import get_mean_elements

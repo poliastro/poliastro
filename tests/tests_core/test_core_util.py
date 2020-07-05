@@ -1,9 +1,8 @@
 from functools import partial
 
-import hypothesis.strategies as st
 import numpy as np
 import pytest
-from hypothesis import given, settings
+from hypothesis import given, settings, strategies as st
 
 from poliastro.core.util import alinspace, rotation_matrix
 

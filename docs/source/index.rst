@@ -87,7 +87,7 @@ Contents
 
 .. toctree::
     :maxdepth: 2
-    :caption: Install, use and contribute
+    :caption: How to
 
     getting_started
     user_guide
@@ -97,20 +97,15 @@ Contents
     :maxdepth: 2
     :caption: Tutorials
 
-    jupyter
+    gallery
 
 .. toctree::
     :maxdepth: 2
-    :caption: API Docs
+    :caption: References
 
     api/safe/safe_index
     api/core/core_index
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Bibliography
-
-    references
+    bibliography
 
 
 .. note::

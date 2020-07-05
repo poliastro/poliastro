@@ -1,10 +1,9 @@
 from functools import partial
 
-import hypothesis.strategies as st
 import numpy as np
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
-from hypothesis import example, given, settings
+from hypothesis import example, given, settings, strategies as st
 
 from poliastro.twobody.sampling import sample_closed
 

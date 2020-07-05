@@ -1,5 +1,5 @@
-References
-==========
+Bibliography
+============
 
   *Nanos gigantum humeris insidentes.*
 

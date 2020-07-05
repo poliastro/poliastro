@@ -6,8 +6,8 @@ References
   Elliptical Orbit Transfers", 1997.
 
 """
-import astropy.units as u
 import numpy as np
+from astropy import units as u
 from numpy import cross
 from numpy.linalg import norm
 
