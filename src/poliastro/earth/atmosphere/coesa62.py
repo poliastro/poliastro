@@ -181,8 +181,7 @@ class COESA62(COESA):
             # Putting g = (g0*(r0/(r0 +z))**2) in (g * dz / z - zb + Tb/Lb)
             # and integrating it.
             integrand = quad(
-                lambda x: (g0_v * (r0_v / (r0_v + x)) ** 2)
-                / (x - zb_v + Tb_v / Lb_v),
+                lambda x: (g0_v * (r0_v / (r0_v + x)) ** 2) / (x - zb_v + Tb_v / Lb_v),
                 zb_v,
                 z_v,
             )
