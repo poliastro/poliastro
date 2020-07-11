@@ -20,7 +20,8 @@ from czml3.properties import (
 from czml3.types import IntervalValue, TimeInterval
 
 from poliastro.bodies import Earth
-from poliastro.czml.utils import ellipsoidal_to_cartesian, project_point_on_ellipsoid
+from poliastro.czml.utils import project_point_on_ellipsoid
+from erfa import gd2gce
 from poliastro.twobody.propagation import propagate
 
 PIC_SATELLITE = (
@@ -276,7 +277,11 @@ class CZMLExtractor:
                 )  # get semi-major and semi-minor axises
             else:
                 a, b = Earth.R.to(u.m).value, Earth.R_polar.to(u.m).value
-            pos = list(map(lambda x: x.value, ellipsoidal_to_cartesian(a, b, u0, v0)))
+            
+            f=1-(b/a) #Flattenning 
+            
+            pos = list(map(lambda x: x, gd2gce(a, f, u0.to_value(u.rad), v0.to_value(u.rad), 0)))
+            
         else:
             raise TypeError(
                 "Invalid coordinates. Coordinates must be of the form [u, v] where u, v are astropy units"
