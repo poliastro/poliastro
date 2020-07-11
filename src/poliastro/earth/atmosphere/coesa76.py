@@ -52,7 +52,7 @@ from poliastro.earth.atmosphere.base import COESA
 
 # Following constants come from original U.S Atmosphere 1962 paper so a pure
 # model of this atmosphere can be implemented
-R = 8314.32 * u.J / u.kg / u.K
+R = 8314.32 * u.J / u.kmol / u.K
 R_air = 287.053 * u.J / u.kg / u.K
 k = 1.380622e-23 * u.J / u.K
 Na = 6.022169e-26 / u.kmol

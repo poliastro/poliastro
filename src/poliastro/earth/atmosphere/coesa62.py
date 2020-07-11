@@ -73,7 +73,7 @@ beta = 1.458e-6 * u.kg / u.s / u.m / u.K ** (0.5)
 _gamma = 1.4
 sigma = 3.65e-10 * u.m
 N = 6.02257e26 * (u.kg * u.mol) ** -1
-R = 8314.32 * u.J / u.kg / u.K
+R = 8314.32 * u.J / u.kmol / u.K
 R_air = 287.053 * u.J / u.kg / u.K
 alpha = 34.1632 * u.K / u.km
 
