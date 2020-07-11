@@ -73,7 +73,7 @@ beta = 1.458e-6 * u.kg / u.s / u.m / u.K ** (0.5)
 _gamma = 1.4
 sigma = 3.65e-10 * u.m
 N = 6.02257e26 * (u.kg * u.mol) ** -1
-R = 8314.32 * u.J / u.kg / u.K
+R = 8314.32 * u.J / u.kmol / u.K
 R_air = 287.053 * u.J / u.kg / u.K
 alpha = 34.1632 * u.K / u.km
 
@@ -181,7 +181,8 @@ class COESA62(COESA):
             # Putting g = (g0*(r0/(r0 +z))**2) in (g * dz / z - zb + Tb/Lb)
             # and integrating it.
             integrand = quad(
-                lambda x: (g0_v * (r0_v / (r0_v + x)) ** 2) / (x - zb_v + Tb_v / Lb_v),
+                lambda x: (g0_v * (r0_v / (r0_v + x)) ** 2)
+                / (x - zb_v + Tb_v / Lb_v),
                 zb_v,
                 z_v,
             )
