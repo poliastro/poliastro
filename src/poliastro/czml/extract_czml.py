@@ -274,7 +274,7 @@ class CZMLExtractor:
                     self.cust_prop[0][2],
                 )  # get semi-major and semi-minor axises
             else:
-                a, b = Earth.R.to(u.m).value, Earth.R_polar.to(u.m).value
+                a, b = Earth.R.to_value(u.m), Earth.R_polar.to_value(u.m)
 
             f = 1 - (b / a)  # Flattenning
 
