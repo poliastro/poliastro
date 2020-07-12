@@ -41,6 +41,7 @@ requires = [
     "numpy",
     "pandas",
     "plotly ~=4.0",
+    "pyerfa",
     "scipy >=1.4.0",
 ]
 

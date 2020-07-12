@@ -18,9 +18,10 @@ from czml3.properties import (
     SolidColorMaterial,
 )
 from czml3.types import IntervalValue, TimeInterval
+from erfa import gd2gce
 
 from poliastro.bodies import Earth
-from poliastro.czml.utils import ellipsoidal_to_cartesian, project_point_on_ellipsoid
+from poliastro.czml.utils import project_point_on_ellipsoid
 from poliastro.twobody.propagation import propagate
 
 PIC_SATELLITE = (
@@ -244,11 +245,9 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        orbit: poliastro.Orbit
-            Orbit to be added
         pos: list [~astropy.units]
             coordinates of ground station,
-            [u v] ellipsoidal coordinates (0 elevation)
+            list of geodetic latitude and longitude [lon, lat] (0 elevation)
         id_description: str
             Set ground station description
         label_fill_color: list (int)
@@ -275,8 +274,12 @@ class CZMLExtractor:
                     self.cust_prop[0][2],
                 )  # get semi-major and semi-minor axises
             else:
-                a, b = Earth.R.to(u.m).value, Earth.R_polar.to(u.m).value
-            pos = list(map(lambda x: x.value, ellipsoidal_to_cartesian(a, b, u0, v0)))
+                a, b = Earth.R.to_value(u.m), Earth.R_polar.to_value(u.m)
+
+            f = 1 - (b / a)  # Flattenning
+
+            pos = list(gd2gce(a, f, u0.to_value(u.rad), v0.to_value(u.rad), 0))
+
         else:
             raise TypeError(
                 "Invalid coordinates. Coordinates must be of the form [u, v] where u, v are astropy units"
