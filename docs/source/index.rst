@@ -43,8 +43,8 @@ and `chat`_.
    :alt: Molniya orbit
 
    Plot of a `Molniya orbit`_ around the Earth
-   (\\(a = 26600\\,\\mathrm{km}, e = 0.75,
-   i = 63.4 \\mathrm{{}^{\\circ}} \\)).
+   (:math:`a = 26600\mathrm{km}, e = 0.75,
+   i = 63.4\mathrm{^\circ}`).
 
 The `source code`_, `issue tracker`_ and `wiki`_ are hosted on GitHub, and all
 contributions and feedback are more than welcome. You can test poliastro in your
