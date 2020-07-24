@@ -33,7 +33,7 @@ announcements and general discussion take place on our `mailing list`_
 and `chat`_.
 
 .. _`mailing list`: https://groups.io/g/poliastro-dev
-.. _`chat`: https://riot.im/app/#/room/#poliastro:matrix.org
+.. _`chat`: http://chat.poliastro.space/
 
 .. include:: form.rst
 

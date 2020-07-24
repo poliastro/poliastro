@@ -39,8 +39,8 @@
    :target: https://groups.io/g/poliastro-dev
 
 .. |matrix| image:: https://img.shields.io/matrix/poliastro:matrix.org.svg?style=flat-square
-   :alt: Join the chat at https://chat.openastronomy.org/#/room/#poliastro:matrix.org
-   :target: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
+   :alt: Join the chat at http://chat.poliastro.space/
+   :target: http://chat.poliastro.space/
 
 |azure_pipelines| |codecov| |codeclimate|
 
@@ -146,7 +146,7 @@ Release announcements and general discussion take place on our `Mailing List`_ .
 
 For further clarifications and discussions, feel free to join Poliastro `Chat Room`_.
 
-.. _`Chat Room`: https://chat.openastronomy.org/#/room/#poliastro:matrix.org
+.. _`Chat Room`: http://chat.poliastro.space/
 .. _`Mailing List`: https://groups.io/g/poliastro-dev
 
 
