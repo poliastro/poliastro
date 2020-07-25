@@ -77,7 +77,7 @@ is within the scope of the library so you don't waste your time -
 `the mailing list`_ or `the chat`_ are good places to ask.
 
 .. _`the mailing list`: https://groups.io/g/poliastro-dev
-.. _`the chat`: https://riot.im/app/#/room/#poliastro:matrix.org
+.. _`the chat`: http://chat.poliastro.space/
 
 If the feature you suggest happens to be useful and within scope, you will
 probably be advised to create a new `wiki`_ page with some information
