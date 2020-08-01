@@ -116,7 +116,7 @@ Bugs fixed
 Backwards incompatible changes
 ..............................
 
-* poliastro :ref:`frames`  now must be imported from the specific submodule.
+* poliastro frames now must be imported from the specific submodule.
 * Renamed ``kepler`` to :py:meth:`poliastro.twobody.propagation.vallado`
   and ``mean_motion`` to :py:meth:`poliastro.twobody.propagation.farnocchia`.
 * Removed ``nu_to_M`` and ``M_to_nu`` functions, see the
