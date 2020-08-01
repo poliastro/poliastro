@@ -69,6 +69,7 @@ dev = [
     "pytest-mypy",
     "pytest-remotedata",
     "sphinx",
+    "sphinx-autoapi",
     "sphinx-gallery",
     "sphinx_rtd_theme==0.5.0rc1",
     "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/master.zip",
