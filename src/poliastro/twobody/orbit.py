@@ -782,18 +782,22 @@ class Orbit:
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
     ):
-        r""" Returns an orbit where the orbital period equals the rotation rate of the orbited body.
-        The synchronous altitude for any central body can directly be obtained from Kepler's Third Law by setting
-        the orbit period P\ :sub:`sync`, equal to the rotation period of the central body relative to the
-        fixed stars D\ :sup:`*`.
-        In order to obtain this, it's important to match orbital period with sidereal rotation period.
+        r""" Returns an orbit where the orbital period equals the rotation rate
+        of the orbited body.  The synchronous altitude for any central body can
+        directly be obtained from Kepler's Third Law by setting the orbit period
+        P\ :sub:`sync`, equal to the rotation period of the central body
+        relative to the fixed stars D\ :sup:`*`. In order to obtain this, it's
+        important to match orbital period with sidereal rotation period.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
         period_mul : ~astropy.units.Quantity
-            Multiplier, default to 1 to indicate that the period of the body is equal to the sidereal rotational period of the body being orbited, 0.5 a period equal to half the average rotational period of the body being orbited, indicates a semi-synchronous orbit.
+            Multiplier, default to 1 to indicate that the period of the body is
+            equal to the sidereal rotational period of the body being orbited,
+            0.5 a period equal to half the average rotational period of the body
+            being orbited, indicates a semi-synchronous orbit.
         ecc : ~astropy.units.Quantity
             Eccentricity,default to 0 as a stationary orbit.
         inc : ~astropy.units.Quantity
@@ -823,13 +827,14 @@ class Orbit:
         -----
 
         Thus:
+
         .. math::
 
-                P_{s y n c}=D^{*} \\
+            P_{s y n c}=D^{*} \\
 
-                a_{s y n c}=\left(\mu / 4 \pi^{2}\right)^{1 / 3}\left(D^{*}\right)^{2 / 3}\\
+            a_{s y n c}=\left(\mu / 4 \pi^{2}\right)^{1 / 3}\left(D^{*}\right)^{2 / 3}\\
 
-                H_{s y n c}=a_{s y n c} - R_{p l a n e t}\\
+            H_{s y n c}=a_{s y n c} - R_{p l a n e t}\\
 
         """
         period_sync = attractor.rotational_period * period_mul

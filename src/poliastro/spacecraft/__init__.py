@@ -46,7 +46,7 @@ class Spacecraft:
 
     @property
     def ballistic_coefficient(self):
-        """Calculates the Ballistic coefficient (km^2/kg)
+        r"""Calculates the Ballistic coefficient (km^2/kg)
 
         Returns
         -------
@@ -55,8 +55,11 @@ class Spacecraft:
 
         Notes
         -----
-        Be aware that you may encounter alternative definitions of the Ballistic coefficient, such as the reciprocal:
+        Be aware that you may encounter alternative definitions of the Ballistic
+        coefficient, such as the reciprocal:
+
         .. math::
+
             \frac{m}{C_D A}
 
         """

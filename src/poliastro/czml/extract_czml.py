@@ -49,8 +49,7 @@ class CZMLExtractor:
     def __init__(
         self, start_epoch, end_epoch, N, attractor=None, pr_map=None, scene3D=True
     ):
-        """
-        Orbital constructor
+        """Orbital constructor
 
         Parameters
         ----------
@@ -59,16 +58,14 @@ class CZMLExtractor:
         end_epoch: ~astropy.time.core.Time
             Ending epoch
         N: int
-            Default number of sample points.
-            Unless otherwise specified, the number
-            of sampled data points will be N when calling
-            add_orbit()
+            Default number of sample points. Unless otherwise specified, the
+            number of sampled data points will be N when calling add_orbit()
         attractor: poliastro.Body
             Attractor of the orbits
         scene3D: bool
-            Determines the scene mode. If set to true, the scene
-            is set to 3D mode, otherwise it's the orthographic
-            projection.
+            Determines the scene mode. If set to true, the scene is set to 3D
+            mode, otherwise it's the orthographic projection.
+
         """
         self.packets = []  # type: List[Packet]
         self.trajectories = []  # type: List[Any]
@@ -185,8 +182,7 @@ class CZMLExtractor:
 
     def _init_czml_(self):
         """
-        Only called at the initialization of the extractor
-        Builds packets.
+        Only called at the initialization of the extractor Builds packets.
         """
         pckt = Preamble(
             name="document_packet",
@@ -204,6 +200,7 @@ class CZMLExtractor:
     def _change_custom_params(self, ellipsoid, pr_map, scene3D):
         """
         Change the custom properties package.
+
         Parameters
         ----------
         ellipsoid: list(int)
@@ -211,6 +208,7 @@ class CZMLExtractor:
             representing the radii in the x, y and z axis
         pr_map: str
             A URL to the projection of the defined ellipsoid (UV map)
+
         """
 
         if pr_map is None:
