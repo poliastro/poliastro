@@ -1,3 +1,5 @@
+""" Holds different classes to model atmospheric models """
+
 from poliastro.earth.atmosphere.util import h_to_z, z_to_h
 
 
@@ -9,8 +11,9 @@ class COESA:
 
         Parameters
         ----------
-        tables: *args
+        tables: *tables
             Different tables that define the atmosphere.
+
         """
 
         self.tables = tables
@@ -42,8 +45,8 @@ class COESA:
     def _check_altitude(self, alt, r0, geometric=True):
         """ Checks if altitude is inside valid range.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         alt: ~astropy.units.Quantity
             Altitude to be checked.
         r0: ~astropy.units.Quantity
@@ -57,6 +60,7 @@ class COESA:
             Geometric altitude.
         h: ~astropy.units.Quantity
             Geopotential altitude.
+
         """
 
         # Get geometric and geopotential altitudes
@@ -91,6 +95,7 @@ class COESA:
         -------
         i: int
             Index for the value.
+
         """
 
         for i, value in enumerate(x_levels):

@@ -2,7 +2,7 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import (
     HCRS,
-    ITRS,
+    ITRS as _ITRS,
     BaseRADecFrame,
     FunctionTransform,
     TimeAttribute,
@@ -46,6 +46,9 @@ __all__ = [
     "UranusFixed",
     "NeptuneFixed",
 ]
+
+# HACK: sphinx-autoapi variable definition
+ITRS = _ITRS
 
 
 class _PlanetaryFixed(BaseRADecFrame):

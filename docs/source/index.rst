@@ -103,8 +103,7 @@ Contents
     :maxdepth: 2
     :caption: References
 
-    api/safe/safe_index
-    api/core/core_index
+    autoapi/index
     bibliography
 
 

@@ -28,7 +28,11 @@ J2 for the Sun was obtained from:
 
 from astropy import time
 from astropy.constants import Constant
-from astropy.constants.iau2015 import M_earth, M_jup as M_jupiter, M_sun
+from astropy.constants.iau2015 import (
+    M_earth as _M_earth,
+    M_jup as _M_jupiter,
+    M_sun as _M_sun,
+)
 
 __all__ = [
     "J2000",
@@ -90,6 +94,11 @@ __all__ = [
     "rho0_earth",
     "Wdivc_sun",
 ]
+
+# HACK: sphinx-autoapi variable definition
+M_earth = _M_earth
+M_jupiter = _M_jupiter
+M_sun = _M_sun
 
 # See for example USNO Circular 179
 J2000_TT = time.Time("J2000", scale="tt")

@@ -35,6 +35,7 @@ needs_sphinx = '1.3'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'autoapi.extension',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
@@ -322,3 +323,15 @@ nbsphinx_thumbnails = {
 nbsphinx_custom_formats = {
     '.md': ['jupytext.reads', {'fmt': 'md'}],
 }
+
+# The sphinx-autoapi tool configuration
+autoapi_type = 'python'
+autoapi_dirs = ['../../src/']
+
+# Make use of custom templates
+autoapi_template_dir = '_autoapi_templates'
+exclude_patterns.append('_autoapi_templates/index.rst')
+exclude_patterns.append('_autoapi_templates/python/module.rst')
+
+# Ignore sphinx-autoapi warnings on multiple target description
+suppress_warnings.append('ref.python')

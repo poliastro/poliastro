@@ -1,9 +1,9 @@
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import (
-    GCRS,
-    HCRS,
-    ICRS,
+    GCRS as _GCRS,
+    HCRS as _HCRS,
+    ICRS as _ICRS,
     AffineTransform,
     BaseRADecFrame,
     CartesianDifferential,
@@ -39,6 +39,11 @@ __all__ = [
     "UranusICRS",
     "NeptuneICRS",
 ]
+
+# HACK: sphinx-autoapi variable definition
+ICRS = _ICRS
+HCRS = _HCRS
+GCRS = _GCRS
 
 
 class _PlanetaryICRS(BaseRADecFrame):

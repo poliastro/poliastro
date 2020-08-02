@@ -1,3 +1,5 @@
+""" Low level propagation algorithms """
+
 import numpy as np
 
 from .._jit import jit

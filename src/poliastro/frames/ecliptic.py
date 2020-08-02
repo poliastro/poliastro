@@ -4,8 +4,8 @@ from astropy.coordinates import (
     BaseEclipticFrame,
     CartesianRepresentation,
     DynamicMatrixTransform,
-    GeocentricMeanEcliptic,
-    HeliocentricEclipticIAU76 as HeliocentricEclipticJ2000,
+    GeocentricMeanEcliptic as _GeocentricMeanEcliptic,
+    HeliocentricEclipticIAU76 as _HeliocentricEclipticJ2000,
     TimeAttribute,
     UnitSphericalRepresentation,
     frame_transform_graph,
@@ -25,6 +25,10 @@ __all__ = [
     "GeocentricMeanEcliptic",
     "HeliocentricEclipticJ2000",
 ]
+
+# HACK: sphinx-autoapi variable definition
+GeocentricMeanEcliptic = _GeocentricMeanEcliptic
+HeliocentricEclipticJ2000 = _HeliocentricEclipticJ2000
 
 
 class GeocentricSolarEcliptic(BaseEclipticFrame):

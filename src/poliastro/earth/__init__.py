@@ -1,3 +1,5 @@
+""" Earth focused orbital mechanics routines """
+
 from typing import Dict
 
 import numpy as np
