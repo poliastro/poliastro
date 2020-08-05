@@ -14,6 +14,7 @@ from astropy.coordinates import (
 )
 from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
+from scipy.optimize import root_scalar
 
 from poliastro.constants import J2000
 from poliastro.frames import Planes
@@ -21,8 +22,18 @@ from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.propagation import farnocchia, propagate
 
+from ..bodies import Sun
 from ..core.propagation.farnocchia import delta_t_from_nu as delta_t_from_nu_fast
-from ..util import find_closest_value, norm
+from ..util import (
+    calculate_a_brackets,
+    calculate_ecc_from_a,
+    calculate_inc_from_a,
+    calculate_pq,
+    find_closest_value,
+    norm,
+    scipy_root_scalar,
+    variable_step_bisection_algorithm,
+)
 from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
 from .angles import D_to_nu, E_to_nu, F_to_nu, M_to_D, M_to_E, M_to_F, raan_from_ltan
 from .elements import (
@@ -1497,3 +1508,500 @@ class Orbit:
             from poliastro.plotting.core import OrbitPlotter2D
 
             return OrbitPlotter2D().plot(self, label=label)
+
+    @classmethod
+    def groundtrack_orbit(
+        cls,
+        attractor,
+        Q,
+        inc=None,
+        ecc=None,
+        prograde=True,
+        xtol=None,
+        xrtol=None,
+        tol=None,
+        rtol=None,
+        maxiter=1000,
+        method="brenth",
+    ):
+        r"""
+        Calculates a daily ground-track orbit,that pass over the same locations at the same time each solar day
+        for an object in any orbit.
+
+        attractor: Body
+            Main attractor.
+        Q: float
+            Trace repetition parameter for a ground-track orbit,amount of orbits in a day, revolutions per day.
+        inc: ~astropy.units.Quantity
+            Inclination.
+        ecc: ~astropy.units.Quantity
+            Eccentricity.
+        prograde: bool
+            Default value is True, for a prograde orbit. False value establishes a retrograde orbit.
+        xtol : float, optional
+            The allowable tolerance of the :math:`x`.
+        xrtol: float, optional
+            The allowable relative tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        tol: float, optional
+            The allowable tolerance of the error, :math:`|y - f(x)|`.
+        rtol: float, optional
+            The allowable relative tolerance of the error using y as reference.
+        maxiter: int, optional
+            Maximum number of iterations. Default value set to 1000.
+        method: string
+            Algorithm chosen to find the solution. Default method is brenth but you can choose any of the following
+            methods: lms, bisect, brentq, ridder, toms748 and secant.
+
+        """
+        # nsol = 2 * pi / Period_around_sun
+        nsol = ((attractor.k + Sun.k) / (get_mean_elements(attractor).a ** 3)) ** 0.5
+        nsol = nsol.to(1 / u.s) * u.rad
+
+        Period_around_sun = (
+            2
+            * np.pi
+            * (get_mean_elements(attractor).a ** 3 / (Sun.k + attractor.k)) ** 0.5
+        )
+        Psol = (1 / attractor.rotational_period - 1 / Period_around_sun) ** -1
+        Psid = attractor.rotational_period.to(u.s)
+        if inc is not None:
+            if inc <= np.pi / 2 * u.rad:  # Prograde
+                Pq = Psol * Psid / (Psid * (Q - 1) + Psol)
+            else:  # Retrograde
+                Pq = Psol * Psid / (Psid * (Q + 1) - Psol)
+        elif prograde:
+            Pq = Psol * Psid / (Psid * (Q - 1) + Psol)
+        else:
+            Pq = Psol * Psid / (Psid * (Q + 1) - Psol)
+
+        if method in {"bisect", "brentq", "brenth", "ridder", "toms748", "secant"}:
+            x0, x1 = calculate_a_brackets(
+                attractor=attractor, inc=inc, ecc=ecc, Psol=Psol, Q=Q, nsol=nsol
+            )
+            result = root_scalar(
+                f=scipy_root_scalar,
+                args=(nsol, attractor, ecc, inc, Pq),
+                method=method,
+                x0=x0,
+                x1=x1,
+                maxiter=1000,
+                bracket=[x0, x1],
+            )
+            a = result.root * u.km
+        elif method == "lms":
+            orbit_elements = {
+                "ecc": ecc,
+                "inc": inc,
+                "nsol": nsol,
+                "attractor": attractor,
+            }
+            a = variable_step_bisection_algorithm(
+                f=calculate_pq,
+                x0=attractor.R.to(u.km),
+                y=Pq,
+                step_size=attractor.R.to(u.km),
+                kwargs=orbit_elements,
+                xtol=xtol,
+                xrtol=xrtol,
+                tol=tol,
+                rtol=rtol,
+                maxiter=maxiter,
+            )
+        else:
+            ValueError("Method not implemented")
+        if ecc is None:
+            a, ecc = calculate_ecc_from_a(a, nsol, inc, attractor)
+        if inc is None:
+            inc = calculate_inc_from_a(a, nsol, ecc, attractor)
+        return cls.from_classical(
+            attractor, a, ecc, inc, raan=0 * u.deg, argp=0 * u.deg, nu=0 * u.deg
+        )
+
+    @classmethod
+    def groundtrack_circular_equatorial_orbit(
+        cls,
+        attractor,
+        Q,
+        prograde=True,
+        xtol=None,
+        xrtol=None,
+        tol=None,
+        rtol=None,
+        maxiter=1000,
+        method="brenth",
+    ):
+        r"""
+        Calculates a daily ground-track orbit,that pass over the same locations at the same time each solar day.
+        for an object in a circular equatorial orbit
+
+        attractor: Body
+            Main attractor.
+        Q: float
+            Trace repetition parameter for a ground-track orbit,amount of orbits in a day, revolutions per day.
+        prograde: bool
+            Default value is True, for a prograde orbit. False value establishes a retrograde orbit.
+        xtol: float, optional
+            The allowable tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        xrtol: float, optional
+            The allowable relative tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        tol: float, optional
+            The allowable tolerance of the error, :math:`|y - f(x)|`.
+        rtol: float, optional
+            The allowable relative tolerance of the error using y as reference.
+        maxiter: int, optional
+            Maximum number of iterations.
+        method: string
+            Algorithm chosen to find the solution. Default method is brenth but you can choose any of the following
+            methods: lms, bisect, brentq, ridder, toms748 and secant.
+
+        Returns:
+        -------
+        Orbit
+            A ground-track orbit.
+
+        Notes:
+        ------
+        The algorithm was obtained from the paper; "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge,
+        S. and Diehl, R. and Neelon, J. and Ely, Todd and Turner, A.E. For further information please consult
+        "Advances in the Astronautical Sciences", Vol 114, pages 1143-1155.
+
+        """
+        ecc = 0 * u.one
+        inc = 0 * u.rad if prograde else np.pi * u.rad
+        return cls.groundtrack_orbit(
+            attractor=attractor,
+            Q=Q,
+            inc=inc,
+            ecc=ecc,
+            prograde=prograde,
+            xtol=xtol,
+            xrtol=xrtol,
+            tol=tol,
+            rtol=rtol,
+            maxiter=maxiter,
+            method=method,
+        )
+
+    @classmethod
+    def groundtrack_equatorial_eccentric_orbit(
+        cls,
+        attractor,
+        Q,
+        prograde=True,
+        xtol=None,
+        xrtol=None,
+        tol=None,
+        rtol=None,
+        maxiter=1000,
+        method="brenth",
+    ):
+        r"""
+        Calculates a daily ground-track orbit,that pass over the same locations at the same time each solar day.
+        for an object in a equatorial eccentric orbit.
+
+        attractor: Body
+            Main attractor.
+        Q: flaot
+            Trace repetition parameter for a ground-track orbit,amount of orbits in a day, revolutions per day.
+        prograde: bool
+            Default value is True, for a prograde orbit. False value establishes a retrograde orbit.
+        xtol: float, optional
+            The allowable tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        xrtol: float, optional
+            The allowable relative tolerance of the semi-major axis desired to achieve a ground-track orbit
+        tol: float, optional
+            The allowable tolerance of the error, :math:`|y - f(x)|`.
+        rtol: float, optional
+            The allowable relative tolerance of the error using y as reference.
+        maxiter: int, optional
+            Maximum number of iterations.
+        method: string
+            Algorithm chosen to find the solution. Default method is brenth but you can choose any of the following
+            methods: lms, bisect, brentq, ridder, toms748 and secant.
+
+        Returns:
+        -------
+        Orbit
+            A ground-track orbit.
+
+        Notes:
+        ------
+        The algorithm was obtained from the paper; "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge,
+        S. and Diehl, R. and Neelon, J. and Ely, Todd and Turner, A.E. For further information please consult
+        "Advances in the Astronautical Sciences", Vol 114, pages 1143-1155.
+
+        """
+        inc = 0 * u.rad if prograde else np.pi * u.rad
+        return cls.groundtrack_orbit(
+            attractor=attractor,
+            Q=Q,
+            inc=inc,
+            prograde=prograde,
+            xtol=xtol,
+            xrtol=xrtol,
+            tol=tol,
+            rtol=rtol,
+            maxiter=maxiter,
+            method=method,
+        )
+
+    @classmethod
+    def groundtrack_specified_eccentricity_orbit(
+        cls,
+        attractor,
+        Q,
+        ecc=ecc,
+        prograde=True,
+        xtol=None,
+        xrtol=None,
+        tol=None,
+        rtol=None,
+        maxiter=None,
+        method="brenth",
+    ):
+        r"""
+        Calculates a daily ground-track orbit,that pass over the same locations at the same time each solar day.
+        for an object in a circular sun synchronous orbit with an specified eccentricity and no inclination.
+
+        attractor: Body
+            Main attractor.
+        Q: float
+            Trace repetition parameter for a ground-track orbit,amount of orbits in a day, revolutions per day.
+        ecc: ~astropy.units.Quantity
+            Eccentricity.
+        prograde: bool
+            Default value is True, for a prograde orbit. False value establishes a retrograde orbit.
+        xtol: float, optional
+            The allowable tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        xrtol: float, optional
+            The allowable relative tolerance of the semi-major axis desired to achieve a ground-track orbit
+        tol: float, optional
+            The allowable tolerance of the error, :math:`|y - f(x)|`.
+        rtol: float, optional
+            The allowable relative tolerance of the error using y as reference.
+        maxiter: int, optional
+            Maximum number of iterations.
+        method: string
+            Algorithm chosen to find the solution. Default method is brenth but you can choose any of the following
+            methods: lms, bisect, brentq, ridder, toms748 and secant.
+
+        Returns:
+        -------
+        Orbit
+            A ground-track orbit.
+
+        Notes:
+        ------
+        The algorithm was obtained from the paper; "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge,
+        S. and Diehl, R. and Neelon, J. and Ely, Todd and Turner, A.E. For further information please consult
+        "Advances in the Astronautical Sciences", Vol 114, pages 1143-1155.
+
+        """
+        return cls.groundtrack_orbit(
+            attractor=attractor,
+            Q=Q,
+            ecc=ecc,
+            prograde=prograde,
+            xtol=xtol,
+            xrtol=xrtol,
+            tol=tol,
+            rtol=rtol,
+            maxiter=maxiter,
+            method=method,
+        )
+
+    @classmethod
+    def groundtrack_circular_sunsynchronous_orbit(
+        cls,
+        attractor,
+        Q,
+        prograde=True,
+        xtol=None,
+        xrtol=None,
+        tol=None,
+        rtol=None,
+        maxiter=None,
+        method="brenth",
+    ):
+        r"""
+        Calculates a daily ground-track orbit,that pass over the same locations at the same time each solar day.
+        for an object in a circular sun synchronous orbit.
+
+        attractor: Body
+            Main attractor.
+        Q: float
+            Trace repetition parameter for a ground-track orbit,amount of orbits in a day, revolutions per day.
+        prograde: bool
+            Default value is True, for a prograde orbit. False value establishes a retrograde orbit.
+        xtol: float, optional
+            The allowable tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        xrtol: float, optional
+            The allowable relative tolerance of the semi-major axis desired to achieve a ground-track orbit
+        tol: float, optional
+            The allowable tolerance of the error, :math:`|y - f(x)|`.
+        rtol: float, optional
+            The allowable relative tolerance of the error using y as reference.
+        maxiter: int, optional
+            Maximum number of iterations.
+        method: string
+            Algorithm chosen to find the solution. Default method is brenth but you can choose any of the following
+            methods: lms, bisect, brentq, ridder, toms748 and secant.
+
+        Returns:
+        -------
+        Orbit
+            A ground-track orbit.
+
+        Notes:
+        ------
+        The algorithm was obtained from the paper; "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge,
+        S. and Diehl, R. and Neelon, J. and Ely, Todd and Turner, A.E. For further information please consult
+        "Advances in the Astronautical Sciences", Vol 114, pages 1143-1155.
+
+        """
+        ecc = 0 * u.one
+        return cls.groundtrack_specified_eccentricity_orbit(
+            attractor=attractor,
+            Q=Q,
+            ecc=ecc,
+            prograde=prograde,
+            xtol=xtol,
+            xrtol=xrtol,
+            tol=tol,
+            rtol=rtol,
+            maxiter=maxiter,
+            method=method,
+        )
+
+    @classmethod
+    def groundtrack_with_specified_inclination_orbit(
+        cls,
+        attractor,
+        Q,
+        inc=inc,
+        prograde=True,
+        xtol=None,
+        xrtol=None,
+        tol=None,
+        rtol=None,
+        maxiter=None,
+        method="brenth",
+    ):
+        r"""
+        Calculates a daily ground-track orbit,that pass over the same locations at the same time each solar day.
+        for an object with an specified inclination and no eccentricity .
+
+        attractor: Body
+            Main attractor.
+        Q: float
+            Trace repetition parameter for a ground-track orbit,amount of orbits in a day, it could be a float.
+        inc: ~astropy.units.Quantity
+            Inclination.
+        prograde: bool
+            Default value is True, for a prograde orbit. False value establishes a retrograde orbit.
+        xtol: float, optional
+            The allowable tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        xrtol: float, optional
+            The allowable relative tolerance of the semi-major axis desired to achieve a ground-track orbit
+        tol: float, optional
+            The allowable tolerance of the error, |y - f(x)|.
+        rtol: float, optional
+            The allowable relative tolerance of the error using y as reference.
+        maxiter: int, optional
+            Maximum number of iterations.
+        method: string
+            Algorithm chosen to find the solution. Default method is brenth but you can choose any of the following
+            methods: lms, bisect, brentq, ridder, toms748 and secant.
+
+        Returns:
+        -------
+        Orbit
+            A ground-track orbit.
+
+        Notes:
+        ------
+        The algorithm was obtained from the paper; "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge,
+        S. and Diehl, R. and Neelon, J. and Ely, Todd and Turner, A.E. For further information please consult
+        "Advances in the Astronautical Sciences", Vol 114, pages 1143-1155.
+
+        """
+        return cls.groundtrack_orbit(
+            attractor,
+            Q=Q,
+            inc=inc,
+            prograde=prograde,
+            xtol=xtol,
+            xrtol=xrtol,
+            tol=tol,
+            rtol=rtol,
+            maxiter=maxiter,
+            method=method,
+        )
+
+    @classmethod
+    def groundtrack_critical_inclined_eccentric_orbit(
+        cls,
+        attractor,
+        Q,
+        prograde=True,
+        xtol=None,
+        xrtol=None,
+        tol=None,
+        rtol=None,
+        maxiter=None,
+        method="brenth",
+    ):
+        r"""
+        Calculates a daily ground-track orbit,that pass over the same locations at the same time each solar day.
+        for an object in critically inclined eccentric orbit, that means i=116.565º or i = 63.435º .
+
+        attractor: Body
+            Main attractor.
+        Q: float
+            Trace repetition parameter for a ground-track orbit,amount of orbits in a day, it could be a float.
+        prograde: bool
+            Default value is True, for a prograde orbit. False value establishes a retrograde orbit.
+        xtol: float, optional
+            The allowable tolerance of the semi-major axis desired to achieve a ground-track orbit.
+        xrtol: float, optional
+            The allowable relative tolerance of the semi-major axis desired to achieve a ground-track orbit
+        tol: float, optional
+            The allowable tolerance of the error, :math:`|y - f(x)|`.
+        rtol: float, optional
+            The allowable relative tolerance of the error using y as reference.
+        maxiter: int, optional
+            Maximum number of iterations.
+        method: string
+            Algorithm chosen to find the solution. Default method is brenth but you can choose any of the following
+            methods: lms, bisect, brentq, ridder, toms748 and secant.
+
+        Returns:
+        -------
+        Orbit
+            A ground-track orbit.
+
+        Notes:
+        ------
+        The algorithm was obtained from the paper; "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge,
+        S. and Diehl, R. and Neelon, J. and Ely, Todd and Turner, A.E. For further information please consult
+        "Advances in the Astronautical Sciences", Vol 114, pages 1143-1155.
+        :math:`cos(inc)` must be negative for positive regression, so only 116.565° is viable.
+
+        """
+        critical_angle = (1 / 5) ** 0.5
+        if prograde:
+            inc = np.arccos(critical_angle) * u.rad
+        else:
+            inc = np.arccos(-critical_angle) * u.rad
+        return cls.groundtrack_with_specified_inclination_orbit(
+            attractor,
+            Q=Q,
+            inc=inc,
+            prograde=prograde,
+            xtol=xtol,
+            xrtol=xrtol,
+            tol=tol,
+            rtol=rtol,
+            maxiter=maxiter,
+            method=method,
+        )

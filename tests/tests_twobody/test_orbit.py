@@ -1279,3 +1279,198 @@ def test_propagation_near_parabolic_orbits_does_not_hang(near_parabolic):
     assert_quantity_allclose(
         (orb_final.epoch - near_parabolic.epoch).to(u.s), near_parabolic.period
     )
+
+
+# "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge, S. and Diehl, R. and Neelon, J. and Ely, Todd
+# and Turner, A.E. For further information please consult "Advances in the Astronautical Sciences", Vol 114,
+# pages 1143-1155. This example was taken from table 2, "Circular Equatorial Orbits" .
+
+
+@pytest.mark.parametrize(
+    "attractor, Q, prograde, expected_a, expected_ecc, expected_inc",
+    [
+        (Mars, 1, True, 20429.9 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 2, True, 12878.6 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 3, True, 9831.7 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 4, True, 8118.4 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 5, True, 6998.2 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 6, True, 6199.0 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 7, True, 5595.2 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 8, True, 5120.2 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 9, True, 4735.0 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 10, True, 4415.2 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 11, True, 4144.7 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 12, True, 3912.4 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 13, True, 3710.3 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 14, True, 3532.7 * u.km, 0 * u.one, 0 * u.deg,),
+        (Mars, 1, False, 20470.7 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 2, False, 12891.4 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 3, False, 9838.3 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 4, False, 8122.4 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 5, False, 7001.0 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 6, False, 6201.1 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 7, False, 5596.8 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 8, False, 5121.5 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 9, False, 4736.0 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 10, False, 4416.0 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 11, False, 4145.4 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 12, False, 3913.0 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 13, False, 3710.9 * u.km, 0 * u.one, 180 * u.deg,),
+        (Mars, 14, False, 3533.2 * u.km, 0 * u.one, 180 * u.deg,),
+    ],
+)
+def test_groundtrack_circular_equatorial_orbit(
+    attractor, Q, prograde, expected_a, expected_ecc, expected_inc
+):
+    for method in ("lms", "bisect", "brentq", "brenth", "ridder", "toms748", "secant"):
+        orbit = Orbit.groundtrack_circular_equatorial_orbit(
+            attractor, Q, prograde, method=method
+        )
+        assert_quantity_allclose(orbit.a, expected_a, rtol=5e-5)
+        assert_quantity_allclose(orbit.ecc, expected_ecc, rtol=0)
+        assert_quantity_allclose(orbit.inc, expected_inc, rtol=0)
+
+
+# "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge, S. and Diehl, R. and Neelon, J. and Ely, Todd
+# and Turner, A.E. For further information please consult "Advances in the Astronautical Sciences", Vol 114,
+# pages 1143-1155. This example was taken from table 3,"Mars ACE Orbit characteristics".
+
+
+@pytest.mark.parametrize(
+    "attractor, Q, prograde, expected_a, expected_ecc, expected_inc",
+    [
+        (Mars, 2, True, 12886 * u.km, 0.691 * u.one, 0 * u.deg,),
+        (Mars, 3, True, 9833 * u.km, 0.402 * u.one, 0 * u.deg,),
+    ],
+)
+def test_groundtrack_equatorial_eccentric_orbit(
+    attractor, Q, prograde, expected_a, expected_ecc, expected_inc
+):
+    for method in ("lms", "bisect", "brentq", "brenth", "ridder", "toms748", "secant"):
+        orbit = Orbit.groundtrack_equatorial_eccentric_orbit(
+            attractor, Q, prograde, method=method
+        )
+        assert_quantity_allclose(orbit.a, expected_a, rtol=1e-3)
+        assert_quantity_allclose(orbit.ecc, expected_ecc, rtol=5e-3)
+        assert_quantity_allclose(orbit.inc, expected_inc, rtol=0)
+
+
+# "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge, S. and Diehl, R. and Neelon, J. and Ely, Todd
+# and Turner, A.E. For further information please consult "Advances in the Astronautical Sciences", Vol 114,
+# pages 1143-1155. This example was taken from table 3, "Circular Sun Synchronous orbits".
+
+
+@pytest.mark.parametrize(
+    "attractor, Q, prograde, expected_a, expected_ecc, expected_inc",
+    [
+        (Mars, 4, True, 8118 * u.km, 0 * u.one, 136.683 * u.deg,),
+        (Mars, 5, True, 6992 * u.km, 0 * u.one, 115.563 * u.deg,),
+        (Mars, 6, True, 6190 * u.km, 0 * u.one, 106.362 * u.deg,),
+        (Mars, 7, True, 5585 * u.km, 0 * u.one, 101.330 * u.deg,),
+        (Mars, 8, True, 5108 * u.km, 0 * u.one, 98.266 * u.deg,),
+        (Mars, 9, True, 4721 * u.km, 0 * u.one, 96.267 * u.deg,),
+        (Mars, 10, True, 4400 * u.km, 0 * u.one, 94.894 * u.deg,),
+        (Mars, 11, True, 4129 * u.km, 0 * u.one, 93.914 * u.deg,),
+        (Mars, 12, True, 3895 * u.km, 0 * u.one, 93.192 * u.deg,),
+        (Mars, 13, True, 3692 * u.km, 0 * u.one, 92.647 * u.deg,),
+        (Mars, 14, True, 3514 * u.km, 0 * u.one, 92.225 * u.deg,),
+    ],
+)
+def test_groundtrack_circular_sunsynchronous_orbit(
+    attractor, Q, prograde, expected_a, expected_ecc, expected_inc
+):
+    for method in ("lms", "bisect", "brentq", "brenth", "ridder", "toms748", "secant"):
+        orbit = Orbit.groundtrack_circular_sunsynchronous_orbit(
+            attractor, Q, prograde, method=method
+        )
+        assert_quantity_allclose(orbit.a, expected_a, rtol=5e-3)
+        assert_quantity_allclose(orbit.ecc, expected_ecc, rtol=0)
+        assert_quantity_allclose(orbit.inc, expected_inc, rtol=1e-3)
+
+
+# "Daily repeat-groundtrack Mars orbits", by Noreen, G. and Kerridge, S. and Diehl, R. and Neelon, J. and Ely, Todd
+# and Turner, A.E. For further information please consult "Advances in the Astronautical Sciences", Vol 114,
+# pages 1143-1155. This example was taken from table 5, "Mars ACCI orbit characteristics".
+
+
+@pytest.mark.parametrize(
+    "attractor, Q, prograde, expected_a, expected_ecc, expected_inc",
+    [(Mars, 4, False, 8114 * u.km, 0.464 * u.one, 116.565 * u.deg)],
+)
+def test_groundtrack_critical_inclined_eccentric_orbit(
+    attractor, Q, prograde, expected_a, expected_ecc, expected_inc
+):
+    for method in ("lms", "bisect", "brentq", "brenth", "ridder", "toms748", "secant"):
+        orbit = Orbit.groundtrack_critical_inclined_eccentric_orbit(
+            attractor, Q, prograde, method=method
+        )
+        assert_quantity_allclose(orbit.a, expected_a, rtol=5e-4)
+        assert_quantity_allclose(orbit.ecc, expected_ecc, rtol=5e-3)
+        assert_quantity_allclose(orbit.inc, expected_inc, rtol=1e-6)
+
+
+# Examples taken from 'Space Mission Analysis and Design', Third Edition, page 156" and
+# Handbook of Satellite Orbits From Kepler to GPS by Michel Capderou.
+@pytest.mark.parametrize(
+    "attractor, Q, inc, expected_a, ecc",
+    [
+        (Earth, 43 / 3, 108 * u.deg, 7169 * u.km, 0.004 * u.one),
+        (Earth, 233 / 16, 98.2 * u.deg, 7077.7 * u.km, 0.001 * u.one),
+        (Earth, 244 / 17, 108.05 * u.deg, 7162.7 * u.km, 0.004 * u.one),
+        (Earth, 12.53, 82.59 * u.deg, 7825.471 * u.km, 0.121592 * u.one),
+        (Earth, 2.68, 9.95 * u.deg, 21937.541 * u.km, 0.682033 * u.one),
+        (Earth, 13.16, 82.56 * u.deg, 7572.702 * u.km, 0.682033 * u.one),
+        (Earth, 14.56, 98.21 * u.deg, 7077.736 * u.km, 0 * u.one),
+        (Earth, 12.81, 66.04 * u.deg, 7714.433 * u.km, 0 * u.one),
+        (Earth, 15.77, 34.99 * u.deg, 6728.216 * u.km, 0 * u.one),
+        (Earth, 6.39, 109.81 * u.deg, 12270.012 * u.km, 0 * u.one),
+        (Earth, 6.47, 52.64 * u.deg, 12162.067 * u.km, 0 * u.one),
+        (Earth, 12.55, 69.49 * u.deg, 7820.301 * u.km, 0 * u.one),
+        (Earth, 12.45, 50.01 * u.deg, 7866.608 * u.km, 0 * u.one),
+        (Earth, 14.72, 90.00 * u.deg, 7028.136 * u.km, 0 * u.one),
+        (Earth, 15.30, 89.02 * u.deg, 6846.809 * u.km, 0.001531 * u.one),
+        (Earth, 2.68, 9.95 * u.deg, 21937.541 * u.km, 0.682033 * u.one),
+        (Earth, 2.94, 7.15 * u.deg, 20611.604 * u.km, 0.679397 * u.one),
+        (Earth, 10.01, 75.07 * u.deg, 9088.656 * u.km, 0.269151 * u.one),
+        (Earth, 12.53, 82.59 * u.deg, 7825.471 * u.km, 0.121592 * u.one),
+        (Earth, 14.19, 98.73 * u.deg, 7202.009 * u.km, 0 * u.one),
+        (Earth, 15.77, 34.99 * u.deg, 6728.216 * u.km, 0 * u.one),
+        (Earth, 2.01, 63.41 * u.deg, 26552.865 * u.km, 0.75 * u.one),
+        (Earth, 1.00, 32.80 * u.deg, 42165.785 * u.km, 0 * u.one),
+        (Earth, 15.31, 143.45 * u.deg, 6861.084 * u.km, 0.000788 * u.one),
+        (Earth, 15.22, 141.75 * u.deg, 6886.555 * u.km, 0.006889 * u.one),
+        (Earth, 2.01, 63.43 * u.deg, 26552.857 * u.km, 0.750000 * u.one),
+        (Earth, 1.00, 63.43 * u.deg, 42163.199 * u.km, 0.423000 * u.one),
+        (Earth, 1.67, 63.43 * u.deg, 29991.447 * u.km, 0.600000 * u.one),
+        (Earth, 3.01, 63.43 * u.deg, 20260.852 * u.km, 0.645900 * u.one),
+        (Earth, 3.01, 75.00 * u.deg, 20267.139 * u.km, 0 * u.one),
+        (Earth, 0.21518, 24.8177 * u.deg, 116618.91 * u.km, 0.4770920 * u.one),
+        (Earth, 3.80, 33.10 * u.deg, 17343.641 * u.km, 0.600191 * u.one),
+        (Earth, 1.50, 72.07 * u.deg, 32169.238 * u.km, 0.773000 * u.one),
+        (Earth, 14.13, 20.00 * u.deg, 7243.677 * u.km, 0 * u.one),
+        (Earth, 15.18, 97.45 * u.deg, 6883.518 * u.km, 0.000175 * u.one),
+        (Earth, 14.21, 98.70 * u.deg, 7195.616 * u.km, 0.000170 * u.one),
+        (Earth, 13.95, 99.08 * u.deg, 7282.275 * u.km, 0 * u.one),
+        (Earth, 14.00, 98.96 * u.deg, 7266.408 * u.km, 0.000186 * u.one),
+        (Earth, 14.56, 98.19 * u.deg, 7077.677 * u.km, 0.000112 * u.one),
+        (Earth, 14.13, 20.00 * u.deg, 7243.677 * u.km, 0 * u.one),
+        (Earth, 1.00, 0.00 * u.deg, 42165.785 * u.km, 0 * u.one),
+        (Earth, 2.01, 54.74 * u.deg, 26559.604 * u.km, 0.002246 * u.one),
+        (Earth, 2.125, 64.80 * u.deg, 25507.602 * u.km, 0 * u.one),
+        (Earth, 1.86, 56.30 * u.deg, 27905.750 * u.km, 0 * u.one),
+        (Earth, 1.00, 0.00 * u.deg, 42165.785 * u.km, 0 * u.one),
+        (Earth, 1.00, 40.91 * u.deg, 42163.941 * u.km, 0.075053 * u.one),
+        (Mars, 1.00, 0.00 * u.deg, 20430.990 * u.km, 0 * u.one),
+        (Mars, 12.58, 92.90 * u.deg, 3775.088 * u.km, 0 * u.one),
+        (Mars, 12.47, 92.96 * u.deg, 3796.847 * u.km, 0 * u.one),
+        (Mars, 3.26, 86.35 * u.deg, 9303.744 * u.km, 0.606911 * u.one),
+        (Mars, 5.48, 75.00 * u.deg, 6578.000 * u.km, 0.460778 * u.one),
+        (Mars, 1.00, 0.00 * u.deg, 20430.990 * u.km, 0 * u.one),
+    ],
+)
+def test_ground_track(attractor, Q, inc, expected_a, ecc):
+    for method in ("lms", "bisect", "brentq", "brenth", "ridder", "toms748", "secant"):
+        orbit = Orbit.groundtrack_orbit(attractor, Q, inc, ecc, method=method)
+        assert_quantity_allclose(orbit.a, expected_a, rtol=5e-3)
+        assert_quantity_allclose(orbit.inc, inc, rtol=0)
+        assert_quantity_allclose(orbit.ecc, ecc, rtol=0)
