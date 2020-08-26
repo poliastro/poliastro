@@ -294,23 +294,19 @@ class Maneuver:
         )
 
     def get_total_time(self):
-        """Returns total time of the maneuver.
-
-        """
+        """Returns total time of the maneuver."""
         total_time = sum(self._dts, 0 * u.s)
         return total_time
 
     def get_total_cost(self):
-        """Returns total cost of the maneuver.
-
-        """
+        """Returns total cost of the maneuver."""
         dvs = [norm(dv) for dv in self._dvs]
         return sum(dvs, 0 * u.km / u.s)
 
     @classmethod
     @u.quantity_input(max_delta_r=u.km)
     def correct_pericenter(cls, orbit, max_delta_r):
-        """ Returns a Maneuver with the time before burning and the velocity vector in direction of the burn.
+        """Returns a Maneuver with the time before burning and the velocity vector in direction of the burn.
 
         Parameters
         ----------

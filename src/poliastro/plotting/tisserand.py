@@ -22,7 +22,7 @@ class TisserandPlotter:
     """ Generates Tisserand figures """
 
     def __init__(self, kind=TisserandKind.APSIS, axes=None):
-        """ Object initializer
+        """Object initializer
 
         Parameters
         ----------
@@ -50,7 +50,7 @@ class TisserandPlotter:
     def _solve_tisserand(
         self, body, vinf_span, num_contours, alpha_lim=(0, np.pi), N=100
     ):
-        """ Solves all possible Tisserand lines with a meshgrid workflow
+        """Solves all possible Tisserand lines with a meshgrid workflow
 
         Parameters
         ----------
@@ -97,7 +97,7 @@ class TisserandPlotter:
         return RR_P, RR_A, EE, TT
 
     def _build_lines(self, RR_P, RR_A, EE, TT, color):
-        """ Collect lines and append them to internal data
+        """Collect lines and append them to internal data
 
         Parameters
         ----------
@@ -126,7 +126,7 @@ class TisserandPlotter:
         return lines
 
     def plot_line(self, body, vinf, alpha_lim=(0, np.pi), color=None):
-        """ Plots body Tisserand line within flyby angle
+        """Plots body Tisserand line within flyby angle
 
         Parameters
         ----------
@@ -164,7 +164,7 @@ class TisserandPlotter:
         return self.ax
 
     def plot(self, body, vinf_span, num_contours=10, color=None):
-        """ Plots body Tisserand for given amount of solutions within Vinf span
+        """Plots body Tisserand for given amount of solutions within Vinf span
 
         Parameters
         ----------

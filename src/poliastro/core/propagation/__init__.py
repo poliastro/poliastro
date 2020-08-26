@@ -194,7 +194,7 @@ def vallado(k, r0, v0, tof, numiter):
 
 @jit
 def mikkola(k, r0, v0, tof, rtol=None):
-    """ Raw algorithm for Mikkola's Kepler solver.
+    """Raw algorithm for Mikkola's Kepler solver.
 
     Parameters
     ----------
@@ -303,7 +303,7 @@ def mikkola(k, r0, v0, tof, rtol=None):
 
 @jit
 def markley(k, r0, v0, tof):
-    """ Solves the kepler problem by a non iterative method. Relative error is
+    """Solves the kepler problem by a non iterative method. Relative error is
     around 1e-18, only limited by machine double-precission errors.
 
     Parameters
@@ -382,7 +382,7 @@ def markley(k, r0, v0, tof):
 
 @jit
 def pimienta(k, r0, v0, tof):
-    """ Raw algorithm for Adonis' Pimienta and John L. Crassidis 15th order
+    """Raw algorithm for Adonis' Pimienta and John L. Crassidis 15th order
     polynomial Kepler solver.
 
     Parameters
@@ -745,7 +745,7 @@ def pimienta(k, r0, v0, tof):
 
 @jit
 def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
-    """ Solves the Elliptic Kepler Equation with a cubic convergence and
+    """Solves the Elliptic Kepler Equation with a cubic convergence and
     accuracy better than 10e-12 rad is normally achieved. It is not valid for
     eccentricities equal or higher than 1.0.
 
@@ -810,7 +810,7 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
 
 @jit
 def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
-    """ Kepler solver for both elliptic and parabolic orbits based on Danby's
+    """Kepler solver for both elliptic and parabolic orbits based on Danby's
     algorithm.
 
     Parameters

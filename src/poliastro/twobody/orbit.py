@@ -400,9 +400,7 @@ class Orbit:
 
     @classmethod
     def from_body_ephem(cls, body, epoch=None):
-        """Return osculating `Orbit` of a body at a given time.
-
-        """
+        """Return osculating `Orbit` of a body at a given time."""
         from poliastro.bodies import Earth, Moon, Sun
 
         warn(
@@ -768,7 +766,12 @@ class Orbit:
 
     @classmethod
     @u.quantity_input(
-        ecc=u.one, inc=u.deg, argp=u.deg, arglat=u.deg, raan=u.deg, period_mul=u.one,
+        ecc=u.one,
+        inc=u.deg,
+        argp=u.deg,
+        arglat=u.deg,
+        raan=u.deg,
+        period_mul=u.one,
     )
     def synchronous(
         cls,

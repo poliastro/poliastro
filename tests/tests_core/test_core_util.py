@@ -42,7 +42,8 @@ angles = partial(st.floats, min_value=-2 * np.pi, max_value=2 * np.pi)
 )
 @settings(deadline=None)
 @given(
-    x=angles(), y=st.one_of(angles(), st.none()),
+    x=angles(),
+    y=st.one_of(angles(), st.none()),
 )
 def test_alinspace_is_always_increasing(x, y):
     result = alinspace(x, y)

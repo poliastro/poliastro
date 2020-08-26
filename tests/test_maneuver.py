@@ -144,7 +144,15 @@ def test_repr_maneuver():
 def test_correct_pericenter(
     attractor, max_delta_r, a, ecc, inc, expected_t, expected_v
 ):
-    ss0 = Orbit.from_classical(attractor, a, ecc, inc, 0 * u.deg, 0 * u.deg, 0 * u.deg,)
+    ss0 = Orbit.from_classical(
+        attractor,
+        a,
+        ecc,
+        inc,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
+    )
 
     maneuver = Maneuver.correct_pericenter(ss0, max_delta_r)
     assert_quantity_allclose(maneuver[0][0], expected_t)
@@ -153,7 +161,13 @@ def test_correct_pericenter(
 
 def test_correct_pericenter_J2_exception():
     ss0 = Orbit.from_classical(
-        Mercury, 1000 * u.km, 0 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg,
+        Mercury,
+        1000 * u.km,
+        0 * u.one,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
     )
     max_delta_r = 30 * u.km
     with pytest.raises(NotImplementedError) as excinfo:
@@ -167,7 +181,13 @@ def test_correct_pericenter_J2_exception():
 
 def test_correct_pericenter_ecc_exception():
     ss0 = Orbit.from_classical(
-        Earth, 1000 * u.km, 0.5 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg,
+        Earth,
+        1000 * u.km,
+        0.5 * u.one,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
     )
     max_delta_r = 30 * u.km
     with pytest.raises(NotImplementedError) as excinfo:

@@ -225,7 +225,7 @@ def _kepler(k, r0, v0, tof, *, numiter):
 
 
 def mikkola(k, r, v, tofs, rtol=None):
-    """ Solves Kepler Equation by a cubic approximation. This method is valid
+    """Solves Kepler Equation by a cubic approximation. This method is valid
     no mater the orbit's nature.
 
     Parameters
@@ -266,7 +266,7 @@ def mikkola(k, r, v, tofs, rtol=None):
 
 
 def markley(k, r, v, tofs, rtol=None):
-    """ Elliptical Kepler Equation solver based on a fifth-order
+    """Elliptical Kepler Equation solver based on a fifth-order
     refinement of the solution of a cubic equation.
 
     Parameters
@@ -308,7 +308,7 @@ def markley(k, r, v, tofs, rtol=None):
 
 
 def pimienta(k, r, v, tofs, rtol=None):
-    """ Kepler solver for both elliptic and parabolic orbits based on a 15th
+    """Kepler solver for both elliptic and parabolic orbits based on a 15th
     order polynomial with accuracies around 10e-5 for elliptic case and 10e-13
     in the hyperbolic regime.
 
@@ -352,7 +352,7 @@ def pimienta(k, r, v, tofs, rtol=None):
 
 
 def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
-    """ Solves the Elliptic Kepler Equation with a cubic convergence and
+    """Solves the Elliptic Kepler Equation with a cubic convergence and
     accuracy better than 10e-12 rad is normally achieved. It is not valid for
     eccentricities equal or greater than 1.0.
 
@@ -395,7 +395,7 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
 
 
 def danby(k, r, v, tofs, rtol=1e-8):
-    """ Kepler solver for both elliptic and parabolic orbits based on Danby's
+    """Kepler solver for both elliptic and parabolic orbits based on Danby's
     algorithm.
 
     Parameters

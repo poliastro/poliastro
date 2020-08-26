@@ -108,7 +108,7 @@ class COESA76(COESA):
         )
 
     def _get_coefficients_avobe_86(self, z, table_coeff):
-        """ Returns corresponding coefficients for 4th order polynomial approximation.
+        """Returns corresponding coefficients for 4th order polynomial approximation.
 
         Parameters
         ----------
@@ -132,7 +132,7 @@ class COESA76(COESA):
         return coeff_list
 
     def temperature(self, alt, geometric=True):
-        """ Solves for temperature at given altitude.
+        """Solves for temperature at given altitude.
 
         Parameters
         ----------
@@ -183,7 +183,7 @@ class COESA76(COESA):
         return T.to(u.K)
 
     def pressure(self, alt, geometric=True):
-        """ Solves pressure at given altitude.
+        """Solves pressure at given altitude.
 
         Parameters
         ----------
@@ -229,7 +229,7 @@ class COESA76(COESA):
         return p.to(u.Pa)
 
     def density(self, alt, geometric=True):
-        """ Solves density at given height.
+        """Solves density at given height.
 
         Parameters
         ----------
@@ -269,7 +269,7 @@ class COESA76(COESA):
         return rho.to(u.kg / u.m ** 3)
 
     def properties(self, alt, geometric=True):
-        """ Solves temperature, pressure, density at given height.
+        """Solves temperature, pressure, density at given height.
 
         Parameters
         ----------
@@ -294,7 +294,7 @@ class COESA76(COESA):
         return T, p, rho
 
     def sound_speed(self, alt, geometric=True):
-        """ Solves speed of sound at given height.
+        """Solves speed of sound at given height.
 
         Parameters
         ----------
@@ -322,7 +322,7 @@ class COESA76(COESA):
         return Cs
 
     def viscosity(self, alt, geometric=True):
-        """ Solves dynamic viscosity at given height.
+        """Solves dynamic viscosity at given height.
 
         Parameters
         ----------
@@ -350,7 +350,7 @@ class COESA76(COESA):
         return mu
 
     def thermal_conductivity(self, alt, geometric=True):
-        """ Solves coefficient of thermal conductivity at given height.
+        """Solves coefficient of thermal conductivity at given height.
 
         Parameters
         ----------

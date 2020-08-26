@@ -9,9 +9,7 @@ import warnings
 
 
 def ijit(first=None, *args, **kwargs):
-    """Identity JIT, returns unchanged function.
-
-    """
+    """Identity JIT, returns unchanged function."""
 
     def _jit(f):
         return f

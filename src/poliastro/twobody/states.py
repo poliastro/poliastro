@@ -5,9 +5,7 @@ from .elements import mean_motion, period
 
 
 class BaseState:
-    """Base State class, meant to be subclassed.
-
-    """
+    """Base State class, meant to be subclassed."""
 
     def __init__(self, attractor, plane):
         """Constructor.
@@ -75,9 +73,7 @@ class BaseState:
 
 
 class ClassicalState(BaseState):
-    """State defined by its classical orbital elements.
-
-    """
+    """State defined by its classical orbital elements."""
 
     def __init__(self, attractor, p, ecc, inc, raan, argp, nu, plane):
         super().__init__(attractor, plane)
@@ -124,9 +120,7 @@ class ClassicalState(BaseState):
         return self._nu
 
     def to_vectors(self):
-        """Converts to position and velocity vector representation.
-
-        """
+        """Converts to position and velocity vector representation."""
         r, v = coe2rv(
             self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
             self.p.to(u.km).value,
@@ -140,15 +134,11 @@ class ClassicalState(BaseState):
         return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_classical(self):
-        """Converts to classical orbital elements representation.
-
-        """
+        """Converts to classical orbital elements representation."""
         return self
 
     def to_equinoctial(self):
-        """Converts to modified equinoctial elements representation.
-
-        """
+        """Converts to modified equinoctial elements representation."""
         p, f, g, h, k, L = coe2mee(
             self.p.to(u.km).value,
             self.ecc.value,
@@ -171,9 +161,7 @@ class ClassicalState(BaseState):
 
 
 class RVState(BaseState):
-    """State defined by its position and velocity vectors.
-
-    """
+    """State defined by its position and velocity vectors."""
 
     def __init__(self, attractor, r, v, plane):
         super().__init__(attractor, plane)
@@ -191,15 +179,11 @@ class RVState(BaseState):
         return self._v
 
     def to_vectors(self):
-        """Converts to position and velocity vector representation.
-
-        """
+        """Converts to position and velocity vector representation."""
         return self
 
     def to_classical(self):
-        """Converts to classical orbital elements representation.
-
-        """
+        """Converts to classical orbital elements representation."""
         (p, ecc, inc, raan, argp, nu) = rv2coe(
             self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
             self.r.to(u.km).value,

@@ -82,7 +82,9 @@ def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic")
     # Does it have a performance impact?
     interpolant_xyz = interp1d(reference_epochs.jd, coordinates.xyz.value, kind=kind)
     interpolant_d_xyz = interp1d(
-        reference_epochs.jd, coordinates.differentials["s"].d_xyz.value, kind=kind,
+        reference_epochs.jd,
+        coordinates.differentials["s"].d_xyz.value,
+        kind=kind,
     )
 
     result_xyz = interpolant_xyz(epochs.jd) * xyz_unit
@@ -115,9 +117,7 @@ def _interpolate_sinc(epochs, reference_epochs, coordinates):
 
 # Taken from https://gist.github.com/endolith/1297227
 def _sinc_interp(x, s, u):
-    """Interpolates x, sampled at "s" instants, at "u" instants.
-
-    """
+    """Interpolates x, sampled at "s" instants, at "u" instants."""
     if len(x) != len(s):
         raise ValueError("x and s must be the same length")
 

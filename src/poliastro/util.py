@@ -74,9 +74,7 @@ def find_closest_value(value, values):
 
 @u.quantity_input(start=u.rad, stop=u.rad)
 def alinspace(start, stop=None, *, num=50, endpoint=True):
-    """Return increasing, evenly spaced angular values over a specified interval.
-
-    """
+    """Return increasing, evenly spaced angular values over a specified interval."""
     if stop is None:
         stop = start + 2 * np.pi * u.rad
 
