@@ -2,8 +2,7 @@ import numpy as np
 
 
 class SpheroidLocation:
-    """ Class representing a ground station on an arbitrary ellipsoid.
-    """
+    """Class representing a ground station on an arbitrary ellipsoid."""
 
     def __init__(self, lon, lat, h, body):
         """
@@ -32,8 +31,7 @@ class SpheroidLocation:
 
     @property
     def cartesian_cords(self):
-        """Convert to the Cartesian Coordinate system.
-        """
+        """Convert to the Cartesian Coordinate system."""
         e2 = 1 - (self._c / self._a) ** 2
         N = self._a / np.sqrt(1 - e2 * np.sin(self._lon) ** 2)
 
@@ -44,14 +42,12 @@ class SpheroidLocation:
 
     @property
     def f(self):
-        """Get first flattening.
-        """
+        """Get first flattening."""
         return 1 - self._c / self._a
 
     @property
     def N(self):
-        """Normal vector of the ellipsoid at the given location.
-        """
+        """Normal vector of the ellipsoid at the given location."""
         x, y, z = self.cartesian_cords
         a, b, c = self._a.value, self._b.value, self._c.value
         N = np.array([2 * x.value / a ** 2, 2 * y.value / b ** 2, 2 * z.value / c ** 2])
@@ -60,8 +56,7 @@ class SpheroidLocation:
 
     @property
     def tangential_vecs(self):
-        """Returns orthonormal vectors tangential to the ellipsoid at the given location.
-        """
+        """Returns orthonormal vectors tangential to the ellipsoid at the given location."""
         N = self.N
         u = np.array([1.0, 0, 0])
         u -= u.dot(N) * N
@@ -71,8 +66,7 @@ class SpheroidLocation:
 
     @property
     def radius_of_curvature(self):
-        """Radius of curvature of the meridian at the latitude of the given location.
-        """
+        """Radius of curvature of the meridian at the latitude of the given location."""
         e2 = 1 - (self._c / self._a) ** 2
         rc = self._a * (1 - e2) / (1 - e2 * np.sin(self._lat) ** 2) ** 1.5
         return rc

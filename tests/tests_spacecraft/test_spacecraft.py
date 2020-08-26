@@ -19,5 +19,7 @@ def test_balistic_coefficient():
     m = 100 * u.kg
     spacecraft = Spacecraft(A, C_D, m)
     assert_quantity_allclose(
-        spacecraft.ballistic_coefficient.to_value(), 1.7278759594743866e-08, rtol=1e-10,
+        spacecraft.ballistic_coefficient.to_value(),
+        1.7278759594743866e-08,
+        rtol=1e-10,
     )

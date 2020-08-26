@@ -77,8 +77,7 @@ def rv_pqw(k, p, ecc, nu):
 
 @jit
 def coe_rotation_matrix(inc, raan, argp):
-    """Create a rotation matrix for coe transformation
-    """
+    """Create a rotation matrix for coe transformation"""
     r = rotation_matrix(raan, 2)
     r = r @ rotation_matrix(inc, 0)
     r = r @ rotation_matrix(argp, 2)

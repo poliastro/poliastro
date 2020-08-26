@@ -2,7 +2,7 @@
 
 
 def geometric_to_geopotential(z, r0):
-    """ Converts from given geometric altitude to geopotential one.
+    """Converts from given geometric altitude to geopotential one.
 
     Parameters
     ----------
@@ -25,7 +25,7 @@ z_to_h = geometric_to_geopotential
 
 
 def geopotential_to_geometric(h, r0):
-    """ Converts from given geopotential altitude to geometric one.
+    """Converts from given geopotential altitude to geometric one.
 
     Parameters
     ----------
@@ -48,7 +48,7 @@ h_to_z = geopotential_to_geometric
 
 
 def gravity(z, g0, r0):
-    """ Relates Earth gravity field magnitude with the geometric height.
+    """Relates Earth gravity field magnitude with the geometric height.
 
     Parameters
     ----------

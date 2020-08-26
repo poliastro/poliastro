@@ -23,7 +23,9 @@ eccentricities_q = partial(with_units, elements=eccentricities(), unit=u.one)
 
 @settings(deadline=None)
 @given(
-    min_nu=angles_q(), ecc=eccentricities_q(), max_nu=st.one_of(angles_q(), st.none()),
+    min_nu=angles_q(),
+    ecc=eccentricities_q(),
+    max_nu=st.one_of(angles_q(), st.none()),
 )
 def test_sample_closed_is_always_between_minus_pi_and_pi(min_nu, ecc, max_nu):
     result = sample_closed(min_nu, ecc, max_nu)

@@ -620,9 +620,7 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
             )
 
         # averaging over 5 last values in the way Curtis does
-        index = int(
-            1.0 * t_days / tof.to(u.day).value * 4000  # type: ignore
-        )
+        index = int(1.0 * t_days / tof.to(u.day).value * 4000)  # type: ignore
         delta_ecc, delta_inc, delta_raan, delta_argp = (
             np.mean(delta_eccs[index - 5 : index]),
             np.mean(delta_incs[index - 5 : index]),

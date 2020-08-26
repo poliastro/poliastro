@@ -39,9 +39,7 @@ def rsmooth(y):
     z = zz = y
 
     def GCVscore(p):
-        """Generalized cross-validation score.
-
-        """
+        """Generalized cross-validation score."""
         # This makes the code more similar to the original
         # and avoids recomputing z after optimizing the penalty
         nonlocal z

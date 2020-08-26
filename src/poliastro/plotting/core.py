@@ -77,7 +77,13 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
             return self.show()
 
     def plot_body_orbit(
-        self, body, epoch, *, label=None, color=None, trail=False,
+        self,
+        body,
+        epoch,
+        *,
+        label=None,
+        color=None,
+        trail=False,
     ):
         """Plots complete revolution of body and current position.
 
@@ -136,9 +142,7 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
 
 class OrbitPlotter3D(_PlotlyOrbitPlotter):
-    """OrbitPlotter3D class.
-
-    """
+    """OrbitPlotter3D class."""
 
     def __init__(self, figure=None, dark=False, *, num_points=150, plane=None):
         super().__init__(figure, num_points=num_points, plane=plane)
@@ -212,9 +216,7 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elev, azim, distance=5 * u.km):
-        """Changes 3D view.
-
-        """
+        """Changes 3D view."""
         x = distance * np.cos(elev) * np.cos(azim)
         y = distance * np.cos(elev) * np.sin(azim)
         z = distance * np.sin(elev)

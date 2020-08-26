@@ -77,7 +77,9 @@ class BaseOrbitPlotter:
         self._clear_attractor()
 
         self._draw_sphere(
-            self._attractor_radius, color, self._attractor.name,
+            self._attractor_radius,
+            color,
+            self._attractor.name,
         )
 
     def _redraw(self):
@@ -158,7 +160,13 @@ class BaseOrbitPlotter:
         )
 
     def _plot_body_orbit(
-        self, body, epoch, *, label=None, color=None, trail=False,
+        self,
+        body,
+        epoch,
+        *,
+        label=None,
+        color=None,
+        trail=False,
     ):
         if color is None:
             color = BODY_COLORS.get(body.name)
@@ -244,7 +252,13 @@ class BaseOrbitPlotter:
         self._plot(orbit, label=label, color=color, trail=trail)
 
     def plot_body_orbit(
-        self, body, epoch, *, label=None, color=None, trail=False,
+        self,
+        body,
+        epoch,
+        *,
+        label=None,
+        color=None,
+        trail=False,
     ):
         """Plots complete revolution of body and current position.
 

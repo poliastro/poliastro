@@ -7,7 +7,7 @@ class COESA:
     """ Class for U.S Standard Atmosphere models. """
 
     def __init__(self, *tables):
-        """ Constructor for Atmosphere instances.
+        """Constructor for Atmosphere instances.
 
         Parameters
         ----------
@@ -43,7 +43,7 @@ class COESA:
         return self.tables[5]
 
     def _check_altitude(self, alt, r0, geometric=True):
-        """ Checks if altitude is inside valid range.
+        """Checks if altitude is inside valid range.
 
         Parameters
         ----------
@@ -82,7 +82,7 @@ class COESA:
         return z, h
 
     def _get_index(self, x, x_levels):
-        """ Finds element in list and returns index.
+        """Finds element in list and returns index.
 
         Parameters
         ----------

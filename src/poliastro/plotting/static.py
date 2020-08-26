@@ -221,7 +221,13 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         return lines
 
     def plot_body_orbit(
-        self, body, epoch, *, label=None, color=None, trail=False,
+        self,
+        body,
+        epoch,
+        *,
+        label=None,
+        color=None,
+        trail=False,
     ):
         """Plots complete revolution of body and current position.
 

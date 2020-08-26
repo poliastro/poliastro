@@ -642,8 +642,16 @@ def test_plane_is_set_in_horizons():
 @pytest.mark.parametrize(
     "attractor,expected_a,expected_period",
     [
-        (Earth, Earth.R + 35786 * u.km, Earth.rotational_period,),
-        (Mars, Mars.R + 17031 * u.km, Mars.rotational_period,),
+        (
+            Earth,
+            Earth.R + 35786 * u.km,
+            Earth.rotational_period,
+        ),
+        (
+            Mars,
+            Mars.R + 17031 * u.km,
+            Mars.rotational_period,
+        ),
     ],
 )
 def test_stationary_orbit(attractor, expected_a, expected_period):
@@ -655,8 +663,16 @@ def test_stationary_orbit(attractor, expected_a, expected_period):
 @pytest.mark.parametrize(
     "attractor,expected_a,expected_period",
     [
-        (Earth, Earth.R + 35786 * u.km, Earth.rotational_period,),
-        (Mars, Mars.R + 17031 * u.km, Mars.rotational_period,),
+        (
+            Earth,
+            Earth.R + 35786 * u.km,
+            Earth.rotational_period,
+        ),
+        (
+            Mars,
+            Mars.R + 17031 * u.km,
+            Mars.rotational_period,
+        ),
     ],
 )
 def test_synchronous_orbit_without_ecc_and_inclination_given(
@@ -676,7 +692,12 @@ def test_synchronous_orbit_without_ecc_and_inclination_given(
             Mercury.R + 240453 * u.km,
             Mercury.rotational_period,
         ),
-        (Jupiter, 0.0934 * u.one, Jupiter.R + 88565 * u.km, Jupiter.rotational_period,),
+        (
+            Jupiter,
+            0.0934 * u.one,
+            Jupiter.R + 88565 * u.km,
+            Jupiter.rotational_period,
+        ),
     ],
 )
 def test_synchronous_orbit_without_inclination_given(
@@ -690,7 +711,14 @@ def test_synchronous_orbit_without_inclination_given(
 
 @pytest.mark.parametrize(
     "attractor,ecc,expected_a,expected_period",
-    [(Mercury, 1 * u.one, Mercury.R + 240453 * u.km, Mercury.rotational_period,)],
+    [
+        (
+            Mercury,
+            1 * u.one,
+            Mercury.R + 240453 * u.km,
+            Mercury.rotational_period,
+        )
+    ],
 )
 def test_synchronous_orbit_pericenter_smaller_than_atractor_radius(
     attractor, ecc, expected_a, expected_period
