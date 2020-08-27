@@ -19,6 +19,7 @@ plotting utilities, API capabilities and many other orbital mechanics topics.
    /examples/Exploring the New Horizons launch.md
    /examples/Going to Mars with Python using poliastro.md
    /examples/Going to Jupiter with Python using Jupyter and poliastro.md
+   /examples/Generating orbit groundtracks.md
    /examples/Plotting in 3D.md
    /examples/Propagation using Cowells formulation.md
    /examples/Revisiting Lamberts problem in Python.md
