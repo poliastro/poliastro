@@ -4,7 +4,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth
 from poliastro.earth.sensors import (
-    max_and_min_ground_range,
+    min_and_max_ground_range,
     max_and_min_ground_range_with_specific_azimuth,
 )
 
@@ -32,7 +32,7 @@ from poliastro.earth.sensors import (
 def test_max_and_min_ground_range(h, n_fov, n_center, expected_Λ_max, expected_Λ_min):
 
     R = Earth.R.to(u.km)
-    Λ_max, Λ_min = max_and_min_ground_range(h, n_fov, n_center, R)
+    Λ_min, Λ_max = min_and_max_ground_range(h, n_fov, n_center, R)
     assert_quantity_allclose(Λ_max, expected_Λ_max)
     assert_quantity_allclose(Λ_min, expected_Λ_min)
 
