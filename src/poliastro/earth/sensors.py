@@ -3,7 +3,7 @@ from astropy import units as u
 
 
 @u.quantity_input(h=u.km, η_fov=u.rad, η_center=u.rad, R=u.km)
-def max_and_min_ground_range(h, η_fov, η_center, R):
+def min_and_max_ground_range(h, η_fov, η_center, R):
     """
     Calculates the minimum and maximum values of ground-range angles
     Parameters
@@ -43,7 +43,7 @@ def max_and_min_ground_range(h, η_fov, η_center, R):
     Λ_max = np.arcsin(ρ_max * np.sin(η_max) / R)
     Λ_min = np.arcsin(ρ_min * np.sin(η_min) / R)
 
-    return Λ_max, Λ_min
+    return Λ_min, Λ_max
 
 
 @u.quantity_input(
@@ -104,7 +104,7 @@ def max_and_min_ground_range_with_specific_azimuth(
     )
     delta_Λ = np.arcsin(np.sin(β) * np.sin(Λ) / np.cos(φ_tgt))
     λ_tgt = λ_nadir + delta_Λ
-    Λ_max, Λ_min = max_and_min_ground_range(h, η_fov, η_center, R)
+    Λ_min, Λ_max = min_and_max_ground_range(h, η_fov, η_center, R)
     delta_λ = (Λ_max - Λ_min) / 2
 
     return delta_λ, φ_tgt, λ_tgt
