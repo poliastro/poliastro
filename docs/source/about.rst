@@ -10,7 +10,7 @@ problems in Astrodynamics and Orbital Mechanics.
 poliastro combines cutting edge technologies like Python JIT compiling
 (using numba) with young, well developed astronomy packages (like astropy and
 jplephem) to provide a user friendly API for solving Astrodynamics problems.
-It is therefore a experiment to mix the best Python open source practices
+It is therefore an experiment to mix the best Python open source practices
 with my love for Orbital Mechanics.
 
 Since I have only solved easy academic problems I cannot assess the
