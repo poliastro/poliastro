@@ -89,7 +89,7 @@ def test_ephem_sample_no_arguments_returns_exactly_same_input(
     result_coordinates = ephem.sample(method=method)
 
     # Exactly the same
-    assert result_coordinates == coordinates
+    assert (result_coordinates == coordinates).all()
 
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
