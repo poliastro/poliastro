@@ -1,5 +1,6 @@
 from unittest import mock
 
+import numpy as np
 import pytest
 from astropy import units as u
 from astropy.coordinates import (
@@ -89,7 +90,7 @@ def test_ephem_sample_no_arguments_returns_exactly_same_input(
     result_coordinates = ephem.sample(method=method)
 
     # Exactly the same
-    assert (result_coordinates == coordinates).all()
+    assert np.all(result_coordinates == coordinates)
 
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
