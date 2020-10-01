@@ -1,0 +1,27 @@
+{% extends "!layout.html" %}
+
+{% block menu %}
+    {{ super() }}
+
+    {% if sidebar_external_links %}
+        <p class="caption">
+            <span class="caption-text">
+            {% if sidebar_external_links_caption %}
+                {{ sidebar_external_links_caption }}
+            {% else %}
+                External links
+            {% endif %}
+            </span>
+        </p>
+        <ul>
+            {% for text, link in sidebar_external_links %}
+                {% if hasdoc(link) %}
+                    <li class="toctree-l1"><a href="{{ pathto(link) }}">{{ text }}</a></li>
+                {% else %}
+                    <li class="toctree-l1"><a href="{{ link }}">{{ text }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}

@@ -155,6 +155,19 @@ html_theme = "sphinx_rtd_theme"
 # documentation.
 #html_theme_options = {}
 
+# Values to pass into the template engine's context for all pages.
+html_context = {
+    'sidebar_external_links_caption': 'Links',
+    'sidebar_external_links': [
+        ('<i class="fa fa-rss fa-fw"></i> Blog', 'https://blog.poliastro.space'),
+        ('<i class="fa fa-github fa-fw"></i> Source code', 'https://github.com/poliastro/poliastro'),
+        ('<i class="fa fa-bug fa-fw"></i> Issue tracker', 'https://github.com/poliastro/poliastro/issues'),
+        ('<i class="fa fa-envelope fa-fw"></i> Mailing list', 'https://groups.io/g/poliastro-dev'),
+        ('<i class="fa fa-comments fa-fw"></i> Chat', 'http://chat.poliastro.space'),
+        ('<i class="fa fa-file-text fa-fw"></i> Citation', 'https://doi.org/10.5281/zenodo.593610'),
+    ],
+}
+
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
