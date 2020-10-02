@@ -36,10 +36,6 @@ We will ask you for your installation details in the following sections.
 ```
 </details>
 
-<!--- Please do `pip install pytest`, run this command and paste its output: -->
-
-* `python -c "import poliastro.testing; poliastro.testing.test()"`
-
 <!--- Paste your output of this command after the colon of "Paste your output here:" -->
 <details>
 
