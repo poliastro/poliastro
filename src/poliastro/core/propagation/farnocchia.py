@@ -284,6 +284,17 @@ def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
 
 
 @jit
+def farnocchia_coe(k, p, ecc, inc, raan, argp, nu):
+    
+    q = p / (1 + ecc)
+
+    delta_t0 = delta_t_from_nu(nu, ecc, k, q)
+    delta_t = delta_t0 + tof
+ 
+    return nu_from_delta_t(delta_t, ecc, k, q)
+
+
+@jit
 def farnocchia(k, r0, v0, tof):
     r"""Propagates orbit using mean motion.
 
@@ -317,11 +328,7 @@ def farnocchia(k, r0, v0, tof):
 
     # get the initial true anomaly and orbit parameters that are constant over time
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
-    q = p / (1 + ecc)
-
-    delta_t0 = delta_t_from_nu(nu0, ecc, k, q)
-    delta_t = delta_t0 + tof
-
-    nu = nu_from_delta_t(delta_t, ecc, k, q)
+    
+    nu = farnocchia_coe(k, p, ecc, inc, raan, argp, nu0)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)

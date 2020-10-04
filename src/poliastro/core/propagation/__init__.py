@@ -16,7 +16,7 @@ from ..angles import (
 )
 from ..elements import coe2rv, rv2coe
 from ..stumpff import c2, c3
-from .farnocchia import farnocchia
+from .farnocchia import farnocchia, farnocchia_coe
 
 __all__ = [
     "func_twobody",
@@ -27,6 +27,7 @@ __all__ = [
     "pimienta",
     "gooding",
     "danby",
+    "farnocchia_coe",
 ]
 
 
