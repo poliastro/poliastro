@@ -328,7 +328,6 @@ def farnocchia(k, r0, v0, tof):
 
     # get the initial true anomaly and orbit parameters that are constant over time
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
-
     nu = farnocchia_coe(k, p, ecc, inc, raan, argp, nu0, tof)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
