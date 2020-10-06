@@ -839,6 +839,7 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
+@jit
 def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol):
 
     semi_axis_a = p / (1 - ecc ** 2)
