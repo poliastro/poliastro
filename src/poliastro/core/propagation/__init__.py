@@ -20,17 +20,18 @@ from .farnocchia import farnocchia, farnocchia_coe
 
 __all__ = [
     "func_twobody",
-    "farnocchia",
     "farnocchia_coe",
+    "farnocchia",
     "vallado",
-    "mikkola",
     "mikkola_coe",
-    "markley",
+    "mikkola",
     "markley_coe",
-    "pimienta",
+    "markley",
     "pimienta_coe",
-    "gooding",
+    "pimienta",
     "gooding_coe",
+    "gooding",
+    "danby_coe",
     "danby",
 ]
 
@@ -838,38 +839,8 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
-@jit
-def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
-    """Kepler solver for both elliptic and parabolic orbits based on Danby's
-    algorithm.
+def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol):
 
-    Parameters
-    ----------
-    k : float
-        Standard gravitational parameter of the attractor.
-    r : 1x3 vector
-        Position vector.
-    v : 1x3 vector
-        Velocity vector.
-    tof : float
-        Time of flight.
-    rtol: float
-        Relative error for accuracy of the method.
-
-    Returns
-    -------
-    rr : 1x3 vector
-        Propagated position vectors.
-    vv : 1x3 vector
-
-    Note
-    ----
-    This algorithm was developed by Danby in his paper *The solution of Kepler
-    Equation* with DOI: https://doi.org/10.1007/BF01686811
-    """
-
-    # Solve first for eccentricity and mean anomaly
-    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
 
@@ -923,13 +894,51 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
                 cta = ecc - np.cosh(E)
 
             nu = np.arctan2(sta, cta)
-            return coe2rv(k, p, ecc, inc, raan, argp, nu)
-
+            break
         else:
             delta = -f / fp
             delta_star = -f / (fp + 0.5 * delta * fpp)
             deltak = -f / (fp + 0.5 * delta_star * fpp + delta_star ** 2 * fppp / 6)
             E = E + deltak
             n += 1
+    else:
+        raise ValueError("Maximum number of iterations has been reached.")
 
-    raise ValueError("Maximum number of iterations has been reached.")
+    return nu
+
+
+@jit
+def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
+    """Kepler solver for both elliptic and parabolic orbits based on Danby's
+    algorithm.
+
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter of the attractor.
+    r : 1x3 vector
+        Position vector.
+    v : 1x3 vector
+        Velocity vector.
+    tof : float
+        Time of flight.
+    rtol: float
+        Relative error for accuracy of the method.
+
+    Returns
+    -------
+    rr : 1x3 vector
+        Propagated position vectors.
+    vv : 1x3 vector
+
+    Note
+    ----
+    This algorithm was developed by Danby in his paper *The solution of Kepler
+    Equation* with DOI: https://doi.org/10.1007/BF01686811
+    """
+
+    # Solve first for eccentricity and mean anomaly
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    nu = danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
+
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
