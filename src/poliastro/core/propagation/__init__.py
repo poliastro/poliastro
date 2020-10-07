@@ -771,7 +771,7 @@ def pimienta(k, r0, v0, tof):
 
 
 @jit
-def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol):
+def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=150, rtol=1e-8):
     # TODO: parabolic and hyperbolic not implemented cases
     if ecc >= 1.0:
         raise NotImplementedError(
@@ -840,7 +840,7 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
 
 
 @jit
-def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol):
+def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
 
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)

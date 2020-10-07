@@ -10,6 +10,14 @@ from pytest import approx
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import J2000
 from poliastro.core.elements import rv2coe
+from poliastro.core.propagation import (
+    danby_coe,
+    gooding_coe,
+    markley_coe,
+    mikkola_coe,
+    pimienta_coe,
+)
+from poliastro.core.propagation.farnocchia import farnocchia_coe
 from poliastro.examples import iss
 from poliastro.frames import Planes
 from poliastro.twobody import Orbit
@@ -406,3 +414,29 @@ def test_propagation_custom_body_works():
     # See https://github.com/poliastro/poliastro/issues/649
     orbit = Orbit.circular(Moon, 100 * u.km)
     orbit.propagate(1 * u.h)
+
+
+@pytest.mark.parametrize(
+    "propagator_coe",
+    [danby_coe, markley_coe, pimienta_coe, mikkola_coe, farnocchia_coe, gooding_coe],
+)
+def test_propagate_with_coe(propagator_coe):
+
+    period = iss.period
+    a, ecc, inc, raan, argp, nu = iss.classical()
+    p = a * (1 - ecc ** 2)
+
+    # Delete de units
+    a = a.to_value(u.km)
+    ecc = ecc.value
+    period = period.to_value(u.s)
+    inc = inc.to_value(u.rad)
+    raan = raan.to_value(u.rad)
+    argp = argp.to_value(u.rad)
+    nu = nu.to_value(u.rad)
+    k = iss.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+
+    nu_final = propagator_coe(k, p, ecc, inc, raan, argp, nu, period)
+    
+    assert 0 < nu_final < 1
+    #assert_quantity_allclose(0, nu_final)
