@@ -30,56 +30,73 @@ trigger:
     - '*post*'
 
 jobs:
-- template: run-tox-env.yml@OpenAstronomy
-  parameters:
-    submodules: false
-    env:
-      - PIP_PREFER_BINARY: true
-      - PIP_PROGRESS_BAR: "off"
-      - MPLBACKEND: Agg
-      - FLIT_ROOT_INSTALL: 1
-    posargs: '-vv'
-    libraries:
-      apt:
-        - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
-    envs:
-      - linux: check
-        name : quality
-        libraries: {}
+- job: test
+  steps:
+  - template: run-tox-env.yml@OpenAstronomy
+    parameters:
+      submodules: false
+      env:
+        - PIP_PREFER_BINARY: true
+        - PIP_PROGRESS_BAR: "off"
+        - MPLBACKEND: Agg
+        - FLIT_ROOT_INSTALL: 1
+      posargs: '-vv'
+      libraries:
+        apt:
+          - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
+      envs:
+        - linux: check
+          name : quality
+          libraries: {}
 
-      - linux: py37
-        name: py37_test
-        libraries: {}
+        - linux: py37
+          name: py37_test
+          libraries: {}
 
-      - linux: py38-fast
-        name: py38_fast_test
-        libraries: {}
+        - linux: py38-fast
+          name: py38_fast_test
+          libraries: {}
 
-      - linux: py38-online
-        name: py38_online_test
-        libraries: {}
+        - linux: py38-online
+          name: py38_online_test
+          libraries: {}
 
-      - linux: py38-slow
-        name: py38_slow
-        libraries: {}
+        - linux: py38-slow
+          name: py38_slow
+          libraries: {}
 
-      - linux: py38-images
-        name: py38_images
-        libraries: {}
+        - linux: py38-images
+          name: py38_images
+          libraries: {}
 
-      - linux: py38-coverage
-        name: coverage
-        coverage: codecov
-        posargs: --cov-report=term-missing
-        libraries: {}
+        - linux: py38-coverage
+          name: coverage
+          coverage: codecov
+          posargs: --cov-report=term-missing
+          libraries: {}
 
-      - linux: docs
-        name: docs_test
+        - linux: docs
+          name: docs_test
 
-      - windows: py38
-        name: py38_test_windows
-        libraries: {}
+        - windows: py38
+          name: py38_test_windows
+          libraries: {}
 
-      - macos: py38
-        name: py38_test_macos
-        libraries: {}
+        - macos: py38
+          name: py38_test_macos
+          libraries: {}
+
+- job: release
+  steps:
+    - template: publish.yml@OpenAstronomy
+      parameters:
+        ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/v') }}:
+          pypi_connection_name: 'pypi_endpoint'
+        libraries:
+          apt:
+            - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
+        targets:
+          - sdist
+          - wheels_linux
+          - wheels_macos
+          - wheels_windows
