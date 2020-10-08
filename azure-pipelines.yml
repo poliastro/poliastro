@@ -30,8 +30,6 @@ trigger:
     - '*post*'
 
 jobs:
-- job: test
-  steps:
   - template: run-tox-env.yml@OpenAstronomy
     parameters:
       submodules: false
@@ -86,17 +84,15 @@ jobs:
           name: py38_test_macos
           libraries: {}
 
-- job: release
-  steps:
-    - template: publish.yml@OpenAstronomy
-      parameters:
-        ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/v') }}:
-          pypi_connection_name: 'pypi_endpoint'
-        libraries:
-          apt:
-            - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
-        targets:
-          - sdist
-          - wheels_linux
-          - wheels_macos
-          - wheels_windows
+  - template: publish.yml@OpenAstronomy
+    parameters:
+      ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/v') }}:
+        pypi_connection_name: 'pypi_endpoint'
+      libraries:
+        apt:
+          - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
+      targets:
+        - sdist
+        - wheels_linux
+        - wheels_macos
+        - wheels_windows
