@@ -437,6 +437,5 @@ def test_propagate_with_coe(propagator_coe):
     k = iss.attractor.k.to_value(u.km ** 3 / u.s ** 2)
 
     nu_final = propagator_coe(k, p, ecc, inc, raan, argp, nu, period)
-    
-    assert 0 < nu_final < 1
-    #assert_quantity_allclose(0, nu_final)
+
+    assert_quantity_allclose(nu_final, nu)
