@@ -427,7 +427,7 @@ def test_propagate_with_coe(propagator_coe):
     p = a * (1 - ecc ** 2)
 
     # Delete de units
-    a = a.to_value(u.km)
+    p = p.to_value(u.km)
     ecc = ecc.value
     period = period.to_value(u.s)
     inc = inc.to_value(u.rad)
