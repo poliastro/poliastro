@@ -16,16 +16,22 @@ from ..angles import (
 )
 from ..elements import coe2rv, rv2coe
 from ..stumpff import c2, c3
-from .farnocchia import farnocchia
+from .farnocchia import farnocchia, farnocchia_coe
 
 __all__ = [
     "func_twobody",
+    "farnocchia_coe",
     "farnocchia",
     "vallado",
+    "mikkola_coe",
     "mikkola",
+    "markley_coe",
     "markley",
+    "pimienta_coe",
     "pimienta",
+    "gooding_coe",
     "gooding",
+    "danby_coe",
     "danby",
 ]
 
@@ -193,35 +199,8 @@ def vallado(k, r0, v0, tof, numiter):
 
 
 @jit
-def mikkola(k, r0, v0, tof, rtol=None):
-    """Raw algorithm for Mikkola's Kepler solver.
+def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
-    Parameters
-    ----------
-    k : ~astropy.units.Quantity
-        Standard gravitational parameter of the attractor.
-    r : ~astropy.units.Quantity
-        Position vector.
-    v : ~astropy.units.Quantity
-        Velocity vector.
-    tofs : ~astropy.units.Quantity
-        Array of times to propagate.
-    rtol: float
-        This method does not require of tolerance since it is non iterative.
-
-    Returns
-    -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-
-    Note
-    ----
-    Original paper: https://doi.org/10.1007/BF01235850
-    """
-
-    # Solving for the classical elements
-    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(a) ** 3)
 
@@ -298,39 +277,46 @@ def mikkola(k, r0, v0, tof, rtol=None):
             # Hyperbolic
             nu = F_to_nu(E, ecc)
 
+    return nu
+
+
+@jit
+def mikkola(k, r0, v0, tof, rtol=None):
+    """Raw algorithm for Mikkola's Kepler solver.
+
+    Parameters
+    ----------
+    k : ~astropy.units.Quantity
+        Standard gravitational parameter of the attractor.
+    r : ~astropy.units.Quantity
+        Position vector.
+    v : ~astropy.units.Quantity
+        Velocity vector.
+    tofs : ~astropy.units.Quantity
+        Array of times to propagate.
+    rtol: float
+        This method does not require of tolerance since it is non iterative.
+
+    Returns
+    -------
+    rr : ~astropy.units.Quantity
+        Propagated position vectors.
+    vv : ~astropy.units.Quantity
+
+    Note
+    ----
+    Original paper: https://doi.org/10.1007/BF01235850
+    """
+
+    # Solving for the classical elements
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    nu = mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof)
+
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
-def markley(k, r0, v0, tof):
-    """Solves the kepler problem by a non iterative method. Relative error is
-    around 1e-18, only limited by machine double-precission errors.
-
-    Parameters
-    ----------
-    k : float
-        Standar Gravitational parameter
-    r0 : array
-        Initial position vector wrt attractor center.
-    v0 : array
-        Initial velocity vector.
-    tof : float
-        Time of flight.
-
-    Returns
-    -------
-    rf: array
-        Final position vector
-    vf: array
-        Final velocity vector
-
-    Note
-    ----
-    The following algorithm was taken from http://dx.doi.org/10.1007/BF00691917.
-
-    """
-    # Solve first for eccentricity and mean anomaly
-    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     a = p / (1 - ecc ** 2)
@@ -377,13 +363,13 @@ def markley(k, r0, v0, tof):
     E += delta5
     nu = E_to_nu(E, ecc)
 
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    return nu
 
 
 @jit
-def pimienta(k, r0, v0, tof):
-    """Raw algorithm for Adonis' Pimienta and John L. Crassidis 15th order
-    polynomial Kepler solver.
+def markley(k, r0, v0, tof):
+    """Solves the kepler problem by a non iterative method. Relative error is
+    around 1e-18, only limited by machine double-precission errors.
 
     Parameters
     ----------
@@ -405,13 +391,19 @@ def pimienta(k, r0, v0, tof):
 
     Note
     ----
-    This algorithm was drived from the original paper: http://hdl.handle.net/10477/50522
+    The following algorithm was taken from http://dx.doi.org/10.1007/BF00691917.
+
     """
-
-    # TODO: implement hyperbolic case
-
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    nu = markley_coe(k, p, ecc, inc, raan, argp, nu, tof)
+
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
+
+@jit
+def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
+
     q = p / (1 + ecc)
 
     # TODO: Do something to increase parabolic accuracy?
@@ -738,9 +730,76 @@ def pimienta(k, r0, v0, tof):
         + 15 * w
     )
 
-    nu = E_to_nu(E, ecc)
+    return E_to_nu(E, ecc)
+
+
+@jit
+def pimienta(k, r0, v0, tof):
+    """Raw algorithm for Adonis' Pimienta and John L. Crassidis 15th order
+    polynomial Kepler solver.
+
+    Parameters
+    ----------
+    k : float
+        Standar Gravitational parameter
+    r0 : array
+        Initial position vector wrt attractor center.
+    v0 : array
+        Initial velocity vector.
+    tof : float
+        Time of flight.
+
+    Returns
+    -------
+    rf: array
+        Final position vector
+    vf: array
+        Final velocity vector
+
+    Note
+    ----
+    This algorithm was drived from the original paper: http://hdl.handle.net/10477/50522
+    """
+
+    # TODO: implement hyperbolic case
+
+    # Solve first for eccentricity and mean anomaly
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    nu = pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
+
+@jit
+def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=150, rtol=1e-8):
+    # TODO: parabolic and hyperbolic not implemented cases
+    if ecc >= 1.0:
+        raise NotImplementedError(
+            "Parabolic/Hyperbolic cases still not implemented in gooding."
+        )
+
+    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
+    semi_axis_a = p / (1 - ecc ** 2)
+    n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
+    M = M0 + n * tof
+
+    # Start the computation
+    n = 0
+    c = ecc * np.cos(M)
+    s = ecc * np.sin(M)
+    psi = s / np.sqrt(1 - 2 * c + ecc ** 2)
+    f = 1.0
+    while f ** 2 >= rtol and n <= numiter:
+        xi = np.cos(psi)
+        eta = np.sin(psi)
+        fd = (1 - c * xi) + s * eta
+        fdd = c * eta + s * xi
+        f = psi - fdd
+        psi = psi - f * fd / (fd ** 2 - 0.5 * f * fdd)
+        n += 1
+
+    E = M + psi
+    return E_to_nu(E, ecc)
 
 
 @jit
@@ -775,71 +834,14 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-
-    # TODO: parabolic and hyperbolic not implemented cases
-    if ecc >= 1.0:
-        raise NotImplementedError(
-            "Parabolic/Hyperbolic cases still not implemented in gooding."
-        )
-
-    M0 = E_to_M(nu_to_E(nu, ecc), ecc)
-    semi_axis_a = p / (1 - ecc ** 2)
-    n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
-    M = M0 + n * tof
-
-    # Start the computation
-    n = 0
-    c = ecc * np.cos(M)
-    s = ecc * np.sin(M)
-    psi = s / np.sqrt(1 - 2 * c + ecc ** 2)
-    f = 1.0
-    while f ** 2 >= rtol and n <= numiter:
-        xi = np.cos(psi)
-        eta = np.sin(psi)
-        fd = (1 - c * xi) + s * eta
-        fdd = c * eta + s * xi
-        f = psi - fdd
-        psi = psi - f * fd / (fd ** 2 - 0.5 * f * fdd)
-        n += 1
-
-    E = M + psi
-    nu = E_to_nu(E, ecc)
+    nu = gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
-def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
-    """Kepler solver for both elliptic and parabolic orbits based on Danby's
-    algorithm.
+def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
 
-    Parameters
-    ----------
-    k : float
-        Standard gravitational parameter of the attractor.
-    r : 1x3 vector
-        Position vector.
-    v : 1x3 vector
-        Velocity vector.
-    tof : float
-        Time of flight.
-    rtol: float
-        Relative error for accuracy of the method.
-
-    Returns
-    -------
-    rr : 1x3 vector
-        Propagated position vectors.
-    vv : 1x3 vector
-
-    Note
-    ----
-    This algorithm was developed by Danby in his paper *The solution of Kepler
-    Equation* with DOI: https://doi.org/10.1007/BF01686811
-    """
-
-    # Solve first for eccentricity and mean anomaly
-    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     semi_axis_a = p / (1 - ecc ** 2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
 
@@ -848,7 +850,7 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
         M0 = E_to_M(nu_to_E(nu, ecc), ecc)
         M = M0 + n * tof
         nu = M - 2 * np.pi * np.floor(M / 2 / np.pi)
-        return coe2rv(k, p, ecc, inc, raan, argp, nu)
+        return nu
 
     elif ecc < 1.0:
         # For elliptical orbit
@@ -893,13 +895,51 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
                 cta = ecc - np.cosh(E)
 
             nu = np.arctan2(sta, cta)
-            return coe2rv(k, p, ecc, inc, raan, argp, nu)
-
+            break
         else:
             delta = -f / fp
             delta_star = -f / (fp + 0.5 * delta * fpp)
             deltak = -f / (fp + 0.5 * delta_star * fpp + delta_star ** 2 * fppp / 6)
             E = E + deltak
             n += 1
+    else:
+        raise ValueError("Maximum number of iterations has been reached.")
 
-    raise ValueError("Maximum number of iterations has been reached.")
+    return nu
+
+
+@jit
+def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
+    """Kepler solver for both elliptic and parabolic orbits based on Danby's
+    algorithm.
+
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter of the attractor.
+    r : 1x3 vector
+        Position vector.
+    v : 1x3 vector
+        Velocity vector.
+    tof : float
+        Time of flight.
+    rtol: float
+        Relative error for accuracy of the method.
+
+    Returns
+    -------
+    rr : 1x3 vector
+        Propagated position vectors.
+    vv : 1x3 vector
+
+    Note
+    ----
+    This algorithm was developed by Danby in his paper *The solution of Kepler
+    Equation* with DOI: https://doi.org/10.1007/BF01686811
+    """
+
+    # Solve first for eccentricity and mean anomaly
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    nu = danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
+
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
