@@ -1205,11 +1205,10 @@ def test_orbit_change_attractor_open():
     v = [-15.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
 
-    with pytest.warns(PatchedConicsWarning) as record:
+    with pytest.warns(
+        PatchedConicsWarning, match="Leaving the SOI of the current attractor"
+    ):
         ss.change_attractor(Sun)
-
-    w = record.pop(PatchedConicsWarning)
-    assert "Leaving the SOI of the current attractor" in w.message.args[0]
 
 
 @pytest.mark.parametrize(

@@ -232,12 +232,9 @@ def test_from_body_non_tdb_epochs_warning(epochs):
     unused_body = Earth
     epochs = Time.now()  # This uses UTC scale
 
-    with pytest.warns(TimeScaleWarning) as record:
+    warning_pattern = "Input time was converted to scale='tdb'"
+    with pytest.warns(TimeScaleWarning, match=warning_pattern):
         Ephem.from_body(unused_body, epochs)
-
-    assert len(record) == 1
-    assert "Input time was converted to scale='tdb'" in record[0].message.args[0]
-    assert "Use Time(..., scale='tdb') instead" in record[0].message.args[0]
 
 
 def test_from_body_scalar_epoch_uses_reshaped_epochs():
