@@ -1,7 +1,8 @@
 import pytest
-from astropy import units as u
+from astropy import time, units as u
 
 from poliastro.bodies import Earth, Mars, Sun
+from poliastro.ephem import Ephem
 from poliastro.examples import churi, iss
 from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
 
@@ -80,6 +81,20 @@ def test_plot_2d_trajectory_without_frame_raises_error():
     with pytest.raises(ValueError) as excinfo:
         frame.set_attractor(Sun)
         frame.plot_trajectory({})
+    assert (
+        "A frame must be set up first, please use "
+        "set_orbit_frame(orbit) or plot(orbit)" in excinfo.exconly()
+    )
+
+
+def test_ephem_without_frame_raises_error():
+    epochs = time.Time("2020-04-29 10:43", scale="tdb")
+    earth = Ephem.from_body(Earth, epochs)
+    plotter = OrbitPlotter2D()
+
+    with pytest.raises(ValueError) as excinfo:
+        plotter.set_attractor(Sun)
+        plotter.plot_ephem(earth)
     assert (
         "A frame must be set up first, please use "
         "set_orbit_frame(orbit) or plot(orbit)" in excinfo.exconly()
