@@ -79,10 +79,10 @@ Using poliastro on JupyterLab
 
 After the release of Plotly 3.0, plotting orbits using poliastro is easier than ever.
 
-You need to install the jupyter-lab, which will install the necessary dependencies.
+You need to install the jupyterlab, which will install the necessary dependencies, including plotly.
 You can do this using pip::
 
-  $ pip install jupyter-lab
+  $ pip install jupyterlab
 
 And then start the jupyter-lab with::
 
