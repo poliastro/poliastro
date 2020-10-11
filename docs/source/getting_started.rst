@@ -43,7 +43,7 @@ If you don't want to use conda you can `install poliastro from PyPI`_
 using pip::
 
   $ pip install numpy  # Run this one first for pip 9 and older!
-  $ pip install poliastro[jupyter] pytest
+  $ pip install poliastro [jupyter] pytest
 
 Finally, you can also install the latest development version of poliastro
 `directly from GitHub`_::
@@ -79,11 +79,14 @@ Using poliastro on JupyterLab
 
 After the release of Plotly 3.0, plotting orbits using poliastro is easier than ever.
 
-You have to install three extensions of JupyterLab to make your experience smooth::
+You need to install the jupyter-lab, which will install the necessary dependencies.
+You can do this using pip::
 
-  $ jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.38
-  $ jupyter labextension install plotlywidget@0.7.0
-  $ jupyter labextension install @jupyterlab/plotly-extension@0.18.1
+  $ pip install jupyter-lab
+
+And then start the jupyter-lab with::
+
+  $ jupyter-lab
 
 And as the documentation of JupyterLab Extensions states:
 
