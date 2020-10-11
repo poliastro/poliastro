@@ -115,6 +115,10 @@ These are some succinct steps to set up a development environment:
 9. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
 10. `Open a pull request! <https://help.github.com/articles/creating-a-pull-request/>`_
 
+If you experience errors complaining about `invalid command 'bdist_wheel'` during `flit install --symlink`,
+install the `wheel` package using :code:`python -m pip install wheel` and try the installation
+again.
+
 For more detailed explanations, please check out the `Astropy development docs`__.
 
 .. _`flit`: https://github.com/takluyver/flit
