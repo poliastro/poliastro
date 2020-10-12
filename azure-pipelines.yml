@@ -12,7 +12,7 @@ resources:
   - repository: OpenAstronomy
     type: github
     endpoint: poliastro
-    name: OpenAstronomy/azure-pipelines-templates
+    name: epassaro/azure-pipelines-templates
     ref: master
 
 trigger:
@@ -83,3 +83,13 @@ jobs:
       - macos: py38
         name: py38_test_macos
         libraries: {}
+
+- template: publish.yml@OpenAstronomy
+  parameters:
+    ${{ if startsWith(variables.Build.SourceBranch, 'refs/tags/v') }}:
+      pypi_connection_name: 'pypi_upload'
+    test_extras: 'dev'
+    test_command: 'cd $(Build.SourcesDirectory)/tests; pytest -m "not slow and not mpl_image_compare"'
+    targets:
+    - sdist
+    - wheels_universal
