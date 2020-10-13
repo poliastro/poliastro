@@ -426,7 +426,7 @@ def test_propagate_with_coe(propagator_coe):
     a, ecc, inc, raan, argp, nu = iss.classical()
     p = a * (1 - ecc ** 2)
 
-    # Delete de units
+    # Delete the units
     p = p.to_value(u.km)
     ecc = ecc.value
     period = period.to_value(u.s)
