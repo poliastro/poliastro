@@ -86,7 +86,7 @@ You can do this using pip::
 
 And then start the jupyter-lab with::
 
-  $ jupyter-lab
+  $ jupyter lab
 
 And as the documentation of JupyterLab Extensions states:
 
