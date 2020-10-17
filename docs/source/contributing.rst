@@ -105,7 +105,7 @@ These are some succinct steps to set up a development environment:
 3. `Fork poliastro <https://help.github.com/articles/fork-a-repo/>`_.
 4. `Clone your fork <https://help.github.com/articles/cloning-a-repository/>`_.
 5. Install `flit`_ using
-   :code:`python -m pip install flit`
+   :code:`python -m pip install flit wheel`
 6. Change into the local checkout of your repository and install it in development mode using
    :code:`flit install --symlink` (:code:`--symlink` means that the
    installed code will change as soon as you change it in the download
