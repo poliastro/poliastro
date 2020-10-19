@@ -89,4 +89,3 @@ def markley(k, r0, v0, tof):
     nu = markley_coe(k, p, ecc, inc, raan, argp, nu, tof)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
-

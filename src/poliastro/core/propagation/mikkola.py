@@ -120,3 +120,17 @@ def mikkola(k, r0, v0, tof, rtol=None):
     nu = mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof)
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
+
+
+@jit
+def mikkola_tofs_coe(k, p, ecc, inc, raan, argp, nu, tofs):
+    nus = np.zeros_like(tofs)
+    for i, tof in tofs.ndenumerate():
+        nus[i] = mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof)
+    return nus
+
+
+@jit
+def mikkola_tofs(k, r0, v0, tofs, rtol=None):
+    p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
+    return mikkola_tofs_coe(k, p, ecc, inc, raan, argp, nu, tofs)
