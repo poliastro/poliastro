@@ -64,5 +64,5 @@ class Spacecraft:
 
         """
 
-        B = self._C_D * (self.A / self.m)
+        B = self._C_D * (self._A / self._m)
         return B
