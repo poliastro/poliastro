@@ -71,8 +71,8 @@ dev = [
     "sphinx",
     "sphinx-autoapi",
     "sphinx-gallery",
-    "sphinx_rtd_theme==0.5.0rc1",
-    "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/master.zip",
+    "sphinx_rtd_theme==0.5.0",
+    "sphinx-hoverxref==0.5b1",
     "sphinx-notfound-page",
     "tox",
 ]
