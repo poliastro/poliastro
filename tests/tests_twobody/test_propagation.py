@@ -345,7 +345,7 @@ def test_propagate_long_times_keeps_geometry(propagator):
     )
 
 
-@pytest.mark.filterwarnings("ignore::astropy._erfa.core.ErfaWarning")
+@pytest.mark.filterwarnings("ignore::erfa.core.ErfaWarning")
 def test_long_propagations_vallado_agrees_farnocchia():
     tof = 100 * u.year
     r_mm, v_mm = iss.propagate(tof, method=farnocchia).rv()
