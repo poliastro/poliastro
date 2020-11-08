@@ -64,7 +64,7 @@ dev = [
     "pycodestyle",
     "pytest>=3.2",
     "pytest-cov<2.6.0",  # https://github.com/pytest-dev/pytest-cov/issues/222
-    "pytest-doctestplus",
+    "pytest-doctestplus>=0.8",  # https://github.com/astropy/pytest-doctestplus/issues/118
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
