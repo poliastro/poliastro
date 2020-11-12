@@ -1,5 +1,6 @@
+import erfa
 import numpy as np
-from astropy import _erfa as erfa, units as u
+from astropy import units as u
 from astropy.coordinates import (
     BaseEclipticFrame,
     CartesianRepresentation,

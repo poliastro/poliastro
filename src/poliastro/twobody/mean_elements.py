@@ -1,4 +1,5 @@
-from astropy import _erfa as erfa, units as u
+import erfa
+from astropy import units as u
 from astropy.coordinates.solar_system import PLAN94_BODY_NAME_TO_PLANET_INDEX
 
 from ..constants import J2000
