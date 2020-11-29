@@ -324,9 +324,7 @@ def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
     M = M0 + n * tof
 
     # Range between -pi and pi
-    M = M % (2 * np.pi)
-    if M > np.pi:
-        M = -(2 * np.pi - M)
+    M = (M + np.pi) % (2 * np.pi) - np.pi
 
     # Equation (20)
     alpha = (3 * np.pi ** 2 + 1.6 * (np.pi - np.abs(M)) / (1 + ecc)) / (np.pi ** 2 - 6)
