@@ -68,11 +68,27 @@ def rv_pqw(k, p, ecc, nu):
     r = [-5312706.25105345  9201877.15251336    0] [m]
     v = [-5753.30180931 -1328.66813933  0] [m]/[s]
 
+    Also works on 1-N arrays:
+    >>> r, v = rv_pqw(np.full((4,1),k), np.full((4,1),p), np.full((4,1),ecc), np.full((4,1),nu))
+    r = [[-5312706.25105345  9201877.15251336    0]
+         [-5312706.25105345  9201877.15251336    0]
+         [-5312706.25105345  9201877.15251336    0]
+         [-5312706.25105345  9201877.15251336    0]] [m]
+    v = [[-5753.30180931 -1328.66813933  0]
+         [-5753.30180931 -1328.66813933  0]
+         [-5753.30180931 -1328.66813933  0]
+         [-5753.30180931 -1328.66813933  0]] [m]/[s]
     """
-    pqw = np.array([[cos(nu), sin(nu), 0], [-sin(nu), ecc + cos(nu), 0]]) * np.array(
-        [[p / (1 + ecc * cos(nu))], [sqrt(k / p)]]
-    )
-    return pqw
+
+    # Unit vectors in pqw (this is done to circumvent a numba issue: https://github.com/numba/numba/issues/4470)
+    u_p = np.array([1, 0, 0])
+    u_q = np.array([0, 1, 0])
+    u_w = np.array([0, 0, 1])
+
+    r = (cos(nu) * u_p + sin(nu) * u_q + 0 * u_w) * (p / (1 + ecc * cos(nu)))
+    v = (-sin(nu) * u_p + (ecc + cos(nu)) * u_q + 0 * u_w) * sqrt(k / p)
+
+    return r, v
 
 
 @jit
