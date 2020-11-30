@@ -2,7 +2,7 @@
     to convert between different elements that define the orbit
     of a body.
     """
-
+import numba
 import numpy as np
 from numpy import cross
 from numpy.core.umath import cos, sin, sqrt
@@ -65,11 +65,11 @@ def rv_pqw(k, p, ecc, nu):
     >>> p = h**2 / k  # Parameter of the orbit
     >>> r, v = rv_pqw(k, p, ecc, nu)
     >>> # Printing the results
-    r = [-5312706.25105345  9201877.15251336    0] [m]
-    v = [-5753.30180931 -1328.66813933  0] [m]/[s]
+    r = [[-5312706.25105345  9201877.15251336    0]] [m]
+    v = [[-5753.30180931 -1328.66813933  0]] [m]/[s]
 
-    Also works on 1-N arrays:
-    >>> r, v = rv_pqw(np.full((4,1),k), np.full((4,1),p), np.full((4,1),ecc), np.full((4,1),nu))
+    Also works on vector inputs:
+    >>> r, v = rv_pqw(np.full(4,k), np.full(4,p), np.full(4,ecc), np.full(4,nu))
     r = [[-5312706.25105345  9201877.15251336    0]
          [-5312706.25105345  9201877.15251336    0]
          [-5312706.25105345  9201877.15251336    0]
@@ -81,12 +81,12 @@ def rv_pqw(k, p, ecc, nu):
     """
 
     # Unit vectors in pqw (this is done to circumvent a numba issue: https://github.com/numba/numba/issues/4470)
-    u_p = np.array([1, 0, 0])
-    u_q = np.array([0, 1, 0])
-    u_w = np.array([0, 0, 1])
+    u_p = np.array([[1, 0, 0]]).T
+    u_q = np.array([[0, 1, 0]]).T
+    u_w = np.array([[0, 0, 1]]).T
 
-    r = (cos(nu) * u_p + sin(nu) * u_q + 0 * u_w) * (p / (1 + ecc * cos(nu)))
-    v = (-sin(nu) * u_p + (ecc + cos(nu)) * u_q + 0 * u_w) * sqrt(k / p)
+    r = ((u_p * cos(nu) + u_q * sin(nu) + u_w * 0.) * (p / (1 + ecc * cos(nu)))).T
+    v = ((u_p * -sin(nu) + u_q *(ecc + cos(nu))  + u_w * 0.) * sqrt(k / p)).T
 
     return r, v
 
