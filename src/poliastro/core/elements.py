@@ -85,8 +85,8 @@ def rv_pqw(k, p, ecc, nu):
     u_q = np.array([[0, 1, 0]]).T
     u_w = np.array([[0, 0, 1]]).T
 
-    r = ((u_p * cos(nu) + u_q * sin(nu) + u_w * 0.) * (p / (1 + ecc * cos(nu)))).T
-    v = ((u_p * -sin(nu) + u_q *(ecc + cos(nu))  + u_w * 0.) * sqrt(k / p)).T
+    r = ((u_p * cos(nu) + u_q * sin(nu) + u_w * 0.0) * (p / (1 + ecc * cos(nu)))).T
+    v = ((u_p * -sin(nu) + u_q * (ecc + cos(nu)) + u_w * 0.0) * sqrt(k / p)).T
 
     return r, v
 
@@ -156,6 +156,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
         \end{bmatrix}
 
     """
+
     pqw = rv_pqw(k, p, ecc, nu)
     rm = coe_rotation_matrix(inc, raan, argp)
 
