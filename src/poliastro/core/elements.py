@@ -2,7 +2,6 @@
     to convert between different elements that define the orbit
     of a body.
     """
-import numba
 import numpy as np
 from numpy import cross
 from numpy.core.umath import cos, sin, sqrt
@@ -99,6 +98,7 @@ def coe_rotation_matrix(inc, raan, argp):
     r = r @ rotation_matrix(argp, 2)
     return r
 
+
 @jit
 def pqw2ijk_vectors(inc, raan, argp):
     r"""
@@ -133,17 +133,22 @@ def pqw2ijk_vectors(inc, raan, argp):
     u_j = np.array([[0, 1, 0]]).T
     u_k = np.array([[0, 0, 1]]).T
 
-    p_ijk = (u_i * (cos(raan)*cos(argp) - sin(raan)*sin(argp)*cos(inc))
-             + u_j * (sin(raan)*cos(argp) + cos(raan)*sin(argp)*cos(inc))
-             + u_k * sin(argp)*sin(inc)).T
-    q_ijk = (u_i * (-cos(raan) * sin(argp) - sin(raan) * cos(argp) * cos(inc))
-             + u_j * (-sin(raan) * sin(argp) + cos(raan) * cos(argp) * cos(inc))
-             + u_k * cos(argp) * sin(inc)).T
-    w_ijk = (u_i * sin(raan) * sin(inc)
-             + u_j * -cos(raan) * sin(inc)
-             + u_k * cos(inc)).T
+    p_ijk = (
+        u_i * (cos(raan) * cos(argp) - sin(raan) * sin(argp) * cos(inc))
+        + u_j * (sin(raan) * cos(argp) + cos(raan) * sin(argp) * cos(inc))
+        + u_k * sin(argp) * sin(inc)
+    ).T
+    q_ijk = (
+        u_i * (-cos(raan) * sin(argp) - sin(raan) * cos(argp) * cos(inc))
+        + u_j * (-sin(raan) * sin(argp) + cos(raan) * cos(argp) * cos(inc))
+        + u_k * cos(argp) * sin(inc)
+    ).T
+    w_ijk = (
+        u_i * sin(raan) * sin(inc) + u_j * -cos(raan) * sin(inc) + u_k * cos(inc)
+    ).T
 
     return p_ijk, q_ijk, w_ijk
+
 
 @jit
 def coe2rv(k, p, ecc, inc, raan, argp, nu):
@@ -213,19 +218,19 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     >>> argp = np.deg2rad(5) # Argument of perigee (rad)
     >>> r, v = coe2rv(k, p, ecc, inc, raan, argp, nu)
     >>> # Printing the results
-    r = [[-5312706.25105345  9201877.15251336    0]] [m]
-    v = [[-5753.30180931 -1328.66813933  0]] [m]/[s]
+    r = [[-7479732.8022355   4367456.2250807   6154536.06448901]] [m]
+    v = [[-5090.25400955 -2699.95544546 -1290.50201252]] [m]/[s]
 
     Also works on vector inputs:
     >>> r, v = coe2rv(np.full(4,k), np.full(4,p), np.full(4,ecc), np.full(4,inc), np.full(4,raan), np.full(4,argp), np.full(4,nu))
-    r = [[-5312706.25105345  9201877.15251336    0]
-         [-5312706.25105345  9201877.15251336    0]
-         [-5312706.25105345  9201877.15251336    0]
-         [-5312706.25105345  9201877.15251336    0]] [m]
-    v = [[-5753.30180931 -1328.66813933  0]
-         [-5753.30180931 -1328.66813933  0]
-         [-5753.30180931 -1328.66813933  0]
-         [-5753.30180931 -1328.66813933  0]] [m]/[s]
+    r = [[-7479732.8022355   4367456.2250807   6154536.06448901]
+         [-7479732.8022355   4367456.2250807   6154536.06448901]
+         [-7479732.8022355   4367456.2250807   6154536.06448901]
+         [-7479732.8022355   4367456.2250807   6154536.06448901]] [m]
+    v = [[-5090.25400955 -2699.95544546 -1290.50201252]
+         [-5090.25400955 -2699.95544546 -1290.50201252]
+         [-5090.25400955 -2699.95544546 -1290.50201252]
+         [-5090.25400955 -2699.95544546 -1290.50201252]] [m]/[s]
 
     """
 
@@ -234,12 +239,16 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
 
     r_ijk = r_pqw[:, 0] * p_ijk.T
     r_ijk = r_ijk + r_pqw[:, 1] * q_ijk.T
-    r_ijk = r_ijk + r_pqw[:, 2] * w_ijk.T    # This line does nothing because w is always 0 in the perifocal frame
+    r_ijk = (
+        r_ijk + r_pqw[:, 2] * w_ijk.T
+    )  # This line does nothing because w is always 0 in the perifocal frame
     r_ijk = r_ijk.T
 
     v_ijk = v_pqw[:, 0] * p_ijk.T
     v_ijk = v_ijk + v_pqw[:, 1] * q_ijk.T
-    v_ijk = v_ijk + v_pqw[:, 2] * w_ijk.T   # This line does nothing because w is always 0 in the perifocal frame
+    v_ijk = (
+        v_ijk + v_pqw[:, 2] * w_ijk.T
+    )  # This line does nothing because w is always 0 in the perifocal frame
     v_ijk = v_ijk.T
 
     return r_ijk, v_ijk
