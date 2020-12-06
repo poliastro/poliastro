@@ -300,11 +300,8 @@ def markley(k, r, v, tofs, rtol=None):
     v0 = v.to(u.m / u.s).value
     tofs = tofs.to(u.s).value
 
-    results = [markley_fast(k, r0, v0, tof) for tof in tofs]
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
+    rr, vv = markley_fast(k, r0, v0, tofs)
+    return (rr * u.m, vv * u.m / u.s)
 
 
 def pimienta(k, r, v, tofs, rtol=None):
@@ -481,6 +478,9 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         rtol=rtol,
         **kwargs
     )
+
+    rr = rr.reshape(-1, 3)
+    vv = vv.reshape(-1, 3)
 
     # TODO: Turn these into unit tests
     assert rr.ndim == 2
