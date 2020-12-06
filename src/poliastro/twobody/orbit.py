@@ -21,6 +21,7 @@ from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.propagation import farnocchia, propagate
 
+from ..core.elements import coe2rv
 from ..core.propagation.farnocchia import delta_t_from_nu as delta_t_from_nu_fast
 from ..util import find_closest_value, norm
 from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
@@ -1416,16 +1417,13 @@ class Orbit:
         else:
             nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
-        # FIXME: Refactor this insanity to remove a lot of back and forth
-        # 1. Convert to classical to extract nu values (either 1 or 3 are no ops)
-        # 2. Sample values of nu -> M -> times
-        # 3. Convert to cartesian to call the farnocchia propagator harcoded here (either 1 or 3 are no ops)
-        # 4. For each time, convert to classical to retain "slow" elements
-        # 5. For each time, compute nu0 -> M0 (same value always)
-        # 6. For each time, t -> M -> nu
-        # 7. For each time, convert classical to cartesian and assemble orbit
-        time_values = time.TimeDelta(self._generate_time_values(nu_values))
-        cartesian = propagate(self, time_values)
+        rr, vv = coe2rv(
+            self.k, self.p, self.ecc, self.inc, self.raan, self.argp, nu_values
+        )
+
+        cartesian = CartesianRepresentation(
+            rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
+        )
 
         return cartesian
 
