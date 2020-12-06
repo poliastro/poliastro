@@ -1425,7 +1425,7 @@ class Orbit:
             self.inc.to(u.rad).value,
             self.raan.to(u.rad).value,
             self.argp.to(u.rad).value,
-            nu_values.to(u.rad).value
+            nu_values.to(u.rad).value,
         )
 
         # Add units
