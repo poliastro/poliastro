@@ -99,6 +99,51 @@ def coe_rotation_matrix(inc, raan, argp):
     r = r @ rotation_matrix(argp, 2)
     return r
 
+@jit
+def pqw2ijk_vectors(inc, raan, argp):
+    r"""
+
+    Computes the nine vectors: pi, pj, pk, qi, qj, qk, wi, wj, wk
+    that define the rotation from the pqw - perifocal frame to the
+    ijk - cartesian frame. This is basically the hard coded result
+    of multiplying the three rotation matrices (3-1-3).
+
+    Parameters
+    ----------
+    inc : float
+        Inclination (rad).
+    omega : float
+        Longitude of ascending node (rad).
+    argp : float
+        Argument of perigee (rad).
+
+    Returns
+    -------
+    p_ijk: np.array
+        Position vector in basis ijk.
+    q_ijk: np.array
+        Position vector in basis ijk.
+    w_ijk: np.array
+        Position vector in basis ijk.
+
+    """
+
+    # Unit vectors in ijk (this is done to circumvent a numba issue: https://github.com/numba/numba/issues/4470)
+    u_i = np.array([[1, 0, 0]]).T
+    u_j = np.array([[0, 1, 0]]).T
+    u_k = np.array([[0, 0, 1]]).T
+
+    p_ijk = (u_i * (cos(raan)*cos(argp) - sin(raan)*sin(argp)*cos(inc))
+             + u_j * (sin(raan)*cos(argp) + cos(raan)*sin(argp)*cos(inc))
+             + u_k * sin(argp)*sin(inc)).T
+    q_ijk = (u_i * (-cos(raan) * sin(argp) - sin(raan) * cos(argp) * cos(inc))
+             + u_j * (-sin(raan) * sin(argp) + cos(raan) * cos(argp) * cos(inc))
+             + u_k * cos(argp) * sin(inc)).T
+    w_ijk = (u_i * sin(raan) * sin(inc)
+             + u_j * -cos(raan) * sin(inc)
+             + u_k * cos(inc)).T
+
+    return p_ijk, q_ijk, w_ijk
 
 @jit
 def coe2rv(k, p, ecc, inc, raan, argp, nu):
@@ -155,14 +200,49 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
         \sin(\omega)\sin(i) & \cos(\omega)\sin(i) & \cos(i)
         \end{bmatrix}
 
+    Examples
+    --------
+    >>> from poliastro.constants import GM_earth
+    >>> k = GM_earth.value  # Earth gravitational parameter
+    >>> ecc = 0.3  # Eccentricity
+    >>> h = 60000e6  # Angular momentum of the orbit (m**2 / s)
+    >>> nu = np.deg2rad(120)  # True Anomaly (rad)
+    >>> p = h**2 / k  # Parameter of the orbit
+    >>> inc = np.deg2rad(45) # Inclination (rad)
+    >>> raan = np.deg2rad(15) # Longitude of ascending node  (rad)
+    >>> argp = np.deg2rad(5) # Argument of perigee (rad)
+    >>> r, v = coe2rv(k, p, ecc, inc, raan, argp, nu)
+    >>> # Printing the results
+    r = [[-5312706.25105345  9201877.15251336    0]] [m]
+    v = [[-5753.30180931 -1328.66813933  0]] [m]/[s]
+
+    Also works on vector inputs:
+    >>> r, v = coe2rv(np.full(4,k), np.full(4,p), np.full(4,ecc), np.full(4,inc), np.full(4,raan), np.full(4,argp), np.full(4,nu))
+    r = [[-5312706.25105345  9201877.15251336    0]
+         [-5312706.25105345  9201877.15251336    0]
+         [-5312706.25105345  9201877.15251336    0]
+         [-5312706.25105345  9201877.15251336    0]] [m]
+    v = [[-5753.30180931 -1328.66813933  0]
+         [-5753.30180931 -1328.66813933  0]
+         [-5753.30180931 -1328.66813933  0]
+         [-5753.30180931 -1328.66813933  0]] [m]/[s]
+
     """
 
-    pqw = rv_pqw(k, p, ecc, nu)
-    rm = coe_rotation_matrix(inc, raan, argp)
+    r_pqw, v_pqw = rv_pqw(k, p, ecc, nu)
+    p_ijk, q_ijk, w_ijk = pqw2ijk_vectors(inc, raan, argp)
 
-    ijk = pqw @ rm.T
+    r_ijk = r_pqw[:, 0] * p_ijk.T
+    r_ijk = r_ijk + r_pqw[:, 1] * q_ijk.T
+    r_ijk = r_ijk + r_pqw[:, 2] * w_ijk.T    # This line does nothing because w is always 0 in the perifocal frame
+    r_ijk = r_ijk.T
 
-    return ijk
+    v_ijk = v_pqw[:, 0] * p_ijk.T
+    v_ijk = v_ijk + v_pqw[:, 1] * q_ijk.T
+    v_ijk = v_ijk + v_pqw[:, 2] * w_ijk.T   # This line does nothing because w is always 0 in the perifocal frame
+    v_ijk = v_ijk.T
+
+    return r_ijk, v_ijk
 
 
 @jit
