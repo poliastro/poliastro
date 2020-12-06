@@ -131,6 +131,10 @@ class ClassicalState(BaseState):
             self.nu.to(u.rad).value,
         )
 
+        # squeeze to 1d arrays
+        r = r[0, :]
+        v = v[0, :]
+
         return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_classical(self):
