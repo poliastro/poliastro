@@ -1417,9 +1417,20 @@ class Orbit:
         else:
             nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
+        # Convert coe's to cartesian
         rr, vv = coe2rv(
-            self.k, self.p, self.ecc, self.inc, self.raan, self.argp, nu_values
+            self.attractor.k.to(u.m ** 3 / u.s ** 2).value,
+            self.p.to(u.m).value,
+            self.ecc.value,
+            self.inc.to(u.rad).value,
+            self.raan.to(u.rad).value,
+            self.argp.to(u.rad).value,
+            nu_values.to(u.rad).value
         )
+
+        # Add units
+        rr = rr * u.m
+        vv = vv * u.m / u.s
 
         cartesian = CartesianRepresentation(
             rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
