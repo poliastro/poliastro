@@ -140,7 +140,7 @@ def _get_destination_frame(attractor, plane, epochs):
     if attractor is not None:
         destination_frame = get_frame(attractor, plane, epochs)
     elif plane is Planes.EARTH_ECLIPTIC:
-        destination_frame = BarycentricMeanEcliptic
+        destination_frame = BarycentricMeanEcliptic()
     else:
         destination_frame = None
 
