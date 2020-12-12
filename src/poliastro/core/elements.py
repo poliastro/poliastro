@@ -4,6 +4,7 @@
     """
 
 import numpy as np
+from numba import prange
 from numpy import cross
 from numpy.core.umath import cos, sin, sqrt
 from numpy.linalg import norm
@@ -432,3 +433,16 @@ def mee2coe(p, f, g, h, k, L):
     argp = (lonper - raan) % (2 * np.pi)
     nu = (L - lonper) % (2 * np.pi)
     return p, ecc, inc, raan, argp, nu
+
+
+@jit(parallel=True)
+def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
+
+    n = nu.shape[0]
+    rr = np.zeros((n, 3))
+    vv = np.zeros((n, 3))
+
+    for i in prange(n):
+        rr[i, :], vv[i, :] = coe2rv(k[i], p[i], ecc[i], inc[i], raan[i], argp[i], nu[i])
+
+    return rr, vv
