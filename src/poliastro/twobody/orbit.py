@@ -1429,8 +1429,8 @@ class Orbit:
         )
 
         # Add units
-        rr = rr * u.m
-        vv = vv * u.m / u.s
+        rr = (rr << u.m).to(u.km)
+        vv = (vv << (u.m / u.s)).to(u.km / u.s)
 
         cartesian = CartesianRepresentation(
             rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
