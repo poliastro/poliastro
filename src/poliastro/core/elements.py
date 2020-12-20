@@ -4,12 +4,11 @@
     """
 
 import numpy as np
-from numba import prange
 from numpy import cross
 from numpy.core.umath import cos, sin, sqrt
 from numpy.linalg import norm
 
-from ._jit import jit
+from ._jit import jit, prange
 from .angles import E_to_nu, F_to_nu
 from .util import rotation_matrix
 
@@ -147,6 +146,19 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     ijk = pqw @ rm.T
 
     return ijk
+
+
+@jit(parallel=True)
+def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
+
+    n = nu.shape[0]
+    rr = np.zeros((n, 3))
+    vv = np.zeros((n, 3))
+
+    for i in prange(n):
+        rr[i, :], vv[i, :] = coe2rv(k[i], p[i], ecc[i], inc[i], raan[i], argp[i], nu[i])
+
+    return rr, vv
 
 
 @jit
@@ -433,16 +445,3 @@ def mee2coe(p, f, g, h, k, L):
     argp = (lonper - raan) % (2 * np.pi)
     nu = (L - lonper) % (2 * np.pi)
     return p, ecc, inc, raan, argp, nu
-
-
-@jit(parallel=True)
-def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
-
-    n = nu.shape[0]
-    rr = np.zeros((n, 3))
-    vv = np.zeros((n, 3))
-
-    for i in prange(n):
-        rr[i, :], vv[i, :] = coe2rv(k[i], p[i], ecc[i], inc[i], raan[i], argp[i], nu[i])
-
-    return rr, vv

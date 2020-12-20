@@ -24,6 +24,7 @@ try:
     import numba
 
     jit = numba.njit
+    prange = numba.prange
 except ImportError:
     warnings.warn(
         "Could not import numba package. All poliastro "
@@ -32,3 +33,4 @@ except ImportError:
         "boost performance."
     )
     jit = ijit
+    prange = range
