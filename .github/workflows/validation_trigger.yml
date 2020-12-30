@@ -26,5 +26,5 @@ jobs:
         run: |
           curl -XPOST -u "${{ secrets.PAT_VALIDATION}}:${{secrets.PAT_VALIDATION_TOKEN}}" \
           -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Content-Type: application/json" https://api.github.com/repos/poliastro/validation/actions/workflows/build.yaml/dispatches \
+          -H "Content-Type: application/json" https://api.github.com/repos/poliastro/validation/actions/workflows/ci_actions.yml/dispatches \
           --data '{"ref": "master"}'
