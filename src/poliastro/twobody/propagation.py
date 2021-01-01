@@ -58,7 +58,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
         passed to solve_ivp: integration stops when this function
         returns <= 0., assuming you set events.terminal=True
     f : function(t0, u, k), optional
-         Objective function, default to Keplerian-only forces.
+        Objective function, default to Keplerian-only forces.
 
     Returns
     -------

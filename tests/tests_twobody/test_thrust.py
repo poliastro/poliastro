@@ -4,6 +4,7 @@ from astropy import units as u
 from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth
+from poliastro.core.propagation import func_twobody
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
@@ -39,7 +40,13 @@ def test_leo_geo_numerical(inc_0):
     s0 = Orbit.circular(Earth, a_0 * u.km - Earth.R, inc_0 * u.rad)
 
     # Propagate orbit
-    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-6)
+    def f_leo_geo(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f * u.s, method=cowell, f=f_leo_geo, rtol=1e-6)
 
     assert_allclose(sf.a.to(u.km).value, a_f, rtol=1e-3)
     assert_allclose(sf.ecc.value, 0.0, atol=1e-2)
@@ -80,7 +87,13 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
     a_d, _, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 
     # Propagate orbit
-    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
+    def f_ss0_disposal(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f * u.s, method=cowell, f=f_ss0_disposal, rtol=1e-8)
 
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-4, atol=1e-4)
 
@@ -144,7 +157,13 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
     a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
 
     # Propagate orbit
-    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
+    def f_geo(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f * u.s, method=cowell, f=f_geo, rtol=1e-8)
 
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-2, atol=1e-2)
     assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
@@ -201,7 +220,13 @@ def test_soyuz_standard_gto_numerical():
     )
 
     # Propagate orbit
-    sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
+    def f_soyuz(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f * u.s, method=cowell, f=f_soyuz, rtol=1e-8)
 
     assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
 

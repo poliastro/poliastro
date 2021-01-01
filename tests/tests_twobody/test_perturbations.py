@@ -19,6 +19,7 @@ from poliastro.core.perturbations import (
     radiation_pressure,
     third_body,
 )
+from poliastro.core.propagation import func_twobody
 from poliastro.earth.atmosphere import COESA76
 from poliastro.ephem import build_ephem_interpolant
 from poliastro.twobody import Orbit
@@ -35,15 +36,16 @@ def test_J2_propagation_Earth():
     orbit = Orbit.from_vectors(Earth, r0 * u.km, v0 * u.km / u.s)
 
     tofs = [48.0] * u.h
-    rr, vv = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
-        tofs,
-        ad=J2_perturbation,
-        J2=Earth.J2.value,
-        R=Earth.R.to(u.km).value,
-    )
+
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = J2_perturbation(
+            t0, u_, k, J2=Earth.J2.value, R=Earth.R.to(u.km).value
+        )
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    rr, vv = cowell(Earth.k, orbit.r, orbit.v, tofs, f=f)
 
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
@@ -107,16 +109,22 @@ def test_J3_propagation_Earth(test_params):
         Earth, a_ini, ecc_ini, inc_ini, raan_ini, argp_ini, nu_ini
     )
 
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = J2_perturbation(
+            t0, u_, k, J2=Earth.J2.value, R=Earth.R.to(u.km).value
+        )
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
     tofs = np.linspace(0, 10.0 * u.day, 1000)
     r_J2, v_J2 = cowell(
         Earth.k,
         orbit.r,
         orbit.v,
         tofs,
-        ad=J2_perturbation,
-        J2=Earth.J2.value,
-        R=Earth.R.to(u.km).value,
         rtol=1e-8,
+        f=f,
     )
 
     def a_J2J3(t0, u_, k_):
@@ -124,7 +132,13 @@ def test_J3_propagation_Earth(test_params):
         j3 = J3_perturbation(t0, u_, k_, J3=Earth.J3.value, R=Earth.R.to(u.km).value)
         return j2 + j3
 
-    r_J3, v_J3 = cowell(Earth.k, orbit.r, orbit.v, tofs, ad=a_J2J3, rtol=1e-8)
+    def f_combined(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_J2J3(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    r_J3, v_J3 = cowell(Earth.k, orbit.r, orbit.v, tofs, rtol=1e-8, f=f_combined)
 
     a_values_J2 = np.array(
         [
@@ -206,17 +220,20 @@ def test_atmospheric_drag_exponential():
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
 
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = atmospheric_drag_exponential(
+            t0, u_, k, R=R, C_D=C_D, A_over_m=A_over_m, H0=H0, rho0=rho0
+        )
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
     rr, _ = cowell(
         Earth.k,
         orbit.r,
         orbit.v,
         [tof] * u.s,
-        ad=atmospheric_drag_exponential,
-        R=R,
-        C_D=C_D,
-        A_over_m=A_over_m,
-        H0=H0,
-        rho0=rho0,
+        f=f,
     )
 
     assert_quantity_allclose(
@@ -247,18 +264,21 @@ def test_atmospheric_demise():
     lithobrake_event = LithobrakeEvent(R)
     events = [lithobrake_event]
 
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = atmospheric_drag_exponential(
+            t0, u_, k, R=R, C_D=C_D, A_over_m=A_over_m, H0=H0, rho0=rho0
+        )
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
     rr, _ = cowell(
         Earth.k,
         orbit.r,
         orbit.v,
         tofs,
-        ad=atmospheric_drag_exponential,
-        R=R,
-        C_D=C_D,
-        A_over_m=A_over_m,
-        H0=H0,
-        rho0=rho0,
         events=events,
+        f=f,
     )
 
     assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
@@ -275,13 +295,8 @@ def test_atmospheric_demise():
         orbit.r,
         orbit.v,
         tofs,
-        ad=atmospheric_drag_exponential,
-        R=R,
-        C_D=C_D,
-        A_over_m=A_over_m,
-        H0=H0,
-        rho0=rho0,
         events=events,
+        f=f,
     )
 
     assert lithobrake_event.last_t == tofs[-1]
@@ -308,17 +323,21 @@ def test_atmospheric_demise_coesa76():
 
     coesa76 = COESA76()
 
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = atmospheric_drag_model(
+            t0, u_, k, R=R, C_D=C_D, A_over_m=A_over_m, model=coesa76
+        )
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
     rr, _ = cowell(
         Earth.k,
         orbit.r,
         orbit.v,
         tofs,
-        ad=atmospheric_drag_model,
-        R=R,
-        C_D=C_D,
-        A_over_m=A_over_m,
-        model=coesa76,
         events=events,
+        f=f,
     )
 
     assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
@@ -349,7 +368,13 @@ def test_cowell_works_with_small_perturbations():
         norm_v = (v_vec * v_vec).sum() ** 0.5
         return 1e-5 * v_vec / norm_v
 
-    final = initial.propagate(3 * u.day, method=cowell, ad=accel)
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = accel(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    final = initial.propagate(3 * u.day, method=cowell, f=f)
 
     assert_quantity_allclose(final.r, r_expected)
     assert_quantity_allclose(final.v, v_expected)
@@ -367,7 +392,13 @@ def test_cowell_converges_with_small_perturbations():
         norm_v = (v_vec * v_vec).sum() ** 0.5
         return 0.0 * v_vec / norm_v
 
-    final = initial.propagate(initial.period, method=cowell, ad=accel)
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = accel(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    final = initial.propagate(initial.period, method=cowell, f=f)
 
     assert_quantity_allclose(final.r, initial.r)
     assert_quantity_allclose(final.v, initial.v)
@@ -508,15 +539,26 @@ def test_3rd_body_Curtis(test_params):
 
         epoch = Time(j_date, format="jd", scale="tdb")
         initial = Orbit.from_classical(Earth, *test_params["orbit"], epoch=epoch)
+
+        def f(t0, u_, k):
+            du_kep = func_twobody(t0, u_, k)
+            ax, ay, az = third_body(
+                t0,
+                u_,
+                k,
+                k_third=body.k.to(u.km ** 3 / u.s ** 2).value,
+                perturbation_body=body_r,
+            )
+            du_ad = np.array([0, 0, 0, ax, ay, az])
+            return du_kep + du_ad
+
         rr, vv = cowell(
             Earth.k,
             initial.r,
             initial.v,
             np.linspace(0, tof, 400) * u.s,
             rtol=1e-10,
-            ad=third_body,
-            k_third=body.k.to(u.km ** 3 / u.s ** 2).value,
-            perturbation_body=body_r,
+            f=f,
         )
 
         incs, raans, argps = [], [], []
@@ -591,18 +633,28 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
         # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
         sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
+        def f(t0, u_, k):
+            du_kep = func_twobody(t0, u_, k)
+            ax, ay, az = radiation_pressure(
+                t0,
+                u_,
+                k,
+                R=Earth.R.to(u.km).value,
+                C_R=2.0,
+                A_over_m=2e-4 / 100,
+                Wdivc_s=Wdivc_sun.value,
+                star=sun_normalized,
+            )
+            du_ad = np.array([0, 0, 0, ax, ay, az])
+            return du_kep + du_ad
+
         rr, vv = cowell(
             Earth.k,
             initial.r,
             initial.v,
             np.linspace(0, (tof).to(u.s).value, 4000) * u.s,
             rtol=1e-8,
-            ad=radiation_pressure,
-            R=Earth.R.to(u.km).value,
-            C_R=2.0,
-            A_over_m=2e-4 / 100,
-            Wdivc_s=Wdivc_sun.value,
-            star=sun_normalized,
+            f=f,
         )
 
         delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []
