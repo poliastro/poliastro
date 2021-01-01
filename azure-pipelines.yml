@@ -39,6 +39,8 @@ jobs:
       - MPLBACKEND: Agg
       - FLIT_ROOT_INSTALL: 1
     posargs: '-vv'
+    toxdeps: "git+https://github.com/tox-dev/tox.git@rewrite"
+    toxargs: "-vv"
     envs:
       - linux: check
         name : quality
@@ -79,6 +81,8 @@ jobs:
       - MPLBACKEND: Agg
       - FLIT_ROOT_INSTALL: 1
     posargs: '-vv'
+    toxdeps: "git+https://github.com/tox-dev/tox.git@rewrite"
+    toxargs: "-vv"
     libraries:
       apt:
         - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
