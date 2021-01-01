@@ -127,14 +127,11 @@ def test_J3_propagation_Earth(test_params):
         f=f,
     )
 
-    def a_J2J3(t0, u_, k_):
-        j2 = J2_perturbation(t0, u_, k_, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
-        j3 = J3_perturbation(t0, u_, k_, J3=Earth.J3.value, R=Earth.R.to(u.km).value)
-        return j2 + j3
-
     def f_combined(t0, u_, k):
         du_kep = func_twobody(t0, u_, k)
-        ax, ay, az = a_J2J3(t0, u_, k)
+        ax, ay, az = J2_perturbation(
+            t0, u_, k, J2=Earth.J2.value, R=Earth.R.to_value(u.km)
+        ) + J3_perturbation(t0, u_, k, J3=Earth.J3.value, R=Earth.R.to_value(u.km))
         du_ad = np.array([0, 0, 0, ax, ay, az])
         return du_kep + du_ad
 
