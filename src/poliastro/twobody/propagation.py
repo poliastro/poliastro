@@ -22,8 +22,6 @@ different propagators available at poliastro:
 +-------------+------------+-----------------+-----------------+
 
 """
-import functools
-
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
@@ -41,7 +39,7 @@ from poliastro.core.propagation import (
 )
 
 
-def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, ad=None, **ad_kwargs):
+def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -59,8 +57,8 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, ad=None, **ad_kwargs):
     events : function(t, u(t)), optional
         passed to solve_ivp: integration stops when this function
         returns <= 0., assuming you set events.terminal=True
-    ad : function(t0, u, k), optional
-         Non Keplerian acceleration (km/s2), default to None.
+    f : function(t0, u, k), optional
+        Objective function, default to Keplerian-only forces.
 
     Returns
     -------
@@ -89,18 +87,11 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, ad=None, **ad_kwargs):
 
     u0 = np.array([x, y, z, vx, vy, vz])
 
-    # Set the non Keplerian acceleration
-    if ad is None:
-
-        def ad(t0, u_, k_):
-            return 0, 0, 0
-
-    f_with_ad = functools.partial(func_twobody, k=k, ad=ad, ad_kwargs=ad_kwargs)
-
     result = solve_ivp(
-        f_with_ad,
+        f,
         (0, max(tofs)),
         u0,
+        args=(k,),
         rtol=rtol,
         atol=1e-12,
         method=DOP853,

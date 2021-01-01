@@ -7,6 +7,7 @@ from astropy import units as u
 
 from poliastro.bodies import Earth
 from poliastro.core.perturbations import J2_perturbation, atmospheric_drag_model
+from poliastro.core.propagation import func_twobody
 from poliastro.earth.enums import EarthGravity
 from poliastro.spacecraft import Spacecraft
 from poliastro.twobody.orbit import Orbit
@@ -103,6 +104,14 @@ class EarthSatellite:
                 "A_over_m": (self.spacecraft.A / self.spacecraft.m),
                 "model": atmosphere,
             }
+
+        def f(t0, state, k):
+            du_kep = func_twobody(t0, state, k)
+            ax, ay, az = ad(t0, state, k, perturbations)
+            du_ad = np.array([0, 0, 0, ax, ay, az])
+
+            return du_kep + du_ad
+
         ad_kwargs.update(perturbations=perturbations)
-        new_orbit = self.orbit.propagate(value=tof, method=cowell, ad=ad, **ad_kwargs)
+        new_orbit = self.orbit.propagate(value=tof, method=cowell, f=f)
         return EarthSatellite(new_orbit, self.spacecraft)

@@ -12,6 +12,7 @@ from poliastro.constants import J2000
 from poliastro.core.elements import rv2coe
 from poliastro.core.propagation import (
     danby_coe,
+    func_twobody,
     gooding_coe,
     markley_coe,
     mikkola_coe,
@@ -274,7 +275,7 @@ def test_cowell_propagation_with_zero_acceleration_equals_kepler():
     expected_r = np.array([-4219.7527, 4363.0292, -3958.7666]) * u.km
     expected_v = np.array([3.689866, -1.916735, -6.112511]) * u.km / u.s
 
-    r, v = cowell(Earth.k, orbit.r, orbit.v, tofs, ad=None)
+    r, v = cowell(Earth.k, orbit.r, orbit.v, tofs)
 
     assert_quantity_allclose(r[0], expected_r, rtol=1e-5)
     assert_quantity_allclose(v[0], expected_v, rtol=1e-4)
@@ -284,15 +285,22 @@ def test_cowell_propagation_circle_to_circle():
     # From [Edelbaum, 1961]
     accel = 1e-7
 
-    def constant_accel(t0, u, k):
-        v = u[3:]
+    def constant_accel(t0, u_, k):
+        v = u_[3:]
         norm_v = (v[0] ** 2 + v[1] ** 2 + v[2] ** 2) ** 0.5
         return accel * v / norm_v
+
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = constant_accel(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+
+        return du_kep + du_ad
 
     ss = Orbit.circular(Earth, 500 * u.km)
     tofs = [20] * ss.period
 
-    r, v = cowell(Earth.k, ss.r, ss.v, tofs, ad=constant_accel)
+    r, v = cowell(Earth.k, ss.r, ss.v, tofs, f=f)
 
     ss_final = Orbit.from_vectors(Earth, r[0], v[0])
 

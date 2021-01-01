@@ -25,7 +25,7 @@ class LithobrakeEvent:
     def last_t(self):
         return self._last_t * u.s
 
-    def __call__(self, t, u):
+    def __call__(self, t, u, k):
         self._last_t = t
         H = norm(u[:3])
         # SciPy will search for H - R = 0
