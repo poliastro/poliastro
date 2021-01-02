@@ -43,9 +43,7 @@ requires = [
     "plotly ~=4.0",
     "pyerfa",
     "scipy >=1.4.0",
-    "numbakit-ode",
 ]
-
 
 [tool.flit.metadata.requires-extra]
 jupyter = ["notebook"]

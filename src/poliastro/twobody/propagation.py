@@ -25,6 +25,7 @@ different propagators available at poliastro:
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
+from scipy.integrate import DOP853, solve_ivp
 
 from poliastro.core.propagation import (
     danby as danby_fast,
@@ -85,7 +86,6 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     tofs = tofs.to(u.s).value
 
     u0 = np.array([x, y, z, vx, vy, vz])
-    t0 = 0
 
     result = solve_ivp(
         f,
@@ -111,7 +111,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
         t = tofs[i]
         if t_end is not None and t > t_end:
             t = t_end
-        t, y = result_solver.run(t)
+        y = result.sol(t)
         rrs.append(y[:3])
         vvs.append(y[3:])
 
