@@ -1,6 +1,5 @@
 import numpy as np
-
-from ._jit import jit
+from numba import njit as jit
 
 
 @jit

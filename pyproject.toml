@@ -37,7 +37,7 @@ requires = [
     "cached_property ; python_version<'3.8'",
     "jplephem",
     "matplotlib >=2.0,!=3.0.1",
-    "numba >=0.46 ; implementation_name=='cpython'",
+    "numba >=0.46",
     "numpy",
     "pandas",
     "plotly ~=4.0",

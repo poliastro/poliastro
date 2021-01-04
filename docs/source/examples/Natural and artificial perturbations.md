@@ -5,7 +5,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.0
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -26,8 +26,8 @@ from astropy.coordinates import solar_system_ephemeris
 from poliastro.twobody.propagation import propagate, cowell
 from poliastro.ephem import build_ephem_interpolant
 from poliastro.core.elements import rv2coe
-
 from poliastro.constants import rho0_earth, H0_earth
+from poliastro.core.propagation import func_twobody
 from poliastro.core.perturbations import atmospheric_drag_exponential, third_body, J2_perturbation
 from poliastro.bodies import Earth, Moon
 from poliastro.twobody import Orbit
@@ -50,7 +50,9 @@ orbit = Orbit.circular(Earth, 250 * u.km, epoch=Time(0.0, format="jd", scale="td
 
 # parameters of a body
 C_D = 2.2  # dimentionless (any value would do)
-A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(u.km ** 2 / u.kg)  # km^2/kg
+A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
+    u.km ** 2 / u.kg
+)  # km^2/kg
 B = C_D * A_over_m
 
 # parameters of the atmosphere
@@ -59,16 +61,29 @@ H0 = H0_earth.to(u.km).value
 
 tofs = TimeDelta(np.linspace(0 * u.h, 100000 * u.s, num=2000))
 
+
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = atmospheric_drag_exponential(
+        t0,
+        state,
+        k,
+        R=R,
+        C_D=C_D,
+        A_over_m=A_over_m,
+        H0=H0,
+        rho0=rho0,
+    )
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+
+
 rr = propagate(
     orbit,
     tofs,
     method=cowell,
-    ad=atmospheric_drag_exponential,
-    R=R,
-    C_D=C_D,
-    A_over_m=A_over_m,
-    H0=H0,
-    rho0=rho0,
+    f=f,
 )
 ```
 
@@ -89,10 +104,11 @@ atmosphere model than the one in atmospheric_drag for these sorts
 of computations.
 
 ```python
+from poliastro.twobody.events import LithobrakeEvent
+
 orbit = Orbit.circular(Earth, 230 * u.km, epoch=Time(0.0, format="jd", scale="tdb"))
 tofs = TimeDelta(np.linspace(0 * u.h, 100 * u.d, num=2000))
 
-from poliastro.twobody.events import LithobrakeEvent
 lithobrake_event = LithobrakeEvent(R)
 events = [lithobrake_event]
 
@@ -100,16 +116,11 @@ rr = propagate(
     orbit,
     tofs,
     method=cowell,
-    ad=atmospheric_drag_exponential,
-    R=R,
-    C_D=C_D,
-    A_over_m=A_over_m,
-    H0=H0,
-    rho0=rho0,
+    f=f,
     events=events,
 )
 
-print('orbital decay seen after', lithobrake_event.last_t.to(u.d).value, 'days')
+print("orbital decay seen after", lithobrake_event.last_t.to(u.d).value, "days")
 ```
 
 ```python tags=["nbsphinx-thumbnail"]
@@ -130,9 +141,22 @@ orbit = Orbit.from_vectors(Earth, r0, v0)
 
 tofs = TimeDelta(np.linspace(0, 48.0 * u.h, num=2000))
 
+
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = J2_perturbation(
+        t0, state, k, J2=Earth.J2.value, R=Earth.R.to(u.km).value
+    )
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+
+
 coords = propagate(
-    orbit, tofs, method=cowell,
-    ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value
+    orbit,
+    tofs,
+    method=cowell,
+    f=f,
 )
 
 rr = coords.xyz.T.to(u.km).value
@@ -179,15 +203,28 @@ initial = Orbit.from_classical(
 
 tofs = TimeDelta(np.linspace(0, 60 * u.day, num=1000))
 
+
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = third_body(
+        t0,
+        state,
+        k,
+        k_third=400 * Moon.k.to(u.km ** 3 / u.s ** 2).value,
+        perturbation_body=body_r,
+    )
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+
+
 # multiply Moon gravity by 400 so that effect is visible :)
 rr = propagate(
     initial,
     tofs,
     method=cowell,
     rtol=1e-6,
-    ad=third_body,
-    k_third=400 * Moon.k.to(u.km ** 3 / u.s ** 2).value,
-    perturbation_body=body_r,
+    f=f,
 )
 ```
 
@@ -226,9 +263,22 @@ s0 = Orbit.from_classical(
 
 a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
 
+
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = a_d(
+        t0,
+        state,
+        k,
+    )
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+
+
 tofs = TimeDelta(np.linspace(0, t_f * u.s, num=1000))
 
-rr2 = propagate(s0, tofs, method=cowell, rtol=1e-6, ad=a_d)
+rr2 = propagate(s0, tofs, method=cowell, rtol=1e-6, f=f)
 ```
 
 ```python
@@ -243,7 +293,7 @@ frame.plot_trajectory(rr2, label="orbit with artificial thrust")
 It might be of interest to determine what effect multiple perturbations have on a single object. In order to add multiple perturbations we can create a custom function that adds them up:
 
 ```python
-from poliastro.core.util import jit
+from numba import njit as jit
 
 # Add @jit for speed!
 @jit
@@ -258,31 +308,57 @@ def a_d(t0, state, k, J2, R, C_D, A_over_m, H0, rho0):
 tofs = TimeDelta(np.linspace(0, 10 * u.day, num=10 * 500))
 orbit = Orbit.circular(Earth, 250 * u.km)  # recall orbit from drag example
 
+
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = a_d(
+        t0,
+        state,
+        k,
+        R=R,
+        C_D=C_D,
+        A_over_m=A_over_m,
+        H0=H0,
+        rho0=rho0,
+        J2=Earth.J2.value,
+    )
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+
+
 # propagate with J2 and atmospheric drag
 rr3 = propagate(
     orbit,
     tofs,
     method=cowell,
-    ad=a_d,
-    R=R,
-    C_D=C_D,
-    A_over_m=A_over_m,
-    H0=H0,
-    rho0=rho0,
-    J2=Earth.J2.value,
+    f=f,
 )
+
+
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = atmospheric_drag_exponential(
+        t0,
+        state,
+        k,
+        R=R,
+        C_D=C_D,
+        A_over_m=A_over_m,
+        H0=H0,
+        rho0=rho0,
+    )
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+
 
 # propagate with only atmospheric drag
 rr4 = propagate(
     orbit,
     tofs,
     method=cowell,
-    ad=atmospheric_drag_exponential,
-    R=R,
-    C_D=C_D,
-    A_over_m=A_over_m,
-    H0=H0,
-    rho0=rho0,
+    f=f,
 )
 ```
 

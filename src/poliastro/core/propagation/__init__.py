@@ -1,8 +1,8 @@
 """ Low level propagation algorithms """
 
 import numpy as np
+from numba import njit as jit
 
-from .._jit import jit
 from ..angles import (
     D_to_nu,
     E_to_M,

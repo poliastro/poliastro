@@ -5,7 +5,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.0
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -37,11 +37,10 @@ from astropy import units as u
 from astropy import time
 
 from poliastro.bodies import Earth
+from poliastro.core.propagation import func_twobody
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import propagate
+from poliastro.twobody.propagation import propagate, cowell
 from poliastro.examples import iss
-
-from poliastro.twobody.propagation import cowell
 from poliastro.plotting import OrbitPlotter3D
 from poliastro.util import norm
 ```
@@ -68,6 +67,15 @@ def constant_accel_factory(accel):
 ```
 
 ```python
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = constant_accel_factory(accel)(t0, state, k)
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+```
+
+```python
 times = np.linspace(0, 10 * iss.period, 500)
 times
 ```
@@ -78,7 +86,7 @@ positions = propagate(
     time.TimeDelta(times),
     method=cowell,
     rtol=1e-11,
-    ad=constant_accel_factory(accel),
+    f=f,
 )
 ```
 
@@ -161,7 +169,14 @@ tof = 20 * ss.period
 
 ad = constant_accel_factory(1e-7)
 
-r, v = cowell(ss.attractor.k, ss.r, ss.v, [tof] * u.s, ad=ad)
+def f(t0, state, k):
+    du_kep = func_twobody(t0, state, k)
+    ax, ay, az = ad(t0, state, k)
+    du_ad = np.array([0, 0, 0, ax, ay, az])
+
+    return du_kep + du_ad
+
+r, v = cowell(ss.attractor.k, ss.r, ss.v, [tof] * u.s, f=f)
 
 ss_final = Orbit.from_vectors(Earth, r[0], v[0], ss.epoch + tof)
 ```

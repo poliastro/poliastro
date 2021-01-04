@@ -1,6 +1,6 @@
 import numpy as np
+from numba import njit as jit
 
-from .._jit import jit
 from ..angles import (
     D_to_M,
     D_to_nu,
