@@ -12,7 +12,7 @@ resources:
   - repository: OpenAstronomy
     type: github
     endpoint: poliastro
-    name: epassaro/azure-pipelines-templates
+    name: OpenAstronomy/azure-pipelines-templates
     ref: master
 
 trigger:
