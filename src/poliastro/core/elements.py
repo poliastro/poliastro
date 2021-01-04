@@ -1,7 +1,6 @@
-"""This module contains a set of functions that can be used
-    to convert between different elements that define the orbit
-    of a body.
-    """
+"""This module contains a set of functions that can be used to
+convert between different elements that define the orbit of a body.
+"""
 
 import numpy as np
 from numba import njit as jit, prange
