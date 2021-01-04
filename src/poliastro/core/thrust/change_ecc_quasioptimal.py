@@ -1,8 +1,7 @@
 import numpy as np
+from numba import njit as jit
 
 from poliastro.core.util import circular_velocity
-
-from .._jit import jit
 
 
 @jit

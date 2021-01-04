@@ -1,8 +1,7 @@
 import numpy as np
 from astropy import units as u
+from numba import njit as jit
 from numpy.linalg import norm
-
-from ._jit import jit
 
 
 @jit

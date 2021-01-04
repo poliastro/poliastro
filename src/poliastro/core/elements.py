@@ -4,11 +4,11 @@
     """
 
 import numpy as np
+from numba import njit as jit, prange
 from numpy import cross
 from numpy.core.umath import cos, sin, sqrt
 from numpy.linalg import norm
 
-from ._jit import jit, prange
 from .angles import E_to_nu, F_to_nu
 from .util import rotation_matrix
 

@@ -1,7 +1,6 @@
 import numpy as np
+from numba import njit as jit
 from numpy import cos, sin
-
-from ._jit import jit
 
 
 @jit
