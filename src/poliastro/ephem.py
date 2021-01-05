@@ -16,11 +16,11 @@ from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 from scipy.interpolate import interp1d
 
+from poliastro.twobody.propagation import propagate
+
 from .frames import Planes
 from .frames.util import get_frame
 from .warnings import TimeScaleWarning
-
-from poliastro.twobody.propagation import propagate
 
 EPHEM_FORMAT = (
     "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
@@ -311,7 +311,12 @@ class Ephem:
         return cls(coordinates, epochs, plane)
 
     @classmethod
-    def from_orbit(cls, orbit, epochs, plane=Planes.EARTH_EQUATOR,):
+    def from_orbit(
+        cls,
+        orbit,
+        epochs,
+        plane=Planes.EARTH_EQUATOR,
+    ):
         """Return 'Ephem` from an `Orbit` at certain epochs.
         Parameters
         ----------
