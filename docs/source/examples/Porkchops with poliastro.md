@@ -30,7 +30,7 @@ For creating a porkchop plot with poliastro, we need to import the `porkchop` fu
 ```python
 import astropy.units as u
 
-from poliastro.plotting.porkchop import porkchop
+from poliastro.plotting.porkchop import PorkchopPlotter
 from poliastro.bodies import Earth, Mars
 from poliastro.util import time_range
 
@@ -47,8 +47,8 @@ All that we must do is pass the two bodies, the two time spans and some extra pl
 * The maximum value for C3 to be ploted: `max_c3=45 * u.km**2 / u.s**2` (by default)
 
 ```python tags=["nbsphinx-thumbnail"]
-dv_dpt, dv_arr, c3dpt, c3arr, tof = porkchop(Earth, Mars, 
-                                             launch_span, arrival_span)
+porkchop_plot = PorkchopPlotter(Earth, Mars, launch_span, arrival_span)
+dv_dpt, dv_arr, c3dpt, c3arr, tof = porkchop_plot.porkchop()
 ```
 
 ### NASA's same porkchop
