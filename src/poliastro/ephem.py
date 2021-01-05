@@ -16,6 +16,8 @@ from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 from scipy.interpolate import interp1d
 
+from poliastro.twobody.propagation import propagate
+
 from .frames import Planes
 from .frames.util import get_frame
 from .warnings import TimeScaleWarning
@@ -306,6 +308,31 @@ class Ephem:
         coordinates = CartesianRepresentation(
             x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
         )
+        return cls(coordinates, epochs, plane)
+
+    @classmethod
+    def from_orbit(
+        cls,
+        orbit,
+        epochs,
+        plane=Planes.EARTH_EQUATOR,
+    ):
+        """Return 'Ephem` from an `Orbit` at certain epochs.
+        Parameters
+        ----------
+        orbit: ~poliastro.twobody.orbit.Orbit
+            Orbit.
+        epochs: ~astropy.time.Time
+            Epochs to sample the orbit positions.
+        plane: ~poliastro.frames.Planes, optional
+            Fundamental plane of the frame, default to Earth Equator.
+        """
+        if epochs.isscalar:
+            epochs = epochs.reshape(1)
+
+        time_of_flights = epochs - orbit.epoch
+        coordinates = propagate(orbit, time_of_flights)
+
         return cls(coordinates, epochs, plane)
 
     def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):

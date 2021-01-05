@@ -15,6 +15,7 @@ from astropy.time import Time
 from poliastro.bodies import Earth, Venus
 from poliastro.ephem import Ephem, InterpolationMethods
 from poliastro.frames import Planes
+from poliastro.twobody.orbit import Orbit
 from poliastro.warnings import TimeScaleWarning
 
 AVAILABLE_INTERPOLATION_METHODS = InterpolationMethods.__members__.values()
@@ -324,3 +325,60 @@ def test_from_horizons_scalar_epoch_uses_reshaped_epochs(horizons_mock):
         epochs=expected_epochs.jd,
         id_type=unused_id_type,
     )
+
+
+def test_from_orbit_scalar_epoch_uses_reshaped_epochs():
+    r = [-6045, -3490, 2500] * u.km
+    v = [-3.457, 6.618, 2.533] * u.km / u.s
+    orb = Orbit.from_vectors(Earth, r, v)
+    expected_epochs = Time(["2020-01-02 12:00:00"])
+    epochs = expected_epochs[0]
+
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem.from_orbit(orbit=orb, epochs=epochs, plane=unused_plane)
+
+    assert ephem.epochs == expected_epochs
+
+
+@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+@pytest.mark.parametrize("rtol", [1e-7, 1e-5])
+def test_from_orbit_has_desired_properties(method, rtol):
+    epochs = Time(
+        [
+            "2020-02-01 12:00:00",
+            "2020-02-13 12:00:00",
+            "2020-03-04 12:00:00",
+            "2020-03-17 12:00:00",
+        ]
+    )
+    expected_coordinates = CartesianRepresentation(
+        [
+            (336.77109079, -1447.38211842, -743.72094119),
+            (-1133.43957703, 449.41297342, 3129.10416554),
+            (201.42480053, -1978.64139325, -287.25776291),
+            (-1084.94556884, -1713.5357774, 3298.72284309),
+        ]
+        * u.km,
+        xyz_axis=1,
+        differentials=CartesianDifferential(
+            [
+                (-2.68502706, -14.85798508, 9.66683585),
+                (1.36841306, 7.30080155, -4.88822441),
+                (-3.46999908, -10.04899184, 11.19715233),
+                (-1.46069855, 5.88696886, 3.28112281),
+            ]
+            * (u.km / u.s),
+            xyz_axis=1,
+        ),
+    )
+
+    r = [-1000, -2000, 3100] * u.km
+    v = [-1.836, 5.218, 4.433] * u.km / u.s
+    orb = Orbit.from_vectors(Earth, r, v)
+
+    unused_plane = Planes.EARTH_EQUATOR
+    ephem = Ephem.from_orbit(orbit=orb, epochs=epochs, plane=unused_plane)
+    coordinates = ephem.sample()
+
+    assert ephem.epochs is epochs
+    assert_coordinates_allclose(coordinates, expected_coordinates, rtol=rtol)
