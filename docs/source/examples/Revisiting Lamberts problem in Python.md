@@ -5,7 +5,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.0
+      jupytext_version: 1.9.1
   kernelspec:
     display_name: Python 3
     language: python
@@ -78,7 +78,7 @@ ax.set_ylabel("$T$");
 
 ## Part 2: Locating $T_{min}$
 
-```python tags=["nbsphinx-thumbnail"]
+```python 
 for M in M_list:
     for ll in ll_list:
         x_T_min, T_min = iod._compute_T_min(ll, M, 10, 1e-8)
