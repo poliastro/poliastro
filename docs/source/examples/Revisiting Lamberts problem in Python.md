@@ -35,7 +35,7 @@ M_list = 0, 1, 2, 3
 ll_list = 1, 0.9, 0.7, 0, -0.7, -0.9, -1
 ```
 
-```python
+```python 
 fig, ax = plt.subplots(figsize=(10, 8))
 ax.set_prop_cycle(cycler('linestyle', ['-', '--']) *
                   (cycler('color', ['black']) * len(ll_list)))
@@ -73,12 +73,12 @@ ax.annotate("$\lambda = -1$", xy=(0.3, 2.5), xytext=(0.65, 2.75),
 
 ax.grid()
 ax.set_xlabel("$x$")
-ax.set_ylabel("$T$");
+ax.set_ylabel("$T$")
 ```
 
 ## Part 2: Locating $T_{min}$
 
-```python 
+```python tags=["nbsphinx-thumbnail"]
 for M in M_list:
     for ll in ll_list:
         x_T_min, T_min = iod._compute_T_min(ll, M, 10, 1e-8)
@@ -97,10 +97,11 @@ ll_ref = 0
 x_ref
 ```
 
-```python
+```python 
 ax.plot(x_ref, T_ref, "o", mew=2, mec="red", mfc="none")
 
 fig
+plt.show()
 ```
 
 ## Part 4: Run some examples
