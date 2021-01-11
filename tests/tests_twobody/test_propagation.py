@@ -39,7 +39,7 @@ from poliastro.twobody.propagation import (
 from poliastro.util import norm
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def halley():
     return Orbit.from_vectors(
         Sun,
