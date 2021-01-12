@@ -1,15 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.0
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .mystnb
+    format_name: myst
+    format_version: 0.12
+    jupytext_version: 1.9.1
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
 ---
 
 # Going to Jupiter with Python using Jupyter and poliastro
@@ -20,7 +19,7 @@ Let us recreate with real data the [Juno NASSA Mission](https://www.jpl.nasa.gov
 
 First of all, let us import some of our favourite Python packages: numpy, astropy and poliastro!
 
-```python
+```{code-cell}
 import numpy as np
 
 import astropy.units as u
@@ -45,7 +44,7 @@ All the data for Juno's mission is sorted [here](https://github.com/poliastro/po
 
 Let us first define the main dates other relevant parameters of the mission.
 
-```python
+```{code-cell}
 ## Main dates
 date_launch = Time("2011-08-05 16:25", scale="utc").tdb
 date_flyby = Time("2013-10-09 19:21", scale="utc").tdb
@@ -57,20 +56,20 @@ C_3 = 31.1 * u.km ** 2 / u.s ** 2
 
 With previous dates we can create the different orbits that define the position of the Earth along the mission.
 
-```python
+```{code-cell}
 # Plot initial Earth's position
 Earth.plot(date_launch, label="Initial Earth's position");
 ```
 
 Since both Earth states have been obtained (initial and flyby) we can now solve for Juno's maneuvers. The first one sets Juno into an elliptical orbit around the Sun so it apply a gravity assist around the Earth.
 
-```python
+```{code-cell}
 earth = Ephem.from_body(Earth, time_range(date_launch, end=date_arrival, periods=500))
 
 r_e0, v_e0 = earth.rv(date_launch)
 ```
 
-```python
+```{code-cell}
 # Assume that the insertion velocity is tangential to that of the Earth
 dv = C_3 ** 0.5 * v_e0 / norm(v_e0)
 
@@ -80,7 +79,7 @@ man = Maneuver.impulse(dv)
 
 If we now apply previous maneuver to the Junos's initial orbit (assume it is the Earth's one for simplicity), we will obtain the orbit around the Sun for Juno. The first inner cruise maneuver is defined just till the ahelion orbit. While Juno is traveling around its new orbit, Earth is also moving. After Juno reaches the aphelion it will be necessary to apply a second maneuver so the flyby is performed around Earth. Once that is achieved a final maneuver will be made in order to benefit from the gravity assist. Let us first propagate Juno's orbit till the aphelion.
 
-```python
+```{code-cell}
 ss_e0 = Orbit.from_ephem(Sun, earth, date_launch)
 ss_efly = Orbit.from_ephem(Sun, earth, date_flyby)
 
@@ -103,13 +102,13 @@ plotter.plot_trajectory(
 
 We can check that the period of the orbit is similar to the one stated in the mission's documentation. Remember that in previous plot we only plotter half of the orbit for Juno first maneuver and the period is the time that would take Juno to complete one full revolution around this new orbit.
 
-```python
+```{code-cell}
 ic1.period.to(u.day)
 ```
 
 Notice in previous plot that Earth's position is not the initial one since while Juno is moving Earth also does. We now solve for the Lambert maneuver in order to perform a flyby around the earth when it is at flyby date.
 
-```python
+```{code-cell}
 # Let's compute the Lambert solution to do the flyby of the Earth
 man_flyby = Maneuver.lambert(ic1_end, ss_efly)
 imp_a, imp_b = man_flyby.impulses
@@ -118,7 +117,7 @@ print("Initial impulse:", imp_a)
 print("Final impulse:", imp_b)
 ```
 
-```python
+```{code-cell}
 # Check the initial delta-V
 dv_a = imp_a[-1]
 norm(dv_a.to(u.km / u.s))
@@ -126,7 +125,7 @@ norm(dv_a.to(u.km / u.s))
 
 We can now solve for the flyby orbit that will help Juno with the gravity assist. Again, the inner pahse 2 maneuver is define till Juno reaches Earth's position for the flyby date although the full orbit is plotted.
 
-```python
+```{code-cell}
 # Let us apply the maneuver
 ic2, ss_flyby = ic1_end.apply_maneuver(man_flyby, intermediate=True)
 
@@ -152,14 +151,14 @@ plotter.plot_trajectory(
 
 We can now start solving for the manuever that will take Juno to Jupiter. Another Lmabert maneuver is required but first let us solve for Jupiter position on arrival.
 
-```python
+```{code-cell}
 # And now, go to Jupiter!
 jupiter = Ephem.from_body(Jupiter, time_range(date_launch, end=date_arrival))
 
 ss_j = Orbit.from_ephem(Sun, jupiter, date_arrival)
 ```
 
-```python
+```{code-cell}
 # Solving for maneuver to Jupiter
 man_jupiter = Maneuver.lambert(ic2_end, ss_j)
 imp_a, imp_b = man_jupiter.impulses
@@ -170,7 +169,7 @@ print("Final impulse:", imp_b)
 
 Again, we apply the maneuver.
 
-```python
+```{code-cell}
 # Apply the maneuver
 ic3, ss_target = ic2_end.apply_maneuver(man_jupiter, intermediate=True)
 ic3_end = ic3.propagate(date_arrival)
@@ -178,7 +177,9 @@ ic3_end = ic3.propagate(date_arrival)
 
 Finally, we can plot all the different phases of the mission. This shows the whole power of *poliastro* package, since a beautiful image is created showing the whole maneuvering process.
 
-```python tags=["nbsphinx-thumbnail"]
+```{code-cell}
+:tags: [nbsphinx-thumbnail]
+
 # Final plot for the whole mission
 plotter = StaticOrbitPlotter()
 plotter.plot_body_orbit(
