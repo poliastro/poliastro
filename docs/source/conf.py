@@ -14,7 +14,6 @@
 # serve to show the default.
 
 import os
-import sys
 
 # Checking the import state for importlib.metadata.version method
 try:
@@ -53,6 +52,7 @@ extensions = [
     'sphinx.ext.graphviz',  # Dependency diagrams
     'notfound.extension',
     'hoverxref.extension',
+    'myst_parser',
 ]
 
 # Hoverxref Extension
@@ -76,7 +76,7 @@ autodoc_member_order = 'bysource'
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ['.rst' , '.md']
 
 # Warning suppresses
 suppress_warnings = ['image.nonlocal_uri']
@@ -264,7 +264,7 @@ latex_elements = {  # type: ignore
 # 'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-# 'preamble': '',
+#  'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -272,7 +272,7 @@ latex_elements = {  # type: ignore
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     ('index', 'poliastro.tex', 'poliastro Documentation',
-   'Juan Luis Cano Rodríguez', 'manual'),
+    'Juan Luis Cano Rodríguez', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -316,8 +316,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'poliastro', 'poliastro Documentation',
-   'Juan Luis Cano Rodríguez', 'poliastro', 'One line description of project.',
-   'Miscellaneous'),
+    'Juan Luis Cano Rodríguez', 'poliastro', 'One line description of project.',
+    'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -344,7 +344,7 @@ nbsphinx_thumbnails = {
 # Custom nbsphinx format for Jupytext markdown notebooks
 
 nbsphinx_custom_formats = {
-    '.md': ['jupytext.reads', {'fmt': 'md'}],
+    '.mystnb': ['jupytext.reads', {'fmt': 'mystnb'}],
 }
 
 # The sphinx-autoapi tool configuration
@@ -358,3 +358,5 @@ exclude_patterns.append('_autoapi_templates/python/module.rst')
 
 # Ignore sphinx-autoapi warnings on multiple target description
 suppress_warnings.append('ref.python')
+
+myst_update_mathjax = False

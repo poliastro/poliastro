@@ -1,25 +1,26 @@
 ---
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.0
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+jupytext:
+  encoding: '# -*- coding: utf-8 -*-'
+  text_representation:
+    extension: .mystnb
+    format_name: myst
+    format_version: 0.12
+    jupytext_version: 1.9.1
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
 ---
 
 # Analyzing NEOs
 
++++
 
 NEO stands for near-Earth object. The Center for NEO Studies ([CNEOS](http://cneos.jpl.nasa.gov/)) defines NEOs as comets and asteroids that have been nudged by the gravitational attraction of nearby planets into orbits that allow them to enter the Earth’s neighborhood.
 
 And what does "near" exactly mean? In terms of orbital elements, asteroids and comets can be considered NEOs if their perihelion (orbit point which is nearest to the Sun) is less than 1.3 au = 1.945 * 10<sup>8</sup> km from the Sun.
 
-```python
+```{code-cell}
 from astropy import time
 
 from poliastro.twobody.orbit import Orbit
@@ -30,14 +31,16 @@ from poliastro.plotting import StaticOrbitPlotter
 
 ## Small Body Database (SBDB)
 
-```python
+```{code-cell}
 eros = Orbit.from_sbdb("Eros")
 eros.plot(label="Eros");
 ```
 
 You can also search by IAU number or SPK-ID (there is a faster `neows.orbit_from_spk_id()` function in that case, although):
 
-```python tags=["nbsphinx-thumbnail"]
+```{code-cell}
+:tags: [nbsphinx-thumbnail]
+
 ganymed = Orbit.from_sbdb("1036")  # Ganymed IAU number
 amor = Orbit.from_sbdb("2001221")  # Amor SPK-ID
 eros = Orbit.from_sbdb("2000433")  # Eros SPK-ID
@@ -50,10 +53,11 @@ frame.plot(eros, label="Eros");
 
 You can use the wildcards from that browser: `*` and `?`.
 
++++
 
 <div class="alert alert-info">Keep it in mind that `from_sbdb()` can only return one Orbit, so if several objects are found with that name, it will raise an error with the different bodies.</div>
 
-```python
+```{code-cell}
 try:
     Orbit.from_sbdb("*alley")
 except ValueError as err:
@@ -62,11 +66,11 @@ except ValueError as err:
 
 <div class="alert alert-info">Note that epoch is provided by the service itself, so if you need orbit on another epoch, you have to propagate it:</div>
 
-```python
+```{code-cell}
 eros.epoch.iso
 ```
 
-```python
+```{code-cell}
 epoch = time.Time(2458000.0, scale="tdb", format="jd")
 eros_november = eros.propagate(epoch)
 eros_november.epoch.iso
@@ -84,10 +88,11 @@ The file is a ~230 MB zip that you can manually [download](ftp://ssd.jpl.nasa.go
 dastcom5.download_dastcom5()
 ```
 
++++
 
 The main DASTCOM5 advantage over NeoWs is that you can use it to search not only NEOs, but any asteroid or comet. The easiest function is `orbit_from_name()`:
 
-```python
+```{code-cell}
 from poliastro.neos import dastcom5
 
 # We might require to download the database if not already downloaded
@@ -97,7 +102,7 @@ except:
     print("Download is not required as file already exists.")
 ```
 
-```python
+```{code-cell}
 atira = dastcom5.orbit_from_name("atira")[0]  # NEO
 wikipedia = dastcom5.orbit_from_name("wikipedia")[0]  # Asteroid, but not NEO.
 
@@ -108,7 +113,7 @@ frame.plot(wikipedia, label="Wikipedia (asteroid)");
 
 Keep in mind that this function returns a list of orbits matching your string. This is made on purpose given that there are comets which have several records in the database (one for each orbit determination in history) what allow plots like this one:
 
-```python
+```{code-cell}
 halleys = dastcom5.orbit_from_name("1P")
 
 frame = StaticOrbitPlotter()
@@ -123,7 +128,7 @@ While `neows` can only be used to get Orbit objects, `dastcom5` can also provide
 Once you have this, you can get specific data about one or more bodies. The complete databases are `ndarrays`, so if you want to know the entire list of available parameters, you can look at the `dtype`, and they are also explained in
 [documentation API Reference](https://docs.poliastro.space/en/latest/api/safe/neos/dastcom5_parameters.html):
 
-```python
+```{code-cell}
 ast_db = dastcom5.asteroid_db()
 comet_db = dastcom5.comet_db()
 ast_db.dtype.names[
@@ -133,16 +138,18 @@ ast_db.dtype.names[
 
 <div class="alert alert-info">Asteroid and comet parameters are not exactly the same (although they are very close)</div>
 
++++
 
 With these `ndarrays` you can classify asteroids and comets, sort them, get all their parameters, and whatever comes to your mind.
 
 For example, NEOs can be grouped in several ways. One of the NEOs group is called `Atiras`, and is formed by NEOs whose orbits are contained entirely with the orbit of the Earth. They are a really little group, and we can try to plot all of these NEOs using `asteroid_db()`:
 
++++
 
 Talking in orbital terms, `Atiras` have an aphelion distance, `Q < 0.983 au` and a semi-major axis, ` a < 1.0 au`.
 Visiting [documentation API Reference](https://docs.poliastro.space/en/latest/api/safe/neos/dastcom5_parameters.html), you can see that DASTCOM5 provides semi-major axis, but doesn't provide aphelion distance. You can get aphelion distance easily knowing perihelion distance (q, QR in DASTCOM5) and semi-major axis `Q = 2*a - q`, but there are probably many other ways.
 
-```python
+```{code-cell}
 aphelion_condition = 2 * ast_db["A"] - ast_db["QR"] < 0.983
 axis_condition = ast_db["A"] < 1.3
 atiras = ast_db[aphelion_condition & axis_condition]
@@ -150,12 +157,13 @@ atiras = ast_db[aphelion_condition & axis_condition]
 
 The number of `Atira NEOs` we use using this method is:
 
-```python
+```{code-cell}
 len(atiras)
 ```
 
 Which is consistent with the [stats published by CNEOS](https://cneos.jpl.nasa.gov/stats/totals.html)
 
++++
 
 Now we're gonna plot all of their orbits, with corresponding labels, just because we love plots :)
 
@@ -168,7 +176,7 @@ There are two ways:
 
 The second one seems easier and it is related to the current notebook, so we are going to use that one, using the `ASTNAM` property of DASTCOM5 database:
 
-```python
+```{code-cell}
 from poliastro.bodies import Earth
 
 frame = StaticOrbitPlotter()
@@ -184,7 +192,7 @@ for record in atiras["NO"]:
 
 If we needed also the names of each asteroid, we could do:
 
-```python
+```{code-cell}
 frame = StaticOrbitPlotter()
 frame.plot_body_orbit(Earth, time.Time.now().tdb)
 
@@ -201,17 +209,18 @@ for i in range(len(atiras)):
 
 <div class="alert alert-info">We knew beforehand that there are no `Atira` comets, only asteroids (comet orbits are usually more eccentric), but we could use the same method with `com_db` if we wanted.</div>
 
++++
 
 Finally, another interesting function in `dastcom5` is `entire_db()`, which is really similar to `ast_db` and `com_db`, but it returns a `Pandas dataframe` instead of a `numpy ndarray`. The dataframe has asteroids and comets in it, but in order to achieve that (and a more manageable dataframe), a lot of parameters were removed, and others were renamed:
 
-```python
+```{code-cell}
 db = dastcom5.entire_db()
 db.columns
 ```
 
 Also, in this function, DASTCOM5 data (specially strings) is ready to use (decoded and improved strings, etc):
 
-```python
+```{code-cell}
 db[
     db.NAME == "Halley"
 ]  # As you can see, Halley is the name of an asteroid too, did you know that?
@@ -219,28 +228,29 @@ db[
 
 Panda offers many functionalities, and can also be used in the same way as the `ast_db` and `comet_db` functions:
 
-```python
+```{code-cell}
 aphelion_condition = (2 * db["A"] - db["QR"]) < 0.983
 axis_condition = db["A"] < 1.3
 atiras = db[aphelion_condition & axis_condition]
 ```
 
-```python
+```{code-cell}
 len(atiras)
 ```
 
 What? I said they can be used in the same way!
 
++++
 
 Dont worry :) If you want to know what's happening here, the only difference is that we are now working with comets too, and some comets have a negative semi-major axis!
 
-```python
+```{code-cell}
 len(atiras[atiras.A < 0])
 ```
 
 So, rewriting our condition:
 
-```python
+```{code-cell}
 axis_condition = (db["A"] < 1.3) & (db["A"] > 0)
 atiras = db[aphelion_condition & axis_condition]
 len(atiras)

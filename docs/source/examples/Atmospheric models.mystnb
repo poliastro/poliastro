@@ -1,18 +1,17 @@
 ---
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.0
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .mystnb
+    format_name: myst
+    format_version: 0.12
+    jupytext_version: 1.9.1
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
 ---
 
-## The atmosphere and its layers
+# The atmosphere and its layers
 
 The World Meteorological Organization (WMO) defines the atmosphere as:
 
@@ -32,20 +31,22 @@ Along history different models have been developed:
 
 Since some of them are implemented in `poliastro`, let us compare the differences among them.
 
-```python
+```{code-cell}
 from poliastro.earth.atmosphere import COESA62, COESA76
 from astropy import units as u
 import numpy as np
 import matplotlib.pyplot as plt
 ```
 
-### Comparing coesa62 and coesa76
+## Comparing coesa62 and coesa76
 
 Also known as `U.S. Standard Atmosphere`, the atmospheric model *coesa76* is just an update of his little brother *coesa62*. The difference is that geopotential heights diverge for higher altitudes.
 
 Let us plot the `Temperature` as increasing altitude for both atmospheric models. 
 
-```python tags=["nbsphinx-thumbnail"]
+```{code-cell}
+:tags: [nbsphinx-thumbnail]
+
 # We build the atmospheric instances
 coesa62 = COESA62()
 coesa76 = COESA76()
@@ -109,11 +110,11 @@ for name in layer_names:
     )
 ```
 
-## Temperature, pressure and density distrubutions
+# Temperature, pressure and density distrubutions
 
 One of the advantages of COESA76 is that it extends up to 1000 kilometers. The behaviour of previous magnitudes againts geometrical altitude can be checked in the following figure. **A logarithmic scale is applied for pressure and density to better see their decay for high altitude values.**
 
-```python
+```{code-cell}
 # We create the basis for the figure
 fig, axs = plt.subplots(1, 3, figsize=(12, 5))
 fig.suptitle("State variables against altitude", fontweight="bold")

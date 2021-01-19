@@ -1,15 +1,14 @@
 ---
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.6.0
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .mystnb
+    format_name: myst
+    format_version: 0.12
+    jupytext_version: 1.9.1
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
 ---
 
 # Cowell's formulation
@@ -20,18 +19,21 @@ In this formulation we write the two body differential equation separating the K
 
 $$\ddot{\mathbb{r}} = -\frac{\mu}{|\mathbb{r}|^3} \mathbb{r} + \mathbb{a}_d$$
 
++++
 
 <div class="alert alert-info">For an in-depth exploration of this topic, still to be integrated in poliastro, check out <a href="https://github.com/Juanlu001/pfc-uc3m">this Master thesis</a></div>
 
++++
 
 <div class="alert alert-info">An earlier version of this notebook allowed for more flexibility and interactivity, but was considerably more complex. Future versions of poliastro and plotly might bring back part of that functionality, depending on user feedback. You can still download the older version <a href="https://github.com/poliastro/poliastro/blob/0.8.x/docs/source/examples/Propagation%20using%20Cowell's%20formulation.ipynb">here</a>.</div>
 
++++
 
 ## First example
 
 Let's setup a very simple example with constant acceleration to visualize the effects on the orbit.
 
-```python
+```{code-cell}
 import numpy as np
 from astropy import units as u
 from astropy import time
@@ -45,18 +47,18 @@ from poliastro.plotting import OrbitPlotter3D
 from poliastro.util import norm
 ```
 
-```python
+```{code-cell}
 import plotly.io as pio
 pio.renderers.default = "notebook_connected"
 ```
 
 To provide an acceleration depending on an extra parameter, we can use **closures** like this one:
 
-```python
+```{code-cell}
 accel = 2e-5
 ```
 
-```python
+```{code-cell}
 def constant_accel_factory(accel):
     def constant_accel(t0, u, k):
         v = u[3:]
@@ -66,7 +68,7 @@ def constant_accel_factory(accel):
     return constant_accel
 ```
 
-```python
+```{code-cell}
 def f(t0, state, k):
     du_kep = func_twobody(t0, state, k)
     ax, ay, az = constant_accel_factory(accel)(t0, state, k)
@@ -75,12 +77,12 @@ def f(t0, state, k):
     return du_kep + du_ad
 ```
 
-```python
+```{code-cell}
 times = np.linspace(0, 10 * iss.period, 500)
 times
 ```
 
-```python
+```{code-cell}
 positions = propagate(
     iss,
     time.TimeDelta(times),
@@ -92,7 +94,7 @@ positions = propagate(
 
 And we plot the results:
 
-```python
+```{code-cell}
 frame = OrbitPlotter3D()
 
 frame.set_attractor(Earth)
@@ -101,7 +103,7 @@ frame.plot_trajectory(positions, label="ISS")
 
 ## Error checking
 
-```python
+```{code-cell}
 def state_to_vector(ss):
     r, v = ss.rv()
     x, y, z = r.to(u.km).value
@@ -109,44 +111,44 @@ def state_to_vector(ss):
     return np.array([x, y, z, vx, vy, vz])
 ```
 
-```python
+```{code-cell}
 k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 ```
 
-```python
+```{code-cell}
 rtol = 1e-13
 full_periods = 2
 ```
 
-```python
+```{code-cell}
 u0 = state_to_vector(iss)
 tf = ((2 * full_periods + 1) * iss.period / 2)
 
 u0, tf
 ```
 
-```python
+```{code-cell}
 iss_f_kep = iss.propagate(tf, rtol=1e-18)
 ```
 
-```python
+```{code-cell}
 r, v = cowell(iss.attractor.k, iss.r, iss.v, [tf] * u.s, rtol=rtol)
 ```
 
-```python
+```{code-cell}
 iss_f_num = Orbit.from_vectors(Earth, r[0], v[0], iss.epoch + tf)
 ```
 
-```python
+```{code-cell}
 iss_f_num.r, iss_f_kep.r
 ```
 
-```python
+```{code-cell}
 assert np.allclose(iss_f_num.r, iss_f_kep.r, rtol=rtol, atol=1e-08 * u.km)
 assert np.allclose(iss_f_num.v, iss_f_kep.v, rtol=rtol, atol=1e-08 * u.km / u.s)
 ```
 
-```python
+```{code-cell}
 assert np.allclose(iss_f_num.a, iss_f_kep.a, rtol=rtol, atol=1e-08 * u.km)
 assert np.allclose(iss_f_num.ecc, iss_f_kep.ecc, rtol=rtol)
 assert np.allclose(iss_f_num.inc, iss_f_kep.inc, rtol=rtol, atol=1e-08 * u.rad)
@@ -163,7 +165,7 @@ $$\frac{\operatorname{d}\!a}{a_0} = 2 \frac{F}{m V_0}\operatorname{d}\!t, \qquad
 
 So let's create a new circular orbit and perform the necessary checks, assuming constant mass and thrust (i.e. constant acceleration):
 
-```python
+```{code-cell}
 ss = Orbit.circular(Earth, 500 * u.km)
 tof = 20 * ss.period
 
@@ -181,23 +183,23 @@ r, v = cowell(ss.attractor.k, ss.r, ss.v, [tof] * u.s, f=f)
 ss_final = Orbit.from_vectors(Earth, r[0], v[0], ss.epoch + tof)
 ```
 
-```python
+```{code-cell}
 da_a0 = (ss_final.a - ss.a) / ss.a
 da_a0
 ```
 
-```python
+```{code-cell}
 dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
 2 * dv_v0
 ```
 
-```python
+```{code-cell}
 np.allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 ```
 
 This means **we successfully validated the model against an extremely simple orbit transfer with approximate analytical solution**. Notice that the final eccentricity, as originally noticed by Edelbaum, is nonzero:
 
-```python
+```{code-cell}
 ss_final.ecc
 ```
 
