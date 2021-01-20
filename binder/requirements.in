@@ -1,3 +1,4 @@
 # For application deployments, like Binder
 git+https://github.com/poliastro/poliastro.git#egg=poliastro
-jupytext
+jupytext>=1.9.0
+jupyterlab>=3.0

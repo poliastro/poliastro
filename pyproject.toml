@@ -57,7 +57,7 @@ dev = [
     "ipywidgets>=7.0",
     "isort",
     "jupyter-client",
-    "jupytext",
+    "jupytext>=1.9.1",
     "mypy>=0.740",
     "myst-parser>=0.13.1",
     "nbsphinx>=0.5.0",
