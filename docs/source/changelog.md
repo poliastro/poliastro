@@ -40,10 +40,11 @@ history of the project.
 * **New color palette**: We introduced a new color palette to improve the
   appearance of plots that include the orbits of the planets of the Solar System.
   We hope you love it as much as we do!
-
-.. image:: _static/solar_system.png
-   :align: center
-
+```
+```{image} _static/solar_system.png
+---
+align: center
+---
 ```
 
 ### New features
@@ -464,11 +465,13 @@ proud and also busier!
   We plan to expand its capabilities by being able to target any body of
   the Solar System. Stay tuned!
 
-.. image:: _static/porkchop.png
-   :width: 675px
-   :align: center
-
 .. _`Porkchop plots`: https://en.wikipedia.org/wiki/Porkchop_plot
+```
+```{image} _static/porkchop.png
+---
+width: 675px
+align: center
+---
 ```
 
 ### Bugs fixed
