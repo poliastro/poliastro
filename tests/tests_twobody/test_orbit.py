@@ -308,7 +308,7 @@ def test_frozen_orbit_no_args(attractor, alt, expected_inc, expected_argp):
         (
             Earth,
             1e6 * u.m,
-            2 * u.deg,  # Non critical value
+            2 * u.deg,  # Non-critical value
             63.4349 * np.pi / 180 * u.rad,
             None,
             0.0549 * u.one,
@@ -316,7 +316,7 @@ def test_frozen_orbit_no_args(attractor, alt, expected_inc, expected_argp):
         (
             Mars,
             3e8 * u.m,
-            0 * u.deg,  # Non critical value
+            0 * u.deg,  # Non-critical value
             63.4349 * np.pi / 180 * u.rad,
             0.04 * u.one,
             0.04 * u.one,

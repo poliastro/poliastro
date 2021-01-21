@@ -167,8 +167,8 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
     B = C_D * A_over_m
 
     if H < R:
-        # the model doesn't want to see a negative altitude
-        # the integration will go a little negative searching for H = R
+        # The model doesn't want to see a negative altitude
+        # The integration will go a little negative searching for H = R
         H = R
 
     rho = model.density((H - R) * u.km).to(u.kg / u.km ** 3).value

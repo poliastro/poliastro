@@ -103,12 +103,12 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
 
     # Define local frame of reference:
     # Center: main body, NOT the barycenter
-    # x-axis: points to the secondary body
+    # X-axis: points to the secondary body
     ux = r2 - r1
     r12 = norm(ux)
     ux = ux / r12
 
-    # y-axis: contained in the orbital plane, perpendicular to x-axis
+    # Y-axis: contained in the orbital plane, perpendicular to x-axis
 
     def cross(x, y):
         return np.cross(x, y) * x.unit * y.unit
@@ -116,10 +116,10 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
     uy = cross(n, ux)
     uy = uy / norm(uy)
 
-    # position in x-axis
+    # Position in x-axis
     x1, x2, x3, x4, x5 = lagrange_points(r12, m1, m2)
 
-    # position in y-axis
+    # Position in y-axis
     # L1, L2, L3 are located in the x-axis, so y123 = 0
 
     # L4 and L5 are points in the plane of rotation which form an equilateral

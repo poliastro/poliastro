@@ -29,7 +29,7 @@ from poliastro.twobody.propagation import cowell
 
 @pytest.mark.slow
 def test_J2_propagation_Earth():
-    # from Curtis example 12.2:
+    # From Curtis example 12.2:
     r0 = np.array([-2384.46, 5729.01, 3050.46])  # km
     v0 = np.array([-7.36138, -2.98997, 1.64354])  # km/s
 
@@ -190,30 +190,30 @@ def test_J3_propagation_Earth(test_params):
 @pytest.mark.slow
 def test_atmospheric_drag_exponential():
     # http://farside.ph.utexas.edu/teaching/celestial/Celestialhtml/node94.html#sair (10.148)
-    # given the expression for \dot{r} / r, aproximate \Delta r \approx F_r * \Delta t
+    # Given the expression for \dot{r} / r, aproximate \Delta r \approx F_r * \Delta t
 
     R = Earth.R.to(u.km).value
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
-    # parameters of a circular orbit with h = 250 km (any value would do, but not too small)
+    # Parameters of a circular orbit with h = 250 km (any value would do, but not too small)
     orbit = Orbit.circular(Earth, 250 * u.km)
     r0, _ = orbit.rv()
     r0 = r0.to(u.km).value
 
-    # parameters of a body
+    # Parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
     A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
         u.km ** 2 / u.kg
     )  # km^2/kg
     B = C_D * A_over_m
 
-    # parameters of the atmosphere
+    # Parameters of the atmosphere
     rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
     H0 = H0_earth.to(u.km).value  # km
     tof = 100000  # s
 
     dr_expected = -B * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
-    # assuming the atmospheric decay during tof is small,
+    # Assuming the atmospheric decay during tof is small,
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
 
@@ -246,17 +246,17 @@ def test_atmospheric_demise():
     orbit = Orbit.circular(Earth, 230 * u.km)
     t_decay = 48.2179 * u.d  # not an analytic value
 
-    # parameters of a body
+    # Parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
     A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
         u.km ** 2 / u.kg
     )  # km^2/kg
 
-    # parameters of the atmosphere
+    # Parameters of the atmosphere
     rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
     H0 = H0_earth.to(u.km).value  # km
 
-    tofs = [365] * u.d  # actually hits the ground a bit after day 48
+    tofs = [365] * u.d  # Actually hits the ground a bit after day 48
 
     lithobrake_event = LithobrakeEvent(R)
     events = [lithobrake_event]
@@ -278,11 +278,11 @@ def test_atmospheric_demise():
         f=f,
     )
 
-    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
+    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # Below 1km
 
     assert_quantity_allclose(lithobrake_event.last_t, t_decay, rtol=1e-2)
 
-    # make sure having the event not firing is ok
+    # Make sure having the event not firing is ok
     tofs = [1] * u.d
     lithobrake_event = LithobrakeEvent(R)
     events = [lithobrake_event]
@@ -307,8 +307,8 @@ def test_atmospheric_demise_coesa76():
     orbit = Orbit.circular(Earth, 250 * u.km)
     t_decay = 7.17 * u.d
 
-    # parameters of a body
-    C_D = 2.2  # dimentionless (any value would do)
+    # Parameters of a body
+    C_D = 2.2  # Dimensionless (any value would do)
     A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
         u.km ** 2 / u.kg
     )  # km^2/kg
@@ -337,7 +337,7 @@ def test_atmospheric_demise_coesa76():
         f=f,
     )
 
-    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # below 1km
+    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # Below 1km
 
     assert_quantity_allclose(lithobrake_event.last_t, t_decay, rtol=1e-2)
 
@@ -522,7 +522,7 @@ sun_geo = {
     ],
 )
 def test_3rd_body_Curtis(test_params):
-    # based on example 12.11 from Howard Curtis
+    # Based on example 12.11 from Howard Curtis
     body = test_params["body"]
     with solar_system_ephemeris.set("builtin"):
         j_date = 2454283.0 * u.day
@@ -568,7 +568,7 @@ def test_3rd_body_Curtis(test_params):
             raans.append(angles[1].value)
             argps.append(angles[2].value)
 
-        # averaging over 5 last values in the way Curtis does
+        # Averaging over 5 last values in the way Curtis does
         inc_f, raan_f, argp_f = (
             np.mean(incs[-5:]),
             np.mean(raans[-5:]),
@@ -611,7 +611,7 @@ def normalize_to_Curtis(t0, sun_r):
     ],
 )
 def test_solar_pressure(t_days, deltas_expected, sun_r):
-    # based on example 12.9 from Howard Curtis
+    # Based on example 12.9 from Howard Curtis
     with solar_system_ephemeris.set("builtin"):
         j_date = 2_438_400.5 * u.day
         tof = 600 * u.day
@@ -627,7 +627,7 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
             343.4268 * u.deg,
             epoch=epoch,
         )
-        # in Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
+        # In Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
         sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
         def f(t0, u_, k):
@@ -668,7 +668,7 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
                 (orbit_params[4] * u.rad).to(u.deg).value - initial.argp.value
             )
 
-        # averaging over 5 last values in the way Curtis does
+        # Averaging over 5 last values in the way Curtis does
         index = int(1.0 * t_days / tof.to(u.day).value * 4000)  # type: ignore
         delta_ecc, delta_inc, delta_raan, delta_argp = (
             np.mean(delta_eccs[index - 5 : index]),

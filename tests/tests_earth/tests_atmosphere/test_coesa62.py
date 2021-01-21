@@ -125,7 +125,7 @@ def test_sound_speed_viscosity_conductivity(z):
 
 def test_sound_speed_over_90km():
     z = 91 * u.km
-    # test speed of sound over 90 km
+    # Test speed of sound over 90 km
     with pytest.raises(ValueError) as excinfo:
         coesa62.sound_speed(z)
     assert (
@@ -136,7 +136,7 @@ def test_sound_speed_over_90km():
 
 def test_viscosity_over_90km():
     z = 91 * u.km
-    # test viscosity over 90 km
+    # Test viscosity over 90 km
     with pytest.raises(ValueError) as excinfo:
         coesa62.viscosity(z)
     assert (
@@ -147,7 +147,7 @@ def test_viscosity_over_90km():
 
 def test_conductivity_over_90km():
     z = 91 * u.km
-    # test thermal conductivity over 90 km
+    # Test thermal conductivity over 90 km
     with pytest.raises(ValueError) as excinfo:
         coesa62.thermal_conductivity(z)
     assert (

@@ -14,7 +14,7 @@ def test_earth_satellite_orbit():
     r = [3_539.08827417, 5_310.19903462, 3_066.31301457] * u.km
     v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-    C_D = 2.2 * u.one  # dimentionless (any value would do)
+    C_D = 2.2 * u.one  # Dimensionless (any value would do)
     A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2)
     m = 100 * u.kg
     spacecraft = Spacecraft(A, C_D, m)
@@ -26,7 +26,7 @@ def test_orbit_attractor():
     r = [3_539.08827417, 5_310.19903462, 3_066.31301457] * u.km
     v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
     ss = Orbit.from_vectors(Mars, r, v)
-    C_D = 2.2 * u.one  # dimentionless (any value would do)
+    C_D = 2.2 * u.one  # Dimensionless (any value would do)
     A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2)
     m = 100 * u.kg
     spacecraft = Spacecraft(A, C_D, m)
@@ -46,7 +46,7 @@ def test_propagate_instance():
         270 * u.deg,
         80 * u.deg,
     )
-    C_D = 2.2 * u.one  # dimentionless (any value would do)
+    C_D = 2.2 * u.one  # Dimensionless (any value would do)
     A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2)
     m = 100 * u.kg
     spacecraft = Spacecraft(A, C_D, m)

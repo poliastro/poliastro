@@ -79,13 +79,13 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     >>> from astropy import units as u
     >>> import numpy as np
     >>> from poliastro.bodies import Earth
-    >>> k = Earth.k.to(u.km**3 / u.s**2)
-    >>> r1 = np.array([5000, 10000, 2100])*u.km #Initial position vector
-    >>> r2 = np.array([-14600, 2500, 7000])*u.km #Final position vector
-    >>> tof = 3600*u.s #Time of fligh
+    >>> k = Earth.k.to(u.km ** 3 / u.s ** 2)
+    >>> r1 = np.array([5000, 10000, 2100]) * u.km # Initial position vector
+    >>> r2 = np.array([-14600, 2500, 7000]) * u.km # Final position vector
+    >>> tof = 3600 * u.s # Time of flight
     >>> v1, v2 = vallado(k.value, r1.value, r2.value, tof.value, short=True, numiter=35, rtol=1e-8)
-    >>> v1 = v1*u.km / u.s
-    >>> v2 = v2*u.km / u.s
+    >>> v1 = v1 * u.km / u.s
+    >>> v2 = v2 * u.km / u.s
     >>> print(v1, v2)
     [-5.99249503  1.92536671  3.24563805] km / s [-3.31245851 -4.19661901 -0.38528906] km / s
 

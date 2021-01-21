@@ -60,7 +60,7 @@ class _PlanetaryICRS(BaseRADecFrame):
 
     @staticmethod
     def to_icrs(planet_coo, _):
-        # this is just an origin translation so without a distance it cannot go ahead
+        # This is just an origin translation so without a distance it cannot go ahead
         if isinstance(planet_coo.data, UnitSphericalRepresentation):
             raise u.UnitsError(_NEED_ORIGIN_HINT.format(planet_coo.__class__.__name__))
 
@@ -82,7 +82,7 @@ class _PlanetaryICRS(BaseRADecFrame):
 
     @staticmethod
     def from_icrs(icrs_coo, planet_frame):
-        # this is just an origin translation so without a distance it cannot go ahead
+        # This is just an origin translation so without a distance it cannot go ahead
         if isinstance(icrs_coo.data, UnitSphericalRepresentation):
             raise u.UnitsError(_NEED_ORIGIN_HINT.format(icrs_coo.__class__.__name__))
 
@@ -108,7 +108,7 @@ class _PlanetaryICRS(BaseRADecFrame):
         if np.all(from_coo.obstime == to_frame.obstime):
             return to_frame.realize_frame(from_coo.data)
         else:
-            # like CIRS, we do this self-transform via ICRS
+            # Like CIRS, we do this self-transform via ICRS
             return from_coo.transform_to(ICRS).transform_to(to_frame)
 
 

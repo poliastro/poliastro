@@ -44,7 +44,7 @@ except ImportError:
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
-# reference frame
+# Reference frame
 ORBIT_NO_FRAME_FORMAT = (
     "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 )
@@ -508,7 +508,7 @@ class Orbit:
         elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
             r_soi = laplace_radius(new_attractor)
             barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
-            # transforming new_attractor's frame into frame of attractor
+            # Transforming new_attractor's frame into frame of attractor
             new_attractor_r = (
                 ICRS(barycentric_position)
                 .transform_to(self.get_frame())
@@ -656,11 +656,11 @@ class Orbit:
         obj = SBDB.query(name, full_precision=True, **kwargs)
 
         if "count" in obj:
-            # no error till now ---> more than one object has been found
-            # contains all the name of the objects
+            # No error till now ---> more than one object has been found
+            # Contains all the name of the objects
             objects_name = obj["list"]["name"]
             objects_name_in_str = (
-                ""  # used to store them in string form each in new line
+                ""  # Used to store them in string form each in new line
             )
             for i in objects_name:
                 objects_name_in_str += i + "\n"
