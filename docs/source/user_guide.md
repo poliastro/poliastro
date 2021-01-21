@@ -47,21 +47,21 @@ And that\'s it! Notice a couple of things:
   which is actually a subclass of NumPy arrays.
 ```
 
--   If we display the orbit we just created, we get a string with the
-    radius of pericenter, radius of apocenter, inclination, reference
-    frame and attractor:
-    ```python    
-    >>> orb
-    7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)
-    ```
+- If we display the orbit we just created, we get a string with the
+  radius of pericenter, radius of apocenter, inclination, reference
+  frame and attractor:
+  ```python    
+  >>> orb
+  7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)
+  ```
 
--   If no time is specified, then a default value is assigned:
-    ```python
-    >>> orb.epoch
-    <Time object: scale='tt' format='jyear_str' value=J2000.000>
-    >>> orb.epoch.iso
-    '2000-01-01 12:00:00.000'
-    ```
+- If no time is specified, then a default value is assigned:
+  ```python
+  >>> orb.epoch
+  <Time object: scale='tt' format='jyear_str' value=J2000.000>
+  >>> orb.epoch.iso
+  '2000-01-01 12:00:00.000'
+  ```
 
 ```{eval-rst}
 * The reference frame of the orbit will be one pseudo-inertial frame around the
@@ -72,11 +72,13 @@ And that\'s it! Notice a couple of things:
 
 Intermezzo: quick visualization of the orbit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. figure:: _static/curtis.png
-   :align: right
-   :figwidth: 350
-   :alt: Plot of the orbit
+```
+```{figure} _static/curtis.png
+---
+align: right
+width: 350px
+alt: Plot of the orbit
+---
 ```
 
 If we\'re working on interactive mode (for example, using the wonderful
@@ -370,13 +372,14 @@ op.plot(ss_f, label="Final orbit")
 
 Which produces this beautiful plot:
 
+```{figure} _static/hohmann.png
+---
+align: center
+alt: Hohmann transfer
+---   
+Plot of a Hohmann transfer.
+```
 ```{eval-rst}
-.. figure:: _static/hohmann.png
-   :align: center
-   :alt: Hohmann transfer
-   
-   Plot of a Hohmann transfer.
-
 Where are the planets? Computing ephemerides
 --------------------------------------------
 
@@ -492,12 +495,12 @@ And these are the results:
 (<Quantity 21910501.00019529 s>, <Quantity [287832.91384349,  58935.96079319, -94156.93383463] km / d>)
 ```
 
-```{eval-rst}
-.. figure:: _static/msl.png
-   :align: center
-   :alt: MSL orbit
-
-   Mars Science Laboratory orbit.
+```{figure} _static/msl.png
+---
+align: center
+alt: MSL orbit
+---
+Mars Science Laboratory orbit.
 ```
 
 ## Fetching Orbits from external sources

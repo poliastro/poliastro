@@ -76,17 +76,14 @@ list](https://groups.io/g/poliastro-dev) and
     </div>
     </div>
 ```
-```{eval-rst}
-.. figure:: _static/molniya.png
-   :align: right
-   :figwidth: 300
-   :alt: Molniya orbit
-
-   Plot of a `Molniya orbit`_ around the Earth
-   (:math:`a = 26600\mathrm{km}, e = 0.75,
-   i = 63.4\mathrm{^\circ}`).
-
-.. _`Molniya orbit`: https://en.wikipedia.org/wiki/Molniya_orbit
+```{figure} _static/molniya.png
+---
+align: right
+width: 300px
+alt: Molniya Orbit
+---
+Plot of a [Molniya orbit](https://en.wikipedia.org/wiki/Molniya_orbit) around the Earth\
+ $(a = 26600\mathrm{km}, e = 0.75, i = 63.4\mathrm{^\circ}).$
 ```
 
 The [source code](https://github.com/poliastro/poliastro), [issue
