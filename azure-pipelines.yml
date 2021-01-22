@@ -81,7 +81,7 @@ jobs:
     posargs: '-vv'
     libraries:
       apt:
-        - pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
+        - pandoc
     envs:
       - linux: docs
         name: docs_test
