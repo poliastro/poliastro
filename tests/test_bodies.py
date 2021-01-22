@@ -48,7 +48,7 @@ def test_from_relative():
         R=0.114,
     )  # Relative to the Sun
 
-    # check values properly calculated
+    # Check values properly calculated
     VALUECHECK = bodies.Body.from_relative(
         reference=bodies.Earth,
         parent=TRAPPIST1,

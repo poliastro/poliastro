@@ -121,7 +121,7 @@ def test_propagation(propagator):
 
 
 def test_propagating_to_certain_nu_is_correct():
-    # take an elliptic orbit
+    # Take an elliptic orbit
     a = 1.0 * u.AU
     ecc = 1.0 / 3.0 * u.one
     _a = 0.0 * u.rad
@@ -141,7 +141,7 @@ def test_propagating_to_certain_nu_is_correct():
     assert elliptic_at_perihelion.epoch > elliptic.epoch
     assert elliptic_at_aphelion.epoch > elliptic.epoch
 
-    # test 10 random true anomaly values
+    # Test 10 random true anomaly values
     # TODO: Rework this test
     for nu in np.random.uniform(low=-np.pi, high=np.pi, size=10):
         elliptic = elliptic.propagate_to_anomaly(nu * u.rad)
@@ -193,7 +193,7 @@ def test_propagation_hyperbolic():
 
 @pytest.mark.parametrize("propagator", PARABOLIC_PROPAGATORS)
 def test_propagation_parabolic(propagator):
-    # example from Howard Curtis (3rd edition), section 3.5, problem 3.15
+    # Example from Howard Curtis (3rd edition), section 3.5, problem 3.15
     # TODO: add parabolic solver in some parabolic propagators, refer to #417
     if propagator in [mikkola, gooding]:
         pytest.skip()
@@ -434,7 +434,7 @@ def test_propagate_with_coe(propagator_coe):
     a, ecc, inc, raan, argp, nu = iss.classical()
     p = a * (1 - ecc ** 2)
 
-    # Delete de units
+    # Delete the units
     p = p.to_value(u.km)
     ecc = ecc.value
     period = period.to_value(u.s)

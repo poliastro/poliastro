@@ -331,10 +331,10 @@ def raan_from_ltan(epoch, ltan=12.0):
 
     # Use the equation of time to calculate the mean sun local time (fictional sun without anomalies)
 
-    # sun mean anomaly
+    # Sun mean anomaly
     M_sun = 357.5291092 * u.deg + 35999.05034 * T_TDB
 
-    # sun mean longitude
+    # Sun mean longitude
     l_sun = 280.460 * u.deg + 36000.771 * T_UT1
     l_ecliptic_part2 = 1.914666471 * u.deg * np.sin(
         M_sun

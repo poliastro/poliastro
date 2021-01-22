@@ -37,7 +37,7 @@ def min_and_max_ground_range(h, η_fov, η_center, R):
     γ_min = np.arcsin(r_sat * np.sin(η_min) / R)
     if abs(γ_min) <= np.pi / 2 * u.rad:
         γ_min = np.pi * u.rad - γ_min
-    # maximum and minimum slant ranges
+    # Maximum and minimum slant ranges
     ρ_max = R * np.cos(γ_max) + r_sat * np.cos(η_max)
     ρ_min = R * np.cos(γ_min) + r_sat * np.cos(η_min)
     Λ_max = np.arcsin(ρ_max * np.sin(η_max) / R)

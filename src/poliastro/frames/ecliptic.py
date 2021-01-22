@@ -100,7 +100,7 @@ def _make_rotation_matrix_from_reprs(start_representation, end_representation):
     rotation_axis = A.cross(B)
     rotation_angle = -np.arccos(
         A.dot(B) / (A.norm() * B.norm())
-    )  # negation is required
+    )  # Negation is required
 
     # This line works around some input/output quirks of Astropy's rotation_matrix()
     matrix = np.array(rotation_matrix(rotation_angle, rotation_axis.xyz.value.tolist()))

@@ -316,7 +316,7 @@ class COESA76(COESA):
                 "Speed of sound in COESA76 has just been implemented up to 86km."
             )
         T = self.temperature(alt, geometric).value
-        # using eqn-(50)
+        # Using eqn-(50)
         Cs = ((gamma * R_air.value * T) ** 0.5) * (u.m / u.s)
 
         return Cs
@@ -344,7 +344,7 @@ class COESA76(COESA):
                 "Dynamic Viscosity in COESA76 has just been implemented up to 86km."
             )
         T = self.temperature(alt, geometric).value
-        # using eqn-(51)
+        # Using eqn-(51)
         mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.N * u.s / (u.m) ** 2)
 
         return mu
@@ -372,7 +372,7 @@ class COESA76(COESA):
                 "Thermal conductivity in COESA76 has just been implemented up to 86km."
             )
         T = self.temperature(alt, geometric=geometric).value
-        # using eqn-(53)
+        # Using eqn-(53)
         k = (2.64638e-3 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
             u.J / u.m / u.s / u.K
         )

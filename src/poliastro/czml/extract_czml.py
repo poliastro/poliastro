@@ -127,7 +127,7 @@ class CZMLExtractor:
             cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
-            # flatten list
+            # Flatten list
             cart_cords += list(map(lambda x: round(x[0], rf), cords.tolist()))
 
         return cart_cords
@@ -164,7 +164,7 @@ class CZMLExtractor:
             cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
-            # flatten list
+            # Flatten list
             cords = list(map(lambda x: round(x[0], rf), cords.tolist()))
             t, p = cords[0], cords[1:]
             pr_p = project_point_on_ellipsoid(
@@ -270,7 +270,7 @@ class CZMLExtractor:
                 a, b = (
                     self.cust_prop[0][0],
                     self.cust_prop[0][2],
-                )  # get semi-major and semi-minor axises
+                )  # Get semi-major and semi-minor axises
             else:
                 a, b = Earth.R.to_value(u.m), Earth.R_polar.to_value(u.m)
 

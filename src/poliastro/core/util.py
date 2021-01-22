@@ -41,7 +41,7 @@ def rotation_matrix(angle, axis):
 def alinspace(start, stop=None, num=50, endpoint=True):
     """Return increasing, evenly spaced angular values over a specified interval."""
     # Create a new variable to avoid numba crash,
-    # see https://github.com/numba/numba/issues/5661
+    # See https://github.com/numba/numba/issues/5661
     if stop is None:
         stop_ = start + 2 * np.pi
     elif stop <= start:

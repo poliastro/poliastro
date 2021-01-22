@@ -158,7 +158,7 @@ class COESA62(COESA):
         Lb = self.Lb_levels[i]
         pb = self.pb_levels[i]
 
-        # if z <= 90km then apply eqn 1.2.10-(3)
+        # If z <= 90km then apply eqn 1.2.10-(3)
         if z <= 90 * u.km:
             # If Lb is zero then apply eqn 1.2.10-(4)
             if Lb == 0.0:
@@ -167,7 +167,7 @@ class COESA62(COESA):
                 T = self.temperature(z)
                 p = pb * (T / Tb) ** (-g0 / R_air / Lb)
 
-        # if 90 < Z < 700 km then eqn 1.2.10-(5) is applied
+        # If 90 < Z < 700 km then eqn 1.2.10-(5) is applied
         else:
             # Converting all the units into SI unit and taking their magnitude
             Lb_v = Lb.to(u.K / u.m).value
@@ -265,7 +265,7 @@ class COESA62(COESA):
                 "Speed of sound in COESA62 has just been implemented up to 90km."
             )
         T = self.temperature(alt, geometric).value
-        # using eqn-1.3.7-(1)
+        # Using eqn-1.3.7-(1)
         Cs = ((_gamma * R_air.value * T) ** 0.5) * (u.m / u.s)
 
         return Cs
@@ -293,7 +293,7 @@ class COESA62(COESA):
                 "Dynamic Viscosity in COESA62 has just been implemented up to 90km."
             )
         T = self.temperature(alt, geometric).value
-        # using eqn-1.3.8-(1)
+        # Using eqn-1.3.8-(1)
         mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.kg / u.m / u.s)
 
         return mu
@@ -322,7 +322,7 @@ class COESA62(COESA):
             )
 
         T = self.temperature(alt, geometric=geometric).value
-        # using eqn-1.3.10-(1)
+        # Using eqn-1.3.10-(1)
         k = (6.325e-7 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
             imperial.kcal / u.m / u.s / u.K
         )
