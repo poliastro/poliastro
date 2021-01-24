@@ -91,15 +91,14 @@ These are some succint steps to set up a development environment:
 1. [Install git](https://git-scm.com/) on your computer.
 2. [Register to GitHub](https://github.com/).
 3. [Fork poliastro](https://help.github.com/articles/fork-a-repo/).
-4. [Clone your
-    fork](https://help.github.com/articles/cloning-a-repository/).
-5. Install [flit]{.title-ref} using [pip install flit]{.title-ref}.
+4. [Clone your fork](https://help.github.com/articles/cloning-a-repository/).
+5. Install `flit` using `pip install flit`.
 6. Install it in development mode using `flit install`, or
-   alternatively [flit install \--symlink]{.title-ref} (this means that
+   alternatively `flit install --symlink` (this means that
    the installed code will change as soon as you change it in the
    download location).
-7. Run [tox -e reformat]{.title-ref} to make the format consistent.
-8. Run [tox -e check]{.title-ref} to check all the formatting is right.
+7. Run `tox -e reformat` to make the format consistent.
+8. Run `tox -e check` to check all the formatting is right.
    (The reformat command will not deal with un-used imports)
 9. Create a new branch.
 10. Make changes and commit.
