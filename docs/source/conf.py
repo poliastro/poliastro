@@ -204,6 +204,9 @@ html_style = os.path.join("css", "custom.css")
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# Include static javascript file below to ensure docs search functionality
+html_js_files = ['language_data.js']
+
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
