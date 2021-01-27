@@ -558,7 +558,7 @@ def test_orbit_from_ephem_is_in_icrs_frame(body):
     epoch = Time(J2000, scale="tdb")
     ephem = Ephem.from_body(body, epoch)
     ss = Orbit.from_ephem(Sun, ephem, epoch)
-    ss._frame = ICRS() # Hack
+    ss._frame = ICRS()  # Hack
 
     assert ss.get_frame().is_equivalent_frame(ICRS())
 
@@ -1176,6 +1176,7 @@ def test_orbit_change_attractor_out_of_SOI():
     with pytest.raises(ValueError) as excinfo:
         ss.change_attractor(Earth)
     assert "ValueError: Orbit is out of new attractor's SOI" in excinfo.exconly()
+
 
 @pytest.mark.filterwarnings("ignore::poliastro.twobody.orbit.PatchedConicsWarning")
 def test_orbit_change_attractor_force():
