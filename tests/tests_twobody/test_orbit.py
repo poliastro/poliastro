@@ -173,7 +173,9 @@ def test_apply_maneuver_changes_epoch():
 def test_orbit_from_ephem_with_no_epoch_is_today():
     # This is not that obvious http://stackoverflow.com/q/6407362/554319
     body = Earth
-    ss = Orbit.from_body_ephem(body)
+    epoch = Time.now().tdb
+    ephem = Ephem.from_body(body, epoch)
+    ss = Orbit.from_ephem(Sun, ephem, epoch)
     assert (Time.now() - ss.epoch).sec < 1
 
 
@@ -553,7 +555,10 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
     "body", [Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune]
 )
 def test_orbit_from_ephem_is_in_icrs_frame(body):
-    ss = Orbit.from_body_ephem(body)
+    epoch = Time(J2000, scale="tdb")
+    ephem = Ephem.from_body(body, epoch)
+    ss = Orbit.from_ephem(Sun, ephem, epoch)
+    ss._frame = ICRS() # Hack
 
     assert ss.get_frame().is_equivalent_frame(ICRS())
 
@@ -1172,7 +1177,7 @@ def test_orbit_change_attractor_out_of_SOI():
         ss.change_attractor(Earth)
     assert "ValueError: Orbit is out of new attractor's SOI" in excinfo.exconly()
 
-
+@pytest.mark.filterwarnings("ignore::poliastro.twobody.orbit.PatchedConicsWarning")
 def test_orbit_change_attractor_force():
     ss = Orbit.from_vectors(
         Sun,
@@ -1257,9 +1262,10 @@ def test_time_to_anomaly(expected_nu):
 def test_can_set_iss_attractor_to_earth():
     # See https://github.com/poliastro/poliastro/issues/798
     epoch = Time("2019-11-10 12:00:00")
-    iss = Orbit.from_horizons(
+    ephem = Ephem.from_horizons(
         "International Space Station", Sun, epoch=epoch, id_type="majorbody"
     )
+    iss = Orbit.from_ephem(Sun, ephem, epoch)
     iss = iss.change_attractor(Earth)
     assert iss.attractor == Earth
 

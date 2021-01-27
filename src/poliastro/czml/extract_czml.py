@@ -80,7 +80,7 @@ class CZMLExtractor:
         elif not (self.attractor.R and self.attractor.R_polar):
             raise ValueError(
                 "Invalid ellipsoid of attractor.\n"
-                + "Make sure your body has valid 'R' and 'R_polar' parameters"
+                + "Make sure your attractor has valid 'R' and 'R_polar' parameters"
             )
 
         ellipsoid = (
