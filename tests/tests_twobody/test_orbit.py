@@ -1264,7 +1264,7 @@ def test_can_set_iss_attractor_to_earth():
     # See https://github.com/poliastro/poliastro/issues/798
     epoch = Time("2019-11-10 12:00:00")
     ephem = Ephem.from_horizons(
-        "International Space Station", Sun, epoch=epoch, id_type="majorbody"
+        "International Space Station", epochs=epoch, attractor=Sun, id_type="majorbody"
     )
     iss = Orbit.from_ephem(Sun, ephem, epoch)
     iss = iss.change_attractor(Earth)
