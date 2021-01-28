@@ -218,7 +218,7 @@ def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol
 
     expected_coordinates = (
         ICRS(equatorial_coordinates)
-        .transform_to(FrameClass)
+        .transform_to(FrameClass())
         .represent_as(CartesianRepresentation, CartesianDifferential)
     )
 

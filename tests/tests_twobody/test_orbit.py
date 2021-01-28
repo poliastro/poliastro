@@ -170,6 +170,7 @@ def test_apply_maneuver_changes_epoch():
     assert orbit_new.epoch == ss.epoch + dt
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_orbit_from_ephem_with_no_epoch_is_today():
     # This is not that obvious http://stackoverflow.com/q/6407362/554319
     body = Earth
@@ -177,6 +178,7 @@ def test_orbit_from_ephem_with_no_epoch_is_today():
     assert (Time.now() - ss.epoch).sec < 1
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     body = Earth
     epoch = Time("2017-09-29 07:31:26", scale="utc")
@@ -188,6 +190,7 @@ def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     assert expected_epoch_string in str(w.message)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 @pytest.mark.parametrize("body", [Moon, Pluto])
 def test_from_ephem_raises_error_for_pluto_moon(body):
     with pytest.raises(RuntimeError) as excinfo:
@@ -549,6 +552,7 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
     )
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 @pytest.mark.parametrize(
     "body", [Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune]
 )
@@ -1180,8 +1184,10 @@ def test_orbit_change_attractor_force():
         v=[-13.30694373, 25.15256978, 11.59846936] * u.km / u.s,
         epoch=J2000,
     )
-
-    ss_new_attractor = ss.change_attractor(Earth, force=True)
+    with pytest.warns(
+        PatchedConicsWarning, match="Leaving the SOI of the current attractor"
+    ):
+        ss_new_attractor = ss.change_attractor(Earth, force=True)
     assert ss_new_attractor.attractor == Earth
 
 
@@ -1257,9 +1263,10 @@ def test_time_to_anomaly(expected_nu):
 def test_can_set_iss_attractor_to_earth():
     # See https://github.com/poliastro/poliastro/issues/798
     epoch = Time("2019-11-10 12:00:00")
-    iss = Orbit.from_horizons(
-        "International Space Station", Sun, epoch=epoch, id_type="majorbody"
+    ephem = Ephem.from_horizons(
+        "International Space Station", epochs=epoch, attractor=Sun, id_type="majorbody"
     )
+    iss = Orbit.from_ephem(Sun, ephem, epoch)
     iss = iss.change_attractor(Earth)
     assert iss.attractor == Earth
 

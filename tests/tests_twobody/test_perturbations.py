@@ -617,16 +617,17 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
         tof = 600 * u.day
         epoch = Time(j_date, format="jd", scale="tdb")
 
-        initial = Orbit.from_classical(
-            Earth,
-            10085.44 * u.km,
-            0.025422 * u.one,
-            88.3924 * u.deg,
-            45.38124 * u.deg,
-            227.493 * u.deg,
-            343.4268 * u.deg,
-            epoch=epoch,
-        )
+        with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
+            initial = Orbit.from_classical(
+                Earth,
+                10085.44 * u.km,
+                0.025422 * u.one,
+                88.3924 * u.deg,
+                45.38124 * u.deg,
+                227.493 * u.deg,
+                343.4268 * u.deg,
+                epoch=epoch,
+            )
         # In Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
         sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 

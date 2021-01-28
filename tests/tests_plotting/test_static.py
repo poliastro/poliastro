@@ -5,7 +5,7 @@ from astropy.time import Time
 from matplotlib import pyplot as plt
 
 from poliastro.bodies import Earth, Jupiter, Mars, Sun
-from poliastro.constants import J2000
+from poliastro.constants import J2000_TDB
 from poliastro.ephem import Ephem
 from poliastro.examples import churi, iss, molniya
 from poliastro.frames import Planes
@@ -62,7 +62,7 @@ def test_plot_trajectory_sets_label():
 
     op = StaticOrbitPlotter()
     trajectory = churi.sample()
-    op.plot_body_orbit(Mars, J2000, label="Mars")
+    op.plot_body_orbit(Mars, J2000_TDB, label="Mars")
 
     op.plot_trajectory(trajectory, label=expected_label)
 
@@ -88,7 +88,7 @@ def test_redraw_makes_attractor_none():
 def test_set_frame_plots_same_colors():
     # TODO: Review
     op = StaticOrbitPlotter()
-    op.plot_body_orbit(Jupiter, J2000)
+    op.plot_body_orbit(Jupiter, J2000_TDB)
     colors1 = [orb[2] for orb in op.trajectories]
     op.set_body_frame(Jupiter)
     colors2 = [orb[2] for orb in op.trajectories]
@@ -99,7 +99,7 @@ def test_redraw_keeps_trajectories():
     # See https://github.com/poliastro/poliastro/issues/518
     op = StaticOrbitPlotter()
     trajectory = churi.sample()
-    op.plot_body_orbit(Mars, J2000, label="Mars")
+    op.plot_body_orbit(Mars, J2000_TDB, label="Mars")
     op.plot_trajectory(trajectory, label="67P")
 
     assert len(op.trajectories) == 2
