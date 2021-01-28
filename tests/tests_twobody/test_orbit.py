@@ -170,15 +170,15 @@ def test_apply_maneuver_changes_epoch():
     assert orbit_new.epoch == ss.epoch + dt
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_orbit_from_ephem_with_no_epoch_is_today():
     # This is not that obvious http://stackoverflow.com/q/6407362/554319
     body = Earth
-    epoch = Time.now().tdb
-    ephem = Ephem.from_body(body, epoch)
-    ss = Orbit.from_ephem(Sun, ephem, epoch)
+    ss = Orbit.from_body_ephem(body)
     assert (Time.now() - ss.epoch).sec < 1
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     body = Earth
     epoch = Time("2017-09-29 07:31:26", scale="utc")
@@ -190,6 +190,7 @@ def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     assert expected_epoch_string in str(w.message)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 @pytest.mark.parametrize("body", [Moon, Pluto])
 def test_from_ephem_raises_error_for_pluto_moon(body):
     with pytest.raises(RuntimeError) as excinfo:
@@ -551,14 +552,12 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
     )
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 @pytest.mark.parametrize(
     "body", [Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune]
 )
 def test_orbit_from_ephem_is_in_icrs_frame(body):
-    epoch = Time(J2000, scale="tdb")
-    ephem = Ephem.from_body(body, epoch)
-    ss = Orbit.from_ephem(Sun, ephem, epoch)
-    ss._frame = ICRS()  # Hack
+    ss = Orbit.from_body_ephem(body)
 
     assert ss.get_frame().is_equivalent_frame(ICRS())
 
@@ -1178,7 +1177,6 @@ def test_orbit_change_attractor_out_of_SOI():
     assert "ValueError: Orbit is out of new attractor's SOI" in excinfo.exconly()
 
 
-@pytest.mark.filterwarnings("ignore::poliastro.twobody.orbit.PatchedConicsWarning")
 def test_orbit_change_attractor_force():
     ss = Orbit.from_vectors(
         Sun,
@@ -1186,8 +1184,10 @@ def test_orbit_change_attractor_force():
         v=[-13.30694373, 25.15256978, 11.59846936] * u.km / u.s,
         epoch=J2000,
     )
-
-    ss_new_attractor = ss.change_attractor(Earth, force=True)
+    with pytest.warns(
+        PatchedConicsWarning, match="Leaving the SOI of the current attractor"
+    ):
+        ss_new_attractor = ss.change_attractor(Earth, force=True)
     assert ss_new_attractor.attractor == Earth
 
 
