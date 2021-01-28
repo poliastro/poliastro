@@ -149,7 +149,7 @@ def nu_to_E(nu, ecc):
     The implementation uses the half-angle formula from [3]_:
 
     .. math::
-        E = 2 \atan \left( \sqrt{\frac{1 - e}{1 + e}} \tan{\frac{\nu}{2}}
+        E = 2 \arctan \left ( \sqrt{\frac{1 - e}{1 + e}} \tan{\frac{\nu}{2}} \right)
         \in (-\pi, \pi]
 
     """
@@ -186,7 +186,7 @@ def nu_to_F(nu, ecc):
     The implementation uses the half-angle formula from [3]_:
 
     .. math::
-        F = 2 \operatorname{arctanh} \sqrt{\frac{e-1}{e+1}} \tan{\frac{\nu}{2}}
+        F = 2 \operatorname{arctanh} \left( \sqrt{\frac{e-1}{e+1}} \tan{\frac{\nu}{2}} \right)
 
     """
     F = 2 * np.arctanh(np.sqrt((ecc - 1) / (ecc + 1)) * np.tan(nu / 2))
@@ -221,7 +221,7 @@ def E_to_nu(E, ecc):
     The implementation uses the half-angle formula from [3]_:
 
     .. math::
-        \nu = 2 \atan \left( \sqrt{\frac{1 + e}{1 - e}} \tan{\frac{E}{2}} \right)
+        \nu = 2 \arctan \left( \sqrt{\frac{1 + e}{1 - e}} \tan{\frac{E}{2}} \right)
         \in (-\pi, \pi]
 
     """
@@ -250,7 +250,7 @@ def F_to_nu(F, ecc):
     The implementation uses the half-angle formula from [3]_:
 
     .. math::
-        \nu = 2 \atan \left( \sqrt{\frac{e + 1}{e - 1}} \tanh{\frac{F}{2}}
+        \nu = 2 \arctan \left( \sqrt{\frac{e + 1}{e - 1}} \tanh{\frac{F}{2}} \right)
         \in (-\pi, \pi]
 
     """
@@ -464,7 +464,7 @@ def fp_angle(nu, ecc):
 
     .. math::
 
-        \phi = \operatorname{atan2}(e \sin{\nu}, 1 + e \cos{\nu})
+        \phi = \arctan(\frac {e \sin{\nu}}{1 + e \cos{\nu}})
 
     """
     return np.arctan2(ecc * np.sin(nu), 1 + ecc * np.cos(nu))
