@@ -218,6 +218,29 @@ def third_body(t0, state, k, k_third, perturbation_body):
         gravitational constant, (km^3/s^2)
     perturbation_body: a callable object returning the position of the pertubation body that causes the perturbation
 
+    Example
+    -------
+    For clarifying the nature of **perturbation_body** argument in **third_body()** function, we can look into the following example:
+
+    >>> from poliastro.ephem import build_ephem_interpolant
+    >>> from poliastro.bodies import Moon
+    >>> from astropy.time import Time, TimeDelta
+    >>> epoch = Time(
+    ...    2454283.0, format="jd", scale="tdb"
+    ...     )  # setting the exact event date is important
+    >>> body_r = build_ephem_interpolant(
+    ...   Moon, 28 * u.day, (epoch.value * u.day, epoch.value * u.day + 60 * u.day), rtol=1e-2
+    ... )
+    >>> type(body_r)
+    <class 'scipy.interpolate.interpolate.interp1d'>
+
+    Here, this implementation shows that we can create a **function** which returns the position of the
+    perturbation body (in this case the *Moon*) whose effect we need to take into consideration so as
+    get the accurate value of the acceleration.
+
+    This functionality can also be extended with **class** or **class method** callable objects, just keeping
+    in mind that it should return the position of the perturbation body taken into consideration.
+
     Note
     ----
     This formula is taken from Howard Curtis, section 12.10. As an example, a third body could be
@@ -254,7 +277,29 @@ def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
     Wdivc_s : float
         total star emitted power divided by the speed of light (W * s / km)
     star: a callable object returning the position of star in attractor frame
-        star position
+
+    Example
+    -------
+    For clarifying the nature of **star** argument in **radiation_pressure()** function, we can look into the following example:
+
+    >>> import functools
+    >>> def normalize_to_Curtis(t0, sun_r):
+    ...     r = sun_r(t0)
+    ...     return 149600000 * r / norm(r)
+    >>> def sun_r():
+    ...     j_date = 2_438_400.5 * u.day
+    ...     tof = 600 * u.day
+    ...     return build_ephem_interpolant(Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2)
+    >>> sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
+    >>> type(sun_normalized)
+    <class 'functools.partial'>
+
+    Here, this implementation shows that we can create a **function** which returns the position of the
+    star (in this case the *Sun*) whose effect we need to take into consideration so as to
+    calculate the radiation pressure from the star in attractor frame.
+
+    This functionality can also be extended with **class** or **class method** callable objects, just keeping
+    in mind that it should return the position of the star {frame dependent} taken into consideration.
 
     Note
     ----
