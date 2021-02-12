@@ -1367,7 +1367,7 @@ class Orbit:
             warn("anomaly outside range, clipping", OrbitSamplingWarning, stacklevel=2)
             limits = limits.clip(-nu_max, nu_max)
 
-        nu_values = np.linspace(*limits, values)
+        nu_values = np.linspace(*limits, values) # type: ignore
         return nu_values
 
     def sample(self, values=100, *, min_anomaly=None, max_anomaly=None):
