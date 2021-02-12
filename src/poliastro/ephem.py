@@ -57,7 +57,7 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
     """
     h = (period * rtol).to(u.day).value
     t_span = (t_span[0].to(u.day).value, t_span[1].to(u.day).value + 0.01)
-    t_values = np.linspace(*t_span, int((t_span[1] - t_span[0]) / h)) # type: ignore
+    t_values = np.linspace(*t_span, int((t_span[1] - t_span[0]) / h))  # type: ignore
     r_values = np.zeros((t_values.shape[0], 3))
 
     for i, t in enumerate(t_values):
