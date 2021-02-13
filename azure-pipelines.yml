@@ -63,6 +63,9 @@ jobs:
         coverage: codecov
         posargs: --cov-report=term-missing
 
+      - linux: py39
+        name: py39_test
+
       - windows: py38
         name: py38_test_windows
 

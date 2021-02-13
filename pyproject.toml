@@ -25,19 +25,21 @@ classifiers = [
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
-requires-python = ">=3.7,<3.9"
+requires-python = ">=3.7,<3.10"
 requires = [
     "astropy >=3.2,<5",
     "astroquery >=0.3.9",
     "cached_property ; python_version<'3.8'",
     "jplephem",
     "matplotlib >=2.0,!=3.0.1",
-    "numba >=0.46",
+    "numba >=0.46 ; python_version<'3.9'",
+    "numba >=0.53.0rc1 ; python_version>='3.9'",
     "numpy",
     "pandas",
     "plotly ~=4.0",
