@@ -125,3 +125,4 @@ dmypy.json
 *.nja
 .idea
 .cache
+.venv

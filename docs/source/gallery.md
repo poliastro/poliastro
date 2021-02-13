@@ -24,7 +24,7 @@ plotting utilities, API capabilities and many other orbital mechanics topics.
    /examples/Propagation using Cowells formulation.mystnb
    /examples/Revisiting Lamberts problem in Python.mystnb
    /examples/Studying Hohmann transfers.mystnb
-   /examples/Using NEOS package.mystnb
+   /examples/Analyzing NEOs.mystnb
    /examples/Visualizing the SpaceX Tesla Roadster trip to Mars.mystnb
    /examples/Natural and artificial perturbations.mystnb
    /examples/Porkchops with poliastro.mystnb
