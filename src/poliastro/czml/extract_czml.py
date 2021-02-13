@@ -547,7 +547,7 @@ class CZMLExtractor:
 
         epochs = np.fromiter(
             map(lambda epoch: (epoch - epochs[0]).to(u.second).value, epochs),
-            dtype=np.float,
+            dtype=float,
         )
 
         positions = np.around(
