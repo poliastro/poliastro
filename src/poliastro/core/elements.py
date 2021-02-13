@@ -4,8 +4,7 @@ convert between different elements that define the orbit of a body.
 
 import numpy as np
 from numba import njit as jit, prange
-from numpy import cross
-from numpy.core.umath import cos, sin, sqrt  # type: ignore
+from numpy import cos, cross, sin, sqrt
 from numpy.linalg import norm
 
 from .angles import E_to_nu, F_to_nu
