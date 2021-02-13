@@ -84,9 +84,6 @@ dev = [
 Source = "https://github.com/poliastro/poliastro"
 Tracker = "https://github.com/poliastro/poliastro/issues"
 
-[tool.flit.entrypoints."console_scripts"]
-poliastro = "poliastro.cli:main"
-
 [tool.flit.sdist]
 include = [
     "src/poliastro/atmosphere/data/coesa62.dat",
