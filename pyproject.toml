@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "flit_core >=2.0,<3",
+    "flit_core >=2.0,<4",
     "wheel",
     "oldest-supported-numpy",
 ]
