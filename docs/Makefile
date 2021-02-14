@@ -54,7 +54,7 @@ clean:
 
 examples:
 	@echo "Building Jupyter notebook examples..."
-	cd $(SRCDIR)/$(EXAMPLESDIR) && jupytext --to ipynb --execute *.md
+	cd $(SRCDIR)/$(EXAMPLESDIR) && jupytext --to ipynb --execute *.mystnb
 	@echo "Finished!"
 
 html:
