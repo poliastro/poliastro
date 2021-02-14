@@ -367,10 +367,28 @@ class Mixin2D:
             Epoch of current position.
 
         """
+        from warnings import warn
+
+        from astropy import time
+
+        from poliastro.bodies import Sun
         from poliastro.twobody import Orbit
 
+        from ..warnings import TimeScaleWarning
+
+        if not epoch:
+            epoch = time.Time.now().tdb
+        elif epoch.scale != "tdb":
+            epoch = epoch.tdb
+            warn(
+                "Input time was converted to scale='tdb' with value "
+                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
+                TimeScaleWarning,
+                stacklevel=2,
+            )
+
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            orbit = Orbit.from_body_ephem(body, epoch).change_plane(self.plane)  # type: ignore
+            ephem = Ephem.from_body(body, epoch, attractor=Sun, plane=self.plane)  # type: ignore
+            orbit = Orbit.from_ephem(Sun, ephem, epoch).change_plane(self.plane)  # type: ignore
 
         self.set_orbit_frame(orbit)
