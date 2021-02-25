@@ -233,6 +233,19 @@ def third_body(t0, state, k, k_third, perturbation_body):
     ... )
     >>> type(body_r)
     <class 'scipy.interpolate.interpolate.interp1d'>
+    >>> # The created `interpolate` can be used effectively within the `third body` function:
+    >>> def f(t0, state, k):
+    ...     du_kep = func_twobody(t0, state, k)
+    ...     ax, ay, az = third_body(
+    ...         t0,
+    ...         state,
+    ...         k,
+    ...         k_third=400 * Moon.k.to(u.km ** 3 / u.s ** 2).value,
+    ...         perturbation_body=body_r,       # calling the interpolate as the passed perturbation_body i.e. Moon
+    ...     )
+    ...     du_ad = np.array([0, 0, 0, ax, ay, az])
+    ...
+    ...     return du_kep + du_ad
 
     Here, this implementation shows that we can create a **function** which returns the position of the
     perturbation body (in this case the *Moon*) whose effect we need to take into consideration so as
