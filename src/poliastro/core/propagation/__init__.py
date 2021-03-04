@@ -271,7 +271,7 @@ def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
             # Hyperbolic
             nu = F_to_nu(E, ecc)
 
-    return nu
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
@@ -304,9 +304,9 @@ def mikkola(k, r0, v0, tof, rtol=None):
 
     # Solving for the classical elements
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    nu = mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof)
+    coe2rv_ = mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof)
 
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    return coe2rv_
 
 
 @jit
@@ -355,7 +355,7 @@ def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
     E += delta5
     nu = E_to_nu(E, ecc)
 
-    return nu
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
@@ -388,9 +388,9 @@ def markley(k, r0, v0, tof):
     """
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    nu = markley_coe(k, p, ecc, inc, raan, argp, nu, tof)
+    coe2rv_ = markley_coe(k, p, ecc, inc, raan, argp, nu, tof)
 
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    return coe2rv_
 
 
 @jit
@@ -722,7 +722,8 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
         + 15 * w
     )
 
-    return E_to_nu(E, ecc)
+    nu = E_to_nu(E, ecc)
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
@@ -757,9 +758,9 @@ def pimienta(k, r0, v0, tof):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    nu = pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof)
+    coe2rv_ = pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof)
 
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    return coe2rv_
 
 
 @jit
@@ -791,7 +792,9 @@ def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=150, rtol=1e-8):
         n += 1
 
     E = M + psi
-    return E_to_nu(E, ecc)
+
+    nu = E_to_nu(E, ecc)
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
@@ -826,9 +829,9 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    nu = gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
+    coe2rv_ = gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
 
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    return coe2rv_
 
 
 @jit
@@ -842,7 +845,7 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
         M0 = E_to_M(nu_to_E(nu, ecc), ecc)
         M = M0 + n * tof
         nu = M - 2 * np.pi * np.floor(M / 2 / np.pi)
-        return nu
+        return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
     elif ecc < 1.0:
         # For elliptical orbit
@@ -897,7 +900,7 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
     else:
         raise ValueError("Maximum number of iterations has been reached.")
 
-    return nu
+    return coe2rv(k, p, ecc, inc, raan, argp, nu)
 
 
 @jit
@@ -932,6 +935,6 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    nu = danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
+    coe2rv_ = danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
 
-    return coe2rv(k, p, ecc, inc, raan, argp, nu)
+    return coe2rv_
