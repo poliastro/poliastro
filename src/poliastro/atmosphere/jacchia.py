@@ -24,7 +24,7 @@ import numpy as np
 from astropy import units as u
 
 # Following constants have been taken from the fortran implementation
-pi2 = 1.57079632679
+pi2 = np.pi / 2
 wm0 = 28.96
 wmN2 = 28.0134
 wmO2 = 31.9988
@@ -37,10 +37,8 @@ qO2 = 0.20955
 qAr = 0.009343
 qHe = 0.000005242
 R0 = 6356.766
-R = 8314.32 * u.J / u.kg / u.K
+R = 8314.32 * u.J / (u.kg * u.mol)
 k = 1.380622e-23 * u.J / u.K
-kmol = u.def_unit("kmol", 1000 * u.mol)
-R = 8314.32 * u.J / kmol / u.K
 
 
 class Jacchia77:
@@ -53,7 +51,7 @@ class Jacchia77:
         self.y = 0.0
 
     def _altitude_profile(self, alt, Texo):
-        # Raise Value Error if alt < 90 or alt > 2500 km.
+        # Raise Value Error if alt < 90 km or alt > 2500 km.
         if alt < 90 or alt > 2500:
             raise ValueError("Jacchia77 has been implemented in range 90km - 2500km.")
 
@@ -166,7 +164,7 @@ class Jacchia77:
             np.array(self.CHe) * 1e6 * (u.m) ** -3,
             np.array(self.CH) * 1e6 * (u.m) ** -3,
             np.array(self.CM) * 1e6 * (u.m) ** -3,
-            self.WM * (u.kg / kmol),
+            self.WM * (u.kg),
         )
 
     def _H_correction(self, alt, Texo):
@@ -254,7 +252,7 @@ class Jacchia77:
             ) / self.CM[iz]
 
     def altitude_profile(self, alt, Texo):
-        """ Solves for atmospheric altitude profile at given altitude and exospheric temperature.
+        """Solves for atmospheric altitude profile at given altitude and exospheric temperature.
 
         Parameters
         ----------
@@ -268,16 +266,17 @@ class Jacchia77:
         altitude_profile: list
             [altitude(Z), T, N2, O2, O, Ar, He, H, Total number density, Mean Molecular weight]
         """
-
-        if 150 <= alt.value < 500:
-            alt_properties = self._altitude_profile(500, Texo.value)
-        else:
-            alt_properties = self._altitude_profile(alt.value, Texo.value)
+        # checking if the units entered are km
+        if alt.unit == u.km:
+            if 150 <= alt.value < 500:
+                alt_properties = self._altitude_profile(500, Texo.value)
+            else:
+                alt_properties = self._altitude_profile(alt.value, Texo.value)
 
         return [last[int(alt.value)] for last in alt_properties]
 
     def temperature(self, alt, Texo):
-        """ Solves for temperature at given altitude and exospheric temperature.
+        """Solves for temperature at given altitude and exospheric temperature.
 
         Parameters
         ----------
@@ -295,7 +294,7 @@ class Jacchia77:
         return T
 
     def pressure(self, alt, Texo):
-        """ Solves pressure at given altitude and exospheric temperature.
+        """Solves pressure at given altitude and exospheric temperature.
 
         Parameters
         ----------
@@ -317,7 +316,7 @@ class Jacchia77:
         return pressure
 
     def density(self, alt, Texo):
-        """ Solves density at given altitude and exospheric temperature.
+        """Solves density at given altitude and exospheric temperature.
 
         Parameters
         ----------

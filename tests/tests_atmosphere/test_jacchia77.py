@@ -5,8 +5,6 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.atmosphere.jacchia import Jacchia77
 
-kmol = u.def_unit("kmol", 1000 * u.mol)
-
 # SOLUTIONS DIRECTLY TAKEN FROM JACCHIA77 REPORT AND
 # https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/jacchia/jacchia-77/t1000.out
 jacchia77_solutions = {
@@ -219,7 +217,7 @@ def test_jacchia77(z):
     expected_CHe = jacchia77_solutions[z][5] * (u.m) ** -3
     expected_CH = jacchia77_solutions[z][6] * (u.m) ** -3
     expected_CM = jacchia77_solutions[z][7] * (u.m) ** -3
-    expected_WM = jacchia77_solutions[z][8] * (u.kg / kmol)
+    expected_WM = jacchia77_solutions[z][8] * (u.kg)
 
     properties = Jacchia77().altitude_profile(z, 1000 * u.K)
 
@@ -251,7 +249,7 @@ def test_tempertaure(z):
 
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_pressure(z):
-    expected_p = jacchia77_solutions[z][9] * (u.N / u.m / u.m)
+    expected_p = jacchia77_solutions[z][9] * (u.N * u.m ** -2)
     pressure = Jacchia77().pressure(z, 1000 * u.K)
     p = np.log10(pressure.value) * pressure.unit
 
@@ -260,7 +258,9 @@ def test_pressure(z):
 
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_density(z):
-    expected_rho = jacchia77_solutions[z][10] * (u.kg / u.m / u.m / u.m)
+    expected_rho = jacchia77_solutions[z][10] * (
+        u.kg ** 2 * u.mol * u.K ** -1 * u.m ** -3
+    )
     density = Jacchia77().density(z, 1000 * u.K)
     rho = np.log10(density.value) * density.unit
 
