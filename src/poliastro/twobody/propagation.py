@@ -783,78 +783,29 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
     else:
         pass
 
-    rr, vv = method(
-        orbit.attractor.k,
-        orbit.r,
-        orbit.v,
-        time_of_flight.reshape(-1).to(u.s),
-        rtol=rtol,
-        **kwargs,
-    )
-
-    # TODO: Turn these into unit tests
-    assert rr.ndim == 2
-    assert vv.ndim == 2
-
-    cartesian = CartesianRepresentation(
-        rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
-    )
-
-    return cartesian
-
-
-def propagate_classical(
-    orbit, time_of_flight, *, method=farnocchia_classical, rtol=1e-10, **kwargs
-):
-    """Propagate an orbit some time and return the result.
-
-    Parameters
-    ----------
-    orbit : ~poliastro.twobody.Orbit
-        Orbit object to propagate.
-    time_of_flight : ~astropy.time.TimeDelta
-        Time of propagation.
-    method : callable, optional
-        Propagation method, default to farnocchia_classical
-    rtol : float, optional
-        Relative tolerance, default to 1e-10.
-
-    Returns
-    -------
-    astropy.coordinates.CartesianRepresentation
-        Propagation coordinates.
-
-    """
-
-    # Check if propagator fulfills orbit requirements
-    if orbit.ecc < 1.0 and method not in ELLIPTIC_PROPAGATORS:
-        raise ValueError(
-            "Can not use an parabolic/hyperbolic propagator for elliptical orbits."
-        )
-    elif orbit.ecc == 1.0 and method not in PARABOLIC_PROPAGATORS:
-        raise ValueError(
-            "Can not use an elliptic/hyperbolic propagator for parabolic orbits."
-        )
-    elif orbit.ecc > 1.0 and method not in HYPERBOLIC_PROPAGATORS:
-        raise ValueError(
-            "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
+    if method.__name__.endswith("_classical"):
+        _, ecc, inc, raan, argp, nu = orbit.classical()
+        rr, vv = method(
+            orbit.attractor.k,
+            orbit.p,
+            ecc,
+            inc,
+            raan,
+            argp,
+            nu,
+            time_of_flight.reshape(-1).to(u.s),
+            rtol=rtol,
+            **kwargs,
         )
     else:
-        pass
-
-    _, ecc, inc, raan, argp, nu = orbit.classical()
-    rr, vv = method(
-        orbit.attractor.k,
-        orbit.p,
-        ecc,
-        inc,
-        raan,
-        argp,
-        nu,
-        time_of_flight.reshape(-1).to(u.s),
-        rtol=rtol,
-        **kwargs,
-    )
+        rr, vv = method(
+            orbit.attractor.k,
+            orbit.r,
+            orbit.v,
+            time_of_flight.reshape(-1).to(u.s),
+            rtol=rtol,
+            **kwargs,
+        )
 
     # TODO: Turn these into unit tests
     assert rr.ndim == 2

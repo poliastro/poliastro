@@ -19,7 +19,7 @@ from poliastro.constants import J2000
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.propagation import farnocchia, propagate, propagate_classical
+from poliastro.twobody.propagation import farnocchia, propagate
 
 from ..core.elements import coe2rv_many
 from ..core.propagation.farnocchia import delta_t_from_nu as delta_t_from_nu_fast
@@ -1266,15 +1266,7 @@ class Orbit:
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        if method.__name__.endswith("_classical"):
-            cartesian = propagate_classical(
-                self, time_of_flight, method=method, rtol=rtol, **kwargs
-            )
-        else:
-            cartesian = propagate(
-                self, time_of_flight, method=method, rtol=rtol, **kwargs
-            )
-
+        cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
         new_epoch = self.epoch + time_of_flight
 
         return self.from_vectors(
