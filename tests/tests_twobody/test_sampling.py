@@ -65,4 +65,4 @@ def test_sample_closed_starts_and_ends_at_min_anomaly_if_in_range_and_no_max_giv
     result = sample_closed(min_nu, ecc)
 
     assert_quantity_allclose(result[0], min_nu, atol=1e-14 * u.rad)
-    assert_quantity_allclose(result[-1], min_nu, atol=1.2e-14 * u.rad)
+    assert_quantity_allclose(result[-1], min_nu, atol=1e-14 * u.rad)

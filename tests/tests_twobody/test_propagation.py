@@ -29,17 +29,11 @@ from poliastro.twobody.propagation import (
     PARABOLIC_PROPAGATORS,
     cowell,
     danby,
-    danby_classical,
     farnocchia,
-    farnocchia_classical,
     gooding,
-    gooding_classical,
     markley,
-    markley_classical,
     mikkola,
-    mikkola_classical,
     pimienta,
-    pimienta_classical,
     vallado,
 )
 from poliastro.util import norm
@@ -78,7 +72,7 @@ def test_elliptic_near_parabolic(ecc, propagator):
 @pytest.mark.parametrize("propagator", HYPERBOLIC_PROPAGATORS)
 def test_hyperbolic_near_parabolic(ecc, propagator):
     # Still not implemented. Refer to issue #714.
-    if propagator in [pimienta, gooding, gooding_classical]:
+    if propagator in [pimienta, gooding]:
         pytest.skip()
 
     _a = 0.0 * u.rad
@@ -124,34 +118,6 @@ def test_propagation(propagator):
 
     assert_quantity_allclose(r, expected_r, rtol=1e-5)
     assert_quantity_allclose(v, expected_v, rtol=1e-4)
-
-
-def test_propagation_cartesian_and_classical_matches():
-    propagators = [farnocchia, mikkola, markley, pimienta, gooding, danby]
-    propagators_classical = [
-        farnocchia_classical,
-        mikkola_classical,
-        markley_classical,
-        pimienta_classical,
-        gooding_classical,
-        danby_classical,
-    ]
-    # Data from Vallado, example 2.4
-    r0 = [1131.340, -2282.343, 6672.423] * u.km
-    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-
-    ss0 = Orbit.from_vectors(Earth, r0, v0)
-    tof = 40 * u.min
-
-    for propagator_pair in zip(propagators, propagators_classical):
-        ss1 = ss0.propagate(tof, method=propagator_pair[0])
-        ss2 = ss0.propagate(tof, method=propagator_pair[1])
-
-        r1, v1 = ss1.rv()
-        r2, v2 = ss2.rv()
-
-        assert_quantity_allclose(r1, r2, rtol=1e-2)
-        assert_quantity_allclose(v1, v2, rtol=1e-2)
 
 
 def test_propagating_to_certain_nu_is_correct():
@@ -229,7 +195,7 @@ def test_propagation_hyperbolic():
 def test_propagation_parabolic(propagator):
     # Example from Howard Curtis (3rd edition), section 3.5, problem 3.15
     # TODO: add parabolic solver in some parabolic propagators, refer to #417
-    if propagator in [mikkola, gooding, gooding_classical]:
+    if propagator in [mikkola, gooding]:
         pytest.skip()
 
     p = 2.0 * 6600 * u.km
@@ -478,7 +444,6 @@ def test_propagate_with_coe(propagator_coe):
     nu = nu.to_value(u.rad)
     k = iss.attractor.k.to_value(u.km ** 3 / u.s ** 2)
 
-    r0, v0 = propagator_coe(k, p, ecc, inc, raan, argp, nu, period)
-    _, _, _, _, _, nu_final = rv2coe(k, r0, v0)
+    nu_final = propagator_coe(k, p, ecc, inc, raan, argp, nu, period)
 
     assert_quantity_allclose(nu_final, nu)

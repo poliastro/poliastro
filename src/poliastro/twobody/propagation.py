@@ -29,18 +29,12 @@ from scipy.integrate import DOP853, solve_ivp
 
 from poliastro.core.propagation import (
     danby as danby_fast,
-    danby_coe as danby_coe_fast,
     farnocchia as farnocchia_fast,
-    farnocchia_coe as farnocchia_coe_fast,
     func_twobody,
     gooding as gooding_fast,
-    gooding_coe as gooding_coe_fast,
     markley as markley_fast,
-    markley_coe as markley_coe_fast,
     mikkola as mikkola_fast,
-    mikkola_coe as mikkola_coe_fast,
     pimienta as pimienta_fast,
-    pimienta_coe as pimienta_coe_fast,
     vallado as vallado_fast,
 )
 
@@ -159,52 +153,6 @@ def farnocchia(k, r, v, tofs, **kwargs):
     )
 
 
-def farnocchia_classical(k, p, ecc, inc, raan, argp, nu, tofs, **kwargs):
-    """Propagates orbit.
-
-    Parameters
-    ----------
-    k : ~astropy.units.Quantity
-            Standard gravitational parameter of the attractor.
-    p: float
-        Semi-latus rectum of parameter (km)
-    ecc: float
-        Eccentricity
-    inc:
-        Inclination (rad)
-    raan: float
-        Right ascension of the ascending node (rad)
-    argp: float
-        Argument of Perigee (rad)
-    nu: float
-        True anomaly
-    tofs: float
-        Time of flight (s).
-
-    Returns
-    -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-        Propagated velocity vectors.
-
-    """
-    p = p.to(u.km).value
-    inc = inc.to(u.rad).value
-    raan = raan.to(u.rad).value
-    argp = argp.to(u.rad).value
-    nu = nu.to(u.rad).value
-    ecc = ecc.value
-    k = k.to(u.km ** 3 / u.s ** 2).value
-    tofs = tofs.to(u.s).value
-    results = [farnocchia_coe_fast(k, p, ecc, inc, raan, argp, nu, tof) for tof in tofs]
-
-    return (
-        [result[0] for result in results] * u.km,
-        [result[1] for result in results] * u.km / u.s,
-    )
-
-
 def vallado(k, r, v, tofs, numiter=350, **kwargs):
     """Propagates Keplerian orbit.
 
@@ -308,57 +256,6 @@ def mikkola(k, r, v, tofs, rtol=None):
     )
 
 
-def mikkola_classical(k, p, ecc, inc, raan, argp, nu, tofs, rtol=None):
-    """Solves Kepler Equation by a cubic approximation. This method is valid
-    no mater the orbit's nature.
-
-    Parameters
-    ----------
-    k : ~astropy.units.Quantity
-        Standard gravitational parameter of the attractor.
-    p: float
-        Semi-latus rectum of parameter (km)
-    ecc: float
-        Eccentricity
-    inc:
-        Inclination (rad)
-    raan: float
-        Right ascension of the ascending node (rad)
-    argp: float
-        Argument of Perigee (rad)
-    nu: float
-        True anomaly
-    tofs: float
-        Time of flight (s).
-
-    Returns
-    -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-
-    Note
-    ----
-    This method was derived by Seppo Mikola in his paper *A Cubic Approximation
-    For Kepler's Equation* with DOI: https://doi.org/10.1007/BF01235850
-    """
-
-    p = p.to(u.m).value
-    inc = inc.to(u.rad).value
-    raan = raan.to(u.rad).value
-    argp = argp.to(u.rad).value
-    nu = nu.to(u.rad).value
-    ecc = ecc.value
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    tofs = tofs.to(u.s).value
-    results = [mikkola_coe_fast(k, p, ecc, inc, raan, argp, nu, tof) for tof in tofs]
-
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
-
-
 def markley(k, r, v, tofs, rtol=None):
     """Elliptical Kepler Equation solver based on a fifth-order
     refinement of the solution of a cubic equation.
@@ -393,60 +290,8 @@ def markley(k, r, v, tofs, rtol=None):
     r0 = r.to(u.m).value
     v0 = v.to(u.m / u.s).value
     tofs = tofs.to(u.s).value
+
     results = [markley_fast(k, r0, v0, tof) for tof in tofs]
-
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
-
-
-def markley_classical(k, p, ecc, inc, raan, argp, nu, tofs, rtol=None):
-    """Elliptical Kepler Equation solver based on a fifth-order
-    refinement of the solution of a cubic equation.
-
-    Parameters
-    ----------
-    k : ~astropy.units.Quantity
-        Standard gravitational parameter of the attractor.
-    p: float
-        Semi-latus rectum of parameter (km)
-    ecc: float
-        Eccentricity
-    inc:
-        Inclination (rad)
-    raan: float
-        Right ascension of the ascending node (rad)
-    argp: float
-        Argument of Perigee (rad)
-    nu: float
-        True anomaly
-    tofs: float
-        Time of flight (s).
-
-    Returns
-    -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-        Propagated velocity vectors.
-
-    Note
-    ----
-    This method was originally presented by Markley in his paper *Kepler Equation Solver*
-    with DOI: https://doi.org/10.1007/BF00691917
-    """
-
-    p = p.to(u.m).value
-    inc = inc.to(u.rad).value
-    raan = raan.to(u.rad).value
-    argp = argp.to(u.rad).value
-    nu = nu.to(u.rad).value
-    ecc = ecc.value
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    tofs = tofs.to(u.s).value
-    results = [markley_coe_fast(k, p, ecc, inc, raan, argp, nu, tof) for tof in tofs]
-
     return (
         [result[0] for result in results] * u.m,
         [result[1] for result in results] * u.m / u.s,
@@ -497,60 +342,6 @@ def pimienta(k, r, v, tofs, rtol=None):
     )
 
 
-def pimienta_classical(k, p, ecc, inc, raan, argp, nu, tofs, rtol=None):
-    """Kepler solver for both elliptic and parabolic orbits based on a 15th
-    order polynomial with accuracies around 10e-5 for elliptic case and 10e-13
-    in the hyperbolic regime.
-
-    Parameters
-    ----------
-    k : ~astropy.units.Quantity
-        Standard gravitational parameter of the attractor.
-    p: float
-        Semi-latus rectum of parameter (km)
-    ecc: float
-        Eccentricity
-    inc:
-        Inclination (rad)
-    raan: float
-        Right ascension of the ascending node (rad)
-    argp: float
-        Argument of Perigee (rad)
-    nu: float
-        True anomaly
-    tofs: float
-        Time of flight (s).
-
-    Returns
-    -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-        Propagated velocity vectors.
-
-    Note
-    ----
-    This algorithm was developed by Pimienta-Peñalver and John L. Crassidis in
-    their paper *Accurate Kepler Equation solver without trascendental function
-    evaluations*. Original paper is on Buffalo's UBIR repository: http://hdl.handle.net/10477/50522
-    """
-
-    p = p.to(u.m).value
-    inc = inc.to(u.rad).value
-    raan = raan.to(u.rad).value
-    argp = argp.to(u.rad).value
-    nu = nu.to(u.rad).value
-    ecc = ecc.value
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    tofs = tofs.to(u.s).value
-    results = [pimienta_coe_fast(k, p, ecc, inc, raan, argp, nu, tof) for tof in tofs]
-
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
-
-
 def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
     """Solves the Elliptic Kepler Equation with a cubic convergence and
     accuracy better than 10e-12 rad is normally achieved. It is not valid for
@@ -588,61 +379,6 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
     tofs = tofs.to(u.s).value
 
     results = [gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
-
-
-def gooding_classical(k, p, ecc, inc, raan, argp, nu, tofs, numiter=150, rtol=1e-8):
-    """Solves the Elliptic Kepler Equation with a cubic convergence and
-    accuracy better than 10e-12 rad is normally achieved. It is not valid for
-    eccentricities equal or greater than 1.0.
-
-    Parameters
-    ----------
-    k : ~astropy.units.Quantity
-        Standard gravitational parameter of the attractor.
-    p: float
-        Semi-latus rectum of parameter (km)
-    ecc: float
-        Eccentricity
-    inc:
-        Inclination (rad)
-    raan: float
-        Right ascension of the ascending node (rad)
-    argp: float
-        Argument of Perigee (rad)
-    nu: float
-        True anomaly
-    tofs: float
-        Time of flight (s).
-    Returns
-    -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-
-    Note
-    ----
-    This method was developed by Gooding and Odell in their paper *The
-    hyperbolic Kepler equation (and the elliptic equation revisited)* with
-    DOI: https://doi.org/10.1007/BF01235540
-    """
-
-    p = p.to(u.m).value
-    inc = inc.to(u.rad).value
-    raan = raan.to(u.rad).value
-    argp = argp.to(u.rad).value
-    nu = nu.to(u.rad).value
-    ecc = ecc.value
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    tofs = tofs.to(u.s).value
-    results = [
-        gooding_coe_fast(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
-        for tof in tofs
-    ]
-
     return (
         [result[0] for result in results] * u.m,
         [result[1] for result in results] * u.m / u.s,
@@ -691,61 +427,6 @@ def danby(k, r, v, tofs, rtol=1e-8):
     )
 
 
-def danby_classical(k, p, ecc, inc, raan, argp, nu, tofs, numiter=20, rtol=1e-8):
-    """Kepler solver for both elliptic and parabolic orbits based on Danby's
-    algorithm.
-
-    Parameters
-    ----------
-    k: float
-        Standard Gravitational parameter.
-    p: float
-        Semi-latus rectum of parameter (km)
-    ecc: float
-        Eccentricity
-    inc:
-        Inclination (rad)
-    raan: float
-        Right ascension of the ascending node (rad)
-    argp: float
-        Argument of Perigee (rad)
-    nu: float
-        True anomaly
-    tofs: float
-        Time of flight (s).
-
-    Returns
-    -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-        Propagated velocity vectors.
-
-    Note
-    ----
-    This algorithm was developed by Danby in his paper *The solution of Kepler
-    Equation* with DOI: https://doi.org/10.1007/BF01686811
-    """
-
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    p = p.to(u.m).value
-    inc = inc.to(u.rad).value
-    raan = raan.to(u.rad).value
-    argp = argp.to(u.rad).value
-    nu = nu.to(u.rad).value
-    ecc = ecc.value
-    tofs = tofs.to(u.s).value
-    results = [
-        danby_coe_fast(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)
-        for tof in tofs
-    ]
-
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
-
-
 def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
 
@@ -783,29 +464,14 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
     else:
         pass
 
-    if method.__name__.endswith("_classical"):
-        _, ecc, inc, raan, argp, nu = orbit.classical()
-        rr, vv = method(
-            orbit.attractor.k,
-            orbit.p,
-            ecc,
-            inc,
-            raan,
-            argp,
-            nu,
-            time_of_flight.reshape(-1).to(u.s),
-            rtol=rtol,
-            **kwargs,
-        )
-    else:
-        rr, vv = method(
-            orbit.attractor.k,
-            orbit.r,
-            orbit.v,
-            time_of_flight.reshape(-1).to(u.s),
-            rtol=rtol,
-            **kwargs,
-        )
+    rr, vv = method(
+        orbit.attractor.k,
+        orbit.r,
+        orbit.v,
+        time_of_flight.reshape(-1).to(u.s),
+        rtol=rtol,
+        **kwargs
+    )
 
     # TODO: Turn these into unit tests
     assert rr.ndim == 2
@@ -820,18 +486,12 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
 
 ELLIPTIC_PROPAGATORS = [
     farnocchia,
-    farnocchia_classical,
     vallado,
     mikkola,
-    mikkola_classical,
     markley,
-    markley_classical,
     pimienta,
-    pimienta_classical,
     gooding,
-    gooding_classical,
     danby,
-    danby_classical,
     cowell,
 ]
 PARABOLIC_PROPAGATORS = [farnocchia, vallado, mikkola, pimienta, gooding, cowell]
