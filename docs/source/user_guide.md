@@ -314,11 +314,11 @@ time:
 >>> ss_i = Orbit.circular(Earth, alt=700 * u.km)
 >>> ss_i
 7078 x 7078 km x 0.0 deg (GCRS) orbit around Earth (♁)
+>>> hoh = Maneuver.hohmann(ss_i, 36000 * u.km)
 >>> hoh.get_total_cost()
 <Quantity 3.6173981270031357 km / s>
 >>> hoh.get_total_time()
 <Quantity 15729.741535747102 s>
->>> hoh = Maneuver.hohmann(ss_i, 36000 * u.km)
 ```
 
 You can also retrieve the individual vectorial impulses:
