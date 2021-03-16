@@ -476,8 +476,8 @@ Mars with Python using poliastro\", where the orbit of the Mars Science
 Laboratory mission (rover Curiosity) is determined:
 
 ```python
-date_launch = time.Time('2011-11-26 15:02', scale='utc')
-date_arrival = time.Time('2012-08-06 05:17', scale='utc')
+date_launch = time.Time('2011-11-26 15:02', scale='tdb')
+date_arrival = time.Time('2012-08-06 05:17', scale='tdb')
 
 ss0 = Orbit.from_ephem(Sun, Ephem.from_body(Earth, date_launch), date_launch)
 ssf = Orbit.from_ephem(Sun, Ephem.from_body(Mars, date_arrival), date_arrival)
