@@ -516,7 +516,8 @@ The data is fetched using the wrappers to these services provided by
 [astroquery](https://astroquery.readthedocs.io/).
 
 ```python
-Ephem.from_horizons("Ceres")
+epoch = time.Time("2020-04-29 10:43")
+Ephem.from_horizons("Ceres", epoch)
 Orbit.from_sbdb("Apophis")
 ```
 
