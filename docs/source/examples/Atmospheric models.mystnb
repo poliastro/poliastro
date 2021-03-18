@@ -19,7 +19,7 @@ The World Meteorological Organization (WMO) defines the atmosphere as:
 
 In fact, the atmosphere is the mean that makes the link between the ground and space and it is crucial when studying perturbations since drag affects LEO satellites.
 
-Therefore, it was necessary to develop some mathematical model based that could predict all the different conditions stated in WMO atmosphere definitoin for given altitudes.
+Therefore, it was necessary to develop some mathematical model that could predict all the different conditions stated in WMO atmosphere definition for given altitudes.
 
 Along history different models have been developed:
 
@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 
 ## Comparing coesa62 and coesa76
 
-Also known as `U.S. Standard Atmosphere`, the atmospheric model *coesa76* is just an update of his little brother *coesa62*. The difference is that geopotential heights diverge for higher altitudes.
+Also known as `U.S. Standard Atmosphere`, the atmospheric model *coesa76* is just an update of its little brother *coesa62*. The difference is that geopotential heights diverge for higher altitudes.
 
 Let us plot the `Temperature` as increasing altitude for both atmospheric models. 
 
@@ -112,7 +112,7 @@ for name in layer_names:
 
 # Temperature, pressure and density distrubutions
 
-One of the advantages of COESA76 is that it extends up to 1000 kilometers. The behaviour of previous magnitudes againts geometrical altitude can be checked in the following figure. **A logarithmic scale is applied for pressure and density to better see their decay for high altitude values.**
+One of the advantages of COESA76 is that it extends up to 1000 kilometers. The behaviour of previous magnitudes against geometrical altitude can be checked in the following figure. **A logarithmic scale is applied for pressure and density to better see their decay for high altitude values.**
 
 ```{code-cell}
 # We create the basis for the figure

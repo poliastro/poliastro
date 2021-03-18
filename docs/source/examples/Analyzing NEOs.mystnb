@@ -64,7 +64,7 @@ except ValueError as err:
     print(err)
 ```
 
-<div class="alert alert-info">Note that epoch is provided by the service itself, so if you need orbit on another epoch, you have to propagate it:</div>
+<div class="alert alert-info">Note that the epoch is provided by the service itself, so if you need orbit on another epoch, you have to propagate it:</div>
 
 ```{code-cell} ipython3
 eros.epoch.iso

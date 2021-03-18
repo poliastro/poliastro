@@ -13,7 +13,7 @@ kernelspec:
 
 # Porkchops with poliastro
 
-Porkchops are also known as mission design curves since they show different parameters used to design the ballistic trajectories for the targetting problem such us:
+Porkchops are also known as mission design curves since they show different parameters used to design the ballistic trajectories for the targetting problem such as:
 
 * Time of flight (TFL)
 * Launch energy (C3L)

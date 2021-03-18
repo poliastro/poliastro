@@ -17,14 +17,14 @@ After the implementation of Izzo's algorithm in *poliastro*, it is possible to s
 problem with a multiple revolution solution. Let us remember first what is this problem about and which
 applications does it have.
 
-Lambert problem tries to solve the orbit that passes trhough $\vec{r_{0}}$ and $\vec{r_{f}}$ being given an amount of time usually denoted by $\Delta t$. This can be used to solve for interplanetary flights, for example if we know the position of Earth at $t_{0}$ and the position of Mars at time $t_{f}$ we can solve for the orbit that we must follow in order to get to the red planet.
+The Lambert problem tries to solve the orbit that passes trhough $\vec{r_{0}}$ and $\vec{r_{f}}$ being given an amount of time usually denoted by $\Delta t$. This can be used to solve for interplanetary flights, for example if we know the position of Earth at $t_{0}$ and the position of Mars at time $t_{f}$ we can solve for the orbit that we must follow in order to get to the red planet.
 
 ## What are multiple revolutions and why do we care about them?
 
-The basic Lambert algorithm looks for a direc transfer, which can be be a short or long arc transfer as stated by the figure. There exist a total of three orbit solutions defined by the location of the focus for those transfer orbits:
+The basic Lambert algorithm looks for a direct transfer, which can be a short or long arc transfer as seen in the figure. There exist a total of three orbit solutions defined by the location of the focus for those transfer orbits:
 
 1. **Minimum-energy orbit**: also called the optimal path. In this case the focus lies in the line that conects $\vec{r_{1}}$ and $\vec{r_{2}}$.
-2. **Short arc orbit**: both focis $F_{1}$ and $F_{2}^{*}$ of the transfer orbit lie in the same side of the line connecting both position vectors.
+2. **Short arc orbit**: both foci $F_{1}$ and $F_{2}^{*}$ of the transfer orbit lie in the same side of the line connecting both position vectors.
 3. **Long arc orbit**: each one of the transfer orbit focus lies in a different side of the line connecting both position vectors.
 
 ![](lambert_paths.png)
@@ -33,9 +33,9 @@ However it is possible to make more than one revolution in order to achieve the 
 
 * A short or long path.
 * The number of revolutions, usually denoted by: $M=0$, $M=1$, $M=2$, ...
-* Solution number for those revolutions, denoted by: $S_{1}$ and $S_{2}$
+* The solution number for those revolutions, denoted by: $S_{1}$ and $S_{2}$
 
-Let us see all this combinations by making use of *poliastro*!
+Let us see all these combinations by making use of *poliastro*!
 
 ```{code-cell}
 from astropy import units as u
@@ -100,7 +100,7 @@ def lambert_transfer(ss_dpt, ss_arr, revs):
 
 ## Solutions for M=0
 
-By making use of the previous defined function, we can easily get the different transfer orbit regarding the number of required revolutions, in this case 0.
+By making use of the previously defined function, we can easily get the different transfer orbit regarding the number of required revolutions, in this case 0.
 
 ```{code-cell}
 # Solving for direct (M=0) transfer long and short arcs
