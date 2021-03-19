@@ -318,7 +318,7 @@ class Ephem:
         plane=Planes.EARTH_EQUATOR,
     ):
         """Return `Ephem` from an `Orbit` at certain epochs.
-        
+
         Parameters
         ----------
         orbit: ~poliastro.twobody.orbit.Orbit
