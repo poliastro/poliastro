@@ -26,7 +26,7 @@ order:
 
 ## Software
 
-poliastro wouldn\'t be possible without the tremendous, often unpaid and
+poliastro wouldn\'t have been possible without the tremendous, often unpaid and
 unrecognised effort of thousands of volunteers who devote a significant
 part of their lives to provide the best software money can buy, for
 free. This is a list of direct poliastro dependencies with a citeable
