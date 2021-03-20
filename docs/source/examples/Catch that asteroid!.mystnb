@@ -16,7 +16,7 @@ kernelspec:
 
 +++
 
-First, we need to increase the timeout time to allow the download of data occur properly
+First, we need to increase the timeout time to allow the download of data occur properly:
 
 ```{code-cell}
 from astropy.utils.data import conf
@@ -45,7 +45,7 @@ from poliastro.frames import Planes
 from poliastro.twobody import Orbit
 from poliastro.plotting import StaticOrbitPlotter
 from poliastro.plotting.misc import plot_solar_system
-from poliastro.util import time_range
+from poliastro.util import norm, time_range
 
 EPOCH = Time("2017-09-01 12:05:50", scale="tdb")
 C_FLORENCE = "#000"
@@ -74,10 +74,6 @@ Therefore, if we `propagate` this orbit to `EPOCH`, the results will be a bit di
 Let's use the `Ephem.from_horizons` method as an alternative, sampling over a period of 6 months:
 
 ```{code-cell}
-from poliastro.ephem import Ephem
-```
-
-```{code-cell}
 epochs = time_range(
     EPOCH - TimeDelta(3 * 30 * u.day), end=EPOCH + TimeDelta(3 * 30 * u.day)
 )
@@ -97,10 +93,6 @@ And now, let's compute the distance between Florence and the Earth at that epoch
 ```{code-cell}
 earth = Ephem.from_body(Earth, epochs, plane=Planes.EARTH_ECLIPTIC)
 earth
-```
-
-```{code-cell}
-from poliastro.util import norm
 ```
 
 ```{code-cell}
@@ -151,8 +143,6 @@ moon
 ```
 
 ```{code-cell}
-from poliastro.plotting.static import StaticOrbitPlotter
-
 plotter = StaticOrbitPlotter()
 plotter.set_attractor(Earth)
 plotter.set_body_frame(Moon)

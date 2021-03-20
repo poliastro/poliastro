@@ -39,7 +39,7 @@ pio.renderers.default = "notebook_connected"
 ```
 
 ## Atmospheric drag ##
-The poliastro package now has several commonly used natural perturbations. One of them is atmospheric drag! See how one can monitor decay of the near-Earth orbit over time using our new module poliastro.twobody.perturbations!
+The poliastro package now has several commonly used natural perturbations. One of them is atmospheric drag! See how one can monitor decay of the near-Earth orbit over time using our new module `poliastro.twobody.perturbations`!
 
 ```{code-cell}
 R = Earth.R.to(u.km).value
@@ -99,7 +99,7 @@ is needed to stop the integration when the satellite reaches the
 surface.
 
 Please note that you will likely want to use a more sophisticated
-atmosphere model than the one in atmospheric_drag for these sorts
+atmosphere model than the one in `atmospheric_drag` for these sorts
 of computations.
 
 ```{code-cell}
@@ -176,7 +176,7 @@ plt.plot(tofs.value, raans)
 
 ## 3rd body
 
-Apart from time-independent perturbations such as atmospheric drag, J2/J3, we have time-dependend perturbations. Lets's see how Moon changes the orbit of GEO satellite over time!
+Apart from time-independent perturbations such as atmospheric drag, J2/J3, we have time-dependent perturbations. Let's see how the Moon changes the orbit of GEO satellite over time!
 
 ```{code-cell}
 # database keeping positions of bodies in Solar system over time
@@ -238,7 +238,7 @@ frame.plot_trajectory(rr, label="orbit influenced by Moon")
 
 ## Applying thrust
 
-Apart from natural perturbations, there are artificial thrusts aimed at intentional change of orbit parameters. One of such changes is simultaineous change of eccentricity and inclination.
+Apart from natural perturbations, there are artificial thrusts aimed at intentional change of orbit parameters. One of such changes is simultaneous change of eccentricity and inclination.
 
 ```{code-cell}
 from poliastro.twobody.thrust import change_inc_ecc

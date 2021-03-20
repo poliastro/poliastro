@@ -17,12 +17,12 @@ kernelspec:
 
 By definition, a groundtrack is just the projection of the position left by a
 satellite over its attractor. They are usually applied to Earth orbiting
-spacecraft and thus, have been implemented within `poliastro.earth.plotting`
+spacecraft and thus, have been implemented within the `poliastro.earth.plotting`
 sub-package.
 
-Something interesting about these kind of figures is that they take into account
-Earth's rotation. Therefore, it is possible to predict over which locations in
-the planet will be the spacecraft within the next hours or days.
+Something interesting about these kind of figures is that they take the Earth's rotation into account.
+Therefore, it is possible to predict over which locations in
+the planet will the spacecraft be within the next hours or days.
 
 In this notebook, we will show all the possibilities that the
 `GrountrackPlotter` class offers to poliastro's users. Let us start by importing
@@ -49,7 +49,7 @@ also other one related with aerodynamic properties, for example. For more
 information, please refer to official API documentation.
 
 Let us build an `EarthSatellite` instance but without any associated
-`Spacecraft` data, since for this notebook will not be useful at all.
+`Spacecraft` data, since for this notebook they will not be useful at all.
 Furthermore, we will generate a desired time span for the next three hours since
 actual ISS epoch. Notice that the `periods` parameter controls the resolution of
 the time vector and thus, the amount of values.
@@ -65,7 +65,7 @@ t_span = time_range(iss.epoch - 1.5 * u.h, periods=150, end=iss.epoch + 1.5 * u.
 Because of its interactive nature, lots of possibilities are offered by
 `GroundtrackPlotter`. It can provide lots of different map projections,
 customization parameters... This utility is based on `plotly.layout.geo`, please
-refer to [official
+refer to the [official
 documentation](https://plotly.com/python/reference/layout/geo/) for more
 information about it. Let us create a simple instance and start plotting.
 
@@ -110,7 +110,7 @@ gp.fig.show()
 Finally, it is also possible to make use of [several map
 projections](https://plotly.com/python/reference/layout/geo/#layout-geo-projection).
 Among the different possibilities, there is also one which holds 3D support:
-`orthographic`. You can simply switch previous figure by simply running:
+`orthographic`. You can simply switch the previous figure by simply running:
 
 ```{code-cell}
 # Switch to three dimensional representation

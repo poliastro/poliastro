@@ -42,7 +42,7 @@ All the data for Juno's mission is sorted [here](https://github.com/poliastro/po
 * Inner cruise phase 2: Fly-by around Earth. Gravity assist is performed. 
 * Inner cruise phase 3: Jupiter insertion maneuver.
 
-Let us first define the main dates other relevant parameters of the mission.
+Let us first define the main dates and other relevant parameters of the mission.
 
 ```{code-cell}
 ## Main dates
@@ -61,7 +61,7 @@ With previous dates we can create the different orbits that define the position 
 Earth.plot(date_launch, label="Initial Earth's position");
 ```
 
-Since both Earth states have been obtained (initial and flyby) we can now solve for Juno's maneuvers. The first one sets Juno into an elliptical orbit around the Sun so it apply a gravity assist around the Earth.
+Since both Earth states have been obtained (initial and flyby) we can now solve for Juno's maneuvers. The first one sets Juno into an elliptical orbit around the Sun so that it applies a gravity assist around the Earth.
 
 ```{code-cell}
 earth = Ephem.from_body(Earth, time_range(date_launch, end=date_arrival, periods=500))
@@ -77,7 +77,7 @@ dv = C_3 ** 0.5 * v_e0 / norm(v_e0)
 man = Maneuver.impulse(dv)
 ```
 
-If we now apply previous maneuver to the Junos's initial orbit (assume it is the Earth's one for simplicity), we will obtain the orbit around the Sun for Juno. The first inner cruise maneuver is defined just till the ahelion orbit. While Juno is traveling around its new orbit, Earth is also moving. After Juno reaches the aphelion it will be necessary to apply a second maneuver so the flyby is performed around Earth. Once that is achieved a final maneuver will be made in order to benefit from the gravity assist. Let us first propagate Juno's orbit till the aphelion.
+If we now apply the previous maneuver to the Junos's initial orbit (assume it is the Earth's one for simplicity), we will obtain the orbit around the Sun for Juno. The first inner cruise maneuver is defined just till the ahelion orbit. While Juno is traveling around its new orbit, Earth is also moving. After Juno reaches the aphelion it will be necessary to apply a second maneuver so the flyby is performed around Earth. Once that is achieved a final maneuver will be made in order to benefit from the gravity assist. Let us first propagate Juno's orbit till the aphelion.
 
 ```{code-cell}
 ss_e0 = Orbit.from_ephem(Sun, earth, date_launch)
@@ -100,13 +100,13 @@ plotter.plot_trajectory(
 );
 ```
 
-We can check that the period of the orbit is similar to the one stated in the mission's documentation. Remember that in previous plot we only plotter half of the orbit for Juno first maneuver and the period is the time that would take Juno to complete one full revolution around this new orbit.
+We can check that the period of the orbit is similar to the one stated in the mission's documentation. Remember that in the previous plot we only plotter half of the orbit for Juno's first maneuver and the period is the time that would take Juno to complete one full revolution around this new orbit.
 
 ```{code-cell}
 ic1.period.to(u.day)
 ```
 
-Notice in previous plot that Earth's position is not the initial one since while Juno is moving Earth also does. We now solve for the Lambert maneuver in order to perform a flyby around the earth when it is at flyby date.
+Notice that in the previous plot that Earth's position is not the initial one since while Juno is moving Earth also does. We now solve for the Lambert maneuver in order to perform a flyby around the earth when it is at flyby date.
 
 ```{code-cell}
 # Let's compute the Lambert solution to do the flyby of the Earth
@@ -123,7 +123,7 @@ dv_a = imp_a[-1]
 norm(dv_a.to(u.km / u.s))
 ```
 
-We can now solve for the flyby orbit that will help Juno with the gravity assist. Again, the inner pahse 2 maneuver is define till Juno reaches Earth's position for the flyby date although the full orbit is plotted.
+We can now solve for the flyby orbit that will help Juno with the gravity assist. Again, the inner phase 2 maneuver is defined till Juno reaches Earth's position for the flyby date although the full orbit is plotted.
 
 ```{code-cell}
 # Let us apply the maneuver
@@ -149,7 +149,7 @@ plotter.plot_trajectory(
 );
 ```
 
-We can now start solving for the manuever that will take Juno to Jupiter. Another Lmabert maneuver is required but first let us solve for Jupiter position on arrival.
+We can now start solving for the manuever that will take Juno to Jupiter. Another Lambert maneuver is required but first let us solve for Jupiter position on arrival.
 
 ```{code-cell}
 # And now, go to Jupiter!
@@ -175,7 +175,7 @@ ic3, ss_target = ic2_end.apply_maneuver(man_jupiter, intermediate=True)
 ic3_end = ic3.propagate(date_arrival)
 ```
 
-Finally, we can plot all the different phases of the mission. This shows the whole power of *poliastro* package, since a beautiful image is created showing the whole maneuvering process.
+Finally, we can plot all the different phases of the mission. This shows the whole power of the *poliastro* package, since a beautiful image is created showing the whole maneuvering process.
 
 ```{code-cell}
 :tags: [nbsphinx-thumbnail]

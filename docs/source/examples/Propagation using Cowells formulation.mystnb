@@ -197,7 +197,7 @@ dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
 np.allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 ```
 
-This means **we successfully validated the model against an extremely simple orbit transfer with approximate analytical solution**. Notice that the final eccentricity, as originally noticed by Edelbaum, is nonzero:
+This means **we successfully validated the model against an extremely simple orbit transfer with an approximate analytical solution**. Notice that the final eccentricity, as originally noticed by Edelbaum, is nonzero:
 
 ```{code-cell}
 ss_final.ecc

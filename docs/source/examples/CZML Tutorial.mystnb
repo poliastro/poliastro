@@ -13,13 +13,13 @@ kernelspec:
 
 # Visualize orbital data with Cesium
 
-Poliastro allows users to easily convert orbital data to CZML, a JSON format primarily used in applications running Cesium
+Poliastro allows users to easily convert orbital data to CZML, a JSON format primarily used in applications running Cesium.
 
 +++
 
 ## Dependencies
 
-You will only need poliastro (obviously) and czml3, a library for easily creating and using CZML packets
+You will only need poliastro (obviously) and czml3, a library for easily creating and using CZML packets.
 
 ``pip install poliastro czml3``
 
@@ -77,9 +77,9 @@ To add an orbit you can simply call ``add_orbit`` and pass your ``Orbit`` along 
 
 ``label_show``: Whether the label is visible (true by default)
 
-``label_fill_color``: The fill color of the label , a simple list with the rgba values
+``label_fill_color``: The fill color of the label, a simple list with the rgba values
 
-``label_outline_color``: The fill color of the label , a simple list with the rgba values
+``label_outline_color``: The fill color of the label, a simple list with the rgba values
 
 ``label_font``:  The font properties (CSS syntax)
 
@@ -177,8 +177,4 @@ extractor.add_orbit(molniya,
 
 ```{code-cell}
 extractor.packets
-```
-
-```{code-cell}
-
 ```

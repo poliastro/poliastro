@@ -14,8 +14,8 @@ kernelspec:
 # Tisserand plots and applications in gravity assisted maneuvers
 
 Spacecraft fuel is limited and thus becomes a constrain when developing
-interplanetary maneuvers. In order to save propellant, mission analysis team
-usually benefits from so called **gravity assisted maneuvers**. Although they
+interplanetary maneuvers. In order to save propellant, the mission analysis team
+usually benefits from the so called **gravity assisted maneuvers**. Although they
 are usually applied for increasing spacecraft velocity, they might also be used
 for the opposite objective. Previous kind of maneuvers are not only useful for
 interplanetary trips but also extremely important when designing so-called "moon
@@ -25,16 +25,16 @@ tours" in Jupiter and Saturn systems.
 
 In order to perform a preliminary gravity assist analysis, it is possible to
 make use of Tisserand plots. These plots illustrate how to move within different
-bodies for a variety of $V_{\infty}$ and $\alpha$, being this last angle the pump angle. Tisserand plots assume:
+bodies for a variety of $V_{\infty}$ and $\alpha$, $\alpha$ being the pump angle. Tisserand plots assume:
 
 * Perfectly circular and coplanar planet orbits. Although it is possible to
   include inclination within the analysis, Tisserand would no longer be 2D
-  plots but become surfaces in a three dimensional space.
+  plots but would instead become surfaces in a three dimensional space.
   
 * Phasing is not taken into account. That means only orbits are taken into
   account, not rendezvous between departure and target body.
   
-Please, note that **poliastro solves `mean orbital elements` for Solar System bodies. Although their orbital parameters do not have great variations among time, planet orbits are assumed not to be perfectly circular either coplanar.** However, Tisserand figures still are useful for quick-design gravity assisted maneuvers.
+Please, note that **poliastro solves `mean orbital elements` for Solar System bodies. Although their orbital parameters do not have great variations among time, planet orbits are assumed not to be perfectly circular or coplanar.** However, Tisserand figures are still useful for quick-design gravity assisted maneuvers.
 
 +++
 
@@ -42,7 +42,7 @@ Please, note that **poliastro solves `mean orbital elements` for Solar System bo
 
 As said before, these kind of plots assume perfectly circular and coplanar orbits. Each point in a Tisserand graph is just a fly-by orbit wiht a given $V_{\infty}$ and pump angle. That particular orbit has some energy associated, which can be computed as $C_{Tiss}=3 - V_{\infty}^2$. The question then is, **where can a spacecraft come and reach that orbit with those particular conditions?**
 
-Although Tisserand figures come in many different ways, they might be usually represent:
+Although Tisserand figures come in many different ways, they might be usually representing:
 
 * Periapsis VS. Apoapsis
 * Orbital period VS. Periapsis
@@ -97,7 +97,7 @@ ax = tp.plot_line(Venus, 7 * u.km / u.s, alpha_lim=(47 * np.pi / 180, 78 * np.pi
 ax = tp.plot_line(Mars, 5 * u.km / u.s, alpha_lim=(119 * np.pi / 180, 164 * np.pi / 180), color="black")
 ```
 
-Previous black lines represents an **EVME**, which means **Earth-Venus-Mars-Earth**. Our spacecraft starts at and orbit with $V_{\infty}=5$km/s at **Earth** location. At this point, a trajectory shared with a $V_{\infty}=7$km/s for **Venus** is shared. This new orbit would take us to a new orbit for $V_{\infty}=5$km/s around **Mars**, which is also intercepted at some point by **Earth** again.
+Previous black lines represent an **EVME**, which means **Earth-Venus-Mars-Earth**. Our spacecraft starts at an orbit with $V_{\infty}=5$km/s at **Earth**'s location. At this point, a trajectory shared with a $V_{\infty}=7$km/s for **Venus** is shared. This new orbit would take us to a new orbit for $V_{\infty}=5$km/s around **Mars**, which is also intercepted at some point by **Earth** again.
 
 +++
 
