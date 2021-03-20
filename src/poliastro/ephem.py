@@ -317,7 +317,8 @@ class Ephem:
         epochs,
         plane=Planes.EARTH_EQUATOR,
     ):
-        """Return 'Ephem` from an `Orbit` at certain epochs.
+        """Return `Ephem` from an `Orbit` at certain epochs.
+
         Parameters
         ----------
         orbit: ~poliastro.twobody.orbit.Orbit
@@ -326,6 +327,7 @@ class Ephem:
             Epochs to sample the orbit positions.
         plane: ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
+
         """
         if epochs.isscalar:
             epochs = epochs.reshape(1)
