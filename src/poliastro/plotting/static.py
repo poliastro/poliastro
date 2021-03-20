@@ -173,7 +173,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             def animate(i):
                 Element.set_data(x.to(u.km).value[i], y.to(u.km).value[i])
                 return Element,
-            myAnimation = animation.FuncAnimation(self.fig, animate, 
+            Animation = animation.FuncAnimation(self.fig, animate, 
                                       frames=np.arange(0, len(x), 1), 
                                       interval=40, blit=True, repeat=True)
             self._ax.legend([label],
