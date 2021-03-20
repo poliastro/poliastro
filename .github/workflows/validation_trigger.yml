@@ -1,13 +1,13 @@
 # This workflow triggers poliastro/validation CI from poliastro/poliastro
-# everytime a new commit is introduced in poliastro:master branch
+# everytime a new commit is introduced in poliastro:main branch
 name: Validation test cases
 
 on:
   # A collection of events which trigger the validation action
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   release:
 
   # Enable manually to execute the actions
@@ -25,6 +25,6 @@ jobs:
       - name: Trigger poliastro/validation
         run: |
           curl -XPOST -u "${{ secrets.PAT_VALIDATION}}:${{secrets.PAT_VALIDATION_TOKEN}}" \
-          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Accept: application/vnd.github.v3+json" \
           -H "Content-Type: application/json" https://api.github.com/repos/poliastro/validation/actions/workflows/ci_actions.yml/dispatches \
-          --data '{"ref": "master"}'
+          --data '{"ref": "main"}'
