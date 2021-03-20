@@ -93,7 +93,7 @@ GitHub, and all contributions and feedback are more than welcome. You
 can test poliastro in your browser using binder, a cloud Jupyter
 notebook server:
 
-[![image](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb)
+[![image](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://mybinder.org/v2/gh/poliastro/poliastro/main?filepath=index.ipynb)
 
 See [benchmarks](https://benchmarks.poliastro.space/) for the
 performance analysis of poliastro.

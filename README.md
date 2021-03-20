@@ -46,14 +46,14 @@ be read on the wonderful [Read the Docs](https://readthedocs.org/).
 
 # Examples
 
-[![mybinder](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://beta.mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb)
+[![mybinder](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://beta.mybinder.org/v2/gh/poliastro/poliastro/main?filepath=index.ipynb)
 
 In the examples directory you can find several Jupyter notebooks with
 specific applications of poliastro. You can launch a cloud Jupyter
 server using [binder](https://beta.mybinder.org/) to edit the notebooks
 without installing anything. Try it out!
 
-<https://beta.mybinder.org/v2/gh/poliastro/poliastro/master?filepath=index.ipynb>
+<https://beta.mybinder.org/v2/gh/poliastro/poliastro/main?filepath=index.ipynb>
 
 # Requirements
 
