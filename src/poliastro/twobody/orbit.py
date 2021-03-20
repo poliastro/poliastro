@@ -1509,3 +1509,21 @@ class Orbit:
             from poliastro.plotting.core import OrbitPlotter2D
 
             return OrbitPlotter2D().plot(self, label=label)
+
+    def anim(self, label=None, use_3d=False, interactive=False):
+        """Animates the orbit.
+
+        Parameters
+        ----------
+        label : str, optional
+            Label for the orbit, defaults to empty.
+        """
+        if not interactive and use_3d:
+            raise ValueError(
+                "currently not supporting 3D and interactive view for animation"
+            )
+        else :
+            from poliastro.plotting.static import StaticOrbitPlotter
+
+            return StaticOrbitPlotter().anim(self, label=label)
+

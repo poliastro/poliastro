@@ -97,7 +97,8 @@ class BaseOrbitPlotter:
 
     def _plot_coordinates(self, coordinates, label, colors, dashed):
         raise NotImplementedError
-
+    def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
+        raise NotImplementedError
     def _plot_position(self, position, label, colors):
         radius = min(
             self._attractor_radius * 0.5, (norm(position) - self._attractor.R) * 0.5
@@ -108,6 +109,18 @@ class BaseOrbitPlotter:
         coordinates, position, label, colors, dashed = trajectory
 
         trace_coordinates = self._plot_coordinates(coordinates, label, colors, dashed)
+
+        if position is not None:
+            trace_position = self._plot_position(position, label, colors)
+        else:
+            trace_position = None
+
+        return trace_coordinates, trace_position
+    
+    def __plot_coordinates_and_position_anim(self, trajectory):
+        coordinates, position, label, colors, dashed = trajectory
+
+        trace_coordinates = self._plot_coordinates_anim(coordinates, label, colors, dashed)
 
         if position is not None:
             trace_position = self._plot_position(position, label, colors)
@@ -126,6 +139,17 @@ class BaseOrbitPlotter:
             trajectory
         )
 
+        return trace_coordinates, trace_position
+
+    def __anim_trajectory(self, coordinates, position=None, *, label, colors, dashed):
+        trajectory = Trajectory(coordinates, position, label, colors, dashed)
+        self._trajectories.append(trajectory)
+
+        self._redraw_attractor()
+
+        trace_coordinates, trace_position = self.__plot_coordinates_and_position_anim(
+            trajectory
+        )
         return trace_coordinates, trace_position
 
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
@@ -156,6 +180,20 @@ class BaseOrbitPlotter:
         coordinates = orbit.sample(self._num_points)
 
         return self.__add_trajectory(
+            coordinates, orbit.r, label=label, colors=colors, dashed=True
+        )
+
+    def _anim(self, orbit, *, label=None, color=None, trail=False):
+        colors = self._get_colors(color, trail)
+
+        self.set_attractor(orbit.attractor)
+
+        orbit = orbit.change_plane(self.plane)
+
+        label = generate_label(orbit.epoch, label)
+        coordinates = orbit.sample(self._num_points)
+
+        return self.__anim_trajectory(
             coordinates, orbit.r, label=label, colors=colors, dashed=True
         )
 
