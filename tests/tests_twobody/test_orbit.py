@@ -26,7 +26,6 @@ from poliastro.bodies import (
     Mercury,
     Moon,
     Neptune,
-    Pluto,
     Saturn,
     Sun,
     Uranus,
@@ -40,7 +39,6 @@ from poliastro.frames.enums import Planes
 from poliastro.frames.equatorial import (
     GCRS,
     HCRS,
-    ICRS,
     JupiterICRS,
     MarsICRS,
     MercuryICRS,
@@ -52,11 +50,7 @@ from poliastro.frames.equatorial import (
 from poliastro.frames.util import get_frame
 from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
-from poliastro.warnings import (
-    OrbitSamplingWarning,
-    PatchedConicsWarning,
-    TimeScaleWarning,
-)
+from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
 
 @pytest.fixture()
@@ -168,34 +162,6 @@ def test_apply_maneuver_changes_epoch():
     dv = [0, 0, 0] * u.km / u.s
     orbit_new = ss.apply_maneuver([(dt, dv)])
     assert orbit_new.epoch == ss.epoch + dt
-
-
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_orbit_from_ephem_with_no_epoch_is_today():
-    # This is not that obvious http://stackoverflow.com/q/6407362/554319
-    body = Earth
-    ss = Orbit.from_body_ephem(body)
-    assert (Time.now() - ss.epoch).sec < 1
-
-
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_from_ephem_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
-    body = Earth
-    epoch = Time("2017-09-29 07:31:26", scale="utc")
-    expected_epoch_string = "2017-09-29 07:32:35.182"  # epoch.tdb.value
-
-    Orbit.from_body_ephem(body, epoch)
-
-    w = recwarn.pop(TimeScaleWarning)
-    assert expected_epoch_string in str(w.message)
-
-
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
-@pytest.mark.parametrize("body", [Moon, Pluto])
-def test_from_ephem_raises_error_for_pluto_moon(body):
-    with pytest.raises(RuntimeError) as excinfo:
-        Orbit.from_body_ephem(body)
-    assert "To compute the position and velocity" in excinfo.exconly()
 
 
 def test_circular_has_proper_semimajor_axis():
@@ -550,16 +516,6 @@ def test_orbit_from_custom_body_raises_error_when_asked_frame():
         "Frames for orbits around custom bodies are not yet supported"
         in excinfo.exconly()
     )
-
-
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
-@pytest.mark.parametrize(
-    "body", [Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune]
-)
-def test_orbit_from_ephem_is_in_icrs_frame(body):
-    ss = Orbit.from_body_ephem(body)
-
-    assert ss.get_frame().is_equivalent_frame(ICRS())
 
 
 def test_orbit_accepts_ecliptic_plane():

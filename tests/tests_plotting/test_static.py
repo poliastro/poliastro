@@ -223,3 +223,18 @@ def test_plot_ephem_no_epoch():
     plotter.plot_ephem(ephem, label="2020 CD3 Minimoon", color="k")
 
     return fig
+
+
+def test_body_frame_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
+    from poliastro.warnings import TimeScaleWarning
+
+    body = Jupiter
+    epoch = Time("2017-09-29 07:31:26", scale="utc")
+    expected_epoch_string = "2017-09-29 07:32:35.182"  # epoch.tdb.value
+
+    op = StaticOrbitPlotter()
+    op.set_body_frame(body, epoch)
+
+    w = recwarn.pop(TimeScaleWarning)
+
+    assert expected_epoch_string in str(w.message)
