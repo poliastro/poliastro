@@ -163,10 +163,10 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             lc.set_array(np.linspace(1, 0, len(x)))
 
             self._ax.add_collection(lc)
-            lines = [lc]
+            
         else:
             from matplotlib import animation
-            lines = self._ax.plot(
+            self._ax.plot(
                 x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
             )
             Element, = self._ax.plot(x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0])
@@ -181,7 +181,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             bbox_to_anchor=(1.05, 1.015),
             title="Names and epochs",
             numpoints=1,
-        )
+            )
         self._ax.set_xlabel("$x$ (km)")
         self._ax.set_ylabel("$y$ (km)")
         self._ax.set_aspect(1)
@@ -286,7 +286,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         if not self._frame:
             self.set_orbit_frame(orbit)
 
-        lines = self._anim(orbit, label=label, color=color, trail=trail)
+        self._anim(orbit, label=label, color=color, trail=trail)
 
     def plot_body_orbit(
         self,

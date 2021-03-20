@@ -120,14 +120,7 @@ class BaseOrbitPlotter:
     def __plot_coordinates_and_position_anim(self, trajectory):
         coordinates, position, label, colors, dashed = trajectory
 
-        trace_coordinates = self._plot_coordinates_anim(coordinates, label, colors, dashed)
-
-        if position is not None:
-            trace_position = self._plot_position(position, label, colors)
-        else:
-            trace_position = None
-
-        return trace_coordinates, trace_position
+        self._plot_coordinates_anim(coordinates, label, colors, dashed)
 
     def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)
@@ -147,10 +140,9 @@ class BaseOrbitPlotter:
 
         self._redraw_attractor()
 
-        trace_coordinates, trace_position = self.__plot_coordinates_and_position_anim(
+        self.__plot_coordinates_and_position_anim(
             trajectory
         )
-        return trace_coordinates, trace_position
 
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         if self._attractor is None:
