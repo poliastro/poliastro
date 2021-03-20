@@ -174,8 +174,12 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0])
             Element, = self._ax.plot(x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0])
             _ = animation.FuncAnimation(self.fig, animate,
-                                      frames=np.arange(0, len(x), 1),
-                                      interval=40, blit=True, repeat=True)
+                                      frames=np.arange(0,
+                                      len(x),
+                                      1),
+                                      interval=40,
+                                      blit=True,
+                                      repeat=True)
             self._ax.legend([label], loc="upper left",
                             bbox_to_anchor=(1.05, 1.015),
                             title="Names and epochs",
