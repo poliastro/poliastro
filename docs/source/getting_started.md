@@ -48,7 +48,7 @@ Finally, you can also install the latest development version of
 poliastro [directly from GitHub](http://github.com/poliastro/poliastro):
 
 ```bash
-$ pip install https://github.com/poliastro/poliastro/archive/master.zip
+$ pip install https://github.com/poliastro/poliastro/archive/main.zip
 ```
 
 This is useful if there is some feature that you want to try, but we did
