@@ -1526,4 +1526,3 @@ class Orbit:
             from poliastro.plotting.static import StaticOrbitPlotter
 
             return StaticOrbitPlotter().anim(self, label=label)
-

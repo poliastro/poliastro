@@ -137,8 +137,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._ax.set_xlabel("$x$ (km)")
         self._ax.set_ylabel("$y$ (km)")
         self._ax.set_aspect(1)
-
         return lines
+
     def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
         if self._frame is None:
             raise ValueError(
@@ -161,27 +161,26 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             )
             lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
             lc.set_array(np.linspace(1, 0, len(x)))
-
             self._ax.add_collection(lc)
-            
         else:
             from matplotlib import animation
-            self._ax.plot(
-                x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
-            )
-            Element, = self._ax.plot(x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0])
+
             def animate(i):
+
                 Element.set_data(x.to(u.km).value[i], y.to(u.km).value[i])
                 return Element,
-            Animation = animation.FuncAnimation(self.fig, animate, 
-                                      frames=np.arange(0, len(x), 1), 
+
+            self._ax.plot(
+                x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0])
+            Element, = self._ax.plot(x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0])
+            _ = animation.FuncAnimation(self.fig, animate,
+                                      frames=np.arange(0, len(x), 1),
                                       interval=40, blit=True, repeat=True)
-            self._ax.legend([label],
-            loc="upper left",
-            bbox_to_anchor=(1.05, 1.015),
-            title="Names and epochs",
-            numpoints=1,
-            )
+            self._ax.legend([label], loc="upper left",
+                            bbox_to_anchor=(1.05, 1.015),
+                            title="Names and epochs",
+                            numpoints=1)
+
         self._ax.set_xlabel("$x$ (km)")
         self._ax.set_ylabel("$y$ (km)")
         self._ax.set_aspect(1)

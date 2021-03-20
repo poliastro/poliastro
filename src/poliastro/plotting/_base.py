@@ -97,8 +97,10 @@ class BaseOrbitPlotter:
 
     def _plot_coordinates(self, coordinates, label, colors, dashed):
         raise NotImplementedError
+
     def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
         raise NotImplementedError
+
     def _plot_position(self, position, label, colors):
         radius = min(
             self._attractor_radius * 0.5, (norm(position) - self._attractor.R) * 0.5
@@ -116,7 +118,7 @@ class BaseOrbitPlotter:
             trace_position = None
 
         return trace_coordinates, trace_position
-    
+
     def __plot_coordinates_and_position_anim(self, trajectory):
         coordinates, position, label, colors, dashed = trajectory
 
