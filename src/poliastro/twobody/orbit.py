@@ -1522,7 +1522,7 @@ class Orbit:
             raise ValueError(
                 "currently not supporting 3D and interactive view for animation"
             )
-        else :
+        else:
             from poliastro.plotting.static import StaticOrbitPlotter
 
             return StaticOrbitPlotter().anim(self, label=label)

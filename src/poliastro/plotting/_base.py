@@ -142,9 +142,7 @@ class BaseOrbitPlotter:
 
         self._redraw_attractor()
 
-        self.__plot_coordinates_and_position_anim(
-            trajectory
-        )
+        self.__plot_coordinates_and_position_anim(trajectory)
 
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         if self._attractor is None:
