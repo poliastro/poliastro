@@ -137,6 +137,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._ax.set_xlabel("$x$ (km)")
         self._ax.set_ylabel("$y$ (km)")
         self._ax.set_aspect(1)
+
         return lines
 
     def _plot_coordinates_anim(self, coordinates, label, colors, dashed):

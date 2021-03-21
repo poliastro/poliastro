@@ -966,7 +966,7 @@ class Orbit:
     def parabolic(
         cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR
     ):
-        """Return parabolic `Orbit`.
+        """Return a parabolic `Orbit`.
 
         Parameters
         ----------
@@ -1007,7 +1007,7 @@ class Orbit:
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
     ):
-        r"""Return frozen Orbit. If any of the given arguments results in an impossibility, some values will be overwritten
+        r"""Return a frozen Orbit. If any of the given arguments results in an impossibility, some values will be overwritten
 
         To achieve frozen orbit these two equations have to be set to zero.
 
