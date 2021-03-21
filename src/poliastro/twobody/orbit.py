@@ -1510,7 +1510,6 @@ class Orbit:
 
             return OrbitPlotter2D().plot(self, label=label)
 
-
     def anim(self, label=None, use_3d=False, interactive=False):
         """Animates the orbit.
 

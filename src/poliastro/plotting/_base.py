@@ -344,6 +344,7 @@ class BaseOrbitPlotter:
         # This behavior might be overriden by subclasses
         self._plot_ephem(ephem, epoch, label=label, color=color, trail=trail)
 
+
 class Mixin2D:
     _trajectories: List[Trajectory]
 
