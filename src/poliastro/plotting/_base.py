@@ -98,6 +98,9 @@ class BaseOrbitPlotter:
     def _plot_coordinates(self, coordinates, label, colors, dashed):
         raise NotImplementedError
 
+    def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
+        raise NotImplementedError
+
     def _plot_position(self, position, label, colors):
         radius = min(
             self._attractor_radius * 0.5, (norm(position) - self._attractor.R) * 0.5
@@ -116,6 +119,11 @@ class BaseOrbitPlotter:
 
         return trace_coordinates, trace_position
 
+    def __plot_coordinates_and_position_anim(self, trajectory):
+        coordinates, position, label, colors, dashed = trajectory
+
+        self._plot_coordinates_anim(coordinates, label, colors, dashed)
+
     def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)
         self._trajectories.append(trajectory)
@@ -127,6 +135,16 @@ class BaseOrbitPlotter:
         )
 
         return trace_coordinates, trace_position
+
+    def __anim_trajectory(self, coordinates, position=None, *, label, colors, dashed):
+        trajectory = Trajectory(coordinates, position, label, colors, dashed)
+        self._trajectories.append(trajectory)
+
+        self._redraw_attractor()
+
+        self.__plot_coordinates_and_position_anim(
+            trajectory
+        )
 
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         if self._attractor is None:
@@ -156,6 +174,20 @@ class BaseOrbitPlotter:
         coordinates = orbit.sample(self._num_points)
 
         return self.__add_trajectory(
+            coordinates, orbit.r, label=label, colors=colors, dashed=True
+        )
+
+    def _anim(self, orbit, *, label=None, color=None, trail=False):
+        colors = self._get_colors(color, trail)
+
+        self.set_attractor(orbit.attractor)
+
+        orbit = orbit.change_plane(self.plane)
+
+        label = generate_label(orbit.epoch, label)
+        coordinates = orbit.sample(self._num_points)
+
+        return self.__anim_trajectory(
             coordinates, orbit.r, label=label, colors=colors, dashed=True
         )
 
@@ -367,28 +399,10 @@ class Mixin2D:
             Epoch of current position.
 
         """
-        from warnings import warn
-
-        from astropy import time
-
-        from poliastro.bodies import Sun
         from poliastro.twobody import Orbit
 
-        from ..warnings import TimeScaleWarning
-
-        if not epoch:
-            epoch = time.Time.now().tdb
-        elif epoch.scale != "tdb":
-            epoch = epoch.tdb
-            warn(
-                "Input time was converted to scale='tdb' with value "
-                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
-                TimeScaleWarning,
-                stacklevel=2,
-            )
-
         with warnings.catch_warnings():
-            ephem = Ephem.from_body(body, epoch, attractor=Sun, plane=self.plane)  # type: ignore
-            orbit = Orbit.from_ephem(Sun, ephem, epoch).change_plane(self.plane)  # type: ignore
+            warnings.simplefilter("ignore", DeprecationWarning)
+            orbit = Orbit.from_body_ephem(body, epoch).change_plane(self.plane)  # type: ignore
 
         self.set_orbit_frame(orbit)
