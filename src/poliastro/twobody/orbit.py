@@ -18,7 +18,6 @@ from astroquery.jplsbdb import SBDB
 from poliastro.constants import J2000
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
-from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.propagation import farnocchia, propagate
 
@@ -1519,5 +1518,7 @@ class Orbit:
         label : str, optional
             Label for the orbit, defaults to empty.
         """
+
+        from poliastro.plotting.static import StaticOrbitPlotter
 
         return StaticOrbitPlotter().anim(self, label=label)
