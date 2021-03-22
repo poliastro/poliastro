@@ -141,55 +141,56 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         return lines
 
     def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
-        if self._frame is None:
-            raise ValueError(
-                "A frame must be set up first, please use "
-                "set_orbit_frame(orbit) or anim(orbit)"
-            )
+        # future
+        # if self._frame is None:
+        #     raise ValueError(
+        #         "A frame must be set up first, please use "
+        #         "set_orbit_frame(orbit) or anim(orbit)"
+        #     )
 
         if dashed:
             linestyle = "dashed"
-        else:
-            linestyle = "solid"
+        # TODO
+        # else:
+        #     linestyle = "solid"
 
         rr = coordinates.xyz.transpose()
         x, y = self._project(rr)
+        # if len(colors) > 1:
+        #     segments = _segments_from_arrays(x, y)
+        #     cmap = LinearSegmentedColormap.from_list(f"{colors[0]}_to_alpha", colors)
+        #     lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
+        #     lc.set_array(np.linspace(1, 0, len(x)))
+        #     self._ax.add_collection(lc)
+        # else:
+        from matplotlib import animation
 
-        if len(colors) > 1:
-            segments = _segments_from_arrays(x, y)
-            cmap = LinearSegmentedColormap.from_list(f"{colors[0]}_to_alpha", colors)
-            lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
-            lc.set_array(np.linspace(1, 0, len(x)))
-            self._ax.add_collection(lc)
-        else:
-            from matplotlib import animation
+        def animate(i):
 
-            def animate(i):
+            Element.set_data(x.to(u.km).value[i], y.to(u.km).value[i])
+            return (Element,)
 
-                Element.set_data(x.to(u.km).value[i], y.to(u.km).value[i])
-                return (Element,)
-
-            self._ax.plot(
-                x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
-            )
-            (Element,) = self._ax.plot(
-                x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0]
-            )
-            Animation = animation.FuncAnimation(
-                self.fig,
-                animate,
-                frames=np.arange(0, len(x), 1),
-                interval=40,
-                blit=True,
-                repeat=True,
-            )
-            self._ax.legend(
-                [label],
-                loc="upper left",
-                bbox_to_anchor=(1.05, 1.015),
-                title="Names and epochs",
-                numpoints=1,
-            )
+        self._ax.plot(
+            x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
+        )
+        (Element,) = self._ax.plot(
+            x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0]
+        )
+        Animation = animation.FuncAnimation(
+            self.fig,
+            animate,
+            frames=np.arange(0, len(x), 1),
+            interval=40,
+            blit=True,
+            repeat=True,
+        )
+        self._ax.legend(
+            [label],
+            loc="upper left",
+            bbox_to_anchor=(1.05, 1.015),
+            title="Names and epochs",
+            numpoints=1,
+        )
 
         self._ax.set_xlabel("$x$ (km)")
         self._ax.set_ylabel("$y$ (km)")
