@@ -175,7 +175,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             (Element,) = self._ax.plot(
                 x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0]
             )
-            _ = animation.FuncAnimation(
+            Animation = animation.FuncAnimation(
                 self.fig,
                 animate,
                 frames=np.arange(0, len(x), 1),
@@ -194,7 +194,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._ax.set_xlabel("$x$ (km)")
         self._ax.set_ylabel("$y$ (km)")
         self._ax.set_aspect(1)
-        plt.show()
+        return Animation
+        
 
     def _plot_position(self, position, label, colors):
         # TODO: Compute radius?
@@ -295,7 +296,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         if not self._frame:
             self.set_orbit_frame(orbit)
 
-        self._anim(orbit, label=label, color=color, trail=trail)
+        _animation=self._anim(orbit, label=label, color=color, trail=trail)
+        return _animation
 
     def plot_body_orbit(
         self,
