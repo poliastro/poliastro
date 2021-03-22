@@ -150,7 +150,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         if dashed:
             linestyle = "dashed"
-        # TODO
+        # future
         # else:
         #     linestyle = "solid"
 

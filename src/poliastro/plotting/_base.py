@@ -98,9 +98,8 @@ class BaseOrbitPlotter:
     def _plot_coordinates(self, coordinates, label, colors, dashed):
         raise NotImplementedError
 
-    # for now not required
-    # def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
-    #     raise NotImplementedError
+    def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
+        raise NotImplementedError
 
     def _plot_position(self, position, label, colors):
         radius = min(
