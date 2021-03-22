@@ -126,7 +126,7 @@ class BaseOrbitPlotter:
             coordinates, label, colors, dashed
         )
 
-        # if position is not None:  
+        # if position is not None:
         #     trace_position = self._plot_position(position, label, colors)
         # else:
         #     trace_position = None
@@ -151,9 +151,7 @@ class BaseOrbitPlotter:
 
         self._redraw_attractor()
 
-        trace_coordinates= self.__plot_coordinates_and_position_anim(
-            trajectory
-        )
+        trace_coordinates = self.__plot_coordinates_and_position_anim(trajectory)
 
         return trace_coordinates
 
