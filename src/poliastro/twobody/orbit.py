@@ -1510,15 +1510,17 @@ class Orbit:
 
             return OrbitPlotter2D().plot(self, label=label)
 
-    def anim(self, label=None):
-        """Animates the orbit.
 
-        Parameters
-        ----------
-        label : str, optional
-            Label for the orbit, defaults to empty.
-        """
+# will be required in future
+# def anim(self, label=None):
+#     """Animates the orbit.
 
-        from poliastro.plotting.static import StaticOrbitPlotter
+#     Parameters
+#     ----------
+#     label : str, optional
+#         Label for the orbit, defaults to empty.
+#     """
 
-        return StaticOrbitPlotter().anim(self, label=label)
+#     from poliastro.plotting.static import StaticOrbitPlotter
+
+#     return StaticOrbitPlotter().anim(self, label=label)
