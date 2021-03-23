@@ -6,12 +6,12 @@ width: 675px
 align: center
 ---
 ```
-**poliastro** is an open source (MIT) collection of Python functions
+**poliastro** is an open source ([MIT](https://opensource.org/licenses/MIT)) collection of Python functions
 useful in Astrodynamics and Orbital Mechanics, focusing on
-interplanetary applications. It provides a simple and intuitive API and
+interplanetary applications. It comes baked with a simple and intuitive [API](https://docs.poliastro.space/en/latest/autoapi/index.html) and
 handles physical quantities with units.
 
-View [source code](https://github.com/poliastro/poliastro) of poliastro!
+View the [source code](https://github.com/poliastro/poliastro) of poliastro!
 
 Some of its awesome features are:
 
@@ -22,7 +22,7 @@ Some of its awesome features are:
 - Hohmann and bielliptic maneuvers computation
 - Trajectory plotting
 - Initial orbit determination (Lambert problem)
-- Planetary ephemerides (using SPICE kernels via Astropy)
+- Planetary ephemerides (using [SPICE kernels](https://naif.jpl.nasa.gov/naif/data.html) via [Astropy]((https://www.astropy.org/))
 - Computation of Near-Earth Objects (NEOs)
 
 And more to come!
@@ -90,7 +90,7 @@ The [source code](https://github.com/poliastro/poliastro), [issue
 tracker](https://github.com/poliastro/poliastro/issues) and
 [wiki](https://github.com/poliastro/poliastro/wiki/) are hosted on
 GitHub, and all contributions and feedback are more than welcome. You
-can test poliastro in your browser using binder, a cloud Jupyter
+can test poliastro in your browser using [Binder](https://mybinder.org/), a cloud Jupyter
 notebook server:
 
 [![image](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://mybinder.org/v2/gh/poliastro/poliastro/main?filepath=index.ipynb)
@@ -98,8 +98,8 @@ notebook server:
 See [benchmarks](https://benchmarks.poliastro.space/) for the
 performance analysis of poliastro.
 
-poliastro works on recent versions of Python and is released under the
-MIT license, hence allowing commercial use of the library.
+poliastro works on the recent Python versions and is released under the
+MIT license, allowing commercial use of the library.
 
 ```python
 from poliastro.examples import molniya

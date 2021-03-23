@@ -4,16 +4,16 @@
 
 poliastro requires a number of Python packages, notably:
 
-- Astropy, for physical units and time handling
-- NumPy, for basic numerical routines
-- jplephem, for the planetary ephemerides using SPICE kernels
-- matplotlib, for static orbit plotting
-- numba (when using CPython), for accelerating the code
-- Plotly, for interactive orbit plotting
-- SciPy, for root finding and numerical propagation
+- [Astropy](https://www.astropy.org/), for physical units and time handling
+- [NumPy](https://numpy.org/), for basic numerical routines
+- [jplephem](https://pypi.org/project/jplephem/), for the planetary ephemerides using SPICE kernels
+- [matplotlib](https://matplotlib.org/), for static orbit plotting
+- [numba](https://numba.pydata.org/) (when using CPython), for accelerating the code
+- [Plotly](https://plotly.com/), for interactive orbit plotting
+- [SciPy](https://www.scipy.org/), for root finding and numerical propagation
 
 poliastro is usually tested on Linux and Windows on Python 3.7 and 3.8
-against latest NumPy. It should work on OS X without problems.
+against the latest NumPy. It should work on OS X without problems.
 
 ## Installation
 
