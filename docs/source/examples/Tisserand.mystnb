@@ -51,8 +51,8 @@ Although Tisserand figures come in many different ways, they might be usually re
 Let us plot a very simple Tisserand-energy kind plot for the inner planets except Mercury.
 
 ```{code-cell}
-import astropy.units as u
-import matplotlib.pyplot as plt
+from astropy import units as u
+from matplotlib import pyplot as plt
 import numpy as np
 
 from poliastro.bodies import Venus, Earth, Mars

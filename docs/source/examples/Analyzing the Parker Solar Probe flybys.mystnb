@@ -54,10 +54,10 @@ energy_ref
 ```
 
 ```{code-cell}
+from astropy.time import Time
+
 from poliastro.ephem import Ephem
 from poliastro.util import norm
-
-from astropy.time import Time
 ```
 
 ```{code-cell}
@@ -166,7 +166,7 @@ def func(theta):
 There are two solutions:
 
 ```{code-cell}
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 ```
 
 ```{code-cell}

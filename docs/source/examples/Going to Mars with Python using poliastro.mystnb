@@ -26,16 +26,16 @@ In this example we're going to draw the trajectory of the mission [Mars Science 
 First of all, we import the necessary modules. Apart from poliastro we will make use of astropy to deal with physical units and time definitions and jplephem to compute the positions and velocities of the planets.
 
 ```{code-cell}
-import numpy as np
-
-import astropy.units as u
+from astropy import units as u
 from astropy import time
+
+import numpy as np
 
 from poliastro import iod
 from poliastro.bodies import Earth, Mars, Sun
 from poliastro.ephem import Ephem
-from poliastro.twobody import Orbit
 from poliastro.maneuver import Maneuver
+from poliastro.twobody import Orbit
 from poliastro.util import time_range
 ```
 

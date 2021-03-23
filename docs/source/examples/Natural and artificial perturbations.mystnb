@@ -14,23 +14,25 @@ kernelspec:
 # Natural and artificial perturbations
 
 ```{code-cell}
+from matplotlib import pyplot as plt
 import numpy as np
 from numpy.linalg import norm
-import matplotlib.pyplot as plt
 
-from astropy import units as u
-from astropy.time import Time, TimeDelta
 from astropy.coordinates import solar_system_ephemeris
+from astropy.time import Time, TimeDelta
+from astropy import units as u
 
-from poliastro.twobody.propagation import propagate, cowell
-from poliastro.ephem import build_ephem_interpolant
-from poliastro.core.elements import rv2coe
-from poliastro.constants import rho0_earth, H0_earth
-from poliastro.core.propagation import func_twobody
-from poliastro.core.perturbations import atmospheric_drag_exponential, third_body, J2_perturbation
 from poliastro.bodies import Earth, Moon
-from poliastro.twobody import Orbit
+from poliastro.constants import rho0_earth, H0_earth
+
+from poliastro.core.elements import rv2coe
+from poliastro.core.perturbations import atmospheric_drag_exponential, third_body, J2_perturbation
+from poliastro.core.propagation import func_twobody
+
+from poliastro.ephem import build_ephem_interpolant
 from poliastro.plotting import OrbitPlotter3D
+from poliastro.twobody import Orbit
+from poliastro.twobody.propagation import propagate, cowell
 ```
 
 ```{code-cell}

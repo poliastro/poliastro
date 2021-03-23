@@ -41,13 +41,13 @@ Let us see all these combinations by making use of *poliastro*!
 from astropy import units as u
 from astropy.time import Time
 
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 from poliastro.bodies import Sun, Earth, Mars
 from poliastro.ephem import Ephem
-from poliastro.twobody import Orbit
 from poliastro.maneuver import Maneuver
 from poliastro.plotting.static import StaticOrbitPlotter
+from poliastro.twobody import Orbit
 from poliastro.util import time_range
 ```
 

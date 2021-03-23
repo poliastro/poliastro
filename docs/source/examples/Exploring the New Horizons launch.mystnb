@@ -19,12 +19,13 @@ Main data source: Guo & Farquhar "New Horizons Mission Design" http://www.boulde
 from astropy import time
 from astropy import units as u
 
+from poliastro import iod
+
 from poliastro.bodies import Sun, Earth, Jupiter
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
-from poliastro.twobody import Orbit
 from poliastro.plotting import StaticOrbitPlotter
-from poliastro import iod
+from poliastro.twobody import Orbit
 from poliastro.util import norm
 ```
 
@@ -112,7 +113,7 @@ So it stays within the same order of magnitude. Which is reasonable, because rea
 ```{code-cell}
 :tags: [nbsphinx-thumbnail]
 
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 fig, ax = plt.subplots(figsize=(8, 8))
 op = StaticOrbitPlotter(ax=ax)

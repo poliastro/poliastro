@@ -20,19 +20,19 @@ Let us recreate with real data the [Juno NASSA Mission](https://www.jpl.nasa.gov
 First of all, let us import some of our favourite Python packages: numpy, astropy and poliastro!
 
 ```{code-cell}
-import numpy as np
-
-import astropy.units as u
+from astropy import units as u
 from astropy.time import Time
 from astropy.coordinates import solar_system_ephemeris
 solar_system_ephemeris.set("jpl")
 
+import numpy as np
+
 from poliastro.bodies import Sun, Earth, Jupiter
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
-from poliastro.twobody import Orbit
 from poliastro.maneuver import Maneuver
 from poliastro.plotting import StaticOrbitPlotter
+from poliastro.twobody import Orbit
 from poliastro.util import norm, time_range
 ```
 

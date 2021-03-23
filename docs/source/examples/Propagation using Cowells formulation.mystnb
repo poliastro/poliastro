@@ -34,16 +34,17 @@ $$\ddot{\mathbb{r}} = -\frac{\mu}{|\mathbb{r}|^3} \mathbb{r} + \mathbb{a}_d$$
 Let's setup a very simple example with constant acceleration to visualize the effects on the orbit.
 
 ```{code-cell}
-import numpy as np
-from astropy import units as u
 from astropy import time
+from astropy import units as u
+
+import numpy as np
 
 from poliastro.bodies import Earth
 from poliastro.core.propagation import func_twobody
-from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import propagate, cowell
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter3D
+from poliastro.twobody import Orbit
+from poliastro.twobody.propagation import propagate, cowell
 from poliastro.util import norm
 ```
 
