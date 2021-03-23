@@ -22,7 +22,7 @@ Some of its awesome features are:
 - Hohmann and bielliptic maneuvers computation
 - Trajectory plotting
 - Initial orbit determination (Lambert problem)
-- Planetary ephemerides (using [SPICE kernels](https://naif.jpl.nasa.gov/naif/data.html) via [Astropy]((https://www.astropy.org/))
+- Planetary ephemerides (using [SPICE kernels](https://naif.jpl.nasa.gov/naif/data.html) via [Astropy](https://www.astropy.org/))
 - Computation of Near-Earth Objects (NEOs)
 
 And more to come!
