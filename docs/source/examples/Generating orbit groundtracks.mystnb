@@ -52,7 +52,7 @@ Let us build an `EarthSatellite` instance but without any associated
 `Spacecraft` data, since for this notebook they will not be useful at all.
 Furthermore, we will generate a desired time span for the next three hours since
 actual ISS epoch. Notice that the `periods` parameter controls the resolution of
-the time vector and thus, the amount of values.
+the time vector and thus, the amount of values:
 
 ```{code-cell}
 # Build spacecraft instance
@@ -67,7 +67,7 @@ Because of its interactive nature, lots of possibilities are offered by
 customization parameters... This utility is based on `plotly.layout.geo`, please
 refer to the [official
 documentation](https://plotly.com/python/reference/layout/geo/) for more
-information about it. Let us create a simple instance and start plotting.
+information about it. Let us create a simple instance and start plotting:
 
 ```{code-cell}
 # Generate an instance of the plotter, add title and show latlon grid
@@ -85,8 +85,8 @@ gp.plot(
 ```
 
 It is even possible to add other kind of information rather than
-`EarthSatellite`'s within previous figure. For example, we will show actual
-location of Madrid city.
+`EarthSatellite`'s within previous figure. For example, we will show the actual
+location of Madrid city:
 
 ```{code-cell}
 # For building geo traces

@@ -29,7 +29,7 @@ Along history different models have been developed:
 * COESA 1976: up to 1000 km.
 * Jacchia-Roberts
 
-Since some of them are implemented in `poliastro`, let us compare the differences among them.
+Since some of them are implemented in `poliastro`, let us compare the differences among them:
 
 ```{code-cell}
 from astropy import units as u
@@ -44,7 +44,7 @@ from poliastro.earth.atmosphere import COESA62, COESA76
 
 Also known as `U.S. Standard Atmosphere`, the atmospheric model *coesa76* is just an update of its little brother *coesa62*. The difference is that geopotential heights diverge for higher altitudes.
 
-Let us plot the `Temperature` as increasing altitude for both atmospheric models. 
+Let us plot the `Temperature` as increasing altitude for both atmospheric models:
 
 ```{code-cell}
 :tags: [nbsphinx-thumbnail]
@@ -114,7 +114,7 @@ for name in layer_names:
 
 # Temperature, pressure and density distrubutions
 
-One of the advantages of COESA76 is that it extends up to 1000 kilometers. The behaviour of previous magnitudes against geometrical altitude can be checked in the following figure. **A logarithmic scale is applied for pressure and density to better see their decay for high altitude values.**
+One of the advantages of COESA76 is that it extends up to 1000 kilometers. The behaviour of previous magnitudes against geometrical altitude can be checked in the following figure. **A logarithmic scale is applied for pressure and density to better see their decay for high altitude values**:
 
 ```{code-cell}
 # We create the basis for the figure

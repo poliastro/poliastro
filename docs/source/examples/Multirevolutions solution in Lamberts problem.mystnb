@@ -160,7 +160,7 @@ for ss in orbit_set:
     op.plot(ss, label=orbit_set[ss][0], color=orbit_set[ss][-1], trail=True)
 ```
 
-We will plot now all the arc transfers just to better see the difference between them.
+We will plot now all the arc transfers just to better see the difference between them:
 
 ```{code-cell}
 :tags: [nbsphinx-thumbnail]

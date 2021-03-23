@@ -23,7 +23,7 @@ In this example we're going to draw the trajectory of the mission [Mars Science 
 
 +++
 
-First of all, we import the necessary modules. Apart from poliastro we will make use of astropy to deal with physical units and time definitions and jplephem to compute the positions and velocities of the planets.
+First of all, we import the necessary modules. Apart from poliastro we will make use of astropy to deal with physical units and time definitions and jplephem to compute the positions and velocities of the planets:
 
 ```{code-cell}
 from astropy import units as u
@@ -51,7 +51,7 @@ from astropy.coordinates import solar_system_ephemeris
 solar_system_ephemeris.set("jpl")
 ```
 
-The initial data was gathered from Wikipedia: the date of the launch was on **November 26, 2011 at 15:02 UTC** and landing was on **August 6, 2012 at 05:17 UTC**. We compute then the time of flight, which is exactly what it sounds.
+The initial data was gathered from Wikipedia: the date of the launch was on **November 26, 2011 at 15:02 UTC** and landing was on **August 6, 2012 at 05:17 UTC**. We compute then the time of flight, which is exactly what it sounds:
 
 ```{code-cell}
 # Initial data
@@ -61,7 +61,7 @@ date_arrival = time.Time("2012-08-06 05:17", scale="utc").tdb
 
 To compute the transfer orbit, we have the useful function `lambert` : according to a theorem with the same name, *the transfer orbit between two points in space only depends on those two points and the time it takes to go from one to the other*. We could make use of the raw algorithms available in `poliastro.iod` for solving this but working with the `poliastro.maneuvers` is even easier!
 
-We just need to create the orbits for each one of the planets at the specific departure and arrival dates.
+We just need to create the orbits for each one of the planets at the specific departure and arrival dates:
 
 ```{code-cell}
 earth = Ephem.from_body(Earth, time_range(date_launch, end=date_arrival))
@@ -74,7 +74,7 @@ ss_earth = Orbit.from_ephem(Sun, earth, date_launch)
 ss_mars = Orbit.from_ephem(Sun, mars, date_arrival)
 ```
 
-We can now solve for the maneuver that will take us from Earth to Mars. After solving it, we just need to apply it to the departure orbit to solve for the transfer one.
+We can now solve for the maneuver that will take us from Earth to Mars. After solving it, we just need to apply it to the departure orbit to solve for the transfer one:
 
 ```{code-cell}
 # Solve for the transfer maneuver

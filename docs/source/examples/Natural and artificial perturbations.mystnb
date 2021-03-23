@@ -240,7 +240,7 @@ frame.plot_trajectory(rr, label="orbit influenced by Moon")
 
 ## Applying thrust
 
-Apart from natural perturbations, there are artificial thrusts aimed at intentional change of orbit parameters. One of such changes is simultaneous change of eccentricity and inclination.
+Apart from natural perturbations, there are artificial thrusts aimed at intentional change of orbit parameters. One of such changes is simultaneous change of eccentricity and inclination:
 
 ```{code-cell}
 from poliastro.twobody.thrust import change_inc_ecc

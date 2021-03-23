@@ -15,7 +15,7 @@ kernelspec:
 
 ## 1. Modulus of the exit velocity, some features of Orbit #2
 
-First, using the data available in the reports, we try to compute some of the properties of orbit #2. This is not enough to completely define the trajectory, but will give us information later on in the process.
+First, using the data available in the reports, we try to compute some of the properties of orbit #2. This is not enough to completely define the trajectory, but will give us information later on in the process:
 
 ```{code-cell}
 from astropy import units as u
@@ -77,7 +77,7 @@ v_mag_ref.to(u.km / u.s)
 
 ## 2. Lambert arc between #0 and #1
 
-To compute the arrival velocity to Venus at flyby #1, we have the necessary data to solve the boundary value problem.
+To compute the arrival velocity to Venus at flyby #1, we have the necessary data to solve the boundary value problem:
 
 ```{code-cell}
 d_launch = Time("2018-08-11", scale="tdb")
@@ -121,7 +121,7 @@ norm(v1_pre)
 
 ## 3. Flyby #1 around Venus
 
-We compute a flyby using poliastro with the default value of the entry angle, just to discover that the results do not match what we expected.
+We compute a flyby using poliastro with the default value of the entry angle, just to discover that the results do not match what we expected:
 
 ```{code-cell}
 from poliastro.threebody.flybys import compute_flyby
@@ -150,7 +150,7 @@ norm(V_2_v_)
 
 ## 4. Optimization
 
-Now we will try to find the value of $\theta$ that satisfies our requirements.
+Now we will try to find the value of $\theta$ that satisfies our requirements:
 
 ```{code-cell}
 from poliastro.twobody import Orbit
@@ -212,14 +212,14 @@ norm(V_2_v_b)
 
 ## 5. Exit orbit
 
-And finally, we compute orbit #2 and check that the period is the expected one.
+And finally, we compute orbit #2 and check that the period is the expected one:
 
 ```{code-cell}
 ss01 = Orbit.from_vectors(Sun, r1, v1_pre, epoch=flyby_1_time)
 ss01
 ```
 
-The two solutions have different inclinations, so we still have to find out which is the good one. We can do this by computing the inclination over the ecliptic - however, as the original data was in the International Celestial Reference Frame (ICRF), whose fundamental plane is parallel to the Earth equator of a reference epoch, we have to change the plane to the Earth **ecliptic**, which is what the original reports use.
+The two solutions have different inclinations, so we still have to find out which is the good one. We can do this by computing the inclination over the ecliptic - however, as the original data was in the International Celestial Reference Frame (ICRF), whose fundamental plane is parallel to the Earth equator of a reference epoch, we have to change the plane to the Earth **ecliptic**, which is what the original reports use:
 
 ```{code-cell}
 ss_1_a = Orbit.from_vectors(Sun, r1, V_2_v_a, epoch=flyby_1_time)
@@ -243,7 +243,7 @@ ss_1_a.change_plane(Planes.EARTH_ECLIPTIC)
 ss_1_b.change_plane(Planes.EARTH_ECLIPTIC)
 ```
 
-Therefore, **the correct option is the first one**.
+Therefore, **the correct option is the first one**:
 
 ```{code-cell}
 ss_1_a.period.to(u.day)

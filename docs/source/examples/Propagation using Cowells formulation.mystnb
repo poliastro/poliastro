@@ -31,7 +31,7 @@ $$\ddot{\mathbb{r}} = -\frac{\mu}{|\mathbb{r}|^3} \mathbb{r} + \mathbb{a}_d$$
 
 ## First example
 
-Let's setup a very simple example with constant acceleration to visualize the effects on the orbit.
+Let's setup a very simple example with constant acceleration to visualize the effects on the orbit:
 
 ```{code-cell}
 from astropy import time

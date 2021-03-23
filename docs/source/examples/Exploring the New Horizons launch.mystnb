@@ -68,7 +68,7 @@ Relation between orbital velocity $v$, local escape velocity $v_e$ and hyperboli
 
 $$ v^2 = v_e^2 + v_{\infty}^2 $$
 
-### Option a): Insert $C_3$ from report, check $v_e$ at parking perigee
+### Option a): Insert $C_3$ from report, check $v_e$ at parking perigee:
 
 ```{code-cell}
 C_3_A = 157.6561 * u.km ** 2 / u.s ** 2  # Designed
@@ -127,7 +127,7 @@ ax.set_ylim(-20000, 20000);
 
 ### Option b): Compute $v_{\infty}$ using the Jupyter flyby
 
-According to Wikipedia, the closest approach occurred at 05:43:40 UTC. We can use this data to compute the solution of the Lambert problem between the Earth and Jupiter.
+According to Wikipedia, the closest approach occurred at 05:43:40 UTC. We can use this data to compute the solution of the Lambert problem between the Earth and Jupiter:
 
 ```{code-cell}
 nh_date = time.Time("2006-01-19 19:00", scale="utc").tdb

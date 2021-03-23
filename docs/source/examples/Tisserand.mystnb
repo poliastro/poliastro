@@ -48,7 +48,7 @@ Although Tisserand figures come in many different ways, they might be usually re
 * Orbital period VS. Periapsis
 * Specific Energy VS. Periapsis
 
-Let us plot a very simple Tisserand-energy kind plot for the inner planets except Mercury.
+Let us plot a very simple Tisserand-energy kind plot for the inner planets except Mercury:
 
 ```{code-cell}
 from astropy import units as u
@@ -60,7 +60,7 @@ from poliastro.plotting.tisserand import TisserandPlotter, TisserandKind
 from poliastro.plotting._base import BODY_COLORS
 ```
 
-Notice that we imported the `TisserandKind` class, which will help us to indicate the kind of Tisserand plot we want to generate.
+Notice that we imported the `TisserandKind` class, which will help us to indicate the kind of Tisserand plot we want to generate:
 
 ```{code-cell}
 # Show all possible Tisserand kinds
@@ -120,7 +120,7 @@ SS_BODIES_OUTTER = [
 ]
 ```
 
-We will impose the final figure also to show a dashed red line which represents $R_{p} = R_{a}$, meaning that orbit is perfectly circular.
+We will impose the final figure also to show a dashed red line which represents $R_{p} = R_{a}$, meaning that orbit is perfectly circular:
 
 ```{code-cell}
 :tags: [nbsphinx-thumbnail]

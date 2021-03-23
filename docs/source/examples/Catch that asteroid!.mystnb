@@ -31,7 +31,7 @@ conf.remote_timeout
 conf.remote_timeout = 10000
 ```
 
-Then, we do the rest of the imports.
+Then, we do the rest of the imports:
 
 ```{code-cell}
 from astropy import units as u

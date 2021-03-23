@@ -24,7 +24,7 @@ For the moment, poliastro is only capable of creating these mission plots betwee
 +++
 
 ## Basic modules
-For creating a porkchop plot with poliastro, we need to import the `porkchop` function from the `poliastro.plotting.porkchop` module. Also, two `poliastro.bodies` are necessary for computing the targetting problem associated. Finally by making use of `time_range`, a very useful function available at `poliastro.utils` it is possible to define a span of launching and arrival dates for the problem.
+For creating a porkchop plot with poliastro, we need to import the `porkchop` function from the `poliastro.plotting.porkchop` module. Also, two `poliastro.bodies` are necessary for computing the targetting problem associated. Finally by making use of `time_range`, a very useful function available at `poliastro.utils` it is possible to define a span of launching and arrival dates for the problem:
 
 ```{code-cell}
 from astropy import units as u
