@@ -16,9 +16,11 @@ kernelspec:
 ```{code-cell}
 import numpy as np
 
+from poliastro.bodies import Earth, Sun
 from poliastro.constants import J2000
-from poliastro.examples import *
-from poliastro.plotting import *
+from poliastro.examples import churi, iss, molniya
+from poliastro.plotting import OrbitPlotter3D
+from poliastro.twobody import Orbit
 ```
 
 ```{code-cell}
@@ -54,13 +56,14 @@ frame.plot(eros, label="eros")
 ```
 
 ```{code-cell}
+from astropy.time import Time
 from poliastro.ephem import Ephem
 from poliastro.util import time_range
 ```
 
 ```{code-cell}
-date_launch = time.Time("2011-11-26 15:02", scale="utc").tdb
-date_arrival = time.Time("2012-08-06 05:17", scale="utc").tdb
+date_launch = Time("2011-11-26 15:02", scale="utc").tdb
+date_arrival = Time("2012-08-06 05:17", scale="utc").tdb
 
 earth = Ephem.from_body(
     Earth, time_range(date_launch, end=date_arrival, periods=50)

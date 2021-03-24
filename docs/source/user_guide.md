@@ -511,7 +511,7 @@ bodies, while JPL SBDB (Small-Body Database Browser) provides model
 orbits for all known asteroids and many comets.
 
 The data is fetched using the wrappers to these services provided by
-[astroquery](https://astroquery.readthedocs.io/).
+[astroquery](https://astroquery.readthedocs.io/):
 
 ```python
 epoch = time.Time("2020-04-29 10:43")
