@@ -124,7 +124,7 @@ And this is an example citation format:
 
 # License
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/poliastro/poliastro/main/COPYING)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/main/COPYING)
 
 poliastro is released under the MIT license, hence allowing commercial
 use of the library. Please refer to the COPYING file.
