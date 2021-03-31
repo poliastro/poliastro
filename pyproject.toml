@@ -1,0 +1,97 @@
+[build-system]
+requires = [
+    "flit_core >=2.0,<4",
+    "wheel",
+    "oldest-supported-numpy",
+]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "poliastro"
+author = "Juan Luis Cano Rodríguez"
+author-email = "hello@juanlu.space"
+description-file = "README.md"
+home-page = "https://github.com/poliastro/poliastro/"
+keywords = "aero,aerospace,engineering,astrodynamics,orbits,kepler,orbital mechanics"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+requires-python = ">=3.7,<3.10"
+requires = [
+    "astropy >=3.2,<5",
+    "astroquery >=0.3.9",
+    "cached_property ; python_version<'3.8'",
+    "jplephem",
+    "matplotlib >=2.0,!=3.0.1",
+    "numba >=0.46 ; python_version<'3.9'",
+    "numba >=0.53.0rc1 ; python_version>='3.9'",
+    "numpy",
+    "pandas",
+    "plotly ~=4.0",
+    "pyerfa",
+    "scipy >=1.4.0",
+]
+
+[tool.flit.metadata.requires-extra]
+jupyter = ["notebook"]
+cesium = ["czml3 ~=0.5.3"]
+dev = [
+    "black==20.8b1",
+    "coverage",
+    "hypothesis",
+    "ipykernel",
+    "ipython>=5.0",
+    "ipywidgets>=7.0",
+    "isort",
+    "jupyter-client",
+    "jupytext",
+    "mypy>=0.740",
+    "myst-parser>=0.13.1",
+    "nbsphinx>=0.5.0",
+    "nbconvert>=5.5",
+    "pycodestyle",
+    "pytest>=3.2",
+    "pytest-cov<2.6.0",  # https://github.com/pytest-dev/pytest-cov/issues/222
+    "pytest-doctestplus>=0.8",  # https://github.com/astropy/pytest-doctestplus/issues/118
+    "pytest-mpl",
+    "pytest-mypy",
+    "pytest-remotedata",
+    "sphinx",
+    "sphinx-autoapi",
+    "sphinx-gallery",
+    "sphinx_rtd_theme==0.5.0",
+    "sphinx-hoverxref==0.5b1",
+    "sphinx-notfound-page",
+    "tox",
+]
+
+[tool.flit.metadata.urls]
+Source = "https://github.com/poliastro/poliastro"
+Tracker = "https://github.com/poliastro/poliastro/issues"
+
+[tool.flit.sdist]
+include = [
+    "src/poliastro/atmosphere/data/coesa62.dat",
+    "src/poliastro/atmosphere/data/coesa76.dat",
+    "src/poliastro/atmosphere/data/coesa76_p.dat",
+    "src/poliastro/atmosphere/data/coesa76_rho.dat",
+    "setup.cfg"
+]
+exclude = [
+    "docs/"
+]

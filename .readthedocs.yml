@@ -1,0 +1,10 @@
+version: 2
+python:
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - dev
+        - cesium
+sphinx:
+  fail_on_warning: true
