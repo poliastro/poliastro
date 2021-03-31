@@ -190,11 +190,19 @@ class BaseOrbitPlotter:
         colors = self._get_colors(color, trail)
 
         self.set_attractor(orbit.attractor)
+        from poliastro.twobody import propagation
 
         orbit = orbit.change_plane(self.plane)
 
         label = generate_label(orbit.epoch, label)
-        coordinates = orbit.sample(self._num_points)
+        time_laps = [i for i in range(int(orbit.period.value))]
+        tofs = time_laps * u.day * 2
+        k = propagation.danby(orbit.attractor.k, orbit.r, orbit.v, tofs)[0]
+        x = k.to(u.km).value[:, 0]
+        y = k.to(u.km).value[:, 1]
+        z = k.to(u.km).value[:, 2]
+        cartesian_repr = CartesianRepresentation(x * (u.km), y * (u.km), z * (u.km))
+        coordinates = cartesian_repr
 
         return self.__anim_trajectory(
             coordinates, orbit.r, label=label, colors=colors, dashed=True

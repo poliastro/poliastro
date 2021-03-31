@@ -180,7 +180,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             self.fig,
             animate,
             frames=np.arange(0, len(x), 1),
-            interval=40,
+            interval=30,
             blit=True,
             repeat=True,
         )
