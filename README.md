@@ -62,7 +62,7 @@ poliastro requires the following Python packages:
 
 - NumPy, for basic numerical routines
 - Astropy, for physical units and time handling
-- numba (mandatory), for accelerating the code
+- numba, for accelerating the code
 - jplephem, for the planetary ephemerides using SPICE kernels
 - matplotlib, for orbit plotting
 - plotly, for 2D and 3D interactive orbit plotting
