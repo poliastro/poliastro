@@ -2,11 +2,11 @@
     <a href="http://poliastro.github.io/"><image src="http://poliastro.github.io/images/logo_text.png" alt="poliastro logo" width="675px"></a>
 </p>
 
-Name:         | poliastro
-:------------:|:--------------
-**Website**:  | <https://poliastro.github.io/>
-**Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
-**Version**:  | 0.15.dev0
+|    Name:     | poliastro                                                                                                                                    |
+| :----------: | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Website**: | <https://poliastro.github.io/>                                                                                                               |
+| **Author**:  | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X) |
+| **Version**: | 0.15.dev0                                                                                                                                    |
 
 [![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=master)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=master)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=master)
@@ -31,6 +31,7 @@ from poliastro.examples import molniya
 
 molniya.plot()
 ```
+
 <p align="center">
     <image src="https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png">
 </p>
@@ -61,7 +62,7 @@ poliastro requires the following Python packages:
 
 - NumPy, for basic numerical routines
 - Astropy, for physical units and time handling
-- numba (optional), for accelerating the code
+- numba (mandatory), for accelerating the code
 - jplephem, for the planetary ephemerides using SPICE kernels
 - matplotlib, for orbit plotting
 - plotly, for 2D and 3D interactive orbit plotting
@@ -80,6 +81,7 @@ install poliastro using [conda](http://conda.io):
 ```bash
     $ conda install poliastro --channel conda-forge
 ```
+
 Please check out the [documentation for alternative installation
 methods](https://docs.poliastro.space/en/latest/getting_started.html#alternative-installation-methods).
 
@@ -136,7 +138,7 @@ use of the library. Please refer to the COPYING file.
 poliastro comes from Polimi, which is the shortened name of the
 Politecnico di Milano, the Italian university where I was studying while
 writing this software. It\'s my tiny tribute to a place I came to love.
-*Grazie mille!*
+_Grazie mille!_
 
 ## Can I do \<insert awesome thing\> with poliastro?
 
