@@ -119,19 +119,19 @@ class BaseOrbitPlotter:
 
         return trace_coordinates, trace_position
 
-    def __plot_coordinates_and_position_anim(self, trajectory):
+    def _plot_coordinates_and_position_anim(self, trajectory):
         coordinates, position, label, colors, dashed = trajectory
 
         trace_coordinates = self._plot_coordinates_anim(
             coordinates, label, colors, dashed
         )
 
-        # if position is not None:
-        #     trace_position = self._plot_position(position, label, colors)
-        # else:
-        #     trace_position = None
+        if position is not None:
+            trace_position = self._plot_position(position, label, colors)
+        else:
+            trace_position = None
 
-        return trace_coordinates
+        return trace_coordinates,trace_position
 
     def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)
@@ -145,13 +145,13 @@ class BaseOrbitPlotter:
 
         return trace_coordinates, trace_position
 
-    def __anim_trajectory(self, coordinates, position=None, *, label, colors, dashed):
+    def _anim_trajectory(self, coordinates, position=None, *, label, colors, dashed):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)
         self._trajectories.append(trajectory)
 
         self._redraw_attractor()
 
-        trace_coordinates = self.__plot_coordinates_and_position_anim(trajectory)
+        trace_coordinates = self._plot_coordinates_and_position_anim(trajectory)
 
         return trace_coordinates
 
@@ -195,16 +195,16 @@ class BaseOrbitPlotter:
         orbit = orbit.change_plane(self.plane)
 
         label = generate_label(orbit.epoch, label)
-        time_laps = [i for i in range(int(orbit.period.value))]
+        time_laps = [i for i in range(800)] 
         tofs = time_laps * u.day * 2
-        k = propagation.danby(orbit.attractor.k, orbit.r, orbit.v, tofs)[0]
+        k = propagation.farnocchia(orbit.attractor.k, orbit.r, orbit.v, tofs)[0]
         x = k.to(u.km).value[:, 0]
         y = k.to(u.km).value[:, 1]
         z = k.to(u.km).value[:, 2]
         cartesian_repr = CartesianRepresentation(x * (u.km), y * (u.km), z * (u.km))
         coordinates = cartesian_repr
 
-        return self.__anim_trajectory(
+        return self._anim_trajectory(
             coordinates, orbit.r, label=label, colors=colors, dashed=True
         )
 

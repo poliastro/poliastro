@@ -140,63 +140,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return lines
 
-    def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
-        # future
-        # if self._frame is None:
-        #     raise ValueError(
-        #         "A frame must be set up first, please use "
-        #         "set_orbit_frame(orbit) or anim(orbit)"
-        #     )
-
-        if dashed:
-            linestyle = "dashed"
-        # future code coverage
-        # else:
-        #     linestyle = "solid"
-
-        rr = coordinates.xyz.transpose()
-        x, y = self._project(rr)
-        # if len(colors) > 1:
-        #     segments = _segments_from_arrays(x, y)
-        #     cmap = LinearSegmentedColormap.from_list(f"{colors[0]}_to_alpha", colors)
-        #     lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
-        #     lc.set_array(np.linspace(1, 0, len(x)))
-        #     self._ax.add_collection(lc)
-        # else:
-        from matplotlib import animation
-
-        def animate(i):
-
-            Element.set_data(x.to(u.km).value[i], y.to(u.km).value[i])
-            return (Element,)
-
-        self._ax.plot(
-            x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
-        )
-        (Element,) = self._ax.plot(
-            x.to(u.km).value[0], y.to(u.km).value[0], "o", mew=0, color=colors[0]
-        )
-        Animation = animation.FuncAnimation(
-            self.fig,
-            animate,
-            frames=np.arange(0, len(x), 1),
-            interval=30,
-            blit=True,
-            repeat=True,
-        )
-        self._ax.legend(
-            [label],
-            loc="upper left",
-            bbox_to_anchor=(1.05, 1.015),
-            title="Names and epochs",
-            numpoints=1,
-        )
-
-        self._ax.set_xlabel("$x$ (km)")
-        self._ax.set_ylabel("$y$ (km)")
-        self._ax.set_aspect(1)
-        return Animation
-
     def _plot_position(self, position, label, colors):
         # TODO: Compute radius?
         return self._draw_point(None, colors[0], label, center=position)
@@ -277,27 +220,6 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._set_legend(self._trajectories[-1].label, *lines)
 
         return lines
-
-    def anim(self, orbit, *, label=None, color=None, trail=False):
-        """animates state and osculating orbit in their plane.
-
-        Parameters
-        ----------
-        orbit : ~poliastro.twobody.orbit.Orbit
-            Orbit to plot.
-        label : string, optional
-            Label of the orbit.
-        color : string, optional
-            Color of the line and the position.
-        trail : bool, optional
-            Fade the orbit trail, default to False.
-
-        """
-        if not self._frame:
-            self.set_orbit_frame(orbit)
-
-        _animation = self._anim(orbit, label=label, color=color, trail=trail)
-        return _animation
 
     def plot_body_orbit(
         self,
