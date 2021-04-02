@@ -44,30 +44,16 @@ class AnimatedOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         self._frame = None
 
     def _clear_attractor(self):
-        for attractor in self._ax.findobj(match=mpl_patches.Circle):
-            attractor.remove()
+        pass
+        # for attractor in self._ax.findobj(match=mpl_patches.Circle):
+        #     attractor.remove()
 
     def _get_colors(self, color, trail):
         if color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319
             color = next(self._ax._get_lines.prop_cycler)["color"]
-
-        if trail:
-            colors = [color, to_rgba(color, 0)]
-        else:
-            colors = [color]
+        colors = [color]
         return colors
-
-    def _draw_point(self, radius, color, name, center=None):
-        x_center, y_center = self._project(
-            center[None]
-        )  # Indexing trick to add one extra dimension
-
-        (l,) = self._ax.plot(
-            x_center.to(u.km).value, y_center.to(u.km).value, "o", mew=0, color=color
-        )
-
-        return l
 
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
