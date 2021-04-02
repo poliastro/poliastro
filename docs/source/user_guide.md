@@ -492,7 +492,7 @@ And these are the results:
 >>> dv_a
 (<Quantity 0. s>, <Quantity [-2.06420561,  2.58796837,  0.23911543] km / s>)
 >>> dv_b
-(<Quantity 21910501.00019529 s>, <Quantity [287832.91384349,  58935.96079319, -94156.93383463] km / d>)
+(<Quantity 21910501.00019529 s>, <Quantity [287832.91384349,  58935.96079319, -94156.93383463] km / s>)
 ```
 
 ```{figure} _static/msl.png
