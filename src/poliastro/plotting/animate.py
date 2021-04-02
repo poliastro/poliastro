@@ -1,7 +1,6 @@
 import numpy as np
 from astropy import units as u
 from matplotlib import animation, patches as mpl_patches, pyplot as plt
-from matplotlib.colors import to_rgba
 
 from ._base import BaseOrbitPlotter, Mixin2D
 
