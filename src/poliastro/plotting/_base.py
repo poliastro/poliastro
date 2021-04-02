@@ -126,12 +126,7 @@ class BaseOrbitPlotter:
             coordinates, label, colors, dashed
         )
 
-        if position is not None:
-            trace_position = self._plot_position(position, label, colors)
-        else:
-            trace_position = None
-
-        return trace_coordinates, trace_position
+        return trace_coordinates
 
     def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)

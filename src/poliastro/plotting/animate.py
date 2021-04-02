@@ -43,15 +43,6 @@ class AnimatedOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         self._frame = None
 
-    def _redraw(self):
-        for artist in self._ax.lines + self._ax.collections:
-            artist.remove()
-
-        super()._redraw()
-
-        self._ax.relim()
-        self._ax.autoscale()
-
     def _clear_attractor(self):
         for attractor in self._ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
@@ -65,7 +56,6 @@ class AnimatedOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             colors = [color, to_rgba(color, 0)]
         else:
             colors = [color]
-
         return colors
 
     def _draw_point(self, radius, color, name, center=None):
