@@ -131,7 +131,7 @@ class BaseOrbitPlotter:
         else:
             trace_position = None
 
-        return trace_coordinates,trace_position
+        return trace_coordinates, trace_position
 
     def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)
@@ -195,7 +195,7 @@ class BaseOrbitPlotter:
         orbit = orbit.change_plane(self.plane)
 
         label = generate_label(orbit.epoch, label)
-        time_laps = [i for i in range(800)] 
+        time_laps = [i for i in range(800)]
         tofs = time_laps * u.day * 2
         k = propagation.farnocchia(orbit.attractor.k, orbit.r, orbit.v, tofs)[0]
         x = k.to(u.km).value[:, 0]
