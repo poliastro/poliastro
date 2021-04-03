@@ -192,13 +192,7 @@ class BaseOrbitPlotter:
         label = generate_label(orbit.epoch, label)
         time_laps = [i for i in range(800)]
         tofs = time_laps * u.day * 2
-        k = propagation.farnocchia(orbit.attractor.k, orbit.r, orbit.v, tofs)[0]
-        x = k.to(u.km).value[:, 0]
-        y = k.to(u.km).value[:, 1]
-        z = k.to(u.km).value[:, 2]
-        cartesian_repr = CartesianRepresentation(x * (u.km), y * (u.km), z * (u.km))
-        coordinates = cartesian_repr
-
+        coordinates = propagation.propagate(orbit, tofs)
         return self._anim_trajectory(
             coordinates, orbit.r, label=label, colors=colors, dashed=True
         )
