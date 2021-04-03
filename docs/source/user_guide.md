@@ -217,9 +217,7 @@ thanks to Cowell\'s method:
 ```
 
 Some natural perturbations are available in poliastro to be used
-directly in this way. For instance, let us examine the effect of J2
-
-perturbation:
+directly in this way. For instance, let us examine the effect of J2 perturbation:
 ```python
 >>> from poliastro.core.perturbations import J2_perturbation
 >>> tof = (48.0 * u.h).to(u.s)
@@ -245,7 +243,7 @@ For more available perturbation options, see the
 
 In addition to natural perturbations, poliastro also has built-in
 artificial perturbations (thrusts) aimed at intentional change of some
-orbital elements. Let us simultaneously change eccentricy and
+orbital elements. Let us simultaneously change eccentricity and
 inclination:
 
 ```python
@@ -513,7 +511,7 @@ bodies, while JPL SBDB (Small-Body Database Browser) provides model
 orbits for all known asteroids and many comets.
 
 The data is fetched using the wrappers to these services provided by
-[astroquery](https://astroquery.readthedocs.io/).
+[astroquery](https://astroquery.readthedocs.io/):
 
 ```python
 epoch = time.Time("2020-04-29 10:43")

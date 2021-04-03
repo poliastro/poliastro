@@ -38,11 +38,11 @@ by running an HTTP server:
 
 ```bash
 $ cd build/html
-$ python -m http.server
-Serving HTTP on 0.0.0.0 port 8000 ...
+$ python -m http.server 8000 --bind 127.0.0.1
+Serving HTTP on 127.0.0.1 port 8000 (http://127.0.0.1:8000/) ...
 ```
 
-And point your browser to <http://0.0.0.0:8000>.
+And point your browser to <http://127.0.0.1:8000>.
 
 ## Code writing
 

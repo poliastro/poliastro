@@ -21,11 +21,12 @@ This is the default plot we will start with:
 
 ```{code-cell}
 from astropy.time import Time
-import matplotlib.pyplot as plt
 
-from poliastro.plotting import StaticOrbitPlotter
-from poliastro.frames import Planes
+from matplotlib import pyplot as plt
+
 from poliastro.bodies import Earth, Mars, Jupiter, Sun
+from poliastro.frames import Planes
+from poliastro.plotting import StaticOrbitPlotter
 from poliastro.twobody import Orbit
 ```
 
@@ -60,7 +61,7 @@ Here we get hold of the lines list from the `OrbitPlotter.plot` method this is a
 More details of the style options for the markers can be found here: https://matplotlib.org/2.0.2/api/markers_api.html#module-matplotlib.markers.
 More details of the style options on lines can be found here: https://matplotlib.org/2.0.2/api/lines_api.html. However make sure that you use the set methods rather than just changing the attributes as the methods will force a re-draw of the plot.
 
-Next we will make some changes to the other two orbits.
+Next we will make some changes to the other two orbits:
 
 ```{code-cell}
 epoch = Time("2018-08-17 12:05:50", scale="tdb")
@@ -90,7 +91,7 @@ jupiter_plots_p.set_markersize(15)
 
 You can also change the style of the plot using the matplotlib axis which can be aquired from the `OrbitPlotter()`.
 
-See the following example that creates a grid, adds a title, and makes the background transparent. To make the changes clearer it goes back to the inital example.
+See the following example that creates a grid, adds a title, and makes the background transparent. To make the changes clearer it goes back to the inital example:
 
 ```{code-cell}
 epoch = Time("2018-08-17 12:05:50", scale="tdb")

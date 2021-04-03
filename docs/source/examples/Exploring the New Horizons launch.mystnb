@@ -19,12 +19,13 @@ Main data source: Guo & Farquhar "New Horizons Mission Design" http://www.boulde
 from astropy import time
 from astropy import units as u
 
+from poliastro import iod
+
 from poliastro.bodies import Sun, Earth, Jupiter
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
-from poliastro.twobody import Orbit
 from poliastro.plotting import StaticOrbitPlotter
-from poliastro import iod
+from poliastro.twobody import Orbit
 from poliastro.util import norm
 ```
 
@@ -67,7 +68,7 @@ Relation between orbital velocity $v$, local escape velocity $v_e$ and hyperboli
 
 $$ v^2 = v_e^2 + v_{\infty}^2 $$
 
-### Option a): Insert $C_3$ from report, check $v_e$ at parking perigee
+### Option a): Insert $C_3$ from report, check $v_e$ at parking perigee:
 
 ```{code-cell}
 C_3_A = 157.6561 * u.km ** 2 / u.s ** 2  # Designed
@@ -112,7 +113,7 @@ So it stays within the same order of magnitude. Which is reasonable, because rea
 ```{code-cell}
 :tags: [nbsphinx-thumbnail]
 
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 fig, ax = plt.subplots(figsize=(8, 8))
 op = StaticOrbitPlotter(ax=ax)
@@ -126,7 +127,7 @@ ax.set_ylim(-20000, 20000);
 
 ### Option b): Compute $v_{\infty}$ using the Jupyter flyby
 
-According to Wikipedia, the closest approach occurred at 05:43:40 UTC. We can use this data to compute the solution of the Lambert problem between the Earth and Jupiter.
+According to Wikipedia, the closest approach occurred at 05:43:40 UTC. We can use this data to compute the solution of the Lambert problem between the Earth and Jupiter:
 
 ```{code-cell}
 nh_date = time.Time("2006-01-19 19:00", scale="utc").tdb

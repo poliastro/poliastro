@@ -23,10 +23,10 @@ And what does "near" exactly mean? In terms of orbital elements, asteroids and c
 ```{code-cell} ipython3
 from astropy import time
 
-from poliastro.twobody.orbit import Orbit
 from poliastro.bodies import Earth
 from poliastro.frames import Planes
 from poliastro.plotting import StaticOrbitPlotter
+from poliastro.twobody.orbit import Orbit
 ```
 
 ## Small Body Database (SBDB)
@@ -55,7 +55,7 @@ You can use the wildcards from that browser: `*` and `?`.
 
 +++
 
-<div class="alert alert-info">Keep it in mind that `from_sbdb()` can only return one Orbit, so if several objects are found with that name, it will raise an error with the different bodies.</div>
+<div class="alert alert-info">Keep it in mind that `from_sbdb()` can only return one Orbit, so if several objects are found with that name, it will raise an error with the different bodies:</div>
 
 ```{code-cell} ipython3
 try:

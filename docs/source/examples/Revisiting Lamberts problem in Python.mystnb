@@ -16,9 +16,10 @@ kernelspec:
 The Izzo algorithm to solve the Lambert problem is available in poliastro and was implemented from [this paper](https://arxiv.org/abs/1403.2705).
 
 ```{code-cell}
-import numpy as np
-import matplotlib.pyplot as plt
 from cycler import cycler
+
+from matplotlib import pyplot as plt
+import numpy as np
 
 from poliastro.core import iod
 from poliastro.iod import izzo

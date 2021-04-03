@@ -14,16 +14,15 @@ kernelspec:
 # Studying Hohmann transfers
 
 ```{code-cell}
-import numpy as np
-import matplotlib.pyplot as plt
-
 from astropy import units as u
 
-from poliastro.util import norm
+from matplotlib import pyplot as plt
+import numpy as np
 
 from poliastro.bodies import Earth
-from poliastro.twobody import Orbit
 from poliastro.maneuver import Maneuver
+from poliastro.twobody import Orbit
+from poliastro.util import norm
 ```
 
 ```{code-cell}

@@ -1,11 +1,9 @@
 # Gallery
 
 
-The following page contains a collection of practical examples and problem
-solutions solved with **poliastro**. From interplanetary transfers, to asteroid
-catching missions or even propagation under external perturbations. In addition,
-user might find other kind of tutorials related on how to use and customize
-plotting utilities, API capabilities and many other orbital mechanics topics.
+The following page contains a collection of practical examples and problems solved with **poliastro**. From interplanetary transfers, to asteroid-catching missions or even propagation under external perturbations.
+In addition, the user might come across tutorials related on how to use and customize
+the plotting utilities, insight on the [API](https://docs.poliastro.space/en/latest/autoapi/index.html) capabilities and many other topics related to orbital mechanics.
 
 ```{eval-rst}
 .. nbgallery::
