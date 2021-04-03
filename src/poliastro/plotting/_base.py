@@ -182,10 +182,11 @@ class BaseOrbitPlotter:
         )
 
     def _anim(self, orbit, *, label=None, color=None, trail=False):
+        from poliastro.twobody import propagation
+
         colors = self._get_colors(color, trail)
 
         self.set_attractor(orbit.attractor)
-        from poliastro.twobody import propagation
 
         orbit = orbit.change_plane(self.plane)
 
