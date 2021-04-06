@@ -32,7 +32,6 @@ import sphinx_rtd_theme
 # sys.path.append('../src/')
 
 # -- General configuration ------------------------------------------------
-nbsphinx_allow_errors = True
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.3'
