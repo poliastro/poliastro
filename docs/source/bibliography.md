@@ -38,9 +38,7 @@ IDEs and browsers for my whole academic life.
   NumPy array: a structure for efficient numerical computation.\"
   *Computing in Science & Engineering* 13, no. 2 (2011): 22-30.
   [DOI:10.1109/MCSE.2011.37](http://dx.doi.org/10.1109/MCSE.2011.37)
-- Jones, Eric, Travis Oliphant, and Pearu Peterson. \"SciPy: Open
-  Source Scientific Tools for Python\", 2001-,
-  <https://www.scipy.org/> \[Online; accessed 2015-12-12\].
+- Virtanen, P., Gommers, R., Oliphant, T.E. et al. SciPy 1.0: fundamental algorithms for scientific computing in Python. Nat Methods 17, 261–272 (2020).[DOI:10.1038/s41592-019-0686-2](https://www.nature.com/articles/s41592-019-0686-2)
 - Hunter✝, John D. \"Matplotlib: A 2D graphics environment.\"
   *Computing in science and engineering* 9, no. 3 (2007): 90-95.
   [DOI:10.1109/MCSE.2007.55](http://dx.doi.org/10.1109/MCSE.2007.55)
@@ -48,8 +46,5 @@ IDEs and browsers for my whole academic life.
   interactive scientific computing.\" *Computing in Science &
   Engineering* 9, no. 3 (2007): 21-29.
   [DOI:10.1109/MCSE.2007.53](http://dx.doi.org/10.1109/MCSE.2007.53)
-- Robitaille, Thomas P., Erik J. Tollerud, Perry Greenfield, Michael
-  Droettboom, Erik Bray, Tom Aldcroft, Matt Davis et al. \"Astropy: A
-  community Python package for astronomy.\" *Astronomy & Astrophysics*
-  558 (2013): A33.
-  [DOI:10.1051/0004-6361/201322068](http://dx.doi.org/10.1051/0004-6361/201322068)
+- The Astropy Collaboration, A. M. Price-Whelan, B. M. Sipőcz, H. M. Günther, P. L. Lim, S. M.Crawford, S.  
+Conseil, D. L. Shupe, M. W. Craig, N. Dencheva "The Astropy Project: Building an Open-science Project and Status of the v2.0 Core Package" The Astropy Collaboration et al AJ 156 123 (2018) [DOI:10.3847/1538-3881/aabc4f](https://iopscience.iop.org/article/10.3847/1538-3881/aabc4f)
