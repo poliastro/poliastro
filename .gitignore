@@ -126,3 +126,6 @@ dmypy.json
 .idea
 .cache
 .venv
+
+# General
+.DS_Store
