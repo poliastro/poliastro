@@ -21,11 +21,11 @@ $$\ddot{\mathbb{r}} = -\frac{\mu}{|\mathbb{r}|^3} \mathbb{r} + \mathbb{a}_d$$
 
 +++
 
-<div class="alert alert-info">For an in-depth exploration of this topic, still to be integrated in poliastro, check out <a href="https://github.com/Juanlu001/pfc-uc3m">this Master thesis</a></div>
+<div class="alert alert-info">For an in-depth exploration of this topic, still to be integrated in poliastro, check out [this Master thesis](https://github.com/Juanlu001/pfc-uc3m).</div>
 
 +++
 
-<div class="alert alert-info">An earlier version of this notebook allowed for more flexibility and interactivity, but was considerably more complex. Future versions of poliastro and plotly might bring back part of that functionality, depending on user feedback. You can still download the older version <a href="https://github.com/poliastro/poliastro/blob/0.8.x/docs/source/examples/Propagation%20using%20Cowell's%20formulation.ipynb">here</a>.</div>
+<div class="alert alert-info">An earlier version of this notebook allowed for more flexibility and interactivity, but was considerably more complex. Future versions of poliastro and plotly might bring back part of that functionality, depending on user feedback. You can still download the older version [here](https://github.com/poliastro/poliastro/blob/0.8.x/docs/source/examples/Propagation%20using%20Cowell's%20formulation.ipynb).</div>
 
 +++
 
