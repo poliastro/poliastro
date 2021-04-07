@@ -43,7 +43,7 @@ And point your browser to <http://0.0.0.0:8000>.
 ## Code writing
 
 Code contributions are welcome! If you are looking for a place to start,
-help us fixing bugs in poliastro and check out the [\"easy\" tag]().
+help us fixing bugs in poliastro and check out the [\"good-first-issue\" tag](https://github.com/poliastro/poliastro/labels/good%20first%20issue).
 Those should be easier to fix than the others and require less knowledge
 about the library.
 
