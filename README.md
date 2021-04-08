@@ -8,7 +8,7 @@ Name:         | poliastro
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
 **Version**:  | 0.15.dev0
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=master)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=master)
+[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=master)
 [![codeclimate](https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability)](https://codeclimate.com/github/poliastro/poliastro/maintainability)
 
@@ -70,7 +70,7 @@ poliastro requires the following Python packages:
 poliastro is tested on Linux, OS X and Windows on Python 3.7 and 3.8
 against latest NumPy.
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=master)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=master)
+[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
 
 # Installation
 
