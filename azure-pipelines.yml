@@ -13,7 +13,7 @@ resources:
     type: github
     endpoint: poliastro
     name: OpenAstronomy/azure-pipelines-templates
-    ref: master
+    ref: main
 
 trigger:
   branches:
