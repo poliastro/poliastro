@@ -1,13 +1,20 @@
 import matplotlib
 import pytest
 
-from poliastro.examples import iss
+from poliastro.examples import churi, iss
 from poliastro.plotting import AnimatedOrbitPlotter
 
 
 def test_type_of_anim():
     op = AnimatedOrbitPlotter()
     ss = iss
+    k = op.anim(ss)
+    assert type(k) == matplotlib.animation.FuncAnimation
+
+
+def test_type_of_anim_larger_orbits():
+    op = AnimatedOrbitPlotter()
+    ss = churi
     k = op.anim(ss)
     assert type(k) == matplotlib.animation.FuncAnimation
 
