@@ -6,6 +6,8 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 
+from poliastro.twobody import propagation
+
 from ..ephem import Ephem
 from ..frames import Planes
 from ..twobody.mean_elements import get_mean_elements
@@ -182,8 +184,6 @@ class BaseOrbitPlotter:
         )
 
     def _anim(self, orbit, *, label=None, color=None, trail=False):
-        from poliastro.twobody import propagation
-
         colors = self._get_colors(color, trail)
 
         self.set_attractor(orbit.attractor)
@@ -191,9 +191,14 @@ class BaseOrbitPlotter:
         orbit = orbit.change_plane(self.plane)
 
         label = generate_label(orbit.epoch, label)
-        time_laps = [i for i in range(800)]
-        tofs = time_laps * u.day * 2
-        coordinates = propagation.propagate(orbit, tofs)
+        if orbit.period.value > 86400:
+            time_laps = [i for i in range(int(orbit.period.value // 86400) + 1)]
+            tofs = time_laps * u.day * 2
+            coordinates = propagation.propagate(orbit, tofs)
+        else:
+            time_laps = [i for i in range(int(orbit.period.value // 60) + 1)]
+            tofs = time_laps * u.min
+            coordinates = propagation.propagate(orbit, tofs)
         return self._anim_trajectory(
             coordinates, orbit.r, label=label, colors=colors, dashed=True
         )

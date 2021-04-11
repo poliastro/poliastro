@@ -90,7 +90,7 @@ class AnimatedOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             self.fig,
             animate,
             frames=np.arange(0, len(x), 1),
-            interval=30,
+            interval=20,
             blit=True,
             repeat=True,
         )
