@@ -1,0 +1,205 @@
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "@type": "SoftwareSourceCode",
+    "license": "https://spdx.org/licenses/MIT",
+    "codeRepository": "https://github.com/poliastro/poliastro",
+    "datePublished": "2013-07-07",
+    "dateModified": "2020-05-08",
+    "downloadUrl": "https://github.com/poliastro/poliastro.git",
+    "issueTracker": "https://github.com/poliastro/poliastro/issues",
+    "name": "poliastro",
+    "version": "0.14.0",
+    "description": "poliastro is an open-source pure Python package dedicated to problems arising in Astrodynamics and Orbital Mechanics, such as orbit propagation, solution of Lambert's problem, conversion between position and velocity vectors, and classical orbital elements and orbit plotting, focusing on interplanetary applications.",
+    "releaseNotes": "https://docs.poliastro.space/en/v0.14.0/changelog.html#poliastro-0-14-0-2020-05-08",
+    "programmingLanguage": [
+        "Python3"
+    ],
+    "softwareRequirements": [
+        "NumPy",
+        "Astropy",
+        "numba",
+        "jplephem",
+        "matplotlib",
+        "plotly",
+        "SciPy"
+    ],
+    "author": [
+        {
+            "@type": "Person",
+            "givenName": "Juan Luis",
+            "familyName": "Cano Rodr\\u00edguez",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Satellogic"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Antonio",
+            "familyName": "Hidalgo"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Shreyas",
+            "familyName": "Bapat",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "IIT Mandi"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Jorge",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "poliastro"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Nikita",
+            "familyName": "Astrakhantsev",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "University of Zurich"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Chatziargyriou",
+            "familyName": "Eleftheria"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Daniel",
+            "familyName": "Lubi\\u00e1n"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Alberto Lorenzo ",
+            "familyName": "M\\u00e1rquez",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Dassault Syst\\u00e8mes"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Abhishek ",
+            "familyName": "Chaurasia"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Emily",
+            "familyName": "Selwood"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Meu"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Pablo Rodr\\u00edguez ",
+            "familyName": "Robles",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Technical University of Munich (TUM)"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Tomek",
+            "familyName": "Mrugalski",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Internet Systems Consortium"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Helge",
+            "familyName": "Eichhorn"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Greg",
+            "familyName": "Lindahl"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Andrej",
+            "familyName": "Rode"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Himanshu ",
+            "familyName": "Garg"
+        },
+        {
+            "@type": "Person",
+            "givenName": "aOrionis"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Ian",
+            "familyName": "DesJardin"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Hrishikesh",
+            "familyName": "Goyal"
+        },
+        {
+            "@type": "Person",
+            "givenName": "priyanshu",
+            "familyName": "rohilla"
+        },
+        {
+            "@type": "Person",
+            "givenName": "AntoniiaK"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Angala"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Ahmada",
+            "familyName": "Yusril"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Sarthak",
+            "familyName": "Jain",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "IIT Indore"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Syed Osama Hussain"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Ole Streicher",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Leibniz Institute for Astrophysics"
+            }
+        },
+        {
+            "@type": "Person",
+            "givenName": "Iv\\u00e1n Castro Fern\\u00e1ndez"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Fabian P. Schmidt"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Divyansh",
+            "familyName": "Raina"
+        }
+    ]
+}
