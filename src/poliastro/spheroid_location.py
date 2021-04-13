@@ -1,4 +1,16 @@
 import numpy as np
+import astropy.units as u
+
+from poliastro.core.spheroid_location import (
+    N as N_fast,
+    cartesian_cords as cartesian_cords_fast,
+    cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
+    distance as distance_fast,
+    f as f_fast,
+    is_visible as is_visible_fast,
+    radius_of_curvature as radius_of_curvature_fast,
+    tangential_vecs as tangential_vecs_fast,
+)
 
 
 class SpheroidLocation:
@@ -32,48 +44,40 @@ class SpheroidLocation:
     @property
     def cartesian_cords(self):
         """Convert to the Cartesian Coordinate system."""
-        e2 = 1 - (self._c / self._a) ** 2
-        N = self._a / np.sqrt(1 - e2 * np.sin(self._lon) ** 2)
-
-        x = (N + self._h) * np.cos(self._lon) * np.cos(self._lat)
-        y = (N + self._h) * np.cos(self._lon) * np.sin(self._lat)
-        z = ((1 - e2) * N + self._h) * np.sin(self._lon)
-        return x, y, z
+        cart_coords = cartesian_cords_fast(
+            self._a, self._c, self._lon, self._lat, self._h,
+        )
+        return cart_coords
 
     @property
     def f(self):
         """Get first flattening."""
-        return 1 - self._c / self._a
+        _a, _c = self._a.value, self._c.value
+        return f_fast(_a, _c)
 
     @property
     def N(self):
         """Normal vector of the ellipsoid at the given location."""
-        x, y, z = self.cartesian_cords
         a, b, c = self._a.value, self._b.value, self._c.value
-        N = np.array([2 * x.value / a ** 2, 2 * y.value / b ** 2, 2 * z.value / c ** 2])
-        N /= np.linalg.norm(N)
-        return N
+        cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
+        return N_fast(a, b, c, cartesian_cords)
 
     @property
     def tangential_vecs(self):
         """Returns orthonormal vectors tangential to the ellipsoid at the given location."""
         N = self.N
-        u = np.array([1.0, 0, 0])
-        u -= u.dot(N) * N
-        u /= np.linalg.norm(u)
-        v = np.cross(N, u)
-        return u, v
+        return tangential_vecs_fast(N)
 
     @property
     def radius_of_curvature(self):
         """Radius of curvature of the meridian at the latitude of the given location."""
-        e2 = 1 - (self._c / self._a) ** 2
-        rc = self._a * (1 - e2) / (1 - e2 * np.sin(self._lat) ** 2) ** 1.5
-        return rc
+        return (
+            radius_of_curvature_fast(self._a, self._c, self._lat)
+        )  # body.R and body.R_polar has u.m as units
 
     def distance(self, px, py, pz):
         """
-        Calculates the distane from an arbitrary point to the given location (Cartesian coordinates).
+        Calculates the distance from an arbitrary point to the given location (Cartesian coordinates).
 
         Parameters
         ----------
@@ -83,11 +87,13 @@ class SpheroidLocation:
             y-coordinate of the point
         pz: ~astropy.units.quantity.Quantity
             z-coordinate of the point
+
         """
-        c = np.array([c.value for c in self.cartesian_cords])
-        u = np.array([px.value, py.value, pz.value])
-        d = np.linalg.norm(c - u)
-        return d
+        px, py, pz = px.value, py.value, pz.value
+        cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
+        return (
+            distance_fast(cartesian_cords, px, py, pz) * u.m
+        )  # body.R and body.R_polar has u.m as units
 
     def is_visible(self, px, py, pz):
         """
@@ -102,22 +108,16 @@ class SpheroidLocation:
             y-coordinate of the point
         pz: ~astropy.units.quantity.Quantity
             z-coordinate of the point
+
         """
-        c = [c.value for c in self.cartesian_cords]
-        u = np.array([px.value, py.value, pz.value])
+        px, py, pz = px.value, py.value, pz.value
+        cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
 
-        N = self.N
-        d = -N.dot(c)
-        p = N.dot(u) + d
-
-        return p >= 0
+        return is_visible_fast(cartesian_cords, px, py, pz, self.N)
 
     def cartesian_to_ellipsoidal(self, x, y, z):
         """
         Converts ellipsoidal coordinates to the Cartesian coordinate system for the given ellipsoid.
-        Instead of the iterative formula, the function uses the approximation introduced in
-        Bowring, B. R. (1976). TRANSFORMATION FROM SPATIAL TO GEOGRAPHICAL COORDINATES
-
 
         Parameters
         ----------
@@ -131,19 +131,7 @@ class SpheroidLocation:
             z coordinate
 
         """
-        a = self._a
-        c = self._c
-        e2 = 1 - (c / a) ** 2
-        e2_ = e2 / (1 - e2)
-        p = np.sqrt(x ** 2 + y ** 2)
-        th = np.arctan(z * a / (p * c))
-        lon = np.arctan(y / x)
-        lat = np.arctan(
-            (z + e2_ * c * np.sin(th) ** 3) / (p - e2 * a * np.cos(th) ** 3)
-        )
-
-        v = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
-        h = p / np.cos(lat) - v
-        h = z / np.sin(lat) - (1 - e2) * v
-
-        return lat, lon, h
+        _a, _c = self._a.value, self._c.value
+        x, y, z = x.value, y.value, z.value
+        lat, lon, h = cartesian_to_ellipsoidal_fast(_a, _c, x, y, z)
+        return lat * u.rad, lon * u.rad, h * u.m
