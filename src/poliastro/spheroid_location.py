@@ -1,5 +1,5 @@
-import numpy as np
 import astropy.units as u
+import numpy as np
 
 from poliastro.core.spheroid_location import (
     N as N_fast,
@@ -45,20 +45,24 @@ class SpheroidLocation:
     def cartesian_cords(self):
         """Convert to the Cartesian Coordinate system."""
         cart_coords = cartesian_cords_fast(
-            self._a, self._c, self._lon, self._lat, self._h,
+            self._a,
+            self._c,
+            self._lon,
+            self._lat,
+            self._h,
         )
         return cart_coords
 
     @property
     def f(self):
         """Get first flattening."""
-        _a, _c = self._a.value, self._c.value
+        _a, _c = self._a.to(u.m).value, self._c.to(u.m).value
         return f_fast(_a, _c)
 
     @property
     def N(self):
         """Normal vector of the ellipsoid at the given location."""
-        a, b, c = self._a.value, self._b.value, self._c.value
+        a, b, c = self._a.to(u.m).value, self._b.to(u.m).value, self._c.to(u.m).value
         cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
         return N_fast(a, b, c, cartesian_cords)
 
@@ -71,8 +75,8 @@ class SpheroidLocation:
     @property
     def radius_of_curvature(self):
         """Radius of curvature of the meridian at the latitude of the given location."""
-        return (
-            radius_of_curvature_fast(self._a, self._c, self._lat)
+        return radius_of_curvature_fast(
+            self._a, self._c, self._lat
         )  # body.R and body.R_polar has u.m as units
 
     def distance(self, px, py, pz):
@@ -89,7 +93,7 @@ class SpheroidLocation:
             z-coordinate of the point
 
         """
-        px, py, pz = px.value, py.value, pz.value
+        px, py, pz = px.to(u.m).value, py.to(u.m).value, pz.to(u.m).value
         cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
         return (
             distance_fast(cartesian_cords, px, py, pz) * u.m
@@ -110,7 +114,7 @@ class SpheroidLocation:
             z-coordinate of the point
 
         """
-        px, py, pz = px.value, py.value, pz.value
+        px, py, pz = px.to(u.m).value, py.to(u.m).value, pz.to(u.m).value
         cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
 
         return is_visible_fast(cartesian_cords, px, py, pz, self.N)
@@ -131,7 +135,7 @@ class SpheroidLocation:
             z coordinate
 
         """
-        _a, _c = self._a.value, self._c.value
-        x, y, z = x.value, y.value, z.value
+        _a, _c = self._a.to(u.m).value, self._c.to(u.m).value
+        x, y, z = x.to(u.m).value, y.to(u.m).value, z.to(u.m).value
         lat, lon, h = cartesian_to_ellipsoidal_fast(_a, _c, x, y, z)
         return lat * u.rad, lon * u.rad, h * u.m

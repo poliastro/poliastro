@@ -132,7 +132,7 @@ def is_visible(cartesian_cords, px, py, pz, N):
 
     Parameters
     ----------
-    cartesian_cords: list
+    cartesian_cords: ~np.array
         Cartesian coordinates
     px: float
         x-coordinate of the point
