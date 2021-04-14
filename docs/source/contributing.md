@@ -1,4 +1,4 @@
-# Contribute
+# Contributions
 
 poliastro is a community project, hence all contributions are more than
 welcome!
@@ -94,20 +94,20 @@ Python 3 only library.
 
 These are some succinct steps to set up a development environment:
 
-1.  [Install git](https://git-scm.com/) on your computer.
-2.  [Register to GitHub](https://github.com/).
-3.  [Fork poliastro](https://help.github.com/articles/fork-a-repo/).
-4.  [Clone your
-    fork](https://help.github.com/articles/cloning-a-repository/).
-5.  Install [flit](https://github.com/takluyver/flit) using
-    `python -m pip install flit wheel`
-6.  Change into the local checkout of your repository and install it in
-    development mode using `flit install --symlink` (`--symlink` means
-    that the installed code will change as soon as you change it in the
-    download location).
-7.  Create a new branch.
-8.  Make changes and commit.
-9.  [Push to your
+1. [Install git](https://git-scm.com/) on your computer.
+2. [Register to GitHub](https://github.com/).
+3. [Fork poliastro](https://help.github.com/articles/fork-a-repo/).
+4. [Clone your
+   fork](https://help.github.com/articles/cloning-a-repository/).
+5. Install [flit](https://github.com/takluyver/flit) using
+   `python -m pip install flit wheel`
+6. Change into the local checkout of your repository and install it in
+   development mode using `flit install --symlink` (`--symlink` means
+   that the installed code will change as soon as you change it in the
+   download location).
+7. Create a new branch.
+8. Make changes and commit.
+9. [Push to your
     fork](https://help.github.com/articles/pushing-to-a-remote/).
 10. [Open a pull
     request!](https://help.github.com/articles/creating-a-pull-request/)
