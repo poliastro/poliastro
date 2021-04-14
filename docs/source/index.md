@@ -6,6 +6,7 @@ width: 675px
 align: center
 ---
 ```
+
 **poliastro** is an open source ([MIT](https://opensource.org/licenses/MIT)) collection of Python functions
 useful in Astrodynamics and Orbital Mechanics, focusing on
 interplanetary applications. It comes baked with a simple and intuitive [API](https://docs.poliastro.space/en/latest/autoapi/index.html) and
@@ -76,6 +77,7 @@ list](https://groups.io/g/poliastro-dev) and
     </div>
     </div>
 ```
+
 ```{figure} _static/molniya.png
 ---
 align: right
@@ -105,6 +107,7 @@ MIT license, allowing commercial use of the library.
 from poliastro.examples import molniya
 molniya.plot()
 ```
+
 ## Success stories
 
 > *\"My team and I used Poliastro for our final project in our Summer
@@ -162,25 +165,25 @@ about.md
 changelog.md
 ```
 
-```{toctree} 
+```{toctree}
 ---
 maxdepth: 2
-caption: How to
+caption: Getting Started
 ---
-getting_started.md
-user_guide.md
+installation.md
+quickstart_guide.md
 contributing.md
 ```
 
 ```{toctree}
 ---
 maxdepth: 2 
-caption: Tutorials
+caption: Examples
 ---
 gallery.md
 ```
 
-```{toctree} 
+```{toctree}
 ---
 maxdepth: 2 
 caption: References

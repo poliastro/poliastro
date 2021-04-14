@@ -8,6 +8,7 @@ The core of poliastro are the :py:class:`~poliastro.twobody.orbit.Orbit` objects
 inside the :py:mod:`poliastro.twobody` module. They store all the required
 information to define an orbit:
 ```
+
 - The body acting as the central body of the orbit, for example the
   Earth.
 - The position and velocity vectors or the orbital elements.
@@ -50,12 +51,14 @@ And that\'s it! Notice a couple of things:
 - If we display the orbit we just created, we get a string with the
   radius of pericenter, radius of apocenter, inclination, reference
   frame and attractor:
-  ```python    
+
+  ```python
   >>> orb
   7283 x 10293 km x 153.2 deg (GCRS) orbit around Earth (♁) at epoch J2000.000 (TT)
   ```
 
 - If no time is specified, then a default value is assigned:
+  
   ```python
   >>> orb.epoch
   <Time object: scale='tt' format='jyear_str' value=J2000.000>
@@ -73,6 +76,7 @@ And that\'s it! Notice a couple of things:
 Intermezzo: quick visualization of the orbit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
+
 ```{figure} _static/curtis.png
 ---
 align: right
@@ -84,7 +88,9 @@ alt: Plot of the orbit
 If we\'re working on interactive mode (for example, using the wonderful
 Jupyter notebook) we can immediately plot the current orbit:
 
-    orb.plot()
+```python
+orb.plot()
+```
 
 This plot is made in the so called *perifocal frame*, which means:
 
@@ -141,6 +147,7 @@ orb = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 
 Notice that whether we create an `Orbit` from $(r)$ and $(v)$ or from
 elements we can access many mathematical properties of the orbit:
+
 ```python
 >>> orb.period.to(u.day)
 <Quantity 686.9713888628166 d>
@@ -163,7 +170,7 @@ performed with the ``propagate`` method of
 :py:class:`~poliastro.twobody.orbit.Orbit` objects:
 ```
 
-```python   
+```python
 >>> from poliastro.examples import iss
 >>> iss
 6772 x 6790 km x 51.6 deg (GCRS) orbit around Earth (♁)
@@ -218,6 +225,7 @@ thanks to Cowell\'s method:
 
 Some natural perturbations are available in poliastro to be used
 directly in this way. For instance, let us examine the effect of J2 perturbation:
+
 ```python
 >>> from poliastro.core.perturbations import J2_perturbation
 >>> tof = (48.0 * u.h).to(u.s)
@@ -329,6 +337,7 @@ You can also retrieve the individual vectorial impulses:
 >>> tuple(val.decompose([u.km, u.s]) for val in hoh[1])
 (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 ```
+
 ```{eval-rst}
 .. _Hohmann: https://en.wikipedia.org/wiki/Hohmann_transfer_orbit
 .. _bielliptic: https://en.wikipedia.org/wiki/Bi-elliptic_transfer
@@ -377,6 +386,7 @@ alt: Hohmann transfer
 ---   
 Plot of a Hohmann transfer.
 ```
+
 ```{eval-rst}
 Where are the planets? Computing ephemerides
 --------------------------------------------
@@ -446,7 +456,6 @@ Notice that the position and velocity vectors are given with respect to the
 **Heliocentric Celestial Reference System** (HCRS)
 which means equatorial coordinates centered on the Sun.
 ```
-
 
 ## Traveling through space: solving the Lambert problem
 

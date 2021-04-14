@@ -1,4 +1,4 @@
-# Getting started
+# Installation Guide
 
 ## Requirements
 
@@ -21,7 +21,7 @@ The easiest and fastest way to get the package up and running is to
 install poliastro using [conda](https://conda.io/docs/):
 
 ```bash
-$ conda install -c conda-forge poliastro=0.14
+$conda install -c conda-forge poliastro=0.14
 ```
 
 ```{note}
@@ -40,15 +40,15 @@ If you don\'t want to use conda you can [install poliastro from
 PyPI](https://pypi.python.org/pypi/poliastro/) using pip:
 
 ```bash
-$ pip install numpy  # Run this one first for pip 9 and older!
-$ pip install poliastro[jupyter] pytest
+$pip install numpy  # Run this one first for pip 9 and older!
+$pip install poliastro[jupyter] pytest
 ```
 
 Finally, you can also install the latest development version of
 poliastro [directly from GitHub](http://github.com/poliastro/poliastro):
 
 ```bash
-$ pip install https://github.com/poliastro/poliastro/archive/main.zip
+$pip install https://github.com/poliastro/poliastro/archive/main.zip
 ```
 
 This is useful if there is some feature that you want to try, but we did
@@ -77,13 +77,13 @@ You need to install the jupyterlab, which will install the necessary
 dependencies, including plotly. You can do this using pip:
 
 ```bash
-$ pip install jupyterlab
+$pip install jupyterlab
 ```
 
 And then start the jupyter-lab with:
 
 ```bash
-$ jupyter lab
+$jupyter lab
 ```
 
 And as the documentation of JupyterLab Extensions states:
