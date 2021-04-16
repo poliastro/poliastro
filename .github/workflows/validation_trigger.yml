@@ -24,7 +24,8 @@ jobs:
     steps:
       - name: Trigger poliastro/validation
         run: |
-          curl -XPOST -u "${{ secrets.PAT_VALIDATION}}:${{secrets.PAT_VALIDATION_TOKEN}}" \
+          curl \
+          -XPOST -u "${{ secrets.VALIDATION_USER }}:${{ secrets.VALIDATION_PASS }}" \
           -H "Accept: application/vnd.github.v3+json" \
-          -H "Content-Type: application/json" https://api.github.com/repos/poliastro/validation/actions/workflows/ci_actions.yml/dispatches \
-          --data '{"ref": "main"}'
+          https://api.github.com/repos/poliastro/validation/actions/workflows/ci_actions.yml/dispatches \
+          --data '{"ref":"main"}'
