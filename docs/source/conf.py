@@ -53,6 +53,7 @@ extensions = [
     'notfound.extension',
     'hoverxref.extension',
     'myst_parser',
+    'sphinx_panels',
 ]
 
 # Hoverxref Extension
@@ -154,6 +155,8 @@ if os.environ.get('POLIASTRO_SKIP_NOTEBOOKS') == 'True':
     nbsphinx_execute = 'never'
 else:
     nbsphinx_execute = 'always'
+
+panels_delimiters = (r"^\!{3,}$", r"^\^{3,}$", r"^\+{3,}$")
 
 # -- Options for HTML output ----------------------------------------------
 

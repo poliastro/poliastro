@@ -152,31 +152,95 @@ molniya.plot()
 
 ------------------------------------------------------------------------
 
-## Contents
+## Docs Structure 
+
+````{panels} 
+---
+container: text-center
+---
+
+!!!
+```{image} logo/rocket-solid.svg
+---
+align: center
+width: 60px
+---
+```
+
+**Welcome To Poliastro**
+
+```{link-button} overview.md
+:text: To OverView & Changelogs 
+:classes: btn-outline-info btn-block stretched-link
+```
+
+!!!
+```{image} logo/user-astronaut-solid.svg
+---
+align: center
+width: 60px
+---
+```
+**How To**
+
+```{link-button} development_ref.md
+:text: To Quick Start Guide 
+:classes: btn-outline-info btn-block stretched-link
+```
+
+!!!
+```{image} logo/meteor-solid.svg
+---
+align: center
+width: 60px
+---
+```
+
+**Tutorials**
+
+```{link-button} gallery.md
+:text: To Tutorials & Examples 
+:classes: btn-outline-info btn-block stretched-link
+```
+
+!!!
+```{image} logo/code-solid.svg
+---
+align: center
+width: 60px
+---
+```
+
+**API References**
+
+```{link-button} autoapi/index.rst
+:text: To API Reference
+:classes: btn-outline-info btn-block stretched-link
+```
+
+````
+
+# Content
+```{toctree}
+---
+maxdepth: 3 
+caption: Welcome to Poliastro
+---
+overview.md
+```
 
 ```{toctree}
 ---
-maxdepth: 2
-caption: Getting started
+maxdepth: 3 
+caption: How To
 ---
-about.md
-installation.md
-quickstart.md
-```
-
-```{toctree} 
----
-maxdepth: 2
-caption: How to guides & Examples
----
-gallery.md
-contributing.md
+development_ref.md
 ```
 
 ```{toctree}
 ---
-maxdepth: 2
-caption: Background
+maxdepth: 2 
+caption: Tutorial
 ---
 background.md
 ```
@@ -186,7 +250,6 @@ background.md
 maxdepth: 2 
 caption: References
 ---
-autoapi/index.rst
 bibliography.md
 changelog.md
 ```

@@ -95,6 +95,7 @@ dev = [
     "sphinx_rtd_theme==0.5.0",
     "sphinx-hoverxref==0.5b1",
     "sphinx-notfound-page",
+    "sphinx_panels",
     "tox",
 ]
 
