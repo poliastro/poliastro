@@ -14,7 +14,7 @@ from poliastro.core.spheroid_location import (
 
 
 class SpheroidLocation:
-    """Class representing a ground station on an arbitrary ellipsoid."""
+    """Class representing a ground station on an oblate ellipsoid."""
 
     def __init__(self, lon, lat, h, body):
         """

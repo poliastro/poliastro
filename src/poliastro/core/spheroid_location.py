@@ -1,4 +1,4 @@
-""" Low level calculations for spheroid locations """
+""" Low level calculations for oblate spheroid locations """
 
 import numpy as np
 from numba import njit as jit
