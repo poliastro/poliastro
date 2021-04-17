@@ -4,20 +4,21 @@ import numpy as np
 from numba import njit as jit
 
 
+@jit
 def cartesian_cords(_a, _c, _lon, _lat, _h):
     """Calculates cartesian coordinates.
 
     Parameters
     ----------
-    _a: ~astropy.units.quantity.Quantity
+    _a: float
         Semi-major axis
-    _c: ~astropy.units.quantity.Quantity
+    _c: float
         Semi-minor axis
-    _lon: ~astropy.units.quantity.Quantity
+    _lon: float
         geodetic longitude
-    _lat: ~astropy.units.quantity.Quantity
+    _lat: float
         geodetic latitude
-    _h: ~astropy.units.quantity.Quantity
+    _h: float
         geodetic height
 
     """
@@ -85,16 +86,17 @@ def tangential_vecs(N):
     return u, v
 
 
+@jit
 def radius_of_curvature(_a, _c, _lat):
     """Radius of curvature of the meridian at the latitude of the given location.
 
     Parameters
     ----------
-    _a: ~astropy.units.quantity.Quantity
+    _a: float
         Semi-major axis
-    _c: ~astropy.units.quantity.Quantity
+    _c: float
         Semi-minor axis
-    _lat: ~astropy.units.quantity.Quantity
+    _lat: float
         geodetic latitude
 
     """

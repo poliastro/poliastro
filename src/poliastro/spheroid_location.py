@@ -44,14 +44,23 @@ class SpheroidLocation:
     @property
     def cartesian_cords(self):
         """Convert to the Cartesian Coordinate system."""
-        cart_coords = cartesian_cords_fast(
-            self._a,
-            self._c,
-            self._lon,
-            self._lat,
-            self._h,
+        _a, _c, _lon, _lat, _h = (
+            self._a.to(u.m).value,
+            self._c.to(u.m).value,
+            self._lon.to(u.rad).value,
+            self._lat.to(u.rad).value,
+            self._h.to(u.m).value,
         )
-        return cart_coords
+        return (
+            cartesian_cords_fast(
+                _a,
+                _c,
+                _lon,
+                _lat,
+                _h,
+            )
+            * u.m
+        )
 
     @property
     def f(self):
@@ -75,9 +84,14 @@ class SpheroidLocation:
     @property
     def radius_of_curvature(self):
         """Radius of curvature of the meridian at the latitude of the given location."""
-        return radius_of_curvature_fast(
-            self._a, self._c, self._lat
-        )  # body.R and body.R_polar has u.m as units
+        _a, _c, _lat = (
+            self._a.to(u.m).value,
+            self._c.to(u.m).value,
+            self._lat.to(u.rad).value,
+        )
+        return (
+            radius_of_curvature_fast(_a, _c, _lat) * u.m
+        )  # Need to convert units to u.rad and then take value because numpy expects angles in radians if unit is not given.
 
     def distance(self, px, py, pz):
         """
