@@ -8,7 +8,7 @@ align: center
 ```
 **poliastro** is an open source ([MIT](https://opensource.org/licenses/MIT)) collection of Python functions
 useful in Astrodynamics and Orbital Mechanics, focusing on
-interplanetary applications. It comes baked with a simple and intuitive [API](https://docs.poliastro.space/en/latest/autoapi/index.html) and
+interplanetary applications. It comes baked with a simple and intuitive {ref}`API <api-reference>` and
 handles physical quantities with units.
 
 View the [source code](https://github.com/poliastro/poliastro) of poliastro!

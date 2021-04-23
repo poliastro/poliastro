@@ -1,3 +1,4 @@
+(bibliography)=
 # Bibliography
 
 > *Nanos gigantum humeris insidentes.*
