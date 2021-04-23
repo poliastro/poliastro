@@ -155,29 +155,29 @@ molniya.plot()
 
 ```{toctree}
 ---
-maxdepth: 2 
-caption: Welcome to poliastro
+maxdepth: 2
+caption: Getting started
 ---
 about.md
-changelog.md
+installation.md
+quickstart.md
 ```
 
 ```{toctree} 
 ---
 maxdepth: 2
-caption: How to
+caption: How to guides & Examples
 ---
-getting_started.md
-user_guide.md
+gallery.md
 contributing.md
 ```
 
 ```{toctree}
 ---
-maxdepth: 2 
-caption: Tutorials
+maxdepth: 2
+caption: Background
 ---
-gallery.md
+background.md
 ```
 
 ```{toctree} 
@@ -187,6 +187,7 @@ caption: References
 ---
 autoapi/index.rst
 bibliography.md
+changelog.md
 ```
 
 ```{note}
