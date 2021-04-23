@@ -6,8 +6,6 @@ on:
   # A collection of events which trigger the validation action
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   release:
 
   # Enable manually to execute the actions
