@@ -1,18 +1,28 @@
 [build-system]
 requires = [
-    "flit_core >=2.0,<4",
+    "flit_core >=3.2,<3.3",
     "wheel",
     "oldest-supported-numpy",
 ]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "poliastro"
-author = "Juan Luis Cano Rodríguez"
-author-email = "hello@juanlu.space"
-description-file = "README.md"
-home-page = "https://github.com/poliastro/poliastro/"
-keywords = "aero,aerospace,engineering,astrodynamics,orbits,kepler,orbital mechanics"
+[project]
+name = "poliastro"
+readme = "README.md"
+requires-python = ">=3.7,<3.10"
+license = {file = "COPYING"}
+authors = [
+    {name = "Juan Luis Cano Rodríguez", email = "hello@juanlu.space"}
+]
+keywords = [
+    "aero",
+    "aerospace",
+    "engineering",
+    "astrodynamics",
+    "orbits",
+    "kepler",
+    "orbital mechanics"
+]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Development Status :: 4 - Beta",
@@ -31,8 +41,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
-requires-python = ">=3.7,<3.10"
-requires = [
+dependencies = [
     "astropy >=3.2,<5",
     "astroquery >=0.3.9",
     "cached_property ; python_version<'3.8'",
@@ -46,8 +55,16 @@ requires = [
     "pyerfa",
     "scipy >=1.4.0",
 ]
+dynamic = ["version", "description"]
 
-[tool.flit.metadata.requires-extra]
+[project.urls]
+Homepage = "https://www.poliastro.space"
+Documentation = "https://docs.poliastro.space"
+Source = "https://github.com/poliastro/poliastro"
+Tracker = "https://github.com/poliastro/poliastro/issues"
+Funding = "https://opencollective.com/poliastro"
+
+[project.optional-dependencies]
 jupyter = ["notebook"]
 cesium = ["czml3 ~=0.5.3"]
 dev = [
@@ -80,10 +97,6 @@ dev = [
     "sphinx-notfound-page",
     "tox",
 ]
-
-[tool.flit.metadata.urls]
-Source = "https://github.com/poliastro/poliastro"
-Tracker = "https://github.com/poliastro/poliastro/issues"
 
 [tool.flit.sdist]
 include = [

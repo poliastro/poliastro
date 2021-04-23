@@ -1,4 +1,4 @@
-# User guide
+# Quickstart
 
 ```{eval-rst}
 Defining the orbit: :py:class:`~poliastro.twobody.orbit.Orbit` objects

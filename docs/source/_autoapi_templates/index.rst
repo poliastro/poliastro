@@ -1,6 +1,8 @@
 :noindex:
 :orphan:
 
+.. _api-reference:
+
 API reference
 =============
 
