@@ -363,3 +363,8 @@ exclude_patterns.append('_autoapi_templates/python/module.rst')
 suppress_warnings.append('ref.python')
 
 myst_update_mathjax = False
+
+# Sphinx 4.0 will change the default MathJax version to 3,
+# so we proactively set it to 2 until we decide to do a migration,
+# see https://www.sphinx-doc.org/en/master/usage/extensions/math.html#module-sphinx.ext.mathjax
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
