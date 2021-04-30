@@ -1,10 +1,10 @@
 <p align="center">
-    <a href="http://poliastro.github.io/"><image src="http://poliastro.github.io/images/logo_text.png" alt="poliastro logo" width="675px"></a>
+    <a href="http://www.poliastro.space/"><image src="https://www.poliastro.space/images/logo_text.png" alt="poliastro logo" width="675px"></a>
 </p>
 
 Name:         | poliastro
 :------------:|:--------------
-**Website**:  | <https://poliastro.github.io/>
+**Website**:  | <https://www.poliastro.space/>
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
 **Version**:  | 0.15.dev0
 
