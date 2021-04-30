@@ -19,12 +19,18 @@ Name:         | poliastro
 [![mailing](https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square)](https://groups.io/g/poliastro-dev)
 [![Join the chat at http://chat.poliastro.space/](https://img.shields.io/matrix/poliastro:matrix.org.svg?style=flat-square)](http://chat.poliastro.space/)
 
-poliastro is an open source pure Python package dedicated to problems
-arising in Astrodynamics and Orbital Mechanics, such as orbit
-propagation, solution of the Lambert\'s problem, conversion between
-position and velocity vectors and classical orbital elements and orbit
-plotting, focusing on interplanetary applications. It is released under
-the MIT license.
+poliastro is an open source (MIT) pure Python library
+for interactive Astrodynamics and Orbital Mechanics,
+with a focus on ease of use, speed, and quick visualization.
+It provides a simple and intuitive API,
+and handles physical quantities with units.
+
+Some features include
+orbit propagation, solution of the Lambert\'s problem,
+conversion between position and velocity vectors and classical orbital elements
+and orbit plotting, among others.
+It focuses on interplanetary applications,
+but can also be used to analyze artificial satellites in Low-Earth Orbit (LEO).
 
 ```python
 from poliastro.examples import molniya
