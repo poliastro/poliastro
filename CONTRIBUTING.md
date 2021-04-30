@@ -40,6 +40,12 @@ by running an HTTP server:
 ```
 And point your browser to <http://0.0.0.0:8000>.
 
+## Small scripts
+
+We would love to give your Astrodynamics scripts a home!
+Please head to [our `contrib/` directory](https://github.com/poliastro/poliastro/tree/main/contrib)
+for further information.
+
 ## Code writing
 
 Code contributions are welcome! If you are looking for a place to start,
