@@ -146,17 +146,23 @@ writing this software. It\'s my tiny tribute to a place I came to love.
 
 ## Can I do \<insert awesome thing\> with poliastro?
 
-poliastro is focused on interplanetary applications. This has two
-consequences:
+poliastro has been historically focused on interplanetary applications,
+but we have been adding more features for artificial satellites in LEO.
+Therefore, you might find that some features are currently lacking,
+in particular propagation of General Perturbations orbital data
+such as TLE/3LE, OMM, and the like.
 
-- It tries to be more general than other Flight Dynamics core
-  libraries more focused on Earth satellites (see [Related
-  software](https://docs.poliastro.space/en/latest/about.html#related-software)
-  for a brief list), allowing the algorithms to work also for orbits
-  around non-Earth bodies.
-- It leaves out certain features that would be too Earth-specific,
-  such as TLE reading, SGP4 propagation, groundtrack plotting and
-  others.
+Besides, poliastro is a community project that strives to be easy to use,
+while at the same time producing correct results
+[that are validated](https://github.com/poliastro/validation/)
+against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/latest/about.html#related-software)
+such as GMAT and Orekit.
+Therefore, you might find that its API is very different from
+these projects,
+and also that some advanced features are missing
+(such as detailed spherical harmonics modeling of the Earth beyond J2 and J3).
+We encourage you to [open an issue](https://github.com/poliastro/validation/issues/new)
+so we can discuss future feature additions!
 
 ## What\'s the future of the project?
 
