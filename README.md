@@ -37,6 +37,7 @@ from poliastro.examples import molniya
 
 molniya.plot()
 ```
+
 <p align="center">
     <image src="https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png">
 </p>
