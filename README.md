@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="http://www.poliastro.space/"><image src="https://www.poliastro.space/images/logo_text.png" alt="poliastro logo" width="675px"></a>
+    <a href="https://www.poliastro.space/"><image src="https://www.poliastro.space/images/logo_text.png" alt="poliastro logo" width="675px"></a>
 </p>
 
 Name:         | poliastro
