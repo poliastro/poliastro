@@ -4,7 +4,7 @@ The `contrib` directory contains community contributions
 that are not yet ready to be part of the poliastro API,
 but are nonetheless useful for Astrodynamics Python users.
 
-If you have a small script or set of scripts
+If you have a small script or set of them
 related to Astrodynamics and Orbital Mechanics
 but you feel they are "ugly", "not polished",
 or you are just not sure "if anybody will find it useful",
@@ -20,8 +20,8 @@ please follow these steps:
   what extra libraries are needed (if any),
   and cite any scientific references related to your work.
 - If it's a series of scripts,
-  create a new directory with a `lower_case` name
-  with a `README.md` specifying your name, email,
+  create a new `lower_case` named directory
+  having a `README.md` specifying your name, email,
   what the scripts do,
   and cite any scientific references related to your work,
   as well as a `requirements.txt` or conda `environment.yml`
