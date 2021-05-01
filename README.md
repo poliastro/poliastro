@@ -1,10 +1,10 @@
 <p align="center">
-    <a href="http://poliastro.github.io/"><image src="http://poliastro.github.io/images/logo_text.png" alt="poliastro logo" width="675px"></a>
+    <a href="https://www.poliastro.space/"><image src="https://www.poliastro.space/images/logo_text.png" alt="poliastro logo" width="675px"></a>
 </p>
 
 Name:         | poliastro
 :------------:|:--------------
-**Website**:  | <https://poliastro.github.io/>
+**Website**:  | <https://www.poliastro.space/>
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
 **Version**:  | 0.15.dev0
 
@@ -19,18 +19,25 @@ Name:         | poliastro
 [![mailing](https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square)](https://groups.io/g/poliastro-dev)
 [![Join the chat at http://chat.poliastro.space/](https://img.shields.io/matrix/poliastro:matrix.org.svg?style=flat-square)](http://chat.poliastro.space/)
 
-poliastro is an open source pure Python package dedicated to problems
-arising in Astrodynamics and Orbital Mechanics, such as orbit
-propagation, solution of the Lambert\'s problem, conversion between
-position and velocity vectors and classical orbital elements and orbit
-plotting, focusing on interplanetary applications. It is released under
-the MIT license.
+poliastro is an open source (MIT) pure Python library
+for interactive Astrodynamics and Orbital Mechanics,
+with a focus on ease of use, speed, and quick visualization.
+It provides a simple and intuitive API,
+and handles physical quantities with units.
+
+Some features include
+orbit propagation, solution of the Lambert\'s problem,
+conversion between position and velocity vectors and classical orbital elements
+and orbit plotting, among others.
+It focuses on interplanetary applications,
+but can also be used to analyze artificial satellites in Low-Earth Orbit (LEO).
 
 ```python
 from poliastro.examples import molniya
 
 molniya.plot()
 ```
+
 <p align="center">
     <image src="https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png">
 </p>
@@ -140,17 +147,23 @@ writing this software. It\'s my tiny tribute to a place I came to love.
 
 ## Can I do \<insert awesome thing\> with poliastro?
 
-poliastro is focused on interplanetary applications. This has two
-consequences:
+poliastro has been historically focused on interplanetary applications,
+but we have been adding more features for artificial satellites in LEO.
+Therefore, you might find that some features are currently lacking,
+in particular propagation of General Perturbations orbital data
+such as TLE/3LE, OMM, and the like.
 
-- It tries to be more general than other Flight Dynamics core
-  libraries more focused on Earth satellites (see [Related
-  software](https://docs.poliastro.space/en/latest/about.html#related-software)
-  for a brief list), allowing the algorithms to work also for orbits
-  around non-Earth bodies.
-- It leaves out certain features that would be too Earth-specific,
-  such as TLE reading, SGP4 propagation, groundtrack plotting and
-  others.
+Besides, poliastro is a community project that strives to be easy to use,
+while at the same time producing correct results
+[that are validated](https://github.com/poliastro/validation/)
+against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/latest/about.html#related-software)
+such as GMAT and Orekit.
+Therefore, you might find that its API is very different from
+these projects,
+and also that some advanced features are missing
+(such as detailed spherical harmonics modeling of the Earth beyond J2 and J3).
+We encourage you to [open an issue](https://github.com/poliastro/validation/issues/new)
+so we can discuss future feature additions!
 
 ## What\'s the future of the project?
 
