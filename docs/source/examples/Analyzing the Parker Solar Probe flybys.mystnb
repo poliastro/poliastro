@@ -256,8 +256,6 @@ ss_1_a.a
 And, finally, we plot the solution:
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
-
 from poliastro.plotting import StaticOrbitPlotter
 
 frame = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
@@ -265,5 +263,5 @@ frame = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
 frame.plot_body_orbit(Earth, d_launch)
 frame.plot_body_orbit(Venus, flyby_1_time)
 frame.plot(ss01, label="#0 to #1", color="C2")
-frame.plot(ss_1_a, label="#1 to #2", color="C3");
+frame.plot(ss_1_a, label="#1 to #2", color="C3")
 ```

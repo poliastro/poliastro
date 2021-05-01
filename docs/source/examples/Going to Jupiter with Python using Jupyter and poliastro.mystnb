@@ -58,7 +58,7 @@ With previous dates we can create the different orbits that define the position 
 
 ```{code-cell} ipython3
 # Plot initial Earth's position
-Earth.plot(date_launch, label="Initial Earth's position");
+Earth.plot(date_launch, label="Initial Earth's position")
 ```
 
 Since both Earth states have been obtained (initial and flyby) we can now solve for Juno's maneuvers. The first one sets Juno into an elliptical orbit around the Sun so that it applies a gravity assist around the Earth:
@@ -97,7 +97,7 @@ plotter.plot_trajectory(
     ic1_end.sample(min_anomaly=0 * u.deg, max_anomaly=180 * u.deg),
     label="Inner cruise 1 full orbit",
     color="C1",
-);
+)
 ```
 
 We can check that the period of the orbit is similar to the one stated in the mission's documentation. Remember that in the previous plot we only plotter half of the orbit for Juno's first maneuver and the period is the time that would take Juno to complete one full revolution around this new orbit.
@@ -146,7 +146,7 @@ plotter.plot_trajectory(
     ic2_end.sample(min_anomaly=180 * u.deg, max_anomaly=400 * u.deg),
     label="Inner cruise 2 full orbit",
     color="C2",
-);
+)
 ```
 
 We can now start solving for the manuever that will take Juno to Jupiter. Another Lambert maneuver is required but first let us solve for Jupiter position on arrival:
@@ -178,7 +178,6 @@ ic3_end = ic3.propagate(date_arrival)
 Finally, we can plot all the different phases of the mission. This shows the whole power of the *poliastro* package, since a beautiful image is created showing the whole maneuvering process:
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
 
 # Final plot for the whole mission
 plotter = StaticOrbitPlotter()
@@ -203,5 +202,5 @@ plotter.plot_trajectory(
 )
 plotter.plot_body_orbit(
     Jupiter, date_arrival, label="Jupiter's position at arrival", trail=True
-);
+)
 ```

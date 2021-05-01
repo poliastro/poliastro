@@ -125,8 +125,6 @@ print("orbital decay seen after", lithobrake_event.last_t.to(u.d).value, "days")
 ```
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
-
 plt.ylabel("h(t)")
 plt.xlabel("t, days")
 plt.plot(tofs.value, rr.norm() - Earth.R)

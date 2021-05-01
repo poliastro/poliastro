@@ -52,8 +52,7 @@ idx_max = np.argmax(hohmann_data)
 ylims = (0.35, 0.6)
 ```
 
-```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
+```{code-cell}
 
 fig, ax = plt.subplots(figsize=(8, 6))
 

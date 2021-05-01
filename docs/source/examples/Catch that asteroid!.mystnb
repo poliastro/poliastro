@@ -118,7 +118,6 @@ HTML(
 And now we can plot!
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
 
 frame = plot_solar_system(outer=False, epoch=EPOCH)
 frame.plot_ephem(florence, EPOCH, label="Florence", color=C_FLORENCE);

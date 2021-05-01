@@ -39,8 +39,7 @@ plotter.plot_body_orbit(Mars, epoch, label="Mars")
 plotter.plot_body_orbit(Jupiter, epoch, label="Jupiter");
 ```
 
-```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
+```{code-cell}
 
 epoch = Time("2018-08-17 12:05:50", scale="tdb")
 

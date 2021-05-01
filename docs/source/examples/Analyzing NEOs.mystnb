@@ -39,7 +39,6 @@ eros.plot(label="Eros");
 You can also search by IAU number or SPK-ID (there is a faster `neows.orbit_from_spk_id()` function in that case, although):
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
 
 ganymed = Orbit.from_sbdb("1036")  # Ganymed IAU number
 amor = Orbit.from_sbdb("2001221")  # Amor SPK-ID

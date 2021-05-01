@@ -111,7 +111,6 @@ print(
 So it stays within the same order of magnitude. Which is reasonable, because real life burns are not instantaneous.
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
 
 from matplotlib import pyplot as plt
 
@@ -122,7 +121,7 @@ op.plot(parking)
 op.plot(exit)
 
 ax.set_xlim(-8000, 8000)
-ax.set_ylim(-20000, 20000);
+ax.set_ylim(-20000, 20000)
 ```
 
 ### Option b): Compute $v_{\infty}$ using the Jupyter flyby
@@ -165,5 +164,5 @@ op = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
 op.plot_body_orbit(Jupiter, nh_flyby_date)
 op.plot_body_orbit(Earth, nh_date)
 
-op.plot(nh, label="New Horizons", color="k");
+op.plot(nh, label="New Horizons", color="k")
 ```

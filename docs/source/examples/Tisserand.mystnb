@@ -123,8 +123,6 @@ SS_BODIES_OUTTER = [
 We will impose the final figure also to show a dashed red line which represents $R_{p} = R_{a}$, meaning that orbit is perfectly circular:
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
-
 # Prellocate Tisserand figure
 fig, ax = plt.subplots(1,1,figsize=(15,7))
 ax.set_title("Apsis Tisserand for Solar System bodies")

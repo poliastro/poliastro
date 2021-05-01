@@ -58,8 +58,6 @@ for ii, r_f in enumerate(r_f_vector):
 ```
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
-
 fig, ax = plt.subplots(figsize=(7, 7))
 
 ax.plot((r_f_vector / r_i).value, (dv_a_vector / v_i).value, label="First impulse")

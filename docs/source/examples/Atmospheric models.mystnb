@@ -47,7 +47,6 @@ Also known as `U.S. Standard Atmosphere`, the atmospheric model *coesa76* is jus
 Let us plot the `Temperature` as increasing altitude for both atmospheric models:
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
 
 # We build the atmospheric instances
 coesa62 = COESA62()

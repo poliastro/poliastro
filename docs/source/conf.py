@@ -342,6 +342,22 @@ nbsphinx_thumbnails = {
     'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
     'examples/Generating orbit groundtracks': '_static/thumbnails/groundtrack.png',
+    # Manually Added
+    'examples/Porkchops with poliastro': '_static/thumbnails/porkchop_plot_thumbnail.png',
+    'examples/Analyzing the Parker Solar Probe flybys': '_static/thumbnails/parker_thumbnail.png',
+    'examples/Atmospheric models': '_static/thumbnails/atmosphere_thumbnail.png',
+    'examples/Catch that asteroid!': '_static/thumbnails/asteroid_thumbnail.png',
+    'examples/Comparing Hohmann and bielliptic transfers': '_static/thumbnails/hohmann-bielliptic-transfers_thumbnail.png',
+    'examples/Customising static orbit plots': '_static/thumbnails/static_orbit_thumbnail.png',
+    'examples/Exploring the New Horizons launch': '_static/thumbnails/new_horizons_thumbnail.png',
+    'examples/Going to Jupiter with Python using Jupyter and poliastro': '_static/thumbnails/going_to_jupiter_thumbnail.png',
+    'examples/Multirevolutions solution in Lamberts problem': '_static/thumbnails/multirevolutions_thumbnail.png',
+    'examples/Natural and artificial perturbations': '_static/thumbnails/natural_artificial_thumbnail.png',
+    'examples/Revisiting Lamberts problem in Python': '_static/thumbnails/lambert_thumbnail.png',
+    'examples/Studying Hohmann transfers': '_static/thumbnails/hohmann_thumbnail.png',
+    'examples/Tisserand': '_static/thumbnails/tisserand_thumbnail.png',
+    'examples/Visualizing the SpaceX Tesla Roadster trip to Mars': '_static/thumbnails/roadster_thumbnail.png',
+    'examples/Analyzing NEOs': '_static/thumbnails/neo_thumbnail.png',
 }
 
 # Custom nbsphinx format for Jupytext markdown notebooks

@@ -163,8 +163,6 @@ for ss in orbit_set:
 We will plot now all the arc transfers just to better see the difference between them:
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
-
 # Plot all solutions together
 fig, ax = plt.subplots(figsize=(5,10))
 op = StaticOrbitPlotter(ax=ax)

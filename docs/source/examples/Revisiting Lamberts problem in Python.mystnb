@@ -77,7 +77,6 @@ ax.set_ylabel("$T$");
 ## Part 2: Locating $T_{min}$
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
 
 for M in M_list:
     for ll in ll_list:

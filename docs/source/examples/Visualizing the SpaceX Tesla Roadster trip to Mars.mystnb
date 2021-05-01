@@ -47,8 +47,6 @@ from poliastro.plotting.misc import plot_solar_system
 ```
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
-
 frame = plot_solar_system(outer=False, epoch=EPOCH)
 frame.plot_ephem(roadster, EPOCH, label="SpaceX Roadster", color="black");
 ```
