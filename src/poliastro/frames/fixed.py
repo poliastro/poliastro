@@ -356,7 +356,7 @@ class MoonFixed(_PlanetaryFixed):
             - 0.0009 * np.cos(E13.to("rad").value)
         ) * u.deg
         W = (
-            38.321
+            38.3213
             + 13.17635815 * d
             - 1.4e-12 * d ** 2
             + 3.5610 * np.sin(E1.to("rad").value)
