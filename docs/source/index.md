@@ -169,7 +169,7 @@ width: 60px
 
 **Welcome To Poliastro**
 
-```{link-button} overview.md
+```{link-button} about.md
 :text: To OverView & Changelogs 
 :classes: btn-outline-info btn-block stretched-link
 ```
@@ -183,7 +183,7 @@ width: 60px
 ```
 **How To**
 
-```{link-button} development_ref.md
+```{link-button} quickstart.md
 :text: To Quick Start Guide 
 :classes: btn-outline-info btn-block stretched-link
 ```
@@ -220,27 +220,31 @@ width: 60px
 
 ````
 
-# Content
+## Contents
+
 ```{toctree}
 ---
-maxdepth: 3 
-caption: Welcome to Poliastro
+maxdepth: 2
+caption: Getting started
 ---
-overview.md
+about.md
+installation.md
+quickstart.md
+```
+
+```{toctree} 
+---
+maxdepth: 2
+caption: How to guides & Examples
+---
+gallery.md
+contributing.md
 ```
 
 ```{toctree}
 ---
-maxdepth: 3 
-caption: How To
----
-development_ref.md
-```
-
-```{toctree}
----
-maxdepth: 2 
-caption: Tutorial
+maxdepth: 2
+caption: Background
 ---
 background.md
 ```
@@ -250,6 +254,7 @@ background.md
 maxdepth: 2 
 caption: References
 ---
+autoapi/index.rst
 bibliography.md
 changelog.md
 ```
