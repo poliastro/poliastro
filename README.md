@@ -19,6 +19,9 @@ Name:         | poliastro
 [![mailing](https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square)](https://groups.io/g/poliastro-dev)
 [![Join the chat at http://chat.poliastro.space/](https://img.shields.io/matrix/poliastro:matrix.org.svg?style=flat-square)](http://chat.poliastro.space/)
 
+[![OpenCollective](https://opencollective.com/poliastro/backers/badge.svg)](#backers)
+[![OpenCollective](https://opencollective.com/poliastro/sponsors/badge.svg)](#sponsors)
+
 poliastro is an open source (MIT) pure Python library
 for interactive Astrodynamics and Orbital Mechanics,
 with a focus on ease of use, speed, and quick visualization.
@@ -135,6 +138,27 @@ And this is an example citation format:
 
 poliastro is released under the MIT license, hence allowing commercial
 use of the library. Please refer to the COPYING file.
+
+# Credits
+
+## Contributors
+
+This project exists thanks to all the people who contribute!
+
+![Contributors](https://opencollective.com/poliastro/contributors.svg?width=890&button=false)
+
+## Backers
+
+Thank you to all our backers! [Become a backer](https://opencollective.com/poliastro#backer).
+
+[![Backers](https://opencollective.com/poliastro/backers.svg?width=890)](https://opencollective.com/poliastro#backer)
+
+## Sponsors
+
+Support us by becoming a sponsor. Your logo will show up here with a link to your website.
+[Become a sponsor](https://opencollective.com/poliastro#sponsor).
+
+[![Sponsors](https://opencollective.com/poliastro/sponsor/0/avatar.svg)](https://opencollective.com/poliastro/sponsor/0/website)
 
 # FAQ
 
