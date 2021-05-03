@@ -4,8 +4,7 @@ from astropy import units as u
 
 @u.quantity_input(h=u.km, η_fov=u.rad, η_center=u.rad, R=u.km)
 def min_and_max_ground_range(h, η_fov, η_center, R):
-    """
-    Calculates the minimum and maximum values of ground-range angles
+    """Calculates the minimum and maximum values of ground-range angles
 
     Parameters
     ----------
@@ -16,7 +15,7 @@ def min_and_max_ground_range(h, η_fov, η_center, R):
     η_center: ~astropy.units.Quantity
         Center boresight angle.
     R: ~astropy.units.Quantity
-        Attractor equatorial radius
+        Attractor equatorial radius.
 
     Returns
     -------
@@ -29,8 +28,8 @@ def min_and_max_ground_range(h, η_fov, η_center, R):
     -----
     For further information, please take a look at "Fundamentals of Astrodynamics and Applications", 4th ed (2013)"
     by David A. Vallado, pages 853-860.
-    """
 
+    """
     r_sat = R + h
     η_max = η_center + η_fov / 2
     η_min = η_center - η_fov / 2
@@ -55,8 +54,7 @@ def min_and_max_ground_range(h, η_fov, η_center, R):
 def max_and_min_ground_range_with_specific_azimuth(
     h, η_fov, η_center, β, φ_nadir, λ_nadir, R
 ):
-    """
-    Calculates the difference in ground-range angles from the η_center angle and the latitude and longitude of the target
+    """Calculates the difference in ground-range angles from the η_center angle and the latitude and longitude of the target
     for a desired phase angle, β, used to specify where the sensor is looking.
 
     Parameters
@@ -67,14 +65,14 @@ def max_and_min_ground_range_with_specific_azimuth(
         Angle of the total area that a sensor can observe.
     η_center: ~astropy.units.Quantity
         Center boresight angle.
-    β : ~astropy.units.Quantity
+    β: ~astropy.units.Quantity
         Phase angle, used to specify where the sensor is looking.
     φ_nadir: ~astropy.units.Quantity
         Latitude angle of nadir point.
     λ_nadir: ~astropy.units.Quantity
         Longitude angle of nadir point.
     R: ~astropy.units.Quantity
-        Earth equatorial radius
+        Earth equatorial radius.
 
     Returns
     -------
@@ -88,15 +86,15 @@ def max_and_min_ground_range_with_specific_azimuth(
     Raises
     ------
     ValueError
-        This formula always gives the answer for the short way to the target ot the acute angle,:math:`{\beta}`,
+        This formula always gives the answer for the short way to the target ot the acute angle, β,
         which must be greater than 0º and less than 180º.
 
     Notes
     -----
     For further information, please take a look at "Fundamentals of Astrodynamics and Applications", 4th ed (2013)"
     by David A. Vallado, pages 853-860.
-    """
 
+    """
     if not 0 * u.rad < β < np.pi * u.rad:
         raise ValueError("β must be between 0º and 180º")
 

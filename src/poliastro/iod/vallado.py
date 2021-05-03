@@ -23,7 +23,7 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
         Final position (km).
     tof : ~astropy.units.Quantity
         Time of flight (s).
-    short : boolean, optional
+    short : bool, optional
         Find out the short path, default to True. If False, find long path.
     numiter : int, optional
         Maximum number of iterations, default to 35.

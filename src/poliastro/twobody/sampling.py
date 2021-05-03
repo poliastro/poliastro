@@ -18,7 +18,7 @@ def sample_closed(min_nu, ecc, max_nu=None, num_values=100):
     First sample the eccentric anomaly uniformly,
     then transform into true anomaly
     to minimize error in the apocenter,
-    see http://www.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
+    see https://apps.dtic.mil/dtic/tr/fulltext/u2/a605040.pdf
 
     """
     # Because how nu_to_E works, we don't need to wrap the angle here!

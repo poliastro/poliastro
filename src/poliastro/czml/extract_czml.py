@@ -243,8 +243,8 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        pos: list [~astropy.units]
-            coordinates of ground station,
+        pos: list [~astropy.units.Quantity]
+            Coordinates of ground station,
             list of geodetic latitude and longitude [lon, lat] (0 elevation)
         id_description: str
             Set ground station description
@@ -331,7 +331,7 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        orbit: poliastro.Orbit
+        orbit: poliastro.twobody.orbit.Orbit
             Orbit to be added
         rtol: float
             Maximum relative error permitted
@@ -340,9 +340,9 @@ class CZMLExtractor:
         groundtrack_show: bool
             If set to true, the groundtrack is
             displayed.
-        groundtrack_lead_time: double
+        groundtrack_lead_time: float
             The time the animation is ahead of the real-time groundtrack
-        groundtrack_trail_time: double
+        groundtrack_trail_time: float
             The time the animation is behind the real-time groundtrack
         groundtrack_width: int
             Groundtrack width
@@ -497,14 +497,14 @@ class CZMLExtractor:
         ----------
         positions: ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-        epochs: ~astropy.time.core.Time
+        epochs: ~astropy.time.Time
             Epochs for positions.
         groundtrack_show: bool
             If set to true, the groundtrack is
             displayed.
-        groundtrack_lead_time: double
+        groundtrack_lead_time: float
             The time the animation is ahead of the real-time groundtrack
-        groundtrack_trail_time: double
+        groundtrack_trail_time: float
             The time the animation is behind the real-time groundtrack
         groundtrack_width: int
             Groundtrack width

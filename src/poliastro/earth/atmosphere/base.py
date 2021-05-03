@@ -51,7 +51,7 @@ class COESA:
             Altitude to be checked.
         r0: ~astropy.units.Quantity
             Attractor radius.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes geometric altitude kind.
 
         Returns

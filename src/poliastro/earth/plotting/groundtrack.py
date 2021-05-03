@@ -24,7 +24,7 @@ class GroundtrackPlotter:
         ----------
         fig: ~plotly.graph_objects.Figure
             Figure instance for the canvas
-        color_palette: dictionary
+        color_palette: dict
             A color palette for background map
 
         """
@@ -54,7 +54,7 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        config: dictionary
+        config: dict
             A collection of custom values for geo figure
 
         """
@@ -66,7 +66,7 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        config: dictionary
+        config: dict
             A collection of custom values for figure layout
 
         """
@@ -138,7 +138,7 @@ class GroundtrackPlotter:
             Collection of epochs
         label: string
             Name for the trace
-        line_style: dictionary
+        line_style: dict
             Dictionary for customizing groundtrack line trace
 
         Returns
@@ -173,7 +173,7 @@ class GroundtrackPlotter:
             EarthSatellite's orbit
         label: string
             Label for the orbit
-        marker: dictionary
+        marker: dict
             Dicitonary holding plotly marker configuration
 
         Returns
@@ -214,9 +214,9 @@ class GroundtrackPlotter:
             A collection of epochs
         color: string
             Desired lines and traces color
-        line_style: dictionary
+        line_style: dict
             Dictionary for customizing groundtrack line trace
-        marker: dictionary
+        marker: dict
             Dictionary for customizing groundtrack marker trace
 
         Returns

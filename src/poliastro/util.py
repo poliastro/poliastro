@@ -30,14 +30,14 @@ def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=
     ----------
     periods : int, optional
         Number of periods, default to 50.
-    spacing : Time or Quantity, optional
+    spacing : ~astropy.time.Time or ~astropy.units.Quantity, optional
         Spacing between periods, optional.
-    end : Time or equivalent, optional
+    end : ~astropy.time.Time or equivalent, optional
         End date.
 
     Returns
     -------
-    Time
+    result: ~astropy.time.Time
         Array of time values.
 
     """

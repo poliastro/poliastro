@@ -220,9 +220,9 @@ class BaseOrbitPlotter:
         ----------
         coordinates : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-        label : string, optional
+        label : str, optional
             Label of the trajectory.
-        color : string, optional
+        color : str, optional
             Color of the trajectory.
         trail : bool, optional
             Fade the orbit trail, default to False.
@@ -239,9 +239,9 @@ class BaseOrbitPlotter:
         ----------
         orbit : ~poliastro.twobody.orbit.Orbit
             Orbit to plot.
-        label : string, optional
+        label : str, optional
             Label of the orbit.
-        color : string, optional
+        color : str, optional
             Color of the line and the position.
         trail : bool, optional
             Fade the orbit trail, default to False.
@@ -270,7 +270,7 @@ class BaseOrbitPlotter:
             Epoch of current position.
         label : str, optional
             Label of the orbit, default to the name of the body.
-        color : string, optional
+        color : str, optional
             Color of the line and the position.
         trail : bool, optional
             Fade the orbit trail, default to False.
@@ -291,7 +291,7 @@ class BaseOrbitPlotter:
             Epoch of the current position, none will be used if not given.
         label : str, optional
             Label of the orbit, default to the name of the body.
-        color : string, optional
+        color : str, optional
             Color of the line and the position.
         trail : bool, optional
             Fade the orbit trail, default to False.
