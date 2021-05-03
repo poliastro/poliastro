@@ -2,6 +2,30 @@
 
 ## poliastro 0.15.0 - Unreleased
 
+This new major release includes lots of API changes and enhancements,
+as well as the fruitful results from Google Summer of Code 2020.
+
+### Highlights
+
+- **Numerous new Earth-specific capabilities!**
+  María Eugenia (Meuge) contributed lots of new features useful for studying artificial satellites,
+  including formulas to compute the field of view and ground range in {py:mod}`poliastro.twobody.orbit`,
+  and new experimental {py:class}`poliastro.earth.EarthSatellite`
+  and {py:class}`~poliastro.earth.Spacecraft` classes.
+- **Revamped website!**
+  We reorganized our domains
+  and [gave poliastro a nice front page](https://www.poliastro.space).
+- **Support for Python 3.9!**
+  The next release will add support for Python 3.10,
+  and depending on development effort we will consider dropping Python 3.7.
+- **Reorganized documentation following the popular [Diátaxis Framework](https://diataxis.fr/)!**
+  We thank Daniele Procida for creating it and for being an endless source of inspiration.
+- **Migrated all documentation to MyST!**
+  Markdown has much wider adoption than reStructuredText,
+  so we made the decision to switch to Markedly Structured Text,
+  a superset of CommonMark that adds some nice features.
+  We hope that this will make contributing to poliastro documentation easier.
+
 ### Contributors
 
 This is a complete, alphabetic list of people that contributed to this release,
