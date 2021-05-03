@@ -1,5 +1,50 @@
 # What\'s new
 
+## poliastro 0.15.0 - Unreleased
+
+### Contributors
+
+This is a complete, alphabetic list of people that contributed to this release,
+with a + sign indicating first contribution.
+This release took longer than usual,
+and therefore the contributors list is larger than ever!
+
+- Abdul Moiz+
+- Abhishek Anant+
+- Abhishek Chaurasia
+- Adarsh Desai+
+- Andrea Carballo+
+- Ángel Ramírez Quispe+
+- Bryan W. Weber+
+- Claudia Millán+
+- Dhruv Sondhi+
+- Ezequiel Pássaro+
+- Giuseppe Di Pasquale+
+- Iago Alonso+
+- Isabel González+
+- Ishan Srivastava+
+- Jorge Martínez Garrido
+- Jos van 't Hof
+- Juan Luis Cano Rodríguez
+- Matthew Jones+
+- María Eugenia Cruz
+- Nickolai Belakovski+
+- Nidhi Zare+
+- Nihar Salunke+
+- Nirav Madhani+
+- Ole Streicher
+- Orestis Ousoultzoglou+
+- Pablo Castro+
+- Paolo Squadrito+
+- Radhika Jadhav+
+- Rafael Araujo Lehmkuhl+
+- Rishabh Nanawati+
+- Souhit Dey+
+- Tomek Mrugalski
+- Venkitesh+
+- Yash Gondhalekar+
+- Zeke Sikelianos+
+
 ## poliastro 0.14.0 - 2020-05-08
 
 This major release contains crucial new features and bug fixes that have
