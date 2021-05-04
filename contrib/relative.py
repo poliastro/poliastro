@@ -93,7 +93,7 @@ class RelativeOrb:
         
         When this class is initialized, it requires two poliastro twobody
         objects: a chief orbiter (satC) and a deputy orbiter (satD). After
-        initialialization, a number of computations must be made.
+        initialisation, a number of computations must be made.
         
         First, the relative orbit is defined by the separation of the relative
         inclination vector [ix,iy], and relative eccentricity vector [ex,ey].
@@ -114,15 +114,15 @@ class RelativeOrb:
         have slightly modified his equations to take into account effects at
         low-inclination orbits that was not captured in his paper.
         
-        Computed parameters
-        -------------------
+        Computed parameters on initialisation
+        -------------------------------------
         - ix --> Relative inclination vector x-component
         - iy --> Relative inclination vector y-component
         - ex --> Relative eccentricity vector x-component
         - ey --> Relative eccentricity vector y-component
         - da --> Relative semi-major axis (normalized over the Chief SMA)
         - dR --> Relative in-track separation due to RAAN differential
-        - du --> Relative argument of latitude (time dependent, default zero)
+        - M  --> Linearized relative motion state transition matrix
         
         """
         
@@ -130,54 +130,29 @@ class RelativeOrb:
         self.satC = satC
         self.satD = satD
         
-        # Below are all the auxiliary parameters used in the computation of
-        # the state transition matrix that converts the time-dependent anomaly
-        # values into relative position and velocity values in the VVLH frame.
-        # Ensure that all the values below are of the same type (numpy.float64)
-        self.ix = (satD.inc - satC.inc).to_value(u.rad)
-        self.iy = (np.sin(satC.inc) * (satD.raan - satC.raan)).to_value(u.rad)
-        self.ex = (satD.ecc*np.cos(satD.argp)) - (satC.ecc*np.cos(satC.argp))
-        self.ex = self.ex.to_value(u.one)
-        self.ey = (satD.ecc*np.sin(satD.argp)) - (satC.ecc*np.sin(satC.argp))
-        self.ey = self.ey.to_value(u.one)
-        self.da = ((satD.a - satC.a) /  satC.a).to_value(u.one)
-        self.dR = ((satD.raan - satC.raan) * np.cos(satC.inc)).to_value(u.rad)
+        # Retrieve the angular orbit parameters from the chief and deputy.
+        aD, aC = satD.a,    satC.a      # Semi-major axis    (u.km)
+        iD, iC = satD.inc,  satC.inc    # Inclination        (u.rad)
+        eD, eC = satD.ecc,  satC.ecc    # Eccentricity       (u.one)
+        wD, wC = satD.argp, satC.argp   # Arg of Periapsis   (u.rad)
+        rD, rC = satD.raan, satC.raan   # Right Ascension    (u.rad)
+        
+        # Compute auxiliary relative elements used in state transition matrix.
+        self.ix = (   iD - iC                                 ).to_value(u.rad)
+        self.iy = ( ( np.sin(iC) * (rD - rC) )                ).to_value(u.rad)
+        self.ex = ( ( eD * np.cos(wD) ) - ( eC * np.cos(wC) ) ).to_value(u.one)
+        self.ey = ( ( eD * np.sin(wD) ) - ( eC * np.sin(wC) ) ).to_value(u.one)
+        self.da = ( ( aD - aC ) / aC                          ).to_value(u.one)
+        self.dR = ( ( rD - rC ) * np.cos(iC)                  ).to_value(u.rad)
         
         # With the above, we can already define the state transition matrix
         # from classical orbit elements to VVLH frame relative state vectors.
-        self.M = np.zeros((6,4))
-        
-        # Column 1 of Linearized Relative EOM Matrix
-        self.M[0][0] = self.da
-        self.M[1][0] = self.dR # This element will be updated in the for loop.
-        self.M[2][0] = 0.0
-        self.M[3][0] = 0.0
-        self.M[4][0] = self.da * (-1.5)
-        self.M[5][0] = 0.0
-        
-        # Column 2 of Linearized Relative EOM Matrix
-        self.M[0][1] = 0.0
-        self.M[1][1] = self.da * (-1.5)
-        self.M[2][1] = 0.0
-        self.M[3][1] = 0.0
-        self.M[4][1] = 0.0
-        self.M[5][1] = 0.0
-        
-        # Column 3 of Linearized Relative EOM Matrix
-        self.M[0][2] = self.ex * (-1)
-        self.M[1][2] = 0.0   # This was mistakenly = -2*ey in the paper
-        self.M[2][2] = self.iy * (-1)
-        self.M[3][2] = self.ey * (-1)
-        self.M[4][2] = 0.0   # This was mistakenly = 2*ex in the paper
-        self.M[5][2] = self.ix
-        
-        # Column 4 of Linearized Relative EOM Matrix
-        self.M[0][3] = self.ey * (-1)
-        self.M[1][3] = 0.0   # This was mistakenly = 2*ex in the paper
-        self.M[2][3] = self.ix
-        self.M[3][3] = self.ex
-        self.M[4][3] = 0.0   # This was mistakenly = 2*ey in the paper
-        self.M[5][3] = self.iy
+        self.M = [[      self.da,          0.0, -1*self.ex, -1*self.ey ],
+                  [      self.dR, -1.5*self.da,        0.0,        0.0 ],
+                  [          0.0,          0.0, -1*self.iy,    self.ix ],
+                  [          0.0,          0.0, -1*self.ey,    self.ex ],
+                  [ -1.5*self.da,          0.0,        0.0,        0.0 ],
+                  [          0.0,          0.0,    self.ix,    self.iy ]]
         
         # Finally, define the output of the relative trajectory propagation.
         self.relPosArray = np.array([]).astype( type(1*u.km) )
@@ -187,7 +162,7 @@ class RelativeOrb:
     def get_eccentricity_separation(self):
         
         """
-        Returns the eccentricity separation vector [ex, ey]
+        Returns the eccentricity separation vector [ex, ey] (dimensionless)
         """
         
         return [ self.ex, self.ey ]
@@ -196,7 +171,7 @@ class RelativeOrb:
     def get_inclination_separation(self):
         
         """
-        Returns the inclination separation vector [ex, ey]
+        Returns the inclination separation vector [ix, iy] (dimensionless)
         """
         
         return [ self.ix, self.iy ]
@@ -205,7 +180,7 @@ class RelativeOrb:
     def _dcmX(self, t):
         
         """
-        Input theta is the scalar angle (IN RADIANS).
+        Input theta is the scalar angle (in radians, non Astropy unit).
         Output is a 3x3 direction cosine matrix.
         """
         
@@ -215,11 +190,11 @@ class RelativeOrb:
     
         return dcm
     
-    # Method to return direction cosine matrix for a rotation t about Z-axis
+    # Internal method to return a direction cosine matrix about the Z-axis
     def _dcmZ(self, t):
     
         """
-        Input theta is the scalar angle (IN RADIANS).
+        Input theta is the scalar angle (in radians, non Astropy unit).
         Output is a 3x3 direction cosine matrix.
         """
         
@@ -229,7 +204,7 @@ class RelativeOrb:
         
         return dcm
     
-    # Method to solve for Kepler's equation with mean anomaly input
+    # Internal method to return a direction cosine matrix about the X-axis
     def _solve_kepler(self, M, ecc):
         
         """
@@ -257,17 +232,21 @@ class RelativeOrb:
         
         """
         Inputs: Keplerian elements and gravitational constant (Astropy units).
-                - a    -> Semi-major axis (km)
-                - e    -> Eccentricity (unit-less)
-                - i    -> Inclination (degrees)
-                - w    -> Argument of Perigee (degrees)
-                - R    -> Right Angle of Asc Node (degrees)
-                - M    -> Mean Anomaly (degrees)
-                - mu   -> Gravitational constant (km^3/s^2)
+                - a        -> Semi-major axis (u.km)
+                - e        -> Eccentricity (u.one)
+                - i        -> Inclination (u.deg)
+                - w        -> Argument of Perigee (u.deg)
+                - R        -> Right Angle of Asc Node (u.deg)
+                - M        -> Mean Anomaly (u.deg)
+                - mu       -> Gravitational constant (u.m^3 / u.s^2)
         
-        Output: A 1x3 position and 1x3 velocity vector in an inertial frame.
+        Output: Inertial position vector, velocity vector, and true anomaly
+                - pos      -> inertial position (1x3 vector, u.km)
+                - vel      -> inertial velocity (1x3 vector, u.km/u.s)
+                - trueAnom -> true anomaly (float, u.rad)
         """
         
+        # Ensure the conversion of the attractor's gravitational constant.
         mu = mu.to(u.km**3/u.s**2)
         
         # The general flow of the program, is to first solve for the radial
@@ -325,17 +304,17 @@ class RelativeOrb:
     def propagate(self, duration=43200, step=60):
         
         """
-        This is the core method used for the relative trajectory generation.
-        Propagates the relative orbit trajectory for one full orbit period.
+        Core method for relative trajectory generation. Inputs duration and
+        time step (integers), and updates the six state arrays of the object
+        (XYZ position and XYZ velocity) for N samples.
 
         Input:
         - duration - integer number of seconds (optional, default = 12 hours)
         - step - integer time step size (optional, default = 1 minute)
         
         Returns two numpy arrays
-        - 1x3 position vector
-        - 1x3 velocity vector
-        - float true anomaly (rad)
+        - Nx3 matrix of all position vectors
+        - Nx3 matrix of all velocity vector
         """
         
         # Check if the orbit is an ellipse (closed)
@@ -443,7 +422,7 @@ class RelativeOrb:
             self.relVelArrayY = np.array(relVelArrayY) * ( 1 * u.km / u.s )
             self.relVelArrayZ = np.array(relVelArrayZ) * (-1 * u.km / u.s )
             
-            # To allow for chaining
+            # To allow for chaining...
             return self
         
         # Or if the orbit is a para/hyperbola...
