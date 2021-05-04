@@ -136,7 +136,7 @@ class TisserandPlotter:
             Vinf velocity line
         alpha_lim: tuple
             Minimum and maximum flyby angles
-        color: string
+        color: str
             String representing for the color lines
 
         Returns
@@ -174,7 +174,7 @@ class TisserandPlotter:
             Minimum and maximum Vinf velocities
         num_contours: int
             Number of points to iterate over previously defined velocities
-        color: string
+        color: str
             String representing for the color lines
 
         Returns

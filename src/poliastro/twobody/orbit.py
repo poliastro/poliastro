@@ -271,7 +271,7 @@ class Orbit:
         ----------
         attractor: Body
             Main attractor
-        coord: astropy.coordinates.SkyCoord or BaseCoordinateFrame
+        coord: ~astropy.coordinates.SkyCoord or ~astropy.coordinates.BaseCoordinateFrame
             Position and velocity vectors in any reference frame. Note that coord must have
             a representation and its differential with respect to time.
         plane : ~poliastro.frames.Planes, optional
@@ -494,7 +494,7 @@ class Orbit:
         ----------
         new_attractor: poliastro.bodies.Body
             Desired new attractor.
-        force: boolean
+        force: bool
             If `True`, changes attractor even if physically has no-sense.
 
         Returns
@@ -579,13 +579,13 @@ class Orbit:
 
         Parameters
         ----------
-        name : string
+        name : str
             Name of the body to query for.
         epoch : ~astropy.time.Time, optional
             Epoch, default to None.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
-        id_type : string, optional
+        id_type : str, optional
             Use "smallbody" for Asteroids and Comets, and "majorbody"
             for Planets and Satellites.
 
@@ -637,7 +637,7 @@ class Orbit:
 
         Parameters
         ----------
-        name: string
+        name: str
             Name of the body to make the request.
 
         Returns

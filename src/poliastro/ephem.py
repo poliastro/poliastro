@@ -264,7 +264,7 @@ class Ephem:
             if not given the Solar System Barycenter will be used.
         plane : ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
-        id_type : string, optional
+        id_type : str, optional
             Use "smallbody" for Asteroids and Comets (default), and "majorbody"
             for Planets and Satellites.
 
