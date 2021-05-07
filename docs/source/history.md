@@ -15,13 +15,16 @@ implemented everything in pure Python and poliastro 0.3 was born.
 
 ## Future ideas
 
-These are some things that I would love to implement in poliastro to
-expand its capabilities:
+poliastro has been historically focused on interplanetary applications,
+so we would like to improve its Earth-specific capabilities in the future,
+for example:
 
-- 3D plotting of orbits
-- Continuous thrust maneuvers
-- Tisserand graphs
-- Porkchop plots
+- High order gravitational model for the Earth
+- Input/output of TLE and other GP data format
+- Attitude & dynamics
+
+And in general, we would like to stabilize the API
+and release a 1.0 version at some point!
 
 ## Acknowledgement from the original author
 
