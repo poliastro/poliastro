@@ -167,7 +167,7 @@ quickstart.md
 ```{toctree} 
 ---
 maxdepth: 2
-caption: How to guides & Examples
+caption: How-to guides & Examples
 ---
 gallery.md
 contributing.md
