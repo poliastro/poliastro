@@ -6,14 +6,14 @@ Name:         | poliastro
 :------------:|:--------------
 **Website**:  | <https://www.poliastro.space/>
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
-**Version**:  | 0.15.dev0
+**Version**:  | 0.15b1
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
+[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.15.x)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.15.x)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=master)
-[![codeclimate](https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability)](https://codeclimate.com/github/poliastro/poliastro/maintainability)
+[![codeclimate](https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/0.15.xtainability)](https://codeclimate.com/github/poliastro/poliastro/0.15.xtainability)
 
-[![docs](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/latest/?badge=latest)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/main/COPYING)
+[![docs](https://img.shields.io/badge/docs-v0.15b1-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/v0.15b1/?badge=v0.15b1)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/0.15.x/COPYING)
 [![doi](https://zenodo.org/badge/11178845.svg?style=flat-square)](https://zenodo.org/badge/latestdoi/11178845)
 [![astropy](http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat-square)](http://www.astropy.org/)
 [![mailing](https://img.shields.io/badge/mailing%20list-groups.io-8cbcd1.svg?style=flat-square)](https://groups.io/g/poliastro-dev)
@@ -42,12 +42,12 @@ molniya.plot()
 ```
 
 <p align="center">
-    <image src="https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png">
+    <image src="https://github.com/poliastro/poliastro/raw/0.15.x/docs/source/examples/molniya.png">
 </p>
 
 # Documentation
 
-[![docs](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/latest/?badge=latest)
+[![docs](https://img.shields.io/badge/docs-v0.15b1-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/v0.15b1/?badge=v0.15b1)
 
 Complete documentation, including a user guide and an API reference, can
 be read on the wonderful [Read the Docs](https://readthedocs.org/).
@@ -56,14 +56,14 @@ be read on the wonderful [Read the Docs](https://readthedocs.org/).
 
 # Examples
 
-[![mybinder](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://beta.mybinder.org/v2/gh/poliastro/poliastro/main?filepath=index.ipynb)
+[![mybinder](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://beta.mybinder.org/v2/gh/poliastro/poliastro/0.15.x?filepath=index.ipynb)
 
 In the examples directory you can find several Jupyter notebooks with
 specific applications of poliastro. You can launch a cloud Jupyter
 server using [binder](https://beta.mybinder.org/) to edit the notebooks
 without installing anything. Try it out!
 
-<https://beta.mybinder.org/v2/gh/poliastro/poliastro/main?filepath=index.ipynb>
+<https://beta.mybinder.org/v2/gh/poliastro/poliastro/0.15.x?filepath=index.ipynb>
 
 # Requirements
 
@@ -80,7 +80,7 @@ poliastro requires the following Python packages:
 poliastro is tested on Linux, OS X and Windows on Python 3.7 and 3.8
 against latest NumPy.
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
+[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.15.x)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.15.x)
 
 # Installation
 
@@ -91,7 +91,7 @@ install poliastro using [conda](http://conda.io):
     $ conda install poliastro --channel conda-forge
 ```
 Please check out the [documentation for alternative installation
-methods](https://docs.poliastro.space/en/latest/getting_started.html#alternative-installation-methods).
+methods](https://docs.poliastro.space/en/v0.15b1/getting_started.html#alternative-installation-methods).
 
 # Problems and suggestions
 
@@ -134,7 +134,7 @@ And this is an example citation format:
 
 # License
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/main/COPYING)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/0.15.x/COPYING)
 
 poliastro is released under the MIT license, hence allowing commercial
 use of the library. Please refer to the COPYING file.
@@ -180,7 +180,7 @@ such as TLE/3LE, OMM, and the like.
 Besides, poliastro is a community project that strives to be easy to use,
 while at the same time producing correct results
 [that are validated](https://github.com/poliastro/validation/)
-against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/latest/about.html#related-software)
+against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/v0.15b1/about.html#related-software)
 such as GMAT and Orekit.
 Therefore, you might find that its API is very different from
 these projects,
