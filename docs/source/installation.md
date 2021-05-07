@@ -1,4 +1,4 @@
-# Getting started
+# Installation
 
 ## Requirements
 
@@ -15,7 +15,7 @@ poliastro requires a number of Python packages, notably:
 poliastro is usually tested on Linux and Windows on Python 3.7 and 3.8
 against the latest NumPy. It should work on OS X without problems.
 
-## Installation
+## Using conda
 
 The easiest and fastest way to get the package up and running is to
 install poliastro using [conda](https://conda.io/docs/):
@@ -34,7 +34,7 @@ environment.
 If the installation fails for any reason, please open an issue in the
 [issue tracker](https://github.com/poliastro/poliastro/issues).
 
-### Alternative installation methods
+## Alternative installation methods
 
 If you don\'t want to use conda you can [install poliastro from
 PyPI](https://pypi.python.org/pypi/poliastro/) using pip:
