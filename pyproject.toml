@@ -87,7 +87,7 @@ dev = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
-    "sphinx",
+    "sphinx<3.5",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery",
     "sphinx_rtd_theme==0.5.0",
