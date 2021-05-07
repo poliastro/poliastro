@@ -3,8 +3,8 @@ jupytext:
   text_representation:
     extension: .mystnb
     format_name: myst
-    format_version: 0.12
-    jupytext_version: 1.9.1
+    format_version: 0.13
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -29,11 +29,11 @@ You will only need poliastro (obviously) and czml3, a library for easily creatin
 
 We'll start off by using one of the readily usable poliastro examples. Of course, you can use any poliastro ``Orbit`` object:
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.czml.extract_czml import CZMLExtractor
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.examples import molniya
 ```
 
@@ -41,13 +41,13 @@ To initialize the extractor, you'll only need the starting and ending epoch of t
 
 For this specific example, we're only interested in a single orbital period:
 
-```{code-cell}
+```{code-cell} ipython3
 start_epoch = molniya.epoch
 end_epoch = molniya.epoch + molniya.period
 N = 80
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 extractor = CZMLExtractor(
         start_epoch,
         end_epoch,
@@ -95,7 +95,7 @@ To add an orbit you can simply call ``add_orbit`` and pass your ``Orbit`` along 
 
 ``groundtrack_color``: The groundtrack color. By default, it is set to the trajectory's color
 
-```{code-cell}
+```{code-cell} ipython3
 extractor.add_orbit(molniya,
               id_name="MolniyaOrbit",
               path_width=2,
@@ -106,7 +106,7 @@ extractor.add_orbit(molniya,
 
 You can now export the extractor packets by simply calling ``extractor.packets`` and load it to the Cesium app as described [here](https://github.com/poliastro/cesium-app):
 
-```{raw-cell}   
+```{raw-cell}
   >>> extractor.packets
   [{
      "id": "document",
@@ -126,17 +126,17 @@ You can now export the extractor packets by simply calling ``extractor.packets``
 
 You can customize the attractor of your orbit by defining any valid ellipsoid with the help of poliastro's ``Body`` class. For your convenience, poliastro offers a pre-defined list of all the major planetary bodies of the solar system so you can simply import them:
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.bodies import Mars
 ```
 
 Of course, when defining a new attractor you want to be able to identify something other than it's shape. For this reason, the extractor allows you to easily set the UV map by simply providing a valid URL:
 
-```{code-cell}
+```{code-cell} ipython3
 mars_uv = "https://upload.wikimedia.org/wikipedia/commons/f/fd/Mars_2020_LandingSites_Final_8-full.jpg"
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 extractor = CZMLExtractor(
         start_epoch,
         end_epoch,
@@ -146,7 +146,7 @@ extractor = CZMLExtractor(
 )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 extractor.packets
 ```
 
@@ -154,7 +154,7 @@ extractor.packets
 
 Instead of a 3D globe you may want to visualize your orbit as a 2D projection instead. In this case you can simply set ``scene3D`` to ``false`` and Cesium will automatically render the scene's orthographic projection. This can be of use when plotting animated groundtracks as we'll see in the next section:
 
-```{code-cell}
+```{code-cell} ipython3
 extractor = CZMLExtractor(
         start_epoch,
         end_epoch,
@@ -163,7 +163,7 @@ extractor = CZMLExtractor(
 )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 extractor.packets
 ```
 
@@ -171,7 +171,7 @@ extractor.packets
 
 Another useful feature the extractor offers, is the ability to plot the ground track of an orbit. You can set the groundtrack by setting the aforementioned ``groundtrack_show`` parameter to true. Note that this also works in 2D view:
 
-```{code-cell}
+```{code-cell} ipython3
 extractor = CZMLExtractor(
         start_epoch,
         end_epoch,
@@ -179,7 +179,7 @@ extractor = CZMLExtractor(
     )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 extractor.add_orbit(molniya,
               groundtrack_show=True,
               groundtrack_lead_time=20,
@@ -187,7 +187,7 @@ extractor.add_orbit(molniya,
              )
 ```
 
-```{raw-cell}    
+```{raw-cell}
   >>> extractor.packets
   [...]
   {

@@ -1,5 +1,85 @@
 # What\'s new
 
+## poliastro 0.15.0 - Unreleased
+
+This new major release includes lots of API changes and enhancements,
+as well as the fruitful results from Google Summer of Code 2020.
+
+### Highlights
+
+- **Numerous new Earth-specific capabilities!**
+  María Eugenia (Meuge) contributed lots of new features useful for studying artificial satellites,
+  including formulas to compute the field of view and ground range in {py:mod}`poliastro.twobody.orbit`,
+  and new experimental {py:class}`poliastro.earth.EarthSatellite`
+  and {py:class}`~poliastro.earth.Spacecraft` classes.
+- **poliastro is now validated!**
+  Thanks to a [NumFOCS Small Development Grant](https://numfocus.org/programs/small-development-grants),
+  we created a [validation framework for poliastro](https://github.com/poliastro/validation/)
+  to compare our results with GMAT and Orekit.
+- **Revamped website!**
+  We reorganized our domains
+  and [gave poliastro a nice front page](https://www.poliastro.space).
+- **Support for Python 3.9!**
+  We also dropped support for Python 3.6, as anticipated.
+  The next release will add support for Python 3.10,
+  and depending on development effort we will consider dropping Python 3.7.
+- **Reorganized documentation following the popular [Diátaxis Framework](https://diataxis.fr/)!**
+  Now our docs are splitted in four sections: Tutorials, How-to guides, Background, and Reference.
+  We thank Daniele Procida for creating it and for being an endless source of inspiration.
+- **Migrated all documentation to MyST!**
+  Markdown has much wider adoption than reStructuredText,
+  so we made the decision to switch to Markedly Structured Text,
+  a superset of CommonMark that adds some nice features.
+  We hope that this will make contributing to poliastro documentation easier.
+- **Added a community contributions procedure!**
+  We now have a top-level `contrib/` directory
+  for community contributions that are not yet ready to be part of the poliastro API.
+  Check out [the instructions](https://github.com/poliastro/poliastro/tree/main/contrib)
+  and make yours!
+
+### Contributors
+
+This is a complete, alphabetic list of people that contributed to this release,
+with a + sign indicating first contribution.
+This release took longer than usual,
+and therefore the contributors list is larger than ever!
+
+- Abdul Moiz+
+- Abhishek Anant+
+- Abhishek Chaurasia
+- Adarsh Desai+
+- Andrea Carballo+
+- Ángel Ramírez Quispe+
+- Bryan W. Weber+
+- Claudia Millán+
+- Dhruv Sondhi+
+- Ezequiel Pássaro+
+- Giuseppe Di Pasquale+
+- Iago Alonso+
+- Isabel González+
+- Ishan Srivastava+
+- Jorge Martínez Garrido
+- Jos van 't Hof
+- Juan Luis Cano Rodríguez
+- Matthew Jones+
+- María Eugenia Cruz
+- Nickolai Belakovski+
+- Nidhi Zare+
+- Nihar Salunke+
+- Nirav Madhani+
+- Ole Streicher
+- Orestis Ousoultzoglou+
+- Pablo Castro+
+- Paolo Squadrito+
+- Radhika Jadhav+
+- Rafael Araujo Lehmkuhl+
+- Rishabh Nanawati+
+- Souhit Dey+
+- Tomek Mrugalski
+- Venkitesh+
+- Yash Gondhalekar+
+- Zeke Sikelianos+
+
 ## poliastro 0.14.0 - 2020-05-08
 
 This major release contains crucial new features and bug fixes that have
