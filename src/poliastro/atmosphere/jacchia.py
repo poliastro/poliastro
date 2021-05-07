@@ -42,7 +42,7 @@ k = 1.380622e-23 * u.J / u.K
 
 
 class Jacchia77:
-    """ Holds the model for U.S Standard Atmosphere 1962."""
+    """Holds the model for U.S Standard Atmosphere 1962."""
 
     def __init__(self):
         self.E5M = [0.0 for _ in range(11)]

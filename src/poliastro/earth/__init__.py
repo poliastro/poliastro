@@ -46,12 +46,12 @@ class EarthSatellite:
 
     @property
     def orbit(self):
-        """Orbit of the EarthSatellite. """
+        """Orbit of the EarthSatellite."""
         return self._orbit
 
     @property
     def spacecraft(self):
-        """Spacecraft of the EarthSatellite. """
+        """Spacecraft of the EarthSatellite."""
         return self._spacecraft
 
     @u.quantity_input(tof=u.min)

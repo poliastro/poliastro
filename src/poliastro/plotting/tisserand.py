@@ -11,7 +11,7 @@ from poliastro.util import norm
 
 
 class TisserandKind(Enum):
-    """ All possible Tisserand kinds """
+    """All possible Tisserand kinds"""
 
     APSIS = "apsis"
     ENERGY = "energy"
@@ -19,7 +19,7 @@ class TisserandKind(Enum):
 
 
 class TisserandPlotter:
-    """ Generates Tisserand figures """
+    """Generates Tisserand figures"""
 
     def __init__(self, kind=TisserandKind.APSIS, axes=None):
         """Object initializer

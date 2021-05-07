@@ -78,117 +78,117 @@ class Orbit:
 
     @property
     def attractor(self):
-        """Main attractor. """
+        """Main attractor."""
         return self._state.attractor
 
     @property
     def epoch(self):
-        """Epoch of the orbit. """
+        """Epoch of the orbit."""
         return self._epoch
 
     @property
     def plane(self):
-        """Fundamental plane of the frame. """
+        """Fundamental plane of the frame."""
         return self._state.plane
 
     @cached_property
     def r(self):
-        """Position vector. """
+        """Position vector."""
         return self._state.to_vectors().r
 
     @cached_property
     def v(self):
-        """Velocity vector. """
+        """Velocity vector."""
         return self._state.to_vectors().v
 
     @cached_property
     def a(self):
-        """Semimajor axis. """
+        """Semimajor axis."""
         return self._state.to_classical().a
 
     @cached_property
     def p(self):
-        """Semilatus rectum. """
+        """Semilatus rectum."""
         return self._state.to_classical().p
 
     @cached_property
     def r_p(self):
-        """Radius of pericenter. """
+        """Radius of pericenter."""
         return self.a * (1 - self.ecc)
 
     @cached_property
     def r_a(self):
-        """Radius of apocenter. """
+        """Radius of apocenter."""
         return self.a * (1 + self.ecc)
 
     @cached_property
     def ecc(self):
-        """Eccentricity. """
+        """Eccentricity."""
         return self._state.to_classical().ecc
 
     @cached_property
     def inc(self):
-        """Inclination. """
+        """Inclination."""
         return self._state.to_classical().inc
 
     @cached_property
     def raan(self):
-        """Right ascension of the ascending node. """
+        """Right ascension of the ascending node."""
         return self._state.to_classical().raan
 
     @cached_property
     def argp(self):
-        """Argument of the perigee. """
+        """Argument of the perigee."""
         return self._state.to_classical().argp
 
     @property
     def nu(self):
-        """True anomaly. """
+        """True anomaly."""
         return self._state.to_classical().nu
 
     @cached_property
     def f(self):
-        """Second modified equinoctial element. """
+        """Second modified equinoctial element."""
         return self._state.to_equinoctial().f
 
     @cached_property
     def g(self):
-        """Third modified equinoctial element. """
+        """Third modified equinoctial element."""
         return self._state.to_equinoctial().g
 
     @cached_property
     def h(self):
-        """Fourth modified equinoctial element. """
+        """Fourth modified equinoctial element."""
         return self._state.to_equinoctial().h
 
     @cached_property
     def k(self):
-        """Fifth modified equinoctial element. """
+        """Fifth modified equinoctial element."""
         return self._state.to_equinoctial().k
 
     @cached_property
     def L(self):
-        """True longitude. """
+        """True longitude."""
         return self.raan + self.argp + self.nu
 
     @cached_property
     def period(self):
-        """Period of the orbit. """
+        """Period of the orbit."""
         return self._state.period
 
     @cached_property
     def n(self):
-        """Mean motion. """
+        """Mean motion."""
         return self._state.n
 
     @cached_property
     def energy(self):
-        """Specific energy. """
+        """Specific energy."""
         return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
 
     @cached_property
     def e_vec(self):
-        """Eccentricity vector. """
+        """Eccentricity vector."""
         r, v = self.rv()
         k = self.attractor.k
         e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
@@ -196,25 +196,25 @@ class Orbit:
 
     @cached_property
     def h_vec(self):
-        """Specific angular momentum vector. """
+        """Specific angular momentum vector."""
         h_vec = np.cross(self.r.to(u.km).value, self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
     @cached_property
     def h_mag(self):
-        """Specific angular momentum. """
+        """Specific angular momentum."""
         h_mag = norm(self.h_vec)
         return h_mag
 
     @cached_property
     def arglat(self):
-        """Argument of latitude. """
+        """Argument of latitude."""
         arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
 
     @cached_property
     def t_p(self):
-        """Elapsed time since latest perifocal passage. """
+        """Elapsed time since latest perifocal passage."""
         t_p = (
             delta_t_from_nu_fast(
                 self.nu.to_value(u.rad),
@@ -1174,11 +1174,11 @@ class Orbit:
         return cartesian.represent_as(representation, differential_class)
 
     def rv(self):
-        """Position and velocity vectors. """
+        """Position and velocity vectors."""
         return self.r, self.v
 
     def classical(self):
-        """Classical orbital elements. """
+        """Classical orbital elements."""
         return (
             self.a,
             self.ecc,
@@ -1189,7 +1189,7 @@ class Orbit:
         )
 
     def pqw(self):
-        """Perifocal frame (PQW) vectors. """
+        """Perifocal frame (PQW) vectors."""
         warn(
             "Orbit.pqw is deprecated and will be removed in a future release",
             DeprecationWarning,

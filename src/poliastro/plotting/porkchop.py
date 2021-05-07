@@ -24,7 +24,7 @@ from poliastro.util import norm
 
 
 def _get_state(body, time):
-    """ Computes the position of a body for a given time. """
+    """Computes the position of a body for a given time."""
 
     solar_system_bodies = [
         Sun,
