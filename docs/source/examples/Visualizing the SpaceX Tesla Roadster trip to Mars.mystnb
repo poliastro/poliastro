@@ -3,8 +3,8 @@ jupytext:
   text_representation:
     extension: .mystnb
     format_name: myst
-    format_version: 0.12
-    jupytext_version: 1.9.1
+    format_version: 0.13
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -13,7 +13,7 @@ kernelspec:
 
 # Visualizing the SpaceX Tesla Roadster trip to Mars
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy.time import Time
 from astropy import units as u
 
@@ -26,12 +26,12 @@ from poliastro.util import time_range
 EPOCH = Time("2018-02-18 12:00:00", scale="tdb")
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 import plotly.io as pio
 pio.renderers.default = "notebook_connected"
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 roadster = Ephem.from_horizons(
     "SpaceX Roadster",
     epochs=time_range(EPOCH, end=EPOCH + 360 * u.day),
@@ -42,18 +42,18 @@ roadster = Ephem.from_horizons(
 roadster
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.plotting.misc import plot_solar_system
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 frame = plot_solar_system(outer=False, epoch=EPOCH)
 frame.plot_ephem(roadster, EPOCH, label="SpaceX Roadster", color="black");
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 frame = OrbitPlotter3D(plane=Planes.EARTH_ECLIPTIC)
 
 frame.plot_body_orbit(Earth, EPOCH)

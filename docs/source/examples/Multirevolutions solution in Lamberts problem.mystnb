@@ -3,8 +3,8 @@ jupytext:
   text_representation:
     extension: .mystnb
     format_name: myst
-    format_version: 0.12
-    jupytext_version: 1.9.1
+    format_version: 0.13
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -37,7 +37,7 @@ However it is possible to make more than one revolution in order to achieve the 
 
 Let us see all these combinations by making use of *poliastro*!
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import units as u
 from astropy.time import Time
 
@@ -51,7 +51,7 @@ from poliastro.twobody import Orbit
 from poliastro.util import time_range
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # Departure and time of flight for the mission
 EPOCH_DPT = Time("2018-12-01", scale="tdb")
 EPOCH_ARR = EPOCH_DPT + 2 * u.year
@@ -66,7 +66,7 @@ earth_departure = Orbit.from_ephem(Sun, earth, EPOCH_DPT)
 mars_arrival = Orbit.from_ephem(Sun, mars, EPOCH_ARR)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 def lambert_transfer(ss_dpt, ss_arr, revs):
     """ Returns the short and long transfer orbits when solving Lambert's problem.
     
@@ -102,7 +102,7 @@ def lambert_transfer(ss_dpt, ss_arr, revs):
 
 By making use of the previously defined function, we can easily get the different transfer orbit regarding the number of required revolutions, in this case 0.
 
-```{code-cell}
+```{code-cell} ipython3
 # Solving for direct (M=0) transfer long and short arcs
 ss_short0, ss_long0 = lambert_transfer(earth_departure, mars_arrival, revs=0)
 
@@ -122,7 +122,7 @@ for ss in orbit_set:
 
 ## Solutions for M=1
 
-```{code-cell}
+```{code-cell} ipython3
 # Solving for M=1 long and short arc transfers
 ss_short1, ss_long1 = lambert_transfer(earth_departure, mars_arrival, revs=1)
 
@@ -142,7 +142,7 @@ for ss in orbit_set:
 
 ## Solutions for M=2
 
-```{code-cell}
+```{code-cell} ipython3
 # Solving for M=2 long and short transfer arcs
 ss_short2, ss_long2 = lambert_transfer(earth_departure, mars_arrival, revs=2)
 
@@ -162,7 +162,7 @@ for ss in orbit_set:
 
 We will plot now all the arc transfers just to better see the difference between them:
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 # Plot all solutions together

@@ -3,8 +3,8 @@ jupytext:
   text_representation:
     extension: .mystnb
     format_name: myst
-    format_version: 0.12
-    jupytext_version: 1.9.1
+    format_version: 0.13
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -19,7 +19,7 @@ The default styling for plots works pretty well however sometimes you may need t
 
 This is the default plot we will start with:
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy.time import Time
 
 from matplotlib import pyplot as plt
@@ -30,7 +30,7 @@ from poliastro.plotting import StaticOrbitPlotter
 from poliastro.twobody import Orbit
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 epoch = Time("2018-08-17 12:05:50", scale="tdb")
 
 plotter = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
@@ -39,7 +39,7 @@ plotter.plot_body_orbit(Mars, epoch, label="Mars")
 plotter.plot_body_orbit(Jupiter, epoch, label="Jupiter");
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 epoch = Time("2018-08-17 12:05:50", scale="tdb")
@@ -63,7 +63,7 @@ More details of the style options on lines can be found here: https://matplotlib
 
 Next we will make some changes to the other two orbits:
 
-```{code-cell}
+```{code-cell} ipython3
 epoch = Time("2018-08-17 12:05:50", scale="tdb")
 
 plotter = StaticOrbitPlotter()
@@ -93,7 +93,7 @@ You can also change the style of the plot using the matplotlib axis which can be
 
 See the following example that creates a grid, adds a title, and makes the background transparent. To make the changes clearer it goes back to the inital example:
 
-```{code-cell}
+```{code-cell} ipython3
 epoch = Time("2018-08-17 12:05:50", scale="tdb")
 
 fig, ax = plt.subplots()

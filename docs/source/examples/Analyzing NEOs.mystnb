@@ -5,7 +5,7 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.1
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
