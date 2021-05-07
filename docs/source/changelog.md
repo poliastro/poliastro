@@ -12,19 +12,30 @@ as well as the fruitful results from Google Summer of Code 2020.
   including formulas to compute the field of view and ground range in {py:mod}`poliastro.twobody.orbit`,
   and new experimental {py:class}`poliastro.earth.EarthSatellite`
   and {py:class}`~poliastro.earth.Spacecraft` classes.
+- **poliastro is now validated!**
+  Thanks to a [NumFOCS Small Development Grant](https://numfocus.org/programs/small-development-grants),
+  we created a [validation framework for poliastro](https://github.com/poliastro/validation/)
+  to compare our results with GMAT and Orekit.
 - **Revamped website!**
   We reorganized our domains
   and [gave poliastro a nice front page](https://www.poliastro.space).
 - **Support for Python 3.9!**
+  We also dropped support for Python 3.6, as anticipated.
   The next release will add support for Python 3.10,
   and depending on development effort we will consider dropping Python 3.7.
 - **Reorganized documentation following the popular [Diátaxis Framework](https://diataxis.fr/)!**
+  Now our docs are splitted in four sections: Tutorials, How-to guides, Background, and Reference.
   We thank Daniele Procida for creating it and for being an endless source of inspiration.
 - **Migrated all documentation to MyST!**
   Markdown has much wider adoption than reStructuredText,
   so we made the decision to switch to Markedly Structured Text,
   a superset of CommonMark that adds some nice features.
   We hope that this will make contributing to poliastro documentation easier.
+- **Added a community contributions procedure!**
+  We now have a top-level `contrib/` directory
+  for community contributions that are not yet ready to be part of the poliastro API.
+  Check out [the instructions](https://github.com/poliastro/poliastro/tree/main/contrib)
+  and make yours!
 
 ### Contributors
 
