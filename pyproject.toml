@@ -58,7 +58,7 @@ dependencies = [
 dynamic = ["version", "description"]
 
 [project.urls]
-Homepage = "https://www.poliastro.space"
+Home-Page = "https://www.poliastro.space"
 Documentation = "https://docs.poliastro.space"
 Source = "https://github.com/poliastro/poliastro"
 Tracker = "https://github.com/poliastro/poliastro/issues"
