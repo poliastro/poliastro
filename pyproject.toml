@@ -70,9 +70,7 @@ cesium = ["czml3 ~=0.5.3"]
 dev = [
     "black==21.5b0",
     "coverage",
-    "docutils",
     "hypothesis",
-    "ipykernel",
     "ipython>=5.0",
     "ipywidgets>=7.0",
     "isort",
@@ -95,7 +93,6 @@ dev = [
     "sphinx_rtd_theme==0.5.0",
     "sphinx-hoverxref==0.5b1",
     "sphinx-notfound-page",
-    "tox",
 ]
 
 [tool.flit.sdist]
