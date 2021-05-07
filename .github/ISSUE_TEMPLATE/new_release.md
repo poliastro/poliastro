@@ -14,7 +14,6 @@ assignees: astrojuanlu
   - Commits since last release branch https://github.com/poliastro/poliastro/compare/X.Y.Z...master
   - Issues closed in this milestone https://github.com/poliastro/poliastro/milestone/N?closed=1 (note that there might be issues without milestone!)
   - Pull requests merged since last branching https://github.com/poliastro/poliastro/pulls?q=is%3Apr+is%3Amerged+merged%3A%3E%3D2019-02-09+sort%3Aupdated-asc
-* [ ] Add X.Y.x branch to CI scripts
 
 ## Before the beta release
 
