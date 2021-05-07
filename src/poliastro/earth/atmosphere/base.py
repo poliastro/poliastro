@@ -4,7 +4,7 @@ from poliastro.earth.atmosphere.util import h_to_z, z_to_h
 
 
 class COESA:
-    """ Class for U.S Standard Atmosphere models. """
+    """Class for U.S Standard Atmosphere models."""
 
     def __init__(self, *tables):
         """Constructor for Atmosphere instances.

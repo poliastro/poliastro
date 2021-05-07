@@ -74,7 +74,7 @@ class GroundtrackPlotter:
         return self.fig
 
     def add_trace(self, trace):
-        """ Adds trace to custom figure """
+        """Adds trace to custom figure"""
 
         self.fig.add_trace(trace)
 

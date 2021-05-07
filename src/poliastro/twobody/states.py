@@ -28,17 +28,17 @@ class BaseState:
 
     @property
     def attractor(self):
-        """Main attractor. """
+        """Main attractor."""
         return self._attractor
 
     @property
     def n(self):
-        """Mean motion. """
+        """Mean motion."""
         return mean_motion(self.attractor.k, self.to_classical().a)
 
     @property
     def period(self):
-        """Period of the orbit. """
+        """Period of the orbit."""
         return period(self.attractor.k, self.to_classical().a)
 
     def to_vectors(self):
@@ -86,37 +86,37 @@ class ClassicalState(BaseState):
 
     @property
     def p(self):
-        """Semilatus rectum. """
+        """Semilatus rectum."""
         return self._p
 
     @property
     def a(self):
-        """Semimajor axis. """
+        """Semimajor axis."""
         return self.p / (1 - self.ecc ** 2)
 
     @property
     def ecc(self):
-        """Eccentricity. """
+        """Eccentricity."""
         return self._ecc
 
     @property
     def inc(self):
-        """Inclination. """
+        """Inclination."""
         return self._inc
 
     @property
     def raan(self):
-        """Right ascension of the ascending node. """
+        """Right ascension of the ascending node."""
         return self._raan
 
     @property
     def argp(self):
-        """Argument of the perigee. """
+        """Argument of the perigee."""
         return self._argp
 
     @property
     def nu(self):
-        """True anomaly. """
+        """True anomaly."""
         return self._nu
 
     def to_vectors(self):
@@ -170,12 +170,12 @@ class RVState(BaseState):
 
     @property
     def r(self):
-        """Position vector. """
+        """Position vector."""
         return self._r
 
     @property
     def v(self):
-        """Velocity vector. """
+        """Velocity vector."""
         return self._v
 
     def to_vectors(self):

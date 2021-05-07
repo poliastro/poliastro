@@ -89,10 +89,10 @@ pb_levels = coesa62_data["pb [mbar]"].data * u.mbar
 
 
 class COESA62(COESA):
-    """ Holds the model for U.S Standard Atmosphere 1962. """
+    """Holds the model for U.S Standard Atmosphere 1962."""
 
     def __init__(self):
-        """ Constructor for the class. """
+        """Constructor for the class."""
         super().__init__(
             b_levels, zb_levels, hb_levels, Tb_levels, Lb_levels, pb_levels
         )

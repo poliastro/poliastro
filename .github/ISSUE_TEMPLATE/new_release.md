@@ -3,7 +3,7 @@ name: New release
 about: Checklist for new release (development only)
 title: Release X.Y.Z checklist
 labels: development
-assignees: Juanlu001
+assignees: astrojuanlu
 ---
 
 ## Preparing the release
@@ -27,7 +27,7 @@ assignees: Juanlu001
 * [ ] Check all the badges in `README` point to the appropriate git **branch** (replace `master` by new branch `sed -i 's/master/.../g' README.rst`)
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `latest` by new tag, without sed!)
 * [ ] Commit
-* [ ] Generate sdist and bdist_wheel with `flit build`
+* [ ] Generate sdist and bdist_wheel with `python -m build`
 * [ ] `twine upload dist/* --repository-url https://test.pypi.org/legacy/`
 * [ ] Tag
 * [ ] Bump master to next development version
