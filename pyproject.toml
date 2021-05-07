@@ -65,7 +65,7 @@ Tracker = "https://github.com/poliastro/poliastro/issues"
 Funding = "https://opencollective.com/poliastro"
 
 [project.optional-dependencies]
-jupyter = ["notebook"]
+jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
 dev = [
     "black==21.5b0",
