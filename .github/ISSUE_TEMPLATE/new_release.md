@@ -19,11 +19,11 @@ assignees: astrojuanlu
 
 * [ ] New branch
 * [ ] Bump version **to X.Yb1** in:
-  - `README.rst`
+  - `README.md`
   - `__init__.py`
   - Sphinx `conf.py`
 * [ ] Check that the release branch will be tested on CI
-* [ ] Check all the badges in `README` point to the appropriate git **branch** (replace `master` by new branch `sed -i 's/master/.../g' README.rst`)
+* [ ] Check all the badges in `README` point to the appropriate git **branch** (replace `master` by new branch `sed -i 's/master/.../g' README.md`)
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `latest` by new tag, without sed!)
 * [ ] Commit
 * [ ] Generate sdist and bdist_wheel with `python -m build`
@@ -43,7 +43,7 @@ assignees: astrojuanlu
 * [ ] Backport any bugs
 * [ ] Update release date in changelog
 * [ ] Bump version **to X.Y.Z** in:
-  - `README.rst`
+  - `README.md`
   - `__init__.py`
   - Sphinx `conf.py`
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `vX.Yb1` by `vX.Y.Z`)
