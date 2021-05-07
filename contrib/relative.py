@@ -176,7 +176,7 @@ class RelativeOrb:
         
         return [ self.ix, self.iy ]
     
-    # Method to return direction cosine matrix for a rotation t about X-axis
+    # Internal method to return a direction cosine matrix about the X-axis
     def _dcmX(self, t):
         
         """
@@ -204,7 +204,7 @@ class RelativeOrb:
         
         return dcm
     
-    # Internal method to return a direction cosine matrix about the X-axis
+    # Internal method to solve Kepler's equation for eccentric anomaly.
     def _solve_kepler(self, M, ecc):
         
         """
@@ -342,11 +342,11 @@ class RelativeOrb:
             # Initialise pi in terms of astropy units
             pi = np.pi * 1 * u.rad
             
+            # Get a time step in Astropy units (seconds)
+            ts = step * u.s
+            
             # For each sample...
             for t in range( 0, duration, step ):
-                
-                # Get a time step in Astropy units (seconds)
-                ts = step * u.s
                 
                 # Update the mean anomaly of the chief.
                 mC = ( ( mC + pi + ( nC * ts ) ) % ( 2 * pi ) ) - pi
