@@ -157,9 +157,8 @@ molniya.plot()
 ```{toctree}
 ---
 maxdepth: 2
-caption: Getting started
+caption: Tutorials
 ---
-about.md
 installation.md
 quickstart.md
 ```
@@ -173,22 +172,24 @@ gallery.md
 contributing.md
 ```
 
+```{toctree} 
+---
+maxdepth: 2 
+caption: Reference
+---
+autoapi/index.rst
+bibliography.md
+changelog.md
+```
+
 ```{toctree}
 ---
 maxdepth: 2
 caption: Background
 ---
+history.md
+related.md
 background.md
-```
-
-```{toctree} 
----
-maxdepth: 2 
-caption: References
----
-autoapi/index.rst
-bibliography.md
-changelog.md
 ```
 
 ```{note}

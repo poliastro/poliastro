@@ -72,9 +72,9 @@ because you might seriously break your system
 Use [virtual environments](https://docs.python.org/3/library/venv.html) instead.
 ```
 
-# Making poliastro work in your editor
+## Making poliastro work in your editor
 
-## Jupyter notebook and JupyterLab
+### Jupyter notebook and JupyterLab
 
 To install the extra dependencies needed to make the interactive plots work on Jupyter, do
 
@@ -88,7 +88,7 @@ to enable the browser extensions.
 Check out [their troubleshooting guide](https://plotly.com/python/troubleshooting/#jupyterlab-problems)
 for further information.
 
-# Problems and suggestions
+## Problems and suggestions
 
 If for any reason you get an unexpected error message or an incorrect result,
 or you want to let the developers know about your use case,
