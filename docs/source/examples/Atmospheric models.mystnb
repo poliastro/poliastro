@@ -3,8 +3,8 @@ jupytext:
   text_representation:
     extension: .mystnb
     format_name: myst
-    format_version: 0.12
-    jupytext_version: 1.9.1
+    format_version: 0.13
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -31,7 +31,7 @@ Along history different models have been developed:
 
 Since some of them are implemented in `poliastro`, let us compare the differences among them:
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import units as u
 
 from matplotlib import pyplot as plt
@@ -46,7 +46,7 @@ Also known as `U.S. Standard Atmosphere`, the atmospheric model *coesa76* is jus
 
 Let us plot the `Temperature` as increasing altitude for both atmospheric models:
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 # We build the atmospheric instances
@@ -116,7 +116,7 @@ for name in layer_names:
 
 One of the advantages of COESA76 is that it extends up to 1000 kilometers. The behaviour of previous magnitudes against geometrical altitude can be checked in the following figure. **A logarithmic scale is applied for pressure and density to better see their decay for high altitude values**:
 
-```{code-cell}
+```{code-cell} ipython3
 # We create the basis for the figure
 fig, axs = plt.subplots(1, 3, figsize=(12, 5))
 fig.suptitle("State variables against altitude", fontweight="bold")

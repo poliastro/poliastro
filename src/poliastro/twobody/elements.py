@@ -92,7 +92,7 @@ def get_eccentricity_critical_inc(ecc=None):
 
     Parameters
     ----------
-    ecc: : ~astropy.units.Quantity, optional
+    ecc: ~astropy.units.Quantity, optional
         Eccentricity, default to None.
 
     """

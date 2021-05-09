@@ -3,7 +3,7 @@ import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-from poliastro.atmosphere.jacchia import Jacchia77
+from poliastro.earth.atmosphere.jacchia import Jacchia77
 
 # SOLUTIONS DIRECTLY TAKEN FROM JACCHIA77 REPORT AND
 # https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/jacchia/jacchia-77/t1000.out

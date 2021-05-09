@@ -65,14 +65,12 @@ Tracker = "https://github.com/poliastro/poliastro/issues"
 Funding = "https://opencollective.com/poliastro"
 
 [project.optional-dependencies]
-jupyter = ["notebook"]
+jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
 dev = [
-    "black==20.8b1",
+    "black==21.5b0",
     "coverage",
-    "docutils",
     "hypothesis",
-    "ipykernel",
     "ipython>=5.0",
     "ipywidgets>=7.0",
     "isort",
@@ -89,13 +87,12 @@ dev = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
-    "sphinx",
+    "sphinx<3.5",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery",
-    "sphinx_rtd_theme==0.5.0",
+    "sphinx_rtd_theme~=0.5.0",
     "sphinx-hoverxref==0.5b1",
     "sphinx-notfound-page",
-    "tox",
 ]
 
 [tool.flit.sdist]

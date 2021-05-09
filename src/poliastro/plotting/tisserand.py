@@ -11,7 +11,7 @@ from poliastro.util import norm
 
 
 class TisserandKind(Enum):
-    """ All possible Tisserand kinds """
+    """All possible Tisserand kinds"""
 
     APSIS = "apsis"
     ENERGY = "energy"
@@ -19,7 +19,7 @@ class TisserandKind(Enum):
 
 
 class TisserandPlotter:
-    """ Generates Tisserand figures """
+    """Generates Tisserand figures"""
 
     def __init__(self, kind=TisserandKind.APSIS, axes=None):
         """Object initializer
@@ -136,7 +136,7 @@ class TisserandPlotter:
             Vinf velocity line
         alpha_lim: tuple
             Minimum and maximum flyby angles
-        color: string
+        color: str
             String representing for the color lines
 
         Returns
@@ -174,7 +174,7 @@ class TisserandPlotter:
             Minimum and maximum Vinf velocities
         num_contours: int
             Number of points to iterate over previously defined velocities
-        color: string
+        color: str
             String representing for the color lines
 
         Returns

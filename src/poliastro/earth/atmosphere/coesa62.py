@@ -89,10 +89,10 @@ pb_levels = coesa62_data["pb [mbar]"].data * u.mbar
 
 
 class COESA62(COESA):
-    """ Holds the model for U.S Standard Atmosphere 1962. """
+    """Holds the model for U.S Standard Atmosphere 1962."""
 
     def __init__(self):
-        """ Constructor for the class. """
+        """Constructor for the class."""
         super().__init__(
             b_levels, zb_levels, hb_levels, Tb_levels, Lb_levels, pb_levels
         )
@@ -104,7 +104,7 @@ class COESA62(COESA):
         ----------
         alt: ~astropy.units.Quantity
             Geometric/Geopotential altitude.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes geometric altitude kind.
 
         Returns
@@ -138,7 +138,7 @@ class COESA62(COESA):
         ----------
         alt: ~astropy.units.Quantity
             Geometric/Geopotential altitude.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes geometric altitude.
 
         Returns
@@ -198,7 +198,7 @@ class COESA62(COESA):
         ----------
         alt: ~astropy.units.Quantity
             Geometric/Geopotential altitude.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes geometric altitude.
 
         Returns
@@ -224,7 +224,7 @@ class COESA62(COESA):
         ----------
         alt: ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns
@@ -249,7 +249,7 @@ class COESA62(COESA):
         ----------
         alt: ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns
@@ -277,7 +277,7 @@ class COESA62(COESA):
         ----------
         alt: ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns
@@ -305,7 +305,7 @@ class COESA62(COESA):
         ----------
         alt: ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: boolean
+        geometric: bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns
