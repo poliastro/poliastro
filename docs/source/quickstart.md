@@ -200,8 +200,10 @@ define custom perturbation accelerations to study non Keplerian orbits,
 thanks to Cowell\'s method:
 
 ```python
->>> from poliastro.twobody.propagation import cowell
 >>> from numba import njit
+>>> import numpy as np
+>>> from poliastro.core.propagation import func_twobody
+>>> from poliastro.twobody.propagation import cowell
 >>> r0 = [-2384.46, 5729.01, 3050.46] * u.km
 >>> v0 = [-7.36138, -2.98997, 1.64354] * u.km / u.s
 >>> initial = Orbit.from_vectors(Earth, r0, v0)
@@ -209,28 +211,42 @@ thanks to Cowell\'s method:
 ... def accel(t0, state, k):
 ...     """Constant acceleration aligned with the velocity. """
 ...     v_vec = state[3:]
-...     norm_v = (v_vec * v_vec).sum() ** .5
+...     norm_v = (v_vec * v_vec).sum() ** 0.5
 ...     return 1e-5 * v_vec / norm_v
 ...
->>> initial.propagate(3 * u.day, method=cowell, ad=accel)
-18255 x 21848 km x 28.0 deg (GCRS) orbit around Earth (♁)
+... def f(t0, u_, k):
+...     du_kep = func_twobody(t0, u_, k)
+...     ax, ay, az = accel(t0, u_, k)
+...     du_ad = np.array([0, 0, 0, ax, ay, az])
+...     return du_kep + du_ad
+
+>>> initial.propagate(3 * u.day, method=cowell, f=f)
+18255 x 21848 km x 28.0 deg (GCRS) orbit around Earth (♁) at epoch J2000.008 (TT)
 ```
 
 Some natural perturbations are available in poliastro to be used
 directly in this way. For instance, let us examine the effect of J2 perturbation:
 ```python
 >>> from poliastro.core.perturbations import J2_perturbation
->>> tof = (48.0 * u.h).to(u.s)
->>> final = initial.propagate(tof, method=cowell, ad=J2_perturbation, J2=Earth.J2.value, R=Earth.R.to(u.km).value)
+>>> tofs = [48.0] * u.h
+>>> def f(t0, u_, k):
+...     du_kep = func_twobody(t0, u_, k)
+...     ax, ay, az = J2_perturbation(
+...         t0, u_, k, J2=Earth.J2.value, R=Earth.R.to(u.km).value
+...     )
+...     du_ad = np.array([0, 0, 0, ax, ay, az])
+...     return du_kep + du_ad
+
+>>> final = initial.propagate(tofs, method=cowell, f=f)
 ```
 
 The J2 perturbation changes the orbit parameters (from Curtis example
 12.2):
 
 ```python
->>> ((final.raan - initial.raan) / tof).to(u.deg / u.h)
+>>> ((final.raan - initial.raan) / tofs).to(u.deg / u.h)
 <Quantity -0.17232668 deg / h>
->>> ((final.argp - initial.argp) / tof).to(u.deg / u.h)
+>>> ((final.argp - initial.argp) / tofs).to(u.deg / u.h)
 <Quantity 0.28220397 deg / h>
 ```
 
@@ -247,21 +263,33 @@ orbital elements. Let us simultaneously change eccentricity and
 inclination:
 
 ```python
->>> from poliastro.twobody.thrust import change_inc_ecc
->>> from poliastro.twobody import Orbit
->>> from poliastro.bodies import Earth
->>> from poliastro.twobody.propagation import cowell
->>> from astropy import units as u
->>> from astropy.time import Time
 >>> ecc_0, ecc_f = 0.4, 0.0
->>> a = 42164
->>> inc_0, inc_f = 0.0, (20.0 * u.deg).to(u.rad).value
->>> argp = 0.0
->>> f = 2.4e-7
->>> k = Earth.k.to(u.km**3 / u.s**2).value
->>> s0 = Orbit.from_classical(Earth, a * u.km, ecc_0 * u.one, inc_0 * u.deg, 0 * u.deg, argp * u.deg, 0 * u.deg, epoch=Time(0, format='jd', scale='tdb'))
+>>> a = 42164  # km
+>>> inc_0 = 0.0  # rad, baseline
+>>> inc_f = (20.0 * u.deg).to(u.rad).value  # rad
+>>> argp = 0.0  # rad, the method is efficient for 0 and 180
+>>> f = 2.4e-7  # km / s2
+
+# Retrieve r and v from initial orbit
+>>> s0 = Orbit.from_classical(
+...     Earth,
+...     a * u.km,
+...     ecc_0 * u.one,
+...     inc_0 * u.deg,
+...     0 * u.deg,
+...     argp * u.deg,
+...     0 * u.deg,
+... )
 >>> a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
->>> sf = s0.propagate(t_f * u.s, method=cowell, ad=a_d, rtol=1e-8)
+
+# Propagate orbit
+>>> def f_geo(t0, u_, k):
+...     du_kep = func_twobody(t0, u_, k)
+...     ax, ay, az = a_d(t0, u_, k)
+...     du_ad = np.array([0, 0, 0, ax, ay, az])
+...     return du_kep + du_ad
+
+>>> sf = s0.propagate(t_f * u.s, method=cowell, f=f_geo, rtol=1e-8)
 ```
 
 The thrust changes orbit parameters as desired (within errors):
