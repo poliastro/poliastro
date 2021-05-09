@@ -348,10 +348,10 @@ class RelativeOrb:
             # For each sample...
             for t in range( 0, duration, step ):
                 
-                # Update the mean anomaly of the chief.
+                # Update the mean anomaly of the chief (loop over pi).
                 mC = ( ( mC + pi + ( nC * ts ) ) % ( 2 * pi ) ) - pi
                 
-                # Update the mean anomaly of the deputy.
+                # Update the mean anomaly of the deputy (loop over pi).
                 mD = ( ( mD + pi + ( nD * ts ) ) % ( 2 * pi ) ) - pi
                 
                 # Compute the chief position, velocity and true anomaly.
@@ -372,15 +372,15 @@ class RelativeOrb:
                 
                 # Get the argument of latitude of the chief.
                 uC = nuC + self.satC.argp
-                uC = ( uC + pi ) % ( 2 * pi ) - pi
+                uC = ( uC + pi ) % ( 2 * pi ) - pi # Loop over pi
                 
                 # Get the argument of latitude of the deputy.
                 uD = nuD + self.satD.argp
-                uD = ( uD + pi ) % ( 2 * pi ) - pi
+                uD = ( uD + pi ) % ( 2 * pi ) - pi # Loop over pi
                 
                 # Get the relative argument of latitude.
                 du = uD - uC
-                du = ( du + pi ) % ( 2 * pi ) - pi
+                du = ( du + pi ) % ( 2 * pi ) - pi # Loop over pi
                 
                 # Save the chief initial argument of latitude.
                 if t == 0:
@@ -576,31 +576,33 @@ class RelativeOrb:
 ##############################################################################
 ##############################################################################
 
-# Initialize an example Satellite A as the chief spacecraft.
-satC = Orbit.from_classical( attractor = Earth,
-                             a         = 6918.140 * u.km,
-                             ecc       = 1e-6     * u.one,
-                             inc       = 10.0     * u.deg,
-                             raan      = 70.0     * u.deg,
-                             argp      = 90.0     * u.deg,
-                             nu        = 1.65     * u.deg)
+# The 'if __name__ == "__main__" statement allows others to import the
+# RelativeOrb class without calling the rest of the script below:
+if __name__ == "__main__":
 
-# Initialize an example Satellite B as the deputy spacecraft.
-satD = Orbit.from_classical( attractor = Earth,
-                             a         = 6918.140 * u.km,
-                             ecc       = 0.012    * u.one,
-                             inc       = 11.4     * u.deg,
-                             raan      = 72.35    * u.deg,
-                             argp      = 135.0    * u.deg,
-                             nu        = -46.5725 * u.deg)
-
-# Instantiate the relative orbits object.
-relativeSat = RelativeOrb( satC, satD )
-
-# Propagate the relative orbit
-relativeSat.propagate()
-
-# Plot the relative trajectory in local Hill Frame (VVLH) of the chief.
-relativeSat.plot()
-
-
+    # Initialize an example Satellite A as the chief spacecraft.
+    satC = Orbit.from_classical( attractor = Earth,
+                                 a         = 6918.140 * u.km,
+                                 ecc       = 1e-6     * u.one,
+                                 inc       = 10.0     * u.deg,
+                                 raan      = 70.0     * u.deg,
+                                 argp      = 90.0     * u.deg,
+                                 nu        = 1.65     * u.deg)
+    
+    # Initialize an example Satellite B as the deputy spacecraft.
+    satD = Orbit.from_classical( attractor = Earth,
+                                 a         = 6918.140 * u.km,
+                                 ecc       = 0.012    * u.one,
+                                 inc       = 11.4     * u.deg,
+                                 raan      = 72.35    * u.deg,
+                                 argp      = 135.0    * u.deg,
+                                 nu        = -46.5725 * u.deg)
+    
+    # Instantiate the relative orbits object.
+    relativeSat = RelativeOrb( satC, satD )
+    
+    # Propagate the relative orbit
+    relativeSat.propagate()
+    
+    # Plot the relative trajectory in local Hill Frame (VVLH) of the chief.
+    relativeSat.plot()
