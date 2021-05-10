@@ -12,6 +12,7 @@ rgas = 831.4
 sr = 7.2722e-5
 dr = 1.72142e-2
 hr = 0.2618
+pset = 2.0
 
 
 class nrlmsise_flags:
@@ -54,9 +55,9 @@ class nrlmsise_flags:
     """
 
     def __init__(self):
-        self.switches = np.empty(24, dtype=np.int16)
-        self.sw = np.empty(24, dtype=np.float16)
-        self.swc = np.empty(24, dtype=np.float16)
+        self.switches = np.zeros(24, dtype=np.int16)
+        self.sw = np.zeros(24, dtype=np.float16)
+        self.swc = np.zeros(24, dtype=np.float16)
 
 
 class ap_array:
@@ -74,7 +75,7 @@ class ap_array:
     """
 
     def __init__(self):
-        a = np.empty(7, dtype=np.float16)
+        a = np.zeros(7, dtype=np.float16)
 
 
 class nrlmsise_input:
@@ -161,8 +162,8 @@ class nrlmsise_output:
     """
 
     def __init__(self):
-        d = np.empty(9, dtype=np.float16)
-        t = np.empty(2, dtype=np.float16)
+        d = np.zeros(9, dtype=np.float16)
+        t = np.zeros(2, dtype=np.float16)
 
 
 # # GTD7
@@ -208,35 +209,39 @@ input = nrlmsise_input()
 output = nrlmsise_output()
 
 # MESO7
-meso_tn1 = np.empty(5, dtype=np.float16)
-meso_tn2 = np.empty(4, dtype=np.float16)
-meso_tn3 = np.empty(5, dtype=np.float16)
-meso_tgn1 = np.empty(2, dtype=np.float16)
-meso_tgn2 = np.empty(2, dtype=np.float16)
-meso_tgn3 = np.empty(2, dtype=np.float16)
+meso_tn1 = np.zeros(5, dtype=np.float16)
+meso_tn2 = np.zeros(4, dtype=np.float16)
+meso_tn3 = np.zeros(5, dtype=np.float16)
+meso_tgn1 = np.zeros(2, dtype=np.float16)
+meso_tgn2 = np.zeros(2, dtype=np.float16)
+meso_tgn3 = np.zeros(2, dtype=np.float16)
 
 # POWER7
-pt = np.empty(150, dtype=np.float16)
-pd = np.empty([9, 150], dtype=np.float16)
-ps = np.empty(150, dtype=np.float16)
-pdl = np.empty([2, 25], dtype=np.float16)
-ptl = np.empty([4, 100], dtype=np.float16)
-pma = np.empty([10, 100], dtype=np.float16)
-sam = np.empty(100, dtype=np.float16)
+pt = np.zeros(150, dtype=np.float16)
+pd = np.zeros([9, 150], dtype=np.float16)
+ps = np.zeros(150, dtype=np.float16)
+pdl = np.zeros([2, 25], dtype=np.float16)
+ptl = np.zeros([4, 100], dtype=np.float16)
+pma = np.zeros([10, 100], dtype=np.float16)
+sam = np.zeros(100, dtype=np.float16)
 
 # LOWER7
-ptm = np.empty(10, dtype=np.float16)
-pdm = np.empty([8, 10], dtype=np.float16)
-pavgm = np.empty(10, dtype=np.float16)
+ptm = np.zeros(10, dtype=np.float16)
+pdm = np.zeros([8, 10], dtype=np.float16)
+pavgm = np.zeros(10, dtype=np.float16)
 
 # LPOLY
 dfa = 0
-plg = np.empty([4, 9], dtype=np.float16)
+plg = np.zeros([4, 9], dtype=np.float16)
 ctloc, stloc = 0
 c2tloc, s2tloc = 0
 s3tloc, c3tloc = 0
 apdf = 0
-apt = np.empty(4, dtype=np.float16)
+apt = np.zeros(4, dtype=np.float16)
+
+gsurf = 0
+re = 0
+dm28 = 0
 
 
 def tselec(flags):
@@ -415,7 +420,7 @@ def spline(x, y, n, yp1, ypn, y2):
                   Values >= 1E30 Signal Signal Second Derivative Zero
     y2          - output array of second derivatives
     """
-    u = np.empty(n, dtype=np.float16)
+    u = np.zeros(n, dtype=np.float16)
     if yp1 > 0.99e30:
         y2[0] = 0
         u[0] = 0
@@ -456,9 +461,9 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
     """
     Calculate Temperature & Density Profiles for Lower Atoms.
     """
-    xs = np.empty(10, dtype=np.float16)
-    ys = np.empty(10, dtype=np.float16)
-    y2out = np.empty(10, dtype=np.float16)
+    xs = np.zeros(10, dtype=np.float16)
+    ys = np.zeros(10, dtype=np.float16)
+    y2out = np.zeros(10, dtype=np.float16)
     y, yi, densm_temp = 0
     densm = d0
     if alt > zn2[0]:
@@ -566,9 +571,9 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
     densu_temp = 1.0
     z1, t1, zgdif = 0
     mn = 0
-    xs = np.empty(5, dtype=np.float16)
-    ys = np.empty(5, dtype=np.float16)
-    y2out = np.empty(5, dtype=np.float16)
+    xs = np.zeros(5, dtype=np.float16)
+    ys = np.zeros(5, dtype=np.float16)
+    y2out = np.zeros(5, dtype=np.float16)
 
     # Joining Altitudes of Bates & Spline
     za = zn1[0]
@@ -660,6 +665,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
 
 
 # GLOBE7
+
 # 3 hr Magnetic Activity Function
 # Eq. A24d
 def g0(a, p):
@@ -701,7 +707,7 @@ def globe7(p, input, flags):
     Calculate G(L) Function
     """
     # Upper Thermosphere Parameters
-    t = np.empty(15, dtype=np.float16)
+    t = np.zeros(15, dtype=np.float16)
     ap = ap_array()
     tloc = input.lst
 
@@ -843,6 +849,1187 @@ def globe7(p, input, flags):
                 )
         else:
             apd = input.ap - 4.0
-            p44=p[43]
-            p45=p[44]
-            if p44<0:
+            p44 = p[43]
+            p45 = p[44]
+            if p44 < 0:
+                p44 = 1.0e-5
+            apdf = apd + (p45 - 1.0) * (apd + (np.exp(-p44 * apd) - 1.0) / p44)
+            if flags.sw[9]:
+                t[8] = apdf * (
+                    p[32]
+                    + p[45] * plg[0][2]
+                    + p[34] * plg[0][4]
+                    + (p[100] * plg[0][1] + p[101] * plg[0][3] + p[102] * plg[0][5])
+                    * cd14
+                    * flags.swc[5]
+                    + (p[121] * plg[1][1] + p[122] * plg[1][3] + p[123] * plg[1][5])
+                    * flags.swc[7]
+                    * np.cos(hr * (tloc - p[124]))
+                )
+
+        if (flags.sw[10]) and (input.g_long > -1000.0):
+
+            # Longitudinal
+            if flags.sw[11]:
+                t[10] = (1.0 + p[80] * dfa * flags.swc[1]) * (
+                    (
+                        p[64] * plg[1][2]
+                        + p[65] * plg[1][4]
+                        + p[66] * plg[1][6]
+                        + p[103] * plg[1][1]
+                        + p[104] * plg[1][3]
+                        + p[105] * plg[1][5]
+                        + flags.swc[5]
+                        * (p[109] * plg[1][1] + p[110] * plg[1][3] + p[111] * plg[1][5])
+                        * cd14
+                    )
+                    * np.cos(dgtr * input.g_long)
+                    + (
+                        p[90] * plg[1][2]
+                        + p[91] * plg[1][4]
+                        + p[92] * plg[1][6]
+                        + p[106] * plg[1][1]
+                        + p[107] * plg[1][3]
+                        + p[108] * plg[1][5]
+                        + flags.swc[5]
+                        * (p[112] * plg[1][1] + p[113] * plg[1][3] + p[114] * plg[1][5])
+                        * cd14
+                    )
+                    * np.sin(dgtr * input.g_long)
+                )
+
+            # UT and Mixed UT, Longitude
+            if flags.sw[12]:
+                t[11] = (
+                    (1.0 + p[95] * plg[0][1])
+                    * (1.0 + p[81] * dfa * flags.swc[1])
+                    * (1.0 + p[119] * plg[0][1] * flags.swc[5] * cd14)
+                    * (
+                        (p[68] * plg[0][1] + p[69] * plg[0][3] + p[70] * plg[0][5])
+                        * np.cos(sr * (input.sec - p[71]))
+                    )
+                )
+
+                t[11] += (
+                    flags.swc[11]
+                    * (p[76] * plg[2][3] + p[77] * plg[2][5] + p[78] * plg[2][7])
+                    * np.cos(sr * (input.sec - p[79]) + 2.0 * dgtr * input.g_long)
+                    * (1.0 + p[137] * dfa * flags.swc[1])
+                )
+
+            # UT, Longitude Magnetic Activity
+            if flags.sw[13]:
+                if flags.sw[9] == -1:
+                    if p[51]:
+                        t[12] = (
+                            apt[0]
+                            * flags.swc[11]
+                            * (1.0 + p[132] * plg[0][1])
+                            * (
+                                (
+                                    p[52] * plg[1][2]
+                                    + p[98] * plg[1][4]
+                                    + p[67] * plg[1][6]
+                                )
+                                * np.cos(dgtr * (input.g_long - p[97]))
+                            )
+                            + apt[0]
+                            * flags.swc[11]
+                            * flags.swc[5]
+                            * (
+                                p[133] * plg[1][1]
+                                + p[134] * plg[1][3]
+                                + p[135] * plg[1][5]
+                            )
+                            * cd14
+                            * np.cos(dgtr * (input.g_long - p[136]))
+                            + apt[0]
+                            * flags.swc[12]
+                            * (
+                                p[55] * plg[0][1]
+                                + p[56] * plg[0][3]
+                                + p[57] * plg[0][5]
+                            )
+                            * np.cos(sr * (input.sec - p[58]))
+                        )
+                else:
+                    t[12] = (
+                        apdf
+                        * flags.swc[11]
+                        * (1.0 + p[120] * plg[0][1])
+                        * (
+                            (p[60] * plg[1][2] + p[61] * plg[1][4] + p[62] * plg[1][6])
+                            * np.cos(dgtr * (input.g_long - p[63]))
+                        )
+                        + apdf
+                        * flags.swc[11]
+                        * flags.swc[5]
+                        * (p[115] * plg[1][1] + p[116] * plg[1][3] + p[117] * plg[1][5])
+                        * cd14
+                        * np.cos(dgtr * (input.g_long - p[118]))
+                        + apdf
+                        * flags.swc[12]
+                        * (p[83] * plg[0][1] + p[84] * plg[0][3] + p[85] * plg[0][5])
+                        * np.cos(sr * (input.sec - p[75]))
+                    )
+
+        # Parms not used: 82, 89, 99, 139-149
+        tinf = p[30]
+        for index in range(0, 14):
+            tinf = tinf + abs(flags.sw[index + 1]) * t[index]
+        return tinf
+
+
+# GLOB7S
+def glob7s(p, input, flags):
+    """
+    Version of GLOBE for Lower Atmosphere 10/26/99
+    """
+    t = np.zeros(14, dtype=np.float16)
+
+    if p[99] == 0:
+        p[99] = pset
+    if not p[99] == pset:
+        print("Wrong parameter set for GLOB7S")
+        return -1
+
+    for ind in range(0, 14):
+        t[ind] == 0.0
+
+    cd32 = np.cos(dr * (input.doy - p[31]))
+    cd18 = np.cos(2.0 * dr * (input.doy - p[17]))
+    cd14 = np.cos(dr * (input.doy - p[13]))
+    cd39 = np.cos(2.0 * dr * (input.doy - p[38]))
+
+    # F10.7
+    t[0] = p[21] * dfa
+
+    # Time Independent
+    t[1] = (
+        p[1] * plg[0][2]
+        + p[2] * plg[0][4]
+        + p[22] * plg[0][6]
+        + p[26] * plg[0][1]
+        + p[14] * plg[0][3]
+        + p[59] * plg[0][5]
+    )
+
+    # Symmetrical Annual
+    t[2] = (p[18] + p[47] * plg[0][2] + p[29] * plg[0][4]) * cd32
+
+    # Symmetrical Semi-Annual
+    t[3] = (p[15] + p[16] * plg[0][2] + p[30] * plg[0][4]) * cd18
+
+    # Asymmetrical Annual
+    t[4] = (p[9] * plg[0][1] + p[10] * plg[0][3] + p[20] * plg[0][5]) * cd14
+
+    # Asymmetrical Semi-Annual
+    t[5] = (p[37] * plg[0][1]) * cd39
+
+    # DIURNAL
+    if flags.sw[7]:
+        t71 = p[11] * plg[1][2] * cd14 * flags.swc[5]
+        t72 = p[12] * plg[1][2] * cd14 * flags.swc[5]
+        t[6] = (p[3] * plg[1][1] + p[4] * plg[1][3] + t71) * ctloc + (
+            p[6] * plg[1][1] + p[7] * plg[1][3] + t72
+        ) * stloc
+
+    # Semi-DIURNAL */
+    if flags.sw[8]:
+        t81 = (p[23] * plg[2][3] + p[35] * plg[2][5]) * cd14 * flags.swc[5]
+        t82 = (p[33] * plg[2][3] + p[36] * plg[2][5]) * cd14 * flags.swc[5]
+        t[7] = (p[5] * plg[2][2] + p[41] * plg[2][4] + t81) * c2tloc + (
+            p[8] * plg[2][2] + p[42] * plg[2][4] + t82
+        ) * s2tloc
+
+    # TerDIURNAL */
+    if flags.sw[14]:
+        t[13] = p[39] * plg[3][3] * s3tloc + p[40] * plg[3][3] * c3tloc
+
+    # Magnetic Activity
+    if flags.sw[9]:
+        if flags.sw[9] == 1:
+            t[8] = apdf * (p[32] + p[45] * plg[0][2] * flags.swc[2])
+        if flags.sw[9] == -1:
+            t[8] = p[50] * apt[0] + p[96] * plg[0][2] * apt[0] * flags.swc[2]
+
+    # Longitudinal
+    if not ((flags.sw[10] == 0) or (flags.sw[11] == 0) or (input.g_long <= -1000.0)):
+        t[10] = (
+            1.0
+            + plg[0][1]
+            * (
+                p[80] * flags.swc[5] * np.cos(dr * (input.doy - p[81]))
+                + p[85] * flags.swc[6] * np.cos(2.0 * dr * (input.doy - p[86]))
+            )
+            + p[83] * flags.swc[3] * np.cos(dr * (input.doy - p[84]))
+            + p[87] * flags.swc[4] * np.cos(2.0 * dr * (input.doy - p[88]))
+        ) * (
+            (
+                p[64] * plg[1][2]
+                + p[65] * plg[1][4]
+                + p[66] * plg[1][6]
+                + p[74] * plg[1][1]
+                + p[75] * plg[1][3]
+                + p[76] * plg[1][5]
+            )
+            * np.cos(dgtr * input.g_long)
+            + (
+                p[90] * plg[1][2]
+                + p[91] * plg[1][4]
+                + p[92] * plg[1][6]
+                + p[77] * plg[1][1]
+                + p[78] * plg[1][3]
+                + p[79] * plg[1][5]
+            )
+            * np.sin(dgtr * input.g_long)
+        )
+
+    tt = 0
+    for ind in range(0, 14):
+        tt += abs(flags.sw[ind + 1]) * t[ind]
+    return tt
+
+
+# GTD7
+def gtd7(input, flags, output):
+    mn3 = 5
+    zn3 = np.array([32.5, 20.0, 15.0, 10.0, 0.0])
+    mn2 = 4
+    zn2 = np.array([72.5, 55.0, 45.0, 32.5])
+    zmix = 62.5
+    tz = 0
+    soutput = nrlmsise_output()
+
+    tselec(flags)
+
+    # Latitude Variation of Gravity (none for sw[2] = 0)
+    xlat = input.g_lat
+    if flags.sw[2] == 0:
+        xlat = 45.0
+    glatf(xlat, gsurf, re)
+
+    xmm = pdm[2][4]
+
+    # Thermosphere / Mesosphere (Above ZN2[0])
+    if input.alt > zn2[0]:
+        altt = input.alt
+    else:
+        altt = zn2[0]
+
+    tmp = input.alt
+    input.alt = altt
+
+    gts7(input, flags, soutput)
+
+    altt = input.alt
+    input.alt = tmp
+
+    if flags.sw[0]:
+        """
+        Metric Adjustments
+        """
+        dm28m = dm28 * 1.0e6
+    else:
+        dm28m = dm28
+
+    output.t[0] = soutput.t[0]
+    output.t[1] = soutput.t[1]
+
+    if input.alt >= zn2[0]:
+        for ind in range(0, 9):
+            output.d[ind] = soutput.d[ind]
+            return
+
+    """
+    Lower Mesosphere / Upper Stratosphere (Between ZN3[0] & ZN2[0])
+        Temperature at Nodes & Gradients at the End Nodes
+        Inverse Temperature a Linear Function of Spherical Harmonics
+    """
+    meso_tgn2[0] = meso_tgn1[1]
+    meso_tn2[0] = meso_tn1[4]
+
+    meso_tn2[1] = (
+        pma[0][0] * pavgm[0] / (1.0 - flags.sw[20] * glob7s(pma[0], input, flags))
+    )
+    meso_tn2[2] = (
+        pma[1][0] * pavgm[1] / (1.0 - flags.sw[20] * glob7s(pma[1], input, flags))
+    )
+    meso_tn2[3] = (
+        pma[2][0]
+        * pavgm[2]
+        / (1.0 - flags.sw[20] * flags.sw[22] * glob7s(pma[2], input, flags))
+    )
+
+    meso_tgn2[1] = (
+        pavgm[8]
+        * pma[9][0]
+        * (1.0 + flags.sw[20] * flags.sw[22] * glob7s(pma[9], input, flags))
+        * meso_tn2[3]
+        * meso_tn2[3]
+        / ((pma[2][0] * pavgm[2]) ** 2)
+    )
+    meso_tn3[0] = meso_tn2[3]
+
+    if input.alt <= zn3[0]:
+        """
+        Lower Stratosphere and Troposphere (Below ZN3[0])
+            Temperature at Nodes and Gradients at End Nodes
+            Inverse Temperature a Linear Function of Spherical Harmonics
+        """
+        meso_tgn3[0] = meso_tgn2[1]
+        meso_tn3[1] = (
+            pma[3][0] * pavgm[3] / (1.0 - flags.sw[22] * glob7s(pma[3], input, flags))
+        )
+        meso_tn3[2] = (
+            pma[4][0] * pavgm[4] / (1.0 - flags.sw[22] * glob7s(pma[4], input, flags))
+        )
+        meso_tn3[3] = (
+            pma[5][0] * pavgm[5] / (1.0 - flags.sw[22] * glob7s(pma[5], input, flags))
+        )
+        meso_tn3[4] = (
+            pma[6][0] * pavgm[6] / (1.0 - flags.sw[22] * glob7s(pma[6], input, flags))
+        )
+        meso_tgn3[1] = (
+            pma[7][0]
+            * pavgm[7]
+            * (1.0 + flags.sw[22] * glob7s(pma[7], input, flags))
+            * meso_tn3[4]
+            * meso_tn3[4]
+            / ((pma[6][0] * pavgm[6]) ** 2)
+        )
+
+    """
+    Linear Transition To Full Mixing Below ZN2[0]
+    """
+
+    dmc = 0
+    if input.alt > zmix:
+        dmc = 1.0 - (zn2[0] - input.alt) / (zn2[0] - zmix)
+    dz28 = soutput.d[2]
+
+    # N2 Density
+    dmr = soutput.d[2] / dm28m - 1.0
+    output.d[2] = densm(
+        input.alt,
+        dm28m,
+        xmm,
+        tz,
+        mn3,
+        zn3,
+        meso_tn3,
+        meso_tgn3,
+        mn2,
+        zn2,
+        meso_tn2,
+        meso_tgn2,
+    )
+    output.d[2] = output.d[2] * (1.0 + dmr * dmc)
+
+    # HE Density
+    dmr = soutput.d[0] / (dz28 * pdm[0][1]) - 1.0
+    output.d[0] = output.d[2] * pdm[0][1] * (1.0 + dmr * dmc)
+
+    # O Density
+    output.d[1] = 0
+    output.d[8] = 0
+
+    # O2 Density
+    dmr = soutput.d[3] / (dz28 * pdm[3][1]) - 1.0
+    output.d[3] = output.d[2] * pdm[3][1] * (1.0 + dmr * dmc)
+
+    # AR Density
+    dmr = soutput.d[4] / (dz28 * pdm[4][1]) - 1.0
+    output.d[4] = output.d[2] * pdm[4][1] * (1.0 + dmr * dmc)
+
+    # HYDROGEN Density
+    output.d[6] = 0
+
+    # ATOMIC NITROGEN Density
+    output.d[7] = 0
+
+    # TOTAL MASS DENSITY
+    output.d[5] = 1.66e-24 * (
+        4.0 * output.d[0]
+        + 16.0 * output.d[1]
+        + 28.0 * output.d[2]
+        + 32.0 * output.d[3]
+        + 40.0 * output.d[4]
+        + output.d[6]
+        + 14.0 * output.d[7]
+    )
+
+    if flags.sw[0]:
+        output.d[5] = output.d[5] / 1000
+
+    # Temperature At Altitude
+    dd = densm(
+        input.alt,
+        1.0,
+        0,
+        tz,
+        mn3,
+        zn3,
+        meso_tn3,
+        meso_tgn3,
+        mn2,
+        zn2,
+        meso_tn2,
+        meso_tgn2,
+    )
+    output.t[1] = tz
+
+
+# GTD7D
+def gtd7d(input, flags, output):
+    gtd7(input, flags, output)
+    output.d[5] = 1.66e-24 * (
+        4.0 * output.d[0]
+        + 16.0 * output.d[1]
+        + 28.0 * output.d[2]
+        + 32.0 * output.d[3]
+        + 40.0 * output.d[4]
+        + output.d[6]
+        + 14.0 * output.d[7]
+        + 16.0 * output.d[8]
+    )
+    if flags.sw[0]:
+        output.d[5] = output.d[5] / 1000
+
+
+# GPH7
+def gph7(input, flags, output, press):
+    bm = 1.3806e-19
+    test = 0.00043
+    ltest = 12
+    pl = np.log10(press)
+    if pl >= -5.0:
+        if pl > 2.5:
+            zi = 18.06 * (3.00 - pl)
+        elif (pl > 0.075) and (pl <= 2.5):
+            zi = 14.98 * (3.08 - pl)
+        elif (pl > -1) and (pl <= 0.075):
+            zi = 17.80 * (2.72 - pl)
+        elif (pl > -2) and (pl <= -1):
+            zi = 14.28 * (3.64 - pl)
+        elif (pl > -4) and (pl <= -2):
+            zi = 12.72 * (4.32 - pl)
+        else:
+            zi = 25.3 * (0.11 - pl)
+
+        cl = input.g_lat / 90.0
+        cl2 = cl ** 2
+
+        if input.doy < 182:
+            cd = (1.0 - float(input.doy)) / 91.25
+        else:
+            cd = (float(input.doy)) / 91.25 - 3.0
+
+        ca = 0
+
+        if (pl > -1.11) and (pl <= -0.23):
+            ca = 1.0
+        if pl > -0.23:
+            ca = (2.79 - pl) / (2.79 + 0.23)
+        if (pl <= -1.11) and (pl > -3):
+            ca = (-2.93 - pl) / (-2.93 + 1.11)
+        z = zi - 4.87 * cl * cd * ca - 1.64 * cl2 * ca + 0.31 * ca * cl
+
+    else:
+        z = 22.0 * (pl + 4.0) ** 2 + 110.0
+
+    # Iteration Loop
+    l = 0
+    while 1 == 1:
+        l += 1
+        input.alt = z
+
+        gtd7(input, flags, output)
+
+        z = input.alt
+        xn = (
+            output.d[0]
+            + output.d[1]
+            + output.d[2]
+            + output.d[3]
+            + output.d[4]
+            + output.d[6]
+            + output.d[7]
+        )
+        p = bm * xn * output.t[1]
+        if flags.sw[0]:
+            p = p * 1.0e-6
+        diff = pl - np.log10(p)
+
+        if math.sqrt(diff * diff) < test:
+            return
+        if l == ltest:
+            print(f"ERROR: ghp7 not converging for press {press} diff {diff}")
+            return
+
+        xm = output.d[5] / xn / 1.66e-24
+        if flags.sw[0]:
+            xm = xm * 1.0e3
+        g = gsurf / ((1.0 + z / re) ** 2)
+        sh = rgas * output.t[1] / (xm * g)
+
+        # New Altitude Estimate Using Scale Height
+        if l < 6:
+            z = z - sh * diff * 2.302
+        else:
+            z = z - sh * diff
+
+
+# GTS7
+def gts7(input, flags, output):
+    """
+    Thermospheric Portion Of NRLMSISE-00
+        Check GTD7 for more extensive comments
+        alt > 72.5 KM !!
+    """
+    mn1 = 5
+    tz = 0
+    zn1 = np.array([120.0, 110.0, 100.0, 90.0, 72.5])
+    alpha = np.array([-0.38, 0.0, 0.0, 0.0, 0.17, 0.0, -0.38, 0.0, 0.0])
+    altl = np.array([200.0, 300.0, 160.0, 250.0, 240.0, 450.0, 320.0, 450.0])
+    za = pdl[1][15]
+    zn1[0] = za
+
+    for ind in range(0, 9):
+        output.d[ind] = 0
+
+    # TINF Variations Not Important Below ZA or ZN1(1)
+    if input.alt > zn1[0]:
+        tinf = ptm[0] * pt[0] * (1.0 + flags.sw[16] * globe7(pt, input, flags))
+    else:
+        tinf = ptm[0] * pt[0]
+    output.t[0] = tinf
+
+    # Gradient Variation Not Important Below ZN1(5)
+    if input.alt > zn1[4]:
+        g0 = ptm[3] * ps[0] * (1.0 + flags.sw[19] * globe7(ps, input, flags))
+    else:
+        g0 = ptm[3] * ps[0]
+    tlb = ptm[1] * (1.0 + flags.sw[17] * globe7(pd[3], input, flags)) * pd[3][0]
+    s = g0 / (tinf - tlb)
+
+    """
+    Lower Thermosphere Temperature Variations Not Significant for Density Above 300 KM
+    """
+    if input.alt < 300.0:
+        meso_tn1[1] = (
+            ptm[6] * ptl[0][0] / (1.0 - flags.sw[18] * glob7s(ptl[0], input, flags))
+        )
+        meso_tn1[2] = (
+            ptm[2] * ptl[1][0] / (1.0 - flags.sw[18] * glob7s(ptl[1], input, flags))
+        )
+        meso_tn1[3] = (
+            ptm[7] * ptl[2][0] / (1.0 - flags.sw[18] * glob7s(ptl[2], input, flags))
+        )
+        meso_tn1[4] = (
+            ptm[4]
+            * ptl[3][0]
+            / (1.0 - flags.sw[18] * flags.sw[20] * glob7s(ptl[3], input, flags))
+        )
+        meso_tgn1[1] = (
+            ptm[8]
+            * pma[8][0]
+            * (1.0 + flags.sw[18] * flags.sw[20] * glob7s(pma[8], input, flags))
+            * meso_tn1[4]
+            * meso_tn1[4]
+            / (pow((ptm[4] * ptl[3][0]), 2.0))
+        )
+    else:
+        meso_tn1[1] = ptm[6] * ptl[0][0]
+        meso_tn1[2] = ptm[2] * ptl[1][0]
+        meso_tn1[3] = ptm[7] * ptl[2][0]
+        meso_tn1[4] = ptm[4] * ptl[3][0]
+        meso_tgn1[1] = (
+            ptm[8]
+            * pma[8][0]
+            * meso_tn1[4]
+            * meso_tn1[4]
+            / (pow((ptm[4] * ptl[3][0]), 2.0))
+        )
+
+    # N2 Variation Factor at ZLB
+    g28 = flags.sw[21] * globe7(pd[2], input, flags)
+
+    # Variation Of TURBOPAUSE Height
+    zhf = pdl[1][24] * (
+        1.0
+        + flags.sw[5]
+        * pdl[0][24]
+        * np.sin(dgtr * input.g_lat)
+        * np.cos(dr * (input.doy - pt[13]))
+    )
+    output.t[0] = tinf
+    xmm = pdm[2][4]
+    z = input.alt
+
+    # N2 Density
+    # Diffusive Density at ZLB
+    db28 = pdm[2][0] * np.exp(g28) * pd[2][0]
+
+    # Diffusive Density at Alt
+    output.d[2] = densu(
+        z,
+        db28,
+        tinf,
+        tlb,
+        28.0,
+        alpha[2],
+        output.t[1],
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    dd = output.d[2]
+
+    # Turbopause
+    zh28 = pdm[2][2] * zhf
+    zhm28 = pdm[2][3] * pdl[1][5]
+    xmd = 28.0 - xmm
+
+    # Mixed Density at Zlb
+    b28 = densu(
+        zh28,
+        db28,
+        tinf,
+        tlb,
+        xmd,
+        (alpha[2] - 1.0),
+        tz,
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    if (flags.sw[15]) and (z <= altl[2]):
+        # Mixed Density at Alt
+        dm28 = densu(
+            z,
+            b28,
+            tinf,
+            tlb,
+            xmm,
+            alpha[2],
+            tz,
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        # Net Density at Alt
+        output.d[2] = dnet(output.d[2], dm28, zhm28, xmm, 28.0)
+
+    # HE DENSITY
+    # Density Variation Factor at ZLB
+    g4 = flags.sw[21] * globe7(pd[0], input, flags)
+
+    #  Diffusive Density at ZLB
+    db04 = pdm[0][0] * np.exp(g4) * pd[0][0]
+
+    #  Diffusive Density at Alt
+    output.d[0] = densu(
+        z,
+        db04,
+        tinf,
+        tlb,
+        4.0,
+        alpha[0],
+        output.t[1],
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    dd = output.d[0]
+    if (flags.sw[15]) and (z < altl[0]):
+        # Turbopause
+        zh04 = pdm[0][2]
+        # Mixed density at ZLB
+        b04 = densu(
+            zh04,
+            db04,
+            tinf,
+            tlb,
+            4.0 - xmm,
+            alpha[0] - 1.0,
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        # Mixed density at Alt
+        dm04 = densu(
+            z,
+            b04,
+            tinf,
+            tlb,
+            xmm,
+            0.0,
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        zhm04 = zhm28
+        # Net density at Alt
+        output.d[0] = dnet(output.d[0], dm04, zhm04, xmm, 4.0)
+        # Correction to specified mixing ratio at ground
+        rl = math.log(b28 * pdm[0][1] / b04)
+        zc04 = pdm[0][4] * pdl[1][0]
+        hc04 = pdm[0][5] * pdl[1][1]
+        # Net density corrected at Alt
+        output.d[0] = output.d[0] * ccor(z, rl, hc04, zc04)
+
+    # # O DENSITY
+    # # Density Variation Factor at ZLB
+    g16 = flags.sw[21] * globe7(pd[1], input, flags)
+
+    # Diffusive Density at ZLB
+    db16 = pdm[1][0] * np.exp(g16) * pd[1][0]
+
+    # Diffusive density at Alt
+    output.d[1] = densu(
+        z,
+        db16,
+        tinf,
+        tlb,
+        16.0,
+        alpha[1],
+        output.t[1],
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    dd = output.d[1]
+    if (flags.sw[15]) and (z <= altl[1]):
+        # Turbopause
+        zh16 = pdm[1][2]
+        # Mixed density at ZLB
+        b16 = densu(
+            zh16,
+            db16,
+            tinf,
+            tlb,
+            16.0 - xmm,
+            (alpha[1] - 1.0),
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        # Mixed density at Alt
+        dm16 = densu(
+            z,
+            b16,
+            tinf,
+            tlb,
+            xmm,
+            0.0,
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        zhm16 = zhm28
+        # Net density at Alt
+        output.d[1] = dnet(output.d[1], dm16, zhm16, xmm, 16.0)
+        rl = (
+            pdm[1][1]
+            * pdl[1][16]
+            * (1.0 + flags.sw[1] * pdl[0][23] * (input.f107A - 150.0))
+        )
+        hc16 = pdm[1][5] * pdl[1][3]
+        zc16 = pdm[1][4] * pdl[1][2]
+        hc216 = pdm[1][5] * pdl[1][4]
+        output.d[1] = output.d[1] * ccor2(z, rl, hc16, zc16, hc216)
+        # Chemistry correction
+        hcc16 = pdm[1][7] * pdl[1][13]
+        zcc16 = pdm[1][6] * pdl[1][12]
+        rc16 = pdm[1][3] * pdl[1][14]
+        # Net density corrected at Alt
+        output.d[1] = output.d[1] * ccor(z, rc16, hcc16, zcc16)
+
+    # O2 DENSITY
+    # Density Variation Factor at ZLB
+    g32 = flags.sw[21] * globe7(pd[4], input, flags)
+
+    # Diffusive Density at ZLB
+    db32 = pdm[3][0] * np.exp(g32) * pd[4][0]
+
+    # Diffusive Density at ALT
+    output.d[3] = densu(
+        z,
+        db32,
+        tinf,
+        tlb,
+        32.0,
+        alpha[3],
+        output.t[1],
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    dd = output.d[3]
+    if flags.sw[15]:
+        if z <= altl[3]:
+            # Turbopause
+            zh32 = pdm[3][2]
+            # Mixed Density at ZLB
+            b32 = densu(
+                zh32,
+                db32,
+                tinf,
+                tlb,
+                32.0 - xmm,
+                alpha[3] - 1.0,
+                output.t[1],
+                ptm[5],
+                s,
+                mn1,
+                zn1,
+                meso_tn1,
+                meso_tgn1,
+            )
+            # Mixed Density at ALT
+            dm32 = densu(
+                z,
+                b32,
+                tinf,
+                tlb,
+                xmm,
+                0.0,
+                output.t[1],
+                ptm[5],
+                s,
+                mn1,
+                zn1,
+                meso_tn1,
+                meso_tgn1,
+            )
+            zhm32 = zhm28
+            # Net Density at ALT
+            output.d[3] = dnet(output.d[3], dm32, zhm32, xmm, 32.0)
+            # Correction to Specific Mixing Ratio at Ground
+            rl = math.log(b28 * pdm[3][1] / b32)
+            hc32 = pdm[3][5] * pdl[1][7]
+            zc32 = pdm[3][4] * pdl[1][6]
+            output.d[3] = output.d[3] * ccor(z, rl, hc32, zc32)
+
+        # Correction for General Departure From Diffusive Equilibrium Above ZLB
+        hcc32 = pdm[3][7] * pdl[1][22]
+        hcc232 = pdm[3][7] * pdl[0][22]
+        zcc32 = pdm[3][6] * pdl[1][21]
+        rc32 = (
+            pdm[3][3]
+            * pdl[1][23]
+            * (1.0 + flags.sw[1] * pdl[0][23] * (input.f107A - 150.0))
+        )
+
+        # Net Density Corrected at ALT
+        output.d[3] = output.d[3] * ccor2(z, rc32, hcc32, zcc32, hcc232)
+
+    # AR DENSITY
+    # Density Variation Factor at ZLB
+    g40 = flags.sw[21] * globe7(pd[5], input, flags)
+
+    # Diffusive Density at ZLB
+    db40 = pdm[4][0] * np.exp(g40) * pd[5][0]
+
+    # Diffusive Density at ALT
+    output.d[4] = densu(
+        z,
+        db40,
+        tinf,
+        tlb,
+        40.0,
+        alpha[4],
+        output.t[1],
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    dd = output.d[4]
+    if (flags.sw[15]) and (z <= altl[4]):
+        # Turbopause
+        zh40 = pdm[4][2]
+        # Mixed Density at ZLB
+        b40 = densu(
+            zh40,
+            db40,
+            tinf,
+            tlb,
+            40.0 - xmm,
+            alpha[4] - 1.0,
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        # Mixed Density at ALT
+        dm40 = densu(
+            z,
+            b40,
+            tinf,
+            tlb,
+            xmm,
+            0.0,
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        zhm40 = zhm28
+        # Net Density at ALT
+        output.d[4] = dnet(output.d[4], dm40, zhm40, xmm, 40.0)
+        # Correction To Specified Mixing Ratio at Ground
+        rl = math.log(b28 * pdm[4][1] / b40)
+        hc40 = pdm[4][5] * pdl[1][9]
+        zc40 = pdm[4][4] * pdl[1][8]
+        # Net Density Corrected at ALT
+        output.d[4] = output.d[4] * ccor(z, rl, hc40, zc40)
+
+        # HYDROGEN DENSITY
+        # Density Variation Factor at ZLB
+        g1 = flags.sw[21] * globe7(pd[6], input, flags)
+
+        # Diffusive Density at ZLB
+        db01 = pdm[5][0] * np.exp(g1) * pd[6][0]
+
+        # Diffusive Density at ALT
+        output.d[6] = densu(
+            z,
+            db01,
+            tinf,
+            tlb,
+            1.0,
+            alpha[6],
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        dd = output.d[6]
+        if (flags.sw[15]) and (z <= altl[6]):
+            # Turbopause
+            zh01 = pdm[5][2]
+            # Mixed Density at ZLB
+            b01 = densu(
+                zh01,
+                db01,
+                tinf,
+                tlb,
+                1.0 - xmm,
+                alpha[6] - 1.0,
+                output.t[1],
+                ptm[5],
+                s,
+                mn1,
+                zn1,
+                meso_tn1,
+                meso_tgn1,
+            )
+            # Mixed Density at ALT
+            dm01 = densu(
+                z,
+                b01,
+                tinf,
+                tlb,
+                xmm,
+                0.0,
+                output.t[1],
+                ptm[5],
+                s,
+                mn1,
+                zn1,
+                meso_tn1,
+                meso_tgn1,
+            )
+            zhm01 = zhm28
+            # Net Density at ALT
+            output.d[6] = dnet(output.d[6], dm01, zhm01, xmm, 1.0)
+            # Correction to Specified Mixing Ratio at
+            rl = math.log(b28 * pdm[5][1] * math.sqrt(pdl[1][17] * pdl[1][17]) / b01)
+            hc01 = pdm[5][5] * pdl[1][11]
+            zc01 = pdm[5][4] * pdl[1][10]
+            # Chemistry Correction
+            hcc01 = pdm[5][7] * pdl[1][19]
+            zcc01 = pdm[5][6] * pdl[1][18]
+            rc01 = pdm[5][3] * pdl[1][20]
+            # Net Density Corrected at ALT
+            output.d[6] = output.d[6] * ccor(z, rc01, hcc01, zcc01)
+
+        # ATOMIC NITROGEN DENSITY
+        # Density Variation Factor at ZLB
+        g14 = flags.sw[21] * globe7(pd[7], input, flags)
+
+        # Diffusive Density at ZLB
+        db14 = pdm[6][0] * np.exp(g14) * pd[7][0]
+
+        # Diffusive Density at ALT
+        output.d[7] = densu(
+            z,
+            db14,
+            tinf,
+            tlb,
+            14.0,
+            alpha[7],
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        dd = output.d[7]
+        if (flags.sw[15]) and (z <= altl[7]):
+            # Turbopause
+            zh14 = pdm[6][2]
+            # Mixed Density at ZLB
+            b14 = densu(
+                zh14,
+                db14,
+                tinf,
+                tlb,
+                14.0 - xmm,
+                alpha[7] - 1.0,
+                output.t[1],
+                ptm[5],
+                s,
+                mn1,
+                zn1,
+                meso_tn1,
+                meso_tgn1,
+            )
+            # Mixed Density at ALT
+            dm14 = densu(
+                z,
+                b14,
+                tinf,
+                tlb,
+                xmm,
+                0.0,
+                output.t[1],
+                ptm[5],
+                s,
+                mn1,
+                zn1,
+                meso_tn1,
+                meso_tgn1,
+            )
+            zhm14 = zhm28
+            # Net Density at ALT
+            output.d[7] = dnet(output.d[7], dm14, zhm14, xmm, 14.0)
+            # Correction to Specified Mixing Ratio at Ground
+            rl = math.log(b28 * pdm[6][1] * math.sqrt(pdl[0][2] * pdl[0][2]) / b14)
+            hc14 = pdm[6][5] * pdl[0][1]
+            zc14 = pdm[6][4] * pdl[0][0]
+            output.d[7] = output.d[7] * ccor(z, rl, hc14, zc14)
+            # Chemistry Correction
+            hcc14 = pdm[6][7] * pdl[0][4]
+            zcc14 = pdm[6][6] * pdl[0][3]
+            rc14 = pdm[6][3] * pdl[0][5]
+            # Net Density Corrected at ALT
+            output.d[7] = output.d[7] * ccor(z, rc14, hcc14, zcc14)
+
+        # ANOMALOUS OXYGEN DENSITY
+
+        g16h = flags.sw[21] * globe7(pd[8], input, flags)
+        db16h = pdm[7][0] * np.exp(g16h) * pd[8][0]
+        tho = pdm[7][9] * pdl[0][6]
+        dd = densu(
+            z,
+            db16h,
+            tho,
+            tho,
+            16.0,
+            alpha[8],
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        zsht = pdm[7][5]
+        zmho = pdm[7][4]
+        zsho = scalh(zmho, 16.0, tho)
+        output.d[8] = dd * np.exp(-zsht / zsho * (np.exp(-(z - zmho) / zsht) - 1.0))
+
+        # Total Mass Density
+        output.d[5] = 1.66e-24 * (
+            4.0 * output.d[0]
+            + 16.0 * output.d[1]
+            + 28.0 * output.d[2]
+            + 32.0 * output.d[3]
+            + 40.0 * output.d[4]
+            + output.d[6]
+            + 14.0 * output.d[7]
+        )
+
+        # Temperature
+        z = math.sqrt(input.alt * input.alt)
+        ddum = densu(
+            z,
+            1.0,
+            tinf,
+            tlb,
+            0.0,
+            0.0,
+            output.t[1],
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        # (void) ddum; /* silence gcc */
+        if flags.sw[0]:
+            for ind in range(0, 9):
+                output.d[ind] = output.d[ind] * 1.0e6
+            output.d[5] = output.d[5] / 1000
