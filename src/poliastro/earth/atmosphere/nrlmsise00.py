@@ -558,6 +558,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
     """
     # New Lower Thermo Polynomial
     densu_temp = 1.0
+    tz = [0.0]
     xs = [0.0 for _ in range(5)]
     ys = [0.0 for _ in range(5)]
     y2out = [0.0 for _ in range(5)]
@@ -576,7 +577,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
     tt = tinf - (tinf - tlb) * np.exp(-s2*zg2)
     ta = tt
     tz[0] = tt
-    densu_temp = tz[0]
+    densu_temp = tz
 
     if alt < za:
         # Calculates Temperature Below ZA
@@ -1851,7 +1852,7 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
-        output.t[1] = temp_one
+        output.t[1] = temp_one[0]
         # Mixed Density at ALT
         temp_one = [output.t[1]]
         global dm40
@@ -1870,7 +1871,7 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
-        output.t[1] = temp_one
+        output.t[1] = temp_one[0]
         zhm40 = zhm28
         # Net Density at ALT
         output.d[4] = dnet(output.d[4], dm40, zhm40, xmm, 40.0)
@@ -1946,7 +1947,7 @@ def gts7(input, flags, output):
                 meso_tn1,
                 meso_tgn1,
             )
-            output.t[1] = temp_one
+            output.t[1] = temp_one[0]
             zhm01 = zhm28
             # Net Density at ALT
             output.d[6] = dnet(output.d[6], dm01, zhm01, xmm, 1.0)
