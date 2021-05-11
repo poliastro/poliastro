@@ -1,5 +1,7 @@
 from typing import Dict
 
+from astropy.coordinates.baseframe import BaseCoordinateFrame
+
 from poliastro.bodies import (
     Earth,
     Jupiter,
@@ -52,7 +54,7 @@ _FRAME_MAPPING = {
     Saturn: {Planes.EARTH_EQUATOR: SaturnICRS, Planes.BODY_FIXED: SaturnFixed},
     Uranus: {Planes.EARTH_EQUATOR: UranusICRS, Planes.BODY_FIXED: UranusFixed},
     Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS, Planes.BODY_FIXED: NeptuneFixed},
-}  # type: Dict[SolarSystemPlanet, Dict[Planes, FrameMeta]]
+}  # type: Dict[SolarSystemPlanet, Dict[Planes, BaseCoordinateFrame]]
 
 
 def get_frame(attractor, plane, obstime=J2000):
