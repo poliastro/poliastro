@@ -1,7 +1,5 @@
 from typing import Dict
 
-from astropy.coordinates.baseframe import FrameMeta
-
 from poliastro.bodies import (
     Earth,
     Jupiter,
