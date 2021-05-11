@@ -6,6 +6,19 @@ import astropy
 import numpy as np
 from astropy import units as u
 
+from poliastro.earth.atmosphere.nrlmsise00_data import (
+    pavgm,
+    pd,
+    pdl,
+    pdm,
+    pma,
+    ps,
+    pt,
+    ptl,
+    ptm,
+    sam,
+)
+
 # Constant Values (Units to be added later)
 dgtr = 1.74533e-2
 rgas = 831.4
@@ -15,7 +28,7 @@ hr = 0.2618
 pset = 2.0
 
 
-class nrlmsise_flags:
+class nrlmsise_flags(object):
     """
     Switches: to turn on and off particular variations use these switches.
     0 is off, 1 is on, and 2 is main effects off but cross terms on.
@@ -55,9 +68,9 @@ class nrlmsise_flags:
     """
 
     def __init__(self):
-        self.switches = np.zeros(24, dtype=np.int16)
-        self.sw = np.zeros(24, dtype=np.float16)
-        self.swc = np.zeros(24, dtype=np.float16)
+        self.switches = [0.0 for _ in range(24)]
+        self.sw = [0.0 for _ in range(24)]
+        self.swc = [0.0 for _ in range(24)]
 
 
 class ap_array:
@@ -75,7 +88,7 @@ class ap_array:
     """
 
     def __init__(self):
-        a = np.zeros(7, dtype=np.float16)
+        self.a = [0.0 for _ in range(7)]
 
 
 class nrlmsise_input:
@@ -102,28 +115,33 @@ class nrlmsise_input:
 
     def __init__(
         self,
-        year,
-        doy,
-        sec,
-        alt,
-        g_lat,
-        g_long,
-        lst,
-        f107A=150,
-        f107=150,
-        ap=4,
+        year=0,
+        doy=0,
+        sec=0.0,
+        alt=0.0,
+        g_lat=0.0,
+        g_long=0.0,
+        lst=0.0,
+        f107A=150.0,
+        f107=150.0,
+        ap=4.0,
+        ap_a=None,
     ):
-        self.year = year
-        self.doy = doy
-        self.sec = sec
-        self.alt = alt
-        self.g_lat = g_lat
-        self.g_long = g_long
-        self.lst = lst
-        self.f107A = f107A
-        self.f107 = f107
-        self.ap = ap
-        self.ap_a = ap_array()
+        self.year = year  # Year, currently Ignored
+        self.doy = doy  # Day Of The Year
+        self.sec = sec  # Seconds of the Day (UT)
+        self.alt = alt  # Altitude in Kilometers
+        self.g_lat = g_lat  # Geodetic Latitude
+        self.g_long = g_long  # Geodetic Longitude
+        self.lst = lst  # Local Apparent Solar Time (in hours)
+        self.f107A = f107A  # 81 Day Average for F10.7 Flux (centered on day)
+        self.f107 = f107  # Daily F10.7 Flux for previous Day
+        self.ap = ap  # Magnetic Index(daily)
+        self.ap_array = ap_a  # Class Implementation
+
+    def set_lst(self):
+        self.lst = (self.sec / 3600) + (self.g_long / 15)
+        return self.lst
 
 
 class nrlmsise_output:
@@ -162,86 +180,45 @@ class nrlmsise_output:
     """
 
     def __init__(self):
-        d = np.zeros(9, dtype=np.float16)
-        t = np.zeros(2, dtype=np.float16)
+        self.d = [0.0 for _ in range(9)]  # Densities
+        self.t = [0.0 for _ in range(2)]  # Temperatures
 
 
-# # GTD7
-# # Neutral Atmosphere Empircial Model from the surface to lower exosphere.
-# def gtd7():
-#     nrlmsise_input():
+# PARMB
+gsurf = [0.0]
+re = [0.0]
 
-# void gtd7 (struct nrlmsise_input *input, \
-#            struct nrlmsise_flags *flags, \
-#            struct nrlmsise_output *output);
+# GTS3C
+dd = 0.0
 
-
-# /* GTD7D */
-# /*   This subroutine provides Effective Total Mass Density for output
-#  *   d[5] which includes contributions from "anomalous oxygen" which can
-#  *   affect satellite drag above 500 km. See the section "output" for
-#  *   additional details.
-#  */
-# void gtd7d(struct nrlmsise_input *input, \
-#            struct nrlmsise_flags *flags, \
-#            struct nrlmsise_output *output);
-
-
-# /* GTS7 */
-# /*   Thermospheric portion of NRLMSISE-00
-#  */
-# void gts7 (struct nrlmsise_input *input, \
-# 	   struct nrlmsise_flags *flags, \
-# 	   struct nrlmsise_output *output);
-
-
-# /* GHP7 */
-# /*   To specify outputs at a pressure level (press) rather than at
-#  *   an altitude.
-#  */
-# void ghp7 (struct nrlmsise_input *input, \
-#            struct nrlmsise_flags *flags, \
-#            struct nrlmsise_output *output, \
-#            double press);
-###################################################################################
-flags = nrlmsise_flags()
-input = nrlmsise_input()
-output = nrlmsise_output()
+# DMIX
+dm04 = 0.0
+dm16 = 0.0
+dm28 = 0.0
+dm32 = 0.0
+dm40 = 0.0
+dm01 = 0.0
+dm14 = 0.0
 
 # MESO7
-meso_tn1 = np.zeros(5, dtype=np.float16)
-meso_tn2 = np.zeros(4, dtype=np.float16)
-meso_tn3 = np.zeros(5, dtype=np.float16)
-meso_tgn1 = np.zeros(2, dtype=np.float16)
-meso_tgn2 = np.zeros(2, dtype=np.float16)
-meso_tgn3 = np.zeros(2, dtype=np.float16)
-
-# POWER7
-pt = np.zeros(150, dtype=np.float16)
-pd = np.zeros([9, 150], dtype=np.float16)
-ps = np.zeros(150, dtype=np.float16)
-pdl = np.zeros([2, 25], dtype=np.float16)
-ptl = np.zeros([4, 100], dtype=np.float16)
-pma = np.zeros([10, 100], dtype=np.float16)
-sam = np.zeros(100, dtype=np.float16)
-
-# LOWER7
-ptm = np.zeros(10, dtype=np.float16)
-pdm = np.zeros([8, 10], dtype=np.float16)
-pavgm = np.zeros(10, dtype=np.float16)
+meso_tn1 = [0.0 for _ in range(5)]
+meso_tn2 = [0.0 for _ in range(4)]
+meso_tn3 = [0.0 for _ in range(5)]
+meso_tgn1 = [0.0 for _ in range(2)]
+meso_tgn2 = [0.0 for _ in range(2)]
+meso_tgn3 = [0.0 for _ in range(2)]
 
 # LPOLY
-dfa = 0
-plg = np.zeros([4, 9], dtype=np.float16)
-ctloc, stloc = 0
-c2tloc, s2tloc = 0
-s3tloc, c3tloc = 0
-apdf = 0
-apt = np.zeros(4, dtype=np.float16)
-
-gsurf = 0
-re = 0
-dm28 = 0
+dfa = 0.0
+plg = [[0.0 for _ in range(9)] for _ in range(4)]
+ctloc = 0.0
+stloc = 0.0
+c2tloc = 0.0
+s2tloc = 0.0
+s3tloc = 0.0
+c3tloc = 0.0
+apdf = 0.0
+apt = [0.0 for _ in range(4)]
 
 
 def tselec(flags):
@@ -258,12 +235,14 @@ def tselec(flags):
         else:
             flags.sw[index] = flags.switches[index]
             flags.swc[index] = flags.switches[index]
+    return
 
 
 def glatf(lat, gv, reff):
     c2 = np.cos(2.0 * dgtr * lat)
-    gv = 980.616 * (1.0 - 0.0026373 * c2)
-    reff = 2.0 * gv / (3.085462e-6 + 2.27e-9 * c2) * 1.0e-5
+    gv[0] = 980.616 * (1.0 - 0.0026373 * c2)
+    reff[0] = 2.0 * gv[0] / (3.085462e-6 + 2.27e-9 * c2) * 1.0e-5
+    return gv, reff
 
 
 def ccor(alt, r, h1, zh):
@@ -307,7 +286,7 @@ def ccor2(alt, r, h1, zh, h2):
 
 def scalh(alt, xm, temp):
     # gsurf & re to be declared
-    g = gsurf / (1.0 + (alt / re)) ** 2
+    g = gsurf[0] / (1.0 + (alt / re[0])) ** 2
     g = rgas * temp / (g * xm)
     return g
 
@@ -332,6 +311,7 @@ def dnet(dd, dm, zhm, xmm, xm):
             return dd
         if dd == 0:
             return dm
+
     ylog = a * math.log(dm, dd)
     if ylog < -10:
         return dd
@@ -376,7 +356,8 @@ def splini(xa, ya, y2a, n, x, y):
         ) * h
         klo += 1
         khi += 1
-    y = yi
+    y[0] = yi
+    # return yi
 
 
 def splint(xa, ya, y2a, n, x, y):
@@ -392,7 +373,7 @@ def splint(xa, ya, y2a, n, x, y):
     klo = 0
     khi = n - 1
     while (khi - klo) > 1:
-        k = (khi + klo) / 2
+        k = int((khi + klo) / 2)
         if xa[k] > x:
             khi = k
         else:
@@ -407,7 +388,8 @@ def splint(xa, ya, y2a, n, x, y):
         + b * ya[khi]
         + ((a ** 3 - a) * y2a[klo] + (b ** 3 - b) * y2a[khi]) * h * h / 6.0
     )
-    y = yi
+    y[0] = yi
+    # return yi
 
 
 def spline(x, y, n, yp1, ypn, y2):
@@ -420,7 +402,7 @@ def spline(x, y, n, yp1, ypn, y2):
                   Values >= 1E30 Signal Signal Second Derivative Zero
     y2          - output array of second derivatives
     """
-    u = np.zeros(n, dtype=np.float16)
+    u = [0.0 for _ in range(n)]
     if yp1 > 0.99e30:
         y2[0] = 0
         u[0] = 0
@@ -449,26 +431,28 @@ def spline(x, y, n, yp1, ypn, y2):
             ypn - (y[n - 1] - y[n - 2]) / (x[n - 1] - x[n - 2])
         )
     y2[n - 1] = (un - qn * u[n - 2]) / (qn * y2[n - 2] + 1.0)
+    # Something to check here !!
     for index in range(0, n - 3, -1):
         y2[index] = y2[index] * y2[index + 1] + u[index]
+    return
 
 
 def zeta(zz, zl):
-    return (zz - zl) * (re + zl) / (re + zz)
+    return (zz - zl) * (re[0] + zl) / (re[0] + zz)
 
 
 def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
     """
     Calculate Temperature & Density Profiles for Lower Atoms.
     """
-    xs = np.zeros(10, dtype=np.float16)
-    ys = np.zeros(10, dtype=np.float16)
-    y2out = np.zeros(10, dtype=np.float16)
-    y, yi, densm_temp = 0
-    densm = d0
+    xs = [0.0 for _ in range(10)]
+    ys = [0.0 for _ in range(10)]
+    y2out = [0.0 for _ in range(10)]
+    # densm_temp = 0
+    densm_temp = d0
     if alt > zn2[0]:
         if xm == 0.0:
-            return tz
+            return tz[0]
         else:
             return d0
 
@@ -490,32 +474,34 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
         xs[i] = zeta(zn2[i], z1) / zgdif
         ys[i] = 1.0 / tn2[i]
     yd1 = -tgn2[0] / (t1 * t2) * zgdif
-    yd2 = -tgn2[1] / (t2 * t2) * zgdif * ((re + z2) / (re + z1) ** 2)
+    yd2 = -tgn2[1] / (t2 * t2) * zgdif * ((re[0] + z2) / (re[0] + z1) ** 2)
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
     x = zg / zgdif
+    y = [0.0]
     splint(xs, ys, y2out, mn, x, y)
 
     # Temperature at Altitude
-    tz = 1.0 / y
+    tz[0] = 1.0 / y[0]
     if not xm == 0.0:
         # Calculates Stratosphere / Mesosphere Density
-        glb = gsurf / ((1.0 + z1 / re) ** 2)
+        glb = gsurf[0] / ((1.0 + z1 / re[0]) ** 2)
         gamm = xm * glb * zgdif / rgas
 
         # Integrate Temperate Profile
+        yi = [0.0]
         splini(xs, ys, y2out, mn, x, yi)
-        expl = gamm * yi
+        expl = gamm * yi[0]
         if expl > 50.0:
             expl = 50.0
 
         # Density at Altitude
-        densm_temp = densm_temp * (t1 / tz) * np.exp(-expl)
+        densm_temp = densm_temp * (t1 / tz[0]) * np.exp(-expl)
 
     if alt > zn3[0]:
         if xm == 0.0:
-            return tz
+            return tz[0]
         else:
             return densm_temp
 
@@ -529,37 +515,41 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
     zg = zeta(z, z1)
     zgdif = zeta(z2, z1)
 
+    # Set Up Spline Nodes
     for i in range(0, mn):
         xs[i] = zeta(zn3[i], z1) / zgdif
         ys[i] = 1.0 / tn3[i]
     yd1 = -tgn3[0] / (t1 * t2) * zgdif
-    yd2 = -tgn3[1] / (t2 * t2) * zgdif * ((re + z2) / (re + z1)) ** 2
+    yd2 = -tgn3[1] / (t2 * t2) * zgdif * ((re[0] + z2) / (re[0] + z1)) ** 2
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
     x = zg / zgdif
+    y = [0.0]
     splint(xs, ys, y2out, mn, x, y)
 
     # Temperature at Altitude
-    tz = 1.0 / y
+    tz[0] = 1.0 / y[0]
     if not xm == 0.0:
         # Calculate Tropospheric / Stratospheric Density
-        glb = gsurf / ((1.0 + z1 / re) ** 2)
+        glb = gsurf[0] / ((1.0 + z1 / re[0]) ** 2)
         gamm = xm * glb * zgdif / rgas
 
         # Integrate Temperature Profile
+        yi = [0.0]
         splini(xs, ys, y2out, mn, x, yi)
-        expl = gamm * yi
+        expl = gamm * yi[0]
         if expl > 50.0:
             expl = 50.0
 
         # Density at Altitude
-        densm_temp = densm_temp * (t1 / tz) * np.exp(-expl)
+        densm_temp = densm_temp * (t1 / tz[0]) * np.exp(-expl)
 
     if xm == 0.0:
-        return tz
+        return tz[0]
     else:
         return densm_temp
+    # return
 
 
 def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
@@ -567,13 +557,10 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
     Calculate Temperature & Density Profile for MSIS Model
     """
     # New Lower Thermo Polynomial
-    x, y, yi = 0
     densu_temp = 1.0
-    z1, t1, zgdif = 0
-    mn = 0
-    xs = np.zeros(5, dtype=np.float16)
-    ys = np.zeros(5, dtype=np.float16)
-    y2out = np.zeros(5, dtype=np.float16)
+    xs = [0.0 for _ in range(5)]
+    ys = [0.0 for _ in range(5)]
+    y2out = [0.0 for _ in range(5)]
 
     # Joining Altitudes of Bates & Spline
     za = zn1[0]
@@ -586,15 +573,15 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
     zg2 = zeta(z, zlb)
 
     # Bates Temperature
-    tt = tinf - (tinf - tlb) * np.exp(-s2 * zg2)
+    tt = tinf - (tinf - tlb) * np.exp(-s2*zg2)
     ta = tt
-    tz = tt
-    densu_temp = tz
+    tz[0] = tt
+    densu_temp = tz[0]
 
     if alt < za:
         # Calculates Temperature Below ZA
         # Temperature Gradient at ZA from Bates Profile.
-        dta = (tinf - ta) * s2 * ((re + zlb) / (re + za)) ** 2
+        dta = (tinf - ta) * s2 * ((re[0] + zlb) / (re[0] + za)) ** 2
         tgn1[0] = dta
         tn1[0] = ta
         if alt > zn1[mn1 - 1]:
@@ -618,22 +605,23 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
 
         # End Node Derivatives
         yd1 = -tgn1[0] / (t1 * t1) * zgdif
-        yd2 = -tgn1[1] / (t2 * t2) * zgdif((re + z2) / (re + z1)) ** 2
+        yd2 = -tgn1[1] / (t2 * t2) * zgdif * ((re[0] + z2) / (re[0] + z1)) ** 2
 
         # Calculates Spline Coefficients
         spline(xs, ys, mn, yd1, yd2, y2out)
         x = zg / zgdif
+        y = [0.0]
         splint(xs, ys, y2out, mn, x, y)
 
         # Temperature at Altitude
-        tz = 1.0 / y
-        densu_temp = tz
+        tz[0] = 1.0 / y[0]
+        densu_temp = tz[0]
 
     if xm == 0:
         return densu_temp
 
     # Calculate Density Above ZA
-    glb = gsurf / ((1.0 + zlb / re) ** 2)
+    glb = gsurf[0] / ((1.0 + zlb / re[0]) ** 2)
     gamma = xm * glb / (s2 * rgas * tinf)
     expl = np.exp(-s2 * gamma * zg2)
     if expl > 50.0:
@@ -648,19 +636,20 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
         return densu_temp
 
     # Calculate Density Below ZA
-    glb = gsurf / (1.0 + z1 / re) ** 2.0
+    glb = gsurf[0] / (1.0 + z1 / re[0]) ** 2.0
     gamm = xm * glb * zgdif / rgas
 
     # Integrate Spline Temperatures
+    yi = [0.0]
     splini(xs, ys, y2out, mn, x, yi)
-    expl = gamm * yi
+    expl = gamm * yi[0]
     if expl > 50.0:
         expl = 50.0
-    if tz <= 0:
+    if tz[0] <= 0:
         expl = 50.0
 
     # Density at Altitude
-    densu_temp = densu_temp * ((t1 / tz) ** (1.0 + alpha)) * np.exp(-expl)
+    densu_temp = densu_temp * ((t1 / tz[0]) ** (1.0 + alpha)) * np.exp(-expl)
     return densu_temp
 
 
@@ -707,12 +696,20 @@ def globe7(p, input, flags):
     Calculate G(L) Function
     """
     # Upper Thermosphere Parameters
-    t = np.zeros(15, dtype=np.float16)
+    t = [0.0 for _ in range(15)]
+    sw9 = 1
     ap = ap_array()
     tloc = input.lst
 
-    for index in range(0, 14):
-        t[index] = 0
+    # for index in range(0, 14):
+    #     t[index] = 0
+
+    if flags.sw[9] > 0:
+        sw9 = 1
+    elif flags.sw[9] < 0:
+        sw9 = -1
+
+    xlong = input.g_long
 
     # Calculate Legendre Polynomials
     c = np.sin(input.g_lat * dgtr)
@@ -747,20 +744,32 @@ def globe7(p, input, flags):
     plg[3][6] = (11.0 * c * plg[3][5] - 8.0 * plg[3][4]) / 3.0
 
     if not (((flags.sw[7] == 0) and (flags.sw[8] == 0)) and (flags.sw[14] == 0)):
+        global stloc
         stloc = np.sin(hr * tloc)
+        global ctloc
         ctloc = np.cos(hr * tloc)
+        global s2tloc
         s2tloc = np.sin(2.0 * hr * tloc)
+        global c2tloc
         c2tloc = np.cos(2.0 * hr * tloc)
+        global s3tloc
         s3tloc = np.sin(3.0 * hr * tloc)
+        global c3tloc
         c3tloc = np.cos(3.0 * hr * tloc)
 
-    cd32 = np.cos(dr * input.doy - p[31])
+    cd32 = np.cos(dr * (input.doy - p[31]))
     cd18 = np.cos(2.0 * dr * (input.doy - p[17]))
-    cd14 = np.cos(dr * input.doy - p[13])
+    cd14 = np.cos(dr * (input.doy - p[13]))
     cd39 = np.cos(2.0 * dr * (input.doy - p[38]))
+
+    p32 = p[31]
+    p18 = p[17]
+    p14 = p[13]
+    p39 = p[38]
 
     # F10.7 EFFECT
     df = input.f107 - input.f107A
+    global dfa
     dfa = input.f107A - 150.0
     t[0] = (
         p[19] * df * (1.0 + p[59] * dfa)
@@ -779,7 +788,10 @@ def globe7(p, input, flags):
     )
 
     # Symmetrical Annual
-    t[2] = (p[15] + p[16] * plg[0][2]) * cd18
+    t[2] = p[18] * cd32
+
+    # Symmetrical Semi-Annual
+    t[3] = (p[15] + p[16] * plg[0][2]) * cd18
 
     # Asymmetrical Annual
     t[4] = f1 * (p[9] * plg[0][1] + p[10] * plg[0][3]) * cd14
@@ -853,6 +865,7 @@ def globe7(p, input, flags):
             p45 = p[44]
             if p44 < 0:
                 p44 = 1.0e-5
+            global apdf
             apdf = apd + (p45 - 1.0) * (apd + (np.exp(-p44 * apd) - 1.0) / p44)
             if flags.sw[9]:
                 t[8] = apdf * (
@@ -973,11 +986,11 @@ def globe7(p, input, flags):
                         * np.cos(sr * (input.sec - p[75]))
                     )
 
-        # Parms not used: 82, 89, 99, 139-149
-        tinf = p[30]
-        for index in range(0, 14):
-            tinf = tinf + abs(flags.sw[index + 1]) * t[index]
-        return tinf
+    # Parms not used: 82, 89, 99, 139-149
+    tinf = p[30]
+    for index in range(0, 14):
+        tinf = tinf + abs(flags.sw[index + 1]) * t[index]
+    return tinf
 
 
 # GLOB7S
@@ -985,21 +998,27 @@ def glob7s(p, input, flags):
     """
     Version of GLOBE for Lower Atmosphere 10/26/99
     """
-    t = np.zeros(14, dtype=np.float16)
+    t = [0.0 for _ in range(14)]
+    pset = 2.0
 
+    # Confirm Parameter Set
     if p[99] == 0:
         p[99] = pset
     if not p[99] == pset:
         print("Wrong parameter set for GLOB7S")
         return -1
 
-    for ind in range(0, 14):
-        t[ind] == 0.0
+    # for ind in range(0, 14):
+    #     t[ind] == 0.0
 
     cd32 = np.cos(dr * (input.doy - p[31]))
     cd18 = np.cos(2.0 * dr * (input.doy - p[17]))
     cd14 = np.cos(dr * (input.doy - p[13]))
     cd39 = np.cos(2.0 * dr * (input.doy - p[38]))
+    p32 = p[31]
+    p18 = p[17]
+    p14 = p[13]
+    p39 = p[38]
 
     # F10.7
     t[0] = p[21] * dfa
@@ -1094,11 +1113,10 @@ def glob7s(p, input, flags):
 # GTD7
 def gtd7(input, flags, output):
     mn3 = 5
-    zn3 = np.array([32.5, 20.0, 15.0, 10.0, 0.0])
+    zn3 = [32.5, 20.0, 15.0, 10.0, 0.0]
     mn2 = 4
-    zn2 = np.array([72.5, 55.0, 45.0, 32.5])
+    zn2 = [72.5, 55.0, 45.0, 32.5]
     zmix = 62.5
-    tz = 0
     soutput = nrlmsise_output()
 
     tselec(flags)
@@ -1210,6 +1228,7 @@ def gtd7(input, flags, output):
 
     # N2 Density
     dmr = soutput.d[2] / dm28m - 1.0
+    tz = [0.0]
     output.d[2] = densm(
         input.alt,
         dm28m,
@@ -1263,6 +1282,7 @@ def gtd7(input, flags, output):
         output.d[5] = output.d[5] / 1000
 
     # Temperature At Altitude
+    global dd
     dd = densm(
         input.alt,
         1.0,
@@ -1277,7 +1297,7 @@ def gtd7(input, flags, output):
         meso_tn2,
         meso_tgn2,
     )
-    output.t[1] = tz
+    output.t[1] = tz[0]
 
 
 # GTD7D
@@ -1302,7 +1322,9 @@ def gph7(input, flags, output, press):
     bm = 1.3806e-19
     test = 0.00043
     ltest = 12
-    pl = np.log10(press)
+
+    pl = math.log10(press)
+
     if pl >= -5.0:
         if pl > 2.5:
             zi = 18.06 * (3.00 - pl)
@@ -1340,7 +1362,7 @@ def gph7(input, flags, output, press):
 
     # Iteration Loop
     l = 0
-    while 1 == 1:
+    while True:
         l += 1
         input.alt = z
 
@@ -1359,7 +1381,7 @@ def gph7(input, flags, output, press):
         p = bm * xn * output.t[1]
         if flags.sw[0]:
             p = p * 1.0e-6
-        diff = pl - np.log10(p)
+        diff = pl - math.log10(p)
 
         if math.sqrt(diff * diff) < test:
             return
@@ -1370,7 +1392,7 @@ def gph7(input, flags, output, press):
         xm = output.d[5] / xn / 1.66e-24
         if flags.sw[0]:
             xm = xm * 1.0e3
-        g = gsurf / ((1.0 + z / re) ** 2)
+        g = gsurf[0] / ((1.0 + z / re[0]) ** 2)
         sh = rgas * output.t[1] / (xm * g)
 
         # New Altitude Estimate Using Scale Height
@@ -1388,10 +1410,9 @@ def gts7(input, flags, output):
         alt > 72.5 KM !!
     """
     mn1 = 5
-    tz = 0
-    zn1 = np.array([120.0, 110.0, 100.0, 90.0, 72.5])
-    alpha = np.array([-0.38, 0.0, 0.0, 0.0, 0.17, 0.0, -0.38, 0.0, 0.0])
-    altl = np.array([200.0, 300.0, 160.0, 250.0, 240.0, 450.0, 320.0, 450.0])
+    zn1 = [120.0, 110.0, 100.0, 90.0, 72.5]
+    alpha = [-0.38, 0.0, 0.0, 0.0, 0.17, 0.0, -0.38, 0.0, 0.0]
+    altl = [200.0, 300.0, 160.0, 250.0, 240.0, 450.0, 320.0, 450.0]
     za = pdl[1][15]
     zn1[0] = za
 
@@ -1437,7 +1458,7 @@ def gts7(input, flags, output):
             * (1.0 + flags.sw[18] * flags.sw[20] * glob7s(pma[8], input, flags))
             * meso_tn1[4]
             * meso_tn1[4]
-            / (pow((ptm[4] * ptl[3][0]), 2.0))
+            / ((ptm[4] * ptl[3][0]) ** 2)
         )
     else:
         meso_tn1[1] = ptm[6] * ptl[0][0]
@@ -1445,12 +1466,12 @@ def gts7(input, flags, output):
         meso_tn1[3] = ptm[7] * ptl[2][0]
         meso_tn1[4] = ptm[4] * ptl[3][0]
         meso_tgn1[1] = (
-            ptm[8]
-            * pma[8][0]
-            * meso_tn1[4]
-            * meso_tn1[4]
-            / (pow((ptm[4] * ptl[3][0]), 2.0))
+            ptm[8] * pma[8][0] * meso_tn1[4] * meso_tn1[4] / ((ptm[4] * ptl[3][0]) ** 2)
         )
+
+    z0 = zn1[3]
+    t0 = meso_tn1[3]
+    tr12 = 1.0
 
     # N2 Variation Factor at ZLB
     g28 = flags.sw[21] * globe7(pd[2], input, flags)
@@ -1472,6 +1493,7 @@ def gts7(input, flags, output):
     db28 = pdm[2][0] * np.exp(g28) * pd[2][0]
 
     # Diffusive Density at Alt
+    temp = [output.t[1]]
     output.d[2] = densu(
         z,
         db28,
@@ -1479,7 +1501,7 @@ def gts7(input, flags, output):
         tlb,
         28.0,
         alpha[2],
-        output.t[1],
+        temp,
         ptm[5],
         s,
         mn1,
@@ -1487,6 +1509,7 @@ def gts7(input, flags, output):
         meso_tn1,
         meso_tgn1,
     )
+    output.t[1] = temp[0]
     dd = output.d[2]
 
     # Turbopause
@@ -1495,6 +1518,7 @@ def gts7(input, flags, output):
     xmd = 28.0 - xmm
 
     # Mixed Density at Zlb
+    tz = [0]
     b28 = densu(
         zh28,
         db28,
@@ -1512,6 +1536,7 @@ def gts7(input, flags, output):
     )
     if (flags.sw[15]) and (z <= altl[2]):
         # Mixed Density at Alt
+        global dm28
         dm28 = densu(
             z,
             b28,
@@ -1538,6 +1563,7 @@ def gts7(input, flags, output):
     db04 = pdm[0][0] * np.exp(g4) * pd[0][0]
 
     #  Diffusive Density at Alt
+    temp = [output.t[1]]
     output.d[0] = densu(
         z,
         db04,
@@ -1545,7 +1571,7 @@ def gts7(input, flags, output):
         tlb,
         4.0,
         alpha[0],
-        output.t[1],
+        temp,
         ptm[5],
         s,
         mn1,
@@ -1553,11 +1579,13 @@ def gts7(input, flags, output):
         meso_tn1,
         meso_tgn1,
     )
+    output.t[1] = temp[0]
     dd = output.d[0]
     if (flags.sw[15]) and (z < altl[0]):
         # Turbopause
         zh04 = pdm[0][2]
         # Mixed density at ZLB
+        temp_one = [output.t[1]]
         b04 = densu(
             zh04,
             db04,
@@ -1565,7 +1593,7 @@ def gts7(input, flags, output):
             tlb,
             4.0 - xmm,
             alpha[0] - 1.0,
-            output.t[1],
+            temp_one,
             ptm[5],
             s,
             mn1,
@@ -1573,7 +1601,10 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp_one[0]
         # Mixed density at Alt
+        temp_one = [output.t[1]]
+        global dm04
         dm04 = densu(
             z,
             b04,
@@ -1581,7 +1612,7 @@ def gts7(input, flags, output):
             tlb,
             xmm,
             0.0,
-            output.t[1],
+            temp_one,
             ptm[5],
             s,
             mn1,
@@ -1589,6 +1620,7 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp_one[0]
         zhm04 = zhm28
         # Net density at Alt
         output.d[0] = dnet(output.d[0], dm04, zhm04, xmm, 4.0)
@@ -1607,6 +1639,7 @@ def gts7(input, flags, output):
     db16 = pdm[1][0] * np.exp(g16) * pd[1][0]
 
     # Diffusive density at Alt
+    temp = [output.t[1]]
     output.d[1] = densu(
         z,
         db16,
@@ -1614,7 +1647,7 @@ def gts7(input, flags, output):
         tlb,
         16.0,
         alpha[1],
-        output.t[1],
+        temp,
         ptm[5],
         s,
         mn1,
@@ -1622,11 +1655,13 @@ def gts7(input, flags, output):
         meso_tn1,
         meso_tgn1,
     )
+    output.t[1] = temp[0]
     dd = output.d[1]
     if (flags.sw[15]) and (z <= altl[1]):
         # Turbopause
         zh16 = pdm[1][2]
         # Mixed density at ZLB
+        temp_one = [output.t[1]]
         b16 = densu(
             zh16,
             db16,
@@ -1634,7 +1669,7 @@ def gts7(input, flags, output):
             tlb,
             16.0 - xmm,
             (alpha[1] - 1.0),
-            output.t[1],
+            temp_one,
             ptm[5],
             s,
             mn1,
@@ -1642,7 +1677,10 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp_one[0]
         # Mixed density at Alt
+        temp_one = [output.t[1]]
+        global dm16
         dm16 = densu(
             z,
             b16,
@@ -1650,7 +1688,7 @@ def gts7(input, flags, output):
             tlb,
             xmm,
             0.0,
-            output.t[1],
+            temp_one,
             ptm[5],
             s,
             mn1,
@@ -1658,6 +1696,7 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp_one[0]
         zhm16 = zhm28
         # Net density at Alt
         output.d[1] = dnet(output.d[1], dm16, zhm16, xmm, 16.0)
@@ -1685,6 +1724,7 @@ def gts7(input, flags, output):
     db32 = pdm[3][0] * np.exp(g32) * pd[4][0]
 
     # Diffusive Density at ALT
+    temp = [output.t[1]]
     output.d[3] = densu(
         z,
         db32,
@@ -1692,7 +1732,7 @@ def gts7(input, flags, output):
         tlb,
         32.0,
         alpha[3],
-        output.t[1],
+        temp,
         ptm[5],
         s,
         mn1,
@@ -1700,12 +1740,14 @@ def gts7(input, flags, output):
         meso_tn1,
         meso_tgn1,
     )
+    output.t[1] = temp[0]
     dd = output.d[3]
     if flags.sw[15]:
         if z <= altl[3]:
             # Turbopause
             zh32 = pdm[3][2]
             # Mixed Density at ZLB
+            temp_one = [output.t[1]]
             b32 = densu(
                 zh32,
                 db32,
@@ -1713,7 +1755,7 @@ def gts7(input, flags, output):
                 tlb,
                 32.0 - xmm,
                 alpha[3] - 1.0,
-                output.t[1],
+                temp_one,
                 ptm[5],
                 s,
                 mn1,
@@ -1721,7 +1763,10 @@ def gts7(input, flags, output):
                 meso_tn1,
                 meso_tgn1,
             )
+            output.t[1] = temp_one[0]
             # Mixed Density at ALT
+            temp_one = [output.t[1]]
+            global dm32
             dm32 = densu(
                 z,
                 b32,
@@ -1729,7 +1774,7 @@ def gts7(input, flags, output):
                 tlb,
                 xmm,
                 0.0,
-                output.t[1],
+                temp_one,
                 ptm[5],
                 s,
                 mn1,
@@ -1737,6 +1782,7 @@ def gts7(input, flags, output):
                 meso_tn1,
                 meso_tgn1,
             )
+            output.t[1] = temp_one[0]
             zhm32 = zhm28
             # Net Density at ALT
             output.d[3] = dnet(output.d[3], dm32, zhm32, xmm, 32.0)
@@ -1767,6 +1813,7 @@ def gts7(input, flags, output):
     db40 = pdm[4][0] * np.exp(g40) * pd[5][0]
 
     # Diffusive Density at ALT
+    temp = [output.t[1]]
     output.d[4] = densu(
         z,
         db40,
@@ -1774,7 +1821,7 @@ def gts7(input, flags, output):
         tlb,
         40.0,
         alpha[4],
-        output.t[1],
+        temp,
         ptm[5],
         s,
         mn1,
@@ -1782,11 +1829,13 @@ def gts7(input, flags, output):
         meso_tn1,
         meso_tgn1,
     )
+    output.t[1] = temp[0]
     dd = output.d[4]
     if (flags.sw[15]) and (z <= altl[4]):
         # Turbopause
         zh40 = pdm[4][2]
         # Mixed Density at ZLB
+        temp_one = [output.t[1]]
         b40 = densu(
             zh40,
             db40,
@@ -1794,7 +1843,7 @@ def gts7(input, flags, output):
             tlb,
             40.0 - xmm,
             alpha[4] - 1.0,
-            output.t[1],
+            temp_one,
             ptm[5],
             s,
             mn1,
@@ -1802,7 +1851,10 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp_one
         # Mixed Density at ALT
+        temp_one = [output.t[1]]
+        global dm40
         dm40 = densu(
             z,
             b40,
@@ -1818,6 +1870,7 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp_one
         zhm40 = zhm28
         # Net Density at ALT
         output.d[4] = dnet(output.d[4], dm40, zhm40, xmm, 40.0)
@@ -1836,6 +1889,7 @@ def gts7(input, flags, output):
         db01 = pdm[5][0] * np.exp(g1) * pd[6][0]
 
         # Diffusive Density at ALT
+        temp = [output.t[1]]
         output.d[6] = densu(
             z,
             db01,
@@ -1843,7 +1897,7 @@ def gts7(input, flags, output):
             tlb,
             1.0,
             alpha[6],
-            output.t[1],
+            temp,
             ptm[5],
             s,
             mn1,
@@ -1851,11 +1905,13 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp[0]
         dd = output.d[6]
         if (flags.sw[15]) and (z <= altl[6]):
             # Turbopause
             zh01 = pdm[5][2]
             # Mixed Density at ZLB
+            temp_one = [output.t[1]]
             b01 = densu(
                 zh01,
                 db01,
@@ -1863,7 +1919,7 @@ def gts7(input, flags, output):
                 tlb,
                 1.0 - xmm,
                 alpha[6] - 1.0,
-                output.t[1],
+                temp_one,
                 ptm[5],
                 s,
                 mn1,
@@ -1871,7 +1927,10 @@ def gts7(input, flags, output):
                 meso_tn1,
                 meso_tgn1,
             )
+            output.t[1] = temp_one[0]
             # Mixed Density at ALT
+            temp_one = [output.t[1]]
+            global dm01
             dm01 = densu(
                 z,
                 b01,
@@ -1879,7 +1938,7 @@ def gts7(input, flags, output):
                 tlb,
                 xmm,
                 0.0,
-                output.t[1],
+                temp_one,
                 ptm[5],
                 s,
                 mn1,
@@ -1887,6 +1946,7 @@ def gts7(input, flags, output):
                 meso_tn1,
                 meso_tgn1,
             )
+            output.t[1] = temp_one
             zhm01 = zhm28
             # Net Density at ALT
             output.d[6] = dnet(output.d[6], dm01, zhm01, xmm, 1.0)
@@ -1909,6 +1969,7 @@ def gts7(input, flags, output):
         db14 = pdm[6][0] * np.exp(g14) * pd[7][0]
 
         # Diffusive Density at ALT
+        temp = [output.t[1]]
         output.d[7] = densu(
             z,
             db14,
@@ -1916,7 +1977,7 @@ def gts7(input, flags, output):
             tlb,
             14.0,
             alpha[7],
-            output.t[1],
+            temp,
             ptm[5],
             s,
             mn1,
@@ -1924,11 +1985,13 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp[0]
         dd = output.d[7]
         if (flags.sw[15]) and (z <= altl[7]):
             # Turbopause
             zh14 = pdm[6][2]
             # Mixed Density at ZLB
+            temp_one = [output.t[1]]
             b14 = densu(
                 zh14,
                 db14,
@@ -1936,7 +1999,7 @@ def gts7(input, flags, output):
                 tlb,
                 14.0 - xmm,
                 alpha[7] - 1.0,
-                output.t[1],
+                temp_one,
                 ptm[5],
                 s,
                 mn1,
@@ -1944,7 +2007,10 @@ def gts7(input, flags, output):
                 meso_tn1,
                 meso_tgn1,
             )
+            output.t[1] = temp_one[0]
             # Mixed Density at ALT
+            temp_one = [output.t[1]]
+            global dm14
             dm14 = densu(
                 z,
                 b14,
@@ -1960,6 +2026,7 @@ def gts7(input, flags, output):
                 meso_tn1,
                 meso_tgn1,
             )
+            output.t[1] = temp_one[0]
             zhm14 = zhm28
             # Net Density at ALT
             output.d[7] = dnet(output.d[7], dm14, zhm14, xmm, 14.0)
@@ -1980,6 +2047,7 @@ def gts7(input, flags, output):
         g16h = flags.sw[21] * globe7(pd[8], input, flags)
         db16h = pdm[7][0] * np.exp(g16h) * pd[8][0]
         tho = pdm[7][9] * pdl[0][6]
+        temp = [output.t[1]]
         dd = densu(
             z,
             db16h,
@@ -1987,7 +2055,7 @@ def gts7(input, flags, output):
             tho,
             16.0,
             alpha[8],
-            output.t[1],
+            temp,
             ptm[5],
             s,
             mn1,
@@ -1995,6 +2063,7 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
+        output.t[1] = temp[0]
         zsht = pdm[7][5]
         zmho = pdm[7][4]
         zsho = scalh(zmho, 16.0, tho)
@@ -2013,6 +2082,7 @@ def gts7(input, flags, output):
 
         # Temperature
         z = math.sqrt(input.alt * input.alt)
+        temp = [output.t[1]]
         ddum = densu(
             z,
             1.0,
@@ -2020,7 +2090,7 @@ def gts7(input, flags, output):
             tlb,
             0.0,
             0.0,
-            output.t[1],
+            temp,
             ptm[5],
             s,
             mn1,
@@ -2028,8 +2098,9 @@ def gts7(input, flags, output):
             meso_tn1,
             meso_tgn1,
         )
-        # (void) ddum; /* silence gcc */
+        output.t[1] = temp[0]
         if flags.sw[0]:
             for ind in range(0, 9):
                 output.d[ind] = output.d[ind] * 1.0e6
             output.d[5] = output.d[5] / 1000
+        return
