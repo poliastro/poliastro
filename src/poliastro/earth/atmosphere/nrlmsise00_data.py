@@ -1,20 +1,3 @@
-import numpy as np
-
-# # POWER7
-# pt = np.zeros(150, dtype=np.float16)
-# pd = np.zeros([9, 150], dtype=np.float16)
-# ps = np.zeros(150, dtype=np.float16)
-# pdl = np.zeros([2, 25], dtype=np.float16)
-# ptl = np.zeros([4, 100], dtype=np.float16)
-# pma = np.zeros([10, 100], dtype=np.float16)
-# sam = np.zeros(100, dtype=np.float16)
-
-# # LOWER7
-# ptm = np.zeros(10, dtype=np.float16)
-# pdm = np.zeros([8, 10], dtype=np.float16)
-# pavgm = np.zeros(10, dtype=np.float16)
-
-
 pt = [
     9.86573e-01,
     1.62228e-02,
