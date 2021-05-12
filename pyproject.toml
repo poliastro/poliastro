@@ -74,6 +74,7 @@ dev = [
     "ipython>=5.0",
     "ipywidgets>=7.0",
     "isort",
+    "Jinja2<3.0.0",
     "jupyter-client",
     "jupytext",
     "mypy>=0.740",
