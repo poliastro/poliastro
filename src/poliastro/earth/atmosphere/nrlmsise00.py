@@ -1432,6 +1432,8 @@ def glob7s(p, input, flags):
 # GTD7
 def gtd7(input, flags, output):
     """
+    Neutral Atmosphere Empircial Model from the surface to lower exosphere.
+
     Parameters
     ----------
     input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
@@ -1633,6 +1635,11 @@ def gtd7(input, flags, output):
 # GTD7D
 def gtd7d(input, flags, output):
     """
+    This function provides Effective Total Mass Density for output d[5] 
+    which includes contributions from "anomalous oxygen" which can 
+    affect satellite drag above 500 km. See the section "output" for
+    additional details.
+
     Parameters
     ----------
     input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
@@ -1661,6 +1668,9 @@ def gtd7d(input, flags, output):
 # GHP7
 def ghp7(input, flags, output, press):
     """
+    To specify outputs at a pressure level (press) rather than at 
+    an altitude.
+
     Parameters
     ----------
     input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
