@@ -1,6 +1,6 @@
 ## Implementation for NRLMSISE 2001 Atmosphere Model
 import math
-
+from math import *
 import astropy
 import numpy as np
 from astropy import units as u
@@ -126,17 +126,17 @@ class nrlmsise_input:
         ap=4.0,
         ap_a=None,
     ):
-        self.year = year        # Year, currently Ignored
-        self.doy = doy          # Day Of The Year
-        self.sec = sec          # Seconds of the Day (UT)
-        self.alt = alt          # Altitude in Kilometers
-        self.g_lat = g_lat      # Geodetic Latitude
-        self.g_long = g_long    # Geodetic Longitude
-        self.lst = lst          # Local Apparent Solar Time (in hours)
-        self.f107A = f107A      # 81 Day Average for F10.7 Flux (centered on day)
-        self.f107 = f107        # Daily F10.7 Flux for previous Day
-        self.ap = ap            # Magnetic Index(daily)
-        self.ap_array = ap_a    # Class Implementation
+        self.year = year  # Year, currently Ignored
+        self.doy = doy  # Day Of The Year
+        self.sec = sec  # Seconds of the Day (UT)
+        self.alt = alt  # Altitude in Kilometers
+        self.g_lat = g_lat  # Geodetic Latitude
+        self.g_long = g_long  # Geodetic Longitude
+        self.lst = lst  # Local Apparent Solar Time (in hours)
+        self.f107A = f107A  # 81 Day Average for F10.7 Flux (centered on day)
+        self.f107 = f107  # Daily F10.7 Flux for previous Day
+        self.ap = ap  # Magnetic Index(daily)
+        self.ap_array = ap_a  # Class Implementation
 
     def set_lst(self):
         self.lst = (self.sec / 3600) + (self.g_long / 15)
@@ -285,7 +285,7 @@ def ccor2(alt, r, h1, zh, h2):
 
 
 def scalh(alt, xm, temp):
-    g = gsurf[0] / (1.0 + math.pow((alt / re[0]), 2))
+    g = gsurf[0] / (1.0 + math.pow((alt / re[0]), 2.0))
     g = rgas * temp / (g * xm)
     return g
 
@@ -860,7 +860,7 @@ def globe7(p, input, flags):
                     * flags.swc[7]
                     * np.cos(hr * (tloc - p[131]))
                 )
-    
+
     else:
         apd = input.ap - 4.0
         p44 = p[43]
@@ -977,8 +977,8 @@ def globe7(p, input, flags):
 
     # Parms not used: 82, 89, 99, 139-149
     tinf = p[30]
-    for i in range(14):
-        tinf = tinf + abs(flags.sw[i + 1]) * t[i]
+    for ind in range(14):
+        tinf = tinf + abs(flags.sw[ind + 1]) * t[ind]
     return tinf
 
 
@@ -1174,7 +1174,7 @@ def gtd7(input, flags, output):
         * (1.0 + flags.sw[20] * flags.sw[22] * glob7s(pma[9], input, flags))
         * meso_tn2[3]
         * meso_tn2[3]
-        / pow((pma[2][0] * pavgm[2]), 2.0)
+        / (pow((pma[2][0] * pavgm[2]), 2.0))
     )
     meso_tn3[0] = meso_tn2[3]
 
@@ -1203,7 +1203,7 @@ def gtd7(input, flags, output):
             * (1.0 + flags.sw[22] * glob7s(pma[7], input, flags))
             * meso_tn3[4]
             * meso_tn3[4]
-            / pow((pma[6][0] * pavgm[6]), 2.0)
+            / (pow((pma[6][0] * pavgm[6]), 2.0))
         )
 
     """
@@ -1449,7 +1449,7 @@ def gts7(input, flags, output):
             * (1.0 + flags.sw[18] * flags.sw[20] * glob7s(pma[8], input, flags))
             * meso_tn1[4]
             * meso_tn1[4]
-            / pow((ptm[4] * ptl[3][0]), 2.0)
+            / (pow((ptm[4] * ptl[3][0]), 2.0))
         )
     else:
         meso_tn1[1] = ptm[6] * ptl[0][0]
@@ -1461,7 +1461,7 @@ def gts7(input, flags, output):
             * pma[8][0]
             * meso_tn1[4]
             * meso_tn1[4]
-            / pow((ptm[4] * ptl[3][0]), 2.0)
+            / (pow((ptm[4] * ptl[3][0]), 2.0))
         )
 
     z0 = zn1[3]
@@ -1949,6 +1949,7 @@ def gts7(input, flags, output):
         rl = math.log(b28 * pdm[5][1] * math.sqrt(pdl[1][17] * pdl[1][17]) / b01)
         hc01 = pdm[5][5] * pdl[1][11]
         zc01 = pdm[5][4] * pdl[1][10]
+        output.d[6] = output.d[6] * ccor(z, rl, hc01, zc01)
         # Chemistry Correction
         hcc01 = pdm[5][7] * pdl[1][19]
         zcc01 = pdm[5][6] * pdl[1][18]
@@ -2037,74 +2038,74 @@ def gts7(input, flags, output):
         # Net Density Corrected at ALT
         output.d[7] = output.d[7] * ccor(z, rc14, hcc14, zcc14)
 
-        # ANOMALOUS OXYGEN DENSITY
+    # ANOMALOUS OXYGEN DENSITY
 
-        g16h = flags.sw[21] * globe7(pd[8], input, flags)
-        db16h = pdm[7][0] * np.exp(g16h) * pd[8][0]
-        tho = pdm[7][9] * pdl[0][6]
-        temp = [output.t[1]]
-        dd = densu(
-            z,
-            db16h,
-            tho,
-            tho,
-            16.0,
-            alpha[8],
-            temp,
-            ptm[5],
-            s,
-            mn1,
-            zn1,
-            meso_tn1,
-            meso_tgn1,
-        )
-        output.t[1] = temp[0]
-        zsht = pdm[7][5]
-        zmho = pdm[7][4]
-        zsho = scalh(zmho, 16.0, tho)
-        output.d[8] = dd * np.exp(-zsht / zsho * (np.exp(-(z - zmho) / zsht) - 1.0))
+    g16h = flags.sw[21] * globe7(pd[8], input, flags)
+    db16h = pdm[7][0] * np.exp(g16h) * pd[8][0]
+    tho = pdm[7][9] * pdl[0][6]
+    temp = [output.t[1]]
+    dd = densu(
+        z,
+        db16h,
+        tho,
+        tho,
+        16.0,
+        alpha[8],
+        temp,
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    output.t[1] = temp[0]
+    zsht = pdm[7][5]
+    zmho = pdm[7][4]
+    zsho = scalh(zmho, 16.0, tho)
+    output.d[8] = dd * np.exp(-zsht / zsho * (np.exp(-(z - zmho) / zsht) - 1.0))
 
-        # Total Mass Density
-        output.d[5] = 1.66e-24 * (
-            4.0 * output.d[0]
-            + 16.0 * output.d[1]
-            + 28.0 * output.d[2]
-            + 32.0 * output.d[3]
-            + 40.0 * output.d[4]
-            + output.d[6]
-            + 14.0 * output.d[7]
-        )
-        db48 = 1.66e-24 * (
-            4.0 * db04
-            + 16.0 * db16
-            + 28.0 * db28
-            + 32.0 * db32
-            + 40.0 * db40
-            + db01
-            + 14.0 * db14
-        )
+    # Total Mass Density
+    output.d[5] = 1.66e-24 * (
+        4.0 * output.d[0]
+        + 16.0 * output.d[1]
+        + 28.0 * output.d[2]
+        + 32.0 * output.d[3]
+        + 40.0 * output.d[4]
+        + output.d[6]
+        + 14.0 * output.d[7]
+    )
+    db48 = 1.66e-24 * (
+        4.0 * db04
+        + 16.0 * db16
+        + 28.0 * db28
+        + 32.0 * db32
+        + 40.0 * db40
+        + db01
+        + 14.0 * db14
+    )
 
-        # Temperature
-        z = math.sqrt(input.alt * input.alt)
-        temp = [output.t[1]]
-        ddum = densu(
-            z,
-            1.0,
-            tinf,
-            tlb,
-            0.0,
-            0.0,
-            temp,
-            ptm[5],
-            s,
-            mn1,
-            zn1,
-            meso_tn1,
-            meso_tgn1,
-        )
-        output.t[1] = temp[0]
-        if flags.sw[0]:
-            for ind in range(0, 9):
-                output.d[ind] = output.d[ind] * 1.0e6
-            output.d[5] = output.d[5] / 1000
-        return
+    # Temperature
+    z = math.sqrt(input.alt * input.alt)
+    temp = [output.t[1]]
+    ddum = densu(
+        z,
+        1.0,
+        tinf,
+        tlb,
+        0.0,
+        0.0,
+        temp,
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    output.t[1] = temp[0]
+    if flags.sw[0]:
+        for ind in range(0, 9):
+            output.d[ind] = output.d[ind] * 1.0e6
+        output.d[5] = output.d[5] / 1000
+    return
