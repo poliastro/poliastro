@@ -1,6 +1,7 @@
 ## Implementation for NRLMSISE 2001 Atmosphere Model
 import math
 from math import *
+
 import astropy
 import numpy as np
 from astropy import units as u
@@ -242,7 +243,7 @@ def glatf(lat, gv, reff):
     c2 = np.cos(2.0 * dgtr * lat)
     gv[0] = 980.616 * (1.0 - 0.0026373 * c2)
     reff[0] = 2.0 * gv[0] / (3.085462e-6 + 2.27e-9 * c2) * 1.0e-5
-    return  # gv, reff
+    return
 
 
 def ccor(alt, r, h1, zh):
@@ -285,7 +286,7 @@ def ccor2(alt, r, h1, zh, h2):
 
 
 def scalh(alt, xm, temp):
-    g = gsurf[0] / (1.0 + math.pow((alt / re[0]), 2.0))
+    g = gsurf[0] / math.pow((1.0 + alt / re[0]), 2.0)
     g = rgas * temp / (g * xm)
     return g
 
@@ -358,7 +359,7 @@ def splini(xa, ya, y2a, n, x, y):
         klo += 1
         khi += 1
     y[0] = yi
-    # return yi
+    return  # yi
 
 
 def splint(xa, ya, y2a, n, x, y):
@@ -477,7 +478,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
         xs[i] = zeta(zn2[i], z1) / zgdif
         ys[i] = 1.0 / tn2[i]
     yd1 = -tgn2[0] / (t1 * t1) * zgdif
-    yd2 = -tgn2[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)), 2.0)
+    yd2 = -tgn2[1] / (t2 * t2) * zgdif * (pow(((re[0] + z2) / (re[0] + z1)), 2.0))
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
@@ -489,7 +490,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
     tz[0] = 1.0 / y[0]
     if not xm == 0.0:
         # Calculates Stratosphere / Mesosphere Density
-        glb = gsurf[0] / pow((1.0 + z1 / re[0]), 2.0)
+        glb = gsurf[0] / (pow((1.0 + z1 / re[0]), 2.0))
         gamm = xm * glb * zgdif / rgas
 
         # Integrate Temperate Profile
@@ -523,7 +524,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
         xs[i] = zeta(zn3[i], z1) / zgdif
         ys[i] = 1.0 / tn3[i]
     yd1 = -tgn3[0] / (t1 * t1) * zgdif
-    yd2 = -tgn3[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)), 2.0)
+    yd2 = -tgn3[1] / (t2 * t2) * zgdif * (pow(((re[0] + z2) / (re[0] + z1)), 2.0))
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
@@ -632,7 +633,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
         expl = 50.0
 
     # Denstiy at Altitude
-    densa = dlb * pow((tlb / tt), (1.0 + alpha + gamma)) * expl
+    densa = dlb * pow((tlb / tt), ((1.0 + alpha + gamma))) * expl
     densu_temp = densa
     if alt >= za:
         return densu_temp
