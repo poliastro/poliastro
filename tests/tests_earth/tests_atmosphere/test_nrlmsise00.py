@@ -1,3 +1,23 @@
+"""
+-------------------------------------------------------------------- 
+---------  N R L M S I S E - 0 0    M O D E L    2 0 0 1  ----------
+--------------------------------------------------------------------
+
+This file has been ported from the NRLMSISE-00 C source code package 
+- release 20041227
+
+The NRLMSISE-00 model was developed by Mike Picone, Alan Hedin, and
+Doug Drob. Model is also available as a NRLMSISE-00 distribution 
+package in FORTRAN (link to model FORTRAN: 
+https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/msis/nrlmsise00/)
+
+Dominik Brodowski implemented and maintains this C version. You can
+reach him at mail@brodo.de. 
+
+Version Dated: 2019-07-09 1255 hrs
+
+This is the Testing File for the NRLMSISE00 model implementation.
+"""
 import astropy
 import numpy as np
 import pytest
@@ -149,8 +169,8 @@ def test_gtd7():
         print("\n", end="")
         for j in range(9):
             print("%E " % output[i].d[j], end="")
-        print("%E " % output[i].t[0], end="")
-        print("%E " % output[i].t[1])
+        # print("%E " % output[i].t[0], end="")
+        # print("%E " % output[i].t[1])
         # /* DL omitted */
 
     # /* output type 2 */

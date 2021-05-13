@@ -1,6 +1,26 @@
-## Implementation for NRLMSISE 2001 Atmosphere Model
+"""
+-------------------------------------------------------------------- 
+---------  N R L M S I S E - 0 0    M O D E L    2 0 0 1  ----------
+--------------------------------------------------------------------
+
+This file has been ported from the NRLMSISE-00 C source code package 
+- release 20041227
+
+The NRLMSISE-00 model was developed by Mike Picone, Alan Hedin, and
+Doug Drob. Model is also available as a NRLMSISE-00 distribution 
+package in FORTRAN (link to model FORTRAN: 
+https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/msis/nrlmsise00/)
+
+Dominik Brodowski implemented and maintains this C version. You can
+reach him at mail@brodo.de. 
+
+Version Dated: 2019-07-09 1255 hrs
+
+This is the Main Code for NRLMSISE00 Model with class implementations for input,
+flags & output.
+"""
+
 import math
-from math import *
 
 import astropy
 import numpy as np
@@ -37,34 +57,59 @@ class nrlmsise_flags(object):
     array "switches" needs to be set accordingly by the calling program.
     The arrays sw and swc are set internally.
 
-    switches[i]:
-    i  - explanation
-    -----------------
-    0  - output in meters and kilograms instead of centimeters and grams
-    1  - F10.7 effect on mean
-    2  - time independent
-    3  - symmetrical annual
-    4  - symmetrical semiannual
-    5  - asymmetrical annual
-    6  - asymmetrical semiannual
-    7  - diurnal
-    8  - semidiurnal
-    9  - daily ap [when this is set to -1 (!) the pointer ap_a in struct nrlmsise_input must
-                    point to a struct ap_array]
-    10 - all UT/long effects
-    11 - longitudinal
-    12 - UT and mixed UT/long
-    13 - mixed AP/UT/LONG
-    14 - terdiurnal
-    15 - departures from diffusive equilibrium
-    16 - all TINF var
-    17 - all TLB var
-    18 - all TN1 var
-    19 - all S var
-    20 - all TN2 var
-    21 - all NLB var
-    22 - all TN3 var
-    23 - turbo scale height var
+    Parameters
+    ----------
+    switches: list
+        i , explanation , size of list = 24
+    0  : int (0,1,2)
+        Output in meters and kilograms (SI Units) instead of centimeters and grams (CGS)
+    1  : int (0,1,2)
+        F10.7 Effect on Mean
+    2  : int (0,1,2)
+        Time independent
+    3  : int (0,1,2)
+        Symmetrical Annual
+    4  : int (0,1,2)
+        Symmetrical Semiannual
+    5  : int (0,1,2)
+        Asymmetrical Annual
+    6  : int (0,1,2)
+        asymmetrical semiannual
+    7  : int (0,1,2)
+        Diurnal
+    8  : int (0,1,2)
+        Semidiurnal
+    9  : int (0,1,2)
+        Daily AP [when this is set to -1 (!) the ap_a in nrlmsise_input must
+                    point to an instance of class ap_array]
+    10 : int (0,1,2)
+        All UT/Long Effects
+    11 : int (0,1,2)
+        Longitudinal
+    12 : int (0,1,2)
+        UT and Mixed UT/long
+    13 : int (0,1,2)
+        Mixed AP/UT/LONG
+    14 : int (0,1,2)
+        Terdiurnal
+    15 : int (0,1,2)
+        Departures from Diffusive Equilibrium
+    16 : int (0,1,2)
+        All TINF var
+    17 : int (0,1,2)
+        All TLB var
+    18 : int (0,1,2)
+        All TN1 var
+    19 : int (0,1,2)
+        All S var
+    20 : int (0,1,2)
+        All TN2 var
+    21 : int (0,1,2)
+        All NLB var
+    22 : int (0,1,2)
+        All TN3 var
+    23 : int (0,1,2)
+        Turbo Scale Height var
     """
 
     def __init__(self):
@@ -76,14 +121,24 @@ class nrlmsise_flags(object):
 class ap_array:
     """
     Array containing the following magnetic values:
-    0 : daily AP
-    1 : 3 hr AP index for current time
-    2 : 3 hr AP index for 3 hrs before current time
-    3 : 3 hr AP index for 6 hrs before current time
-    4 : 3 hr AP index for 9 hrs before current time
-    5 : Average of eight 3 hr AP indicies from 12 to 33 hrs
+
+    Parameters
+    ----------
+    0 : float
+        Daily AP
+    1 : float
+        3 hr AP index for current time
+    2 : float
+        3 hr AP index for 3 hrs before current time
+    3 : float
+        3 hr AP index for 6 hrs before current time
+    4 : float
+        3 hr AP index for 9 hrs before current time
+    5 : float
+        Average of eight 3 hr AP indicies from 12 to 33 hrs
         prior to current time
-    6 : Average of eight 3 hr AP indicies from 36 to 57 hrs
+    6 : float
+        Average of eight 3 hr AP indicies from 36 to 57 hrs
         prior to current time
     """
 
@@ -94,6 +149,7 @@ class ap_array:
 class nrlmsise_input:
     """
     NOTES ON INPUT VARIABLES:
+
     UT, Local Time, and Longitude are used independently in the
     model and are not of equal importance for every situation.
     For the most physically realistic calculation these three
@@ -111,6 +167,34 @@ class nrlmsise_input:
     f107, f107A, and ap effects are neither large nor well
     established below 80 km and these parameters should be set to
     150., 150., and 4. respectively.
+
+    Parameters
+    ----------
+    year : int
+        Year for computation
+    doy : int
+        Day of the Year
+    sec : float
+        Seconds of the day (UT)
+    alt : float
+        Altitude (km)
+    g_lat : float
+        Geodetic Latitude
+    g_long : float
+        Geodetic Longitude
+    lst : float
+        Local Apparent Solar Time (hrs)
+    F107A : float
+        81 Day Average for 10.7 Flux (Centered on day)
+        Defaults to 150.0
+    F107 : float
+        Daily F10.7 Flux for previous day
+        Defaults to 150.0
+    ap : float
+        Magnetic Index (Daily)
+        Defaults to 4.0
+    ap_a : ~poliastro.earth.atmosphere.nrlmsise00.ap_array
+        Check `ap_array` for information
     """
 
     def __init__(
@@ -127,38 +211,42 @@ class nrlmsise_input:
         ap=4.0,
         ap_a=None,
     ):
-        self.year = year  # Year, currently Ignored
-        self.doy = doy  # Day Of The Year
-        self.sec = sec  # Seconds of the Day (UT)
-        self.alt = alt  # Altitude in Kilometers
-        self.g_lat = g_lat  # Geodetic Latitude
-        self.g_long = g_long  # Geodetic Longitude
-        self.lst = lst  # Local Apparent Solar Time (in hours)
-        self.f107A = f107A  # 81 Day Average for F10.7 Flux (centered on day)
-        self.f107 = f107  # Daily F10.7 Flux for previous Day
-        self.ap = ap  # Magnetic Index(daily)
-        self.ap_array = ap_a  # Class Implementation
+        self.year = year
+        self.doy = doy
+        self.sec = sec
+        self.alt = alt
+        self.g_lat = g_lat
+        self.g_long = g_long
+        self.lst = lst
+        self.f107A = f107A
+        self.f107 = f107
+        self.ap = ap
+        self.ap_array = ap_a
 
     def set_lst(self):
+        """
+        Generates the value for Local Apparent Solar Time using the formula
+        lst = sec/3600 + g_long/15
+
+        Parameters
+        ----------
+        sec : float
+            Seconds of the Day
+        g_long : float
+            Geodetic Longitude
+
+        Returns
+        -------
+        lst : float
+            Local Apparent Solar Time (UT) calculated using longitude value
+        """
         self.lst = (self.sec / 3600) + (self.g_long / 15)
         return self.lst
 
 
 class nrlmsise_output:
     """
-    OUTPUT VARIABLES:
-    d[0] - HE NUMBER DENSITY(CM-3)
-    d[1] - O NUMBER DENSITY(CM-3)
-    d[2] - N2 NUMBER DENSITY(CM-3)
-    d[3] - O2 NUMBER DENSITY(CM-3)
-    d[4] - AR NUMBER DENSITY(CM-3)
-    d[5] - TOTAL MASS DENSITY(GM/CM3) [includes d[8] in td7d]
-    d[6] - H NUMBER DENSITY(CM-3)
-    d[7] - N NUMBER DENSITY(CM-3)
-    d[8] - Anomalous oxygen NUMBER DENSITY(CM-3)
-
-    t[0] - EXOSPHERIC TEMPERATURE
-    t[1] - TEMPERATURE AT ALT
+    Output Class for storing values for NRLMSISE00 Computation
 
     O, H, and N are set to zero below 72.5 km
 
@@ -166,17 +254,42 @@ class nrlmsise_output:
     altitudes below 120 km. The 120 km gradient is left at global
     average value for altitudes below 72 km.
 
-    d[5], TOTAL MASS DENSITY, is NOT the same for subroutines GTD7
+    d[5], Total Mass Density, is NOT the same for subroutines GTD7
     and GTD7D
 
-    SUBROUTINE GTD7 -- d[5] is the sum of the mass densities of the
+    SUBROUTINE GTD7 : d[5] is the sum of the mass densities of the
     species labeled by indices 0-4 and 6-7 in output variable d.
     This includes He, O, N2, O2, Ar, H, and N but does NOT include
     anomalous oxygen (species index 8).
 
-    SUBROUTINE GTD7D -- d[5] is the "effective total mass density
+    SUBROUTINE GTD7D : d[5] is the "effective total mass density
     for drag" and is the sum of the mass densities of all species
     in this model, INCLUDING anomalous oxygen.
+
+    Parameters
+    ----------
+    d[0] : float
+        HE Number Density(cm-3)
+    d[1] : float
+        O Number Density(cm-3)
+    d[2] : float
+        N2 Number Density(cm-3)
+    d[3] : float
+        O2 Number Density(cm-3)
+    d[4] : float
+        AR Number Density(cm-3)
+    d[5] : float
+        Total Mass denisty(g/cm3) [includes d[8] in td7d]
+    d[6] : float
+        H Number Density(cm-3)
+    d[7] : float
+        N Number Density(cm-3)
+    d[8] : float
+        Anomalous Oxygen Number Density(cm-3)
+    t[0] : float
+        Exospheric Temperature
+    t[1] : float
+        Temperature at altitude
     """
 
     def __init__(self):
@@ -184,6 +297,7 @@ class nrlmsise_output:
         self.t = [0.0 for _ in range(2)]  # Temperatures
 
 
+# Values to set (global variables)
 # PARMB
 gsurf = [0.0]
 re = [0.0]
@@ -220,8 +334,15 @@ c3tloc = 0.0
 apdf = 0.0
 apt = [0.0 for _ in range(4)]
 
-
+# TSELEC
 def tselec(flags):
+    """
+    Parameters
+    ----------
+    flags : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_flags
+        Flags for various values (0,1,2)
+        Check class nrlmsise_flags for complete description
+    """
     for index in range(0, 24):
         if not index == 9:
             if flags.switches[index] == 1:
@@ -239,7 +360,18 @@ def tselec(flags):
     return
 
 
+# GLATF
 def glatf(lat, gv, reff):
+    """
+    Parameters
+    ----------
+    lat : float
+        Latitude Value
+    gv : float
+        Effective Gravity
+    reff : float
+        Effective Radius of Earth
+    """
     c2 = np.cos(2.0 * dgtr * lat)
     gv[0] = 980.616 * (1.0 - 0.0026373 * c2)
     reff[0] = 2.0 * gv[0] / (3.085462e-6 + 2.27e-9 * c2) * 1.0e-5
@@ -249,10 +381,22 @@ def glatf(lat, gv, reff):
 def ccor(alt, r, h1, zh):
     """
     Chemistry/Dissociation Correction for MSIS Models
-    alt - altitude
-    r   - target ratio
-    h1  - transition scale length
-    zh  - altitude of (1/2 r)
+
+    Parameters
+    ----------
+    alt : float
+        Altitude
+    r   : float
+        Target Ratio
+    h1  : float
+        Transition Scale Length
+    zh  : float
+        Altitude of (1/2 * r)
+
+    Returns
+    -------
+    exp value : float
+        Exponential value based on Altitude
     """
     e = (alt - zh) / h1
     if e > 70:
@@ -267,11 +411,22 @@ def ccor(alt, r, h1, zh):
 def ccor2(alt, r, h1, zh, h2):
     """
     Chemistry/Dissociation Correction for MSIS Models
-    alt - altitude
-    r   - target ratio
-    h1  - transition scale length
-    zh  - altitude of (1/2 r)
-    h2  - transition scale length #2 ?
+
+    alt : float
+        Altitude
+    r   : float
+        Target Ratio
+    h1  : float
+        Transition Scale Length
+    zh  : float
+        Altitude of (1/2 * r)
+    h2  : float
+        Transition Scale Length 2
+
+    Returns
+    -------
+    exp value : float
+        Exponential value based on Altitude
     """
     e1 = (alt - zh) / h1
     e2 = (alt - zh) / h2
@@ -286,6 +441,16 @@ def ccor2(alt, r, h1, zh, h2):
 
 
 def scalh(alt, xm, temp):
+    """
+    Parameters
+    ----------
+    alt : float
+        Altitude
+    xm : float
+        Species Molecular Weight
+    temp : float
+        Temperature
+    """
     g = gsurf[0] / math.pow((1.0 + alt / re[0]), 2.0)
     g = rgas * temp / (g * xm)
     return g
@@ -295,12 +460,29 @@ def dnet(dd, dm, zhm, xmm, xm):
     """
     TurboPause Correction For MSIS Model
     Root Mean Density
-    dd   - diffusive density
-    dm   - full mixed density
-    zhm  - transition scale length
-    xmm  - full mixed molecular weight
-    xm   - species molecular weight
-    dnet - combined density
+
+    Parameters
+    ----------
+    dd : float
+        Diffusive Density
+    dm : float
+        Full Mixed Density
+    zhm : float
+        Transition Scale Length
+    xmm : float
+        Full Mixed Molecular Weight
+    xm : float
+        Species Molecular Weight
+    dnet : float
+        Combined Density
+
+    Returns
+    -------
+    dm : float
+        if (dd = 0) , Full Mixed Density
+    dd : float
+        if (dd = 0) , Diffusive Density
+    a : float
     """
     a = zhm / (xmm - xm)
     if not ((dm > 0) and (dd > 0)):
@@ -324,11 +506,21 @@ def dnet(dd, dm, zhm, xmm, xm):
 def splini(xa, ya, y2a, n, x, y):
     """
     Integrate Cubic Spline Function from XA(1) to X
-    xa, ya  - array of tabulated functions in ascending order by x
-    y2a     - array of second derivatives
-    n       - size of arrays xa, ya, y2a
-    x       - abscissa endpoint for integration
-    y       - output value
+
+    Parameters
+    ----------
+    xa : list
+        Array of Tabulated Functions in Ascending Order by x
+    ya  : list
+        Array of Tabulated Functions in Ascending Order by x
+    y2a : list
+        Array of Second Derivatives
+    n : int
+        Size of Arrays xa, ya, y2a
+    x : float
+        Abscissa Endpoint for Integration
+    y : float
+        Output Value
     """
     yi = 0
     klo = 0
@@ -359,18 +551,28 @@ def splini(xa, ya, y2a, n, x, y):
         klo += 1
         khi += 1
     y[0] = yi
-    return  # yi
+    return
 
 
 def splint(xa, ya, y2a, n, x, y):
     """
     Calculate Cubic Spline Interp Value
     Adapted From Numerical Recipes by PRESS ET AL.
-    xa, ya  - array of tabulated functions in ascending order by x
-    y2a     - array of second derivatives
-    n       - size of arrays xa, ya, y2a
-    x       - abscissa for interpolation
-    y       - output value
+
+    Parameters
+    ----------
+    xa : list
+        Array of Tabulated Functions in Ascending Order by x
+    ya  : list
+        Array of Tabulated Functions in Ascending Order by x
+    y2a : list
+        Array of Second Derivatives
+    n : int
+        Size of Arrays xa, ya, y2a
+    x : float
+        Abscissa for Interpolation
+    y : float
+        Output Value
     """
     klo = 0
     khi = n - 1
@@ -391,18 +593,29 @@ def splint(xa, ya, y2a, n, x, y):
         + ((a * a * a - a) * y2a[klo] + (b * b * b - b) * y2a[khi]) * h * h / 6.0
     )
     y[0] = yi
-    # return yi
+    return
 
 
 def spline(x, y, n, yp1, ypn, y2):
     """
     Calculate 2nd Derivatives of Cubic Spline Interp Function
     Adapted from Numerical Recipes by PRESS ET AL.
-    x,y         - arrays of tabulated function in Ascending Order by x
-    n           - sizes of arrays x,y
-    yp1, ypn    - specified derivatives at X[0] and X[n-1],
-                  Values >= 1E30 Signal Signal Second Derivative Zero
-    y2          - output array of second derivatives
+
+    Parameters
+    ----------
+    x : list
+        Arrays of Tabulated Function in Ascending Order by x
+    y : list
+        Arrays of Tabulated Function in Ascending Order by x
+    n : int
+        Sizes of Arrays x,y
+    yp1 : float
+        Specified Derivative value at x[0]
+    ypn : float
+        Specified Derivative value at x[n-1]
+        Values >= 1E30 Signal Signal Second Derivative Zero
+    y2 : list
+        Output Array of Second Derivatives
     """
     u = [0.0 for _ in range(n)]
     if yp1 > 0.99e30:
@@ -433,7 +646,6 @@ def spline(x, y, n, yp1, ypn, y2):
             ypn - (y[n - 1] - y[n - 2]) / (x[n - 1] - x[n - 2])
         )
     y2[n - 1] = (un - qn * u[n - 2]) / (qn * y2[n - 2] + 1.0)
-    # Something to check here !!
     index = n - 2
     while index >= 0:
         y2[index] = y2[index] * y2[index + 1] + u[index]
@@ -442,17 +654,60 @@ def spline(x, y, n, yp1, ypn, y2):
 
 
 def zeta(zz, zl):
+    """
+    Parameters
+    ----------
+    zz : float
+    zl : float
+
+    Returns
+    -------
+    zeta_value : float
+        Geopotential Difference between the parameters
+        Computation based on the following formula
+        (zz - zl) * (re + zl) / (re + zz)
+    """
     return (zz - zl) * (re[0] + zl) / (re[0] + zz)
 
 
 def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
     """
     Calculate Temperature & Density Profiles for Lower Atoms.
+
+    Parameters
+    ----------
+    alt : float
+        Altitude
+    d0 : float
+    xm : float
+        Species Molecular Weight
+    tz : list
+        Contains only one value
+    mn3 : list
+        Troposphere / Stratosphere
+    zn3 : list
+        Troposphere / Stratosphere
+    tn3 : list
+        Troposphere / Stratosphere
+    tgn3 : list
+        Troposphere / Stratosphere
+    mn2 : list
+        Stratosphere / Mesosphere
+    zn2 : list
+        Stratosphere / Mesosphere
+    tn2 : list
+        Stratosphere / Mesosphere
+    tgn2 : list
+        Stratosphere / Mesosphere
+
+    Returns
+    -------
+    tz : float
+    densm_temp : float
     """
     xs = [0.0 for _ in range(10)]
     ys = [0.0 for _ in range(10)]
     y2out = [0.0 for _ in range(10)]
-    # densm_temp = 0
     densm_temp = d0
     if alt > zn2[0]:
         if xm == 0.0:
@@ -478,7 +733,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
         xs[i] = zeta(zn2[i], z1) / zgdif
         ys[i] = 1.0 / tn2[i]
     yd1 = -tgn2[0] / (t1 * t1) * zgdif
-    yd2 = -tgn2[1] / (t2 * t2) * zgdif * (pow(((re[0] + z2) / (re[0] + z1)), 2.0))
+    yd2 = -tgn2[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)), 2.0)
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
@@ -490,7 +745,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
     tz[0] = 1.0 / y[0]
     if not xm == 0.0:
         # Calculates Stratosphere / Mesosphere Density
-        glb = gsurf[0] / (pow((1.0 + z1 / re[0]), 2.0))
+        glb = gsurf[0] / pow((1.0 + z1 / re[0]), 2.0)
         gamm = xm * glb * zgdif / rgas
 
         # Integrate Temperate Profile
@@ -524,7 +779,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
         xs[i] = zeta(zn3[i], z1) / zgdif
         ys[i] = 1.0 / tn3[i]
     yd1 = -tgn3[0] / (t1 * t1) * zgdif
-    yd2 = -tgn3[1] / (t2 * t2) * zgdif * (pow(((re[0] + z2) / (re[0] + z1)), 2.0))
+    yd2 = -tgn3[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)), 2.0)
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
@@ -558,6 +813,31 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
 def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
     """
     Calculate Temperature & Density Profile for MSIS Model
+
+    Parameters
+    ----------
+    alt : float
+        Altitude
+    dlb : float
+    tinf : float
+        Temperature at inf
+    tlb : float
+        Temperature at
+    xm : float
+        Species Molecular Weight
+    alpha : float
+    tz : list
+        Contains only one value
+    zlb : float
+    s2 : float
+    mn1 : list
+    zn1 : list
+    tn1 : list
+    tgn1 : list
+
+    Returns
+    -------
+    densu_temp : float
     """
     # New Lower Thermo Polynomial
     densu_temp = 1.0
@@ -633,7 +913,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
         expl = 50.0
 
     # Denstiy at Altitude
-    densa = dlb * pow((tlb / tt), ((1.0 + alpha + gamma))) * expl
+    densa = dlb * pow((tlb / tt), (1.0 + alpha + gamma)) * expl
     densu_temp = densa
     if alt >= za:
         return densu_temp
@@ -661,6 +941,15 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
 # 3 hr Magnetic Activity Function
 # Eq. A24d
 def g0(a, p):
+    """
+    Parameters
+    ----------
+    a : float
+    p : float
+
+    Returns
+    -------
+    """
     return (
         a
         - 4.0
@@ -676,11 +965,29 @@ def g0(a, p):
 
 # Eq. A24c
 def sumex(ex):
+    """
+    Parameters
+    ----------
+    ex : float
+
+    Returns
+    -------
+    """
     return 1.0 + (1.0 - pow(ex, 19.0)) / (1.0 - ex) * pow(ex, 0.5)
 
 
 # Eq. A24a
 def sg0(ex, p, ap):
+    """
+    Parameters
+    ----------
+    ex ([type]): [description]
+    p ([type]): [description]
+    ap ([type]): [description]
+
+    Returns
+    -------
+    """
     return (
         g0(ap[1], p)
         + (
@@ -697,11 +1004,22 @@ def sg0(ex, p, ap):
 def globe7(p, input, flags):
     """
     Calculate G(L) Function
+
+    Parameters
+    ----------
+    p : list
+    input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
+        Nrlmsise_input class instance
+    flags : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_flags
+        Nrlmsise_flags class instance
+
+    Returns
+    -------
+    tinf : float
     """
     # Upper Thermosphere Parameters
-    t = [0 for _ in range(15)]  # modified this, there was a for loop that did this
+    t = [0 for _ in range(15)]
     sw9 = 1
-
     tloc = input.lst
 
     if flags.sw[9] > 0:
@@ -723,15 +1041,14 @@ def globe7(p, input, flags):
     plg[0][4] = (35.0 * c4 - 30.0 * c2 + 3.0) / 8.0
     plg[0][5] = (63.0 * c2 * c2 * c - 70.0 * c2 * c + 15.0 * c) / 8.0
     plg[0][6] = (11.0 * c * plg[0][5] - 5.0 * plg[0][4]) / 6.0
-    # /*      plg[0][7] = (13.0*c*plg[0][6] - 6.0*plg[0][5])/7.0; */
+
     plg[1][1] = s
     plg[1][2] = 3.0 * c * s
     plg[1][3] = 1.5 * (5.0 * c2 - 1.0) * s
     plg[1][4] = 2.5 * (7.0 * c2 * c - 3.0 * c) * s
     plg[1][5] = 1.875 * (21.0 * c4 - 14.0 * c2 + 1.0) * s
     plg[1][6] = (11.0 * c * plg[1][5] - 6.0 * plg[1][4]) / 5.0
-    # /*      plg[1][7] = (13.0*c*plg[1][6]-7.0*plg[1][5])/6.0; */
-    # /*      plg[1][8] = (15.0*c*plg[1][7]-8.0*plg[1][6])/7.0; */
+
     plg[2][2] = 3.0 * s2
     plg[2][3] = 15.0 * s2 * c
     plg[2][4] = 7.5 * (7.0 * c2 - 1.0) * s2
@@ -987,6 +1304,18 @@ def globe7(p, input, flags):
 def glob7s(p, input, flags):
     """
     Version of GLOBE for Lower Atmosphere 10/26/99
+
+    Parameters
+    ----------
+    p : list
+    input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
+        Nrlmsise_input class instance
+    flags : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_flags
+        Nrlmsise_flags class instance
+
+    Returns
+    -------
+    tt : float
     """
     t = [0.0 for _ in range(14)]
     pset = 2.0
@@ -1102,6 +1431,16 @@ def glob7s(p, input, flags):
 
 # GTD7
 def gtd7(input, flags, output):
+    """
+    Parameters
+    ----------
+    input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
+        Nrlmsise_input class instance
+    flags : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_flags
+        Nrlmsise_flags class instance
+    output :  ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_output
+        Nrlmsise_output class instance
+    """
     mn3 = 5
     zn3 = [32.5, 20.0, 15.0, 10.0, 0.0]
     mn2 = 4
@@ -1175,7 +1514,7 @@ def gtd7(input, flags, output):
         * (1.0 + flags.sw[20] * flags.sw[22] * glob7s(pma[9], input, flags))
         * meso_tn2[3]
         * meso_tn2[3]
-        / (pow((pma[2][0] * pavgm[2]), 2.0))
+        / pow((pma[2][0] * pavgm[2]), 2.0)
     )
     meso_tn3[0] = meso_tn2[3]
 
@@ -1204,7 +1543,7 @@ def gtd7(input, flags, output):
             * (1.0 + flags.sw[22] * glob7s(pma[7], input, flags))
             * meso_tn3[4]
             * meso_tn3[4]
-            / (pow((pma[6][0] * pavgm[6]), 2.0))
+            / pow((pma[6][0] * pavgm[6]), 2.0)
         )
 
     """
@@ -1257,7 +1596,7 @@ def gtd7(input, flags, output):
     # ATOMIC NITROGEN Density
     output.d[7] = 0
 
-    # TOTAL MASS DENSITY
+    # Total Mass Density
     output.d[5] = 1.66e-24 * (
         4.0 * output.d[0]
         + 16.0 * output.d[1]
@@ -1293,6 +1632,16 @@ def gtd7(input, flags, output):
 
 # GTD7D
 def gtd7d(input, flags, output):
+    """
+    Parameters
+    ----------
+    input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
+        Nrlmsise_input class instance
+    flags : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_flags
+        Nrlmsise_flags class instance
+    output :  ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_output
+        Nrlmsise_output class instance
+    """
     gtd7(input, flags, output)
     output.d[5] = 1.66e-24 * (
         4.0 * output.d[0]
@@ -1311,6 +1660,17 @@ def gtd7d(input, flags, output):
 
 # GHP7
 def ghp7(input, flags, output, press):
+    """
+    Parameters
+    ----------
+    input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
+        Nrlmsise_input class instance
+    flags : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_flags
+        Nrlmsise_flags class instance
+    output :  ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_output
+        Nrlmsise_output class instance
+    press : float
+    """
     bm = 1.3806e-19
     test = 0.00043
     ltest = 12
@@ -1400,6 +1760,15 @@ def gts7(input, flags, output):
     Thermospheric Portion Of NRLMSISE-00
         Check GTD7 for more extensive comments
         alt > 72.5 KM !!
+
+    Parameters
+    ----------
+    input : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_input
+        Nrlmsise_input class instance
+    flags : ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_flags
+        Nrlmsise_flags class instance
+    output :  ~poliastro.earth.atmosphere.nrlmsise00.nrlmsise_output
+        Nrlmsise_output class instance
     """
     mn1 = 5
     zn1 = [120.0, 110.0, 100.0, 90.0, 72.5]
@@ -1450,7 +1819,7 @@ def gts7(input, flags, output):
             * (1.0 + flags.sw[18] * flags.sw[20] * glob7s(pma[8], input, flags))
             * meso_tn1[4]
             * meso_tn1[4]
-            / (pow((ptm[4] * ptl[3][0]), 2.0))
+            / pow((ptm[4] * ptl[3][0]), 2.0)
         )
     else:
         meso_tn1[1] = ptm[6] * ptl[0][0]
@@ -1462,7 +1831,7 @@ def gts7(input, flags, output):
             * pma[8][0]
             * meso_tn1[4]
             * meso_tn1[4]
-            / (pow((ptm[4] * ptl[3][0]), 2.0))
+            / pow((ptm[4] * ptl[3][0]), 2.0)
         )
 
     z0 = zn1[3]
@@ -2040,7 +2409,6 @@ def gts7(input, flags, output):
         output.d[7] = output.d[7] * ccor(z, rc14, hcc14, zcc14)
 
     # ANOMALOUS OXYGEN DENSITY
-
     g16h = flags.sw[21] * globe7(pd[8], input, flags)
     db16h = pdm[7][0] * np.exp(g16h) * pd[8][0]
     tho = pdm[7][9] * pdl[0][6]

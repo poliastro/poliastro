@@ -1,3 +1,34 @@
+"""
+-------------------------------------------------------------------- 
+---------  N R L M S I S E - 0 0    M O D E L    2 0 0 1  ----------
+--------------------------------------------------------------------
+
+This file has been ported from the NRLMSISE-00 C source code package 
+- release 20041227
+
+The NRLMSISE-00 model was developed by Mike Picone, Alan Hedin, and
+Doug Drob. Model is also available as a NRLMSISE-00 distribution 
+package in FORTRAN (link to model FORTRAN: 
+https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/msis/nrlmsise00/)
+
+Dominik Brodowski implemented and maintains this C version. You can
+reach him at mail@brodo.de. 
+
+Version Dated: 2019-07-09 1255 hrs
+
+This is the Data File for all the relevant variables used in nrlmsise00 model
+Variables present in the Data File :
+    pavgm,
+    pd,
+    pdl,
+    pdm,
+    pma,
+    ps,
+    pt,
+    ptl,
+    ptm,
+    sam
+"""
 pt = [
     9.86573e-01,
     1.62228e-02,
