@@ -1635,8 +1635,8 @@ def gtd7(input, flags, output):
 # GTD7D
 def gtd7d(input, flags, output):
     """
-    This function provides Effective Total Mass Density for output d[5] 
-    which includes contributions from "anomalous oxygen" which can 
+    This function provides Effective Total Mass Density for output d[5]
+    which includes contributions from "anomalous oxygen" which can
     affect satellite drag above 500 km. See the section "output" for
     additional details.
 
@@ -1668,7 +1668,7 @@ def gtd7d(input, flags, output):
 # GHP7
 def ghp7(input, flags, output, press):
     """
-    To specify outputs at a pressure level (press) rather than at 
+    To specify outputs at a pressure level (press) rather than at
     an altitude.
 
     Parameters
