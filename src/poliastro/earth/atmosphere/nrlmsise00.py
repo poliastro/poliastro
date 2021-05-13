@@ -221,7 +221,7 @@ class nrlmsise_input:
         self.f107A = f107A
         self.f107 = f107
         self.ap = ap
-        self.ap_array = ap_a
+        self.ap_a = ap_a
 
     def set_lst(self):
         """
@@ -619,8 +619,8 @@ def spline(x, y, n, yp1, ypn, y2):
     """
     u = [0.0 for _ in range(n)]
     if yp1 > 0.99e30:
-        y2[0] = 0
-        u[0] = 0
+        y2[0] = 0.0
+        u[0] = 0.0
     else:
         y2[0] = -0.5
         u[0] = (3.0 / (x[1] - x[0])) * ((y[1] - y[0]) / (x[1] - x[0]) - yp1)
@@ -638,8 +638,8 @@ def spline(x, y, n, yp1, ypn, y2):
             - sig * u[index - 1]
         ) / p
     if ypn > 0.99e30:
-        qn = 0
-        un = 0
+        qn = 0.0
+        un = 0.0
     else:
         qn = 0.5
         un = (3.0 / (x[n - 1] - x[n - 2])) * (
@@ -1709,7 +1709,7 @@ def ghp7(input, flags, output, press):
         else:
             cd = (float(input.doy)) / 91.25 - 3.0
 
-        ca = 0
+        ca = 0.0
 
         if (pl > -1.11) and (pl <= -0.23):
             ca = 1.0

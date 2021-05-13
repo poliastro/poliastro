@@ -354,7 +354,7 @@ nrlmsise_input_output = {
 }
 
 @pytest.mark.parametrize("z", nrlmsise_input_output.keys())
-def test_output(z):
+def test_input(z):
     expected_input = [nrlmsise_input() for _ in range(15)]
     
     expected_input[z].doy = nrlmsise_input_output[z][0]
