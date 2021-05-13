@@ -1,7 +1,5 @@
 ## Implementation for NRLMSISE 2001 Atmosphere Model
-
 import math
-from math import *
 
 import astropy
 import numpy as np
@@ -128,17 +126,17 @@ class nrlmsise_input:
         ap=4.0,
         ap_a=None,
     ):
-        self.year = year  # Year, currently Ignored
-        self.doy = doy  # Day Of The Year
-        self.sec = sec  # Seconds of the Day (UT)
-        self.alt = alt  # Altitude in Kilometers
-        self.g_lat = g_lat  # Geodetic Latitude
-        self.g_long = g_long  # Geodetic Longitude
-        self.lst = lst  # Local Apparent Solar Time (in hours)
-        self.f107A = f107A  # 81 Day Average for F10.7 Flux (centered on day)
-        self.f107 = f107  # Daily F10.7 Flux for previous Day
-        self.ap = ap  # Magnetic Index(daily)
-        self.ap_array = ap_a  # Class Implementation
+        self.year = year        # Year, currently Ignored
+        self.doy = doy          # Day Of The Year
+        self.sec = sec          # Seconds of the Day (UT)
+        self.alt = alt          # Altitude in Kilometers
+        self.g_lat = g_lat      # Geodetic Latitude
+        self.g_long = g_long    # Geodetic Longitude
+        self.lst = lst          # Local Apparent Solar Time (in hours)
+        self.f107A = f107A      # 81 Day Average for F10.7 Flux (centered on day)
+        self.f107 = f107        # Daily F10.7 Flux for previous Day
+        self.ap = ap            # Magnetic Index(daily)
+        self.ap_array = ap_a    # Class Implementation
 
     def set_lst(self):
         self.lst = (self.sec / 3600) + (self.g_long / 15)
@@ -318,7 +316,7 @@ def dnet(dd, dm, zhm, xmm, xm):
         return dd
     if ylog > 10:
         return dm
-    a = dd * math.pow((1.0 + np.exp(ylog)),(1.0 / a))
+    a = dd * math.pow((1.0 + np.exp(ylog)), (1.0 / a))
     return a
 
 
@@ -479,7 +477,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
         xs[i] = zeta(zn2[i], z1) / zgdif
         ys[i] = 1.0 / tn2[i]
     yd1 = -tgn2[0] / (t1 * t1) * zgdif
-    yd2 = -tgn2[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)),2.0)
+    yd2 = -tgn2[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)), 2.0)
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
@@ -491,7 +489,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
     tz[0] = 1.0 / y[0]
     if not xm == 0.0:
         # Calculates Stratosphere / Mesosphere Density
-        glb = gsurf[0] / pow((1.0 + z1 / re[0]),2.0)
+        glb = gsurf[0] / pow((1.0 + z1 / re[0]), 2.0)
         gamm = xm * glb * zgdif / rgas
 
         # Integrate Temperate Profile
@@ -525,7 +523,7 @@ def densm(alt, d0, xm, tz, mn3, zn3, tn3, tgn3, mn2, zn2, tn2, tgn2):
         xs[i] = zeta(zn3[i], z1) / zgdif
         ys[i] = 1.0 / tn3[i]
     yd1 = -tgn3[0] / (t1 * t1) * zgdif
-    yd2 = -tgn3[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)),2.0)
+    yd2 = -tgn3[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)), 2.0)
 
     # Calculate Spline Coefficients
     spline(xs, ys, mn, yd1, yd2, y2out)
@@ -585,7 +583,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
     if alt < za:
         # Calculates Temperature Below ZA
         # Temperature Gradient at ZA from Bates Profile.
-        dta = (tinf - ta) * s2 * pow(((re[0] + zlb) / (re[0] + za)),2.0)
+        dta = (tinf - ta) * s2 * pow(((re[0] + zlb) / (re[0] + za)), 2.0)
         tgn1[0] = dta
         tn1[0] = ta
         if alt > zn1[mn1 - 1]:
@@ -609,7 +607,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
 
         # End Node Derivatives
         yd1 = -tgn1[0] / (t1 * t1) * zgdif
-        yd2 = -tgn1[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)),2.0)
+        yd2 = -tgn1[1] / (t2 * t2) * zgdif * pow(((re[0] + z2) / (re[0] + z1)), 2.0)
 
         # Calculates Spline Coefficients
         spline(xs, ys, mn, yd1, yd2, y2out)
@@ -625,7 +623,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
         return densu_temp
 
     # Calculate Density Above ZA
-    glb = gsurf[0] / pow((1.0 + zlb / re[0]),2.0)
+    glb = gsurf[0] / pow((1.0 + zlb / re[0]), 2.0)
     gamma = xm * glb / (s2 * rgas * tinf)
     expl = np.exp(-s2 * gamma * zg2)
     if expl > 50.0:
@@ -634,13 +632,13 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
         expl = 50.0
 
     # Denstiy at Altitude
-    densa = dlb * pow((tlb / tt),(1.0 + alpha + gamma)) * expl
+    densa = dlb * pow((tlb / tt), (1.0 + alpha + gamma)) * expl
     densu_temp = densa
     if alt >= za:
         return densu_temp
 
     # Calculate Density Below ZA
-    glb = gsurf[0] / pow((1.0 + z1 / re[0]),2.0)
+    glb = gsurf[0] / pow((1.0 + z1 / re[0]), 2.0)
     gamm = xm * glb * zgdif / rgas
 
     # Integrate Spline Temperatures
@@ -653,7 +651,7 @@ def densu(alt, dlb, tinf, tlb, xm, alpha, tz, zlb, s2, mn1, zn1, tn1, tgn1):
         expl = 50.0
 
     # Density at Altitude
-    densu_temp = densu_temp * pow((t1 / tz[0]),(1.0 + alpha)) * np.exp(-expl)
+    densu_temp = densu_temp * pow((t1 / tz[0]), (1.0 + alpha)) * np.exp(-expl)
     return densu_temp
 
 
@@ -677,7 +675,7 @@ def g0(a, p):
 
 # Eq. A24c
 def sumex(ex):
-    return 1.0 + (1.0 - pow(ex,19.0)) / (1.0 - ex) * pow(ex,0.5)
+    return 1.0 + (1.0 - pow(ex, 19.0)) / (1.0 - ex) * pow(ex, 0.5)
 
 
 # Eq. A24a
@@ -687,9 +685,9 @@ def sg0(ex, p, ap):
         + (
             g0(ap[2], p) * ex
             + g0(ap[3], p) * ex * ex
-            + g0(ap[4], p) * pow(ex,3.0)
-            + (g0(ap[5], p) * pow(ex,4.0) + g0(ap[6], p) * pow(ex,12.0))
-            * (1.0 - pow(ex,8.0))
+            + g0(ap[4], p) * pow(ex, 3.0)
+            + (g0(ap[5], p) * pow(ex, 4.0) + g0(ap[6], p) * pow(ex, 12.0))
+            * (1.0 - pow(ex, 8.0))
             / (1.0 - ex)
         )
     ) / sumex(ex)
@@ -700,7 +698,7 @@ def globe7(p, input, flags):
     Calculate G(L) Function
     """
     # Upper Thermosphere Parameters
-    t = [0 for _ in range(15)]
+    t = [0 for _ in range(15)]  # modified this, there was a for loop that did this
     sw9 = 1
 
     tloc = input.lst
@@ -709,7 +707,6 @@ def globe7(p, input, flags):
         sw9 = 1
     elif flags.sw[9] < 0:
         sw9 = -1
-
     xlong = input.g_long
 
     # Calculate Legendre Polynomials
@@ -725,14 +722,15 @@ def globe7(p, input, flags):
     plg[0][4] = (35.0 * c4 - 30.0 * c2 + 3.0) / 8.0
     plg[0][5] = (63.0 * c2 * c2 * c - 70.0 * c2 * c + 15.0 * c) / 8.0
     plg[0][6] = (11.0 * c * plg[0][5] - 5.0 * plg[0][4]) / 6.0
-
+    # /*      plg[0][7] = (13.0*c*plg[0][6] - 6.0*plg[0][5])/7.0; */
     plg[1][1] = s
     plg[1][2] = 3.0 * c * s
     plg[1][3] = 1.5 * (5.0 * c2 - 1.0) * s
     plg[1][4] = 2.5 * (7.0 * c2 * c - 3.0 * c) * s
     plg[1][5] = 1.875 * (21.0 * c4 - 14.0 * c2 + 1.0) * s
     plg[1][6] = (11.0 * c * plg[1][5] - 6.0 * plg[1][4]) / 5.0
-
+    # /*      plg[1][7] = (13.0*c*plg[1][6]-7.0*plg[1][5])/6.0; */
+    # /*      plg[1][8] = (15.0*c*plg[1][7]-8.0*plg[1][6])/7.0; */
     plg[2][2] = 3.0 * s2
     plg[2][3] = 15.0 * s2 * c
     plg[2][4] = 7.5 * (7.0 * c2 - 1.0) * s2
@@ -762,11 +760,10 @@ def globe7(p, input, flags):
     cd18 = np.cos(2.0 * dr * (input.doy - p[17]))
     cd14 = np.cos(dr * (input.doy - p[13]))
     cd39 = np.cos(2.0 * dr * (input.doy - p[38]))
-
-    # p32 = p[31]
-    # p18 = p[17]
-    # p14 = p[13]
-    # p39 = p[38]
+    p32 = p[31]
+    p18 = p[17]
+    p14 = p[13]
+    p39 = p[38]
 
     # F10.7 EFFECT
     df = input.f107 - input.f107A
@@ -776,7 +773,7 @@ def globe7(p, input, flags):
         p[19] * df * (1.0 + p[59] * dfa)
         + p[20] * df * df
         + p[21] * dfa
-        + p[29] * pow(dfa,2.0)
+        + p[29] * pow(dfa, 2.0)
     )
     f1 = 1.0 + (p[47] * dfa + p[19] * df + p[20] * df * df) * flags.swc[1]
     f2 = 1.0 + (p[49] * dfa + p[19] * df + p[20] * df * df) * flags.swc[1]
@@ -836,7 +833,7 @@ def globe7(p, input, flags):
     # Magnetic activity based on daily ap
     if flags.sw[9] == -1:
         ap = input.ap_a
-        if not p[51] == 0:
+        if p[51] != 0:
             exp1 = np.exp(
                 -10800.0
                 * math.sqrt(p[51] * p[51])
@@ -847,7 +844,10 @@ def globe7(p, input, flags):
             if p[24] < 1.0e-4:
                 p[24] = 1.0e-4
             apt[0] = sg0(exp1, p, ap.a)
-
+            # /* apt[1]=sg2(exp1,p,ap->a);
+            #   apt[2]=sg0(exp2,p,ap->a);
+            #   apt[3]=sg2(exp2,p,ap->a);
+            # */
             if flags.sw[9]:
                 t[8] = apt[0] * (
                     p[50]
@@ -860,137 +860,125 @@ def globe7(p, input, flags):
                     * flags.swc[7]
                     * np.cos(hr * (tloc - p[131]))
                 )
-        else:
-            apd = input.ap - 4.0
-            p44 = p[43]
-            p45 = p[44]
-            if p44 < 0:
-                p44 = 1.0e-5
-            global apdf
-            apdf = apd + (p45 - 1.0) * (apd + (np.exp(-p44 * apd) - 1.0) / p44)
-            if flags.sw[9]:
-                t[8] = apdf * (
-                    p[32]
-                    + p[45] * plg[0][2]
-                    + p[34] * plg[0][4]
-                    + (p[100] * plg[0][1] + p[101] * plg[0][3] + p[102] * plg[0][5])
+    
+    else:
+        apd = input.ap - 4.0
+        p44 = p[43]
+        p45 = p[44]
+        if p44 < 0:
+            p44 = 1.0e-5
+        global apdf
+        apdf = apd + (p45 - 1.0) * (apd + (np.exp(-p44 * apd) - 1.0) / p44)
+        if flags.sw[9]:
+            t[8] = apdf * (
+                p[32]
+                + p[45] * plg[0][2]
+                + p[34] * plg[0][4]
+                + (p[100] * plg[0][1] + p[101] * plg[0][3] + p[102] * plg[0][5])
+                * cd14
+                * flags.swc[5]
+                + (p[121] * plg[1][1] + p[122] * plg[1][3] + p[123] * plg[1][5])
+                * flags.swc[7]
+                * np.cos(hr * (tloc - p[124]))
+            )
+
+    if (flags.sw[10]) and (input.g_long > -1000.0):
+        # Longitudinal
+        if flags.sw[11]:
+            t[10] = (1.0 + p[80] * dfa * flags.swc[1]) * (
+                (
+                    p[64] * plg[1][2]
+                    + p[65] * plg[1][4]
+                    + p[66] * plg[1][6]
+                    + p[103] * plg[1][1]
+                    + p[104] * plg[1][3]
+                    + p[105] * plg[1][5]
+                    + flags.swc[5]
+                    * (p[109] * plg[1][1] + p[110] * plg[1][3] + p[111] * plg[1][5])
                     * cd14
-                    * flags.swc[5]
-                    + (p[121] * plg[1][1] + p[122] * plg[1][3] + p[123] * plg[1][5])
-                    * flags.swc[7]
-                    * np.cos(hr * (tloc - p[124]))
                 )
-
-        if (flags.sw[10]) and (input.g_long > -1000.0):
-
-            # Longitudinal
-            if flags.sw[11]:
-                t[10] = (1.0 + p[80] * dfa * flags.swc[1]) * (
-                    (
-                        p[64] * plg[1][2]
-                        + p[65] * plg[1][4]
-                        + p[66] * plg[1][6]
-                        + p[103] * plg[1][1]
-                        + p[104] * plg[1][3]
-                        + p[105] * plg[1][5]
-                        + flags.swc[5]
-                        * (p[109] * plg[1][1] + p[110] * plg[1][3] + p[111] * plg[1][5])
-                        * cd14
-                    )
-                    * np.cos(dgtr * input.g_long)
-                    + (
-                        p[90] * plg[1][2]
-                        + p[91] * plg[1][4]
-                        + p[92] * plg[1][6]
-                        + p[106] * plg[1][1]
-                        + p[107] * plg[1][3]
-                        + p[108] * plg[1][5]
-                        + flags.swc[5]
-                        * (p[112] * plg[1][1] + p[113] * plg[1][3] + p[114] * plg[1][5])
-                        * cd14
-                    )
-                    * np.sin(dgtr * input.g_long)
+                * np.cos(dgtr * input.g_long)
+                + (
+                    p[90] * plg[1][2]
+                    + p[91] * plg[1][4]
+                    + p[92] * plg[1][6]
+                    + p[106] * plg[1][1]
+                    + p[107] * plg[1][3]
+                    + p[108] * plg[1][5]
+                    + flags.swc[5]
+                    * (p[112] * plg[1][1] + p[113] * plg[1][3] + p[114] * plg[1][5])
+                    * cd14
                 )
+                * np.sin(dgtr * input.g_long)
+            )
 
-            # UT and Mixed UT, Longitude
-            if flags.sw[12]:
-                t[11] = (
-                    (1.0 + p[95] * plg[0][1])
-                    * (1.0 + p[81] * dfa * flags.swc[1])
-                    * (1.0 + p[119] * plg[0][1] * flags.swc[5] * cd14)
-                    * (
-                        (p[68] * plg[0][1] + p[69] * plg[0][3] + p[70] * plg[0][5])
-                        * np.cos(sr * (input.sec - p[71]))
-                    )
+        # UT and Mixed UT, Longitude
+        if flags.sw[12]:
+            t[11] = (
+                (1.0 + p[95] * plg[0][1])
+                * (1.0 + p[81] * dfa * flags.swc[1])
+                * (1.0 + p[119] * plg[0][1] * flags.swc[5] * cd14)
+                * (
+                    (p[68] * plg[0][1] + p[69] * plg[0][3] + p[70] * plg[0][5])
+                    * np.cos(sr * (input.sec - p[71]))
                 )
+            )
 
-                t[11] += (
-                    flags.swc[11]
-                    * (p[76] * plg[2][3] + p[77] * plg[2][5] + p[78] * plg[2][7])
-                    * np.cos(sr * (input.sec - p[79]) + 2.0 * dgtr * input.g_long)
-                    * (1.0 + p[137] * dfa * flags.swc[1])
-                )
+            t[11] += (
+                flags.swc[11]
+                * (p[76] * plg[2][3] + p[77] * plg[2][5] + p[78] * plg[2][7])
+                * np.cos(sr * (input.sec - p[79]) + 2.0 * dgtr * input.g_long)
+                * (1.0 + p[137] * dfa * flags.swc[1])
+            )
 
-            # UT, Longitude Magnetic Activity
-            if flags.sw[13]:
-                if flags.sw[9] == -1:
-                    if p[51]:
-                        t[12] = (
-                            apt[0]
-                            * flags.swc[11]
-                            * (1.0 + p[132] * plg[0][1])
-                            * (
-                                (
-                                    p[52] * plg[1][2]
-                                    + p[98] * plg[1][4]
-                                    + p[67] * plg[1][6]
-                                )
-                                * np.cos(dgtr * (input.g_long - p[97]))
-                            )
-                            + apt[0]
-                            * flags.swc[11]
-                            * flags.swc[5]
-                            * (
-                                p[133] * plg[1][1]
-                                + p[134] * plg[1][3]
-                                + p[135] * plg[1][5]
-                            )
-                            * cd14
-                            * np.cos(dgtr * (input.g_long - p[136]))
-                            + apt[0]
-                            * flags.swc[12]
-                            * (
-                                p[55] * plg[0][1]
-                                + p[56] * plg[0][3]
-                                + p[57] * plg[0][5]
-                            )
-                            * np.cos(sr * (input.sec - p[58]))
-                        )
-                else:
+        # UT, Longitude Magnetic Activity
+        if flags.sw[13]:
+            if flags.sw[9] == -1:
+                if p[51]:
                     t[12] = (
-                        apdf
+                        apt[0]
                         * flags.swc[11]
-                        * (1.0 + p[120] * plg[0][1])
+                        * (1.0 + p[132] * plg[0][1])
                         * (
-                            (p[60] * plg[1][2] + p[61] * plg[1][4] + p[62] * plg[1][6])
-                            * np.cos(dgtr * (input.g_long - p[63]))
+                            (p[52] * plg[1][2] + p[98] * plg[1][4] + p[67] * plg[1][6])
+                            * np.cos(dgtr * (input.g_long - p[97]))
                         )
-                        + apdf
+                        + apt[0]
                         * flags.swc[11]
                         * flags.swc[5]
-                        * (p[115] * plg[1][1] + p[116] * plg[1][3] + p[117] * plg[1][5])
+                        * (p[133] * plg[1][1] + p[134] * plg[1][3] + p[135] * plg[1][5])
                         * cd14
-                        * np.cos(dgtr * (input.g_long - p[118]))
-                        + apdf
+                        * np.cos(dgtr * (input.g_long - p[136]))
+                        + apt[0]
                         * flags.swc[12]
-                        * (p[83] * plg[0][1] + p[84] * plg[0][3] + p[85] * plg[0][5])
-                        * np.cos(sr * (input.sec - p[75]))
+                        * (p[55] * plg[0][1] + p[56] * plg[0][3] + p[57] * plg[0][5])
+                        * np.cos(sr * (input.sec - p[58]))
                     )
+            else:
+                t[12] = (
+                    apdf
+                    * flags.swc[11]
+                    * (1.0 + p[120] * plg[0][1])
+                    * (
+                        (p[60] * plg[1][2] + p[61] * plg[1][4] + p[62] * plg[1][6])
+                        * np.cos(dgtr * (input.g_long - p[63]))
+                    )
+                    + apdf
+                    * flags.swc[11]
+                    * flags.swc[5]
+                    * (p[115] * plg[1][1] + p[116] * plg[1][3] + p[117] * plg[1][5])
+                    * cd14
+                    * np.cos(dgtr * (input.g_long - p[118]))
+                    + apdf
+                    * flags.swc[12]
+                    * (p[83] * plg[0][1] + p[84] * plg[0][3] + p[85] * plg[0][5])
+                    * np.cos(sr * (input.sec - p[75]))
+                )
 
     # Parms not used: 82, 89, 99, 139-149
     tinf = p[30]
-    for index in range(0, 14):
-        tinf = tinf + abs(flags.sw[index + 1]) * t[index]
+    for i in range(14):
+        tinf = tinf + abs(flags.sw[i + 1]) * t[i]
     return tinf
 
 
@@ -1186,7 +1174,7 @@ def gtd7(input, flags, output):
         * (1.0 + flags.sw[20] * flags.sw[22] * glob7s(pma[9], input, flags))
         * meso_tn2[3]
         * meso_tn2[3]
-        / pow((pma[2][0] * pavgm[2]),2.0)
+        / pow((pma[2][0] * pavgm[2]), 2.0)
     )
     meso_tn3[0] = meso_tn2[3]
 
@@ -1215,7 +1203,7 @@ def gtd7(input, flags, output):
             * (1.0 + flags.sw[22] * glob7s(pma[7], input, flags))
             * meso_tn3[4]
             * meso_tn3[4]
-            / pow((pma[6][0] * pavgm[6]),2.0)
+            / pow((pma[6][0] * pavgm[6]), 2.0)
         )
 
     """
@@ -1361,7 +1349,7 @@ def ghp7(input, flags, output, press):
         z = zi - 4.87 * cl * cd * ca - 1.64 * cl2 * ca + 0.31 * ca * cl
 
     else:
-        z = 22.0 * pow((pl + 4.0),2.0) + 110.0
+        z = 22.0 * pow((pl + 4.0), 2.0) + 110.0
 
     # Iteration Loop
     l = 0
@@ -1395,7 +1383,7 @@ def ghp7(input, flags, output, press):
         xm = output.d[5] / xn / 1.66e-24
         if flags.sw[0]:
             xm = xm * 1.0e3
-        g = gsurf[0] / pow((1.0 + z / re[0]),2.0)
+        g = gsurf[0] / pow((1.0 + z / re[0]), 2.0)
         sh = rgas * output.t[1] / (xm * g)
 
         # New Altitude Estimate Using Scale Height
@@ -1419,7 +1407,7 @@ def gts7(input, flags, output):
     za = pdl[1][15]
     zn1[0] = za
 
-    for ind in range(0, 9):
+    for ind in range(9):
         output.d[ind] = 0
 
     # TINF Variations Not Important Below ZA or ZN1(1)
@@ -1461,7 +1449,7 @@ def gts7(input, flags, output):
             * (1.0 + flags.sw[18] * flags.sw[20] * glob7s(pma[8], input, flags))
             * meso_tn1[4]
             * meso_tn1[4]
-            / pow((ptm[4] * ptl[3][0]),2.0)
+            / pow((ptm[4] * ptl[3][0]), 2.0)
         )
     else:
         meso_tn1[1] = ptm[6] * ptl[0][0]
@@ -1469,7 +1457,11 @@ def gts7(input, flags, output):
         meso_tn1[3] = ptm[7] * ptl[2][0]
         meso_tn1[4] = ptm[4] * ptl[3][0]
         meso_tgn1[1] = (
-            ptm[8] * pma[8][0] * meso_tn1[4] * meso_tn1[4] / pow((ptm[4] * ptl[3][0]),2.0)
+            ptm[8]
+            * pma[8][0]
+            * meso_tn1[4]
+            * meso_tn1[4]
+            / pow((ptm[4] * ptl[3][0]), 2.0)
         )
 
     z0 = zn1[3]
@@ -1884,22 +1876,44 @@ def gts7(input, flags, output):
         # Net Density Corrected at ALT
         output.d[4] = output.d[4] * ccor(z, rl, hc40, zc40)
 
-        # HYDROGEN DENSITY
-        # Density Variation Factor at ZLB
-        g1 = flags.sw[21] * globe7(pd[6], input, flags)
+    # HYDROGEN DENSITY
+    # Density Variation Factor at ZLB
+    g1 = flags.sw[21] * globe7(pd[6], input, flags)
 
-        # Diffusive Density at ZLB
-        db01 = pdm[5][0] * np.exp(g1) * pd[6][0]
+    # Diffusive Density at ZLB
+    db01 = pdm[5][0] * np.exp(g1) * pd[6][0]
 
-        # Diffusive Density at ALT
+    # Diffusive Density at ALT
+    temp = [output.t[1]]
+    output.d[6] = densu(
+        z,
+        db01,
+        tinf,
+        tlb,
+        1.0,
+        alpha[6],
+        temp,
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    output.t[1] = temp[0]
+    dd = output.d[6]
+    if (flags.sw[15]) and (z <= altl[6]):
+        # Turbopause
+        zh01 = pdm[5][2]
+        # Mixed Density at ZLB
         temp = [output.t[1]]
-        output.d[6] = densu(
-            z,
+        b01 = densu(
+            zh01,
             db01,
             tinf,
             tlb,
-            1.0,
-            alpha[6],
+            1.0 - xmm,
+            alpha[6] - 1.0,
             temp,
             ptm[5],
             s,
@@ -1909,77 +1923,77 @@ def gts7(input, flags, output):
             meso_tgn1,
         )
         output.t[1] = temp[0]
-        dd = output.d[6]
-        if (flags.sw[15]) and (z <= altl[6]):
-            # Turbopause
-            zh01 = pdm[5][2]
-            # Mixed Density at ZLB
-            temp = [output.t[1]]
-            b01 = densu(
-                zh01,
-                db01,
-                tinf,
-                tlb,
-                1.0 - xmm,
-                alpha[6] - 1.0,
-                temp,
-                ptm[5],
-                s,
-                mn1,
-                zn1,
-                meso_tn1,
-                meso_tgn1,
-            )
-            output.t[1] = temp[0]
-            # Mixed Density at ALT
-            temp = [output.t[1]]
-            global dm01
-            dm01 = densu(
-                z,
-                b01,
-                tinf,
-                tlb,
-                xmm,
-                0.0,
-                temp,
-                ptm[5],
-                s,
-                mn1,
-                zn1,
-                meso_tn1,
-                meso_tgn1,
-            )
-            output.t[1] = temp[0]
-            zhm01 = zhm28
-            # Net Density at ALT
-            output.d[6] = dnet(output.d[6], dm01, zhm01, xmm, 1.0)
-            # Correction to Specified Mixing Ratio at
-            rl = math.log(b28 * pdm[5][1] * math.sqrt(pdl[1][17] * pdl[1][17]) / b01)
-            hc01 = pdm[5][5] * pdl[1][11]
-            zc01 = pdm[5][4] * pdl[1][10]
-            # Chemistry Correction
-            hcc01 = pdm[5][7] * pdl[1][19]
-            zcc01 = pdm[5][6] * pdl[1][18]
-            rc01 = pdm[5][3] * pdl[1][20]
-            # Net Density Corrected at ALT
-            output.d[6] = output.d[6] * ccor(z, rc01, hcc01, zcc01)
-
-        # ATOMIC NITROGEN DENSITY
-        # Density Variation Factor at ZLB
-        g14 = flags.sw[21] * globe7(pd[7], input, flags)
-
-        # Diffusive Density at ZLB
-        db14 = pdm[6][0] * np.exp(g14) * pd[7][0]
-
-        # Diffusive Density at ALT
+        # Mixed Density at ALT
         temp = [output.t[1]]
-        output.d[7] = densu(
+        global dm01
+        dm01 = densu(
             z,
+            b01,
+            tinf,
+            tlb,
+            xmm,
+            0.0,
+            temp,
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        output.t[1] = temp[0]
+        zhm01 = zhm28
+        # Net Density at ALT
+        output.d[6] = dnet(output.d[6], dm01, zhm01, xmm, 1.0)
+        # Correction to Specified Mixing Ratio at
+        rl = math.log(b28 * pdm[5][1] * math.sqrt(pdl[1][17] * pdl[1][17]) / b01)
+        hc01 = pdm[5][5] * pdl[1][11]
+        zc01 = pdm[5][4] * pdl[1][10]
+        # Chemistry Correction
+        hcc01 = pdm[5][7] * pdl[1][19]
+        zcc01 = pdm[5][6] * pdl[1][18]
+        rc01 = pdm[5][3] * pdl[1][20]
+        # Net Density Corrected at ALT
+        output.d[6] = output.d[6] * ccor(z, rc01, hcc01, zcc01)
+
+    # ATOMIC NITROGEN DENSITY
+    # Density Variation Factor at ZLB
+    g14 = flags.sw[21] * globe7(pd[7], input, flags)
+
+    # Diffusive Density at ZLB
+    db14 = pdm[6][0] * np.exp(g14) * pd[7][0]
+
+    # Diffusive Density at ALT
+    temp = [output.t[1]]
+    output.d[7] = densu(
+        z,
+        db14,
+        tinf,
+        tlb,
+        14.0,
+        alpha[7],
+        temp,
+        ptm[5],
+        s,
+        mn1,
+        zn1,
+        meso_tn1,
+        meso_tgn1,
+    )
+    output.t[1] = temp[0]
+    dd = output.d[7]
+    if (flags.sw[15]) and (z <= altl[7]):
+        # Turbopause
+        zh14 = pdm[6][2]
+        # Mixed Density at ZLB
+        temp = [output.t[1]]
+        b14 = densu(
+            zh14,
             db14,
             tinf,
             tlb,
-            14.0,
-            alpha[7],
+            14.0 - xmm,
+            alpha[7] - 1.0,
             temp,
             ptm[5],
             s,
@@ -1989,61 +2003,39 @@ def gts7(input, flags, output):
             meso_tgn1,
         )
         output.t[1] = temp[0]
-        dd = output.d[7]
-        if (flags.sw[15]) and (z <= altl[7]):
-            # Turbopause
-            zh14 = pdm[6][2]
-            # Mixed Density at ZLB
-            temp = [output.t[1]]
-            b14 = densu(
-                zh14,
-                db14,
-                tinf,
-                tlb,
-                14.0 - xmm,
-                alpha[7] - 1.0,
-                temp,
-                ptm[5],
-                s,
-                mn1,
-                zn1,
-                meso_tn1,
-                meso_tgn1,
-            )
-            output.t[1] = temp[0]
-            # Mixed Density at ALT
-            temp = [output.t[1]]
-            global dm14
-            dm14 = densu(
-                z,
-                b14,
-                tinf,
-                tlb,
-                xmm,
-                0.0,
-                temp,
-                ptm[5],
-                s,
-                mn1,
-                zn1,
-                meso_tn1,
-                meso_tgn1,
-            )
-            output.t[1] = temp[0]
-            zhm14 = zhm28
-            # Net Density at ALT
-            output.d[7] = dnet(output.d[7], dm14, zhm14, xmm, 14.0)
-            # Correction to Specified Mixing Ratio at Ground
-            rl = math.log(b28 * pdm[6][1] * math.sqrt(pdl[0][2] * pdl[0][2]) / b14)
-            hc14 = pdm[6][5] * pdl[0][1]
-            zc14 = pdm[6][4] * pdl[0][0]
-            output.d[7] = output.d[7] * ccor(z, rl, hc14, zc14)
-            # Chemistry Correction
-            hcc14 = pdm[6][7] * pdl[0][4]
-            zcc14 = pdm[6][6] * pdl[0][3]
-            rc14 = pdm[6][3] * pdl[0][5]
-            # Net Density Corrected at ALT
-            output.d[7] = output.d[7] * ccor(z, rc14, hcc14, zcc14)
+        # Mixed Density at ALT
+        temp = [output.t[1]]
+        global dm14
+        dm14 = densu(
+            z,
+            b14,
+            tinf,
+            tlb,
+            xmm,
+            0.0,
+            temp,
+            ptm[5],
+            s,
+            mn1,
+            zn1,
+            meso_tn1,
+            meso_tgn1,
+        )
+        output.t[1] = temp[0]
+        zhm14 = zhm28
+        # Net Density at ALT
+        output.d[7] = dnet(output.d[7], dm14, zhm14, xmm, 14.0)
+        # Correction to Specified Mixing Ratio at Ground
+        rl = math.log(b28 * pdm[6][1] * math.sqrt(pdl[0][2] * pdl[0][2]) / b14)
+        hc14 = pdm[6][5] * pdl[0][1]
+        zc14 = pdm[6][4] * pdl[0][0]
+        output.d[7] = output.d[7] * ccor(z, rl, hc14, zc14)
+        # Chemistry Correction
+        hcc14 = pdm[6][7] * pdl[0][4]
+        zcc14 = pdm[6][6] * pdl[0][3]
+        rc14 = pdm[6][3] * pdl[0][5]
+        # Net Density Corrected at ALT
+        output.d[7] = output.d[7] * ccor(z, rc14, hcc14, zcc14)
 
         # ANOMALOUS OXYGEN DENSITY
 
