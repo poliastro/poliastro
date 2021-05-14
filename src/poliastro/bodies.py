@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import math
 from collections import namedtuple
-from typing import Any, Type
+from typing import Any, Optional, Type
 
 from astropy import units as u
 from astropy.constants import G
@@ -63,10 +63,10 @@ class Body(
 
     def __new__(
         cls: Type[Body],
-        parent: Body | None,
+        parent: Optional[Body],
         k: Quantity,
         name: str,
-        symbol: str | None = None,
+        symbol: Optional[str] = None,
         R: Quantity = 0 * u.km,
         R_polar: Quantity = 0 * u.km,
         R_mean: Quantity = 0 * u.km,
@@ -110,7 +110,7 @@ class Body(
         parent,
         k: Quantity,
         name: str,
-        symbol: str | None = None,
+        symbol: Optional[str] = None,
         R: u.km = 0 * u.km,
         **kwargs,
     ) -> Body:
@@ -120,10 +120,10 @@ class Body(
     def from_relative(
         cls: Type[Body],
         reference: Body,
-        parent: Body | None,
+        parent: Optional[Body],
         k: float,
         name: str,
-        symbol: str | None = None,
+        symbol: Optional[str] = None,
         R: float = 0,
         **kwargs,
     ) -> Body:
@@ -135,8 +135,8 @@ class Body(
 class SolarSystemPlanet(Body):
     def plot(
         self,
-        epoch: Time | None = None,
-        label: str | None = None,
+        epoch: Optional[Time] = None,
+        label: Optional[str] = None,
         use_3d: bool = False,
         interactive: bool = False,
         plane: Planes = Planes.EARTH_ECLIPTIC,
