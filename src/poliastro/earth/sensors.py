@@ -51,9 +51,7 @@ def min_and_max_ground_range(h, η_fov, η_center, R):
 @u.quantity_input(
     h=u.km, η_fov=u.rad, η_center=u.rad, β=u.rad, φ_nadir=u.rad, λ_nadir=u.rad, R=u.km
 )
-def max_and_min_ground_range_with_specific_azimuth(
-    h, η_fov, η_center, β, φ_nadir, λ_nadir, R
-):
+def ground_range_diff_at_azimuth(h, η_fov, η_center, β, φ_nadir, λ_nadir, R):
     """Calculates the difference in ground-range angles from the η_center angle and the latitude and longitude of the target
     for a desired phase angle, β, used to specify where the sensor is looking.
 
@@ -66,7 +64,7 @@ def max_and_min_ground_range_with_specific_azimuth(
     η_center: ~astropy.units.Quantity
         Center boresight angle.
     β: ~astropy.units.Quantity
-        Phase angle, used to specify where the sensor is looking.
+        Azimuth angle, used to specify where the sensor is looking.
     φ_nadir: ~astropy.units.Quantity
         Latitude angle of nadir point.
     λ_nadir: ~astropy.units.Quantity

@@ -4,7 +4,7 @@ from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth
 from poliastro.earth.sensors import (
-    max_and_min_ground_range_with_specific_azimuth,
+    ground_range_diff_at_azimuth,
     min_and_max_ground_range,
 )
 
@@ -54,7 +54,7 @@ def test_max_and_min_ground_range(h, n_fov, n_center, expected_Λ_max, expected_
         ),
     ],
 )
-def test_max_and_min_ground_range_with_specific_azimuth(
+def test_ground_range_diff_at_azimuth(
     h,
     n_fov,
     n_center,
@@ -67,7 +67,7 @@ def test_max_and_min_ground_range_with_specific_azimuth(
 ):
 
     R = Earth.R.to(u.km)
-    delta_Λ, φ_tgt, λ_tgt = max_and_min_ground_range_with_specific_azimuth(
+    delta_Λ, φ_tgt, λ_tgt = ground_range_diff_at_azimuth(
         h, n_center, n_fov, β, φ_nadir, λ_nadir, R
     )
     assert_quantity_allclose(delta_Λ, expected_delta_Λ)
@@ -92,7 +92,7 @@ def test_max_and_min_ground_range_with_specific_azimuth(
         ),
     ],
 )
-def test_exception_max_and_min_ground_range_with_specific_azimuth(
+def test_exception_ground_range_diff_at_azimuth(
     h,
     n_fov,
     n_center,
@@ -106,7 +106,5 @@ def test_exception_max_and_min_ground_range_with_specific_azimuth(
 
     R = Earth.R.to(u.km)
     with pytest.raises(ValueError) as excinfo:
-        max_and_min_ground_range_with_specific_azimuth(
-            h, n_center, n_fov, β, φ_nadir, λ_nadir, R
-        )
+        ground_range_diff_at_azimuth(h, n_center, n_fov, β, φ_nadir, λ_nadir, R)
     assert "β must be between 0º and 180º" in excinfo.exconly()
