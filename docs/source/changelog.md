@@ -1,6 +1,6 @@
 # What\'s new
 
-## poliastro 0.15.0 - Unreleased
+## poliastro 0.15.0 - 2021-05-14
 
 This new major release includes lots of API changes and enhancements,
 as well as the fruitful results from Google Summer of Code 2020.
@@ -37,6 +37,45 @@ as well as the fruitful results from Google Summer of Code 2020.
   Check out [the instructions](https://github.com/poliastro/poliastro/tree/main/contrib)
   and make yours!
 
+### New features
+
+- New {py:meth}`poliastro.twobody.Orbit.stationary` and {py:meth}`~poliastro.twobody.Orbit.synchronous`
+  methods for all attractors.
+- New experimental {py:class}`poliastro.earth.EarthSatellite` class
+  containing a specialized `propagate` method
+  with some preconfigured perturbations.
+- New experimental {py:class}`poliastro.spacecraft.Spacecraft` class
+  containing physical attributes like area, drag coefficient, and mass.
+- New {py:class}`poliastro.plotting.tisserand.TisserandPlotter` class.
+- New {py:meth}`poliastro.maneuver.Maneuver.correct_pericenter` maneuver.
+- New {py:mod}`poliastro.earth.sensors` module
+  with ground range and field of view calculations,
+  like {py:meth}`~poliastro.earth.sensors.min_and_max_ground_range`
+  and {py:meth}`~poliastro.earth.sensors.ground_range_diff_at_azimuth`.
+- New {py:class}`poliastro.earth.plotting.groundtrack.GroundtrackPlotter` class.
+- New {py:meth}`poliastro.ephem.Ephem.from_orbit` method.
+
+### Bugs fixed
+
+- [Issue \#740](https://github.com/poliastro/poliastro/issues/740): Incorrect Hohmann maneuver when not at pericenter
+- [Issue \#957](https://github.com/poliastro/poliastro/issues/957): poliastro description on PyPI is wrong
+- [Issue \#992](https://github.com/poliastro/poliastro/issues/992): Units error in COESA amtospheric models
+- [Issue \#1021](https://github.com/poliastro/poliastro/issues/1021): Uncaught error in plotting
+- [Issue \#1192](https://github.com/poliastro/poliastro/issues/1192): Wrong W angle for Moon IAU pole
+
+And many more smaller documentation and rendering issues
+introduced during the migration to MyST.
+
+### Backwards incompatible changes
+
+- [We refactored the {py:meth}`poliastro.twobody.propagation.cowell` method](https://github.com/poliastro/poliastro/pull/1053)
+  and rewrote its signature to make it easier to maintain and to use.
+  Code using it will need adjustment,
+  see our {ref}`quickstart` and our {ref}`gallery` for guidance.
+- [The method `Orbit.from_body_ephem` has been removed](https://github.com/poliastro/poliastro/pull/1110),
+  use {py:meth}`poliastro.twobody.Orbit.from_ephem`
+  and {py:class}`poliastro.ephem.Ephem` instead.
+
 ### Contributors
 
 This is a complete, alphabetic list of people that contributed to this release,
@@ -57,6 +96,7 @@ and therefore the contributors list is larger than ever!
 - Giuseppe Di Pasquale+
 - Iago Alonso+
 - Isabel González+
+- Ismael Jiménez+
 - Ishan Srivastava+
 - Jorge Martínez Garrido
 - Jos van 't Hof

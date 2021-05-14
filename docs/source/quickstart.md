@@ -1,3 +1,4 @@
+(quickstart)=
 # Quickstart
 
 ```{eval-rst}
