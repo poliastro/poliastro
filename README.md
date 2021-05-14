@@ -10,7 +10,7 @@ Name:         | poliastro
 
 [![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.15.x)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.15.x)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=master)
-[![codeclimate](https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/0.15.xtainability)](https://codeclimate.com/github/poliastro/poliastro/0.15.xtainability)
+[![codeclimate](https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability)](https://codeclimate.com/github/poliastro/poliastro/maintainability)
 
 [![docs](https://img.shields.io/badge/docs-v0.15b1-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/v0.15b1/?badge=v0.15b1)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/0.15.x/COPYING)
