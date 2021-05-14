@@ -18,11 +18,15 @@ and a way to define new bodies (:py:class:`~Body` class).
 
 Data references can be found in :py:mod:`~poliastro.constants`
 """
+from __future__ import annotations
+
 import math
 from collections import namedtuple
+from typing import Any, Optional, Type
 
 from astropy import units as u
 from astropy.constants import G
+from astropy.time import Time
 from astropy.units import Quantity
 
 from . import constants
@@ -58,19 +62,19 @@ class Body(
     __slots__ = ()
 
     def __new__(
-        cls,
-        parent,
-        k,
-        name,
-        symbol=None,
-        R=0 * u.km,
-        R_polar=0 * u.km,
-        R_mean=0 * u.km,
-        rotational_period=0.0 * u.day,
-        J2=0.0 * u.one,
-        J3=0.0 * u.one,
-        mass=None,
-    ):
+        cls: Type[Body],
+        parent: Optional[Body],
+        k: Quantity,
+        name: str,
+        symbol: Optional[str] = None,
+        R: Quantity = 0 * u.km,
+        R_polar: Quantity = 0 * u.km,
+        R_mean: Quantity = 0 * u.km,
+        rotational_period: Quantity = 0.0 * u.day,
+        J2: Quantity = 0.0 * u.one,
+        J3: Quantity = 0.0 * u.one,
+        mass: Quantity = None,
+    ) -> Body:
         if mass is None:
             mass = k / G
 
@@ -90,38 +94,53 @@ class Body(
         )
 
     @property
-    def angular_velocity(self):
+    def angular_velocity(self) -> Quantity:
         return (2 * math.pi * u.rad) / self.rotational_period.to(u.s)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.symbol})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     @classmethod
     @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
-    def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
+    def from_parameters(
+        cls,
+        parent,
+        k: Quantity,
+        name: str,
+        symbol: Optional[str] = None,
+        R: Quantity = 0 * u.km,
+        **kwargs,
+    ) -> Body:
         return cls(parent, k, name, symbol, R, **kwargs)
 
     @classmethod
     def from_relative(
-        cls, reference, parent=None, k=None, name=None, symbol=None, R=None, **kwargs
-    ):
-        k = k * reference.k
-        R = R * reference.R
-        return cls(parent, k, name, symbol, R, **kwargs)
+        cls: Type[Body],
+        reference: Body,
+        parent: Optional[Body],
+        k: float,
+        name: str,
+        symbol: Optional[None] = None,
+        R: float = 0,
+        **kwargs,
+    ) -> Body:
+        _k: Quantity = k * reference.k
+        _R: Quantity = R * reference.R
+        return cls(parent, _k, name, symbol, _R, **kwargs)
 
 
 class SolarSystemPlanet(Body):
     def plot(
         self,
-        epoch=None,
-        label=None,
-        use_3d=False,
-        interactive=False,
-        plane=Planes.EARTH_ECLIPTIC,
-    ):
+        epoch: Optional[Time] = None,
+        label: Optional[str] = None,
+        use_3d: bool = False,
+        interactive: bool = False,
+        plane: Planes = Planes.EARTH_ECLIPTIC,
+    ) -> Any:
         """Plots the body orbit.
 
         Parameters
@@ -164,8 +183,8 @@ Sun = SolarSystemPlanet(
     symbol="\u2609",
     R=constants.R_sun,
     rotational_period=constants.rotational_period_sun,
-    J2=_q(constants.J2_sun),
-    mass=_q(constants.M_sun),
+    J2=constants.J2_sun,
+    mass=constants.M_sun,
 )
 
 
@@ -180,6 +199,7 @@ Mercury = SolarSystemPlanet(
     rotational_period=constants.rotational_period_mercury,
 )
 
+
 Venus = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_venus,
@@ -189,9 +209,11 @@ Venus = SolarSystemPlanet(
     R_mean=constants.R_mean_venus,
     R_polar=constants.R_polar_venus,
     rotational_period=constants.rotational_period_venus,
-    J2=_q(constants.J2_venus),
-    J3=_q(constants.J3_venus),
+    J2=constants.J2_venus,
+    J3=constants.J3_venus,
 )
+
+
 Earth = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_earth,
@@ -201,10 +223,12 @@ Earth = SolarSystemPlanet(
     R_mean=constants.R_mean_earth,
     R_polar=constants.R_polar_earth,
     rotational_period=constants.rotational_period_earth,
-    mass=_q(constants.M_earth),
-    J2=_q(constants.J2_earth),
-    J3=_q(constants.J3_earth),
+    mass=constants.M_earth,
+    J2=constants.J2_earth,
+    J3=constants.J3_earth,
 )
+
+
 Mars = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_mars,
@@ -214,9 +238,11 @@ Mars = SolarSystemPlanet(
     R_mean=constants.R_mean_mars,
     R_polar=constants.R_polar_mars,
     rotational_period=constants.rotational_period_mars,
-    J2=_q(constants.J2_mars),
-    J3=_q(constants.J3_mars),
+    J2=constants.J2_mars,
+    J3=constants.J3_mars,
 )
+
+
 Jupiter = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_jupiter,
@@ -226,8 +252,10 @@ Jupiter = SolarSystemPlanet(
     R_mean=constants.R_mean_jupiter,
     R_polar=constants.R_polar_jupiter,
     rotational_period=constants.rotational_period_jupiter,
-    mass=_q(constants.M_jupiter),
+    mass=constants.M_jupiter,
 )
+
+
 Saturn = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_saturn,
@@ -238,6 +266,8 @@ Saturn = SolarSystemPlanet(
     R_polar=constants.R_polar_saturn,
     rotational_period=constants.rotational_period_saturn,
 )
+
+
 Uranus = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_uranus,
@@ -248,6 +278,8 @@ Uranus = SolarSystemPlanet(
     R_polar=constants.R_polar_uranus,
     rotational_period=constants.rotational_period_uranus,
 )
+
+
 Neptune = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_neptune,
@@ -259,6 +291,7 @@ Neptune = SolarSystemPlanet(
     rotational_period=constants.rotational_period_neptune,
 )
 
+
 Pluto = Body(
     parent=Sun,
     k=constants.GM_pluto,
@@ -269,6 +302,7 @@ Pluto = Body(
     R_polar=constants.R_polar_pluto,
     rotational_period=constants.rotational_period_pluto,
 )
+
 
 Moon = Body(
     parent=Earth,
