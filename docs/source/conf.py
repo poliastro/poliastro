@@ -168,7 +168,7 @@ html_theme = "sphinx_rtd_theme"
 html_context = {
     'sidebar_external_links_caption': 'Links',
     'sidebar_external_links': [
-        ('<i class="fa fa-rss fa-fw"></i> Blog', 'https://blog.poliastro.space'),
+        ('<i class="fa fa-rss fa-fw"></i> Blog', 'https://www.poliastro.space'),
         ('<i class="fa fa-github fa-fw"></i> Source code', 'https://github.com/poliastro/poliastro'),
         ('<i class="fa fa-bug fa-fw"></i> Issue tracker', 'https://github.com/poliastro/poliastro/issues'),
         ('<i class="fa fa-envelope fa-fw"></i> Mailing list', 'https://groups.io/g/poliastro-dev'),
