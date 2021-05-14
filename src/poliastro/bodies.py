@@ -73,7 +73,7 @@ class Body(
         rotational_period: Quantity = 0.0 * u.day,
         J2: Quantity = 0.0 * u.one,
         J3: Quantity = 0.0 * u.one,
-        mass: Quantity = None,
+        mass: Optional[Quantity] = None,
     ) -> Body:
         if mass is None:
             mass = k / G
