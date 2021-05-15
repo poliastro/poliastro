@@ -556,6 +556,7 @@ def test_3rd_body_Curtis(test_params):
             np.linspace(0, tof, 400) * u.s,
             rtol=1e-10,
             f=f,
+            use_odeint=True
         )
 
         incs, raans, argps = [], [], []
@@ -653,6 +654,7 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
             np.linspace(0, (tof).to(u.s).value, 4000) * u.s,
             rtol=1e-8,
             f=f,
+            use_odeint=True,
         )
 
         delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []

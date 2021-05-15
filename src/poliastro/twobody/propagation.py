@@ -25,7 +25,7 @@ different propagators available at poliastro:
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
-from scipy.integrate import DOP853, solve_ivp
+from scipy.integrate import DOP853, solve_ivp, odeint
 
 from poliastro.core.propagation import (
     danby as danby_fast,
@@ -38,8 +38,7 @@ from poliastro.core.propagation import (
     vallado as vallado_fast,
 )
 
-
-def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
+def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody, use_odeint=False):
     """Propagates orbit using Cowell's formulation.
 
     Parameters
@@ -59,6 +58,8 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
         returns <= 0., assuming you set events.terminal=True
     f : function(t0, u, k), optional
         Objective function, default to Keplerian-only forces.
+    use_odeint : bool, optional
+        Use odeint integrator instead of solve_ivp, defaults to False
 
     Returns
     -------
@@ -87,31 +88,46 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
 
     u0 = np.array([x, y, z, vx, vy, vz])
 
-    result = solve_ivp(
-        f,
-        (0, max(tofs)),
-        u0,
-        args=(k,),
-        rtol=rtol,
-        atol=1e-12,
-        method=DOP853,
-        dense_output=True,
-        events=events,
-    )
-    if not result.success:
-        raise RuntimeError("Integration failed")
-
-    t_end = (
-        min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
-    )
-
     rrs = []
     vvs = []
+
+    if not use_odeint:
+        result = solve_ivp(
+            f,
+            (0, max(tofs)),
+            u0,
+            args=(k,),
+            rtol=rtol,
+            atol=1e-12,
+            method=DOP853,
+            dense_output=True,
+            events=events,
+            )
+        if not result.success:
+            raise RuntimeError("Integration failed")
+        t_end = (
+            min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
+        )
+    else:
+        result = odeint(
+            f,
+            u0,
+            tofs,
+            args=(k,),
+            rtol=rtol,
+            atol=1e-12,
+            tfirst=True
+            )
+
     for i in range(len(tofs)):
-        t = tofs[i]
-        if t_end is not None and t > t_end:
-            t = t_end
-        y = result.sol(t)
+        if not use_odeint:
+            t = tofs[i]
+            if t_end is not None and t > t_end:
+                t = t_end
+            y = result.sol(t)
+        else:
+            y = result[i]
+
         rrs.append(y[:3])
         vvs.append(y[3:])
 
