@@ -556,7 +556,7 @@ def test_3rd_body_Curtis(test_params):
             np.linspace(0, tof, 400) * u.s,
             rtol=1e-10,
             f=f,
-            use_odeint=True
+            use_odeint=True,
         )
 
         incs, raans, argps = [], [], []

@@ -25,7 +25,7 @@ different propagators available at poliastro:
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
-from scipy.integrate import DOP853, solve_ivp, odeint
+from scipy.integrate import DOP853, odeint, solve_ivp
 
 from poliastro.core.propagation import (
     danby as danby_fast,
@@ -37,6 +37,7 @@ from poliastro.core.propagation import (
     pimienta as pimienta_fast,
     vallado as vallado_fast,
 )
+
 
 def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody, use_odeint=False):
     """Propagates orbit using Cowell's formulation.
@@ -102,22 +103,16 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody, use_odeint
             method=DOP853,
             dense_output=True,
             events=events,
-            )
+        )
         if not result.success:
             raise RuntimeError("Integration failed")
         t_end = (
-            min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
+            min(result.t_events[0])
+            if result.t_events and len(result.t_events[0])
+            else None
         )
     else:
-        result = odeint(
-            f,
-            u0,
-            tofs,
-            args=(k,),
-            rtol=rtol,
-            atol=1e-12,
-            tfirst=True
-            )
+        result = odeint(f, u0, tofs, args=(k,), rtol=rtol, atol=1e-12, tfirst=True)
 
     for i in range(len(tofs)):
         if not use_odeint:
