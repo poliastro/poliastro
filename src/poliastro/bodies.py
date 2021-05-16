@@ -18,8 +18,6 @@ and a way to define new bodies (:py:class:`~Body` class).
 
 Data references can be found in :py:mod:`~poliastro.constants`
 """
-
-
 import math
 from collections import namedtuple
 
@@ -108,9 +106,9 @@ class Body(
 
     @classmethod
     def from_relative(cls, reference, parent, k, name, symbol=None, R=0, **kwargs):
-        _k: Quantity = k * reference.k
-        _R: Quantity = R * reference.R
-        return cls(parent, _k, name, symbol, _R, **kwargs)
+        k = k * reference.k
+        R = R * reference.R
+        return cls(parent, k, name, symbol, R, **kwargs)
 
 
 class SolarSystemPlanet(Body):
