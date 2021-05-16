@@ -38,6 +38,12 @@ def test_earth_has_k_given_in_literature():
     assert_quantity_allclose(k.decompose([u.km, u.s]), expected_k)
 
 
+def test_earth_has_angular_velocity_given_in_literature():
+    expected_k = 7.292114e-5 * u.rad / u.s
+    k = bodies.Earth.angular_velocity
+    assert_quantity_allclose(k.decompose([u.rad, u.s]), expected_k)
+
+
 def test_from_relative():
     TRAPPIST1 = bodies.Body.from_relative(
         reference=bodies.Sun,
