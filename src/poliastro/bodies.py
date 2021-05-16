@@ -18,15 +18,13 @@ and a way to define new bodies (:py:class:`~Body` class).
 
 Data references can be found in :py:mod:`~poliastro.constants`
 """
-from __future__ import annotations
+
 
 import math
 from collections import namedtuple
-from typing import Any, Optional, Type
 
 from astropy import units as u
 from astropy.constants import G
-from astropy.time import Time
 from astropy.units import Quantity
 
 from . import constants
@@ -62,19 +60,19 @@ class Body(
     __slots__ = ()
 
     def __new__(
-        cls: Type[Body],
-        parent: Optional[Body],
-        k: Quantity,
-        name: str,
-        symbol: Optional[str] = None,
-        R: Quantity = 0 * u.km,
-        R_polar: Quantity = 0 * u.km,
-        R_mean: Quantity = 0 * u.km,
-        rotational_period: Quantity = 0.0 * u.day,
-        J2: Quantity = 0.0 * u.one,
-        J3: Quantity = 0.0 * u.one,
-        mass: Optional[Quantity] = None,
-    ) -> Body:
+        cls,
+        parent,
+        k,
+        name,
+        symbol=None,
+        R=0 * u.km,
+        R_polar=0 * u.km,
+        R_mean=0 * u.km,
+        rotational_period=0.0 * u.day,
+        J2=0.0 * u.one,
+        J3=0.0 * u.one,
+        mass=None,
+    ):
         if mass is None:
             mass = k / G
 
@@ -94,39 +92,22 @@ class Body(
         )
 
     @property
-    def angular_velocity(self) -> Quantity:
+    def angular_velocity(self):
         return (2 * math.pi * u.rad) / self.rotational_period.to(u.s)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.name} ({self.symbol})"
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return self.__str__()
 
     @classmethod
-    @u.quantity_input(k=u.km ** 3 / u.s ** 2)
-    def from_parameters(
-        cls,
-        parent,
-        k: Quantity,
-        name: str,
-        symbol: Optional[str] = None,
-        R: u.km = 0 * u.km,
-        **kwargs,
-    ) -> Body:
+    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
+    def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
         return cls(parent, k, name, symbol, R, **kwargs)
 
     @classmethod
-    def from_relative(
-        cls: Type[Body],
-        reference: Body,
-        parent: Optional[Body],
-        k: float,
-        name: str,
-        symbol: Optional[str] = None,
-        R: float = 0,
-        **kwargs,
-    ) -> Body:
+    def from_relative(cls, reference, parent, k, name, symbol=None, R=0, **kwargs):
         _k: Quantity = k * reference.k
         _R: Quantity = R * reference.R
         return cls(parent, _k, name, symbol, _R, **kwargs)
@@ -135,12 +116,12 @@ class Body(
 class SolarSystemPlanet(Body):
     def plot(
         self,
-        epoch: Optional[Time] = None,
-        label: Optional[str] = None,
-        use_3d: bool = False,
-        interactive: bool = False,
-        plane: Planes = Planes.EARTH_ECLIPTIC,
-    ) -> Any:
+        epoch=None,
+        label=None,
+        use_3d=False,
+        interactive=False,
+        plane=Planes.EARTH_ECLIPTIC,
+    ):
         """Plots the body orbit.
 
         Parameters
