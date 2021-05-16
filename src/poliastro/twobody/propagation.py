@@ -92,27 +92,25 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
         f,
         0,
         u0,
-        args=(k,),
-        rtol=rtol,
-        atol=1e-12,
+        params=k,
+        # rtol=rtol,
+        # atol=1e-12,
     )
     t, y, t_events, y_events = sol.run_events(max(tofs), events=events)
-    # if not result.success:
-    #     raise RuntimeError("Integration failed")
-
-    # t_end = (
-    #     min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
-    # )
+    
+    t_end = (
+        min(t_events[0]) if t_events and len(t_events[0]) else None
+    )
 
     rrs = []
     vvs = []
     for i in range(len(tofs)):
-        t = tofs[i]
-        # if t_end is not None and t > t_end:
-        #     t = t_end
-        # y = result.sol(t)
-        rrs.append(y[:3])
-        vvs.append(y[3:])
+        t1 = tofs[i]
+        if t_end is not None and t1 > t_end:
+            t1 = t_end
+        y_end = sol.run(t1)
+        rrs.append(y_end[:3])
+        vvs.append(y_end[3:])
 
     return rrs * u.km, vvs * u.km / u.s
 
