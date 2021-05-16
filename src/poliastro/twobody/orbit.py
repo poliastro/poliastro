@@ -672,15 +672,15 @@ class Orbit:
         if "object" not in obj.keys():
             raise ValueError("Object {} not found".format(name))
 
-        a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
+        a = obj["orbit"]["elements"]["a"]
         ecc = float(obj["orbit"]["elements"]["e"]) * u.one
-        inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
-        raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
-        argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
+        inc = obj["orbit"]["elements"]["i"]
+        raan = obj["orbit"]["elements"]["om"]
+        argp = obj["orbit"]["elements"]["w"]
 
         # Since JPL provides Mean Anomaly (M) we need to make
         # the conversion to the true anomaly (nu)
-        M = obj["orbit"]["elements"]["ma"].to(u.rad) * u.rad
+        M = obj["orbit"]["elements"]["ma"].to(u.rad)
         # NOTE: It is unclear how this conversion should happen,
         # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
         if ecc < 1:
