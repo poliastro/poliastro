@@ -92,7 +92,7 @@ dev = [
     "sphinx-autoapi",
     "sphinx-gallery",
     "sphinx_rtd_theme~=0.5.0",
-    "sphinx-hoverxref==0.5b1",
+    "sphinx-hoverxref @ https://github.com/readthedocs/sphinx-hoverxref/archive/humitos/support-intersphinx.zip",
     "sphinx-notfound-page",
 ]
 
