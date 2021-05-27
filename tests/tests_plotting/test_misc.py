@@ -5,19 +5,11 @@ from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.plotting.misc import plot_solar_system
 
 
-@pytest.mark.filterwarnings(
-    'ignore:ERFA function "epv00" yielded.*of "'
-    'warning. date outsidethe range 1900-2100 AD"'
-)
-@pytest.mark.parametrize("outer,expected", [(True, 8), (False, 4)])
+@pytest.mark.parametrize("outer, expected", [(True, 8), (False, 4)])
 def test_plot_solar_system_has_expected_number_of_orbits(outer, expected):
     assert len(plot_solar_system(outer).trajectories) == expected
 
 
-@pytest.mark.filterwarnings(
-    'ignore:ERFA function "epv00" yielded.*of "'
-    'warning. date outsidethe range 1900-2100 AD"'
-)
 @pytest.mark.parametrize(
     "use_3d, plotter_class", [(True, OrbitPlotter3D), (False, OrbitPlotter2D)]
 )
@@ -32,10 +24,6 @@ def test_plot_inner_solar_system_static(earth_perihelion):
     return plt.gcf()
 
 
-@pytest.mark.filterwarnings(
-    'ignore:ERFA function "epv00" yielded.*of "'
-    'warning. date outsidethe range 1900-2100 AD"'
-)
 @pytest.mark.mpl_image_compare
 def test_plot_outer_solar_system_static(earth_perihelion):
     plot_solar_system(outer=True, epoch=earth_perihelion)
