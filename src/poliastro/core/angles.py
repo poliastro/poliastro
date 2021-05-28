@@ -281,11 +281,10 @@ def M_to_E(M, ecc):
     This uses a Newton iteration on the Kepler equation.
 
     """
-    assert -np.pi <= M <= np.pi
-    if ecc < 0.8:
-        E0 = M
+    if -np.pi < M < 0 or M > np.pi:
+        E0 = M - ecc
     else:
-        E0 = np.pi * np.sign(M)
+        E0 = M + ecc
     E = newton("elliptic", E0, args=(M, ecc))
     return E
 
@@ -311,7 +310,16 @@ def M_to_F(M, ecc):
     This uses a Newton iteration on the hyperbolic Kepler equation.
 
     """
-    F0 = np.arcsinh(M / ecc)
+    if ecc < 1.6:
+        if -np.pi < M < 0 or M > np.pi:
+            F0 = M - ecc
+        else:
+            F0 = M + ecc
+    else:
+        if ecc < 3.6 and np.abs(M) > np.pi:
+            F0 = M - np.sign(M) * ecc
+        else:
+            F0 = M / (ecc - 1)
     F = newton("hyperbolic", F0, args=(M, ecc), maxiter=100)
     return F
 
