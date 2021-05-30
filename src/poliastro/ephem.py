@@ -290,7 +290,7 @@ class Ephem:
                 "uranus": 799,
                 "neptune": 899,
             }
-            location = "500@{}".format(bodies_dict[attractor.name.lower()])
+            location = f"500@{bodies_dict[attractor.name.lower()]}"
         else:
             location = "@ssb"
 
