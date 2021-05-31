@@ -60,11 +60,11 @@ def mercury_rot_elements_at_epoch(T, d):
         Right ascension and declination of north pole, and angle of the prime meridian.
 
     """
-    M1 = 174.7910857 + 4.092335 * d
-    M2 = 349.5821714 + 8.184670 * d
-    M3 = 164.3732571 + 12.277005 * d
-    M4 = 339.1643429 + 16.369340 * d
-    M5 = 153.9554286 + 20.461675 * d
+    M1 = np.deg2rad(174.7910857 + 4.092335 * d)
+    M2 = np.deg2rad(349.5821714 + 8.184670 * d)
+    M3 = np.deg2rad(164.3732571 + 12.277005 * d)
+    M4 = np.deg2rad(339.1643429 + 16.369340 * d)
+    M5 = np.deg2rad(153.9554286 + 20.461675 * d)
     ra = 281.0103 - 0.0328 * T
     dec = 61.45 - 0.005 * T
     W = (329.5988 + 6.1385108 * d) + (
@@ -119,11 +119,11 @@ def mars_rot_elements_at_epoch(T, d):
         Right ascension and declination of north pole, and angle of the prime meridian.
 
     """
-    M1 = 198.991226 + 19139.4819985 * T
-    M2 = 226.292679 + 38280.8511281 * T
-    M3 = 249.663391 + 57420.7251593 * T
-    M4 = 266.183510 + 76560.6367950 * T
-    M5 = 79.398797 + 0.5042615 * T
+    M1 = np.deg2rad(198.991226 + 19139.4819985 * T)
+    M2 = np.deg2rad(226.292679 + 38280.8511281 * T)
+    M3 = np.deg2rad(249.663391 + 57420.7251593 * T)
+    M4 = np.deg2rad(266.183510 + 76560.6367950 * T)
+    M5 = np.deg2rad(79.398797 + 0.5042615 * T)
 
     ra = (
         317.269202
@@ -135,11 +135,11 @@ def mars_rot_elements_at_epoch(T, d):
         + 0.419057 * np.sin(M5)
     )
 
-    K1 = 122.433576 + 19139.9407476 * T
-    K2 = 43.058401 + 38280.8753272 * T
-    K3 = 57.663379 + 57420.7517205 * T
-    K4 = 79.476401 + 76560.6495004 * T
-    K5 = 166.325722 + 0.5042615 * T
+    K1 = np.deg2rad(122.433576 + 19139.9407476 * T)
+    K2 = np.deg2rad(43.058401 + 38280.8753272 * T)
+    K3 = np.deg2rad(57.663379 + 57420.7517205 * T)
+    K4 = np.deg2rad(79.476401 + 76560.6495004 * T)
+    K5 = np.deg2rad(166.325722 + 0.5042615 * T)
 
     dec = (
         54.432516
@@ -151,12 +151,12 @@ def mars_rot_elements_at_epoch(T, d):
         + 1.591274 * np.cos(K5)
     )
 
-    J1 = 129.071773 + 19140.0328244 * T
-    J2 = 36.352167 + 38281.0473591 * T
-    J3 = 56.668646 + 57420.9295360 * T
-    J4 = 67.364003 + 76560.2552215 * T
-    J5 = 104.792680 + 95700.4387578 * T
-    J6 = 95.391654 + 0.5042615 * T
+    J1 = np.deg2rad(129.071773 + 19140.0328244 * T)
+    J2 = np.deg2rad(36.352167 + 38281.0473591 * T)
+    J3 = np.deg2rad(56.668646 + 57420.9295360 * T)
+    J4 = np.deg2rad(67.364003 + 76560.2552215 * T)
+    J5 = np.deg2rad(104.792680 + 95700.4387578 * T)
+    J6 = np.deg2rad(95.391654 + 0.5042615 * T)
 
     W = (
         176.049863
@@ -189,11 +189,11 @@ def jupiter_rot_elements_at_epoch(T, d):
         Right ascension and declination of north pole, and angle of the prime meridian.
 
     """
-    Ja = 99.360714 + 4850.4046 * T
-    Jb = 175.895369 + 1191.9605 * T
-    Jc = 300.323162 + 262.5475 * T
-    Jd = 114.012305 + 6070.2476 * T
-    Je = 49.511251 + 64.3000 * T
+    Ja = np.deg2rad(99.360714 + 4850.4046 * T)
+    Jb = np.deg2rad(175.895369 + 1191.9605 * T)
+    Jc = np.deg2rad(300.323162 + 262.5475 * T)
+    Jd = np.deg2rad(114.012305 + 6070.2476 * T)
+    Je = np.deg2rad(49.511251 + 64.3000 * T)
 
     ra = (
         268.056595
@@ -283,7 +283,7 @@ def neptune_rot_elements_at_epoch(T, d):
         Right ascension and declination of north pole, and angle of the prime meridian.
 
     """
-    N = 357.85 + 52.316 * T
+    N = np.deg2rad(357.85 + 52.316 * T)
 
     ra = 299.36 + 0.70 * np.sin(N)
     dec = 43.46 - 0.51 * np.cos(N)
@@ -309,19 +309,19 @@ def moon_rot_elements_at_epoch(T, d):
         Right ascension and declination of north pole, and angle of the prime meridian.
 
     """
-    E1 = 125.045 - 0.0529921 * d
-    E2 = 250.089 - 0.1059842 * d
-    E3 = 260.008 + 13.0120009 * d
-    E4 = 176.625 + 13.3407154 * d
-    E5 = 357.529 + 0.9856003 * d
-    E6 = 311.589 + 26.4057084 * d
-    E7 = 134.963 + 13.0649930 * d
-    E8 = 276.617 + 0.3287146 * d
-    E9 = 34.226 + 1.7484877 * d
-    E10 = 15.134 - 0.1589763 * d
-    E11 = 119.743 + 0.0036096 * d
-    E12 = 239.961 + 0.1643573 * d
-    E13 = 25.053 + 12.9590088 * d
+    E1 = np.deg2rad(125.045 - 0.0529921 * d)
+    E2 = np.deg2rad(250.089 - 0.1059842 * d)
+    E3 = np.deg2rad(260.008 + 13.0120009 * d)
+    E4 = np.deg2rad(176.625 + 13.3407154 * d)
+    E5 = np.deg2rad(357.529 + 0.9856003 * d)
+    E6 = np.deg2rad(311.589 + 26.4057084 * d)
+    E7 = np.deg2rad(134.963 + 13.0649930 * d)
+    E8 = np.deg2rad(276.617 + 0.3287146 * d)
+    E9 = np.deg2rad(34.226 + 1.7484877 * d)
+    E10 = np.deg2rad(15.134 - 0.1589763 * d)
+    E11 = np.deg2rad(119.743 + 0.0036096 * d)
+    E12 = np.deg2rad(239.961 + 0.1643573 * d)
+    E13 = np.deg2rad(25.053 + 12.9590088 * d)
 
     ra = (
         269.9949
