@@ -74,9 +74,7 @@ class COESA:
         # Assert in range
         if z < self.zb_levels[0] or z > self.zb_levels[-1]:
             raise ValueError(
-                "Geometric altitude must be in range [{}, {}]".format(
-                    self.zb_levels[0], self.zb_levels[-1]
-                )
+                f"Geometric altitude must be in range [{self.zb_levels[0]}, {self.zb_levels[-1]}]"
             )
 
         return z, h
