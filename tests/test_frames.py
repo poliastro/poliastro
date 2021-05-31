@@ -14,6 +14,7 @@ from poliastro.bodies import (
     Jupiter,
     Mars,
     Mercury,
+    Moon,
     Neptune,
     Saturn,
     Sun,
@@ -39,6 +40,7 @@ from poliastro.frames.fixed import (
     JupiterFixed,
     MarsFixed,
     MercuryFixed,
+    MoonFixed,
     NeptuneFixed,
     SaturnFixed,
     SunFixed,
@@ -268,6 +270,15 @@ def test_GeocentricSolarEcliptic_raises_error_nonscalar_obstime():
             NeptuneFixed,
             (299.33373896 * u.deg, 42.95035902 * u.deg, 249.99600757 * u.deg),
         ),
+        (
+            Moon,
+            MoonFixed,
+            (
+                266.85773344495135 * u.deg,
+                65.64110274784535 * u.deg,
+                41.1952639807452 * u.deg,
+            ),
+        ),
     ],
 )
 def test_fixed_frame_calculation_gives_expected_result(body, fixed_frame, radecW):
@@ -276,4 +287,6 @@ def test_fixed_frame_calculation_gives_expected_result(body, fixed_frame, radecW
         0 * u.deg, 0 * u.deg, body.R, obstime=epoch, representation_type="spherical"
     )
 
-    assert_quantity_allclose(fixed_position.rot_elements_at_epoch(), radecW, atol=1e-7 * u.deg)
+    assert_quantity_allclose(
+        fixed_position.rot_elements_at_epoch(), radecW, atol=1e-7 * u.deg
+    )
