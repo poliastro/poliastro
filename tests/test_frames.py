@@ -14,6 +14,7 @@ from poliastro.bodies import (
     Jupiter,
     Mars,
     Mercury,
+    Moon,
     Neptune,
     Saturn,
     Sun,
@@ -39,6 +40,7 @@ from poliastro.frames.fixed import (
     JupiterFixed,
     MarsFixed,
     MercuryFixed,
+    MoonFixed,
     NeptuneFixed,
     SaturnFixed,
     SunFixed,
@@ -242,4 +244,49 @@ def test_GeocentricSolarEcliptic_raises_error_nonscalar_obstime():
     assert (
         "To perform this transformation the "
         "obstime Attribute must be a scalar." in str(excinfo.value)
+    )
+
+
+@pytest.mark.parametrize(
+    "body, fixed_frame, radecW",
+    [
+        (Sun, SunFixed, (286.13 * u.deg, 63.87 * u.deg, 84.176 * u.deg)),
+        (Mercury, MercuryFixed, (281.0103 * u.deg, 61.45 * u.deg, 329.5999488 * u.deg)),
+        (Venus, VenusFixed, (272.76 * u.deg, 67.16 * u.deg, 160.2 * u.deg)),
+        (
+            Mars,
+            MarsFixed,
+            (317.68085441 * u.deg, 52.88643928 * u.deg, 176.63205973 * u.deg),
+        ),
+        (
+            Jupiter,
+            JupiterFixed,
+            (268.05720404 * u.deg, 64.49580995 * u.deg, 284.95 * u.deg),
+        ),
+        (Saturn, SaturnFixed, (40.589 * u.deg, 83.537 * u.deg, 38.9 * u.deg)),
+        (Uranus, UranusFixed, (257.311 * u.deg, -15.175 * u.deg, 203.81 * u.deg)),
+        (
+            Neptune,
+            NeptuneFixed,
+            (299.33373896 * u.deg, 42.95035902 * u.deg, 249.99600757 * u.deg),
+        ),
+        (
+            Moon,
+            MoonFixed,
+            (
+                266.85773344495135 * u.deg,
+                65.64110274784535 * u.deg,
+                41.1952639807452 * u.deg,
+            ),
+        ),
+    ],
+)
+def test_fixed_frame_calculation_gives_expected_result(body, fixed_frame, radecW):
+    epoch = J2000
+    fixed_position = fixed_frame(
+        0 * u.deg, 0 * u.deg, body.R, obstime=epoch, representation_type="spherical"
+    )
+
+    assert_quantity_allclose(
+        fixed_position.rot_elements_at_epoch(), radecW, atol=1e-7 * u.deg
     )
