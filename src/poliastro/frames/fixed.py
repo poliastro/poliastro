@@ -112,7 +112,7 @@ class _PlanetaryFixed(BaseRADecFrame):
         return fixed_frame.realize_frame(r_f)
 
     @classmethod
-    def rot_elements_at_epoch(cls, epoch):
+    def rot_elements_at_epoch(cls, epoch=J2000):
         """Provides rotational elements at epoch.
 
         Provides north pole of body and angle to prime meridian.

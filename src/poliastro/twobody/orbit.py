@@ -670,7 +670,7 @@ class Orbit:
             )
 
         if "object" not in obj.keys():
-            raise ValueError("Object {} not found".format(name))
+            raise ValueError(f"Object {name} not found")
 
         a = obj["orbit"]["elements"]["a"]
         ecc = float(obj["orbit"]["elements"]["e"]) * u.one
@@ -1328,7 +1328,7 @@ class Orbit:
 
         if time_of_flight < 0:
             if self.ecc >= 1:
-                raise ValueError("True anomaly {:.2f} not reachable".format(value))
+                raise ValueError(f"True anomaly {value:.2f} not reachable")
             else:
                 # For a closed orbit, instead of moving backwards
                 # we need to do another revolution

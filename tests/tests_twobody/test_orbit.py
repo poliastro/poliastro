@@ -1239,7 +1239,7 @@ def test_issue_916(mock_query):
     )
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_sbdb(name)
-    assert "ValueError: Object {} not found".format(name) in excinfo.exconly()
+    assert f"ValueError: Object {name} not found" in excinfo.exconly()
 
 
 def test_near_parabolic_M_does_not_hang(near_parabolic):
