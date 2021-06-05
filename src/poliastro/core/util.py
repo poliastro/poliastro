@@ -44,10 +44,8 @@ def alinspace(start, stop=None, num=50, endpoint=True):
     # See https://github.com/numba/numba/issues/5661
     if stop is None:
         stop_ = start + 2 * np.pi
-    elif stop == start:
-        stop_ = stop + 2 * np.pi
-    elif stop < start:
-        stop_ = stop + np.ceil((start - stop) / 2 / np.pi) * 2 * np.pi
+    elif stop <= start:
+        stop_ = stop + (np.floor((start - stop) / 2 / np.pi) + 1 ) * 2 * np.pi
     else:
         stop_ = stop
 
