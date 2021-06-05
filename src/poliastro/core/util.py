@@ -44,12 +44,10 @@ def alinspace(start, stop=None, num=50, endpoint=True):
     # See https://github.com/numba/numba/issues/5661
     if stop is None:
         stop_ = start + 2 * np.pi
-    elif stop <= start:
-        stop_ = stop
-        while stop_ <= start:
-            stop_ = stop_ + 2 * np.pi
     else:
         stop_ = stop
+        while stop_ <= start:
+            stop_ += 2 * np.pi
 
     if endpoint:
         return np.linspace(start, stop_, num)
