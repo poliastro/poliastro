@@ -34,12 +34,6 @@ def test_rotation_matrix_z():
 angles = partial(st.floats, min_value=-2 * np.pi, max_value=2 * np.pi)
 
 
-@pytest.mark.xfail(
-    reason=(
-        "At the moment the function assumes that "
-        "the maximum difference between min and max angles is 2 pi"
-    )
-)
 @settings(deadline=None)
 @given(
     x=angles(),
@@ -47,7 +41,6 @@ angles = partial(st.floats, min_value=-2 * np.pi, max_value=2 * np.pi)
 )
 def test_alinspace_is_always_increasing(x, y):
     result = alinspace(x, y)
-
     assert (np.diff(result) >= 0).all()
 
 
