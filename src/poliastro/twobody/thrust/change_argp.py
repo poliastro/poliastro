@@ -13,6 +13,7 @@ from numpy.linalg import norm
 
 from poliastro.core.elements import rv2coe
 from poliastro.core.thrust.change_argp import extra_quantities
+from numba import njit
 
 
 def change_argp(k, a, ecc, argp_0, argp_f, f):
@@ -26,6 +27,7 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
         Magnitude of constant acceleration
     """
 
+    @njit
     def a_d(t0, u_, k):
         r = u_[:3]
         v = u_[3:]

@@ -9,6 +9,7 @@ import numpy as np
 from astropy import units as u
 from numpy import cross
 from numpy.linalg import norm
+from numba import njit
 
 from poliastro.core.elements import rv2coe
 from poliastro.core.thrust.change_inc_ecc import beta, extra_quantities
@@ -46,6 +47,7 @@ def change_inc_ecc(ss_0, ecc_f, inc_f, f):
 
     beta_0_ = beta(ecc_0, ecc_f, inc_0, inc_f, argp)
 
+    @njit
     def a_d(t0, u_, k):
         r = u_[:3]
         v = u_[3:]

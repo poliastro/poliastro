@@ -53,7 +53,6 @@ def test_leo_geo_numerical(inc_0):
     assert_allclose(sf.inc.to(u.rad).value, inc_f, atol=2e-3)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
 )
@@ -72,7 +71,6 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
     assert_allclose(t_f / 86400, expected_t_f, rtol=1e-4)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
 )
@@ -98,7 +96,6 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-4, atol=1e-4)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ecc_0,inc_f,expected_beta,expected_delta_V",
     [
@@ -135,7 +132,6 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     assert_allclose(beta, expected_beta, rtol=1e-2)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize("ecc_0,ecc_f", [[0.4, 0.0], [0.0, 0.4]])
 def test_geo_cases_numerical(ecc_0, ecc_f):
     a = 42164  # km
@@ -169,7 +165,6 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
     assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
 
 
-@pytest.mark.slow
 def test_soyuz_standard_gto_delta_v():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
@@ -192,7 +187,6 @@ def test_soyuz_standard_gto_delta_v():
     assert_allclose(t_f / 86400, expected_t_f, rtol=1e-2)
 
 
-@pytest.mark.slow
 def test_soyuz_standard_gto_numerical():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
@@ -231,7 +225,6 @@ def test_soyuz_standard_gto_numerical():
     assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "inc_0, expected_t_f, expected_delta_V, rtol",
     [

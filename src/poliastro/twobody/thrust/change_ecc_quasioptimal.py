@@ -10,6 +10,7 @@ import numpy as np
 from astropy import units as u
 from numpy import cross
 from numpy.linalg import norm
+from numba import njit
 
 from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
 
@@ -40,6 +41,7 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
     h_unit = ss_0.h_vec / norm(ss_0.h_vec)
     thrust_unit = cross(h_unit, ref_vec) * np.sign(ecc_f - ecc_0)
 
+    @njit
     def a_d(t0, u_, k):
         accel_v = f * thrust_unit
         return accel_v
