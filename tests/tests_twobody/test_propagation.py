@@ -335,6 +335,7 @@ def test_propagate_to_date_has_proper_epoch():
     assert (ss1.epoch - final_epoch).sec == approx(0.0, abs=1e-6)
 
 
+@pytest.mark.filterwarnings("ignore::erfa.core.ErfaWarning")
 @pytest.mark.parametrize("propagator", [danby, markley, gooding])
 def test_propagate_long_times_keeps_geometry(propagator):
     # See https://github.com/poliastro/poliastro/issues/265

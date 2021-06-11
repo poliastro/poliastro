@@ -197,6 +197,7 @@ def test_parabolic_has_zero_energy():
     assert_allclose(ss.energy.value, 0.0, atol=1e-16)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_pqw_for_circular_equatorial_orbit():
     ss = Orbit.circular(Earth, 600 * u.km)
     expected_p = [1, 0, 0] * u.one
@@ -561,44 +562,6 @@ def test_orbit_propagate_retains_plane():
     assert final_ss.get_frame().is_equivalent_frame(expected_frame)
 
 
-@pytest.mark.remote_data
-def test_from_horizons_raise_valueerror():
-    with pytest.raises(ValueError) as exep:
-        Orbit.from_horizons(name="Dummy", attractor=Sun)
-    assert (
-        "ValueError: Unknown target (Dummy). Maybe try different id_type?"
-        in exep.exconly()
-    )
-
-
-@pytest.mark.remote_data
-def test_orbit_from_horizons_has_expected_elements():
-    epoch = Time("2018-07-23", scale="tdb")
-    # Orbit Parameters of Ceres
-    # Taken from https://ssd.jpl.nasa.gov/horizons.cgi
-    ss = Orbit.from_classical(
-        Sun,
-        2.76710759221651 * u.au,
-        0.07554803091400027 * u.one,
-        27.18502494739172 * u.deg,
-        23.36913218336299 * u.deg,
-        132.2919809219236 * u.deg,
-        21.28957916690369 * u.deg,
-        epoch,
-    )
-    ss1 = Orbit.from_horizons(name="Ceres", attractor=Sun, epoch=epoch)
-    assert ss.pqw()[0].value.all() == ss1.pqw()[0].value.all()
-    assert_quantity_allclose(ss.r_a, ss1.r_a, rtol=1.0e-4)
-    assert_quantity_allclose(ss.a, ss1.a, rtol=1.0e-4)
-
-
-@pytest.mark.remote_data
-def test_plane_is_set_in_horizons():
-    plane = Planes.EARTH_ECLIPTIC
-    ss = Orbit.from_horizons(name="Ceres", attractor=Sun, plane=plane)
-    assert ss.plane == plane
-
-
 @pytest.mark.parametrize(
     "attractor,expected_a,expected_period",
     [
@@ -887,6 +850,7 @@ def test_convert_from_coe_to_rv():
     assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_perifocal_points_to_perigee():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -903,6 +867,7 @@ def test_arglat_within_range():
     assert 0 * u.deg <= ss.arglat <= 360 * u.deg
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_pqw_returns_dimensionless():
     r_0 = ([1, 0, 0] * u.au).to(u.km)  # type: ignore
     v_0 = ([0, 6, 0] * u.au / u.year).to(u.km / u.day)
@@ -1014,26 +979,6 @@ def test_from_coord_if_coord_is_not_of_shape_zero():
     assert_quantity_allclose(ss.v, vel * u.km / u.s, rtol=1e-5)
 
 
-@pytest.mark.remote_data
-@pytest.mark.parametrize(
-    "target_name", ["Ceres", "Vesta", "Eros"]
-)  # Objects in both JPL SBDB and JPL Horizons
-def test_from_sbdb_and_from_horizons_give_similar_results(target_name):
-    ss_target = Orbit.from_sbdb(target_name)
-    ss_classical = ss_target.classical()
-    ss_ref_class = Orbit.from_horizons(
-        name=target_name,
-        attractor=Sun,
-        plane=Planes.EARTH_ECLIPTIC,
-        epoch=ss_target.epoch,
-    ).classical()
-
-    for test_elm, ref_elm in zip(ss_classical, ss_ref_class):
-        assert_quantity_allclose(
-            test_elm, ref_elm, rtol=1e-3
-        )  # Maximum error of 0.1% (chosen arbitrarily)
-
-
 def test_propagate_to_anomaly_gives_expected_result():
     # From "Going to Jupiter with Python using Jupyter and poliastro.ipynb"
     ic1 = Orbit.from_vectors(
@@ -1106,14 +1051,6 @@ def test_from_classical_wrong_dimensions_fails():
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(Earth, bad_a, _, _a, _a, _a, _a)
     assert "ValueError: Elements must be scalar, got [1.] AU" in excinfo.exconly()
-
-
-@pytest.mark.remote_data
-def test_orbit_change_attractor():
-    Io = 501  # Id for Io moon
-    ss_io = Orbit.from_horizons(Io, Sun, epoch=J2000, id_type="majorbody")
-    ss_io = ss_io.change_attractor(Jupiter)
-    assert Jupiter == ss_io.attractor
 
 
 def test_orbit_change_attractor_returns_self():

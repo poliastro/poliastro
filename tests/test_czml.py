@@ -70,7 +70,7 @@ def test_czml_custom_packet():
     )
 
     pckt = extractor.packets[-1]
-    # Test that custom packet parameters where set correctly
+    # Test that custom packet parameters were set correctly
     assert repr(pckt) == expected_packet
 
 
