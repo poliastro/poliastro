@@ -77,7 +77,12 @@ class CZMLExtractor:
 
         if not self.attractor:
             self.attractor = Earth
-        elif self.attractor.R is None or self.attractor.R_polar is None:
+        elif (
+            self.attractor.R is None
+            or self.attractor.R == 0
+            or self.attractor.R_polar is None
+            or self.attractor.R_polar == 0
+        ):
             raise ValueError(
                 "Invalid ellipsoid of attractor.\n"
                 + "Make sure your body has valid 'R' and 'R_polar' parameters"
