@@ -12,7 +12,6 @@ from astropy.coordinates import (
     get_body_barycentric,
     get_body_barycentric_posvel,
 )
-from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
