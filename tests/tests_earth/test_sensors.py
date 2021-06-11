@@ -11,7 +11,7 @@ from poliastro.earth.sensors import (
 
 # Example taken from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David A. Vallado, pages 859-860
 @pytest.mark.parametrize(
-    "h, n_fov, n_center,expected_Λ_max,expected_Λ_min ",
+    "h, eta_fov, eta_center, expected_lambda_max, expected_lambda_min ",
     [
         (
             800 * u.km,
@@ -29,17 +29,19 @@ from poliastro.earth.sensors import (
         ),
     ],
 )
-def test_max_and_min_ground_range(h, n_fov, n_center, expected_Λ_max, expected_Λ_min):
+def test_max_and_min_ground_range(
+    h, eta_fov, eta_center, expected_lambda_max, expected_lambda_min
+):
 
     R = Earth.R.to(u.km)
-    Λ_min, Λ_max = min_and_max_ground_range(h, n_fov, n_center, R)
-    assert_quantity_allclose(Λ_max, expected_Λ_max)
-    assert_quantity_allclose(Λ_min, expected_Λ_min)
+    lambda_min, lambda_max = min_and_max_ground_range(h, eta_fov, eta_center, R)
+    assert_quantity_allclose(lambda_max, expected_lambda_max)
+    assert_quantity_allclose(lambda_min, expected_lambda_min)
 
 
 # Example taken from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David A. Vallado, pages 859-860
 @pytest.mark.parametrize(
-    "h, n_fov, n_center, β, φ_nadir, λ_nadir, expected_delta_Λ, expected_φ_tgt, expected_λ_tgt",
+    "h, eta_fov, eta_center, beta, phi_nadir, lambda_nadir, expected_delta_lambda, expected_phi_tgt, expected_lambda_tgt",
     [
         (
             800 * u.km,
@@ -56,28 +58,28 @@ def test_max_and_min_ground_range(h, n_fov, n_center, expected_Λ_max, expected_
 )
 def test_ground_range_diff_at_azimuth(
     h,
-    n_fov,
-    n_center,
-    β,
-    φ_nadir,
-    λ_nadir,
-    expected_delta_Λ,
-    expected_φ_tgt,
-    expected_λ_tgt,
+    eta_fov,
+    eta_center,
+    beta,
+    phi_nadir,
+    lambda_nadir,
+    expected_delta_lambda,
+    expected_phi_tgt,
+    expected_lambda_tgt,
 ):
 
     R = Earth.R.to(u.km)
-    delta_Λ, φ_tgt, λ_tgt = ground_range_diff_at_azimuth(
-        h, n_center, n_fov, β, φ_nadir, λ_nadir, R
+    delta_lambda, phi_tgt, lambda_tgt = ground_range_diff_at_azimuth(
+        h, eta_center, eta_fov, beta, phi_nadir, lambda_nadir, R
     )
-    assert_quantity_allclose(delta_Λ, expected_delta_Λ)
-    assert_quantity_allclose(φ_tgt, expected_φ_tgt)
-    assert_quantity_allclose(λ_tgt, expected_λ_tgt)
+    assert_quantity_allclose(delta_lambda, expected_delta_lambda)
+    assert_quantity_allclose(phi_tgt, expected_phi_tgt)
+    assert_quantity_allclose(lambda_tgt, expected_lambda_tgt)
 
 
 # Example taken from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David A. Vallado, pages 859-860
 @pytest.mark.parametrize(
-    "h, n_fov, n_center, β, φ_nadir, λ_nadir, expected_delta_Λ, expected_φ_tgt, expected_λ_tgt",
+    "h, eta_fov, eta_center, beta, phi_nadir, lambda_nadir, expected_delta_lambda, expected_phi_tgt, expected_lambda_tgt",
     [
         (
             800 * u.km,
@@ -94,17 +96,19 @@ def test_ground_range_diff_at_azimuth(
 )
 def test_exception_ground_range_diff_at_azimuth(
     h,
-    n_fov,
-    n_center,
-    β,
-    φ_nadir,
-    λ_nadir,
-    expected_delta_Λ,
-    expected_φ_tgt,
-    expected_λ_tgt,
+    eta_fov,
+    eta_center,
+    beta,
+    phi_nadir,
+    lambda_nadir,
+    expected_delta_lambda,
+    expected_phi_tgt,
+    expected_lambda_tgt,
 ):
 
     R = Earth.R.to(u.km)
     with pytest.raises(ValueError) as excinfo:
-        ground_range_diff_at_azimuth(h, n_center, n_fov, β, φ_nadir, λ_nadir, R)
-    assert "β must be between 0º and 180º" in excinfo.exconly()
+        ground_range_diff_at_azimuth(
+            h, eta_center, eta_fov, beta, phi_nadir, lambda_nadir, R
+        )
+    assert "beta must be between 0º and 180º" in excinfo.exconly()
