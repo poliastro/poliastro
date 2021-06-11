@@ -197,6 +197,18 @@ def test_parabolic_has_zero_energy():
     assert_allclose(ss.energy.value, 0.0, atol=1e-16)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_pqw_for_circular_equatorial_orbit():
+    ss = Orbit.circular(Earth, 600 * u.km)
+    expected_p = [1, 0, 0] * u.one
+    expected_q = [0, 1, 0] * u.one
+    expected_w = [0, 0, 1] * u.one
+    p, q, w = ss.pqw()
+    assert_allclose(p, expected_p)
+    assert_allclose(q, expected_q)
+    assert_allclose(w, expected_w)
+
+
 @pytest.mark.parametrize(
     "attractor,alt,argp,expected_argp,expected_inc",
     [
@@ -560,6 +572,28 @@ def test_from_horizons_raise_valueerror():
     )
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.remote_data
+def test_orbit_from_horizons_has_expected_elements():
+    epoch = Time("2018-07-23", scale="tdb")
+    # Orbit Parameters of Ceres
+    # Taken from https://ssd.jpl.nasa.gov/horizons.cgi
+    ss = Orbit.from_classical(
+        Sun,
+        2.76710759221651 * u.au,
+        0.07554803091400027 * u.one,
+        27.18502494739172 * u.deg,
+        23.36913218336299 * u.deg,
+        132.2919809219236 * u.deg,
+        21.28957916690369 * u.deg,
+        epoch,
+    )
+    ss1 = Orbit.from_horizons(name="Ceres", attractor=Sun, epoch=epoch)
+    assert ss.pqw()[0].value.all() == ss1.pqw()[0].value.all()
+    assert_quantity_allclose(ss.r_a, ss1.r_a, rtol=1.0e-4)
+    assert_quantity_allclose(ss.a, ss1.a, rtol=1.0e-4)
+
+
 @pytest.mark.remote_data
 def test_plane_is_set_in_horizons():
     plane = Planes.EARTH_ECLIPTIC
@@ -855,11 +889,34 @@ def test_convert_from_coe_to_rv():
     assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_perifocal_points_to_perigee():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    p, _, _ = ss.pqw()
+    assert_allclose(p, ss.e_vec / ss.ecc)
+
+
 def test_arglat_within_range():
     r = [3_539.08827417, 5_310.19903462, 3_066.31301457] * u.km
     v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
     assert 0 * u.deg <= ss.arglat <= 360 * u.deg
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_pqw_returns_dimensionless():
+    r_0 = ([1, 0, 0] * u.au).to(u.km)  # type: ignore
+    v_0 = ([0, 6, 0] * u.au / u.year).to(u.km / u.day)
+    ss = Orbit.from_vectors(Sun, r_0, v_0)
+
+    p, q, w = ss.pqw()
+
+    assert p.unit == u.one
+    assert q.unit == u.one
+    assert w.unit == u.one
 
 
 def test_from_coord_fails_if_no_time_differential():
