@@ -15,7 +15,7 @@ def extra_quantities(k, a_0, a_f, inc_0, inc_f, f):
 
 
 @jit
-def beta(t, *, V_0, f, beta_0):
+def beta(t, V_0, f, beta_0):
     """Compute yaw angle (β) as a function of time and the problem parameters."""
     return np.arctan2(V_0 * np.sin(beta_0), V_0 * np.cos(beta_0) - f * t)
 

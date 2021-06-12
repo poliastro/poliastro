@@ -15,15 +15,9 @@ from poliastro.twobody.thrust import (
 )
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "inc_0",
-    [
-        np.radians(28.5),
-        pytest.param(
-            np.radians(90.0), marks=pytest.mark.skip(reason="too long for now")
-        ),
-    ],
+    [np.radians(28.5), np.radians(90.0)],
 )
 def test_leo_geo_numerical(inc_0):
     f = 3.5e-7  # km / s2
