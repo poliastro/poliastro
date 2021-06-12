@@ -1,4 +1,5 @@
 import numpy as np
+from numba import jit
 from numpy import cross
 from numpy.linalg import norm
 
@@ -42,6 +43,7 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
 
     V_0, beta_0_, _ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
 
+    @jit(forceobj=True)
     def a_d(t0, u_, k):
         r = u_[:3]
         v = u_[3:]

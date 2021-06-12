@@ -8,6 +8,7 @@ References
 
 """
 import numpy as np
+from numba import njit
 from numpy import cross
 from numpy.linalg import norm
 
@@ -26,6 +27,7 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
         Magnitude of constant acceleration
     """
 
+    @njit
     def a_d(t0, u_, k):
         r = u_[:3]
         v = u_[3:]
