@@ -1,7 +1,7 @@
 import numpy as np
+from numba import jit
 from numpy import cross
 from numpy.linalg import norm
-from numba import jit
 
 from poliastro.core.thrust.change_a_inc import (
     beta,

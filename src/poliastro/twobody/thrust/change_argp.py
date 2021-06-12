@@ -8,12 +8,12 @@ References
 
 """
 import numpy as np
+from numba import njit
 from numpy import cross
 from numpy.linalg import norm
 
 from poliastro.core.elements import rv2coe
 from poliastro.core.thrust.change_argp import extra_quantities
-from numba import njit
 
 
 def change_argp(k, a, ecc, argp_0, argp_f, f):

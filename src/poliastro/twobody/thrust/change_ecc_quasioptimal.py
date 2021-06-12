@@ -8,9 +8,9 @@ References
 """
 import numpy as np
 from astropy import units as u
+from numba import njit
 from numpy import cross
 from numpy.linalg import norm
-from numba import njit
 
 from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
 
