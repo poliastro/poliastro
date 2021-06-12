@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit
+from numba import njit
 from numpy import cross
 from numpy.linalg import norm
 
@@ -43,17 +43,16 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
 
     V_0, beta_0_, _ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
 
-    @jit(forceobj=True)
+    @njit
     def a_d(t0, u_, k):
         r = u_[:3]
         v = u_[3:]
 
         # Change sign of beta with the out-of-plane velocity
-        beta_ = beta(t0, V_0=V_0, f=f, beta_0=beta_0_) * np.sign(r[0] * (inc_f - inc_0))
+        beta_ = beta(t0, V_0, f, beta_0_) * np.sign(r[0] * (inc_f - inc_0))
 
         t_ = v / norm(v)
         w_ = cross(r, v) / norm(cross(r, v))
-        # n_ = cross(t_, w_)
         accel_v = f * (np.cos(beta_) * t_ + np.sin(beta_) * w_)
         return accel_v
 
