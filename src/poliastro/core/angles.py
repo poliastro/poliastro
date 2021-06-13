@@ -310,7 +310,7 @@ def M_to_F(M, ecc):
     This uses a Newton iteration on the hyperbolic Kepler equation.
 
     """
-    if ecc < 1.25:
+    if ecc < 1.6:
         if -np.pi < M < 0 or np.pi < M:
             F0 = M - ecc
         else:
