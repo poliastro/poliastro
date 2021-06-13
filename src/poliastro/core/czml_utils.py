@@ -72,7 +72,9 @@ def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
             )
         )
     ) / (a ** 2 * b ** 2 * m ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
-    p0, p1 = np.array([x + t0, y + k * t0, z + m * t0]), np.array([x - t1, y - t1 * k, z - t1 * m])
+    p0, p1 = np.array([x + t0, y + k * t0, z + m * t0]), np.array(
+        [x - t1, y - t1 * k, z - t1 * m]
+    )
 
     return p0, p1
 
@@ -93,6 +95,6 @@ def project_point_on_ellipsoid(x, y, z, a, b, c):
     p1, p2 = intersection_ellipsoid_line(x, y, z, x, y, z, a, b, c)
 
     norm_1 = np.linalg.norm(np.array([p1[0] - x, p1[1] - y, p1[2] - z]))
-    norm_2 =  np.linalg.norm(np.array([p2[0] - x, p2[1] - y, p2[2] - z]))
+    norm_2 = np.linalg.norm(np.array([p2[0] - x, p2[1] - y, p2[2] - z]))
 
     return p1 if norm_1 <= norm_2 else p2
