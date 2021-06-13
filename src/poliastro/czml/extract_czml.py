@@ -21,7 +21,9 @@ from czml3.types import IntervalValue, TimeInterval
 from erfa import gd2gce
 
 from poliastro.bodies import Earth
-from poliastro.czml.utils import project_point_on_ellipsoid
+from poliastro.core.czml_utils import (
+    project_point_on_ellipsoid as project_point_on_ellipsoid_fast,
+)
 from poliastro.twobody.propagation import propagate
 
 PIC_SATELLITE = (
@@ -172,12 +174,12 @@ class CZMLExtractor:
             # Flatten list
             cords = list(map(lambda x: round(x[0], rf), cords.tolist()))
             t, p = cords[0], cords[1:]
-            pr_p = project_point_on_ellipsoid(
+            pr_p = project_point_on_ellipsoid_fast(
                 p[0], p[1], p[2], ellipsoid[0], ellipsoid[1], ellipsoid[2]
             )
             # Add a small number to ensure that our point lies above the surface of the
             # ellipsoid. We do this because small losses in precision may cause the point
-            # to lie slightly bellow the surface. An iterative method could be used instead
+            # to lie slightly below the surface. An iterative method could be used instead
             # but the error margin is too small to be worth it.
 
             _cords = t, pr_p[0] + 0.1, pr_p[1] + 0.1, pr_p[2] + 0.1

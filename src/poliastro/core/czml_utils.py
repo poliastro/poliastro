@@ -1,24 +1,26 @@
 import numpy as np
+from numba import njit as jit
 
 
+@jit
 def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
-    """
-    Intersection of an ellipsoid defined by its axises a, b, c with the
+    """Intersection of an ellipsoid defined by its axes a, b, c with the
     line p + λu.
 
     Parameters
     ----------
-    float x, y, z
-        a point of the line
-    float u1, u2, u3
-        the line vector
-    float a, b, c
-        the ellipsoidal axises
+    x, y, z: float
+        A point of the line
+    u1, u2, u3: float
+        The line vector
+    a, b, c: float
+        The ellipsoidal axises
 
     Returns
     -------
-    p0, p1: list
+    p0, p1: ~np.array
         This returns both of the points intersecting the ellipsoid.
+
     """
     # Get rid of one parameter by translating the line's direction vector
     k, m = u2 / u1, u3 / u1
@@ -70,28 +72,29 @@ def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
             )
         )
     ) / (a ** 2 * b ** 2 * m ** 2 + a ** 2 * c ** 2 * k ** 2 + b ** 2 * c ** 2)
-    p0, p1 = [x + t0, y + k * t0, z + m * t0], [x - t1, y - t1 * k, z - t1 * m]
+    p0, p1 = np.array([x + t0, y + k * t0, z + m * t0]), np.array(
+        [x - t1, y - t1 * k, z - t1 * m]
+    )
 
     return p0, p1
 
 
+@jit
 def project_point_on_ellipsoid(x, y, z, a, b, c):
-    """
-    Return the projection of a point on an ellipsoid.
+    """Return the projection of a point on an ellipsoid.
 
     Parameters
     ----------
-    float x, y, z
+    x, y, z: float
         Cartesian coordinates of point
 
-    float a, b, c
-        semi-axises of the ellipsoid
+    a, b, c: float
+        Semi-axes of the ellipsoid
+
     """
     p1, p2 = intersection_ellipsoid_line(x, y, z, x, y, z, a, b, c)
 
-    if np.linalg.norm([p1[0] - x, p1[1] - y, p1[2] - z]) <= np.linalg.norm(
-        [p2[0] - x, p2[1] - y, p2[2] - z]
-    ):
-        return p1
-    else:
-        return p2
+    norm_1 = np.linalg.norm(np.array([p1[0] - x, p1[1] - y, p1[2] - z]))
+    norm_2 = np.linalg.norm(np.array([p2[0] - x, p2[1] - y, p2[2] - z]))
+
+    return p1 if norm_1 <= norm_2 else p2
