@@ -281,7 +281,7 @@ def M_to_E(M, ecc):
     This uses a Newton iteration on the Kepler equation.
 
     """
-    if -np.pi < M < 0 or M > np.pi:
+    if -np.pi < M < 0 or np.pi < M:
         E0 = M - ecc
     else:
         E0 = M + ecc
@@ -311,12 +311,12 @@ def M_to_F(M, ecc):
 
     """
     if ecc < 1.25:
-        if -np.pi < M < 0 or M > np.pi:
+        if -np.pi < M < 0 or np.pi < M:
             F0 = M - ecc
         else:
             F0 = M + ecc
     else:
-        if ecc < 3.6 and np.abs(M) > np.pi:
+        if ecc < 3.6 and np.pi < np.abs(M):
             F0 = M - np.sign(M) * ecc
         else:
             F0 = M / (ecc - 1)
