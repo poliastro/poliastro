@@ -247,8 +247,8 @@ def test_propagation_hyperbolic_zero_time_returns_same_state():
 
     r, v = ss1.rv()
 
-    assert_quantity_allclose(r, r0)
-    assert_quantity_allclose(v, v0)
+    assert_quantity_allclose(r, r0, atol=1e-24 * u.km)
+    assert_quantity_allclose(v, v0, atol=1e-27 * u.km / u.s)
 
 
 def test_apply_zero_maneuver_returns_equal_state():
