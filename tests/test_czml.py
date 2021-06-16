@@ -425,6 +425,7 @@ def expected_doc_add_trajectory():
 
     return expected_doc
 
+
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_add_trajectory(expected_doc_add_trajectory):
     start_epoch = iss.epoch
