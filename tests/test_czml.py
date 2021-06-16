@@ -442,7 +442,6 @@ def test_czml_add_trajectory():
 
     assert repr(extractor.packets) == expected_doc
 
-
     x = u.Quantity([1.0, 2.0, 3.0], u.m)
     y = u.Quantity([4.0, 5.0, 6.0], u.m)
     z = u.Quantity([7.0, 8.0, 9.0], u.m)
@@ -454,7 +453,7 @@ def test_czml_add_trajectory():
 
     with pytest.raises(ValueError) as excinfo:
         extractor.add_trajectory(positions, epochs, label_text="Test", path_color=color)
-    assert ("Number of Points and Epochs must be equal." in excinfo.exconly())
+    assert "Number of Points and Epochs must be equal." in excinfo.exconly()
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")

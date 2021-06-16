@@ -2,7 +2,7 @@ import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-from poliastro.bodies import Body, Earth, Sun, Jupiter
+from poliastro.bodies import Body, Earth, Jupiter, Sun
 
 
 def test_body_has_k_given_in_constructor():
@@ -21,6 +21,7 @@ def test_body_from_parameters_raises_valueerror_if_k_units_not_correct():
         "UnitsError: Argument 'k' to function 'from_parameters' must be in units convertible to 'km3 / s2'."
         in excinfo.exconly()
     )
+
 
 def test_body_from_parameters_returns_body_object():
     k = 3.98e5 * u.km ** 3 / u.s ** 2
