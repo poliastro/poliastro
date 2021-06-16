@@ -450,12 +450,13 @@ def test_propagate_with_coe(propagator_coe):
     assert_quantity_allclose(nu_final, nu)
 
 
-def test_danby_with_zero_eccentricity():
+@pytest.mark.parametrize("propagator", ALL_PROPAGATORS)
+def test_propagator_with_zero_eccentricity(propagator):
     attractor = Earth
     altitude = 300 * u.km
     orbit = Orbit.circular(attractor, altitude)
     time_of_flight = 50 * u.s
-    res = orbit.propagate(time_of_flight, method=danby)
+    res = orbit.propagate(time_of_flight, method=propagator)
 
     assert_quantity_allclose(orbit.a, res.a)
     assert_quantity_allclose(orbit.ecc, res.ecc, atol=1e-15)
