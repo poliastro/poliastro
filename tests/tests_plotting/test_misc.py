@@ -16,6 +16,11 @@ def test_plot_solar_system_has_expected_number_of_orbits(outer, expected):
 def test_plot_solar_system_uses_expected_orbitplotter(use_3d, plotter_class):
     assert isinstance(plot_solar_system(use_3d=use_3d, interactive=True), plotter_class)
 
+    if use_3d:
+        with pytest.raises(ValueError) as excinfo:
+            plot_solar_system(use_3d=use_3d)
+        assert ("The static plotter does not support 3D" in excinfo.exconly())
+
 
 @pytest.mark.mpl_image_compare
 def test_plot_inner_solar_system_static(earth_perihelion):
