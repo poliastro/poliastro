@@ -164,6 +164,22 @@ def test_apply_maneuver_changes_epoch():
     assert orbit_new.epoch == ss.epoch + dt
 
 
+def test_apply_maneuver_returns_intermediate_states_if_true():
+    _d = 1.0 * u.AU  # Unused distance
+    _ = 0.5 * u.one  # Unused dimensionless value
+    _a = 1.0 * u.deg  # Unused angle
+    ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    dt1 = 0.5 * u.h
+    dv1 = [5, 0, 10] * u.km / u.s
+    dt2 = 0.5 * u.h
+    dv2 = [0, 5, 10] * u.km / u.s
+
+    states = ss.apply_maneuver([(dt1, dv1), (dt2, dv2)], intermediate=True)
+
+    assert len(states) == 2
+    assert states[-1].epoch == ss.epoch + dt1 + dt2
+
+
 def test_circular_has_proper_semimajor_axis():
     alt = 500 * u.km
     attractor = Earth

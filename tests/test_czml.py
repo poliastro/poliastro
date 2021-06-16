@@ -326,22 +326,8 @@ def test_czml_add_orbit():
     assert repr(extractor.packets) == expected_doc
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
-def test_czml_add_trajectory():
-    start_epoch = iss.epoch
-    end_epoch = iss.epoch + molniya.period
-
-    sample_points = 10
-    color = [255, 255, 0]
-
-    x = u.Quantity([1.0, 2.0, 3.0], u.m)
-    y = u.Quantity([4.0, 5.0, 6.0], u.m)
-    z = u.Quantity([7.0, 8.0, 9.0], u.m)
-    positions = CartesianRepresentation(x, y, z)
-
-    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
-    epochs = Time(time, format="isot")
-
+@pytest.fixture()
+def expected_doc_add_trajectory():
     expected_doc = """[{
     "id": "document",
     "version": "1.0",
@@ -436,11 +422,53 @@ def test_czml_add_trajectory():
         }
     }
 }]"""
+
+    return expected_doc
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_add_trajectory(expected_doc_add_trajectory):
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+    color = [255, 255, 0]
+
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
+    epochs = Time(time, format="isot")
+
     extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
 
     extractor.add_trajectory(positions, epochs, label_text="Test", path_color=color)
 
-    assert repr(extractor.packets) == expected_doc
+    assert repr(extractor.packets) == expected_doc_add_trajectory
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_raises_error_if_length_of_points_and_epochs_not_same():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+    color = [255, 255, 0]
+
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30"]
+    epochs = Time(time, format="isot")
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    with pytest.raises(ValueError) as excinfo:
+        extractor.add_trajectory(positions, epochs, label_text="Test", path_color=color)
+    assert "Number of Points and Epochs must be equal." in excinfo.exconly()
 
 
 @pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
