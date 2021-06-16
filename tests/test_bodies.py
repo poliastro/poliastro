@@ -24,11 +24,13 @@ def test_body_from_parameters_raises_valueerror_if_k_units_not_correct():
 
 
 def test_body_from_parameters_returns_body_object():
-    k = 3.98e5 * u.km ** 3 / u.s ** 2
+    k = 1.26712763e17 * u.m ** 3 / u.s ** 2
+    R = 71492000 * u.m
     _name = _symbol = "jupiter"
     jupiter = Body.from_parameters(Sun, k, _name, _symbol, Jupiter.R)
 
-    assert type(jupiter) == Body
+    assert jupiter.k == k
+    assert jupiter.R == R
 
 
 def test_body_printing_has_name_and_symbol():
