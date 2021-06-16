@@ -448,3 +448,17 @@ def test_propagate_with_coe(propagator_coe):
     nu_final = propagator_coe(k, p, ecc, inc, raan, argp, nu, period)
 
     assert_quantity_allclose(nu_final, nu)
+
+
+def test_danby_with_zero_eccentricity():
+    attractor = Earth
+    altitude = 300 * u.km
+    orbit = Orbit.circular(attractor, altitude)
+    time_of_flight = 50 * u.s
+    res = orbit.propagate(time_of_flight, method=danby)
+
+    assert_quantity_allclose(orbit.a, res.a)
+    assert_quantity_allclose(orbit.ecc, res.ecc, atol=1e-15)
+    assert_quantity_allclose(orbit.inc, res.inc)
+    assert_quantity_allclose(orbit.raan, res.raan)
+    assert_quantity_allclose(orbit.argp, res.argp)
