@@ -74,9 +74,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
 
     Note
     -----
-    This method uses a Dormand & Prince method of order 8(5,3) available
-    in the :py:class:`poliastro.integrators` module. If multiple tofs
-    are provided, the method propagates to the maximum value and
+    This method uses the `solve_ivp` method from `scipy.integrate` using the
+    Dormand & Prince integration method of order 8(5,3) (DOP853).
+    If multiple tofs are provided, the method propagates to the maximum value and
     calculates the other values via dense output
 
     """
@@ -501,5 +501,5 @@ HYPERBOLIC_PROPAGATORS = [
     cowell,
 ]
 ALL_PROPAGATORS = list(
-    set(ELLIPTIC_PROPAGATORS) & set(PARABOLIC_PROPAGATORS) & set(HYPERBOLIC_PROPAGATORS)
+    set(ELLIPTIC_PROPAGATORS + PARABOLIC_PROPAGATORS + HYPERBOLIC_PROPAGATORS)
 )
