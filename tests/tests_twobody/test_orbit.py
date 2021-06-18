@@ -1034,7 +1034,7 @@ def test_from_sbdb_raise_valueerror():
         Orbit.from_sbdb(name="Halley")
 
     assert (
-        "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley\n"
+        "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley"
         in excinfo.exconly()
     )
 
