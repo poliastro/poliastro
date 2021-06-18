@@ -463,3 +463,22 @@ def test_propagator_with_zero_eccentricity(propagator):
     assert_quantity_allclose(orbit.inc, res.inc)
     assert_quantity_allclose(orbit.raan, res.raan)
     assert_quantity_allclose(orbit.argp, res.argp)
+
+
+@pytest.mark.parametrize("propagator", ALL_PROPAGATORS)
+def test_after_propagation_r_and_v_dimensions(propagator):
+    r0 = [111.340, -228.343, 2413.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    tof = time.TimeDelta(50 * u.s)
+    orbit = Orbit.from_vectors(Earth, r0, v0)
+
+    rr, vv = propagator(
+        orbit.attractor.k,
+        orbit.r,
+        orbit.v,
+        tof.reshape(-1).to(u.s),
+        rtol=1e-10,
+    )
+
+    assert rr.ndim == 2
+    assert vv.ndim == 2
