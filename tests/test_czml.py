@@ -859,3 +859,42 @@ def test_czml_invalid_orbit_epoch_error():
         "ValueError: The orbit's epoch cannot exceed the constructor's ending epoch"
         in excinfo.exconly()
     )
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_add_ground_station_raises_error_if_invalid_coordinates():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+    sample_points = 10
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    with pytest.raises(TypeError) as excinfo:
+        extractor.add_ground_station([0.70930 * u.rad])
+
+    assert (
+        "Invalid coordinates. Coordinates must be of the form [u, v] where u, v are astropy units"
+        in excinfo.exconly()
+    )
+
+
+@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_add_trajectory_raises_error_for_groundtrack_show():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
+    epochs = Time(time, format="isot")
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        extractor.add_trajectory(positions, epochs, groundtrack_show=True)
+    assert "Ground tracking for trajectory not implemented yet" in excinfo.exconly()
