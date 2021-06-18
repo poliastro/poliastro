@@ -188,6 +188,12 @@ def test_circular_has_proper_semimajor_axis():
     assert ss.a == expected_a
 
 
+def test_circular_raises_error_if_negative_altitude():
+    with pytest.raises(ValueError) as excinfo:
+        Orbit.circular(Earth, -1 * u.m, epoch=Time(0.0, format="jd", scale="tdb"))
+    assert "Altitude of an orbit cannot be negative." in excinfo.exconly()
+
+
 def test_geosync_has_proper_period():
     expected_period = 1436 * u.min
 
@@ -326,7 +332,7 @@ def test_frozen_orbit_venus_special_case():
     with pytest.raises(NotImplementedError) as excinfo:
         Orbit.frozen(Venus, 1 * u.m)
     assert excinfo.type == NotImplementedError
-    assert str(excinfo.value) == "This has not been implemented for Venus"
+    assert "This has not been implemented for Venus" in excinfo.exconly()
 
 
 def test_frozen_orbit_non_spherical_arguments():
@@ -334,8 +340,7 @@ def test_frozen_orbit_non_spherical_arguments():
         Orbit.frozen(Jupiter, 1 * u.m)
     assert excinfo.type == AttributeError
     assert (
-        str(excinfo.value)
-        == "Attractor Jupiter has not spherical harmonics implemented"
+        "Attractor Jupiter has not spherical harmonics implemented" in excinfo.exconly()
     )
 
 
@@ -343,10 +348,7 @@ def test_frozen_orbit_altitude():
     with pytest.raises(ValueError) as excinfo:
         Orbit.frozen(Earth, -1 * u.m)
     assert excinfo.type == ValueError
-    assert (
-        str(excinfo.value)
-        == "The semimajor axis may not be smaller that Earth's radius"
-    )
+    assert "Altitude of an orbit cannot be negative" in excinfo.exconly()
 
 
 def test_orbit_representation():
@@ -665,7 +667,7 @@ def test_synchronous_orbit_pericenter_smaller_than_atractor_radius(
     with pytest.raises(ValueError) as excinfo:
         Orbit.synchronous(attractor=attractor, ecc=ecc)
     assert excinfo.type == ValueError
-    assert str(excinfo.value) == "The orbit for the given parameters doesn't exist"
+    assert "The orbit for the given parameters doesn't exist" in excinfo.exconly()
 
 
 @pytest.mark.parametrize(
@@ -1032,8 +1034,8 @@ def test_from_sbdb_raise_valueerror():
         Orbit.from_sbdb(name="Halley")
 
     assert (
-        str(excinfo.value)
-        == "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley\n"
+        "2 different objects found: \n2688 Halley (1982 HG1)\n1P/Halley\n"
+        in excinfo.exconly()
     )
 
 
