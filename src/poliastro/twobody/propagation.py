@@ -451,7 +451,7 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
     # Check if propagator fulfills orbit requirements
     if orbit.ecc < 1.0 and method not in ELLIPTIC_PROPAGATORS:
         raise ValueError(
-            "Can not use an parabolic/hyperbolic propagator for elliptical orbits."
+            "Can not use an parabolic/hyperbolic propagator for elliptical/circular orbits."
         )
     elif orbit.ecc == 1.0 and method not in PARABOLIC_PROPAGATORS:
         raise ValueError(
@@ -472,10 +472,6 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         rtol=rtol,
         **kwargs
     )
-
-    # TODO: Turn these into unit tests
-    assert rr.ndim == 2
-    assert vv.ndim == 2
 
     cartesian = CartesianRepresentation(
         rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
