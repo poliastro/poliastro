@@ -55,7 +55,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     rtol : float, optional
         Maximum relative error permitted, default to 1e-10.
     events : function(t, u(t)), optional
-        passed to solve_ivp: integration stops when this function
+        Passed to `solve_ivp`: Integration stops when this function
         returns <= 0., assuming you set events.terminal=True
     f : function(t0, u, k), optional
         Objective function, default to Keplerian-only forces.
@@ -76,8 +76,8 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     -----
     This method uses the `solve_ivp` method from `scipy.integrate` using the
     Dormand & Prince integration method of order 8(5,3) (DOP853).
-    If multiple tofs are provided, the method propagates to the maximum value and
-    calculates the other values via dense output
+    If multiple tofs are provided, the method propagates to the maximum value
+    (unless a terminal event is defined) and calculates the other values via dense output.
 
     """
     k = k.to(u.km ** 3 / u.s ** 2).value
