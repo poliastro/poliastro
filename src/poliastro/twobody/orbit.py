@@ -673,6 +673,8 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        if alt < 0:
+            raise ValueError("Altitude of an orbit cannot be negative.")
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
@@ -1019,7 +1021,8 @@ class Orbit:
                     f"This has not been implemented for {attractor.name}"
                 )
 
-            assert alt > 0
+            if alt < 0:
+                raise ValueError("Altitude of an orbit cannot be negative")
 
             argp = critical_argps[0] if argp is None else argp
             a = attractor.R + alt
@@ -1063,7 +1066,7 @@ class Orbit:
 
         except AssertionError as exc:
             raise ValueError(
-                f"The semimajor axis may not be smaller that {attractor.name}'s radius"
+                f"The semimajor axis may not be smaller than the {attractor.name}'s radius"
             ) from exc
 
     def represent_as(self, representation, differential_class=None):
