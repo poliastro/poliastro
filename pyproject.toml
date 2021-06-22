@@ -78,6 +78,7 @@ dev = [
     "jupytext",
     "mypy>=0.740",
     "myst-parser>=0.13.1",
+    "myst-nb",
     "nbsphinx>=0.8.6",
     "nbconvert>=5.5",
     "pycodestyle",
