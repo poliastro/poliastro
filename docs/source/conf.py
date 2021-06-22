@@ -52,7 +52,7 @@ extensions = [
     'sphinx.ext.graphviz',  # Dependency diagrams
     'notfound.extension',
     'hoverxref.extension',
-    'myst_parser',
+    'myst_nb',
 ]
 
 # Hoverxref Extension
