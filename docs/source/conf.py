@@ -83,6 +83,7 @@ templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = {
+    '.rst': 'restructuredtext',  # https://github.com/readthedocs/sphinx-autoapi/issues/294
     '.mystnb': 'myst-nb',
 }
 
