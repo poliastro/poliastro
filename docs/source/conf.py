@@ -52,7 +52,6 @@ extensions = [
     'sphinx.ext.graphviz',  # Dependency diagrams
     'notfound.extension',
     'hoverxref.extension',
-    'myst_parser',
 ]
 
 # Hoverxref Extension
@@ -367,5 +366,3 @@ exclude_patterns.append('_autoapi_templates/python/module.rst')
 
 # Ignore sphinx-autoapi warnings on multiple target description
 suppress_warnings.append('ref.python')
-
-myst_update_mathjax = False
