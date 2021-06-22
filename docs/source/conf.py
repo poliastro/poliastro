@@ -353,6 +353,7 @@ nbsphinx_thumbnails = {
 
 nbsphinx_custom_formats = {
     '.mystnb': ['jupytext.reads', {'fmt': 'mystnb'}],
+    '.md': ['jupytext.reads', {'fmt': 'Rmd'}],
 }
 
 # The sphinx-autoapi tool configuration
