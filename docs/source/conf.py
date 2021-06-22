@@ -82,7 +82,9 @@ autodoc_member_order = 'bysource'
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = ['.rst' , '.md']
+source_suffix = {
+    '.mystnb': 'myst-nb',
+}
 
 # Warning suppresses
 suppress_warnings = ['image.nonlocal_uri']
@@ -155,11 +157,6 @@ intersphinx_mapping = {
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('https://matplotlib.org', None)
 }
-
-if os.environ.get('POLIASTRO_SKIP_NOTEBOOKS') == 'True':
-    nbsphinx_execute = 'never'
-else:
-    nbsphinx_execute = 'always'
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -348,12 +345,6 @@ nbsphinx_thumbnails = {
     'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
     'examples/Generating orbit groundtracks': '_static/thumbnails/groundtrack.png',
-}
-
-# Custom nbsphinx format for Jupytext markdown notebooks
-
-nbsphinx_custom_formats = {
-    '.mystnb': ['jupytext.reads', {'fmt': 'mystnb'}],
 }
 
 # The sphinx-autoapi tool configuration
