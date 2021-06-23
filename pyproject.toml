@@ -79,7 +79,7 @@ dev = [
     "mypy>=0.740",
     "myst-parser>=0.13.1",
     "myst-nb==0.13.0a1",
-    "nbsphinx @ git+https://github.com/mgeier/nbsphinx/tree/check-source-suffix",
+    "nbsphinx @ git+https://github.com/mgeier/nbsphinx@check-source-suffix",
     "nbconvert>=5.5",
     "pycodestyle",
     "pytest>=3.2",
