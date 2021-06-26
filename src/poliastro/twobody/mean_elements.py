@@ -6,6 +6,9 @@ from ..constants import J2000
 from ..frames import Planes
 from .states import RVState
 
+from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+
+SOLAR_SYSTEM_BODIES = [Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune]
 
 def get_mean_elements(body, epoch=J2000):
     """Get ecliptic mean elements of body.
@@ -23,6 +26,8 @@ def get_mean_elements(body, epoch=J2000):
     # So we are reverting the conversion in the last line
     # This way at least we avoid copy pasting the values
     try:
+        if body not in SOLAR_SYSTEM_BODIES:
+            raise ValueError("The input body is invalid. Pass an instance of `poliastro.bodies.SolarSystemPlanet` instead.")
         name = body.name.lower()
         if name == "earth":
             name = "earth-moon-barycenter"
