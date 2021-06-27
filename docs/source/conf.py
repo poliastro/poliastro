@@ -58,6 +58,12 @@ extensions = [
 # Hoverxref Extension
 hoverxref_auto_ref = True
 hoverxref_mathjax = True
+hoverxref_intersphinx = [
+    "astropy",
+    "numpy",
+    "scipy",
+    "matplotlib",
+]
 hoverxref_domains = ['py']
 hoverxref_role_types = {
     'hoverxref': 'modal',
@@ -144,8 +150,8 @@ pygments_style = 'sphinx'
 # Intersphinx configuration
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'astropy': ('http://docs.astropy.org/en/stable/', None),
-    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'astropy': ('https://docs.astropy.org/en/stable/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('https://matplotlib.org', None)
 }
