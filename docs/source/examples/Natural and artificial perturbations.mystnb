@@ -36,8 +36,9 @@ from poliastro.twobody.propagation import propagate, cowell
 ```
 
 ```{code-cell} ipython3
+# More info: https://plotly.com/python/renderers/
 import plotly.io as pio
-pio.renderers.default = "notebook_connected"
+pio.renderers.default = "plotly_mimetype+notebook_connected"
 ```
 
 ## Atmospheric drag ##
