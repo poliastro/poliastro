@@ -1,5 +1,29 @@
 # What\'s new
 
+## poliastro 0.15.1 - 2021-06-27
+
+This release fixes some bugs found after 0.15.0.
+
+### Bugs fixed
+
+- [Issue \#1229](https://github.com/poliastro/poliastro/issues/1229):
+  Unit conversion error when using newer astroquery
+- [Issue \#1245](https://github.com/poliastro/poliastro/issues/1245):
+  Fix incorrect dependency specification for extras
+- \[No issue number\] Allow Plotly 5.0
+- \[No issue number\] Enable intersphinx support for sphinx-hoverxref
+
+Do you want to help with the remaining ones? [Check the current list here!](https://github.com/poliastro/poliastro/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+
+### Contributors
+
+This is the complete list of the people that contributed to this
+release, with a + sign indicating first contribution.
+
+- Javier Tegedor+
+- Jero Bado+
+- Juan Luis Cano
+
 ## poliastro 0.15.0 - 2021-05-14
 
 This new major release includes lots of API changes and enhancements,
