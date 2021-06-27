@@ -1,5 +1,9 @@
 # What\'s new
 
+## poliastro 0.15.2 - 2021-06-27
+
+Same as 0.15.1, but fixes error in release artifact.
+
 ## poliastro 0.15.1 - 2021-06-27
 
 This release fixes some bugs found after 0.15.0.
