@@ -821,7 +821,7 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
     -------
     rr : ~np.array
         Final position vector.
-     vv : ~np.array
+    vv : ~np.array
         Final velocity vector.
     Note
     ----
