@@ -293,3 +293,16 @@ Moon = Body(
     R_polar=constants.R_polar_moon,
     rotational_period=constants.rotational_period_moon,
 )
+
+
+SOLAR_SYSTEM_BODIES = [
+    Sun,
+    Mercury,
+    Venus,
+    Earth,
+    Mars,
+    Jupiter,
+    Saturn,
+    Uranus,
+    Neptune,
+]
