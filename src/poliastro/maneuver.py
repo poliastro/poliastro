@@ -189,10 +189,7 @@ class Maneuver:
         sols = list(method(k, r_i, r_f, tof, **kwargs))
 
         # Return short or long solution
-        if short:
-            dv_a, dv_b = sols[0]
-        else:
-            dv_a, dv_b = sols[-1]
+        dv_a, dv_b = sols[0] if short else sols[-1]
 
         return cls(
             (0 * u.s, (dv_a - orbit_i.v).decompose()),
