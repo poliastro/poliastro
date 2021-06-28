@@ -4,7 +4,7 @@ from poliastro.twobody.mean_elements import get_mean_elements
 
 
 def test_get_mean_elements_raises_error_if_invalid_body():
-    body = "Sun"
+    body = "PlanetNine"
 
     with pytest.raises(ValueError) as excinfo:
         get_mean_elements(body)
