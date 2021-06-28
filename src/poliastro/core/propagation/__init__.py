@@ -752,7 +752,7 @@ def pimienta(k, r0, v0, tof):
 
     Note
     ----
-    This algorithm was derived from the original paper: http://hdl.handle.net/10477/50522
+    This algorithm was derived from the original paper: https://www.researchgate.net/publication/288133262_Accurate_Kepler_equation_solver_without_transcendental_function_evaluations
     """
 
     # TODO: implement hyperbolic case
