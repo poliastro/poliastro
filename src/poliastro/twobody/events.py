@@ -1,13 +1,13 @@
 from astropy import units as u
-from numpy.linalg import norm
-
-from astropy.time import Time
 from astropy.coordinates import (
     GCRS,
     ITRS,
     CartesianRepresentation,
     SphericalRepresentation,
 )
+from astropy.time import Time
+from numpy.linalg import norm
+
 
 class Event:
     """Base class for event functionalities.
@@ -105,6 +105,7 @@ class LatitudeCrossEvent(Event):
         or below, defaults to 0, i.e., event is triggered while traversing from both directions.
 
     """
+
     def __init__(self, lat, R, terminal=True, direction=0):
         super().__init__(terminal, direction)
         self._R = R
@@ -116,7 +117,9 @@ class LatitudeCrossEvent(Event):
 
         obstime = Time(self._last_t, format="jd")
         gcrs_xyz = GCRS(
-            xyz, obstime=obstime, representation_type=CartesianRepresentation,
+            xyz,
+            obstime=obstime,
+            representation_type=CartesianRepresentation,
         )
         itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
         itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
@@ -140,6 +143,7 @@ class LongitudeCrossEvent(Event):
         or below, defaults to 0, i.e., event is triggered while traversing from both directions.
 
     """
+
     def __init__(self, lon, R, terminal=True, direction=0):
         super().__init__(terminal, direction)
         self._R = R
@@ -151,7 +155,9 @@ class LongitudeCrossEvent(Event):
 
         obstime = Time(self._last_t, format="jd")
         gcrs_xyz = GCRS(
-            xyz, obstime=obstime, representation_type=CartesianRepresentation,
+            xyz,
+            obstime=obstime,
+            representation_type=CartesianRepresentation,
         )
         itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
         itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
