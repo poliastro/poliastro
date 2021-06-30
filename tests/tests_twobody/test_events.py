@@ -1,6 +1,12 @@
 import numpy as np
 import pytest
 from astropy import units as u
+from astropy.coordinates import (
+    GCRS,
+    ITRS,
+    CartesianRepresentation,
+    SphericalRepresentation,
+)
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.linalg import norm
 
@@ -95,9 +101,7 @@ def test_latitude_longitude_cross_event():
 
     tofs = [5] * u.d
 
-    events = [
-        latitude_cross_event,
-    ]  # longitude_cross_event]
+    events = [latitude_cross_event]
     rr, _ = cowell(
         Earth.k,
         orbit.r,
@@ -106,17 +110,27 @@ def test_latitude_longitude_cross_event():
         events=events,
     )
 
+    obstime = orbit.epoch + t_lat
+    gcrs_xyz = GCRS(
+        rr[-1],
+        obstime=obstime,
+        representation_type=CartesianRepresentation,
+    )
+    itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
+    itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
+    orbit_lat = itrs_latlon_pos.lat.to(u.deg)
+
     assert_quantity_allclose(latitude_cross_event.last_t, t_lat)
-    assert_quantity_allclose()
+    assert_quantity_allclose(orbit_lat, thresh_lat, atol=1.2e-4 * u.deg)
 
 
 def test_longitude_cross():
     R = Earth.R.to(u.km).value
     orbit = Orbit.circular(Earth, 230 * u.km)
 
-    t_lon = 0.062894918 * u.s
+    t_lon = 0.06289492 * u.s
 
-    thresh_lon = 3 * u.deg
+    thresh_lon = 79.810036 * u.deg
     longitude_cross_event = LongitudeCrossEvent(thresh_lon.value, R)
 
     tofs = [5] * u.d
@@ -130,4 +144,15 @@ def test_longitude_cross():
         events=events,
     )
 
+    obstime = orbit.epoch + t_lon
+    gcrs_xyz = GCRS(
+        rr[-1],
+        obstime=obstime,
+        representation_type=CartesianRepresentation,
+    )
+    itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
+    itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
+    orbit_lon = itrs_latlon_pos.lon.to(u.deg)
+
     assert_quantity_allclose(longitude_cross_event.last_t, t_lon)
+    assert_quantity_allclose(orbit_lon, thresh_lon)
