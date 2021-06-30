@@ -22,14 +22,11 @@ class SpheroidLocation:
         Parameters
         ----------
         lon: ~astropy.units.quantity.Quantity
-            geodetic longitude
-
+            Geodetic longitude
         lat: ~astropy.units.quantity.Quantity
-            geodetic latitude
-
+            Geodetic latitude
         h: ~astropy.units.quantity.Quantity
-            geodetic height
-
+            Geodetic height
         body: ~poliastro.bodies.Body
             Planetary body the spheroid location lies on
 
@@ -141,10 +138,8 @@ class SpheroidLocation:
         ----------
         x: ~astropy.units.quantity.Quantity
             x coordinate
-
         y: ~astropy.units.quantity.Quantity
             y coordinate
-
         z: ~astropy.units.quantity.Quantity
             z coordinate
 
