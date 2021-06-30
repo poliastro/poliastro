@@ -111,9 +111,9 @@ class LatitudeCrossEvent(Event):
         self._R = R
         self._lat = lat  # Threshold latitude (in degrees).
 
-    def __call__(self, t, u, k):
+    def __call__(self, t, u_, k):
         self._last_t = t
-        xyz = u[:3]
+        xyz = u_[:3]
 
         obstime = Time(self._last_t, format="jd")
         gcrs_xyz = GCRS(
@@ -123,7 +123,7 @@ class LatitudeCrossEvent(Event):
         )
         itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
         itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
-        orbit_lat = itrs_latlon_pos.lat.value
+        orbit_lat = itrs_latlon_pos.lat.to(u.deg).value
         return self._lat - orbit_lat
 
 
@@ -149,9 +149,9 @@ class LongitudeCrossEvent(Event):
         self._R = R
         self._lon = lon  # Threshold longitude (in degrees).
 
-    def __call__(self, t, u, k):
+    def __call__(self, t, u_, k):
         self._last_t = t
-        xyz = u[:3]
+        xyz = u_[:3]
 
         obstime = Time(self._last_t, format="jd")
         gcrs_xyz = GCRS(
@@ -161,6 +161,6 @@ class LongitudeCrossEvent(Event):
         )
         itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
         itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
-        orbit_lon = itrs_latlon_pos.lon.value
+        orbit_lon = itrs_latlon_pos.lon.to(u.deg).value
 
         return self._lon - orbit_lon
