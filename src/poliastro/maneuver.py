@@ -41,12 +41,13 @@ class Maneuver:
         self.impulses = args
         # HACK: Change API or validation code
         _dts, _dvs = zip(*args)
-        self._dts, self._dvs = self._initialize(
-            [(_dt * u.one).value for _dt in _dts] * (_dts[0] * u.one).unit,
-            [(_dv * u.one).value for _dv in _dvs] * (_dvs[0] * u.one).unit,
-        )
+
         try:
-            if not all(len(dv) == 3 for dv in self._dvs):
+            self._dts, self._dvs = self._initialize(
+                [(_dt * u.one).value for _dt in _dts] * (_dts[0] * u.one).unit,
+                [(_dv * u.one).value for _dv in _dvs] * (_dvs[0] * u.one).unit,
+            )
+            if not all(len(dv) == 3 for dv in _dvs):
                 raise TypeError
         except TypeError:
             raise ValueError("Delta-V must be three dimensions vectors")
