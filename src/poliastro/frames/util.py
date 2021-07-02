@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 
 from astropy.coordinates.baseframe import BaseCoordinateFrame
 
@@ -42,6 +42,7 @@ from .fixed import (
 )
 
 _FRAME_MAPPING = {
+    Sun: {Planes.EARTH_EQUATOR: HCRS, Planes.EARTH_ECLIPTIC: HeliocentricEclipticJ2000},
     Mercury: {Planes.EARTH_EQUATOR: MercuryICRS, Planes.BODY_FIXED: MercuryFixed},
     Venus: {Planes.EARTH_EQUATOR: VenusICRS, Planes.BODY_FIXED: VenusFixed},
     Earth: {
@@ -54,12 +55,7 @@ _FRAME_MAPPING = {
     Saturn: {Planes.EARTH_EQUATOR: SaturnICRS, Planes.BODY_FIXED: SaturnFixed},
     Uranus: {Planes.EARTH_EQUATOR: UranusICRS, Planes.BODY_FIXED: UranusFixed},
     Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS, Planes.BODY_FIXED: NeptuneFixed},
-}  # type: Dict[SolarSystemPlanet, Dict[Planes, BaseCoordinateFrame]]
-
-_FRAME_MAPPING[Sun] = {
-    Planes.EARTH_EQUATOR: HCRS,
-    Planes.EARTH_ECLIPTIC: HeliocentricEclipticJ2000,
-}  # type: Dict[Body, Dict[Planes, BaseCoordinateFrame]]
+}  # type: Dict[Union[Body, SolarSystemPlanet], Dict[Planes, BaseCoordinateFrame]]
 
 
 def get_frame(attractor, plane, obstime=J2000):
