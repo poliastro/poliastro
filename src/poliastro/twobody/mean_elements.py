@@ -2,8 +2,6 @@ import erfa
 from astropy import units as u
 from astropy.coordinates.solar_system import PLAN94_BODY_NAME_TO_PLANET_INDEX
 
-from poliastro.bodies import SOLAR_SYSTEM_BODIES
-
 from ..constants import J2000
 from ..frames import Planes
 from .states import RVState
@@ -25,11 +23,11 @@ def get_mean_elements(body, epoch=J2000):
     # So we are reverting the conversion in the last line
     # This way at least we avoid copy pasting the values
     try:
-        if body not in SOLAR_SYSTEM_BODIES:
+        name = body.name.lower()
+        if name not in PLAN94_BODY_NAME_TO_PLANET_INDEX:
             raise ValueError(
                 f"The input body '{body}' is invalid. It must be an instance of `poliastro.bodies.SolarSystemPlanet`."
             )
-        name = body.name.lower()
         if name == "earth":
             name = "earth-moon-barycenter"
 
