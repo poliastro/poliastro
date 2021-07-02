@@ -28,11 +28,6 @@ def get_mean_elements(body, epoch=J2000):
         if name == "earth":
             name = "earth-moon-barycenter"
 
-        if name not in PLAN94_BODY_NAME_TO_PLANET_INDEX:
-            raise ValueError(
-                f"The input body '{body}' is invalid. It must be an instance of `poliastro.bodies.SolarSystemPlanet`."
-            )
-
         body_index = PLAN94_BODY_NAME_TO_PLANET_INDEX[name]
         body_pv_helio = erfa.plan94(epoch.jd1, epoch.jd2, body_index)
 
