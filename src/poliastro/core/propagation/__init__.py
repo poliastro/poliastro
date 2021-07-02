@@ -752,7 +752,9 @@ def pimienta(k, r0, v0, tof):
 
     Note
     ----
-    This algorithm was derived from the original paper: https://www.researchgate.net/publication/288133262_Accurate_Kepler_equation_solver_without_transcendental_function_evaluations
+    This algorithm was derived from the original paper:
+    Pimienta-Peñalver, A. & Crassidis, John. (2013). Accurate Kepler equation
+    solver without transcendental function evaluations. Advances in the Astronautical Sciences. 147. 233-247. 
     """
 
     # TODO: implement hyperbolic case
