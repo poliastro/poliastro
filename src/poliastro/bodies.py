@@ -155,7 +155,7 @@ class SolarSystemPlanet(Body):
             return OrbitPlotter2D(plane=plane).plot_body_orbit(self, epoch, label=label)
 
 
-Sun = SolarSystemPlanet(
+Sun = Body(
     parent=None,
     k=constants.GM_sun,
     name="Sun",
@@ -293,16 +293,3 @@ Moon = Body(
     R_polar=constants.R_polar_moon,
     rotational_period=constants.rotational_period_moon,
 )
-
-
-SOLAR_SYSTEM_BODIES = [
-    Sun,
-    Mercury,
-    Venus,
-    Earth,
-    Mars,
-    Jupiter,
-    Saturn,
-    Uranus,
-    Neptune,
-]
