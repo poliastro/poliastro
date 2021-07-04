@@ -790,7 +790,7 @@ def test_heliosynchronous_orbit_raises_floating_point_error_if_invalid_input():
     inc = 0 * u.rad
 
     with pytest.raises(ValueError) as excinfo:
-        orbit = Orbit.heliosynchronous(Earth, a=a, inc=inc)
+        Orbit.heliosynchronous(Earth, a=a, inc=inc)
     assert "No SSO orbit with given parameters can be found." in excinfo.exconly()
 
 
