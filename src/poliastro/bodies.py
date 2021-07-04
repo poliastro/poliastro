@@ -155,7 +155,7 @@ class SolarSystemPlanet(Body):
             return OrbitPlotter2D(plane=plane).plot_body_orbit(self, epoch, label=label)
 
 
-Sun = SolarSystemPlanet(
+Sun = Body(
     parent=None,
     k=constants.GM_sun,
     name="Sun",

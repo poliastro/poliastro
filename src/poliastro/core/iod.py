@@ -96,10 +96,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     in the same book under name Example 5.2.
 
     """
-    if short:
-        t_m = +1
-    else:
-        t_m = -1
+    t_m = 1 if short else -1
 
     norm_r0 = np.dot(r0, r0) ** 0.5
     norm_r = np.dot(r, r) ** 0.5
@@ -177,7 +174,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     M: int
         Number of revolutions
     numiter: int
-        Numbert of iterations
+        Number of iterations
     rtol: float
         Error tolerance
 

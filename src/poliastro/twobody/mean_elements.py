@@ -24,6 +24,7 @@ def get_mean_elements(body, epoch=J2000):
     # This way at least we avoid copy pasting the values
     try:
         name = body.name.lower()
+
         if name == "earth":
             name = "earth-moon-barycenter"
 
@@ -34,6 +35,8 @@ def get_mean_elements(body, epoch=J2000):
         v = body_pv_helio["v"] * u.au / u.day
 
     except KeyError as e:
-        raise ValueError(f"No available mean elements for {body}") from e
+        raise ValueError(
+            f"No available mean elements for {body}. It must be an instance of `poliastro.bodies.SolarSystemPlanet`"
+        ) from e
 
     return RVState(body.parent, r, v, plane=Planes.EARTH_ECLIPTIC).to_classical()

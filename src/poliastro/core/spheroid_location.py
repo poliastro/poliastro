@@ -15,11 +15,11 @@ def cartesian_cords(_a, _c, _lon, _lat, _h):
     _c: float
         Semi-minor axis
     _lon: float
-        geodetic longitude
+        Geodetic longitude
     _lat: float
-        geodetic latitude
+        Geodetic latitude
     _h: float
-        geodetic height
+        Geodetic height
 
     """
     e2 = 1 - (_c / _a) ** 2
@@ -55,7 +55,7 @@ def N(a, b, c, cartesian_cords):
     a: float
         Semi-major axis
     b: float
-        Equitorial radius
+        Equatorial radius
     c: float
         Semi-minor axis
     cartesian_cords: ~np.array
@@ -97,7 +97,7 @@ def radius_of_curvature(_a, _c, _lat):
     _c: float
         Semi-minor axis
     _lat: float
-        geodetic latitude
+        Geodetic latitude
 
     """
     e2 = 1 - (_c / _a) ** 2

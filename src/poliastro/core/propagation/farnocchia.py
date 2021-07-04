@@ -311,9 +311,9 @@ def farnocchia(k, r0, v0, tof):
     ----------
     k : float
         Standar Gravitational parameter
-    r0 : ~astropy.units.Quantity
+    r0 : ~np.array
         Initial position vector wrt attractor center.
-    v0 : ~astropy.units.Quantity
+    v0 : ~np.array
         Initial velocity vector.
     tof : float
         Time of flight (s).
