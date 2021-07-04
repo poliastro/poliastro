@@ -855,6 +855,10 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        # Temporary fix: raan_from_ltan works only for Earth
+        if attractor.name.lower() != "earth":
+            raise NotImplementedError("Attractors other than Earth not supported yet")
+
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
@@ -903,10 +907,6 @@ class Orbit:
                     )
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
-
-        # Temporary fix: raan_from_ltan works only for Earth
-        if attractor.name.lower() != "earth":
-            raise NotImplementedError("Attractors other than Earth not supported yet")
 
         raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
