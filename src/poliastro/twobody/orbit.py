@@ -888,7 +888,7 @@ class Orbit:
                         * R_SSO ** 2
                         * J2_SSO
                         * np.sqrt(k_SSO)
-                        * np.cos(inc.to(u.rad))
+                        * np.cos(inc)
                         / (2 * a ** (7 / 2) * n_sunsync)
                     )
                     ecc = np.sqrt(1 - _ecc_0)
