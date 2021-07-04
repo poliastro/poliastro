@@ -760,18 +760,6 @@ def test_heliosynchronous_orbit_a():
     assert_quantity_allclose(ss0.ecc, expected_ecc)
 
 
-def test_heliosynchronous_orbit_inc():
-    # Vallado, example 11-2b
-    expected_ecc = 0.0 * u.one
-    expected_inc = 98.6 * u.deg
-    expected_a = 7178.1363 * u.km
-    ss0 = Orbit.heliosynchronous(Earth, a=expected_a, ecc=expected_ecc)
-
-    assert_quantity_allclose(ss0.inc, expected_inc, rtol=1e-4)
-    assert_quantity_allclose(ss0.a, expected_a, rtol=1e-5)
-    assert_quantity_allclose(ss0.ecc, expected_ecc)
-
-
 def test_heliosynchronous_orbit_ecc():
     # Vallado, example 11-2b
     expected_ecc = 0.0 * u.one
