@@ -10,7 +10,7 @@ from astropy.coordinates import (
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.linalg import norm
 
-from poliastro.bodies import Earth
+from poliastro.bodies import Earth, Venus
 from poliastro.constants import H0_earth, rho0_earth
 from poliastro.core.perturbations import atmospheric_drag_exponential
 from poliastro.core.propagation import func_twobody
@@ -90,14 +90,45 @@ def test_altitude_cross_not_happening_is_ok():
     assert altitude_cross_event.last_t == tofs[-1]
 
 
-def test_latitude_longitude_cross_event():
-    R = Earth.R.to(u.km).value
+def test_latitude_event_raises_not_implemented_error_if_not_earth():
+    lat = 50 * u.deg  # Unused
+    orbit = Orbit.from_classical(
+        Venus,
+        1000 * u.km,
+        0.1 * u.one,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
+    )
+    with pytest.raises(NotImplementedError) as excinfo:
+        LatitudeCrossEvent(orbit, lat)
+    assert "Attractors other than the Earth are not supported yet." in excinfo.exconly()
+
+
+def test_longitude_event_raises_not_implemented_error_if_not_earth():
+    lon = 50 * u.deg  # Unused
+    orbit = Orbit.from_classical(
+        Venus,
+        1000 * u.km,
+        0.1 * u.one,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
+        0 * u.deg,
+    )
+    with pytest.raises(NotImplementedError) as excinfo:
+        LongitudeCrossEvent(orbit, lon)
+    assert "Attractors other than the Earth are not supported yet." in excinfo.exconly()
+
+
+def test_latitude_cross_event():
     orbit = Orbit.circular(Earth, 230 * u.km)
 
-    t_lat = 1989.9932 * u.s
+    t_lat = 2036.314196 * u.s
 
     thresh_lat = 0 * u.deg
-    latitude_cross_event = LatitudeCrossEvent(thresh_lat.value, R)
+    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat.value)
 
     tofs = [5] * u.d
 
@@ -124,14 +155,13 @@ def test_latitude_longitude_cross_event():
     assert_quantity_allclose(orbit_lat, thresh_lat, atol=1.2e-4 * u.deg)
 
 
-def test_longitude_cross():
-    R = Earth.R.to(u.km).value
+def test_longitude_cross_event():
     orbit = Orbit.circular(Earth, 230 * u.km)
 
-    t_lon = 0.06289492 * u.s
+    t_lon = 0.06289322 * u.s
 
     thresh_lon = 79.810036 * u.deg
-    longitude_cross_event = LongitudeCrossEvent(thresh_lon.value, R)
+    longitude_cross_event = LongitudeCrossEvent(orbit, thresh_lon.value)
 
     tofs = [5] * u.d
 
