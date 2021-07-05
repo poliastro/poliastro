@@ -8,6 +8,8 @@ from astropy.coordinates import (
 from astropy.time import Time
 from numpy.linalg import norm
 
+from poliastro.bodies import Earth
+
 
 class Event:
     """Base class for event functionalities.
@@ -94,10 +96,10 @@ class LatitudeCrossEvent(Event):
 
     Parameters
     ----------
+    orbit: ~poliastro.twobody.orbit.Orbit
+        Orbit.
     lat: float
-        Threshold latitude (km).
-    R: float
-        Radius of the attractor (km).
+        Threshold latitude (in degrees).
     terminal: bool
         Whether to terminate integration if this event occurs, defaults to True.
     direction: float
@@ -106,16 +108,20 @@ class LatitudeCrossEvent(Event):
 
     """
 
-    def __init__(self, lat, R, terminal=True, direction=0):
+    def __init__(self, orbit, lat, terminal=True, direction=0):
         super().__init__(terminal, direction)
-        self._R = R
+
+        if orbit.attractor != Earth:
+            raise NotImplementedError("Attractors other than the Earth are not supported yet.")
+        self._R = orbit.attractor.R
+        self._epoch = orbit.epoch
         self._lat = lat  # Threshold latitude (in degrees).
 
     def __call__(self, t, u_, k):
         self._last_t = t
         xyz = u_[:3]
 
-        obstime = Time(self._last_t, format="jd")
+        obstime = Time(self._last_t * u.s + self._epoch)
         gcrs_xyz = GCRS(
             xyz,
             obstime=obstime,
@@ -132,28 +138,34 @@ class LongitudeCrossEvent(Event):
 
     Parameters
     ----------
+    orbit: ~poliastro.twobody.orbit.Orbit
+        Orbit.
     lon: float
-        Threshold longitude (km).
-    R: float
-        Radius of the attractor (km).
+        Threshold longitude (in degrees).
     terminal: bool
         Whether to terminate integration if this event occurs, defaults to True.
     direction: float
-        Handle triggering of event based on whether longitude is crossed from above
+        Handle triggering of event based on whether latitude is crossed from above
         or below, defaults to 0, i.e., event is triggered while traversing from both directions.
 
     """
 
-    def __init__(self, lon, R, terminal=True, direction=0):
+    def __init__(self, orbit, lon, terminal=True, direction=0):
         super().__init__(terminal, direction)
-        self._R = R
-        self._lon = lon  # Threshold longitude (in degrees).
+
+        if orbit.attractor != Earth:
+            raise NotImplementedError(
+                "Attractors other than the Earth are not supported yet."
+            )
+        self._R = orbit.attractor.R
+        self._epoch = orbit.epoch
+        self._lon = lon  # Threshold latitude (in degrees).
 
     def __call__(self, t, u_, k):
         self._last_t = t
         xyz = u_[:3]
 
-        obstime = Time(self._last_t, format="jd")
+        obstime = Time(self._last_t * u.s + self._epoch)
         gcrs_xyz = GCRS(
             xyz,
             obstime=obstime,
@@ -162,5 +174,4 @@ class LongitudeCrossEvent(Event):
         itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
         itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
         orbit_lon = itrs_latlon_pos.lon.to(u.deg).value
-
         return self._lon - orbit_lon
