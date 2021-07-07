@@ -1446,3 +1446,18 @@ class Orbit:
             from poliastro.plotting.core import OrbitPlotter2D
 
             return OrbitPlotter2D().plot(self, label=label)
+
+
+# will be required in future
+# def anim(self, label=None):
+#     """Animates the orbit.
+
+#     Parameters
+#     ----------
+#     label : str, optional
+#         Label for the orbit, defaults to empty.
+#     """
+
+#     from poliastro.plotting.static import StaticOrbitPlotter
+
+#     return StaticOrbitPlotter().anim(self, label=label)

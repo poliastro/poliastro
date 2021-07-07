@@ -6,6 +6,8 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 
+from poliastro.twobody import propagation
+
 from ..ephem import Ephem
 from ..frames import Planes
 from ..twobody.mean_elements import get_mean_elements
@@ -98,6 +100,9 @@ class BaseOrbitPlotter:
     def _plot_coordinates(self, coordinates, label, colors, dashed):
         raise NotImplementedError
 
+    def _plot_coordinates_anim(self, coordinates, label, colors, dashed):
+        raise NotImplementedError
+
     def _plot_position(self, position, label, colors):
         radius = min(
             self._attractor_radius * 0.5, (norm(position) - self._attractor.R) * 0.5
@@ -116,6 +121,15 @@ class BaseOrbitPlotter:
 
         return trace_coordinates, trace_position
 
+    def _plot_coordinates_and_position_anim(self, trajectory):
+        coordinates, position, label, colors, dashed = trajectory
+
+        trace_coordinates = self._plot_coordinates_anim(
+            coordinates, label, colors, dashed
+        )
+
+        return trace_coordinates
+
     def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)
         self._trajectories.append(trajectory)
@@ -127,6 +141,16 @@ class BaseOrbitPlotter:
         )
 
         return trace_coordinates, trace_position
+
+    def _anim_trajectory(self, coordinates, position=None, *, label, colors, dashed):
+        trajectory = Trajectory(coordinates, position, label, colors, dashed)
+        self._trajectories.append(trajectory)
+
+        self._redraw_attractor()
+
+        trace_coordinates = self._plot_coordinates_and_position_anim(trajectory)
+
+        return trace_coordinates
 
     def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
         if self._attractor is None:
@@ -156,6 +180,26 @@ class BaseOrbitPlotter:
         coordinates = orbit.sample(self._num_points)
 
         return self.__add_trajectory(
+            coordinates, orbit.r, label=label, colors=colors, dashed=True
+        )
+
+    def _anim(self, orbit, *, label=None, color=None, trail=False):
+        colors = self._get_colors(color, trail)
+
+        self.set_attractor(orbit.attractor)
+
+        orbit = orbit.change_plane(self.plane)
+
+        label = generate_label(orbit.epoch, label)
+        if orbit.period.value > 86400:
+            time_laps = [i for i in range(int(orbit.period.value // 86400) + 1)]
+            tofs = time_laps * u.day * 2
+            coordinates = propagation.propagate(orbit, tofs)
+        else:
+            time_laps = [i for i in range(int(orbit.period.value // 60) + 1)]
+            tofs = time_laps * u.min
+            coordinates = propagation.propagate(orbit, tofs)
+        return self._anim_trajectory(
             coordinates, orbit.r, label=label, colors=colors, dashed=True
         )
 

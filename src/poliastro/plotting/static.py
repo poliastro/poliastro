@@ -27,7 +27,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
     """
 
-    def __init__(self, ax=None, num_points=150, dark=False, *, plane=None):
+    def __init__(self, ax=None, fig=None, num_points=150, dark=False, *, plane=None):
         """Constructor.
 
         Parameters
@@ -43,12 +43,13 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         super().__init__(num_points=num_points, plane=plane)
 
         self._ax = ax
+        self.fig = fig
         if not self._ax:
             if dark:
                 with plt.style.context("dark_background"):
-                    _, self._ax = plt.subplots(figsize=(6, 6))
+                    self.fig, self._ax = plt.subplots(figsize=(6, 6))
             else:
-                _, self._ax = plt.subplots(figsize=(6, 6))
+                self.fig, self._ax = plt.subplots(figsize=(6, 6))
 
         self._frame = None
 
