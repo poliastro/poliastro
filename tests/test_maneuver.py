@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pytest
 from astropy import units as u
@@ -10,13 +12,24 @@ from poliastro.maneuver import Maneuver
 from poliastro.twobody import Orbit
 
 
+def test_maneuver_constructor_raises_error_if_invalid_delta_v():
+    dv1 = np.zeros(3) * u.km / u.s
+    dv2 = np.ones(2) * u.km / u.s  # Incorrect dv
+    with pytest.raises(ValueError) as excinfo:
+        with warnings.catch_warnings():
+            # Different length numpy arrays generate a deprecation warning.
+            warnings.simplefilter("ignore", category=np.VisibleDeprecationWarning)
+            Maneuver((0 * u.s, dv1), (2 * u.s, dv2))
+    assert "Delta-V must be three dimensions vectors" in excinfo.exconly()
+
+
 def test_maneuver_raises_error_if_units_are_wrong():
     wrong_dt = 1.0
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     with pytest.raises(u.UnitsError) as excinfo:
         Maneuver([wrong_dt, _v])
     assert (
-        "UnitsError: Argument 'dts' to function '_initialize' must be in units convertible to 's'."
+        "Argument 'dts' to function '_initialize' must be in units convertible to 's'."
         in excinfo.exconly()
     )
 
@@ -26,7 +39,7 @@ def test_maneuver_raises_error_if_dvs_are_not_vectors():
     wrong_dv = 1 * u.km / u.s
     with pytest.raises(ValueError) as excinfo:
         Maneuver((dt, wrong_dv))
-    assert "ValueError: Delta-V must be three dimensions vectors" in excinfo.exconly()
+    assert "Delta-V must be three dimensions vectors" in excinfo.exconly()
 
 
 def test_maneuver_total_time():
