@@ -4,7 +4,7 @@ from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from ._base import BaseOrbitPlotter, Mixin2D
+from poliastro.plotting._base import BaseOrbitPlotter, Mixin2D
 
 
 def _segments_from_arrays(x, y):

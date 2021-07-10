@@ -1,7 +1,7 @@
 from astropy import units as u
 
-from ..core.elements import coe2mee, coe2rv, mee2coe, rv2coe
-from .elements import mean_motion, period
+from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
+from poliastro.twobody.elements import mean_motion, period
 
 
 class BaseState:

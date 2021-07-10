@@ -6,11 +6,11 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation
 
-from ..ephem import Ephem
-from ..frames import Planes
-from ..twobody.mean_elements import get_mean_elements
-from ..util import norm, time_range
-from .util import BODY_COLORS, generate_label
+from poliastro.ephem import Ephem
+from poliastro.frames import Planes
+from poliastro.plotting.util import BODY_COLORS, generate_label
+from poliastro.twobody.mean_elements import get_mean_elements
+from poliastro.util import norm, time_range
 
 
 class Trajectory(

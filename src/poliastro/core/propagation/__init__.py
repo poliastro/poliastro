@@ -3,7 +3,7 @@
 import numpy as np
 from numba import njit as jit
 
-from ..angles import (
+from poliastro.core.angles import (
     D_to_nu,
     E_to_M,
     E_to_nu,
@@ -14,9 +14,9 @@ from ..angles import (
     nu_to_E,
     nu_to_F,
 )
-from ..elements import coe2rv, rv2coe
-from ..stumpff import c2, c3
-from .farnocchia import farnocchia, farnocchia_coe
+from poliastro.core.elements import coe2rv, rv2coe
+from poliastro.core.propagation.farnocchia import farnocchia, farnocchia_coe
+from poliastro.core.stumpff import c2, c3
 
 __all__ = [
     "func_twobody",

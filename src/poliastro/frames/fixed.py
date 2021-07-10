@@ -33,8 +33,7 @@ from poliastro.core.fixed import (
     uranus_rot_elements_at_epoch as uranus_rot_elements_at_epoch_fast,
     venus_rot_elements_at_epoch as venus_rot_elements_at_epoch_fast,
 )
-
-from .equatorial import (
+from poliastro.frames.equatorial import (
     JupiterICRS,
     MarsICRS,
     MercuryICRS,

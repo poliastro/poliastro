@@ -14,10 +14,9 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-
-from ..frames import Planes
-from .core import OrbitPlotter2D, OrbitPlotter3D
-from .static import StaticOrbitPlotter
+from poliastro.frames import Planes
+from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
+from poliastro.plotting.static import StaticOrbitPlotter
 
 
 def _plot_bodies(orbit_plotter, outer=True, epoch=None):

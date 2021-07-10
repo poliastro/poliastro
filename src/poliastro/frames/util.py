@@ -16,10 +16,9 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000
-
-from .ecliptic import GeocentricMeanEcliptic, HeliocentricEclipticJ2000
-from .enums import Planes
-from .equatorial import (
+from poliastro.frames.ecliptic import GeocentricMeanEcliptic, HeliocentricEclipticJ2000
+from poliastro.frames.enums import Planes
+from poliastro.frames.equatorial import (
     GCRS,
     HCRS,
     JupiterICRS,
@@ -30,7 +29,7 @@ from .equatorial import (
     UranusICRS,
     VenusICRS,
 )
-from .fixed import (
+from poliastro.frames.fixed import (
     ITRS,
     JupiterFixed,
     MarsFixed,

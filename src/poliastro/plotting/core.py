@@ -8,10 +8,9 @@ import plotly.colors
 from astropy import units as u
 from plotly.graph_objects import Figure, Layout, Scatter, Scatter3d, Surface
 
+from poliastro.frames import Planes
+from poliastro.plotting._base import BaseOrbitPlotter, Mixin2D
 from poliastro.plotting.util import generate_sphere
-
-from ..frames import Planes
-from ._base import BaseOrbitPlotter, Mixin2D
 
 
 class _PlotlyOrbitPlotter(BaseOrbitPlotter):
