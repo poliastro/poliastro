@@ -2,9 +2,9 @@ import erfa
 from astropy import units as u
 from astropy.coordinates.solar_system import PLAN94_BODY_NAME_TO_PLANET_INDEX
 
-from ..constants import J2000
-from ..frames import Planes
-from .states import RVState
+from poliastro.constants import J2000
+from poliastro.frames import Planes
+from poliastro.twobody.states import RVState
 
 
 def get_mean_elements(body, epoch=J2000):

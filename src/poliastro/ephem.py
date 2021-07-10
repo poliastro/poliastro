@@ -16,11 +16,10 @@ from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 from scipy.interpolate import interp1d
 
+from poliastro.frames import Planes
+from poliastro.frames.util import get_frame
 from poliastro.twobody.propagation import propagate
-
-from .frames import Planes
-from .frames.util import get_frame
-from .warnings import TimeScaleWarning
+from poliastro.warnings import TimeScaleWarning
 
 EPHEM_FORMAT = (
     "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"

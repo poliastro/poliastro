@@ -25,8 +25,8 @@ from astropy import units as u
 from astropy.constants import G
 from astropy.units import Quantity
 
-from . import constants
-from .frames import Planes
+from poliastro import constants
+from poliastro.frames import Planes
 
 
 # HACK: Constants cannot be hashed
