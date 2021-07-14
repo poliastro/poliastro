@@ -1,6 +1,9 @@
+import numpy as np
+import pytest
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
-from poliastro.bodies import Sun
+from poliastro.bodies import Earth, Sun
 from poliastro.twobody.states import ClassicalState, RVState
 
 
@@ -35,3 +38,42 @@ def test_rv_state_has_rv_given_in_constructor():
     ss = RVState(Sun, r, v, None)
     assert (ss.r == r).all()
     assert (ss.v == v).all()
+
+
+def test_mean_motion():
+    # From Vallado Example 1-1.
+    attractor = Earth
+    period = 86164.090518 * u.s
+    a = 42164.1696 * u.km
+    # Unused variables.
+    _ecc = 0 * u.one
+    _inc = 1.85 * u.deg
+    _raan = 50 * u.deg
+    _argp = 200 * u.deg
+    _nu = 20 * u.deg
+
+    ss = ClassicalState(
+        attractor, a * (1 - _ecc ** 2), _ecc, _inc, _raan, _argp, _nu, None
+    )
+
+    expected_mean_motion = (2 * np.pi / period) * u.rad
+    n = ss.n
+
+    assert_quantity_allclose(n, expected_mean_motion)
+
+
+def test_classical_to_equinoctial_raises_singularity_error_if_inc_180_degrees():
+    a = 10000 * u.km
+    ecc = 0.3 * u.one
+    inc = 180 * u.deg  # True retrograde equatorial case.
+    raan = 49.562 * u.deg
+    argp = 286.537 * u.deg
+    nu = 23.33 * u.deg
+
+    ss = ClassicalState(Sun, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, None)
+    with pytest.raises(ValueError) as excinfo:
+        ss.to_equinoctial()
+    assert (
+        "Cannot compute the equinoctial parameters, `h` and `k`, due to singularity"
+        in excinfo.exconly()
+    )
