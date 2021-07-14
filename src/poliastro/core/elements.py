@@ -170,13 +170,12 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     The modified equinoctial orbital elements are a set of orbital elements that are useful for
     trajectory analysis and optimization. They are valid for circular, elliptic, and hyperbolic
     orbits. These direct modified equinoctial equations exhibit no singularity for zero
-    eccentricity and orbital inclinations equal to 0 and 90 degrees. However, two of the
-    components are singular for an orbital inclination of 180 degrees.
+    eccentricity and orbital inclinations equal to 0 and 90 degrees. However, the h and k
+    components are singular for an orbital inclination of 180 degrees since the retrograde factor
+    is not yet supported.
 
     Parameters
     ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
     p : float
         Semi-latus rectum or parameter (km).
     ecc : float
@@ -220,10 +219,13 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
         \end{align}
 
     """
+    if inc == np.pi:
+        raise ValueError(
+            "Cannot compute the equinoctial parameters, `h` and `k`, due to singularity"
+        )
     lonper = raan + argp
     f = ecc * np.cos(lonper)
     g = ecc * np.sin(lonper)
-    # TODO: Check polar case (see [Walker, 1985])
     h = np.tan(inc / 2) * np.cos(raan)
     k = np.tan(inc / 2) * np.sin(raan)
     L = lonper + nu
