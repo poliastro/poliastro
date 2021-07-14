@@ -445,3 +445,74 @@ def mee2coe(p, f, g, h, k, L):
     argp = (lonper - raan) % (2 * np.pi)
     nu = (L - lonper) % (2 * np.pi)
     return p, ecc, inc, raan, argp, nu
+
+
+@jit
+def mee2rv(p, f, g, h, k, L):
+    """Calculates position and velocity vector from modified equinoctial elements.
+
+    Parameters
+    ----------
+    p: float
+        Semi-latus rectum
+    f: float
+        Equinoctial parameter f
+    g: float
+        Equinoctial parameter g
+    h: float
+        Equinoctial parameter h
+    k: float
+        Equinoctial parameter k
+    L: float
+        Longitude
+
+    Returns
+    -------
+    r: np.array
+        Position vector.
+    v: np.array
+        Velocity vector.
+
+    Note
+    ----
+    The definition of `r` and `v` is taken from
+    https://spsweb.fltops.jpl.nasa.gov/portaldataops/mpg/MPG_Docs/Source%20Docs/EquinoctalElements-modified.pdf,
+    Equation 3a and 3b.
+
+    """
+    w = 1 + f * np.cos(L) + g * np.sin(L)
+    r = p / w
+    s2 = 1 + h ** 2 + k ** 2
+    alpha2 = h ** 2 - k ** 2
+
+    rx = (r / s2)(np.cos(L) + alpha2 ** 2 * np.cos(L) + 2 * h * k * np.sin(L))
+    ry = (r / s2)(np.sin(L) - alpha2 ** 2 * np.sin(L) + 2 * h * k * np.cos(L))
+    rz = (2 * r / s2)(h * np.sin(L) - k * np.cos(L))
+
+    vx = (
+        (-1 / s2)
+        * (np.sqrt(k / p))
+        * (
+            np.sin(L)
+            + alpha2 * np.sin(L)
+            - 2 * h * k * np.cos(L)
+            + g
+            - 2 * f * h * k
+            + alpha2 * g
+        )
+    )
+    vy = (
+        (-1 / s2)
+        * (np.sqrt(k / p))
+        * (
+            -np.cos(L)
+            + alpha2 * np.cos(L)
+            + 2 * h * k * np.sin(L)
+            - f
+            + 2 * g * h * k
+            + alpha2 * f
+        )
+    )
+    vz = (2 / s2) * (np.sqrt(k / p)) * (h * np.cos(L) + k * np.sin(L) + f * h + g * k)
+
+    return np.array([rx, ry, rz]), np.array([vx, vy, vz])
