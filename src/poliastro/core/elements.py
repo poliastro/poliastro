@@ -221,8 +221,9 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     """
     if inc == np.pi:
         raise ValueError(
-            "Cannot compute the equinoctial parameters, `h` and `k`, due to singularity"
+            "Cannot compute modified equinoctial set for 180 degrees orbit inclination due to `h` and `k` singularity."
         )
+
     lonper = raan + argp
     f = ecc * np.cos(lonper)
     g = ecc * np.sin(lonper)
