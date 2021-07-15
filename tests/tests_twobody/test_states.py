@@ -62,7 +62,7 @@ def test_mean_motion():
     assert_quantity_allclose(n, expected_mean_motion)
 
 
-def test_classical_to_equinoctial_raises_singularity_error_if_inc_180_degrees():
+def test_coe_to_mee_raises_singularity_error_orbit_equatorial_and_retrograde():
     a = 10000 * u.km
     ecc = 0.3 * u.one
     inc = 180 * u.deg  # True retrograde equatorial case.
@@ -74,6 +74,6 @@ def test_classical_to_equinoctial_raises_singularity_error_if_inc_180_degrees():
     with pytest.raises(ValueError) as excinfo:
         ss.to_equinoctial()
     assert (
-        "Cannot compute the equinoctial parameters, `h` and `k`, due to singularity"
+        "Cannot compute modified equinoctial set for 180 degrees orbit inclination due to `h` and `k` singularity."
         in excinfo.exconly()
     )
