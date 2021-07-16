@@ -760,6 +760,29 @@ def test_heliosynchronous_orbit_a():
     assert_quantity_allclose(ss0.ecc, expected_ecc)
 
 
+def test_heliosynchronous_orbit_ecc():
+    # Vallado, example 11-2b
+    expected_ecc = 0.0 * u.one
+    expected_inc = 98.6 * u.deg
+    expected_a = 7178.1363 * u.km
+    ss0 = Orbit.heliosynchronous(Earth, a=expected_a, inc=expected_inc)
+
+    assert_quantity_allclose(ss0.inc, expected_inc, rtol=1e-4)
+    assert_quantity_allclose(ss0.a, expected_a, rtol=1e-5)
+    # Vallado uses a slightly different value for n_sunsync, hence `atol` needs to be added.
+    assert_quantity_allclose(ss0.ecc, expected_ecc, atol=1e-1)
+
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_heliosynchronous_orbit_raises_floating_point_error_if_invalid_input():
+    a = 0 * u.km
+    inc = 0 * u.rad
+
+    with pytest.raises(ValueError) as excinfo:
+        Orbit.heliosynchronous(Earth, a=a, inc=inc)
+    assert "No SSO orbit with given parameters can be found." in excinfo.exconly()
+
+
 def test_perigee_and_apogee():
     expected_r_a = 500 * u.km
     expected_r_p = 300 * u.km

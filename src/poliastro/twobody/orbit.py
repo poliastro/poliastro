@@ -855,6 +855,10 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        # Temporary fix: raan_from_ltan works only for Earth
+        if attractor.name.lower() != "earth":
+            raise NotImplementedError("Attractors other than Earth not supported yet")
+
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
@@ -866,7 +870,7 @@ class Orbit:
 
         try:
             with np.errstate(invalid="raise"):
-                if (a is None) and (ecc is None) and (inc is None):
+                if all(coe is None for coe in [a, ecc, inc]):
                     # We check sufficient number of parameters
                     raise ValueError(
                         "At least two parameters of the set {a, ecc, inc} are required."
@@ -888,7 +892,7 @@ class Orbit:
                         * R_SSO ** 2
                         * J2_SSO
                         * np.sqrt(k_SSO)
-                        * np.cos(inc.to(u.rad))
+                        * np.cos(inc)
                         / (2 * a ** (7 / 2) * n_sunsync)
                     )
                     ecc = np.sqrt(1 - _ecc_0)
@@ -903,10 +907,6 @@ class Orbit:
                     )
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
-
-        # Temporary fix: raan_from_ltan works only for Earth
-        if attractor.name.lower() != "earth":
-            raise NotImplementedError("Attractors other than Earth not supported yet")
 
         raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
