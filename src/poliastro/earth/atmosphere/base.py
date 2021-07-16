@@ -92,7 +92,7 @@ class COESA:
         ----------
         x: ~astropy.units.Quantity
             Element to be searched.
-        x_levels: !astropy.units.Quantity
+        x_levels: ~astropy.units.Quantity
             List for searching.
 
         Returns
