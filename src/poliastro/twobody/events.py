@@ -95,7 +95,7 @@ class LatitudeCrossEvent(Event):
     orbit: ~poliastro.twobody.orbit.Orbit
         Orbit.
     lat: astropy.quantity.Quantity
-        Threshold latitude (in degrees).
+        Threshold latitude.
     terminal: bool
         Whether to terminate integration if this event occurs, defaults to True.
     direction: float
