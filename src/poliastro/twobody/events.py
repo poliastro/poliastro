@@ -1,5 +1,10 @@
+import numpy as np
 from astropy import units as u
 from numpy.linalg import norm
+
+from poliastro.core.spheroid_location import (
+    cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
+)
 
 
 class Event:
@@ -80,3 +85,36 @@ class LithobrakeEvent(AltitudeCrossEvent):
 
     def __init__(self, R, terminal=True):
         super().__init__(0, R, terminal, direction=-1)
+
+
+class LatitudeCrossEvent(Event):
+    """Detect if a satellite crosses a specific threshold latitude.
+
+    Parameters
+    ----------
+    orbit: ~poliastro.twobody.orbit.Orbit
+        Orbit.
+    lat: astropy.quantity.Quantity
+        Threshold latitude.
+    terminal: bool
+        Whether to terminate integration if this event occurs, defaults to True.
+    direction: float
+        Handle triggering of event based on whether latitude is crossed from above
+        or below, defaults to 0, i.e., event is triggered while traversing from both directions.
+
+    """
+
+    def __init__(self, orbit, lat, terminal=True, direction=0):
+        super().__init__(terminal, direction)
+
+        self._R = orbit.attractor.R.to(u.m).value
+        self._R_polar = orbit.attractor.R_polar.to(u.m).value
+        self._epoch = orbit.epoch
+        self._lat = lat.to(u.deg).value  # Threshold latitude (in degrees).
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+        pos_on_body = (u_[:3] / norm(u_[:3])) * self._R
+        lat_, _, _ = cartesian_to_ellipsoidal_fast(self._R, self._R_polar, *pos_on_body)
+
+        return np.rad2deg(lat_) - self._lat

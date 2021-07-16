@@ -9,7 +9,7 @@ from poliastro.constants import H0_earth, rho0_earth
 from poliastro.core.perturbations import atmospheric_drag_exponential
 from poliastro.core.propagation import func_twobody
 from poliastro.twobody import Orbit
-from poliastro.twobody.events import AltitudeCrossEvent
+from poliastro.twobody.events import AltitudeCrossEvent, LatitudeCrossEvent
 from poliastro.twobody.propagation import cowell
 
 
@@ -78,3 +78,26 @@ def test_altitude_cross_not_happening_is_ok():
     )
 
     assert altitude_cross_event.last_t == tofs[-1]
+
+
+def test_latitude_cross_event():
+    r = [-6142438.668, 3492467.56, -25767.257] << u.km
+    v = [505.848, 942.781, 7435.922] << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r, v)
+
+    thresh_lat = 60 * u.deg
+    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=True)
+    t_lat = 1701.716842130476 * u.s
+
+    tofs = [5] * u.d
+
+    events = [latitude_cross_event]
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        events=events,
+    )
+
+    assert_quantity_allclose(latitude_cross_event.last_t, t_lat)
