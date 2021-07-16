@@ -84,8 +84,7 @@ def test_altitude_cross_not_happening_is_ok():
 def test_latitude_cross_event():
     r = [-6142438.668, 3492467.56, -25767.257] << u.km
     v = [505.848, 942.781, 7435.922] << u.km / u.s
-    epoch = Time("2003-09-16", scale="utc")
-    orbit = Orbit.from_vectors(Earth, r, v, epoch)
+    orbit = Orbit.from_vectors(Earth, r, v)
 
     thresh_lat = 60 * u.deg
     latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=True)
