@@ -870,7 +870,7 @@ class Orbit:
 
         try:
             with np.errstate(invalid="raise"):
-                if (a is None) and (ecc is None) and (inc is None):
+                if all(coe is None for coe in [a, ecc, inc]):
                     # We check sufficient number of parameters
                     raise ValueError(
                         "At least two parameters of the set {a, ecc, inc} are required."
