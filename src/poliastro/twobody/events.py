@@ -94,7 +94,7 @@ class LatitudeCrossEvent(Event):
     ----------
     orbit: ~poliastro.twobody.orbit.Orbit
         Orbit.
-    lat: float
+    lat: astropy.quantity.Quantity
         Threshold latitude (in degrees).
     terminal: bool
         Whether to terminate integration if this event occurs, defaults to True.
@@ -110,7 +110,7 @@ class LatitudeCrossEvent(Event):
         self._R = orbit.attractor.R
         self._R_polar = orbit.attractor.R_polar
         self._epoch = orbit.epoch
-        self._lat = lat  # Threshold latitude (in degrees).
+        self._lat = lat.to(u.deg).value  # Threshold latitude (in degrees).
 
     def __call__(self, t, u_, k):
         self._last_t = t
