@@ -1,14 +1,10 @@
+import numpy as np
 from astropy import units as u
-from astropy.coordinates import (
-    GCRS,
-    ITRS,
-    CartesianRepresentation,
-    SphericalRepresentation,
-)
-from astropy.time import Time
 from numpy.linalg import norm
 
-from poliastro.bodies import Earth
+from poliastro.core.spheroid_location import (
+    cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
+)
 
 
 class Event:
@@ -111,69 +107,14 @@ class LatitudeCrossEvent(Event):
     def __init__(self, orbit, lat, terminal=True, direction=0):
         super().__init__(terminal, direction)
 
-        if orbit.attractor != Earth:
-            raise NotImplementedError(
-                "Attractors other than the Earth are not supported yet."
-            )
         self._R = orbit.attractor.R
+        self._R_polar = orbit.attractor.R_polar
         self._epoch = orbit.epoch
         self._lat = lat  # Threshold latitude (in degrees).
 
     def __call__(self, t, u_, k):
         self._last_t = t
-        xyz = u_[:3]
+        pos_on_body = (u_[:3] / norm(u_[:3])) * self._R
+        lat_, _, _ = cartesian_to_ellipsoidal_fast(self._R, self._R_polar, *pos_on_body)
 
-        obstime = Time(self._last_t * u.s + self._epoch)
-        gcrs_xyz = GCRS(
-            xyz,
-            obstime=obstime,
-            representation_type=CartesianRepresentation,
-        )
-        itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
-        itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
-        orbit_lat = itrs_latlon_pos.lat.to(u.deg).value
-        return self._lat - orbit_lat
-
-
-class LongitudeCrossEvent(Event):
-    """Detect if a satellite crosses a specific threshold latitude.
-
-    Parameters
-    ----------
-    orbit: ~poliastro.twobody.orbit.Orbit
-        Orbit.
-    lon: float
-        Threshold longitude (in degrees).
-    terminal: bool
-        Whether to terminate integration if this event occurs, defaults to True.
-    direction: float
-        Handle triggering of event based on whether longitude is crossed from above
-        or below, defaults to 0, i.e., event is triggered while traversing from both directions.
-
-    """
-
-    def __init__(self, orbit, lon, terminal=True, direction=0):
-        super().__init__(terminal, direction)
-
-        if orbit.attractor != Earth:
-            raise NotImplementedError(
-                "Attractors other than the Earth are not supported yet."
-            )
-        self._R = orbit.attractor.R
-        self._epoch = orbit.epoch
-        self._lon = lon  # Threshold longitude (in degrees).
-
-    def __call__(self, t, u_, k):
-        self._last_t = t
-        xyz = u_[:3]
-
-        obstime = Time(self._last_t * u.s + self._epoch)
-        gcrs_xyz = GCRS(
-            xyz,
-            obstime=obstime,
-            representation_type=CartesianRepresentation,
-        )
-        itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=obstime))
-        itrs_latlon_pos = itrs_xyz.represent_as(SphericalRepresentation)
-        orbit_lon = itrs_latlon_pos.lon.to(u.deg).value
-        return self._lon - orbit_lon
+        return np.rad2deg(lat_) - self._lat
