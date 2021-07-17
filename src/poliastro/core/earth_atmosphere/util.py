@@ -98,3 +98,16 @@ def _get_index(x, x_levels):
             return i
         else:
             return i - 1
+
+
+@jit
+def _check_altitude(alt, r0, geometric):
+    # Get geometric and geopotential altitudes
+    if geometric:
+        z = alt
+        h = z_to_h(z, r0)
+    else:
+        h = alt
+        z = h_to_z(h, r0)
+
+    return z, h

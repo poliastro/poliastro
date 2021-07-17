@@ -3,9 +3,8 @@
 import astropy.units as u
 
 from poliastro.core.earth_atmosphere.util import (
+    _check_altitude as _check_altitude_fast,
     _get_index as _get_index_fast,
-    h_to_z,
-    z_to_h,
 )
 
 
@@ -68,16 +67,10 @@ class COESA:
             Geopotential altitude.
 
         """
-        alt = alt.to(u.km).value
-        r0 = r0.to(u.km).value
-        # Get geometric and geopotential altitudes
-        if geometric:
-            z = alt
-            h = z_to_h(z, r0)
-        else:
-            h = alt
-            z = h_to_z(h, r0)
+        alt = alt.to_value(u.km)
+        r0 = r0.to_value(u.km)
 
+        z, h = _check_altitude_fast(alt, r0, geometric)
         z, h = z * u.km, h * u.km
 
         # Assert in range
