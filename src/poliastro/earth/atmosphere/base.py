@@ -68,7 +68,8 @@ class COESA:
             Geopotential altitude.
 
         """
-
+        alt = alt.to(u.km).value
+        r0 = r0.to(u.km).value
         # Get geometric and geopotential altitudes
         if geometric:
             z = alt
@@ -77,8 +78,10 @@ class COESA:
             h = alt
             z = h_to_z(h, r0)
 
+        z, h = z * u.km, h * u.km
+
         # Assert in range
-        if z < self.zb_levels[0] or z > self.zb_levels[-1]:
+        if not self.zb_levels[0] <= z <= self.zb_levels[-1]:
             raise ValueError(
                 f"Geometric altitude must be in range [{self.zb_levels[0]}, {self.zb_levels[-1]}]"
             )

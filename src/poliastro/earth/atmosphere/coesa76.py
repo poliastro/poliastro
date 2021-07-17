@@ -162,16 +162,16 @@ class COESA76(COESA):
             # TODO: Apply air mean molecular weight ratio factor
             Tm = Tb + Lb * (h - hb)
             T = Tm
-        elif z >= self.zb_levels[7] and z < self.zb_levels[8]:
+        elif self.zb_levels[7] <= z and z < self.zb_levels[8]:
             # [86km, 91km)
             T = 186.87 * u.K
-        elif z >= self.zb_levels[8] and z < self.zb_levels[9]:
+        elif self.zb_levels[8] <= z and z < self.zb_levels[9]:
             # [91km, 110km]
             Tc = 263.1905 * u.K
             A = -76.3232 * u.K
             a = -19.9429 * u.km
             T = Tc + A * (1 - ((z - self.zb_levels[8]) / a) ** 2) ** 0.5
-        elif z >= self.zb_levels[9] and z < self.zb_levels[10]:
+        elif self.zb_levels[9] <= z and z < self.zb_levels[10]:
             # [110km, 120km]
             T = 240 * u.K + Lb * (z - self.zb_levels[9])
         else:

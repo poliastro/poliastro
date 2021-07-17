@@ -107,7 +107,7 @@ def _H_correction(alt, Texo, x, y, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM, T):
 @jit
 def _altitude_profile(alt, Texo, x, y, E5M, E6P):
     # Raise Value Error if alt < 90 km or alt > 2500 km.
-    if alt < 90 or alt > 2500:
+    if alt < 90 or 2500 < alt:
         raise ValueError("Jacchia77 has been implemented in range 90km - 2500km.")
 
     alt = int(alt + 1)  # in fortran the upper limits are included. in python are not.
@@ -192,7 +192,7 @@ def _altitude_profile(alt, Texo, x, y, E5M, E6P):
 
     _O_and_O2_correction(alt, Texo, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM)
 
-    if alt >= 500:
+    if 500 <= alt:
         _H_correction(alt, Texo, x, y, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM, T)
 
     return (
