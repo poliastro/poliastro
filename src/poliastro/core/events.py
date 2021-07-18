@@ -2,7 +2,7 @@ import numpy as np
 from numba import njit as jit
 from numpy.linalg import norm
 
-from poliastro.core.elements import rv2coe, coe_rotation_matrix
+from poliastro.core.elements import coe_rotation_matrix, rv2coe
 
 
 @jit
@@ -41,6 +41,11 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
     sin_delta_shadow = np.sin((R_sec - pm * R_primary) / r_sec_norm)
 
     cos_psi = beta * np.cos(nu) + zeta * np.sin(nu)
-    shadow_function = ((R_primary ** 2) * (1 + ecc * np.cos(nu)) ** 2) + (p ** 2) * (cos_psi ** 2) - p ** 2 + pm * (2 * p * R_primary * cos_psi) * (1 + ecc * np.cos(nu)) * sin_delta_shadow
+    shadow_function = (
+        ((R_primary ** 2) * (1 + ecc * np.cos(nu)) ** 2)
+        + (p ** 2) * (cos_psi ** 2)
+        - p ** 2
+        + pm * (2 * p * R_primary * cos_psi) * (1 + ecc * np.cos(nu)) * sin_delta_shadow
+    )
 
     return shadow_function

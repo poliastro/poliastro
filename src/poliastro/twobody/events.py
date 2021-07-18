@@ -141,6 +141,9 @@ class EclipseEvent(Event):
         self._primary_body = orbit.attractor
         self._secondary_body = orbit.attractor.parent
         self._epoch = orbit.epoch
+        self.k = self._primary_body.k.to_value(u.km ** 3 / u.s ** 2)
+        self.R_sec = self._secondary_body.R.to_value(u.km)
+        self.R_primary = self._primary_body.R.to_value(u.km)
 
     def __call__(self, t, u_, k):
         # Solve for primary and secondary bodies position w.r.t. solar system
@@ -175,18 +178,13 @@ class PenumbraEvent(EclipseEvent):
     def __call__(self, t, u_, k):
         self._last_t = t
 
-        k = self._primary_body.k.to_value(u.km ** 3 / u.s ** 2)
-        R_sec = self._secondary_body.R.to_value(u.km)
-        R_primary = self._primary_body.R.to_value(u.km)
-
         r_sec = super().__call__(t, u_, k)
-
         shadow_function = eclipse_function_fast(
-            k,
+            self.k,
             u_,
             r_sec,
-            R_sec,
-            R_primary,
+            self.R_sec,
+            self.R_primary,
             umbra=False,
         )
 
@@ -214,12 +212,9 @@ class UmbraEvent(EclipseEvent):
     def __call__(self, t, u_, k):
         self._last_t = t
 
-        k = self._primary_body.k.to_value(u.km ** 3 / u.s ** 2)
-        R_sec = self._secondary_body.R.to_value(u.km)
-        R_primary = self._primary_body.R.to_value(u.km)
-
         r_sec = super().__call__(t, u_, k)
-
-        shadow_function = eclipse_function_fast(k, u_, r_sec, R_sec, R_primary)
+        shadow_function = eclipse_function_fast(
+            self.k, u_, r_sec, self.R_sec, self.R_primary
+        )
 
         return shadow_function
