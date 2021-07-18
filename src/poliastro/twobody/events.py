@@ -1,7 +1,9 @@
 import numpy as np
 from astropy import units as u
+from astropy.coordinates import get_body_barycentric_posvel
 from numpy.linalg import norm
 
+from poliastro.core.events import eclipse_function as eclipse_function_fast
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
@@ -118,3 +120,101 @@ class LatitudeCrossEvent(Event):
         lat_, _, _ = cartesian_to_ellipsoidal_fast(self._R, self._R_polar, *pos_on_body)
 
         return np.rad2deg(lat_) - self._lat
+
+
+class EclipseEvent(Event):
+    """Base class for the eclipse event.
+
+    Parameters
+    ----------
+    orbit: poliastro.twobody.orbit.Orbit
+        Orbit of the satellite.
+    terminal: bool, optional
+        Whether to terminate integration when the event occurs, defaults to False.
+    direction: float, optional
+        Specify which direction must the event trigger, defaults to 0.
+
+    """
+
+    def __init__(self, orbit, terminal=False, direction=0):
+        super().__init__(terminal, direction)
+        self._primary_body = orbit.attractor
+        self._secondary_body = orbit.attractor.parent
+        self._epoch = orbit.epoch
+        self.k = self._primary_body.k.to_value(u.km ** 3 / u.s ** 2)
+        self.R_sec = self._secondary_body.R.to_value(u.km)
+        self.R_primary = self._primary_body.R.to_value(u.km)
+
+    def __call__(self, t, u_, k):
+        # Solve for primary and secondary bodies position w.r.t. solar system
+        # barycenter at a particular epoch.
+        (r_primary_wrt_ssb, _), (r_secondary_wrt_ssb, _) = [
+            get_body_barycentric_posvel(body.name, self._epoch + t * u.s)
+            for body in (self._primary_body, self._secondary_body)
+        ]
+        r_sec = ((r_secondary_wrt_ssb - r_primary_wrt_ssb).xyz << u.km).value
+
+        return r_sec
+
+
+class PenumbraEvent(EclipseEvent):
+    """Detect whether a satellite is in penumbra or not.
+
+    Parameters
+    ----------
+    orbit: poliastro.twobody.orbit.Orbit
+        Orbit of the satellite.
+    terminal: bool, optional
+        Whether to terminate integration when the event occurs, defaults to False.
+    direction: float, optional
+        Handle triggering of event based on whether entry is into or out of
+        penumbra, defaults to 0, i.e., event is triggered at both, entry and exit points.
+
+    """
+
+    def __init__(self, orbit, terminal=False, direction=0):
+        super().__init__(orbit, terminal, direction)
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+
+        r_sec = super().__call__(t, u_, k)
+        shadow_function = eclipse_function_fast(
+            self.k,
+            u_,
+            r_sec,
+            self.R_sec,
+            self.R_primary,
+            umbra=False,
+        )
+
+        return shadow_function
+
+
+class UmbraEvent(EclipseEvent):
+    """Detect whether a satellite is in umbra or not.
+
+    Parameters
+    ----------
+    orbit: poliastro.twobody.orbit.Orbit
+        Orbit of the satellite.
+    terminal: bool, optional
+        Whether to terminate integration when the event occurs, defaults to False.
+    direction: float, optional
+        Handle triggering of event based on whether entry is into or out of
+        umbra, defaults to 0, i.e., event is triggered at both, entry and exit points.
+
+    """
+
+    def __init__(self, orbit, terminal=False, direction=0):
+        super().__init__(orbit, terminal, direction)
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+
+        r_sec = super().__call__(t, u_, k)
+        shadow_function = eclipse_function_fast(
+            self.k, u_, r_sec, self.R_sec, self.R_primary
+        )
+
+        return shadow_function

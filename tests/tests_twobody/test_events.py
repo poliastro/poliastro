@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.time import Time
 from numpy.linalg import norm
 
 from poliastro.bodies import Earth
@@ -9,7 +10,12 @@ from poliastro.constants import H0_earth, rho0_earth
 from poliastro.core.perturbations import atmospheric_drag_exponential
 from poliastro.core.propagation import func_twobody
 from poliastro.twobody import Orbit
-from poliastro.twobody.events import AltitudeCrossEvent, LatitudeCrossEvent
+from poliastro.twobody.events import (
+    AltitudeCrossEvent,
+    LatitudeCrossEvent,
+    PenumbraEvent,
+    UmbraEvent,
+)
 from poliastro.twobody.propagation import cowell
 
 
@@ -101,3 +107,103 @@ def test_latitude_cross_event():
     )
 
     assert_quantity_allclose(latitude_cross_event.last_t, t_lat)
+
+
+def test_penumbra_event_not_triggering_is_ok():
+    attractor = Earth
+    tof = 100 * u.s
+    r0 = np.array([281.89, 1411.473, 750.672])
+    v0 = np.array([7.36138, 2.98997, 1.64354])
+    orbit = Orbit.from_vectors(attractor, r0 * u.km, v0 * u.km / u.s)
+
+    penumbra_event = PenumbraEvent(orbit)
+    events = [penumbra_event]
+
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    assert penumbra_event.last_t == tof
+
+
+def test_umbra_event_not_triggering_is_ok():
+    attractor = Earth
+    tof = 100 * u.s
+    r0 = np.array([281.89, 1411.473, 750.672])
+    v0 = np.array([7.36138, 2.98997, 1.64354])
+    orbit = Orbit.from_vectors(attractor, r0 * u.km, v0 * u.km / u.s)
+
+    umbra_event = UmbraEvent(orbit)
+    events = [umbra_event]
+
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    assert umbra_event.last_t == tof
+
+
+def test_umbra_event_crossing():
+    expected_umbra_t = Time("2020-01-01 00:04:51.328", scale="utc")  # From Orekit.
+    attractor = Earth
+    tof = 2 * u.d
+    epoch = Time("2020-01-01", scale="utc")
+    coe = (
+        6828137.0 * u.m,
+        0.0073 * u.one,
+        87.0 * u.deg,
+        20.0 * u.deg,
+        10.0 * u.deg,
+        0 * u.deg,
+    )
+    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
+
+    umbra_event = UmbraEvent(orbit, terminal=True)
+    events = [umbra_event]
+
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    assert expected_umbra_t.isclose(epoch + umbra_event.last_t, atol=1 * u.s)
+
+
+def test_penumbra_event_crossing():
+    expected_penumbra_t = Time("2020-01-01 00:04:26.060", scale="utc")  # From Orekit.
+    attractor = Earth
+    tof = 2 * u.d
+    epoch = Time("2020-01-01", scale="utc")
+    coe = (
+        6828137.0 * u.m,
+        0.0073 * u.one,
+        87.0 * u.deg,
+        20.0 * u.deg,
+        10.0 * u.deg,
+        0 * u.deg,
+    )
+    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
+
+    penumbra_event = PenumbraEvent(orbit, terminal=True)
+    events = [penumbra_event]
+
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    assert expected_penumbra_t.isclose(epoch + penumbra_event.last_t, atol=1 * u.s)
