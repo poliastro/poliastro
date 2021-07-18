@@ -3,10 +3,7 @@ from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
 from numpy.linalg import norm
 
-from poliastro.core.events import (
-    continuous_shadow_function_for_penumbra as continuous_shadow_function_for_penumbra_fast,
-    continuous_shadow_function_for_umbra as continuous_shadow_function_for_umbra_fast,
-)
+from poliastro.core.events import eclipse_function as eclipse_function_fast
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
@@ -184,8 +181,13 @@ class PenumbraEvent(EclipseEvent):
 
         r_sec = super().__call__(t, u_, k)
 
-        shadow_function = continuous_shadow_function_for_penumbra_fast(
-            k, u_, r_sec, R_sec, R_primary
+        shadow_function = eclipse_function_fast(
+            k,
+            u_,
+            r_sec,
+            R_sec,
+            R_primary,
+            umbra=False,
         )
 
         return shadow_function
@@ -218,8 +220,6 @@ class UmbraEvent(EclipseEvent):
 
         r_sec = super().__call__(t, u_, k)
 
-        shadow_function = continuous_shadow_function_for_umbra_fast(
-            k, u_, r_sec, R_sec, R_primary
-        )
+        shadow_function = eclipse_function_fast(k, u_, r_sec, R_sec, R_primary)
 
         return shadow_function
