@@ -3,11 +3,13 @@ from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
 from numpy.linalg import norm
 
-from poliastro.core.elements import rv2coe
+from poliastro.core.events import (
+    continuous_shadow_function_for_penumbra as continuous_shadow_function_for_penumbra_fast,
+    continuous_shadow_function_for_umbra as continuous_shadow_function_for_umbra_fast,
+)
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
-from poliastro.twobody.orbit import Orbit
 
 
 class Event:
@@ -182,35 +184,8 @@ class PenumbraEvent(EclipseEvent):
 
         r_sec = super().__call__(t, u_, k)
 
-        p, ecc, inc, raan, argp, nu = rv2coe(k, u_[:3], u_[3:])
-
-        # A dummy orbit is needed to access the `pqw` method.
-        dummy_orbit = Orbit.from_vectors(
-            self._primary_body, u_[:3] << u.km, u_[3:] << u.km / u.s
-        )
-        P_, Q_, _ = dummy_orbit.pqw()
-
-        # Px = np.cos(raan) * np.cos(argp) - np.sin(raan) * np.sin(argp) * np.cos(inc)
-        # Py = np.cos(raan) * np.sin(argp) + np.sin(raan) * np.cos(argp) * np.cos(inc)
-        # Pz = np.sin(raan) * np.sin(inc)
-        # P_ = np.array([Px, Py, Pz])
-        # Qx = -np.sin(raan) * np.cos(argp) - np.cos(raan) * np.sin(argp) * np.cos(inc)
-        # Qy = -np.sin(raan) * np.sin(argp) + np.cos(raan) * np.cos(argp) * np.cos(inc)
-        # Qz = np.cos(raan) * np.sin(inc)
-        # Q_ = np.array([Qx, Qy, Qz])
-
-        r_sec_norm = norm(r_sec)
-        beta = np.dot(P_, r_sec) / r_sec_norm
-        zeta = np.dot(Q_, r_sec) / r_sec_norm
-
-        delta_p = np.arcsin((R_sec + R_primary) / r_sec_norm)
-
-        cos_psi = beta * np.cos(nu) + zeta * np.sin(nu)
-        shadow_function = (
-            ((R_primary ** 2) * (1 + ecc * np.cos(nu)) ** 2)
-            + (p ** 2) * (cos_psi ** 2)
-            - p ** 2
-            - (2 * p * R_primary * cos_psi) * (1 + ecc * np.cos(nu)) * np.sin(delta_p)
+        shadow_function = continuous_shadow_function_for_penumbra_fast(
+            k, u_, r_sec, R_sec, R_primary
         )
 
         return shadow_function
@@ -243,34 +218,8 @@ class UmbraEvent(EclipseEvent):
 
         r_sec = super().__call__(t, u_, k)
 
-        p, ecc, inc, raan, argp, nu = rv2coe(k, u_[:3], u_[3:])
-
-        dummy_orbit = Orbit.from_vectors(
-            self._primary_body, u_[:3] << u.km, u_[3:] << u.km / u.s
-        )
-        P_, Q_, _ = dummy_orbit.pqw()
-
-        # Px = np.cos(raan) * np.cos(argp) - np.sin(raan) * np.sin(argp) * np.cos(inc)
-        # Py = np.cos(raan) * np.sin(argp) + np.sin(raan) * np.cos(argp) * np.cos(inc)
-        # Pz = np.sin(raan) * np.sin(inc)
-        # P_ = np.array([Px, Py, Pz])
-        # Qx = -np.sin(raan) * np.cos(argp) - np.cos(raan) * np.sin(argp) * np.cos(inc)
-        # Qy = -np.sin(raan) * np.sin(argp) + np.cos(raan) * np.cos(argp) * np.cos(inc)
-        # Qz = np.cos(raan) * np.sin(inc)
-        # Q_ = np.array([Qx, Qy, Qz])
-
-        r_sec_norm = norm(r_sec)
-        beta = np.dot(P_, r_sec) / r_sec_norm
-        zeta = np.dot(Q_, r_sec) / r_sec_norm
-
-        delta_u = np.arcsin((R_sec - R_primary) / r_sec_norm)
-
-        cos_psi = beta * np.cos(nu) + zeta * np.sin(nu)
-        shadow_function = (
-            ((R_primary ** 2) * (1 + ecc * np.cos(nu)) ** 2)
-            + (p ** 2) * (cos_psi ** 2)
-            - p ** 2
-            + (2 * p * R_primary * cos_psi) * (1 + ecc * np.cos(nu)) * np.sin(delta_u)
+        shadow_function = continuous_shadow_function_for_umbra_fast(
+            k, u_, r_sec, R_sec, R_primary
         )
 
         return shadow_function
