@@ -58,11 +58,34 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
 
 @jit
 def line_of_sight(r1, r2, R):
+    """Calculates the line of sight condition between two position vectors, r1 and r2.
+
+    Parameters
+    ----------
+    r1: ~np.array
+        The position vector of the first object with respect to a central attractor.
+    r2: ~np.array
+        The position vector of the second object with respect to a central attractor.
+    R: float
+        The radius of the central attractor.
+
+    Returns
+    -------
+    delta_theta: float
+        Greater than or equal to zero, if there exists a LOS between two objects
+        located by r1 and r2, else negative.
+
+    """
     r1_norm = np.linalg.norm(r1)
+    if r1_norm <= R:
+        raise ValueError(
+            "The norm of the position vector r_1 is less than the radius of the attractor."
+        )
+
     r2_norm = np.linalg.norm(r2)
 
     theta = np.arccos(np.dot(r1, r2) / r1_norm / r2_norm)
     theta_1 = np.arccos(R / r1_norm)
     theta_2 = np.arccos(R / r2_norm)
 
-    return theta <= theta_1 + theta_2
+    return (theta_1 + theta_2) - theta
