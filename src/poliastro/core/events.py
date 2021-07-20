@@ -54,3 +54,15 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
     )
 
     return shadow_function
+
+
+@jit
+def line_of_sight(r1, r2, R):
+    r1_norm = np.linalg.norm(r1)
+    r2_norm = np.linalg.norm(r2)
+
+    theta = np.arccos(np.dot(r1, r2) / r1_norm / r2_norm)
+    theta_1 = np.arccos(R / r1_norm)
+    theta_2 = np.arccos(R / r2_norm)
+
+    return theta <= theta_1 + theta_2
