@@ -110,7 +110,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     for i in range(len(tofs)):
         t = tofs[i]
         if t_end is not None and t > t_end:
-            t = t_end
+            # Terminate propagation if for atleast one event, event.terminal is True, else continue.
+            if any(event.terminal for event in events):
+                t = t_end
         y = result.sol(t)
         rrs.append(y[:3])
         vvs.append(y[3:])
