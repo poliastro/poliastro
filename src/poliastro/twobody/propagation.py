@@ -101,18 +101,40 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     if not result.success:
         raise RuntimeError("Integration failed")
 
-    t_end = (
-        min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
-    )
+    # t_end = (
+    #     min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
+    # )
+
+    # if any(event.terminal for event in events):
+
+    ###
+    # Collect only the terminal events
+    terminal_events = [event for event in events if event.terminal]
+
+    # If there are no terminal events, then the last time of integration is the
+    # greatest one from the original array of propagation times
+    if not terminal_events:
+        last_t = max(tofs)
+        limiting_event = None
+    else:
+        # Filter the event which triggered first
+        last_t = min([event.last_t for event in terminal_events]).to_value(u.s)
+        limiting_event = [event for event in terminal_events if event.last_t == last_t]
+
+    tofs = [tof for tof in tofs if tof <= last_t] # Only this line will return empty `rr` if len(tofs) == 1.
+    # print(tofs)
+    # below_or_equal_last_t = tofs <= last_t
+    # print(below_or_equal_last_t)
+    # tofs = tofs[below_or_equal_last_t]
+    # print(tofs)
+    ###
 
     rrs = []
     vvs = []
     for i in range(len(tofs)):
         t = tofs[i]
-        if t_end is not None and t > t_end:
-            # Terminate propagation if for atleast one event, event.terminal is True, else continue.
-            if any(event.terminal for event in events):
-                t = t_end
+        # if t_end is not None and t > t_end:
+        #     t = t_end
         y = result.sol(t)
         rrs.append(y[:3])
         vvs.append(y[3:])
