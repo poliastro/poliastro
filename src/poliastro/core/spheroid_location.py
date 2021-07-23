@@ -181,9 +181,9 @@ def cartesian_to_ellipsoidal(_a, _c, x, y, z):
     lat = np.arctan((z + e2_ * _c * np.sin(th) ** 3) / (p - e2 * _a * np.cos(th) ** 3))
 
     v = _a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
-    if lat == np.pi / 2 or lat:
+    if lat == np.pi / 2 or lat == 0:
         h = z / np.sin(lat) - (1 - e2) * v
     else:
         h = x / np.cos(lat) - v
-
+    # print(lat)
     return lat, lon, h
