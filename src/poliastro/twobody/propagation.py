@@ -109,14 +109,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
         # greatest one from the original array of propagation times
         if not terminal_events:
             last_t = max(tofs)
-            limiting_event = None
         else:
             # Filter the event which triggered first
             last_t = min([event.last_t for event in terminal_events]).to_value(u.s)
-            limiting_event = [
-                event for event in terminal_events if event.last_t == last_t
-            ]
-
             tofs = [tof for tof in tofs if tof < last_t] + [last_t]
 
     rrs = []
