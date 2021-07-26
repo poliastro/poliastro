@@ -14,9 +14,9 @@ from poliastro.plotting.util import generate_sphere
 
 
 class _PlotlyOrbitPlotter(BaseOrbitPlotter):
-    def __init__(self, figure=None, *, num_points=150, plane=None):
+    def __init__(self, figure=None, *, num_points=150, plane=None, unit):
         super().__init__(num_points=num_points, plane=plane)
-
+        self.unit = unit
         self._figure = figure or Figure()
         self._layout = None
 
@@ -145,8 +145,9 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 class OrbitPlotter3D(_PlotlyOrbitPlotter):
     """OrbitPlotter3D class."""
 
-    def __init__(self, figure=None, dark=False, *, num_points=150, plane=None):
+    def __init__(self, figure=None, dark=False, *, num_points=150, plane=None, unit):
         super().__init__(figure, num_points=num_points, plane=plane)
+        self.unit =unit
         self._layout = Layout(
             autosize=True,
             scene=dict(
@@ -184,9 +185,9 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
     def _plot_coordinates(self, coordinates, label, colors, dashed):
         trace = Scatter3d(
-            x=coordinates.x.to(u.km).value,
-            y=coordinates.y.to(u.km).value,
-            z=coordinates.z.to(u.km).value,
+            x=coordinates.x.to_value(self.unit),
+            y=coordinates.y.to_value(self.unit),
+            z=coordinates.z.to_value(self.unit),
             name=label,
             line=dict(color=colors[0], width=5, dash="dash" if dashed else "solid"),
             mode="lines",  # Boilerplate
@@ -246,8 +247,9 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     .. versionadded:: 0.9.0
     """
 
-    def __init__(self, figure=None, *, num_points=150, plane=None):
+    def __init__(self, figure=None, *, num_points=150, plane=None, unit):
         super().__init__(figure, num_points=num_points, plane=plane)
+        self.unit = unit
         self._layout = Layout(
             autosize=True,
             xaxis=dict(title="x (km)", constrain="domain"),
