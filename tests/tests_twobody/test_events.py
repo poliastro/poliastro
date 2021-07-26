@@ -13,6 +13,7 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.events import (
     AltitudeCrossEvent,
     LatitudeCrossEvent,
+    NodeCrossEvent,
     PenumbraEvent,
     UmbraEvent,
 )
@@ -207,3 +208,44 @@ def test_penumbra_event_crossing():
     )
 
     assert expected_penumbra_t.isclose(epoch + penumbra_event.last_t, atol=1 * u.s)
+
+
+def test_node_cross_event():
+    t_node = 3.46524036 * u.s
+    r = [-6142438.668, 3492467.56, -25767.257] << u.km
+    v = [505.848, 942.781, 7435.922] << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r, v)
+
+    node_event = NodeCrossEvent(terminal=True)
+    events = [node_event]
+
+    tofs = [0.01, 0.1, 0.5, 0.8, 1, 3, 5, 6, 10, 15] << u.s
+    rr, vv = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        events=events,
+    )
+
+    assert_quantity_allclose(node_event.last_t, t_node)
+
+
+def test_node_event_equatorial_orbit():
+    node_event = NodeCrossEvent(terminal=True)
+    events = [node_event]
+
+    r = np.array([9946.2, 1035.4, 0.0])
+    v = np.array([7.0, -0.1, 0.0])
+    orb = Orbit.from_vectors(Earth, r * u.km, v * u.km / u.s)
+
+    tofs = [5, 10, 50] << u.s
+    rr, vv = cowell(
+        Earth.k,
+        orb.r,
+        orb.v,
+        tofs,
+        events=events,
+    )
+
+    assert_quantity_allclose(node_event.last_t, 0.0 * u.s, atol=1e-1 * u.s)

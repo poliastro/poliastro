@@ -225,5 +225,5 @@ class NodeCrossEvent(Event):
         super().__init__(terminal, direction)
 
     def __call__(self, t, u_, k):
-        self._last = t
+        self._last_t = t
         return u_[2]
