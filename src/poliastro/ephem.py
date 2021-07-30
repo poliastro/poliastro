@@ -152,7 +152,7 @@ class Ephem:
     """Time history of position and velocity of some object at particular epochs.
 
     Instead of creating Ephem objects directly,
-    you are encouraged to use the available classmethods.
+    the user is encouraged to use the available classmethods.
 
     Parameters
     ----------
