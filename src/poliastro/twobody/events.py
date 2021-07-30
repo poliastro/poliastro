@@ -98,9 +98,9 @@ class LatitudeCrossEvent(Event):
         Orbit.
     lat: astropy.quantity.Quantity
         Threshold latitude.
-    terminal: bool
+    terminal: bool, optional
         Whether to terminate integration if this event occurs, defaults to True.
-    direction: float
+    direction: float, optional
         Handle triggering of event based on whether latitude is crossed from above
         or below, defaults to 0, i.e., event is triggered while traversing from both directions.
 
@@ -221,9 +221,23 @@ class UmbraEvent(EclipseEvent):
 
 
 class NodeCrossEvent(Event):
+    """Detect equatorial node (ascending or descending) crossings.
+
+    Parameters
+    ----------
+    terminal: bool, optional
+        Whether to terminate integration when the event occurs, defaults to False.
+    direction: float, optional
+        Handle triggering of event based on whether the node is crossed from above
+        i.e. descending node, or is crossed from below i.e. ascending node, defaults to 0,
+        i.e. event is triggered during both crossings.
+
+    """
+
     def __init__(self, terminal=False, direction=0):
         super().__init__(terminal, direction)
 
     def __call__(self, t, u_, k):
         self._last_t = t
+        # Check if z-coordinate of the satellite is zero or not.
         return u_[2]
