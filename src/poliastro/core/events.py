@@ -25,6 +25,10 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
         Whether to calculate the shadow function for umbra or penumbra, defaults to True
         i.e. calculates for umbra.
 
+    Note
+    ----
+    The shadow function is taken from Escobal, P. (1985). Methods of orbit determination.
+
     """
     # Plus or minus condition
     pm = 1 if umbra else -1
