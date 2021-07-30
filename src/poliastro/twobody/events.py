@@ -218,3 +218,12 @@ class UmbraEvent(EclipseEvent):
         )
 
         return shadow_function
+
+
+class NodeCrossEvent(Event):
+    def __init__(self, terminal=False, direction=0):
+        super().__init__(terminal, direction)
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+        return u_[2]
