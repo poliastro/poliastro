@@ -282,7 +282,7 @@ def test_orbit_propagation_position_vector_does_not_repeat_if_events_terminal_is
 
     thresh_lat = 60 * u.deg
     # Event occurs at ~1701.7 s.
-    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=True)
+    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat)
     events = [latitude_cross_event]
 
     # The last two tofs are after the detection of the event.
