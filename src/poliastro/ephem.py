@@ -151,8 +151,7 @@ def _get_destination_frame(attractor, plane, epochs):
 class Ephem:
     """Time history of position and velocity of some object at particular epochs.
 
-    Instead of creating Ephem objects directly,
-    the user is encouraged to use the available classmethods.
+    Instead of creating Ephem objects directly, use the available classmethods.
 
     Parameters
     ----------

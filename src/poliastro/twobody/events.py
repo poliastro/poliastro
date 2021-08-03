@@ -239,5 +239,5 @@ class NodeCrossEvent(Event):
 
     def __call__(self, t, u_, k):
         self._last_t = t
-        # Check if z-coordinate of the satellite is zero or not.
+        # Check if the z coordinate of the satellite is zero.
         return u_[2]
