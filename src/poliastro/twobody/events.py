@@ -8,6 +8,8 @@ from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
 
+from poliastro.spheroid_location import SpheroidLocation
+
 
 class Event:
     """Base class for event functionalities.
@@ -241,3 +243,20 @@ class NodeCrossEvent(Event):
         self._last_t = t
         # Check if the z coordinate of the satellite is zero.
         return u_[2]
+
+
+class SatelliteVisibility(Event):
+    def __init__(self, lon, lat, h, body, terminal=False, direction=0):
+        super().__init__(terminal, direction)
+        sph_loc = SpheroidLocation(lon, lat, h, body)
+        self._lon = lon.to(u.rad).value
+        self._lat = lat.to(u.rad).value
+        self._H = h.to(u.m).value
+        self._R_primary = body.R.to(u.m).value
+        self._N = sph_loc.N
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+
+        visibility_function = visibility_function_fast(u_, self._N, self._lat, self._H, self._R_primary)
+        return visibility_function
