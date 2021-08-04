@@ -54,3 +54,20 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
     )
 
     return shadow_function
+
+
+@jit
+def satellite_visibility(u_, N, phi, H, R_primary):
+    p, ecc, inc, raan, argp, nu = rv2coe(k, u_[:3], u_[3:])
+    a = p / (1 - ecc ** 2)
+
+    PQW = coe_rotation_matrix(inc, raan, argp)
+    P_, Q_ = np.ascontiguousarray(PQW[:, 0]), np.ascontiguousarray(PQW[:, 1])
+
+    denom = np.sqrt(1 - (2 * f - f ** 2) * np.sin(phi) ** 2))
+    g1 = H + (R_primary / denom)
+    g2 = H + (1 - f ** 2) * R_primary / denom
+    g = g1 * np.cos(phi) ** 2 + g2 * np.sin(phi) ** 2
+    visibility_function = a * (np.cos(E) - ecc) * np.dot(P_, N) + (a * np.sqrt(1 - ecc ** 2) * np.sin(E)) * np.dot(Q_, N) - g
+
+    return visibility_function
