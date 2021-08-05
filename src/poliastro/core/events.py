@@ -57,17 +57,43 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
 
 
 @jit
-def satellite_visibility(u_, N, phi, H, R_primary):
+def satellite_visibility(k, u_, N, phi, H, R):
+    """Calculates a continuous visibility function for the visibility
+    of a satellite over a ground station.
+
+    Parameters
+    ----------
+    k: float
+        Standard gravitational parameter (km^3 / s^2).
+    u_: ~numpy.array
+        Satellite position and velocity vector with respect to the central attractor.
+    N: ~numpy.array
+        Normal vector of the central attractor, an ellipsoid.
+    phi: float
+        Geodetic Latitude.
+    H: float
+        Geodetic Height.
+    R: float
+        Equatorial radius of the central attractor.
+    
+    """
     p, ecc, inc, raan, argp, nu = rv2coe(k, u_[:3], u_[3:])
     a = p / (1 - ecc ** 2)
+    E = nu_to_E(nu, ecc)
 
     PQW = coe_rotation_matrix(inc, raan, argp)
     P_, Q_ = np.ascontiguousarray(PQW[:, 0]), np.ascontiguousarray(PQW[:, 1])
 
-    denom = np.sqrt(1 - (2 * f - f ** 2) * np.sin(phi) ** 2))
-    g1 = H + (R_primary / denom)
-    g2 = H + (1 - f ** 2) * R_primary / denom
+    f = 1 - np.sqrt(1 - ecc ** 2)
+    denom = np.sqrt(1 - ecc ** 2 * np.sin(phi) ** 2)
+    g1 = H + (R / denom)
+    g2 = H + (1 - f) ** 2 * R / denom
     g = g1 * np.cos(phi) ** 2 + g2 * np.sin(phi) ** 2
-    visibility_function = a * (np.cos(E) - ecc) * np.dot(P_, N) + (a * np.sqrt(1 - ecc ** 2) * np.sin(E)) * np.dot(Q_, N) - g
+
+    visibility_function = (
+        a * (np.cos(E) - ecc) * np.dot(P_, N)
+        + (a * np.sqrt(1 - ecc ** 2) * np.sin(E)) * np.dot(Q_, N)
+        - g
+    )
 
     return visibility_function
