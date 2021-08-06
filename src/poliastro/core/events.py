@@ -2,6 +2,7 @@ import numpy as np
 from numba import njit as jit
 from numpy.linalg import norm
 
+from poliastro.core.angles import nu_to_E
 from poliastro.core.elements import coe_rotation_matrix, rv2coe
 
 
@@ -57,7 +58,7 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
 
 
 @jit
-def satellite_visibility(k, u_, N, phi, H, R):
+def visibility_function(k, u_, N, phi, H, R, el):
     """Calculates a continuous visibility function for the visibility
     of a satellite over a ground station.
 
@@ -75,7 +76,9 @@ def satellite_visibility(k, u_, N, phi, H, R):
         Geodetic Height.
     R: float
         Equatorial radius of the central attractor.
-    
+    el: float
+        Elevation, as measured from the local horizon.
+
     """
     p, ecc, inc, raan, argp, nu = rv2coe(k, u_[:3], u_[3:])
     a = p / (1 - ecc ** 2)
@@ -90,9 +93,33 @@ def satellite_visibility(k, u_, N, phi, H, R):
     g2 = H + (1 - f) ** 2 * R / denom
     g = g1 * np.cos(phi) ** 2 + g2 * np.sin(phi) ** 2
 
+    # Computation for the case when satellite is above the geodetic horizon.
+    Nx, Ny, Nz = N
+    Px, Py, Pz = P_
+    Qx, Qy, Qz = Q_
+    g0 = np.sqrt(g2 ** 2 * np.sin(phi) ** 2 + g1 ** 2 * np.cos(phi) ** 2)
+    # Compute the slant range vector
+    rho = np.sqrt(
+        a ** 2 * (1 - ecc * np.cos(E)) ** 2
+        + g0 ** 2
+        - 2
+        * g1
+        * Nx
+        * (a * (np.cos(E) - ecc) * Px + a * np.sqrt(1 - ecc ** 2) * np.sin(E * Qx))
+        - 2
+        * g1
+        * Ny
+        * (a * (np.cos(E) - ecc) * Py + a * np.sqrt(1 - ecc ** 2) * np.sin(E * Qy))
+        - 2
+        * g1
+        * Nz
+        * (a * (np.cos(E) - ecc) * Pz + a * np.sqrt(1 - ecc ** 2) * np.sin(E * Qz))
+    )
+
     visibility_function = (
         a * (np.cos(E) - ecc) * np.dot(P_, N)
         + (a * np.sqrt(1 - ecc ** 2) * np.sin(E)) * np.dot(Q_, N)
+        - rho * np.sin(el)
         - g
     )
 

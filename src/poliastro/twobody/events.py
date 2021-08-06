@@ -3,10 +3,12 @@ from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
 from numpy.linalg import norm
 
-from poliastro.core.events import eclipse_function as eclipse_function_fast, visibility_function as visibility_function_fast
+from poliastro.core.events import (
+    eclipse_function as eclipse_function_fast,
+    visibility_function as visibility_function_fast,
+)
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
-    N as N_fast,
 )
 from poliastro.spheroid_location import SpheroidLocation
 
@@ -246,20 +248,46 @@ class NodeCrossEvent(Event):
 
 
 class SatelliteVisibility(Event):
-    def __init__(self, lon, lat, h, body, terminal=False, direction=0):
+    """Detects whether a satellite is visible from a ground station.
+
+    Parameters
+    ----------
+    el: float
+        Minimum elevation angle of the station.
+    lon: float
+        Longitude of the station.
+    lat: float
+        Latitude of the station.
+    h: float
+        Geodetic height.
+    body: poliastro.bodies.Body
+        The body on which the station is defined.
+
+    """
+
+    def __init__(self, el, lon, lat, h, body, terminal=False, direction=0):
         super().__init__(terminal, direction)
+        self._el = el.to(u.rad).value
         sph_loc = SpheroidLocation(lon, lat, h, body)
         self._lon = lon.to(u.rad).value  # Unused
         self._lat = lat.to(u.rad).value
         self._H = h.to(u.km).value
         self._R = body.R.to(u.km).value
-        self._N = (sph_loc.N << u.km).value
+        self._N = (
+            sph_loc.N << u.km
+        ).value  # Instead compute in core to prevent creating SpheroidLocation object?
         self._k = body.k.to_value(u.km ** 3 / u.s ** 2)
 
     def __call__(self, t, u_, k):
         self._last_t = t
 
-        visibility_function = satellite_visibility_fast(
-            self._k, u_, self._N, self._lat, self._H, self._R,
+        visibility_function = visibility_function_fast(
+            self._k,
+            u_,
+            self._N,
+            self._lat,
+            self._H,
+            self._R,
+            self._el,
         )
         return visibility_function
