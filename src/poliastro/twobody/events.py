@@ -106,7 +106,7 @@ class LatitudeCrossEvent(Event):
 
     """
 
-    def __init__(self, orbit, lat, terminal=True, direction=0):
+    def __init__(self, orbit, lat, terminal=False, direction=0):
         super().__init__(terminal, direction)
 
         self._R = orbit.attractor.R.to(u.m).value

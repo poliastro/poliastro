@@ -249,3 +249,103 @@ def test_node_event_equatorial_orbit():
     )
 
     assert_quantity_allclose(node_event.last_t, 0.0 * u.s, atol=1e-1 * u.s)
+
+
+def test_orbit_propagation_continues_if_events_terminal_is_False():
+    r = [-6142438.668, 3492467.56, -25767.257] << u.km
+    v = [505.848, 942.781, 7435.922] << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r, v)
+
+    thresh_lat = 60 * u.deg
+    # Event occurs at ~1701.7 s.
+    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=False)
+    events = [latitude_cross_event]
+
+    # The last two tofs are after the detection of the event.
+    tofs = [1000, 1250, 1500, 1710, 2000] << u.s
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        events=events,
+    )
+
+    # Check position vectors don't repeat during propagation.
+    assert not np.allclose(rr[-1], rr[-2])
+
+
+def test_orbit_propagation_position_vector_does_not_repeat_if_events_terminal_is_True():
+    r = [-6142438.668, 3492467.56, -25767.257] << u.km
+    v = [505.848, 942.781, 7435.922] << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r, v)
+
+    thresh_lat = 60 * u.deg
+    # Event occurs at ~1701.7 s.
+    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=True)
+    events = [latitude_cross_event]
+
+    # The last two tofs are after the detection of the event.
+    tofs = [1000, 1250, 1500, 1710, 2000] << u.s
+    rr, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        events=events,
+    )
+
+    # Check position vector doesn't repeat if terminal set to True.
+    assert len(rr) == 4  # From the 5th tof in tofs, position vector starts repeating.
+
+
+@pytest.mark.parametrize(
+    "latitude_terminal,penumbra_terminal,rr_length,t_end",
+    [
+        (True, True, 4, 266.15058 * u.s),
+        (True, False, 5, 305.65173 * u.s),
+        (False, True, 4, 266.15058 * u.s),
+        (False, False, 6, 500 * u.s),
+    ],
+)
+def test_propagation_stops_if_atleast_one_event_has_terminal_set_to_True(
+    latitude_terminal, penumbra_terminal, rr_length, t_end
+):
+    # Penumbra occurs at 266.15058s and latitude event occurs at 305.65173s.
+    # `terminals` is for latitude event and penumbra event, in that order.
+    attractor = Earth
+    tofs = [50, 100, 150, 300, 400, 500] << u.s
+    epoch = Time("2020-01-01", scale="utc")
+    coe = (
+        6828137.0 * u.m,
+        0.0073 * u.one,
+        87.0 * u.deg,
+        20.0 * u.deg,
+        10.0 * u.deg,
+        0 * u.deg,
+    )
+    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
+
+    penumbra_event = PenumbraEvent(orbit, terminal=penumbra_terminal)
+
+    thresh_lat = 30 * u.deg
+    latitude_cross_event = LatitudeCrossEvent(
+        orbit, thresh_lat, terminal=latitude_terminal
+    )
+    events = [penumbra_event, latitude_cross_event]
+
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+        events=events,
+    )
+
+    assert len(rr) == rr_length
+    if penumbra_terminal:
+        assert_quantity_allclose(penumbra_event.last_t, t_end)
+    elif latitude_terminal and not penumbra_terminal:
+        assert_quantity_allclose(latitude_cross_event.last_t, t_end)
+    else:
+        assert_quantity_allclose(t_end, tofs[-1])
