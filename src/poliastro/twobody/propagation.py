@@ -472,8 +472,6 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         raise ValueError(
             "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
         )
-    else:
-        pass
 
     rr, vv = method(
         orbit.attractor.k,

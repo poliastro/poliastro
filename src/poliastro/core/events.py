@@ -18,12 +18,17 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
     r_sec: ~np.array
         Position vector of the secondary body with respect to the primary body.
     R_sec: float
-        Radius of the secondary body.
+        Equatorial radius of the secondary body.
     R_primary: float
-        Radius of the primary body.
+        Equatorial radius of the primary body.
     umbra: bool
         Whether to calculate the shadow function for umbra or penumbra, defaults to True
         i.e. calculates for umbra.
+
+    Note
+    ----
+    The shadow function is taken from Escobal, P. (1985). Methods of orbit determination.
+    The current implementation assumes circular bodies and doesn't account for flattening.
 
     """
     # Plus or minus condition
