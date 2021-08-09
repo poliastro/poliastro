@@ -18,6 +18,7 @@ from poliastro.twobody.events import (
     LosEvent,
     NodeCrossEvent,
     PenumbraEvent,
+    SatelliteViewEvent,
     UmbraEvent,
 )
 from poliastro.twobody.propagation import cowell
@@ -524,23 +525,23 @@ def test_eclipse_does_not_trigger_when_satellite_view_event_triggers():
     satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
 
     # Satellite view
-    events = [satellite_view_event]
+    events_1 = [satellite_view_event]
     rr, _ = cowell(
         attractor.k,
         orbit.r,
         orbit.v,
         [tof] * u.s,
-        events=events,
+        events=events_1,
     )
 
     # Eclipse
-    events = [penumbra_event]
+    events_2 = [penumbra_event]
     rr, _ = cowell(
         attractor.k,
         orbit.r,
         orbit.v,
         [tof] * u.s,
-        events=events,
+        events=events_2,
     )
 
     expected_view_t.isclose(epoch + satellite_view_event.last_t)
