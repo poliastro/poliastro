@@ -112,16 +112,20 @@ def satellite_view(k, u_, r_sec):
     E = nu_to_E(nu, ecc)
 
     r_sec_norm = norm(r_sec)
-    r_norm = norm(u_[:3])
 
     PQW = coe_rotation_matrix(inc, raan, argp)
     P_, Q_ = np.ascontiguousarray(PQW[:, 0]), np.ascontiguousarray(PQW[:, 1])
 
-    cos_psi = np.dot(u_[:3], r_sec) / r_sec_norm / r_norm
+    beta = np.dot(P_, r_sec) / r_sec_norm
+    zeta = np.dot(Q_, r_sec) / r_sec_norm
+
+    cos_psi = beta * np.cos(nu) + zeta * np.sin(nu)
+
     view_function = (
-        (np.cos(E) - ecc) * (np.dot(P_, r_sec))
-        + (np.sqrt(1 - ecc ** 2) * np.sin(E)) * np.dot(Q_, r_sec)
-        - (1 - ecc * np.cos(E)) * r_sec_norm * cos_psi
+        (beta + ecc * cos_psi) * np.cos(E)
+        + (zeta * np.sqrt(1 - ecc ** 2)) * np.sin(E)
+        - beta * ecc
+        - cos_psi
     )
 
     return view_function
