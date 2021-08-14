@@ -345,6 +345,7 @@ nbsphinx_thumbnails = {
     'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
     'examples/Generating orbit groundtracks': '_static/thumbnails/groundtrack.png',
+    'examples/Detecting Events': '_static/thumbnails/eclipse.png',
 }
 
 # Custom nbsphinx format for Jupytext markdown notebooks

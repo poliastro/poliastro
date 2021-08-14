@@ -42,16 +42,6 @@ from astropy.time import Time
 from astropy.coordinates import CartesianRepresentation, get_body_barycentric_posvel
 
 from poliastro.bodies import Earth, Sun
-from poliastro.constants import H0_earth, rho0_earth
-from poliastro.earth import EarthSatellite
-from poliastro.earth.plotting import GroundtrackPlotter
-from poliastro.frames import Planes
-from poliastro.plotting import StaticOrbitPlotter
-
-from poliastro.core.events import eclipse_function
-from poliastro.core.perturbations import atmospheric_drag_exponential
-from poliastro.core.propagation import func_twobody
-from poliastro.core.spheroid_location import cartesian_to_ellipsoidal
 
 from poliastro.twobody.events import(
     AltitudeCrossEvent,
@@ -70,7 +60,11 @@ from poliastro.util import time_range
 Let's define some natural perturbation conditions for our orbit so that its altitude decreases with time.
 
 ```{code-cell} ipython3
-R = Earth.R.to(u.km).value
+from poliastro.constants import H0_earth, rho0_earth
+from poliastro.core.perturbations import atmospheric_drag_exponential
+from poliastro.core.propagation import func_twobody
+
+R = Earth.R.to_value(u.km)
 
 # Parameters of the body
 C_D = 2.2  # Dimensionless (any value would do)
@@ -79,8 +73,8 @@ A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
 )  # km^2/kg
 
 # Parameters of the atmosphere
-rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
-H0 = H0_earth.to(u.km).value  # km
+rho0 = rho0_earth.to_value(u.kg / u.km ** 3)  # kg/km^3
+H0 = H0_earth.to_value(u.km)  # km
 
 def f(t0, u_, k):
     du_kep = func_twobody(t0, u_, k)
@@ -132,16 +126,16 @@ Similar to the `AltitudeCrossEvent`, just pass the threshold latitude while inst
 
 ```{code-cell} ipython3
 orbit = Orbit.from_classical(
-    Earth, 6900 << u.km, 0.63 * u.one, 30 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg
+    Earth, 6900 << u.km, 0.75 * u.one, 45 * u.deg, 0 * u.deg, 0 * u.deg, 130 * u.deg
 )
 ```
 
 ```{code-cell} ipython3
-thresh_lat = 20 * u.deg
+thresh_lat = 35 * u.deg
 latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=True)
 events = [latitude_cross_event]
 
-tofs = np.arange(0, 2000, 10) << u.s
+tofs = np.arange(0, 20 * orbit.period.to_value(u.s), 150) << u.s
 rr, _ = cowell(
     Earth.k,
     orbit.r,
@@ -155,6 +149,8 @@ print(f"The threshold latitude was crossed {latitude_cross_event.last_t} s after
 Let's plot the latitude varying with time:
 
 ```{code-cell} ipython3
+from poliastro.core.spheroid_location import cartesian_to_ellipsoidal
+
 latitudes = []
 for r in rr:
     position_on_body = (r / norm(r)) * Earth.R
@@ -166,16 +162,20 @@ plt.ylabel("Latitude (in degrees)");
 plt.xlabel("Time (in days)");
 ```
 
-The orbit latitude doesn't change after the event was detected since we had set `terminal=True`.
+The orbit's latitude would not change after the event was detected since we had set `terminal=True`.
 
 Since the attractor is `Earth`, we could use `GroundtrackPlotter` for showing the groundtrack of the
 orbit on Earth.
 
 ```{code-cell} ipython3
+from poliastro.earth import EarthSatellite
+from poliastro.earth.plotting import GroundtrackPlotter
+from poliastro.plotting import StaticOrbitPlotter
+
 es = EarthSatellite(orbit, None)
 
 # Show the groundtrack plot from
-t_span = time_range(orbit.epoch - 1.5 * u.h, end=orbit.epoch + latitude_cross_event.last_t)
+t_span = time_range(orbit.epoch, end=orbit.epoch + latitude_cross_event.last_t)
 
 # Generate ground track plotting instance.
 gp = GroundtrackPlotter()
@@ -198,7 +198,7 @@ gp.update_geos(projection_type="orthographic")
 gp.fig.show()
 ```
 
-and voila! The groundtrack terminates almost at the 60 degree latitude mark.
+and voila! The groundtrack terminates almost at the 35 degree latitude mark.
 
 ## Eclipse Event
 
@@ -206,6 +206,8 @@ Users can detect umbra/penumbra crossings using the `UmbraEvent` and `PenumbraEv
 respectively. As seen from the above examples, the procedure doesn't change much.
 
 ```{code-cell} ipython3
+from poliastro.core.events import eclipse_function
+
 attractor = Earth
 tof = 2 * u.d
 # Classical orbital elements
@@ -289,11 +291,22 @@ It seems our satellite is exiting the umbra region, as is evident from the orang
 
 ## Node Cross Event
 
+This event detector aims to check for ascending and descending node crossings. Note that it could
+yield inaccurate results if the orbit is near-equatorial.
+
 ```{code-cell} ipython3
 r = [-3182930.668, 94242.56, -85767.257] << u.km
 v = [505.848, 942.781, 7435.922] << u.km / u.s
 orbit = Orbit.from_vectors(Earth, r, v)
 ```
+
+As a sanity check, let's check the orbit's inclination to ensure it is not near-zero:
+
+```{code-cell} ipython3
+print(orbit.inc)
+```
+
+Indeed, it isn't!
 
 ```{code-cell} ipython3
 node_event = NodeCrossEvent(terminal=True)
@@ -348,7 +361,8 @@ gp.update_geos(projection_type="orthographic")
 gp.fig.show()
 ```
 
-Indeed, we can observe that it's an ascending node crossing!
+Indeed, we can observe that it's an ascending node crossing! If we want to only detect
+either of the two crossings, the `direction` attribute is at our disposal!
 
 
 ## Multiple Event Detection
