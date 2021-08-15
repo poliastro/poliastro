@@ -1,6 +1,7 @@
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
+from astropy.time import Time
 from numpy.linalg import norm
 
 from poliastro.core.events import (
@@ -10,7 +11,8 @@ from poliastro.core.events import (
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
-from poliastro.spheroid_location import SpheroidLocation
+
+# from poliastro.spheroid_location import SpheroidLocation
 
 
 class Event:
@@ -252,42 +254,51 @@ class SatelliteVisibility(Event):
 
     Parameters
     ----------
-    el: float
+    orbit: poliastro.twobody.orbit.Orbit
+        Satellite's orbit
+    el: ..
         Minimum elevation angle of the station.
-    lon: float
-        Longitude of the station.
-    lat: float
+    lon: astropy.quantity.Quantity
+        East longitude of the station.
+    lat: astropy.quantity.Quantity
         Latitude of the station.
-    h: float
-        Geodetic height.
+    h: astropy.quantity.Quantity
+        Height of the station above the attractor (ellipsoid).
     body: poliastro.bodies.Body
-        The body on which the station is defined.
+        The body on which the station exists.
 
     """
 
-    def __init__(self, el, lon, lat, h, body, terminal=False, direction=0):
+    def __init__(self, orbit, lat, lon, h, body, terminal=False, direction=0):
         super().__init__(terminal, direction)
-        self._el = el.to(u.rad).value
-        sph_loc = SpheroidLocation(lon, lat, h, body)
-        self._lon = lon.to(u.rad).value  # Unused
-        self._lat = lat.to(u.rad).value
-        self._H = h.to(u.km).value
+        self._orbit = orbit
+        self._lon = lon.to(u.rad)
+        self._lat = lat.to(u.rad)
+        self._H = h.to(u.km)
         self._R = body.R.to(u.km).value
-        self._N = (
-            sph_loc.N << u.km
-        ).value  # Instead compute in core to prevent creating SpheroidLocation object?
         self._k = body.k.to_value(u.km ** 3 / u.s ** 2)
+        self._R_p = orbit.attractor.R_polar.to(u.km).value
 
     def __call__(self, t, u_, k):
         self._last_t = t
 
-        visibility_function = visibility_function_fast(
+        current_time = Time(
+            self._orbit.epoch + t * u.s,
+            scale="utc",
+            location=(self._lon, self._lat, self._H),
+        )
+
+        # Local sidereal time = Greenwich Mean Sidereal time + East longitude of station.
+        # theta must be in [0, 360] degree range.
+        theta = current_time.sidereal_time("mean", "greenwich") + self._lon
+
+        el = visibility_function_fast(
             self._k,
             u_,
-            self._N,
-            self._lat,
-            self._H,
+            self._lat.to_value(u.rad),
+            theta.to_value(u.rad),
             self._R,
-            self._el,
+            self._R_p,
+            self._H.to_value(u.km),
         )
-        return visibility_function
+        return el
