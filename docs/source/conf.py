@@ -90,9 +90,6 @@ suppress_warnings = ['image.nonlocal_uri']
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
-# The master toctree document.
-master_doc = 'index'
-
 # General information about the project.
 project = 'poliastro'
 copyright = u'2013-2021, Juan Luis Cano Rodríguez and the poliastro development team'
