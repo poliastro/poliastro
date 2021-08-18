@@ -70,6 +70,7 @@ cesium = ["czml3 ~=0.5.3"]
 dev = [
     "black==21.5b0",
     "coverage",
+    "docutils<0.17",  # https://github.com/poliastro/poliastro/issues/1305
     "hypothesis",
     "ipython>=5.0",
     "ipywidgets>=7.6",
@@ -91,7 +92,7 @@ dev = [
     "sphinx-autoapi",
     "sphinx-gallery",
     "sphinx_rtd_theme~=1.0.0rc1",
-    "sphinx-hoverxref==0.7b1",
+    "sphinx-hoverxref==0.6b1",  # https://github.com/poliastro/poliastro/issues/1305
     "sphinx-notfound-page",
 ]
 
