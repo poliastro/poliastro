@@ -88,7 +88,7 @@ dev = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
-    "sphinx!=3.5,!=4.0,!=4.1",  # https://github.com/poliastro/poliastro/issues/1305
+    "sphinx!=3.5.*,!=4.0.*,!=4.1.*",  # https://github.com/poliastro/poliastro/issues/1305
     "sphinx-autoapi",
     "sphinx-gallery",
     "sphinx_rtd_theme~=1.0.0rc1",
