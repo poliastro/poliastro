@@ -90,7 +90,7 @@ dev = [
     "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery",
-    "sphinx_rtd_theme~=0.5.0",
+    "sphinx_rtd_theme~=1.0.0rc1",
     "sphinx-hoverxref==0.7b1",
     "sphinx-notfound-page",
 ]
