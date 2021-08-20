@@ -77,11 +77,6 @@ def line_of_sight(r1, r2, R):
 
     """
     r1_norm = np.linalg.norm(r1)
-    if r1_norm <= R:
-        raise ValueError(
-            "The norm of the position vector r_1 is less than the radius of the attractor."
-        )
-
     r2_norm = np.linalg.norm(r2)
 
     theta = np.arccos(np.dot(r1, r2) / r1_norm / r2_norm)

@@ -1,3 +1,5 @@
+from warnings import warn
+
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
@@ -270,6 +272,11 @@ class LosEvent(Event):
 
     def __call__(self, t, u_, k):
         self._last_t = t
+
+        if norm(u_[:3]) < self._R:
+            warn(
+                "The norm of the position vector of the primary body is less than the radius of the attractor."
+            )
 
         pos_coord = self._pos_coords.pop(0) if self._pos_coords else self._last_coord
 

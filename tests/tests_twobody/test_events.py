@@ -14,6 +14,7 @@ from poliastro.twobody import Orbit
 from poliastro.twobody.events import (
     AltitudeCrossEvent,
     LatitudeCrossEvent,
+    LithobrakeEvent,
     LosEvent,
     NodeCrossEvent,
     PenumbraEvent,
@@ -367,7 +368,7 @@ def test_line_of_sight():
     assert los_with_sun >= 0  # LOS condition.
 
 
-def test_LOS_event_raises_error_if_norm_of_r1_less_than_attractor_radius_during_propagation():
+def test_LOS_event_raises_warning_if_norm_of_r1_less_than_attractor_radius_during_propagation():
     r2 = np.array([-500, 1500, 4012.09]) << u.km
     v2 = np.array([5021.38, -2900.7, 1000.354]) << u.km / u.s
     orbit = Orbit.from_vectors(Earth, r2, v2)
@@ -392,7 +393,7 @@ def test_LOS_event_raises_error_if_norm_of_r1_less_than_attractor_radius_during_
     events = [los_event]
     tofs = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.5] << u.s
 
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.warns(UserWarning, match="The norm of the position vector"):
         r, v = cowell(
             Earth.k,
             orb.r,
@@ -400,7 +401,74 @@ def test_LOS_event_raises_error_if_norm_of_r1_less_than_attractor_radius_during_
             tofs,
             events=events,
         )
-    assert (
-        "The norm of the position vector r_1 is less than the radius of the attractor"
-        in excinfo.exconly()
+
+
+@pytest.mark.filterwarnings("ignore::UserWarning")
+def test_LOS_event_with_lithobrake_event_raises_warning_when_satellite_cuts_attractor():
+    r2 = np.array([-500, 1500, 4012.09]) << u.km
+    v2 = np.array([5021.38, -2900.7, 1000.354]) << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r2, v2)
+
+    tofs = [100, 500, 1000, 2000] << u.s
+    # Propagate the secondary body to generate its position coordinates.
+    rr, vv = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
     )
+    pos_coords = rr  # Trajectory of the secondary body.
+
+    r1 = np.array([0, -5010.696, -5102.509]) << u.km
+    v1 = np.array([736.138, 2989.7, 164.354]) << u.km / u.s
+    orb = Orbit.from_vectors(Earth, r1, v1)
+
+    los_event = LosEvent(Earth, pos_coords, terminal=True)
+    tofs = [0.003, 0.004, 0.01, 0.02, 0.03, 0.04, 0.07, 0.1, 0.2, 0.3, 0.4, 1, 3] << u.s
+
+    lithobrake_event = LithobrakeEvent(Earth.R.to_value(u.km))
+    events = [lithobrake_event, los_event]
+    r, v = cowell(
+        Earth.k,
+        orb.r,
+        orb.v,
+        tofs,
+        events=events,
+    )
+
+    assert lithobrake_event.last_t < los_event.last_t
+
+
+def test_LOS_event():
+    t_los = 2327.165 * u.s
+    r2 = np.array([-500, 1500, 4012.09]) << u.km
+    v2 = np.array([5021.38, -2900.7, 1000.354]) << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r2, v2)
+
+    tofs = [100, 500, 1000, 2000] << u.s
+    # Propagate the secondary body to generate its position coordinates.
+    rr, vv = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        tofs,
+    )
+    pos_coords = rr  # Trajectory of the secondary body.
+
+    orb = Orbit.from_classical(
+        Earth, 16000 * u.km, 0.53 * u.one, 5 * u.deg, 5 * u.deg, 10 * u.deg, 30 * u.deg
+    )
+
+    los_event = LosEvent(Earth, pos_coords, terminal=True)
+    events = [los_event]
+    tofs = [1, 5, 10, 100, 1000, 2000, 3000, 5000] << u.s
+
+    r, v = cowell(
+        Earth.k,
+        orb.r,
+        orb.v,
+        tofs,
+        events=events,
+    )
+
+    assert_quantity_allclose(los_event.last_t, t_los)
