@@ -23,5 +23,6 @@ the plotting utilities, insight on the {ref}`API <api-reference>` capabilities a
    /examples/Natural and artificial perturbations.mystnb
    /examples/Porkchops with poliastro.mystnb
    /examples/Tisserand.mystnb
+   /examples/Detecting Events.mystnb
    
 ```
