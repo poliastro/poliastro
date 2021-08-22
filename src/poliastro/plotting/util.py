@@ -35,13 +35,3 @@ def generate_sphere(radius, center, num=20):
     zz = z_center + radius * np.cos(vv)
 
     return xx, yy, zz
-
-
-def generate_circle(radius, center, num=500):
-    u1 = np.linspace(0, 2 * np.pi, num)
-    x_center, y_center, z_center = center
-
-    xx = x_center + radius * np.cos(u1)
-    yy = y_center + radius * np.sin(u1)
-
-    return xx, yy
