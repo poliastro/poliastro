@@ -55,6 +55,18 @@ extensions = [
     'myst_parser',
 ]
 
+# MathJax config
+# See https://github.com/spatialaudio/nbsphinx/issues/572#issuecomment-853389268
+mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+mathjax2_config = {
+    'tex2jax': {
+        'inlineMath': [['$', '$'], ['\\(', '\\)']],
+        'processEscapes': True,
+        'ignoreClass': 'document',
+        'processClass': 'math|output_area',
+    }
+}
+
 # Hoverxref Extension
 hoverxref_auto_ref = True
 hoverxref_mathjax = True
