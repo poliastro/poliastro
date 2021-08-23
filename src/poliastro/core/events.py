@@ -92,7 +92,7 @@ def visibility_function(k, u_, phi, theta, R, R_p, H):
     )
 
     # Position of satellite with respect to station.
-    rho = np.add(u_[:3], -1 * station_coords)
+    rho = np.subtract(u_[:3], station_coords)
     # Transformation matrix for converting geocentric equatorial coordinates to topocentric horizon system.
     rot_matrix = np.array(
         [

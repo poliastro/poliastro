@@ -251,7 +251,6 @@ class NodeCrossEvent(Event):
 
 class SatelliteVisibility(Event):
     """Detects whether a satellite is visible from a ground station.
-
     Parameters
     ----------
     orbit: poliastro.twobody.orbit.Orbit
@@ -261,31 +260,31 @@ class SatelliteVisibility(Event):
     lon: astropy.quantity.Quantity
         East longitude of the station.
     lat: astropy.quantity.Quantity
-        Latitude of the station.
+        Latitude of the station, must be in the range [-pi/2, pi/2].
     h: astropy.quantity.Quantity
         Height of the station above the attractor (ellipsoid).
     body: poliastro.bodies.Body
         The body on which the station exists.
-
     """
 
-    def __init__(self, orbit, lat, lon, h, body, terminal=False, direction=0):
+    def __init__(self, orbit, lat, lon, h, terminal=False, direction=0):
         super().__init__(terminal, direction)
         self._orbit = orbit
         self._lon = lon.to(u.rad)
         self._lat = lat.to(u.rad)
         self._H = h.to(u.km)
-        self._R = body.R.to(u.km).value
-        self._k = body.k.to_value(u.km ** 3 / u.s ** 2)
+        self._R = orbit.attractor.R.to(u.km).value
+        self._k = orbit.attractor.k.to_value(u.km ** 3 / u.s ** 2)
         self._R_p = orbit.attractor.R_polar.to(u.km).value
 
     def __call__(self, t, u_, k):
         self._last_t = t
 
+        location = (self._lon, self._lat, self._H)
         current_time = Time(
             self._orbit.epoch + t * u.s,
             scale="utc",
-            location=(self._lon, self._lat, self._H),
+            location=location,
         )
 
         # Local sidereal time = Greenwich Mean Sidereal time + East longitude of station.
