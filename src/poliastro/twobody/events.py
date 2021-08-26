@@ -4,6 +4,7 @@ from astropy.coordinates import get_body_barycentric_posvel
 from astropy.time import Time
 from numpy.linalg import norm
 
+from poliastro.bodies import Earth
 from poliastro.core.events import (
     eclipse_function as eclipse_function_fast,
     visibility_function as visibility_function_fast,
@@ -11,8 +12,6 @@ from poliastro.core.events import (
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
-
-# from poliastro.spheroid_location import SpheroidLocation
 
 
 class Event:
@@ -249,26 +248,30 @@ class NodeCrossEvent(Event):
         return u_[2]
 
 
-class SatelliteVisibility(Event):
+class SatelliteVisibilityEvent(Event):
     """Detects whether a satellite is visible from a ground station.
+
     Parameters
     ----------
     orbit: poliastro.twobody.orbit.Orbit
         Satellite's orbit
-    el: ..
-        Minimum elevation angle of the station.
-    lon: astropy.quantity.Quantity
-        East longitude of the station.
     lat: astropy.quantity.Quantity
         Latitude of the station, must be in the range [-pi/2, pi/2].
+    lon: astropy.quantity.Quantity
+        East longitude of the station.
     h: astropy.quantity.Quantity
         Height of the station above the attractor (ellipsoid).
-    body: poliastro.bodies.Body
-        The body on which the station exists.
+
     """
 
     def __init__(self, orbit, lat, lon, h, terminal=False, direction=0):
         super().__init__(terminal, direction)
+
+        if orbit.attractor != Earth:
+            raise ValueError(
+                "The satellite visibility event only supports Earth as the orbit's attractor."
+            )
+
         self._orbit = orbit
         self._lon = lon.to(u.rad)
         self._lat = lat.to(u.rad)
