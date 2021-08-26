@@ -54,3 +54,55 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
     )
 
     return shadow_function
+
+
+@jit
+def visibility_function(k, u_, phi, theta, R, R_p, H):
+    """Calculates a continuous visibility function for the visibility
+    of a satellite over a ground station.
+
+    Parameters
+    ----------
+    k: float
+        Standard gravitational parameter (km^3 / s^2).
+    u_: ~numpy.array
+        Satellite position and velocity vector with respect to the central attractor.
+    phi: float
+        Geodetic Latitude of the station.
+    theta: float
+        Local sidereal time at a particular instant.
+    R: float
+        Equatorial radius of the central attractor.
+    R_p: float
+        Polar radius of the central attractor.
+    H: float
+        Elevation, above the ellipsoidal surface.
+
+    """
+    ecc = np.sqrt(1 - (R_p / R) ** 2)
+    denom = np.sqrt(1 - ecc ** 2 * np.sin(phi) ** 2)
+    g1 = H + (R / denom)
+    g2 = H + (1 - ecc ** 2) * R / denom
+    station_coords = np.array(
+        [
+            g1 * np.cos(phi) * np.cos(theta),
+            g1 * np.cos(phi) * np.sin(theta),
+            g2 * np.sin(phi),
+        ]
+    )
+
+    # Position of satellite with respect to station.
+    rho = np.subtract(u_[:3], station_coords)
+    # Transformation matrix for converting geocentric equatorial coordinates to topocentric horizon system.
+    rot_matrix = np.array(
+        [
+            [-np.sin(theta), np.cos(theta), 0],
+            [-np.sin(phi) * np.cos(theta), -np.sin(phi) * np.sin(theta), np.cos(phi)],
+            [np.cos(phi) * np.cos(theta), np.cos(phi) * np.sin(theta), np.sin(phi)],
+        ]
+    )
+    new_rho = rot_matrix @ rho
+    new_rho = new_rho / np.linalg.norm(new_rho)
+    el = np.arcsin(new_rho[-1])
+
+    return el

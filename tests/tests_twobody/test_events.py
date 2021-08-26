@@ -5,7 +5,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.linalg import norm
 
-from poliastro.bodies import Earth
+from poliastro.bodies import Earth, Mercury
 from poliastro.constants import H0_earth, rho0_earth
 from poliastro.core.perturbations import atmospheric_drag_exponential
 from poliastro.core.propagation import func_twobody
@@ -15,6 +15,7 @@ from poliastro.twobody.events import (
     LatitudeCrossEvent,
     NodeCrossEvent,
     PenumbraEvent,
+    SatelliteVisibilityEvent,
     UmbraEvent,
 )
 from poliastro.twobody.propagation import cowell
@@ -349,3 +350,60 @@ def test_propagation_stops_if_atleast_one_event_has_terminal_set_to_True(
         assert_quantity_allclose(latitude_cross_event.last_t, t_end)
     else:
         assert_quantity_allclose(t_end, tofs[-1])
+
+
+def test_satellite_visibility():
+    t_satellite_visible = 988.771 * u.s  # From orekit.
+
+    a, ecc, inc, raan, argp, nu = (6839137.0, 0.081, 75.0, 20.0, 10.0, 0)
+    orbit = Orbit.from_classical(
+        Earth,
+        a * u.m,
+        ecc * u.one,
+        inc * u.deg,
+        raan * u.deg,
+        argp * u.deg,
+        nu * u.deg,
+        epoch=Time("2020-01-01", scale="utc"),
+    )
+    satellite_visibility_event = SatelliteVisibilityEvent(
+        orbit, 70 * u.deg, 30 * u.deg, 0.0 * u.m, terminal=True
+    )
+
+    tof = 2 * 24 * 3600
+
+    events = [satellite_visibility_event]
+    _, _ = cowell(
+        Earth.k,
+        orbit.r,
+        orbit.v,
+        np.linspace(0, tof, 100) * u.s,
+        events=events,
+    )
+
+    assert_quantity_allclose(
+        satellite_visibility_event.last_t, t_satellite_visible, atol=2.5 * u.s
+    )
+
+
+def test_satellite_visibility_raises_error_if_attractor_not_earth():
+    a, ecc, inc, raan, argp, nu = (6839137.0, 0.081, 75.0, 20.0, 10.0, 0)
+    orbit = Orbit.from_classical(
+        Mercury,
+        a * u.m,
+        ecc * u.one,
+        inc * u.deg,
+        raan * u.deg,
+        argp * u.deg,
+        nu * u.deg,
+        epoch=Time("2020-01-01", scale="utc"),
+    )
+
+    with pytest.raises(ValueError) as excinfo:
+        SatelliteVisibilityEvent(
+            orbit, 70 * u.deg, 30 * u.deg, 0.0 * u.m, terminal=True
+        )
+    assert (
+        "The satellite visibility event only supports Earth as the orbit's attractor."
+        in excinfo.exconly()
+    )

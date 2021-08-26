@@ -1,9 +1,14 @@
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
+from astropy.time import Time
 from numpy.linalg import norm
 
-from poliastro.core.events import eclipse_function as eclipse_function_fast
+from poliastro.bodies import Earth
+from poliastro.core.events import (
+    eclipse_function as eclipse_function_fast,
+    visibility_function as visibility_function_fast,
+)
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
@@ -241,3 +246,61 @@ class NodeCrossEvent(Event):
         self._last_t = t
         # Check if the z coordinate of the satellite is zero.
         return u_[2]
+
+
+class SatelliteVisibilityEvent(Event):
+    """Detects whether a satellite is visible from a ground station.
+
+    Parameters
+    ----------
+    orbit: poliastro.twobody.orbit.Orbit
+        Satellite's orbit
+    lat: astropy.quantity.Quantity
+        Latitude of the station, must be in the range [-pi/2, pi/2].
+    lon: astropy.quantity.Quantity
+        East longitude of the station.
+    h: astropy.quantity.Quantity
+        Height of the station above the attractor (ellipsoid).
+
+    """
+
+    def __init__(self, orbit, lat, lon, h, terminal=False, direction=0):
+        super().__init__(terminal, direction)
+
+        if orbit.attractor != Earth:
+            raise ValueError(
+                "The satellite visibility event only supports Earth as the orbit's attractor."
+            )
+
+        self._orbit = orbit
+        self._lon = lon.to(u.rad)
+        self._lat = lat.to(u.rad)
+        self._H = h.to(u.km)
+        self._R = orbit.attractor.R.to(u.km).value
+        self._k = orbit.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+        self._R_p = orbit.attractor.R_polar.to(u.km).value
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+
+        location = (self._lon, self._lat, self._H)
+        current_time = Time(
+            self._orbit.epoch + t * u.s,
+            scale="utc",
+            location=location,
+        )
+
+        # Local sidereal time = Greenwich Mean Sidereal time + East longitude of station.
+        # theta must be in [0, 360] degree range.
+        theta = current_time.sidereal_time("mean", "greenwich") + self._lon
+
+        el = visibility_function_fast(
+            self._k,
+            u_,
+            self._lat.to_value(u.rad),
+            theta.to_value(u.rad),
+            self._R,
+            self._R_p,
+            self._H.to_value(u.km),
+        )
+        return el
