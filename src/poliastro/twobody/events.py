@@ -1,9 +1,14 @@
+from warnings import warn
+
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
 from numpy.linalg import norm
 
-from poliastro.core.events import eclipse_function as eclipse_function_fast
+from poliastro.core.events import (
+    eclipse_function as eclipse_function_fast,
+    line_of_sight as line_of_sight_fast,
+)
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
 )
@@ -241,3 +246,40 @@ class NodeCrossEvent(Event):
         self._last_t = t
         # Check if the z coordinate of the satellite is zero.
         return u_[2]
+
+
+class LosEvent(Event):
+    """Detect whether there exists a LOS between two satellites.
+
+    Parameters
+    ----------
+    attractor: ~poliastro.bodies.body
+        The central attractor with respect to which the position vectors of the satellites are defined.
+    pos_coords: ~astropy.quantity.Quantity
+        A list of position coordinates for the secondary body. These coordinates
+        can be found by propagating the body for a desired amount of time.
+
+    """
+
+    def __init__(self, attractor, pos_coords, terminal=False, direction=0):
+        super().__init__(terminal, direction)
+        self._attractor = attractor
+        self._pos_coords = (pos_coords << u.km).value.tolist()
+        self._last_coord = (
+            self._pos_coords[-1] << u.km
+        ).value  # Used to prevent any errors if `self._pos_coords` gets exhausted early.
+        self._R = self._attractor.R.to_value(u.km)
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+
+        if norm(u_[:3]) < self._R:
+            warn(
+                "The norm of the position vector of the primary body is less than the radius of the attractor."
+            )
+
+        pos_coord = self._pos_coords.pop(0) if self._pos_coords else self._last_coord
+
+        # Need to cast `pos_coord` to array since `norm` inside numba only works for arrays, not lists.
+        delta_angle = line_of_sight_fast(u_[:3], np.array(pos_coord), self._R)
+        return delta_angle
