@@ -472,3 +472,77 @@ def test_LOS_event():
     )
 
     assert_quantity_allclose(los_event.last_t, t_los)
+
+
+def test_satellite_view_event():
+    expected_view_t = Time("2020-01-01 00:00:00.044", scale="utc")
+    attractor = Earth
+    tof = 2 * u.d
+    epoch = Time("2020-01-01", scale="utc")
+    coe = (
+        6828137.0 * u.m,
+        0.0073 * u.one,
+        87.0 * u.deg,
+        20.0 * u.deg,
+        10.0 * u.deg,
+        0 * u.deg,
+    )
+    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
+
+    satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
+    events = [satellite_view_event]
+
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    expected_view_t.isclose(epoch + satellite_view_event.last_t, atol=1 * u.s)
+
+
+def test_eclipse_does_not_trigger_when_satellite_view_event_triggers():
+    # Same parameters as `test_penumbra_event_crossing`
+    expected_view_t = Time("2020-01-01 00:00:00.044", scale="utc")
+    expected_penumbra_t = Time("2020-01-01 00:04:26.060", scale="utc")  # From Orekit.
+    attractor = Earth
+    tof = 2 * u.d
+    epoch = Time("2020-01-01", scale="utc")
+    coe = (
+        6828137.0 * u.m,
+        0.0073 * u.one,
+        87.0 * u.deg,
+        20.0 * u.deg,
+        10.0 * u.deg,
+        0 * u.deg,
+    )
+    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
+
+    penumbra_event = PenumbraEvent(orbit, terminal=True)
+    satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
+
+    # Satellite view
+    events = [satellite_view_event]
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    # Eclipse
+    events = [penumbra_event]
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    expected_view_t.isclose(epoch + satellite_view_event.last_t)
+    expected_penumbra_t.isclose(epoch + satellite_view_event.last_t)
+    assert satellite_view_event.last_t < penumbra_event.last_t

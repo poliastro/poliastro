@@ -2,6 +2,7 @@ import numpy as np
 from numba import njit as jit
 from numpy.linalg import norm
 
+from poliastro.core.angles import nu_to_E
 from poliastro.core.elements import coe_rotation_matrix, rv2coe
 
 
@@ -84,3 +85,43 @@ def line_of_sight(r1, r2, R):
     theta_2 = np.arccos(R / r2_norm)
 
     return (theta_1 + theta_2) - theta
+
+
+@jit
+def satellite_view(k, u_, r_sec):
+    """Calculates a continuous visibility function to check whether a body with a
+    given position vector, u_[:3], can view the attractor's surface illuminated by the secondary
+    body, with position vector `r_sec`. All the position vectors are with respect to the attractor.
+
+    Parameters
+    ----------
+    k: float
+        Standard gravitational parameter (km^3 / s^2).
+    u_: ~numpy.array
+        Satellite position and velocity vector with respect to the primary body
+        i.e the body around which the satellite revolves.
+    r_sec: ~numpy.array
+        Position vector of the secondary body with respect to the primary body.
+
+    Note
+    ----
+    The implementation supports only elliptical orbits.
+
+    """
+    p, ecc, inc, raan, argp, nu = rv2coe(k, u_[:3], u_[3:])
+    E = nu_to_E(nu, ecc)
+
+    r_sec_norm = norm(r_sec)
+    r_norm = norm(u_[:3])
+
+    PQW = coe_rotation_matrix(inc, raan, argp)
+    P_, Q_ = np.ascontiguousarray(PQW[:, 0]), np.ascontiguousarray(PQW[:, 1])
+
+    cos_psi = np.dot(u_[:3], r_sec) / r_sec_norm / r_norm
+    view_function = (
+        (np.cos(E) - ecc) * (np.dot(P_, r_sec))
+        + (np.sqrt(1 - ecc ** 2) * np.sin(E)) * np.dot(Q_, r_sec)
+        - (1 - ecc * np.cos(E)) * r_sec_norm * cos_psi
+    )
+
+    return view_function
