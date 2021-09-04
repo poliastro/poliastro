@@ -7,11 +7,8 @@ from numpy.linalg import norm
 
 from poliastro.core.events import (
     eclipse_function as eclipse_function_fast,
-<<<<<<< HEAD
     line_of_sight as line_of_sight_fast,
-=======
     satellite_view as satellite_view_fast,
->>>>>>> 9564e790... Add satellite view event
 )
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,

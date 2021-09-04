@@ -11,6 +11,7 @@ from poliastro.core.events import line_of_sight
 from poliastro.core.perturbations import atmospheric_drag_exponential
 from poliastro.core.propagation import func_twobody
 from poliastro.twobody import Orbit
+from poliastro.twobody.elements import mean_motion
 from poliastro.twobody.events import (
     AltitudeCrossEvent,
     LatitudeCrossEvent,
@@ -476,7 +477,7 @@ def test_LOS_event():
 
 
 def test_satellite_view_event():
-    expected_view_t = Time("2020-01-01 00:00:00.044", scale="utc")
+    # Calculates event time using equation 5.14 from Escobal's book.
     attractor = Earth
     tof = 2 * u.d
     epoch = Time("2020-01-01", scale="utc")
@@ -490,9 +491,20 @@ def test_satellite_view_event():
     )
     orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
 
-    satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
-    events = [satellite_view_event]
+    ecc = orbit.ecc.value
+    # Eccentric anomaly at event epoch. This is the last eccentric anomaly calculated inside `__call__`.
+    E = (0.0002958065666483107 * u.rad).value
 
+    # At orbit's epoch, it is at perigee since true anomaly is zero.
+    t_perigee = 0
+    n = mean_motion(orbit.attractor.k, orbit.a)
+
+    # Equation 5.14 from Escobal.
+    expected_view_t = t_perigee + (E - ecc * np.sin(E)) / n.value
+
+    satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
+
+    events = [satellite_view_event]
     rr, _ = cowell(
         attractor.k,
         orbit.r,
@@ -501,7 +513,7 @@ def test_satellite_view_event():
         events=events,
     )
 
-    expected_view_t.isclose(epoch + satellite_view_event.last_t, atol=1 * u.s)
+    assert_quantity_allclose(satellite_view_event.last_t, expected_view_t * u.s)
 
 
 def test_eclipse_does_not_trigger_when_satellite_view_event_triggers():
