@@ -5,6 +5,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.linalg import norm
 
+from poliastro.twobody.angles import nu_to_E
 from poliastro.bodies import Earth
 from poliastro.constants import H0_earth, rho0_earth
 from poliastro.core.events import line_of_sight
@@ -491,21 +492,10 @@ def test_satellite_view_event():
     )
     orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
 
-    ecc = orbit.ecc.value
-    # Eccentric anomaly at event epoch. This is the last eccentric anomaly calculated inside `__call__`.
-    E = (0.0002958065666483107 * u.rad).value
-
-    # At orbit's epoch, it is at perigee since true anomaly is zero.
-    t_perigee = 0
-    n = mean_motion(orbit.attractor.k, orbit.a)
-
-    # Equation 5.14 from Escobal.
-    expected_view_t = t_perigee + (E - ecc * np.sin(E)) / n.value
-
     satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
 
     events = [satellite_view_event]
-    rr, _ = cowell(
+    rr, vv = cowell(
         attractor.k,
         orbit.r,
         orbit.v,
@@ -513,7 +503,21 @@ def test_satellite_view_event():
         events=events,
     )
 
-    assert_quantity_allclose(satellite_view_event.last_t, expected_view_t * u.s)
+    # Create a dummy orbit with position and velocity vector from event epoch.
+    orb = Orbit.from_vectors(attractor, rr[-1], vv[-1])
+    ecc = orb.ecc
+
+    # Eccentric anomaly at event epoch
+    E = nu_to_E(orb.nu, orb.ecc)
+
+    # At orbit's epoch, it is at perigee since true anomaly is zero.
+    t_perigee = 0 * u.s
+    n = mean_motion(orb.attractor.k, orb.a)
+
+    # Equation 5.14 from Escobal.
+    expected_view_t = t_perigee + (E - ecc * np.sin(E) * u.rad) / n
+
+    assert_quantity_allclose(satellite_view_event.last_t, expected_view_t)
 
 
 def test_eclipse_does_not_trigger_when_satellite_view_event_triggers():
