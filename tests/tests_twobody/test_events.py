@@ -5,13 +5,13 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.linalg import norm
 
-from poliastro.twobody.angles import nu_to_E
 from poliastro.bodies import Earth
 from poliastro.constants import H0_earth, rho0_earth
 from poliastro.core.events import line_of_sight
 from poliastro.core.perturbations import atmospheric_drag_exponential
 from poliastro.core.propagation import func_twobody
 from poliastro.twobody import Orbit
+from poliastro.twobody.angles import nu_to_E
 from poliastro.twobody.elements import mean_motion
 from poliastro.twobody.events import (
     AltitudeCrossEvent,
