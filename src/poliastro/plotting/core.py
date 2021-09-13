@@ -14,13 +14,15 @@ from poliastro.plotting.util import generate_sphere
 
 
 class _PlotlyOrbitPlotter(BaseOrbitPlotter):
-    def __init__(self, figure=None, *, num_points=150, plane=None):
+    def __init__(self, figure=None, *, num_points=150, plane=None, unit=u.km):
         super().__init__(num_points=num_points, plane=plane)
 
         self._figure = figure or Figure()
         self._layout = None
 
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
+
+        self._unit = unit
 
     def _clear_attractor(self):
         # FIXME: Implement
@@ -145,14 +147,16 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 class OrbitPlotter3D(_PlotlyOrbitPlotter):
     """OrbitPlotter3D class."""
 
-    def __init__(self, figure=None, dark=False, *, num_points=150, plane=None):
-        super().__init__(figure, num_points=num_points, plane=plane)
+    def __init__(
+        self, figure=None, dark=False, *, num_points=150, plane=None, unit=u.km
+    ):
+        super().__init__(figure, num_points=num_points, plane=plane, unit=unit)
         self._layout = Layout(
             autosize=True,
             scene=dict(
-                xaxis=dict(title="x (km)"),
-                yaxis=dict(title="y (km)"),
-                zaxis=dict(title="z (km)"),
+                xaxis=dict(title=f"x ({self._unit})"),
+                yaxis=dict(title=f"y ({self._unit})"),
+                zaxis=dict(title=f"z ({self._unit})"),
                 aspectmode="data",  # Important!
             ),
         )
@@ -168,9 +172,9 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         xx, yy, zz = generate_sphere(radius, center)
         sphere = Surface(
-            x=xx.to(u.km).value,
-            y=yy.to(u.km).value,
-            z=zz.to(u.km).value,
+            x=xx.to_value(self._unit),
+            y=yy.to_value(self._unit),
+            z=zz.to_value(self._unit),
             name=name,
             colorscale=[[0, color], [1, color]],
             cauto=False,
@@ -184,9 +188,9 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
 
     def _plot_coordinates(self, coordinates, label, colors, dashed):
         trace = Scatter3d(
-            x=coordinates.x.to(u.km).value,
-            y=coordinates.y.to(u.km).value,
-            z=coordinates.z.to(u.km).value,
+            x=coordinates.x.to_value(self._unit),
+            y=coordinates.y.to_value(self._unit),
+            z=coordinates.z.to_value(self._unit),
             name=label,
             line=dict(color=colors[0], width=5, dash="dash" if dashed else "solid"),
             mode="lines",  # Boilerplate
@@ -227,9 +231,9 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
                 "scene": {
                     "camera": {
                         "eye": {
-                            "x": x.to(u.km).value,
-                            "y": y.to(u.km).value,
-                            "z": z.to(u.km).value,
+                            "x": x.to_value(self._unit),
+                            "y": y.to_value(self._unit),
+                            "z": z.to_value(self._unit),
                         }
                     }
                 }
@@ -246,12 +250,12 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     .. versionadded:: 0.9.0
     """
 
-    def __init__(self, figure=None, *, num_points=150, plane=None):
-        super().__init__(figure, num_points=num_points, plane=plane)
+    def __init__(self, figure=None, *, num_points=150, plane=None, unit=u.km):
+        super().__init__(figure, num_points=num_points, plane=plane, unit=unit)
         self._layout = Layout(
             autosize=True,
-            xaxis=dict(title="x (km)", constrain="domain"),
-            yaxis=dict(title="y (km)", scaleanchor="x"),
+            xaxis=dict(title=f" x ({self._unit})", constrain="domain"),
+            yaxis=dict(title=f" y ({self._unit})", scaleanchor="x"),
             shapes=[],
         )
 
@@ -266,8 +270,8 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         )  # Indexing trick to add one extra dimension
 
         trace = Scatter(
-            x=x_center.to(u.km).value,
-            y=y_center.to(u.km).value,
+            x=x_center.to_value(self._unit),
+            y=y_center.to_value(self._unit),
             mode="markers",
             marker=dict(size=10, color=color),
             name=name,
@@ -285,10 +289,10 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             "type": "circle",
             "xref": "x",
             "yref": "y",
-            "x0": (x_center[0] - radius).to(u.km).value,
-            "y0": (y_center[0] - radius).to(u.km).value,
-            "x1": (x_center[0] + radius).to(u.km).value,
-            "y1": (y_center[0] + radius).to(u.km).value,
+            "x0": (x_center[0] - radius).to_value(self._unit),
+            "y0": (y_center[0] - radius).to_value(self._unit),
+            "x1": (x_center[0] + radius).to_value(self._unit),
+            "y1": (y_center[0] + radius).to_value(self._unit),
             "opacity": 1,
             "fillcolor": color,
             "line": {"color": color},
@@ -309,8 +313,8 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         x, y = self._project(rr)
 
         trace = Scatter(
-            x=x.to(u.km).value,
-            y=y.to(u.km).value,
+            x=x.to_value(self._unit),
+            y=y.to_value(self._unit),
             name=label,
             line=dict(color=colors[0], width=2, dash="dash" if dashed else "solid"),
             hoverinfo="none",  # TODO: Review
