@@ -21,8 +21,8 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
         self._layout = None
 
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
-        
-        self._unit = unit 
+
+        self._unit = unit
 
     def _clear_attractor(self):
         # FIXME: Implement
@@ -152,9 +152,9 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
         self._layout = Layout(
             autosize=True,
             scene=dict(
-                xaxis=dict(title= f"x ({self._unit})"),
-                yaxis=dict(title= f"y({self._unit})"),
-                zaxis=dict(title= f"z({self._unit})"),
+                xaxis=dict(title=f"x ({self._unit})"),
+                yaxis=dict(title=f"y ({self._unit})"),
+                zaxis=dict(title=f"z ({self._unit})"),
                 aspectmode="data",  # Important!
             ),
         )
@@ -249,11 +249,11 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     """
 
     def __init__(self, figure=None, *, num_points=150, plane=None, unit=u.km):
-        super().__init__(figure, num_points=num_points, plane=plane, unit=unit )
+        super().__init__(figure, num_points=num_points, plane=plane, unit=unit)
         self._layout = Layout(
             autosize=True,
-            xaxis=dict(title = f" x ({self._unit})", constrain="domain"),
-            yaxis=dict(title = f" y({self._unit})", scaleanchor="x"),
+            xaxis=dict(title=f" x ({self._unit})", constrain="domain"),
+            yaxis=dict(title=f" y ({self._unit})", scaleanchor="x"),
             shapes=[],
         )
 
