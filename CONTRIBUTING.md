@@ -8,7 +8,7 @@ poliastro is a community project, all contributions are more than welcome!
 
 Not only things can break, but also different people have
 different use cases for the project. If you find anything that doesn't
-work as expected or have suggestions, open a new issue on our
+work as expected or have suggestions, please open a new issue on our
 [issue tracker](https://github.com/poliastro/poliastro/issues).
 
 ### Participate in the chat
@@ -115,8 +115,8 @@ And with this, you will be ready to start contributing!
 
 ### Pull request workflow
 
-Every time you want to contribute some code or documentation to poliastro
-you will need follow these steps:
+Every time you want to contribute some code or documentation to poliastro,
+you will need to follow these steps:
 
 1. Make sure that your `main` branch is up to date: `git switch main`
    (or `git checkout main`) and `git pull --rebase upstream main`
@@ -179,4 +179,4 @@ Apart from all the steps described above, you need to have these extra things in
    `tox -e py39-fast -- -k "anomaly"`
 
 Automatic services will ensure your code works
-on all the supported operative systems and Python versions.
+on all the supported operating systems and Python versions.
