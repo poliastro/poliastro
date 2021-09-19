@@ -63,7 +63,9 @@ at the same time. To learn more, you can have a look at
 Finally, you might want to have an Integrated Development Environment (IDE)
 that makes editing the source files easier.
 If you are hesitant on what IDE or editor to use,
-have a look at PyCharm, Visual Studio Code, or Spyder.
+have a look at [PyCharm](https://www.jetbrains.com/pycharm/),
+[Visual Studio Code](https://code.visualstudio.com/),
+or [Spyder](https://www.spyder-ide.org/).
 
 ### Work from a cloud environment
 
