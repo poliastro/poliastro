@@ -108,7 +108,7 @@ Next, configure your Python environment:
 6. Install Python for development.
 7. Create a Python virtual environment using `python -m venv .venv`
 8. Activate it using `source .venv/bin/activate`
-9. Upgrade the development dependencies using `python pip install -U pip setuptools wheel flit tox`
+9. Upgrade the development dependencies using `python -m pip install -U pip setuptools wheel flit tox`
 10. Install the code in development mode using `flit install --simlink`
     (this means that the installed code will change as soon as you change it in the
     download location).
