@@ -54,7 +54,7 @@ straight from GitHub and open pull requests from your browser.
 For more complex contributions, it will be more effective
 to set up a local development environment and work from your own computer.
 
-The most important thing is to understand how git works. git is a decentralized
+The most important thing is to understand how Git works. Git is a decentralized
 version control system that preserves the history of the software, helps
 tracking changes and allows for multiple versions of the code to exist
 at the same time. To learn more, you can have a look at
@@ -87,12 +87,12 @@ for example:
 
 ### Set up a development environment
 
-To set up a development environment you will need git and Python
+To set up a development environment you will need Git and Python
 up and running. You should only need to do this once!
 
-Start by setting up git:
+Start by setting up Git:
 
-1. [Install git](https://git-scm.com/) on your computer.
+1. [Install Git](https://git-scm.com/) on your computer.
 2. [Sign up to GitHub](https://github.com/).
 3. [Fork poliastro](https://help.github.com/articles/fork-a-repo/).
 4. [Clone your fork](https://help.github.com/articles/cloning-a-repository/)
