@@ -167,6 +167,7 @@ intersphinx_mapping = {
 
 if os.environ.get('POLIASTRO_SKIP_NOTEBOOKS') == 'True':
     nbsphinx_execute = 'never'
+    suppress_warnings.append('nbsphinx.thumbnail')
 else:
     nbsphinx_execute = 'always'
 
