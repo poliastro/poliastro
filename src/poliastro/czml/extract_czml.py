@@ -539,10 +539,6 @@ class CZMLExtractor:
             Indicates whether the label is visible
 
         """
-
-        if self.attractor is None:
-            raise ValueError("An attractor must be set up first.")
-
         positions = (
             positions.represent_as(CartesianRepresentation).get_xyz(1).to_value(u.m)
         )

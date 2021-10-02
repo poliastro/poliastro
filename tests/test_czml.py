@@ -336,9 +336,9 @@ def test_czml_add_orbit_negative_rtol_raises_error_if_beyond_range():
     with pytest.raises(ValueError) as excinfo:
         extractor.add_orbit(
             molniya,
-            rtol=1e2,
+            rtol=1e2,  # rtol > 1.
             label_text="Molniya",
-            label_fill_color=[125, 80, 120, 255],  # rtol > 1.
+            label_fill_color=[125, 80, 120, 255],
         )
     assert (
         "The relative tolerance must be a value in the range (0, 1)"
