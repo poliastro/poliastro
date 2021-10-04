@@ -1,14 +1,14 @@
 (quickstart)=
 # Quickstart
 
-```{eval-rst}
 Defining the orbit: :py:class:`~poliastro.twobody.orbit.Orbit` objects
 ----------------------------------------------------------------------
 
 The core of poliastro are the :py:class:`~poliastro.twobody.orbit.Orbit` objects
 inside the :py:mod:`poliastro.twobody` module. They store all the required
 information to define an orbit:
-```
+
+
 - The body acting as the central body of the orbit, for example the
   Earth.
 - The position and velocity vectors or the orbital elements.
@@ -25,12 +25,11 @@ from poliastro.twobody import Orbit
 
 ## From position and velocity
 
-```{eval-rst}
 There are several methods available to create
 :py:class:`~poliastro.twobody.orbit.Orbit` objects. For example, if we have the
 position and velocity vectors we can use
 :py:meth:`~poliastro.twobody.orbit.Orbit.from_vectors`:
-```
+
 
 ```python
 # Data from Curtis, example 4.3
@@ -42,11 +41,9 @@ orb = Orbit.from_vectors(Earth, r, v)
 
 And that\'s it! Notice a couple of things:
 
-```{eval-rst}
 * Defining vectorial physical quantities using Astropy units is very easy.
   The list is automatically converted to a :py:mod:`astropy.units.Quantity`,
   which is actually a subclass of NumPy arrays.
-```
 
 - If we display the orbit we just created, we get a string with the
   radius of pericenter, radius of apocenter, inclination, reference
@@ -64,23 +61,18 @@ And that\'s it! Notice a couple of things:
   '2000-01-01 12:00:00.000'
   ```
 
-```{eval-rst}
+
 * The reference frame of the orbit will be one pseudo-inertial frame around the
   attractor. You can retrieve it using the :py:attr:`~poliastro.twobody.orbit.Orbit.frame` property:
-
-    >>> orb.get_frame()
-    <GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
-
+```
+>>> orb.get_frame()
+<GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
+```
 Intermezzo: quick visualization of the orbit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
-```{figure} _static/curtis.png
----
-align: right
-width: 350px
-alt: Plot of the orbit
----
-```
+--------------------------------------------  
+    
+<img align="right" width="350" alt="Plot of the orbit" src="_static/curtis.png">
+
 
 If we\'re working on interactive mode (for example, using the wonderful
 Jupyter notebook) we can immediately plot the current orbit:
@@ -98,23 +90,17 @@ The dotted line represents the *osculating orbit*: the instantaneous
 Keplerian orbit at that point. This is relevant in the context of
 perturbations, when the object shall deviate from its Keplerian orbit.
 
-```{eval-rst}
-.. note::
+> This visualization uses Plotly under the hood and works best in a Jupyter notebook.  
+> To use the static interface based on matplotlib which might be more useful for batch jobs and publication-quality plots, check out the :py:class:`poliastro.plotting.static.StaticOrbitPlotter`.
 
-  This visualization uses Plotly under the hood and works best in a Jupyter notebook.
-  To use the static interface based on matplotlib,
-  which might be more useful for batch jobs and publication-quality plots,
-  check out the :py:class:`poliastro.plotting.static.StaticOrbitPlotter`.
-```
 
 ## From classical orbital elements
 
-```{eval-rst}
 We can also define an :py:class:`~poliastro.twobody.orbit.Orbit` using a set of
 six parameters called orbital elements. Although there are several of
 these element sets, each one with its advantages and drawbacks, right now
 poliastro supports the *classical orbital elements*:
-```
+
 
 - Semimajor axis $(a)$.
 - Eccentricity $(e)$.
@@ -123,10 +109,9 @@ poliastro supports the *classical orbital elements*:
 - Argument of pericenter $(\omega)$.
 - True anomaly $(\nu)$.
 
-```{eval-rst}
 In this case, we'd use the method
 :py:meth:`~poliastro.twobody.orbit.Orbit.from_classical`:
-```
+
 
 ```python
 # Data for Mars at J2000 from JPL HORIZONS
@@ -149,20 +134,18 @@ elements we can access many mathematical properties of the orbit:
 <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
 ```
 
-```{eval-rst}
 To see a complete list of properties, check out the
 :py:class:`poliastro.twobody.orbit.Orbit` class on the API reference.
-```
+
 
 ## Moving forward in time: propagation
 
-```{eval-rst}
 Now that we have defined an orbit, we might be interested in computing
 how is it going to evolve in the future. In the context of orbital
 mechanics, this process is known as **propagation**, and can be
 performed with the ``propagate`` method of
 :py:class:`~poliastro.twobody.orbit.Orbit` objects:
-```
+
 
 ```python   
 >>> from poliastro.examples import iss
@@ -176,10 +159,9 @@ performed with the ``propagate`` method of
 <Quantity 3.887010576192155 deg / min>
 ```
 
-```{eval-rst}
 Using the :py:meth:`~poliastro.twobody.orbit.Orbit.propagate` method
 we can now retrieve the position of the ISS after some time:
-```
+
 
 ```python
 >>> iss_30m = iss.propagate(30 * u.min)
@@ -189,10 +171,9 @@ we can now retrieve the position of the ISS after some time:
 <Quantity 163.1409357544868 deg>
 ```
 
-```{eval-rst}
 For more advanced propagation options, check out the
 :py:mod:`poliastro.twobody.propagation` module.
-```
+
 
 ## Studying non-keplerian orbits: perturbations
 
@@ -251,10 +232,9 @@ The J2 perturbation changes the orbit parameters (from Curtis example
 <Quantity 0.28220397 deg / h>
 ```
 
-```{eval-rst}
 For more available perturbation options, see the
 :py:mod:`poliastro.twobody.perturbations` module.
-```
+
 
 ## Studying artificial perturbations: thrust
 
@@ -300,7 +280,6 @@ The thrust changes orbit parameters as desired (within errors):
 (<Quantity 0.34719734 rad>, <Quantity 0.00894513>)
 ```
 
-```{eval-rst}
 For more available perturbation options, see the
 :py:mod:`poliastro.twobody.thrust` module.
 
@@ -327,15 +306,14 @@ man = Maneuver.impulse(dv)
 man = Maneuver((0 * u.s, dv))  # Equivalent
 ```
 
-```{eval-rst}
 There are other useful methods you can use to compute common in-plane
 maneuvers, notably :py:meth:`~poliastro.maneuver.Maneuver.hohmann` and
 :py:meth:`~poliastro.maneuver.Maneuver.bielliptic` for `Hohmann`_ and
 `bielliptic`_ transfers respectively. Both return the corresponding
 ``Maneuver`` object, which in turn you can use to calculate the total cost
-in terms of velocity change :math:`\sum |\Delta v_i|` and the transfer
+in terms of velocity change $\sum |\Delta v_i|$ and the transfer
 time:
-```
+
 
 ```python
 >>> ss_i = Orbit.circular(Earth, alt=700 * u.km)
@@ -358,13 +336,14 @@ You can also retrieve the individual vectorial impulses:
 >>> tuple(val.decompose([u.km, u.s]) for val in hoh[1])
 (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 ```
-```{eval-rst}
-.. _Hohmann: https://en.wikipedia.org/wiki/Hohmann_transfer_orbit
-.. _bielliptic: https://en.wikipedia.org/wiki/Bi-elliptic_transfer
+
+
+* [Hohmann](https://en.wikipedia.org/wiki/Hohmann_transfer_orbit)
+* [bielliptic](https://en.wikipedia.org/wiki/Bi-elliptic_transfer)
 
 To actually retrieve the resulting ``Orbit`` after performing a maneuver, use
 the method :py:meth:`~poliastro.twobody.orbit.Orbit.apply_maneuver`:
-```
+
 
 ```python
 >>> ss_f = ss_i.apply_maneuver(hoh)
@@ -372,7 +351,6 @@ the method :py:meth:`~poliastro.twobody.orbit.Orbit.apply_maneuver`:
 36000 x 36000 km x 0.0 deg (GCRS) orbit around Earth (♁)
 ```
 
-```{eval-rst}
 More advanced plotting: :py:class:`~poliastro.plotting.OrbitPlotter` objects
 ----------------------------------------------------------------------------
 
@@ -381,7 +359,7 @@ plot orbits. Now we'd like to plot several orbits in one graph (for example,
 the maneuver we computed in the previous section). For this purpose, we
 have :py:class:`~poliastro.plotting.OrbitPlotter` objects in the
 :py:mod:`~poliastro.plotting` module.
-```
+
 
 These objects hold the perifocal plane of the first `Orbit` we plot in
 them, projecting any further trajectories on this plane. This allows to
@@ -406,22 +384,22 @@ alt: Hohmann transfer
 ---   
 Plot of a Hohmann transfer.
 ```
-```{eval-rst}
+
 Where are the planets? Computing ephemerides
 --------------------------------------------
 
-.. versionadded:: 0.14.0
-```
+versionadded: [0.14.0](https://github.com/poliastro/poliastro/tree/v0.14.0)
+
 
 Thanks to Astropy and jplephem, poliastro can read Satellite Planet
 Kernel (SPK) files, part of NASA\'s SPICE toolkit. This means that we
 can query the position and velocity of the planets of the Solar System.
 
-```{eval-rst}
+
 The :py:class:`poliastro.ephem.Ephem` class allows us to retrieve
 a planetary orbit using low precision ephemerides available in
 Astropy and an :py:mod:`astropy.time.Time`:
-```
+
 
 ```python
 from astropy import time
@@ -440,7 +418,7 @@ Ephemerides at 1 epochs from 2020-04-29 10:44:09.186 (TDB) to 2020-04-29 10:44:0
 This does not require any external download. If on the other hand we
 want to use higher precision ephemerides, we can tell Astropy to do so:
 
-```{eval-rst}
+```
 >>> from astropy.coordinates import solar_system_ephemeris
 >>> solar_system_ephemeris.set("jpl")
 Downloading http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de430.bsp
@@ -452,18 +430,12 @@ for future computations. For more information, check out [Astropy
 documentation on
 ephemerides](https://docs.astropy.org/en/stable/coordinates/solarsystem.html).
 
-````{warning}
-```{eval-rst}
-    This is the preferred method over :py:meth:`poliastro.twobody.orbit.Orbit.from_body_ephem`,
-    which is now deprecated and will be removed in the next release.
+> :warning: ⚠ This is the preferred method over :py:meth:`poliastro.twobody.orbit.Orbit.from_body_ephem`, which is now deprecated and will be removed in the next release.
 
-```
-````
 
-```{eval-rst}
 If we want to retrieve the **osculating orbit** at a given epoch,
 we can do so using :py:meth:`~poliastro.twobody.Orbit.from_ephem`:
-```
+
 
 ```python
 >>> Orbit.from_ephem(Sun, earth, epoch)
@@ -484,7 +456,7 @@ flight is known in celestial mechanics as **Lambert\'s problem**, also
 known as two point boundary value problem. This contrasts with Kepler\'s
 problem or propagation, which is rather an initial value problem.
 
-```{eval-rst}
+
 The package :py:obj:`poliastro.iod` holds the different raw algorithms to solve
 Lambert's problem, provided the main attractor's gravitational constant, the
 two position vectors and the time of flight. As you can imagine, being able to
@@ -496,7 +468,7 @@ use of the :py:obj:`poliastro.maneuver` module. We just need to pass as
 arguments the initial and final orbits and the output will be a
 :py:obj:`poliastro.maneuver.Maneuver` instance. Time of flight is computed
 internally since orbits epochs are known.
-```
+
 
 For instance, this is a simplified version of the example \"Going to
 Mars with Python using poliastro\", where the orbit of the Mars Science
