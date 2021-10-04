@@ -68,7 +68,7 @@ Funding = "https://opencollective.com/poliastro"
 jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
 dev = [
-    "black==21.5b0",
+    "black==21.9b0",
     "coverage",
     "hypothesis",
     "ipython>=5.0",
