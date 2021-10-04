@@ -338,7 +338,7 @@ the method {py:meth}`~poliastro.twobody.orbit.Orbit.apply_maneuver`:
 
 ### More advanced plotting: `OrbitPlotter*` objects
 
-We previously saw the :py:func:`poliastro.plotting.plot` function to easily plot orbits. Now we'd like to plot several orbits in one graph (for example, the maneuver we computed in the previous section). For this purpose, we have {py:class}`~poliastro.plotting.OrbitPlotter` objects in the {py:mod}`~poliastro.plotting` module.
+We previously saw the {py:meth}`~poliastro.twobody.Orbit.plot` method to easily plot orbits. Now we'd like to plot several orbits in one graph (for example, the maneuver we computed in the previous section). For this purpose, we have `OrbitPlotter*` objects in the {py:mod}`~poliastro.plotting` module.
 
 
 These objects hold the perifocal plane of the first `Orbit` we plot in them, projecting any further trajectories on this plane. This allows to easily visualize in two dimensions:
