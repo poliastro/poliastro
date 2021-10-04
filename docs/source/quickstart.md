@@ -363,7 +363,7 @@ alt: Hohmann transfer
 Plot of a Hohmann transfer.
 ```
 
-##### Where are the planets? Computing ephemerides
+### Where are the planets? Computing ephemerides
 
 ```{eval-rst}
 .. versionadded:: 0.14.0
