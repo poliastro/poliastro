@@ -70,8 +70,13 @@ And that\'s it! Notice a couple of things:
 
 ### Intermezzo: quick visualization of the orbit
 
-<img align="right" width="350" alt="Plot of the orbit" src="_static/curtis.png">
-
+```{figure} _static/curtis.png
+---
+align: right
+width: 350px
+alt: Plot of the orbit
+---
+```
 
 If we\'re working on interactive mode (for example, using the wonderful
 Jupyter notebook) we can immediately plot the current orbit:
@@ -86,9 +91,10 @@ This plot is made in the so called *perifocal frame*, which means:
 
 The dotted line represents the *osculating orbit*: the instantaneous Keplerian orbit at that point. This is relevant in the context of perturbations, when the object shall deviate from its Keplerian orbit.
 
-> This visualization uses Plotly under the hood and works best in a Jupyter notebook.
-> To use the static interface based on matplotlib, which might be more useful for batch jobs and ublication-quality plots, check out the {py:class}`poliastro.plotting.static.StaticOrbitPlotter`.
-
+```{note}
+This visualization uses Plotly under the hood and works best in a Jupyter notebook.
+To use the static interface based on matplotlib, which might be more useful for batch jobs and ublication-quality plots, check out the {py:class}`poliastro.plotting.static.StaticOrbitPlotter`.
+```
 
 ## From classical orbital elements
 
@@ -292,7 +298,7 @@ man = Maneuver((0 * u.s, dv))  # Equivalent
 ```
 
 
-There are other useful methods you can use to compute common in-plane maneuvers, notably {py:meth} `~poliastro.maneuver.Maneuver.hohmann` and {py:meth}`~poliastro.maneuver.Maneuver.bielliptic` for `Hohmann`_ and `bielliptic`_ transfers respectively. Both return the corresponding ``Maneuver`` object, which in turn you can use to calculate the total cost
+There are other useful methods you can use to compute common in-plane maneuvers, notably {py:meth} `~poliastro.maneuver.Maneuver.hohmann` and {py:meth}`~poliastro.maneuver.Maneuver.bielliptic` for [Hohmann](https://en.wikipedia.org/wiki/Hohmann_transfer_orbit) and [bielliptic](https://en.wikipedia.org/wiki/Bi-elliptic_transfer) transfers respectively. Both return the corresponding ``Maneuver`` object, which in turn you can use to calculate the total cost
 in terms of velocity change $\sum |\Delta v_i|$ and the transfer time:
 
 
@@ -318,8 +324,6 @@ You can also retrieve the individual vectorial impulses:
 (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 ```
 
-* [Hohmann](https://en.wikipedia.org/wiki/Hohmann_transfer_orbit)
-* [bielliptic](https://en.wikipedia.org/wiki/Bi-elliptic_transfer)
 
 To actually retrieve the resulting ``Orbit`` after performing a maneuver, use
 the method {py:meth}`~poliastro.twobody.orbit.Orbit.apply_maneuver`:
@@ -351,12 +355,19 @@ op.plot(ss_f, label="Final orbit")
 
 Which produces this beautiful plot:
 
-<img align="center" width="350" alt="Plot of a Hohmann transfer" src="_static/hohmann.png">
-
+```{figure} _static/hohmann.png
+---
+align: center
+alt: Hohmann transfer
+---   
+Plot of a Hohmann transfer.
+```
 
 ##### Where are the planets? Computing ephemerides
 
-versionadded: [0.14.0](https://github.com/poliastro/poliastro/tree/v0.14.0)
+```{eval-rst}
+.. versionadded:: 0.14.0
+```
 
 
 
@@ -393,9 +404,9 @@ Downloading http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de430.
 
 This in turn will download the ephemerides files from NASA and use them for future computations. For more information, check out [Astropy documentation on ephemerides](https://docs.astropy.org/en/stable/coordinates/solarsystem.html).
 
-
-> :warning: ⚠ This is the preferred method over {py:meth}`poliastro.twobody.orbit.Orbit.from_body_ephem`, which is now deprecated and will be removed in the next release.
-
+```{warning} 
+This is the preferred method over {py:meth}`poliastro.twobody.orbit.Orbit.from_body_ephem`, which is now deprecated and will be removed in the next release.
+```
 
 If we want to retrieve the **osculating orbit** at a given epoch,
 we can do so using {py:meth}`~poliastro.twobody.Orbit.from_ephem`:
@@ -447,7 +458,14 @@ And these are the results:
 (<Quantity 21910501.00019529 s>, <Quantity [287832.91384349,  58935.96079319, -94156.93383463] km / s>)
 ```
 
-<img align="center" alt="MSL orbit" src=" _static/msl.png">
+```{figure} _static/msl.png
+---
+align: center
+width: 350px
+alt: Plot of the orbit
+---
+```
+
 
 
 ## Fetching Orbits from external sources
