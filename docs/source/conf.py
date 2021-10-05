@@ -50,6 +50,7 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.mathjax',  # Maths visualization
     'sphinx.ext.graphviz',  # Dependency diagrams
+    'sphinx_copybutton',
     'notfound.extension',
     'hoverxref.extension',
     'myst_parser',
