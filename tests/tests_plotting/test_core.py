@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from astropy import time, units as u
 
@@ -44,6 +46,7 @@ def test_set_different_attractor_raises_error(plotter_class):
     assert "Attractor has already been set to Earth" in excinfo.exconly()
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
 def test_plot_sets_attractor(plotter_class):
     frame = plotter_class()
@@ -53,6 +56,7 @@ def test_plot_sets_attractor(plotter_class):
     assert frame._attractor == iss.attractor
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
 def test_plot_appends_data(plotter_class):
     frame = plotter_class()
@@ -101,6 +105,7 @@ def test_ephem_without_frame_raises_error():
     )
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_plot_3d_trajectory_plots_a_trajectory():
     frame = OrbitPlotter3D()
     assert len(frame.trajectories) == 0
@@ -113,6 +118,7 @@ def test_plot_3d_trajectory_plots_a_trajectory():
     assert frame._attractor == Sun
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_plot_2d_trajectory_plots_a_trajectory():
     frame = OrbitPlotter2D()
     assert len(frame.trajectories) == 0
