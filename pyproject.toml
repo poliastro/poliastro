@@ -93,6 +93,7 @@ dev = [
     "sphinx_rtd_theme~=1.0.0rc1",
     "sphinx-hoverxref==0.7b1",
     "sphinx-notfound-page",
+    "sphinx-copybutton>0.2.9",
 ]
 
 [tool.flit.sdist]
