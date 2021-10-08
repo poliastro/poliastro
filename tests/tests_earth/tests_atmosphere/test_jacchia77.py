@@ -219,7 +219,7 @@ def test_jacchia77(z):
     expected_CM = jacchia77_solutions[z][7] * (u.m) ** -3
     expected_WM = jacchia77_solutions[z][8] * (u.kg)
 
-    properties = Jacchia77().altitude_profile(z, 1000 * u.K)
+    properties = Jacchia77(1000 * u.K).altitude_profile(z)
 
     for i in range(2, len(properties) - 1):
         if properties[i].value > 1.26e-10:
@@ -242,7 +242,7 @@ def test_jacchia77(z):
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_tempertaure(z):
     expected_T = jacchia77_solutions[z][0] * u.K
-    T = Jacchia77().temperature(z, 1000 * u.K)
+    T = Jacchia77(1000 * u.K).temperature(z)
 
     assert_quantity_allclose(T, expected_T, rtol=1e-4)
 
@@ -250,7 +250,7 @@ def test_tempertaure(z):
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_pressure(z):
     expected_p = jacchia77_solutions[z][9] * (u.N * u.m ** -2)
-    pressure = Jacchia77().pressure(z, 1000 * u.K)
+    pressure = Jacchia77(1000 * u.K).pressure(z)
     p = np.log10(pressure.value) * pressure.unit
 
     assert_quantity_allclose(p, expected_p, rtol=1e-3)
@@ -261,7 +261,7 @@ def test_density(z):
     expected_rho = jacchia77_solutions[z][10] * (
         u.kg ** 2 * u.mol * u.K ** -1 * u.m ** -3
     )
-    density = Jacchia77().density(z, 1000 * u.K)
+    density = Jacchia77(1000 * u.K).density(z)
     rho = np.log10(density.value) * density.unit
 
     assert_quantity_allclose(rho, expected_rho, rtol=1e-2)
@@ -271,7 +271,7 @@ def test_outside_upper_limit_coesa76():
     with pytest.raises(ValueError) as excinfo:
         alt = 2501.0 * u.km
         Texo = 1000 * u.K
-        Jacchia77().altitude_profile(alt, Texo)
+        Jacchia77(Texo).altitude_profile(alt)
     assert (
         "ValueError: Jacchia77 has been implemented in range 90km - 2500km."
         in excinfo.exconly()
@@ -282,7 +282,7 @@ def test_outside_lower_limit_coesa76():
     with pytest.raises(ValueError) as excinfo:
         alt = 89.0 * u.km
         Texo = 1000 * u.K
-        Jacchia77().altitude_profile(alt, Texo)
+        Jacchia77(Texo).altitude_profile(alt)
     assert (
         "ValueError: Jacchia77 has been implemented in range 90km - 2500km."
         in excinfo.exconly()
