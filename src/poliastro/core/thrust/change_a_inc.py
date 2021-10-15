@@ -7,7 +7,7 @@ from poliastro.core.util import circular_velocity
 @jit
 def extra_quantities(k, a_0, a_f, inc_0, inc_f, f):
     """Extra quantities given by the Edelbaum (a, i) model."""
-    V_0, beta_0_, _ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
+    V_0, beta_0_ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
     delta_V_ = delta_V(V_0, beta_0_, inc_0, inc_f)
     t_f_ = delta_V_ / f
 
@@ -32,12 +32,11 @@ def beta_0(V_0, V_f, inc_0, inc_f):
 @jit
 def compute_parameters(k, a_0, a_f, inc_0, inc_f):
     """Compute parameters of the model."""
-    delta_inc = abs(inc_f - inc_0)
     V_0 = circular_velocity(k, a_0)
     V_f = circular_velocity(k, a_f)
     beta_0_ = beta_0(V_0, V_f, inc_0, inc_f)
 
-    return V_0, beta_0_, delta_inc
+    return V_0, beta_0_
 
 
 @jit

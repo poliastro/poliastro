@@ -11,7 +11,8 @@ from poliastro.core.thrust.change_a_inc import (
 
 
 def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
-    """Guidance law from the Edelbaum/Kéchichian theory, optimal transfer between circular inclined orbits
+    """Change semimajor axis and inclination.
+       Guidance law from the Edelbaum/Kéchichian theory, optimal transfer between circular inclined orbits
        (a_0, i_0) --> (a_f, i_f), ecc = 0.
 
     Parameters
@@ -41,7 +42,7 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
       Transfer Problem Using Optimal Control Theory", 1997.
     """
 
-    V_0, beta_0_, _ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
+    V_0, beta_0_ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
 
     @njit
     def a_d(t0, u_, k):
