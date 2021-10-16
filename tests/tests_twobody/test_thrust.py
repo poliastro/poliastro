@@ -10,8 +10,8 @@ from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
     change_a_inc,
     change_argp,
+    change_ecc_inc,
     change_ecc_quasioptimal,
-    change_inc_ecc,
 )
 
 
@@ -120,7 +120,7 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
         0 * u.deg,
     )
 
-    _, delta_V, beta, _ = change_inc_ecc(s0, ecc_f, inc_f, f)
+    _, delta_V, beta, _ = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
 
     assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
     assert_allclose(beta, expected_beta, rtol=1e-2)
@@ -144,7 +144,7 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
         argp * u.deg,
         0 * u.deg,
     )
-    a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
+    a_d, _, _, t_f = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
 
     # Propagate orbit
     def f_geo(t0, u_, k):

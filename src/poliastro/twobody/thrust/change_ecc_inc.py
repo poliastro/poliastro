@@ -12,11 +12,12 @@ from numpy import cross
 from numpy.linalg import norm
 
 from poliastro.core.elements import rv2coe
-from poliastro.core.thrust.change_inc_ecc import beta, extra_quantities
+from poliastro.core.thrust.change_ecc_inc import beta, extra_quantities
 
 
-def change_inc_ecc(ss_0, ecc_f, inc_f, f):
-    """Guidance law from the model.
+def change_ecc_inc(ss_0, ecc_f, inc_f, f):
+    """Simultaneous eccentricity and inclination changes.
+    Guidance law from the model.
     Thrust is aligned with an inertially fixed direction perpendicular to the
     semimajor axis of the orbit.
 

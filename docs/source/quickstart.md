@@ -256,7 +256,7 @@ inclination:
 ...     argp * u.deg,
 ...     0 * u.deg,
 ... )
->>> a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
+>>> a_d, _, _, t_f = change_ecc_inc(s0, ecc_f, inc_f, f)
 
 # Propagate orbit
 >>> def f_geo(t0, u_, k):
