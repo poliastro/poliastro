@@ -1,5 +1,62 @@
 # What\'s new
 
+## poliastro 0.16 (Unreleased)
+
+### Highlights
+
+- Lots of new event detectors! https://github.com/poliastro/poliastro/pull/1304
+  check out docs in ...
+
+### New features
+
+- New `AltitudeCrossEvent` class https://github.com/poliastro/poliastro/pull/1254
+- New `LatitudeCrossEvent` class https://github.com/poliastro/poliastro/pull/1268
+- New `EclipseEvent` class https://github.com/poliastro/poliastro/pull/1246
+- New `NodeCrossEvent` class https://github.com/poliastro/poliastro/pull/1293
+- New `LosEvent` class https://github.com/poliastro/poliastro/pull/1258
+- Now `alinspace` accepts angle differences beyond $2\pi$ https://github.com/poliastro/poliastro/pull/1249
+- Compatibility with Plotly 5 https://github.com/poliastro/poliastro/pull/1262
+- Support for Astropy 4.X? https://github.com/poliastro/poliastro/pull/1217
+- Add ability to change axis units in interactive plots https://github.com/poliastro/poliastro/pull/1318
+
+### "Contrib" (TBC)
+
+- Relative orbits https://github.com/poliastro/poliastro/pull/1204
+- Mean elements https://github.com/poliastro/poliastro/pull/1211
+
+### Performance improvements
+
+- Accelerate flyby computations https://github.com/poliastro/poliastro/pull/1184
+- Accelerate planetary reference frames computations https://github.com/poliastro/poliastro/pull/1190/
+- Accelerate sensor computations https://github.com/poliastro/poliastro/pull/1191
+- Accelerate some low-thrust guidance lows https://github.com/poliastro/poliastro/pull/1250
+- Accelerate CZML computations https://github.com/poliastro/poliastro/pull/1252
+- Accelerate parabolic and hyperbolic anomaly computations https://github.com/poliastro/poliastro/pull/1247
+- Accelerate atmosphere computations https://github.com/poliastro/poliastro/pull/1280 and https://github.com/poliastro/poliastro/pull/1282
+- Slightly accelerate propagation for all propagators https://github.com/poliastro/poliastro/pull/1286
+
+### Documentation improvements
+
+- Add new notebook for event detectors https://github.com/poliastro/poliastro/pull/1304
+- Easy way of copying code snippets https://github.com/poliastro/poliastro/pull/1332
+
+### Bugs fixed
+
+- Fix corner case in latitude computation https://github.com/poliastro/poliastro/issues/1290
+- Fix `Jacchia77` method signatures https://github.com/poliastro/poliastro/pull/1334
+
+### Backwards incompatible changes
+
+- Rename function https://github.com/poliastro/poliastro/pull/1224
+- Switch `shadow_function` sign convention https://github.com/poliastro/poliastro/pull/1243
+- Some `Orbit` classmethods will raise an error if passed a negative altitude https://github.com/poliastro/poliastro/pull/1255
+- `Sun` is not a `SolarSystemPlanet` anymore, but a `Body` https://github.com/poliastro/poliastro/pull/1264
+- Continue propagation if `event.terminal` is `False` ???
+- Remove unused `generate_circle` function https://github.com/poliastro/poliastro/pull/1313
+- Now `change_a_inc.compute_parameters` does not return inclination change https://github.com/poliastro/poliastro/pull/1344
+
+### Contributors
+
 ## poliastro 0.15.2 - 2021-06-27
 
 Same as 0.15.1, but fixes error in release artifact.
