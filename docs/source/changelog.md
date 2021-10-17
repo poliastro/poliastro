@@ -1,4 +1,4 @@
-# What\'s new
+# What's new
 
 ## poliastro 0.16 (Unreleased)
 
