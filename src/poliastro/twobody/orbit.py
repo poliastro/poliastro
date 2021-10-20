@@ -646,13 +646,13 @@ class Orbit:
         epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
         ss = cls.from_classical(
-            Sun,
-            a,
-            ecc,
-            inc,
-            raan,
-            argp,
-            nu,
+            attractor=Sun,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
             epoch=epoch.tdb,
             plane=Planes.EARTH_ECLIPTIC,
         )
@@ -698,7 +698,15 @@ class Orbit:
         argp = 0 * u.deg
 
         return cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+            attractor=attractor,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=arglat,
+            epoch=epoch,
+            plane=plane
         )
 
     @classmethod
@@ -803,7 +811,15 @@ class Orbit:
             raise ValueError("The orbit for the given parameters doesn't exist")
 
         return cls.from_classical(
-            attractor, a_sync, ecc, inc, raan, argp, nu, epoch, plane
+            attractor=attractor,
+            a=a_sync,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
+            epoch=epoch,
+            plane=plane
         )
 
     @classmethod
@@ -910,7 +926,15 @@ class Orbit:
 
         raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+            attractor=attractor,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
+            epoch=epoch.tdb,
+            plane=plane
         )
 
         return ss
@@ -1061,7 +1085,15 @@ class Orbit:
                         attractor.R, attractor.J2, attractor.J3, a, ecc
                     )
                 return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                    attractor=attractor,
+                    a=a,
+                    ecc=ecc,
+                    inc=inc,
+                    raan=raan,
+                    argp=argp,
+                    nu=arglat,
+                    epoch=epoch,
+                    plane=plane
                 )
 
             inc = critical_inclinations[0] if inc is None else inc
@@ -1069,7 +1101,15 @@ class Orbit:
             if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
                 ecc = get_eccentricity_critical_inc(ecc)
                 return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                    attractor=attractor,
+                    a=a,
+                    ecc=ecc,
+                    inc=inc,
+                    raan=raan,
+                    argp=argp,
+                    nu=arglat,
+                    epoch=epoch,
+                    plane=plane
                 )
 
             argp = critical_argps[0]
@@ -1079,7 +1119,15 @@ class Orbit:
             )
 
             return cls.from_classical(
-                attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                attractor=attractor,
+                a=a,
+                ecc=ecc,
+                inc=inc,
+                raan=raan,
+                argp=argp,
+                nu=arglat,
+                epoch=epoch,
+                plane=plane
             )
 
         except AssertionError as exc:
@@ -1290,13 +1338,13 @@ class Orbit:
                 time_of_flight = self.period + time_of_flight
 
         return self.from_classical(
-            self.attractor,
-            self.a,
-            self.ecc,
-            self.inc,
-            self.raan,
-            self.argp,
-            nu,
+            attractor=self.attractor,
+            a=self.a,
+            ecc=self.ecc,
+            inc=self.inc,
+            raan=self.raan,
+            argp=self.argp,
+            nu=nu,
             epoch=self.epoch + time_of_flight,
             plane=self.plane,
         )

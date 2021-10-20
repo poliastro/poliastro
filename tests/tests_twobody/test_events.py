@@ -160,15 +160,16 @@ def test_umbra_event_crossing():
     attractor = Earth
     tof = 2 * u.d
     epoch = Time("2020-01-01", scale="utc")
-    coe = (
-        6828137.0 * u.m,
-        0.0073 * u.one,
-        87.0 * u.deg,
-        20.0 * u.deg,
-        10.0 * u.deg,
-        0 * u.deg,
+    orbit = Orbit.from_classical(
+        attractor=attractor,
+        a=6828137.0 * u.m,
+        ecc=0.0073 * u.one,
+        inc=87.0 * u.deg,
+        raan=20.0 * u.deg,
+        argp=10.0 * u.deg,
+        nu=0 * u.deg,
+        epoch=epoch
     )
-    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
 
     umbra_event = UmbraEvent(orbit, terminal=True)
     events = [umbra_event]
@@ -189,15 +190,16 @@ def test_penumbra_event_crossing():
     attractor = Earth
     tof = 2 * u.d
     epoch = Time("2020-01-01", scale="utc")
-    coe = (
-        6828137.0 * u.m,
-        0.0073 * u.one,
-        87.0 * u.deg,
-        20.0 * u.deg,
-        10.0 * u.deg,
-        0 * u.deg,
+    orbit = Orbit.from_classical(
+        attractor=attractor,
+        a=6828137.0 * u.m,
+        ecc=0.0073 * u.one,
+        inc=87.0 * u.deg,
+        raan=20.0 * u.deg,
+        argp=10.0 * u.deg,
+        nu=0 * u.deg,
+        epoch=epoch
     )
-    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
 
     penumbra_event = PenumbraEvent(orbit, terminal=True)
     events = [penumbra_event]
@@ -319,15 +321,16 @@ def test_propagation_stops_if_atleast_one_event_has_terminal_set_to_True(
     attractor = Earth
     tofs = [50, 100, 150, 300, 400, 500] << u.s
     epoch = Time("2020-01-01", scale="utc")
-    coe = (
-        6828137.0 * u.m,
-        0.0073 * u.one,
-        87.0 * u.deg,
-        20.0 * u.deg,
-        10.0 * u.deg,
-        0 * u.deg,
+    orbit = Orbit.from_classical(
+        attractor=attractor,
+        a=6828137.0 * u.m,
+        ecc=0.0073 * u.one,
+        inc=87.0 * u.deg,
+        raan=20.0 * u.deg,
+        argp=10.0 * u.deg,
+        nu=0 * u.deg,
+        epoch=epoch
     )
-    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
 
     penumbra_event = PenumbraEvent(orbit, terminal=penumbra_terminal)
 
@@ -456,7 +459,13 @@ def test_LOS_event():
     pos_coords = rr  # Trajectory of the secondary body.
 
     orb = Orbit.from_classical(
-        Earth, 16000 * u.km, 0.53 * u.one, 5 * u.deg, 5 * u.deg, 10 * u.deg, 30 * u.deg
+        attractor=Earth,
+        a=16000 * u.km,
+        ecc=0.53 * u.one,
+        inc=5 * u.deg,
+        raan=5 * u.deg,
+        argp=10 * u.deg,
+        nu=30 * u.deg
     )
 
     los_event = LosEvent(Earth, pos_coords, terminal=True)

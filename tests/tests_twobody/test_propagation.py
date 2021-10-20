@@ -58,7 +58,13 @@ def test_elliptic_near_parabolic(ecc, propagator):
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
-        Earth, 10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
+        attractor=Earth,
+        a=10000 * u.km,
+        ecc=ecc * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=1.0 * u.rad
     )
 
     ss_cowell = ss0.propagate(tof, method=cowell)
@@ -78,7 +84,13 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
-        Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
+        attractor=Earth,
+        a=-10000 * u.km,
+        ecc=ecc * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=1.0 * u.rad
     )
 
     ss_cowell = ss0.propagate(tof, method=cowell)
@@ -126,7 +138,15 @@ def test_propagating_to_certain_nu_is_correct():
     ecc = 1.0 / 3.0 * u.one
     _a = 0.0 * u.rad
     nu = 10 * u.deg
-    elliptic = Orbit.from_classical(Sun, a, ecc, _a, _a, _a, nu)
+    elliptic = Orbit.from_classical(
+        attractor=Sun,
+        a=a,
+        ecc=ecc,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=nu
+    )
 
     elliptic_at_perihelion = elliptic.propagate_to_anomaly(0.0 * u.rad)
     r_per, _ = elliptic_at_perihelion.rv()
@@ -232,13 +252,13 @@ def test_propagation_zero_time_returns_same_state():
 
 def test_propagation_hyperbolic_zero_time_returns_same_state():
     ss0 = Orbit.from_classical(
-        Earth,
-        -27112.5464 * u.km,
-        1.25 * u.one,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=-27112.5464 * u.km,
+        ecc=1.25 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     r0, v0 = ss0.rv()
     tof = 0 * u.s
@@ -255,7 +275,15 @@ def test_apply_zero_maneuver_returns_equal_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    ss = Orbit.from_classical(
+        attractor=Sun,
+        a=_d,
+        ecc=_,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=_a
+    )
     dt = 0 * u.s
     dv = [0, 0, 0] * u.km / u.s
     orbit_new = ss.apply_maneuver([(dt, dv)])

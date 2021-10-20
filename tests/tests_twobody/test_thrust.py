@@ -57,7 +57,13 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
     expected_t_f = 29.697  # days, reverse-engineered
     expected_delta_V = 0.6158  # km / s, lower than actual result
     s0 = Orbit.from_classical(
-        Earth, a_0 * u.km, ecc_0 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg
+        attractor=Earth,
+        a=a_0 * u.km,
+        ecc=ecc_0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg
     )
     _, delta_V, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 
@@ -74,7 +80,13 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(
-        Earth, a_0 * u.km, ecc_0 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg
+        attractor=Earth,
+        a=a_0 * u.km,
+        ecc=ecc_0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg
     )
     a_d, _, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 
@@ -111,13 +123,13 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     expected_beta = np.radians(expected_beta)
 
     s0 = Orbit.from_classical(
-        Earth,
-        a * u.km,
-        ecc_0 * u.one,
-        inc_0 * u.deg,
-        0 * u.deg,
-        argp * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=a * u.km,
+        ecc=ecc_0 * u.one,
+        inc=inc_0 * u.deg,
+        raan=0 * u.deg,
+        argp=argp * u.deg,
+        nu=0 * u.deg,
     )
 
     _, delta_V, beta, _ = change_inc_ecc(s0, ecc_f, inc_f, f)
@@ -136,13 +148,13 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(
-        Earth,
-        a * u.km,
-        ecc_0 * u.one,
-        inc_0 * u.deg,
-        0 * u.deg,
-        argp * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=a * u.km,
+        ecc=ecc_0 * u.one,
+        inc=inc_0 * u.deg,
+        raan=0 * u.deg,
+        argp=argp * u.deg,
+        nu=0 * u.deg,
     )
     a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
 
@@ -198,13 +210,13 @@ def test_soyuz_standard_gto_numerical():
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(
-        Earth,
-        a * u.km,
-        (r_a / a - 1) * u.one,
-        6 * u.deg,
-        188.5 * u.deg,
-        178 * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=a * u.km,
+        ecc=(r_a / a - 1) * u.one,
+        inc=6 * u.deg,
+        raan=188.5 * u.deg,
+        argp=178 * u.deg,
+        nu=0 * u.deg,
     )
 
     # Propagate orbit
