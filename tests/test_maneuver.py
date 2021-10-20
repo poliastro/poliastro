@@ -129,10 +129,10 @@ def test_repr_maneuver():
     alt_fi = 376310.0 * u.km
     ss_i = Orbit.from_vectors(Earth, r, v)
 
-    expected_hohmann_manuever = "Number of impulses: 2, Total cost: 3.060548 km / s"
+    expected_hohmann_maneuver = "Number of impulses: 2, Total cost: 3.060548 km / s"
     expected_bielliptic_maneuver = "Number of impulses: 3, Total cost: 3.122556 km / s"
 
-    assert repr(Maneuver.hohmann(ss_i, Earth.R + alt_f)) == expected_hohmann_manuever
+    assert repr(Maneuver.hohmann(ss_i, Earth.R + alt_f)) == expected_hohmann_maneuver
     assert (
         repr(Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_fi))
         == expected_bielliptic_maneuver

@@ -149,7 +149,7 @@ plotter.plot_trajectory(
 );
 ```
 
-We can now start solving for the manuever that will take Juno to Jupiter. Another Lambert maneuver is required but first let us solve for Jupiter position on arrival:
+We can now start solving for the maneuver that will take Juno to Jupiter. Another Lambert maneuver is required but first let us solve for Jupiter position on arrival:
 
 ```{code-cell} ipython3
 # And now, go to Jupiter!
