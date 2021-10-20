@@ -112,7 +112,7 @@ def test_J3_propagation_Earth(test_params):
         inc=inc_ini,
         raan=raan_ini,
         argp=argp_ini,
-        nu=nu_ini
+        nu=nu_ini,
     )
 
     def f(t0, u_, k):

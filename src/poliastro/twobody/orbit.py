@@ -706,7 +706,7 @@ class Orbit:
             argp=argp,
             nu=arglat,
             epoch=epoch,
-            plane=plane
+            plane=plane,
         )
 
     @classmethod
@@ -819,7 +819,7 @@ class Orbit:
             argp=argp,
             nu=nu,
             epoch=epoch,
-            plane=plane
+            plane=plane,
         )
 
     @classmethod
@@ -934,7 +934,7 @@ class Orbit:
             argp=argp,
             nu=nu,
             epoch=epoch.tdb,
-            plane=plane
+            plane=plane,
         )
 
         return ss
@@ -1093,7 +1093,7 @@ class Orbit:
                     argp=argp,
                     nu=arglat,
                     epoch=epoch,
-                    plane=plane
+                    plane=plane,
                 )
 
             inc = critical_inclinations[0] if inc is None else inc
@@ -1109,7 +1109,7 @@ class Orbit:
                     argp=argp,
                     nu=arglat,
                     epoch=epoch,
-                    plane=plane
+                    plane=plane,
                 )
 
             argp = critical_argps[0]
@@ -1127,7 +1127,7 @@ class Orbit:
                 argp=argp,
                 nu=arglat,
                 epoch=epoch,
-                plane=plane
+                plane=plane,
             )
 
         except AssertionError as exc:

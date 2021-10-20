@@ -64,7 +64,7 @@ def test_elliptic_near_parabolic(ecc, propagator):
         inc=_a,
         raan=_a,
         argp=_a,
-        nu=1.0 * u.rad
+        nu=1.0 * u.rad,
     )
 
     ss_cowell = ss0.propagate(tof, method=cowell)
@@ -90,7 +90,7 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
         inc=_a,
         raan=_a,
         argp=_a,
-        nu=1.0 * u.rad
+        nu=1.0 * u.rad,
     )
 
     ss_cowell = ss0.propagate(tof, method=cowell)
@@ -139,13 +139,7 @@ def test_propagating_to_certain_nu_is_correct():
     _a = 0.0 * u.rad
     nu = 10 * u.deg
     elliptic = Orbit.from_classical(
-        attractor=Sun,
-        a=a,
-        ecc=ecc,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=nu
+        attractor=Sun, a=a, ecc=ecc, inc=_a, raan=_a, argp=_a, nu=nu
     )
 
     elliptic_at_perihelion = elliptic.propagate_to_anomaly(0.0 * u.rad)
@@ -276,13 +270,7 @@ def test_apply_zero_maneuver_returns_equal_state():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.from_classical(
-        attractor=Sun,
-        a=_d,
-        ecc=_,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=_a
+        attractor=Sun, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
     )
     dt = 0 * u.s
     dv = [0, 0, 0] * u.km / u.s

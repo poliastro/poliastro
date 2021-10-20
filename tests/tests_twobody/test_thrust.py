@@ -63,7 +63,7 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
         inc=0 * u.deg,
         raan=0 * u.deg,
         argp=0 * u.deg,
-        nu=0 * u.deg
+        nu=0 * u.deg,
     )
     _, delta_V, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 
@@ -86,7 +86,7 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
         inc=0 * u.deg,
         raan=0 * u.deg,
         argp=0 * u.deg,
-        nu=0 * u.deg
+        nu=0 * u.deg,
     )
     a_d, _, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 

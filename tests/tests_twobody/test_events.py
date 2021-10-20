@@ -168,7 +168,7 @@ def test_umbra_event_crossing():
         raan=20.0 * u.deg,
         argp=10.0 * u.deg,
         nu=0 * u.deg,
-        epoch=epoch
+        epoch=epoch,
     )
 
     umbra_event = UmbraEvent(orbit, terminal=True)
@@ -198,7 +198,7 @@ def test_penumbra_event_crossing():
         raan=20.0 * u.deg,
         argp=10.0 * u.deg,
         nu=0 * u.deg,
-        epoch=epoch
+        epoch=epoch,
     )
 
     penumbra_event = PenumbraEvent(orbit, terminal=True)
@@ -329,7 +329,7 @@ def test_propagation_stops_if_atleast_one_event_has_terminal_set_to_True(
         raan=20.0 * u.deg,
         argp=10.0 * u.deg,
         nu=0 * u.deg,
-        epoch=epoch
+        epoch=epoch,
     )
 
     penumbra_event = PenumbraEvent(orbit, terminal=penumbra_terminal)
@@ -465,7 +465,7 @@ def test_LOS_event():
         inc=5 * u.deg,
         raan=5 * u.deg,
         argp=10 * u.deg,
-        nu=30 * u.deg
+        nu=30 * u.deg,
     )
 
     los_event = LosEvent(Earth, pos_coords, terminal=True)

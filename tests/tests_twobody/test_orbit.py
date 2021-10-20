@@ -80,13 +80,7 @@ def test_default_time_for_new_state():
     _body = Sun  # Unused body
     expected_epoch = J2000
     ss = Orbit.from_classical(
-        attractor=_body,
-        a=_d,
-        ecc=_,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=_a
+        attractor=_body, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
     )
     assert ss.epoch == expected_epoch
 
@@ -98,13 +92,7 @@ def test_state_raises_unitserror_if_elements_units_are_wrong():
     wrong_angle = 1.0 * u.AU
     with pytest.raises(u.UnitsError) as excinfo:
         Orbit.from_classical(
-            attractor=Sun,
-            a=_d,
-            ecc=_,
-            inc=_a,
-            raan=_a,
-            argp=_a,
-            nu=wrong_angle
+            attractor=Sun, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=wrong_angle
         )
     assert (
         "UnitsError: Argument 'nu' to function 'from_classical' must be in units convertible to 'rad'."
@@ -119,13 +107,7 @@ def test_orbit_from_classical_wraps_out_of_range_anomaly_and_warns():
     out_angle = np.pi * u.rad
     with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
         Orbit.from_classical(
-            attractor=Sun,
-            a=_d,
-            ecc=_,
-            inc=_a,
-            raan=_a,
-            argp=_a,
-            nu=out_angle
+            attractor=Sun, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=out_angle
         )
 
 
@@ -147,13 +129,7 @@ def test_parabolic_elements_fail_early():
     _a = 1.0 * u.deg  # Unused angle
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(
-            attractor=attractor,
-            a=_d,
-            ecc=ecc,
-            inc=_a,
-            raan=_a,
-            argp=_a,
-            nu=_a
+            attractor=attractor, a=_d, ecc=ecc, inc=_a, raan=_a, argp=_a, nu=_a
         )
     assert (
         "ValueError: For parabolic orbits use Orbit.parabolic instead"
@@ -169,13 +145,7 @@ def test_bad_inclination_raises_exception():
     bad_inc = 200 * u.deg
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(
-            attractor=_body,
-            a=_d,
-            ecc=_,
-            inc=bad_inc,
-            raan=_a,
-            argp=_a,
-            nu=_a
+            attractor=_body, a=_d, ecc=_, inc=bad_inc, raan=_a, argp=_a, nu=_a
         )
     assert (
         "ValueError: Inclination must be between 0 and 180 degrees" in excinfo.exconly()
@@ -190,13 +160,7 @@ def test_bad_hyperbolic_raises_exception():
     _body = Sun  # Unused body
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(
-            attractor=_body,
-            a=bad_a,
-            ecc=ecc,
-            inc=_inc,
-            raan=_a,
-            argp=_a,
-            nu=_a
+            attractor=_body, a=bad_a, ecc=ecc, inc=_inc, raan=_a, argp=_a, nu=_a
         )
     assert "Hyperbolic orbits have negative semimajor axis" in excinfo.exconly()
 
@@ -206,13 +170,7 @@ def test_apply_maneuver_changes_epoch():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.from_classical(
-        attractor=Sun,
-        a=_d,
-        ecc=_,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=_a
+        attractor=Sun, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
     )
     dt = 1 * u.h
     dv = [0, 0, 0] * u.km / u.s
@@ -225,13 +183,7 @@ def test_apply_maneuver_returns_intermediate_states_if_true():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.from_classical(
-        attractor=Sun,
-        a=_d,
-        ecc=_,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=_a
+        attractor=Sun, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
     )
     dt1 = 0.5 * u.h
     dv1 = [5, 0, 10] * u.km / u.s
@@ -440,13 +392,7 @@ def test_sample_numpoints():
     _a = 1.0 * u.deg  # Unused angle
     _body = Sun  # Unused body
     ss = Orbit.from_classical(
-        attractor=_body,
-        a=_d,
-        ecc=_,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=_a
+        attractor=_body, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
     )
     positions = ss.sample(values=50)
     assert len(positions) == 50
@@ -862,13 +808,7 @@ def test_perigee_and_apogee():
     ecc = expected_r_a / a - 1
     _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.from_classical(
-        attractor=Earth,
-        a=a,
-        ecc=ecc,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=_a
+        attractor=Earth, a=a, ecc=ecc, inc=_a, raan=_a, argp=_a, nu=_a
     )
     assert_allclose(ss.r_a.to(u.km).value, expected_r_a.to(u.km).value)
     assert_allclose(ss.r_p.to(u.km).value, expected_r_p.to(u.km).value)
@@ -886,13 +826,7 @@ def test_expected_mean_anomaly():
     nu = 120 * u.deg
 
     orbit = Orbit.from_classical(
-        attractor=attractor,
-        a=a,
-        ecc=ecc,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=nu
+        attractor=attractor, a=a, ecc=ecc, inc=_a, raan=_a, argp=_a, nu=nu
     )
     orbit_M = E_to_M(nu_to_E(orbit.nu, orbit.ecc), orbit.ecc)
 
@@ -911,13 +845,7 @@ def test_expected_angular_momentum():
     nu = 120 * u.deg
 
     orbit = Orbit.from_classical(
-        attractor=attractor,
-        a=a,
-        ecc=ecc,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=nu
+        attractor=attractor, a=a, ecc=ecc, inc=_a, raan=_a, argp=_a, nu=nu
     )
     orbit_h_mag = orbit.h_mag
 
@@ -936,13 +864,7 @@ def test_expected_last_perifocal_passage():
     nu = 120 * u.deg
 
     orbit = Orbit.from_classical(
-        attractor=attractor,
-        a=a,
-        ecc=ecc,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=nu
+        attractor=attractor, a=a, ecc=ecc, inc=_a, raan=_a, argp=_a, nu=nu
     )
     orbit_t_p = orbit.t_p
 
@@ -968,7 +890,7 @@ def test_convert_from_rv_to_coe():
         inc=inc,
         raan=raan,
         argp=argp,
-        nu=nu
+        nu=nu,
     ).rv()
 
     assert_quantity_allclose(r, expected_r, rtol=1e-5)
@@ -1007,13 +929,7 @@ def test_perifocal_points_to_perigee():
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
     ss = Orbit.from_classical(
-        attractor=Sun,
-        a=_d,
-        ecc=_,
-        inc=_a,
-        raan=_a,
-        argp=_a,
-        nu=_a
+        attractor=Sun, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
     )
     p, _, _ = ss.pqw()
     assert_allclose(p, ss.e_vec / ss.ecc)
@@ -1209,13 +1125,7 @@ def test_from_classical_wrong_dimensions_fails():
 
     with pytest.raises(ValueError) as excinfo:
         Orbit.from_classical(
-            attractor=Earth,
-            a=bad_a,
-            ecc=_,
-            inc=_a,
-            raan=_a,
-            argp=_a,
-            nu=_a
+            attractor=Earth, a=bad_a, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
         )
     assert "ValueError: Elements must be scalar, got [1.] AU" in excinfo.exconly()
 

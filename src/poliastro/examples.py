@@ -25,7 +25,7 @@ molniya = Orbit.from_classical(
     inc=63.4 * u.deg,
     raan=0 * u.deg,
     argp=270 * u.deg,
-    nu=80 * u.deg
+    nu=80 * u.deg,
 )
 """Molniya orbit example"""
 
@@ -39,7 +39,7 @@ soyuz_gto = Orbit.from_classical(
     inc=6 * u.deg,
     raan=188.5 * u.deg,
     argp=178 * u.deg,
-    nu=0 * u.deg
+    nu=0 * u.deg,
 )
 """Soyuz geostationary transfer orbit (GTO) example
 

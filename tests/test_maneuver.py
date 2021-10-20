@@ -70,7 +70,7 @@ def test_hohmann_maneuver(nu):
         inc=_a,
         raan=_a,
         argp=_a,
-        nu=nu
+        nu=nu,
     )
 
     # Expected output
@@ -102,7 +102,7 @@ def test_bielliptic_maneuver(nu):
         inc=_a,
         raan=_a,
         argp=_a,
-        nu=nu
+        nu=nu,
     )
 
     # Expected output
