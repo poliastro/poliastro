@@ -64,7 +64,13 @@ def test_hohmann_maneuver(nu):
     alt_f = 35781.34857 * u.km
     _a = 0 * u.deg
     ss_i = Orbit.from_classical(
-        Earth, Earth.R + alt_i, ecc=0 * u.one, inc=_a, raan=_a, argp=_a, nu=nu
+        attractor=Earth,
+        a=Earth.R + alt_i,
+        ecc=0 * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=nu,
     )
 
     # Expected output
@@ -90,7 +96,13 @@ def test_bielliptic_maneuver(nu):
     alt_f = 376310.0 * u.km
     _a = 0 * u.deg
     ss_i = Orbit.from_classical(
-        Earth, Earth.R + alt_i, ecc=0 * u.one, inc=_a, raan=_a, argp=_a, nu=nu
+        attractor=Earth,
+        a=Earth.R + alt_i,
+        ecc=0 * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=nu,
     )
 
     # Expected output
@@ -158,13 +170,13 @@ def test_correct_pericenter(
     attractor, max_delta_r, a, ecc, inc, expected_t, expected_v
 ):
     ss0 = Orbit.from_classical(
-        attractor,
-        a,
-        ecc,
-        inc,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=attractor,
+        a=a,
+        ecc=ecc,
+        inc=inc,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
 
     maneuver = Maneuver.correct_pericenter(ss0, max_delta_r)
@@ -174,13 +186,13 @@ def test_correct_pericenter(
 
 def test_correct_pericenter_J2_exception():
     ss0 = Orbit.from_classical(
-        Mercury,
-        1000 * u.km,
-        0 * u.one,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=Mercury,
+        a=1000 * u.km,
+        ecc=0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     max_delta_r = 30 * u.km
     with pytest.raises(NotImplementedError) as excinfo:
@@ -194,13 +206,13 @@ def test_correct_pericenter_J2_exception():
 
 def test_correct_pericenter_ecc_exception():
     ss0 = Orbit.from_classical(
-        Earth,
-        1000 * u.km,
-        0.5 * u.one,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=1000 * u.km,
+        ecc=0.5 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     max_delta_r = 30 * u.km
     with pytest.raises(NotImplementedError) as excinfo:
