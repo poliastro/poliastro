@@ -7,7 +7,7 @@ from poliastro.core.earth_atmosphere.jacchia import (
     _O_and_O2_correction as _O_and_O2_correction_fast,
 )
 
-R = 8314.32 * u.J / (u.kg * u.mol)
+R = 8314.32 * u.J / (u.K * u.kmol)
 k = 1.380622e-23 * u.J / u.K
 
 
