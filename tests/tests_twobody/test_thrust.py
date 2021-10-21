@@ -5,6 +5,7 @@ from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth
 from poliastro.core.propagation import func_twobody
+from poliastro.core.thrust import change_a_inc as change_a_inc_fast
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
@@ -19,7 +20,40 @@ from poliastro.twobody.thrust import (
     "inc_0",
     [np.radians(28.5), np.radians(90.0)],
 )
-def test_leo_geo_numerical(inc_0):
+def test_leo_geo_numerical_safe(inc_0):
+    f = 3.5e-7 * u.km / u.s ** 2  # km / s2
+
+    a_0 = 7000.0 * u.km  # km
+    a_f = 42166.0 * u.km  # km
+    inc_0 = inc_0 * u.rad  # rad
+    inc_f = 0.0 * u.rad  # rad
+
+    k = Earth.k.to(u.km ** 3 / u.s ** 2)
+
+    a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.circular(Earth, a_0 - Earth.R, inc_0)
+
+    # Propagate orbit
+    def f_leo_geo(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f, method=cowell, f=f_leo_geo, rtol=1e-6)
+
+    assert_allclose(sf.a.to(u.km).value, a_f.value, rtol=1e-3)
+    assert_allclose(sf.ecc.value, 0.0, atol=1e-2)
+    assert_allclose(sf.inc.to(u.rad).value, inc_f.value, atol=2e-3)
+
+
+@pytest.mark.parametrize(
+    "inc_0",
+    [np.radians(28.5), np.radians(90.0)],
+)
+def test_leo_geo_numerical_fast(inc_0):
     f = 3.5e-7  # km / s2
 
     a_0 = 7000.0  # km
@@ -28,7 +62,7 @@ def test_leo_geo_numerical(inc_0):
 
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
-    a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+    a_d, _, t_f = change_a_inc_fast(k, a_0, a_f, inc_0, inc_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.circular(Earth, a_0 * u.km - Earth.R, inc_0 * u.rad)
@@ -248,7 +282,7 @@ def test_leo_geo_time_and_delta_v(inc_0, expected_t_f, expected_delta_V, rtol):
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
     inc_0 = np.radians(inc_0)  # rad
 
-    _, delta_V, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+    _, delta_V, t_f = change_a_inc_fast(k, a_0, a_f, inc_0, inc_f, f)
 
     assert_allclose(delta_V, expected_delta_V, rtol=rtol)
     assert_allclose((t_f * u.s).to(u.day).value, expected_t_f, rtol=rtol)
