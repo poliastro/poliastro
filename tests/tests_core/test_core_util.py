@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from hypothesis import given, settings, strategies as st
 
-from poliastro.core.util import alinspace, rotation_matrix
+from poliastro.core.util import alinspace, rotation_matrix, spherical_to_cartesian
 
 
 def test_rotation_matrix_x():
@@ -28,6 +28,22 @@ def test_rotation_matrix_z():
     expected = np.array(
         [[0.97633196, -0.21627739, 0.0], [0.21627739, 0.97633196, 0.0], [0.0, 0.0, 1.0]]
     )
+    assert np.allclose(expected, result)
+
+
+def test_spherical_to_cartesian():
+    result = spherical_to_cartesian(np.array([0.5, np.pi / 4, -np.pi / 4]))
+    expected = np.array([0.25, -0.25, 0.35355339])
+    assert np.allclose(expected, result)
+
+    result = spherical_to_cartesian(np.array([0.5, -np.pi / 4, np.pi / 4]))
+    expected = np.array([-0.25, -0.25, 0.35355339])
+    assert np.allclose(expected, result)
+
+    result = spherical_to_cartesian(
+        np.array([[0.5, np.pi / 4, -np.pi / 4], [0.5, -np.pi / 4, np.pi / 4]])
+    )
+    expected = np.array([[0.25, -0.25, 0.35355339], [-0.25, -0.25, 0.35355339]])
     assert np.allclose(expected, result)
 
 

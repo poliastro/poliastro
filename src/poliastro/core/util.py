@@ -53,3 +53,37 @@ def alinspace(start, stop=None, num=50, endpoint=True):
         return np.linspace(start, stop_, num)
     else:
         return np.linspace(start, stop_, num + 1)[:-1]
+
+
+@jit
+def spherical_to_cartesian(v):
+    r"""Compute cartesian coordinates from spherical coordinates (norm, colat, long). This function is vectorized.
+
+    .. math::
+
+       v = norm \cdot \begin{bmatrix}
+       \sin(colat)\cos(long)\\
+       \sin(colat)\sin(long)\\
+       \cos(colat)\\
+       \end{bmatrix}
+
+    Parameters
+    ----------
+    v : np.array
+        Spherical coordinates in 3D (norm, colat, long). Angles must be in radians.
+
+    Returns
+    -------
+
+    v : np.array
+        Cartesian coordinates (x,y,z)
+
+    """
+    v = np.asarray(v)
+    norm = np.expand_dims(np.asarray(v[..., 0]), -1)
+    vsin = np.sin(v[..., 1:3])
+    vcos = np.cos(v[..., 1:3])
+    x = np.asarray(vsin[..., 0] * vcos[..., 1])
+    y = np.asarray(vsin[..., 0] * vsin[..., 1])
+    z = np.asarray(vcos[..., 0])
+    return norm * np.stack((x, y, z), axis=-1)
