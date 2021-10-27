@@ -5,7 +5,10 @@ from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth
 from poliastro.core.propagation import func_twobody
-from poliastro.core.thrust import change_a_inc as change_a_inc_fast
+from poliastro.core.thrust import (
+    change_a_inc as change_a_inc_fast,
+    change_argp as change_argp_fast,
+)
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
@@ -205,7 +208,7 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
     assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
 
 
-def test_soyuz_standard_gto_delta_v():
+def test_soyuz_standard_gto_delta_v_safe():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
     r_p = (Earth.R + 250 * u.km).to(u.km).value
@@ -214,7 +217,7 @@ def test_soyuz_standard_gto_delta_v():
     ecc = r_a / a - 1
     argp_0 = (178 * u.deg).to(u.rad).value  # rad
     argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
-    f = 2.4e-7  # km / s2
+    f = 2.4e-7 * u.km / u.s ** 2  # km / s2
 
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
@@ -224,10 +227,10 @@ def test_soyuz_standard_gto_delta_v():
     expected_delta_V = 0.2489  # km / s
 
     assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
-    assert_allclose(t_f / 86400, expected_t_f, rtol=1e-2)
+    assert_allclose((t_f).value / 86400, expected_t_f, rtol=1e-2)
 
 
-def test_soyuz_standard_gto_numerical():
+def test_soyuz_standard_gto_delta_v_fast():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
     r_p = (Earth.R + 250 * u.km).to(u.km).value
@@ -240,7 +243,67 @@ def test_soyuz_standard_gto_numerical():
 
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
+    _, delta_V, t_f = change_argp_fast(k, a, ecc, argp_0, argp_f, f)
+
+    expected_t_f = 12.0  # days, approximate
+    expected_delta_V = 0.2489  # km / s
+
+    assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
+    assert_allclose(t_f / 86400, expected_t_f, rtol=1e-2)
+
+
+def test_soyuz_standard_gto_numerical_safe():
+    # Data from Soyuz Users Manual, issue 2 revision 0
+    r_a = (Earth.R + 35950 * u.km).to(u.km).value
+    r_p = (Earth.R + 250 * u.km).to(u.km).value
+
+    a = (r_a + r_p) / 2  # km
+    ecc = r_a / a - 1
+    argp_0 = (178 * u.deg).to(u.rad).value  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
+    f = 2.4e-7 * u.km / u.s ** 2  # km / s2
+
+    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+
     a_d, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.from_classical(
+        attractor=Earth,
+        a=a * u.km,
+        ecc=(r_a / a - 1) * u.one,
+        inc=6 * u.deg,
+        raan=188.5 * u.deg,
+        argp=178 * u.deg,
+        nu=0 * u.deg,
+    )
+
+    # Propagate orbit
+    def f_soyuz(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f, method=cowell, f=f_soyuz, rtol=1e-8)
+
+    assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
+
+
+def test_soyuz_standard_gto_numerical_fast():
+    # Data from Soyuz Users Manual, issue 2 revision 0
+    r_a = (Earth.R + 35950 * u.km).to(u.km).value
+    r_p = (Earth.R + 250 * u.km).to(u.km).value
+
+    a = (r_a + r_p) / 2  # km
+    ecc = r_a / a - 1
+    argp_0 = (178 * u.deg).to(u.rad).value  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
+    f = 2.4e-7  # km / s2
+
+    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+
+    a_d, _, t_f = change_argp_fast(k, a, ecc, argp_0, argp_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(

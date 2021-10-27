@@ -7,13 +7,9 @@ References
 * Pollard, J. E. "Evaluation of Low-Thrust Orbital Maneuvers", 1998.
 
 """
-import numpy as np
-from numba import njit
-from numpy import cross
-from numpy.linalg import norm
+from astropy import units as u
 
-from poliastro.core.elements import rv2coe
-from poliastro.core.thrust.change_argp import extra_quantities
+from poliastro.core.thrust.change_argp import change_argp as change_a_inc_fast
 
 
 def change_argp(k, a, ecc, argp_0, argp_f, f):
@@ -23,24 +19,16 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
 
     Parameters
     ----------
-    f : float
+    f : ~astropy.units.quantity.Quantity
         Magnitude of constant acceleration
     """
+    a_d, delta_V, t_f = change_a_inc_fast(
+        k,
+        a,
+        ecc,
+        argp_0,
+        argp_f,
+        f=f.to_value(u.km / u.s ** 2),
+    )
 
-    @njit
-    def a_d(t0, u_, k):
-        r = u_[:3]
-        v = u_[3:]
-        nu = rv2coe(k, r, v)[-1]
-
-        alpha_ = nu - np.pi / 2
-
-        r_ = r / norm(r)
-        w_ = cross(r, v) / norm(cross(r, v))
-        s_ = cross(w_, r_)
-        accel_v = f * (np.cos(alpha_) * s_ + np.sin(alpha_) * r_)
-        return accel_v
-
-    delta_V, t_f = extra_quantities(k, a, ecc, argp_0, argp_f, f, A=0.0)
-
-    return a_d, delta_V, t_f
+    return a_d, delta_V, t_f * u.s
