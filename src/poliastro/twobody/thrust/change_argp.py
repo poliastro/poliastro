@@ -38,11 +38,10 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
     a_d, delta_V, t_f : tuple (function, ~astropy.units.quantity.Quantity, ~astropy.time.Time)
     """
 
-
     a_d, delta_V, t_f = change_argp_fast(
         k=k.to_value(u.km ** 3 / u.s ** 2),
         a=a.to_value(u.km),
-        ecc = ecc.to_value(u.one),
+        ecc=ecc.to_value(u.one),
         argp_0=inc_0.to_value(u.rad),
         argp_f=inc_0.to_value(u.rad),
         f=f.to_value(u.km / u.s ** 2),

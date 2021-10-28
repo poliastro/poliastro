@@ -8,7 +8,9 @@ References
 """
 from astropy import units as u
 
-from poliastro.core.thrust.change_ecc_quasioptimal import change_ecc_quasioptimal as change_ecc_quasioptimal_fast
+from poliastro.core.thrust.change_ecc_quasioptimal import (
+    change_ecc_quasioptimal as change_ecc_quasioptimal_fast,
+)
 
 
 def change_ecc_quasioptimal(ss_0, ecc_f, f):
@@ -26,9 +28,9 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
         Magnitude of constant acceleration (km / s**2).
     """
     a_d, delta_V, t_f = change_ecc_quasioptimal_fast(
-        ss_0 = ss_0,
-        ecc_f = ecc_f.to_value(u.one),
-        f = f.to_value(u.km / u.s ** 2),
+        ss_0=ss_0,
+        ecc_f=ecc_f.to_value(u.one),
+        f=f.to_value(u.km / u.s ** 2),
     )
 
     return a_d, delta_V, t_f * u.s

@@ -29,10 +29,10 @@ def change_ecc_inc(ss_0, ecc_f, inc_f, f):
     """
 
     a_d, delta_V, beta_, t_f = change_ecc_inc_fast(
-        ss_0 = ss_0,
-        ecc_f = ecc_f.to_value(u.one),
-        inc_f = inc_f.to_value(u.rad),
-        f = f.to_value(u.km / u.s ** 2),
+        ss_0=ss_0,
+        ecc_f=ecc_f.to_value(u.one),
+        inc_f=inc_f.to_value(u.rad),
+        f=f.to_value(u.km / u.s ** 2),
     )
 
     return a_d, delta_V, beta_, t_f * u.s

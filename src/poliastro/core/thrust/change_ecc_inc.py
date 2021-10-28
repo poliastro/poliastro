@@ -47,6 +47,7 @@ def extra_quantities(k, a, ecc_0, ecc_f, inc_0, inc_f, argp, f):
 
     return delta_V_, beta_, t_f_
 
+
 def change_ecc_inc(ss_0, ecc_f, inc_f, f):
     """Simultaneous eccentricity and inclination changes.
     Guidance law from the model.
