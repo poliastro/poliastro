@@ -7,6 +7,7 @@ from poliastro.bodies import Earth
 from poliastro.core.propagation import func_twobody
 from poliastro.core.thrust import change_a_inc as change_a_inc_fast
 from poliastro.core.thrust import change_argp as change_argp_fast
+from poliastro.core.thrust import change_ecc_inc as change_ecc_inc_fast
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
@@ -147,7 +148,7 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
         [0.8, 10.0, 16.304, 1.9799],
     ],
 )
-def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_V):
+def test_geo_cases_beta_dnd_delta_v_fast(ecc_0, inc_f, expected_beta, expected_delta_V):
     a = 42164  # km
     ecc_f = 0.0
     inc_0 = 0.0  # rad, baseline
@@ -167,14 +168,49 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
         nu=0 * u.deg,
     )
 
-    _, delta_V, beta, _ = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
+    _, delta_V, beta, _ = change_ecc_inc_fast(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
 
     assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
     assert_allclose(beta, expected_beta, rtol=1e-2)
 
+@pytest.mark.parametrize(
+    "ecc_0,inc_f,expected_beta,expected_delta_V",
+    [
+        [0.1, 20.0, 83.043, 1.6789],
+        [0.2, 20.0, 76.087, 1.6890],
+        [0.4, 20.0, 61.522, 1.7592],
+        [0.6, 16.0, 40.0, 1.7241],
+        [0.8, 10.0, 16.304, 1.9799],
+    ],
+)
+def test_geo_cases_beta_dnd_delta_v_safe(ecc_0, inc_f, expected_beta, expected_delta_V):
+    a = 42164  # km
+    ecc_f = 0.0
+    inc_0 = 0.0  # rad, baseline
+    argp = 0.0  # rad, the method is efficient for 0 and 180
+    f = 2.4e-7  # km / s2, unused
+
+    inc_f = np.radians(inc_f)
+    expected_beta = np.radians(expected_beta)
+
+    s0 = Orbit.from_classical(
+        attractor=Earth,
+        a=a * u.km,
+        ecc=ecc_0 * u.one,
+        inc=inc_0 * u.deg,
+        raan=0 * u.deg,
+        argp=argp * u.deg,
+        nu=0 * u.deg,
+    )
+
+    _, delta_V, beta, _ = change_ecc_inc(ss_0=s0, ecc_f=ecc_f*(u.one), inc_f=inc_f*(u.rad), f=f*(u.km / u.s ** 2))
+
+    assert_allclose(delta_V.value, expected_delta_V, rtol=1e-2)
+    assert_allclose(beta, expected_beta, rtol=1e-2)
+
 
 @pytest.mark.parametrize("ecc_0,ecc_f", [[0.4, 0.0], [0.0, 0.4]])
-def test_geo_cases_numerical(ecc_0, ecc_f):
+def test_geo_cases_numerical_fast(ecc_0, ecc_f):
     a = 42164  # km
     inc_0 = 0.0  # rad, baseline
     inc_f = (20.0 * u.deg).to(u.rad).value  # rad
@@ -191,7 +227,39 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
         argp=argp * u.deg,
         nu=0 * u.deg,
     )
-    a_d, _, _, t_f = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
+    a_d, _, _, t_f = change_ecc_inc_fast(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
+
+    # Propagate orbit
+    def f_geo(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f * u.s, method=cowell, f=f_geo, rtol=1e-8)
+
+    assert_allclose(sf.ecc.value, ecc_f, rtol=1e-2, atol=1e-2)
+    assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
+
+@pytest.mark.parametrize("ecc_0,ecc_f", [[0.4, 0.0], [0.0, 0.4]])
+def test_geo_cases_numerical_safe(ecc_0, ecc_f):
+    a = 42164  # km
+    inc_0 = 0.0  # rad, baseline
+    inc_f = (20.0 * u.deg).to(u.rad).value  # rad
+    argp = 0.0  # rad, the method is efficient for 0 and 180
+    f = 2.4e-7  # km / s2
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.from_classical(
+        attractor=Earth,
+        a=a * u.km,
+        ecc=ecc_0 * u.one,
+        inc=inc_0 * u.deg,
+        raan=0 * u.deg,
+        argp=argp * u.deg,
+        nu=0 * u.deg,
+    )
+    a_d, _, _, t_f = change_ecc_inc(ss_0=s0, ecc_f=ecc_f*(u.one), inc_f=inc_f*(u.rad), f=f*(u.km / u.s ** 2))
 
     # Propagate orbit
     def f_geo(t0, u_, k):
