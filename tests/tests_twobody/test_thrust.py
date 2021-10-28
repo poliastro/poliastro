@@ -8,6 +8,7 @@ from poliastro.core.propagation import func_twobody
 from poliastro.core.thrust import change_a_inc as change_a_inc_fast
 from poliastro.core.thrust import change_argp as change_argp_fast
 from poliastro.core.thrust import change_ecc_inc as change_ecc_inc_fast
+from poliastro.core.thrust import change_ecc_quasioptimal as change_ecc_quasioptimal_fast
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
@@ -86,7 +87,7 @@ def test_leo_geo_numerical_fast(inc_0):
 @pytest.mark.parametrize(
     "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
 )
-def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
+def test_sso_disposal_time_and_delta_v_fast(ecc_0, ecc_f):
     a_0 = Earth.R.to(u.km).value + 900  # km
     f = 2.4e-7  # km / s2, assumed constant
 
@@ -101,16 +102,39 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
         argp=0 * u.deg,
         nu=0 * u.deg,
     )
-    _, delta_V, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
+    _, delta_V, t_f = change_ecc_quasioptimal_fast(s0, ecc_f, f)
 
     assert_allclose(delta_V, expected_delta_V, rtol=1e-4)
     assert_allclose(t_f / 86400, expected_t_f, rtol=1e-4)
+
+@pytest.mark.parametrize(
+    "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
+)
+def test_sso_disposal_time_and_delta_v_safe(ecc_0, ecc_f):
+    a_0 = Earth.R.to(u.km).value + 900  # km
+    f = 2.4e-7  # km / s2, assumed constant
+
+    expected_t_f = 29.697  # days, reverse-engineered
+    expected_delta_V = 0.6158  # km / s, lower than actual result
+    s0 = Orbit.from_classical(
+        attractor=Earth,
+        a=a_0 * u.km,
+        ecc=ecc_0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
+    )
+    _, delta_V, t_f = change_ecc_quasioptimal(s0, ecc_f*(u.one), f*(u.km / u.s ** 2))
+
+    assert_allclose(delta_V.value, expected_delta_V, rtol=1e-4)
+    assert_allclose(t_f.value / 86400, expected_t_f, rtol=1e-4)
 
 
 @pytest.mark.parametrize(
     "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
 )
-def test_sso_disposal_numerical(ecc_0, ecc_f):
+def test_sso_disposal_numerical_fast(ecc_0, ecc_f):
     a_0 = Earth.R.to(u.km).value + 900  # km
     f = 2.4e-7  # km / s2, assumed constant
 
@@ -124,7 +148,37 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
         argp=0 * u.deg,
         nu=0 * u.deg,
     )
-    a_d, _, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
+    a_d, _, t_f = change_ecc_quasioptimal_fast(s0, ecc_f, f)
+
+    # Propagate orbit
+    def f_ss0_disposal(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f * u.s, method=cowell, f=f_ss0_disposal, rtol=1e-8)
+
+    assert_allclose(sf.ecc.value, ecc_f, rtol=1e-4, atol=1e-4)
+
+@pytest.mark.parametrize(
+    "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
+)
+def test_sso_disposal_numerical_safe(ecc_0, ecc_f):
+    a_0 = Earth.R.to(u.km).value + 900  # km
+    f = 2.4e-7  # km / s2, assumed constant
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.from_classical(
+        attractor=Earth,
+        a=a_0 * u.km,
+        ecc=ecc_0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
+    )
+    a_d, _, t_f = change_ecc_quasioptimal(s0, ecc_f*(u.one), f*(u.km / u.s ** 2))
 
     # Propagate orbit
     def f_ss0_disposal(t0, u_, k):

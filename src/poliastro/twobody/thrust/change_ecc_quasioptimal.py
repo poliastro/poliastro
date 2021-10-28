@@ -6,13 +6,9 @@ References
   Elliptical Orbit Transfers", 1997.
 
 """
-import numpy as np
 from astropy import units as u
-from numba import njit
-from numpy import cross
-from numpy.linalg import norm
 
-from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
+from poliastro.core.thrust.change_ecc_quasioptimal import change_ecc_quasioptimal as change_ecc_quasioptimal_fast
 
 
 def change_ecc_quasioptimal(ss_0, ecc_f, f):
@@ -24,27 +20,15 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
     ----------
     ss_0 : Orbit
         Initial orbit, containing all the information.
-    ecc_f : float
+    ecc_f : ~astropy.units.quantity.Quantity
         Final eccentricity.
-    f : float
-        Magnitude of constant acceleration
+    f : ~astropy.units.quantity.Quantity
+        Magnitude of constant acceleration (km / s**2).
     """
-    # We fix the inertial direction at the beginning
-    k = ss_0.attractor.k.to(u.km ** 3 / u.s ** 2).value
-    a = ss_0.a.to(u.km).value
-    ecc_0 = ss_0.ecc.value
-    if ecc_0 > 0.001:  # Arbitrary tolerance
-        ref_vec = ss_0.e_vec / ecc_0
-    else:
-        ref_vec = ss_0.r / norm(ss_0.r)
+    a_d, delta_V, t_f = change_ecc_quasioptimal_fast(
+        ss_0 = ss_0,
+        ecc_f = ecc_f.to_value(u.one),
+        f = f.to_value(u.km / u.s ** 2),
+    )
 
-    h_unit = ss_0.h_vec / norm(ss_0.h_vec)
-    thrust_unit = cross(h_unit, ref_vec) * np.sign(ecc_f - ecc_0)
-
-    @njit
-    def a_d(t0, u_, k):
-        accel_v = f * thrust_unit
-        return accel_v
-
-    delta_V, t_f = extra_quantities(k, a, ecc_0, ecc_f, f)
-    return a_d, delta_V, t_f
+    return a_d, delta_V, t_f * u.s
