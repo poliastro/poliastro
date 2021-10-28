@@ -24,7 +24,7 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
         Gravitational parameter(km**3 / s**2).
     a : ~astropy.units.quantity.Quantity
         Semimajor axis (km).
-    ecc : float
+    ecc : ~astropy.units.quantity.Quantity
         Eccentricity.
     argp_0 : ~astropy.units.quantity.Quantity
         Initial Argument of Perigee (rad).
@@ -42,7 +42,7 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
     a_d, delta_V, t_f = change_argp_fast(
         k=k.to_value(u.km ** 3 / u.s ** 2),
         a=a.to_value(u.km),
-        ecc = ecc,
+        ecc = ecc.to_value(u.one),
         argp_0=inc_0.to_value(u.rad),
         argp_f=inc_0.to_value(u.rad),
         f=f.to_value(u.km / u.s ** 2),
