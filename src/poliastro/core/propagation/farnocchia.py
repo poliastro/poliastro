@@ -26,14 +26,14 @@ def _kepler_equation_near_parabolic(D, M, ecc):
 @jit
 def _kepler_equation_prime_near_parabolic(D, M, ecc):
     x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
-    assert abs(x) < 1
+    assert abs(x) < 1, "Absolute value of x must be less than one."
     S = dS_x_alt(ecc, x)
     return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 2) * S
 
 
 @jit
 def S_x(ecc, x, atol=1e-12):
-    assert abs(x) < 1
+    assert abs(x) < 1, "Absolute value of x must be less than one."
     S = 0
     k = 0
     while True:
@@ -50,7 +50,7 @@ def dS_x_alt(ecc, x, atol=1e-12):
     # the partial derivative of S with respect to D,
     # but the result of arranging the terms
     # in section 4.2 of Farnocchia et al. 2013
-    assert abs(x) < 1
+    assert abs(x) < 1, "Absolute value of x must be less than one."
     S = 0
     k = 0
     while True:
@@ -68,7 +68,7 @@ def d2S_x_alt(ecc, x, atol=1e-12):
     # but the result of arranging the terms
     # in section 4.2 of Farnocchia et al. 2013
     # Also, notice that we are not using this function yet
-    assert abs(x) < 1
+    assert abs(x) < 1, "Absolute value of x must be less than one."
     S = 0
     k = 0
     while True:
@@ -82,7 +82,7 @@ def d2S_x_alt(ecc, x, atol=1e-12):
 @jit
 def D_to_M_near_parabolic(D, ecc):
     x = (ecc - 1.0) / (ecc + 1.0) * (D ** 2)
-    assert abs(x) < 1
+    assert abs(x) < 1, "Absolute value of x must be less than one."
     S = S_x(ecc, x)
     return (
         np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D ** 3) * S
@@ -145,7 +145,7 @@ def delta_t_from_nu(nu, ecc, k=1.0, q=1.0, delta=1e-2):
         Time elapsed since periapsis.
 
     """
-    assert -np.pi <= nu < np.pi
+    assert -np.pi <= nu < np.pi, "nu must be in the interval [-pi, pi)"
     if ecc < 1 - delta:
         # Strong elliptic
         E = nu_to_E(nu, ecc)  # (-pi, pi]
