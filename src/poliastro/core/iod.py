@@ -380,7 +380,7 @@ def _initial_guess(T, ll, M):
         else:
             # This is the real condition, which is not exactly equivalent
             # elif T_1 < T < T_0
-            x_0 = (T_0 / T) ** (np.log2(T_1 / T_0)) - 1
+            x_0 = np.exp(np.log(2) * np.log(T / T_0) / np.log(T_1 / T_0)) - 1
 
         return [x_0]
     else:
