@@ -159,7 +159,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
 
 @jit
 def izzo(k, r1, r2, tof, M, numiter, rtol):
-    """Aplies izzo algorithm to solve Lambert's problem.
+    """Applies Izzo's algorithm to solve Lambert's problem.
 
     Parameters
     ----------
@@ -188,10 +188,8 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
 
     """
 
-    # Check preconditions
-    assert tof > 0
-    assert k > 0
-
+    assert tof > 0, "Assert tof must be positive"
+    
     # Check collinearity of r1 and r2
     if not cross(r1, r2).any():
         raise ValueError("Lambert solution cannot be computed for collinear vectors")
@@ -408,7 +406,7 @@ def _halley(p0, T0, ll, tol, maxiter):
     this module and is not really reusable.
 
     """
-    for ii in range(maxiter):
+    for _ in range(maxiter):
         y = _compute_y(p0, ll)
         fder = _tof_equation_p(p0, y, T0, ll)
         fder2 = _tof_equation_p2(p0, y, T0, fder, ll)
@@ -436,7 +434,7 @@ def _householder(p0, T0, ll, M, tol, maxiter):
     this module and is not really reusable.
 
     """
-    for ii in range(maxiter):
+    for _ in range(maxiter):
         y = _compute_y(p0, ll)
         fval = _tof_equation_y(p0, y, T0, ll, M)
         T = fval + T0
