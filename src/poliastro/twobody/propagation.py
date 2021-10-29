@@ -53,7 +53,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
     rtol : float, optional
-        Maximum relative error permitted, default to 1e-10.
+        Maximum relative error permitted, defaults to 1e-11.
     events : function(t, u(t)), optional
         Passed to `solve_ivp`: Integration stops when this function
         returns <= 0., assuming you set events.terminal=True

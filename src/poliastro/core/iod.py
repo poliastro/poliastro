@@ -189,8 +189,8 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     """
 
     # Check preconditions
-    assert tof > 0, "tof must be a non-negative value."
-    assert k > 0, "k must be a non-negative value."
+    assert tof > 0
+    assert k > 0
 
     # Check collinearity of r1 and r2
     if not cross(r1, r2).any():
@@ -251,8 +251,8 @@ def _reconstruct(x, y, r1, r2, ll, gamma, rho, sigma):
 def _find_xy(ll, T, M, numiter, rtol):
     """Computes all x, y for given number of revolutions."""
     # For abs(ll) == 1 the derivative is not continuous
-    assert abs(ll) < 1, "Absolute value of `ll` must be less than one."
-    assert T > 0, "T must be greater than zero."  # Mistake in the original paper
+    assert abs(ll) < 1
+    assert T > 0  # Mistake in the original paper
 
     M_max = np.floor(T / pi)
     T_00 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # T_xM
