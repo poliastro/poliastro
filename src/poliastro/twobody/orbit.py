@@ -60,11 +60,11 @@ except ImportError:
     from cached_property import cached_property  # type: ignore
 
 
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
+ORBIT_FORMAT = "{r_p:.0f} x {r_a:.1g} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
 # Reference frame
 ORBIT_NO_FRAME_FORMAT = (
-    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
+    "{r_p:.0f} x {r_a:.1g} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 )
 
 
@@ -395,7 +395,7 @@ class Orbit:
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         if not -np.pi * u.rad <= nu < np.pi * u.rad:
-            warn("Wrapping true anomaly to -π <= nu < π", stacklevel=2)
+            warn("Wrapping true anomaly to -π <= nu < π", stacklevel=3)
             nu = ((nu + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad).to(
                 nu.unit
             )
