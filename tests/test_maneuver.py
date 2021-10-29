@@ -230,4 +230,4 @@ def test_apply_manuever_correct_plane():
     imp = Maneuver.impulse([0, 0, 0] * u.km / u.s)
     new_ceres = ceres.apply_maneuver(imp)
     assert ceres.plane == Planes.EARTH_ECLIPTIC
-    assert new_cres.plane == ceres.plane
+    assert new_ceres.plane == ceres.plane
