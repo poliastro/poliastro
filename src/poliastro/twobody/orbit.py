@@ -1463,8 +1463,10 @@ class Orbit:
                 orbit_new = orbit_new.propagate(delta_t)
             r, v = orbit_new.rv()
             vnew = v + delta_v
-            orbit_new = self.from_vectors(attractor = attractor, r = r, v = vnew, epoch = orbit_new.epoch, plane = plane)
-            if intermediate: # Avoid keeping them in memory.
+            orbit_new = self.from_vectors(
+                attractor=attractor, r=r, v=vnew, epoch=orbit_new.epoch, plane=plane
+            )
+            if intermediate:  # Avoid keeping them in memory.
                 states.append(orbit_new)
         if intermediate:
             res = states  # type: Union[Orbit, List[Orbit]]

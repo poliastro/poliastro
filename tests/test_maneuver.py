@@ -7,8 +7,8 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.testing import assert_allclose
 
-from poliastro.frames import Planes
 from poliastro.bodies import Earth, Mercury, Moon
+from poliastro.frames import Planes
 from poliastro.maneuver import Maneuver
 from poliastro.twobody import Orbit
 
@@ -224,10 +224,10 @@ def test_correct_pericenter_ecc_exception():
         == f"The correction maneuver is not yet supported with {ss0.ecc},it should be less than or equal to 0.001"
     )
 
+
 def test_apply_manuever_correct_plane():
     ceres = Orbit.from_sbdb("Ceres")
     imp = Maneuver.impulse([0, 0, 0] * u.km / u.s)
     new_ceres = ceres.apply_maneuver(imp)
     assert ceres.plane == Planes.EARTH_ECLIPTIC
     assert new_cres.plane == ceres.plane
-    
