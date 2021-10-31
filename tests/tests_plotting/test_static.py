@@ -9,6 +9,7 @@ from poliastro.constants import J2000_TDB
 from poliastro.ephem import Ephem
 from poliastro.examples import churi, iss, molniya
 from poliastro.frames import Planes
+from poliastro.maneuver import Maneuver
 from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody import Orbit
 from poliastro.util import time_range
@@ -238,3 +239,31 @@ def test_body_frame_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     w = recwarn.pop(TimeScaleWarning)
 
     assert expected_epoch_string in str(w.message)
+
+
+@pytest.mark.mpl_image_compare
+def test_plot_maneuver():
+    # Data from Vallado, example 6.1
+    alt_i = 191.34411 * u.km
+    alt_f = 35781.34857 * u.km
+    _a = 0 * u.deg
+    ss_i = Orbit.from_classical(
+        attractor=Earth,
+        a=Earth.R + alt_i,
+        ecc=0 * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=_a,
+    )
+
+    # Create the maneuver
+    man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
+
+    # Plot the maneuver
+    fig, ax = plt.subplots()
+    plotter = StaticOrbitPlotter(ax=ax)
+    plotter.plot(ss_i, color="blue", label="Initial orbit")
+    plotter.plot_maneuver(ss_i, man)
+
+    return fig
