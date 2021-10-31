@@ -33,8 +33,26 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
 
     Parameters
     ----------
+    k : float
+        Gravitational parameter (km**3 / s**2)
+    a : float
+        Semi-major axis (km)
+    ecc : float
+        Eccentricity
+    argp_0 : float
+        Initial argument of periapsis (rad)
+    argp_f : float
+        Final argument of periapsis (rad)
     f : float
-        Magnitude of constant acceleration
+        Magnitude of constant acceleration (km / s**2)
+
+    Returns
+    -------
+    a_d : function
+
+    delta_V : numpy.array
+
+    t_f : float
     """
 
     @jit

@@ -210,16 +210,16 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
 
 def test_soyuz_standard_gto_delta_v_safe():
     # Data from Soyuz Users Manual, issue 2 revision 0
-    r_a = (Earth.R + 35950 * u.km).to(u.km).value
-    r_p = (Earth.R + 250 * u.km).to(u.km).value
+    r_a = (Earth.R + 35950 * u.km).to(u.km)
+    r_p = (Earth.R + 250 * u.km).to(u.km)
 
-    a = (r_a + r_p) / 2  # km
+    a = ((r_a + r_p) / 2).to(u.km)  # km
     ecc = r_a / a - 1
-    argp_0 = (178 * u.deg).to(u.rad).value  # rad
-    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
+    argp_0 = (178 * u.deg).to(u.rad)  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad)  # rad
     f = 2.4e-7 * u.km / u.s ** 2  # km / s2
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km ** 3 / u.s ** 2)
 
     _, delta_V, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
 
@@ -254,23 +254,23 @@ def test_soyuz_standard_gto_delta_v_fast():
 
 def test_soyuz_standard_gto_numerical_safe():
     # Data from Soyuz Users Manual, issue 2 revision 0
-    r_a = (Earth.R + 35950 * u.km).to(u.km).value
-    r_p = (Earth.R + 250 * u.km).to(u.km).value
+    r_a = (Earth.R + 35950 * u.km).to(u.km)
+    r_p = (Earth.R + 250 * u.km).to(u.km)
 
-    a = (r_a + r_p) / 2  # km
+    a = ((r_a + r_p) / 2).to(u.km)  # km
     ecc = r_a / a - 1
-    argp_0 = (178 * u.deg).to(u.rad).value  # rad
-    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
+    argp_0 = (178 * u.deg).to(u.rad)  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad)  # rad
     f = 2.4e-7 * u.km / u.s ** 2  # km / s2
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km ** 3 / u.s ** 2)
 
     a_d, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(
         attractor=Earth,
-        a=a * u.km,
+        a=a,
         ecc=(r_a / a - 1) * u.one,
         inc=6 * u.deg,
         raan=188.5 * u.deg,
@@ -287,7 +287,7 @@ def test_soyuz_standard_gto_numerical_safe():
 
     sf = s0.propagate(t_f, method=cowell, f=f_soyuz, rtol=1e-8)
 
-    assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
+    assert_allclose(sf.argp.to(u.rad).value, (argp_f).value, rtol=1e-4)
 
 
 def test_soyuz_standard_gto_numerical_fast():

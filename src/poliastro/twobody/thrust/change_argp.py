@@ -19,15 +19,29 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
 
     Parameters
     ----------
+    k : ~astropy.units.quantity.Quantity
+        Gravitational parameter (km**3 / s**2)
+    a : ~astropy.units.quantity.Quantity
+        Semi-major axis (km)
+    ecc : float
+        Eccentricity
+    argp_0 : ~astropy.units.quantity.Quantity
+        Initial argument of periapsis (rad)
+    argp_f : ~astropy.units.quantity.Quantity
+        Final argument of periapsis (rad)
     f : ~astropy.units.quantity.Quantity
-        Magnitude of constant acceleration
+        Magnitude of constant acceleration (km / s**2)
+
+    Returns
+    -------
+    a_d, delta_V, t_f : tuple (function, ~astropy.units.quantity.Quantity, ~astropy.time.Time)
     """
     a_d, delta_V, t_f = change_a_inc_fast(
-        k,
-        a,
-        ecc,
-        argp_0,
-        argp_f,
+        k=k.to_value(u.km ** 3 / u.s ** 2),
+        a=a.to_value(u.km),
+        ecc=ecc,
+        argp_0=argp_0.to_value(u.rad),
+        argp_f=argp_f.to_value(u.rad),
         f=f.to_value(u.km / u.s ** 2),
     )
 
