@@ -58,6 +58,33 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
         if not self._figure._in_batch_mode:
             return self.show()
 
+    def plot_maneuver(
+        self, initial_orbit, maneuver, label=None, color=None, trail=False
+    ):
+        """Plots the maneuver trajectory applied to the provided initial orbit.
+
+        Parameters
+        ----------
+        initial_orbit: ~poliastro.twobody.orbit.Orbit
+            The base orbit for which the maneuver will be applied.
+        manuever: ~poliastro.maneuver.Maneuver
+            The maneuver to be plotted.
+        label : str, optional
+            Label of the trajectory.
+        color : str, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+
+        super().plot_maneuver(
+            initial_orbit, maneuver, label=label, color=color, trail=trail
+        )
+
+        if not self._figure._in_batch_mode:
+            return self.show()
+
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
 
@@ -162,6 +189,16 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
         )
         if dark:
             self._layout.template = "plotly_dark"
+            self._draw_impulse
+
+    def _draw_impulse(self, color, name, center=None):
+        marker_dict = dict(size=7, color=color, symbol="x")
+        impulse = Scatter3d(
+            x=center[0], y=center[1], z=center[2], marker=marker_dict, name=name
+        )
+        self._figure.add_trace(impulse)
+
+        return impulse
 
     def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
         # We use _plot_sphere here because it's not easy to specify the size of a marker
@@ -264,20 +301,31 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
     def _redraw(self):
         raise NotImplementedError("OrbitPlotter2D does not support reprojecting yet")
 
-    def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+    def _draw_marker(self, symbol, size, color, name=None, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
+
+        showlegend = False if name is None else True
 
         trace = Scatter(
             x=x_center.to_value(self._unit),
             y=y_center.to_value(self._unit),
             mode="markers",
-            marker=dict(size=10, color=color),
+            marker=dict(size=size, color=color, symbol=symbol),
             name=name,
+            showlegend=showlegend,
         )
         self._figure.add_trace(trace)
 
+        return trace
+
+    def _draw_impulse(self, color, name, center=[0, 0, 0] * u.km):
+        trace = self._draw_marker("x", 8, color, name, center)
+        return trace
+
+    def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
+        trace = self._draw_marker("circle", 10, color, name=None, center=center)
         return trace
 
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
