@@ -77,16 +77,29 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return colors
 
-    def _draw_point(self, radius, color, name, center=None):
+    def _draw_marker(self, marker, size, color, name, center=None):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
 
         (l,) = self._ax.plot(
-            x_center.to(u.km).value, y_center.to(u.km).value, "o", mew=0, color=color
+            x_center.to(u.km).value,
+            y_center.to(u.km).value,
+            marker,
+            mew=size,
+            color=color,
+            label=name,
         )
 
         return l
+
+    def _draw_point(self, radius, color, name, center=None):
+        point_marker = self._draw_marker("o", 0, color, name, center)
+        return point_marker
+
+    def _draw_impulse(self, color, name, center=None):
+        impulse_marker = self._draw_marker("x", 2, color, name, center)
+        return impulse_marker
 
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
@@ -187,6 +200,41 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         lines = self._plot_trajectory(
             coordinates, label=label, color=color, trail=trail
+        )
+
+        if label:
+            self._set_legend(label, *lines)
+
+        return lines
+
+    def plot_maneuver(
+        self, initial_orbit, maneuver, label=None, color=None, trail=False
+    ):
+        """Plots the maneuver trajectory applied to the provided initial orbit.
+
+        Parameters
+        ----------
+        initial_orbit: ~poliastro.twobody.orbit.Orbit
+            The base orbit for which the maneuver will be applied.
+        manuever: ~poliastro.maneuver.Maneuver
+            The maneuver to be plotted.
+        label : str, optional
+            Label of the trajectory.
+        color : str, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
+        lines = self._plot_maneuver(
+            initial_orbit, maneuver, label=label, color=color, trail=trail
         )
 
         if label:
