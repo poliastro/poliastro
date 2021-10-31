@@ -287,7 +287,7 @@ def test_soyuz_standard_gto_numerical_safe():
 
     sf = s0.propagate(t_f, method=cowell, f=f_soyuz, rtol=1e-8)
 
-    assert_allclose(sf.argp.to(u.rad).value, (argp_f).value, rtol=1e-4)
+    assert_allclose(sf.argp.to_value(u.rad), argp_f.to_value(u.rad), rtol=1e-4)
 
 
 def test_soyuz_standard_gto_numerical_fast():
