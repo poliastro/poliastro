@@ -25,16 +25,20 @@ def circular_velocity(k, a):
 
 @jit
 def rotation_matrix(angle, axis):
+    assert axis in (0, 1, 2)
+    angle = np.asarray(angle)
     c = cos(angle)
     s = sin(angle)
-    if axis == 0:
-        return np.array([[1.0, 0.0, 0.0], [0.0, c, -s], [0.0, s, c]])
-    elif axis == 1:
-        return np.array([[c, 0.0, s], [0.0, 1.0, 0.0], [s, 0.0, c]])
-    elif axis == 2:
-        return np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
-    else:
-        raise ValueError("Invalid axis: must be one of 'x', 'y' or 'z'")
+
+    a1 = (axis + 1) % 3
+    a2 = (axis + 2) % 3
+    R = np.zeros(angle.shape + (3, 3))
+    R[..., axis, axis] = 1.0
+    R[..., a1, a1] = c
+    R[..., a1, a2] = -s
+    R[..., a2, a1] = s
+    R[..., a2, a2] = c
+    return R
 
 
 @jit

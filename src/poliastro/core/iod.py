@@ -193,7 +193,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     assert k > 0
 
     # Check collinearity of r1 and r2
-    if np.all(cross(r1, r2) == 0):
+    if not cross(r1, r2).any():
         raise ValueError("Lambert solution cannot be computed for collinear vectors")
 
     # Chord
@@ -244,7 +244,7 @@ def _reconstruct(x, y, r1, r2, ll, gamma, rho, sigma):
     V_r2 = -gamma * ((ll * y - x) + rho * (ll * y + x)) / r2
     V_t1 = gamma * sigma * (y + ll * x) / r1
     V_t2 = gamma * sigma * (y + ll * x) / r2
-    return [V_r1, V_r2, V_t1, V_t2]
+    return V_r1, V_r2, V_t1, V_t2
 
 
 @jit
@@ -252,7 +252,7 @@ def _find_xy(ll, T, M, numiter, rtol):
     """Computes all x, y for given number of revolutions."""
     # For abs(ll) == 1 the derivative is not continuous
     assert abs(ll) < 1
-    assert T > 0  # Mistake on original paper
+    assert T > 0  # Mistake in the original paper
 
     M_max = np.floor(T / pi)
     T_00 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # T_xM
@@ -363,7 +363,7 @@ def _compute_T_min(ll, M, numiter, rtol):
             x_T_min = _halley(x_i, T_i, ll, rtol, numiter)
             T_min = _tof_equation(x_T_min, 0.0, ll, M)
 
-    return [x_T_min, T_min]
+    return x_T_min, T_min
 
 
 @jit
@@ -380,7 +380,10 @@ def _initial_guess(T, ll, M):
         else:
             # This is the real condition, which is not exactly equivalent
             # elif T_1 < T < T_0
-            x_0 = (T_0 / T) ** (np.log2(T_1 / T_0)) - 1
+            # Corrected initial guess,
+            # piecewise equation right after expression (30) in the original paper is incorrect
+            # See https://github.com/poliastro/poliastro/issues/1362
+            x_0 = np.exp(np.log(2) * np.log(T / T_0) / np.log(T_1 / T_0)) - 1
 
         return [x_0]
     else:

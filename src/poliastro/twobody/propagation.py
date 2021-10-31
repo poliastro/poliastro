@@ -53,7 +53,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
     rtol : float, optional
-        Maximum relative error permitted, default to 1e-10.
+        Maximum relative error permitted, defaults to 1e-11.
     events : function(t, u(t)), optional
         Passed to `solve_ivp`: Integration stops when this function
         returns <= 0., assuming you set events.terminal=True
@@ -211,7 +211,9 @@ def _kepler(k, r0, v0, tof, *, numiter):
     # Compute Lagrange coefficients
     f, g, fdot, gdot = vallado_fast(k, r0, v0, tof, numiter)
 
-    assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
+    assert (
+        np.abs(f * gdot - fdot * g - 1) < 1e-5
+    ), "Internal error, solution is not consistent"  # Fixed tolerance
 
     # Return position and velocity vectors
     r = f * r0 + g * v0
@@ -256,10 +258,7 @@ def mikkola(k, r, v, tofs, rtol=None):
     tofs = tofs.to_value(u.s)
 
     results = np.array([mikkola_fast(k, r0, v0, tof) for tof in tofs])
-    return (
-        results[:, 0] << u.m,
-        results[:, 1] << u.m / u.s,
-    )
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def markley(k, r, v, tofs, rtol=None):
@@ -299,10 +298,7 @@ def markley(k, r, v, tofs, rtol=None):
     tofs = tofs.to_value(u.s)
 
     results = np.array([markley_fast(k, r0, v0, tof) for tof in tofs])
-    return (
-        results[:, 0] << u.m,
-        results[:, 1] << u.m / u.s,
-    )
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def pimienta(k, r, v, tofs, rtol=None):
@@ -344,10 +340,7 @@ def pimienta(k, r, v, tofs, rtol=None):
     tofs = tofs.to_value(u.s)
 
     results = np.array([pimienta_fast(k, r0, v0, tof) for tof in tofs])
-    return (
-        results[:, 0] << u.m,
-        results[:, 1] << u.m / u.s,
-    )
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
@@ -390,10 +383,7 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
     results = np.array(
         [gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
     )
-    return (
-        results[:, 0] << u.m,
-        results[:, 1] << u.m / u.s,
-    )
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def danby(k, r, v, tofs, rtol=1e-8):
@@ -433,10 +423,7 @@ def danby(k, r, v, tofs, rtol=1e-8):
     tofs = tofs.to_value(u.s)
 
     results = np.array([danby_fast(k, r0, v0, tof) for tof in tofs])
-    return (
-        results[:, 0] << u.m,
-        results[:, 1] << u.m / u.s,
-    )
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
