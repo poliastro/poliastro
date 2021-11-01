@@ -214,7 +214,7 @@ class Orbit:
     @cached_property
     def h_vec(self):
         """Specific angular momentum vector."""
-        h_vec = np.cross(self.r.to(u.km).value, self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
     @cached_property
@@ -466,7 +466,7 @@ class Orbit:
         else:
             # TODO: The attractor is not really the Sun, but the Solar System
             # Barycenter
-            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.d), epoch)
             ss._frame = ICRS()  # Hack!
 
         return ss
@@ -1200,7 +1200,7 @@ class Orbit:
         )
 
         if self.ecc < 1e-8:
-            if abs(self.inc.to(u.rad).value) > 1e-8:
+            if abs(self.inc.to_value(u.rad)) > 1e-8:
                 node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
                 p_vec = node / norm(node)  # Circular inclined
             else:
@@ -1219,7 +1219,7 @@ class Orbit:
 
         try:
             return ORBIT_FORMAT.format(
-                r_p=self.r_p.to(unit).value,
+                r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
                 frame=self.get_frame().__class__.__name__,
@@ -1229,7 +1229,7 @@ class Orbit:
             )
         except NotImplementedError:
             return ORBIT_NO_FRAME_FORMAT.format(
-                r_p=self.r_p.to(unit).value,
+                r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
                 body=self.attractor,
@@ -1356,11 +1356,11 @@ class Orbit:
         # the arc cosine, which is in the range [0, 180)
         # Start from -nu_limit
         wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
-        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to(u.rad).value
+        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
 
         limits = [
-            min_anomaly.to(u.rad).value if min_anomaly is not None else -nu_limit,
-            max_anomaly.to(u.rad).value if max_anomaly is not None else nu_limit,
+            min_anomaly.to_value(u.rad) if min_anomaly is not None else -nu_limit,
+            max_anomaly.to_value(u.rad) if max_anomaly is not None else nu_limit,
         ] * u.rad  # type: u.Quantity
 
         # Now we check that none of the provided values
@@ -1422,13 +1422,13 @@ class Orbit:
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
-            np.full(n, self.attractor.k.to(u.m ** 3 / u.s ** 2).value),
-            np.full(n, self.p.to(u.m).value),
+            np.full(n, self.attractor.k.to_value(u.m ** 3 / u.s ** 2)),
+            np.full(n, self.p.to_value(u.m)),
             np.full(n, self.ecc.value),
-            np.full(n, self.inc.to(u.rad).value),
-            np.full(n, self.raan.to(u.rad).value),
-            np.full(n, self.argp.to(u.rad).value),
-            nu_values.to(u.rad).value,
+            np.full(n, self.inc.to_value(u.rad)),
+            np.full(n, self.raan.to_value(u.rad)),
+            np.full(n, self.argp.to_value(u.rad)),
+            nu_values.to_value(u.rad),
         )
 
         # Add units

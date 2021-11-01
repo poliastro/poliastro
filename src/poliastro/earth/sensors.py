@@ -30,10 +30,10 @@ def min_and_max_ground_range(h, eta_fov, eta_center, R):
         Maximum value of latitude and longitude.
 
     """
-    h = h.to(u.km).value
-    eta_fov = eta_fov.to(u.rad).value
-    eta_center = eta_center.to(u.rad).value
-    R = R.to(u.km).value
+    h = h.to_value(u.km)
+    eta_fov = eta_fov.to_value(u.rad)
+    eta_center = eta_center.to_value(u.rad)
+    R = R.to_value(u.km)
     lambda_min, lambda_max = min_and_max_ground_range_fast(h, eta_fov, eta_center, R)
 
     return lambda_min * u.rad, lambda_max * u.rad
@@ -88,13 +88,13 @@ def ground_range_diff_at_azimuth(
         which must be greater than 0º and less than 180º.
 
     """
-    h = h.to(u.km).value
-    eta_fov = eta_fov.to(u.rad).value
-    eta_center = eta_center.to(u.rad).value
-    beta = beta.to(u.rad).value
-    phi_nadir = phi_nadir.to(u.rad).value
-    lambda_nadir = lambda_nadir.to(u.rad).value
-    R = R.to(u.km).value
+    h = h.to_value(u.km)
+    eta_fov = eta_fov.to_value(u.rad)
+    eta_center = eta_center.to_value(u.rad)
+    beta = beta.to_value(u.rad)
+    phi_nadir = phi_nadir.to_value(u.rad)
+    lambda_nadir = lambda_nadir.to_value(u.rad)
+    R = R.to_value(u.km)
 
     (delta_lambda, phi_tgt, lambda_tgt,) = ground_range_diff_at_azimuth_fast(
         h, eta_fov, eta_center, beta, phi_nadir, lambda_nadir, R

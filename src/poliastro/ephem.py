@@ -54,8 +54,8 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
         Interpolated function.
 
     """
-    h = (period * rtol).to(u.day).value
-    t_span = (t_span[0].to(u.day).value, t_span[1].to(u.day).value + 0.01)
+    h = (period * rtol).to_value(u.d)
+    t_span = (t_span[0].to_value(u.d), t_span[1].to_value(u.d) + 0.01)
     t_values = np.linspace(*t_span, int((t_span[1] - t_span[0]) / h))  # type: ignore
     r_values = np.zeros((t_values.shape[0], 3))
 
@@ -71,7 +71,7 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
 
         r_values[i] = r.xyz.to(u.km)
 
-    t_values = ((t_values - t_span[0]) * u.day).to(u.s).value
+    t_values = ((t_values - t_span[0]) * u.day).to_value(u.s)
     return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
 
 

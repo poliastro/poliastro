@@ -135,8 +135,8 @@ class _PlanetaryFixed(BaseRADecFrame):
             Right ascension and declination of north pole, and angle of the prime meridian.
 
         """
-        T = (epoch.tdb - J2000).to(u.day).value / 36525
-        d = (epoch.tdb - J2000).to(u.day).value
+        T = (epoch.tdb - J2000).to_value(u.d) / 36525
+        d = (epoch.tdb - J2000).to_value(u.d)
         return cls._rot_elements_at_epoch(T, d)
 
     @staticmethod

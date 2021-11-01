@@ -168,7 +168,7 @@ class CZMLExtractor:
         for k in range(self.orbits[i][1] + 2):
             position = propagate(self.orbits[i][0], TimeDelta(k * h), rtol=rtol)
 
-            cords = position.represent_as(CartesianRepresentation).xyz.to(u.m).value
+            cords = position.represent_as(CartesianRepresentation).xyz.to_value(u.m)
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
             # Flatten list

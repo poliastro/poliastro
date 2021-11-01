@@ -34,11 +34,11 @@ def compute_flyby(v_spacecraft, v_body, k, r_p, theta=0 * u.deg):
         Turn angle.
 
     """
-    v_spacecraft = v_spacecraft.to(u.km / u.s).value
-    v_body = v_body.to(u.km / u.s).value
-    k = k.to(u.km ** 3 / u.s ** 2).value
-    r_p = r_p.to(u.km).value
-    theta = theta.to(u.rad).value
+    v_spacecraft = v_spacecraft.to_value(u.km / u.s)
+    v_body = v_body.to_value(u.km)
+    k = k.to_value(u.km ** 3 / u.s ** 2)
+    r_p = r_p.to_value(u.km)
+    theta = theta.to_value(u.rad)
 
     v_spacecraft_out, delta = compute_flyby_fast(v_spacecraft, v_body, k, r_p, theta)
 

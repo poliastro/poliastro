@@ -93,7 +93,7 @@ def _get_index(x, x_levels):
     """
     for i, value in enumerate(x_levels):
         if i < len(x_levels) and value < x:
-            pass
+            continue
         elif x == value:
             return i
         else:

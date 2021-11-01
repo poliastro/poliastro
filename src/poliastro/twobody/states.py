@@ -122,13 +122,13 @@ class ClassicalState(BaseState):
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
         r, v = coe2rv(
-            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-            self.p.to(u.km).value,
+            self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+            self.p.to_value(u.km),
             self.ecc.value,
-            self.inc.to(u.rad).value,
-            self.raan.to(u.rad).value,
-            self.argp.to(u.rad).value,
-            self.nu.to(u.rad).value,
+            self.inc.to_value(u.rad),
+            self.raan.to_value(u.rad),
+            self.argp.to_value(u.rad),
+            self.nu.to_value(u.rad),
         )
 
         return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
@@ -140,12 +140,12 @@ class ClassicalState(BaseState):
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
         p, f, g, h, k, L = coe2mee(
-            self.p.to(u.km).value,
+            self.p.to_value(u.km),
             self.ecc.value,
-            self.inc.to(u.rad).value,
-            self.raan.to(u.rad).value,
-            self.argp.to(u.rad).value,
-            self.nu.to(u.rad).value,
+            self.inc.to_value(u.rad),
+            self.raan.to_value(u.rad),
+            self.argp.to_value(u.rad),
+            self.nu.to_value(u.rad),
         )
 
         return ModifiedEquinoctialState(
@@ -185,9 +185,9 @@ class RVState(BaseState):
     def to_classical(self):
         """Converts to classical orbital elements representation."""
         (p, ecc, inc, raan, argp, nu) = rv2coe(
-            self.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-            self.r.to(u.km).value,
-            self.v.to(u.km / u.s).value,
+            self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+            self.r.to_value(u.km),
+            self.v.to_value(u.km / u.s),
         )
 
         return ClassicalState(
@@ -238,12 +238,12 @@ class ModifiedEquinoctialState(BaseState):
 
     def to_classical(self):
         p, ecc, inc, raan, argp, nu = mee2coe(
-            self.p.to(u.km).value,
-            self.f.to(u.rad).value,
-            self.g.to(u.rad).value,
-            self.h.to(u.rad).value,
-            self.k.to(u.rad).value,
-            self.L.to(u.rad).value,
+            self.p.to_value(u.km),
+            self.f.to_value(u.rad),
+            self.g.to_value(u.rad),
+            self.h.to_value(u.rad),
+            self.k.to_value(u.rad),
+            self.L.to_value(u.rad),
         )
 
         return ClassicalState(
