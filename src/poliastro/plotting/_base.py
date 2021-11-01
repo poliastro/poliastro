@@ -170,7 +170,7 @@ class BaseOrbitPlotter:
 
         if len(maneuver_phases) == 0:
             # For single-impulse maneuver only draw the impulse marker
-            self._draw_impulse(color, f"Impulse - {label}", maneuver_phases[0].r)
+            return ([self._draw_impulse(color, f"Impulse - {label}", final_phase.r)],)
         else:
             coordinates_list = []
 
@@ -201,7 +201,7 @@ class BaseOrbitPlotter:
             )
 
         # Concatenate the different phase coordinates into a single coordinates
-        # instance
+        # instance.
         coordinates = concatenate_representations(coordinates_list)
 
         return self.__add_trajectory(

@@ -4,7 +4,7 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.13.0
 kernelspec:
   display_name: Python 3
   language: python
@@ -93,6 +93,7 @@ ss_e_ic1 = Orbit.from_ephem(Sun, earth, epoch=ic1_end.epoch)
 # We can check new bodies positions
 plotter = StaticOrbitPlotter()
 plotter.plot_body_orbit(Earth, ic1_end.epoch, label="Earth at end of flyby")
+plotter.plot_maneuver(ss_e0, man, color="C1", label="Initial impulse")
 plotter.plot_trajectory(
     ic1_end.sample(min_anomaly=0 * u.deg, max_anomaly=180 * u.deg),
     label="Inner cruise 1 full orbit",
@@ -139,13 +140,13 @@ plotter.plot_body_orbit(
     label="Earth's position at flyby",
     trail=True,
 )
+plotter.plot_maneuver(ss_e0, man, color="C1", label="Initial impulse")
 plotter.plot_trajectory(
     ic1.sample(max_anomaly=180 * u.deg), label="Inner cruise 1", color="C1"
 )
-plotter.plot_trajectory(
-    ic2_end.sample(min_anomaly=180 * u.deg, max_anomaly=400 * u.deg),
-    label="Inner cruise 2 full orbit",
-    color="C2",
+plotter.plot_maneuver(ic1_end, man_flyby,
+        label="Inner cruise 2 maneuver",
+        color="C2",
 );
 ```
 
@@ -188,18 +189,17 @@ plotter.plot_body_orbit(
     label="Earth's position at flyby",
     trail=True,
 )
+plotter.plot_maneuver(ss_e0, man, color="C1", label="Initial impulse")
 plotter.plot_trajectory(
-    ic1.sample(max_anomaly=180 * u.deg), label="Inner cruise 1", color="orange"
+    ic1.sample(max_anomaly=180 * u.deg), label="Inner cruise 1", color="C1"
 )
-plotter.plot_trajectory(
-    ic2.sample(min_anomaly=180 * u.deg, max_anomaly=400 * u.deg),
-    label="Inner cruise 2",
-    color="C2",
+plotter.plot_maneuver(ic1_end, man_flyby,
+        label="Inner cruise 2",
+        color="C2",
 )
-plotter.plot_trajectory(
-    ic3.sample(min_anomaly=10 * u.deg, max_anomaly=180 * u.deg),
-    label="Inner cruise 3",
-    color="C3",
+plotter.plot_maneuver(ic2_end, man_jupiter,
+        label="Inner cruise 3",
+        color="C3",
 )
 plotter.plot_body_orbit(
     Jupiter, date_arrival, label="Jupiter's position at arrival", trail=True
