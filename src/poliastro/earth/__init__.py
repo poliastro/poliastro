@@ -6,7 +6,7 @@ import numpy as np
 from astropy import units as u
 
 from poliastro.bodies import Earth
-from poliastro.core.perturbations import J2_perturbation, atmospheric_drag_model
+from poliastro.core.perturbations import J2_perturbation
 from poliastro.core.propagation import func_twobody
 from poliastro.earth.enums import EarthGravity
 from poliastro.spacecraft import Spacecraft
