@@ -4,7 +4,6 @@ from astropy import units as u
 
 from poliastro.bodies import Earth, Mars
 from poliastro.earth import EarthSatellite
-from poliastro.earth.atmosphere import COESA76
 from poliastro.earth.enums import EarthGravity
 from poliastro.spacecraft import Spacecraft
 from poliastro.twobody.orbit import Orbit
@@ -53,9 +52,9 @@ def test_propagate_instance():
     earth_satellite = EarthSatellite(ss0, spacecraft)
     orbit_with_j2 = earth_satellite.propagate(tof=tof, gravity=EarthGravity.J2)
     orbit_without_perturbation = earth_satellite.propagate(tof)
-    orbit_with_atmosphere_and_j2 = earth_satellite.propagate(
-        tof=tof, gravity=EarthGravity.J2, atmosphere=COESA76()
-    )
+    # orbit_with_atmosphere_and_j2 = earth_satellite.propagate(
+    #     tof=tof, gravity=EarthGravity.J2, atmosphere=COESA76()
+    # )
     assert isinstance(orbit_with_j2, EarthSatellite)
-    assert isinstance(orbit_with_atmosphere_and_j2, EarthSatellite)
+    # assert isinstance(orbit_with_atmosphere_and_j2, EarthSatellite)
     assert isinstance(orbit_without_perturbation, EarthSatellite)

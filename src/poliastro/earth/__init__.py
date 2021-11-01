@@ -98,12 +98,10 @@ class EarthSatellite:
                 "R": Earth.R.to_value(u.km),
             }
         if atmosphere is not None:
-            perturbations[atmospheric_drag_model] = {
-                "R": Earth.R.to_value(u.km),
-                "C_D": self.spacecraft.C_D,
-                "A_over_m": (self.spacecraft.A / self.spacecraft.m),
-                "model": atmosphere,
-            }
+            # Cannot compute density without knowing the state,
+            # the perturbations parameters are not always fixed
+            # TODO: This whole function probably needs a refactoring
+            raise NotImplementedError
 
         def f(t0, state, k):
             du_kep = func_twobody(t0, state, k)
