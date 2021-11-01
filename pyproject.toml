@@ -71,6 +71,7 @@ dev = [
     "black==21.9b0",
     "coverage",
     "hypothesis",
+    "import-linter",
     "ipython>=5.0",
     "ipywidgets>=7.6",
     "isort",
