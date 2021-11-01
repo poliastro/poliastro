@@ -1,5 +1,4 @@
 import numpy as np
-from astropy import units as u
 from numba import njit as jit
 from numpy.linalg import norm
 
@@ -130,7 +129,8 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
     return -(1.0 / 2.0) * rho * B * v * v_vec
 
 
-def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
+@jit
+def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
     r"""Calculates atmospheric drag acceleration (km/s2)
 
     .. math::
@@ -148,13 +148,12 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard Gravitational parameter (km^3/s^2)
-    R : float
-        Radius of the attractor (km)
     C_D: float
         Dimensionless drag coefficient ()
     A_over_m: float
         Frontal area/mass of the spacecraft (km^2/kg)
-    model: A callable model from poliastro.earth.atmosphere
+    rho: float
+        Air density at corresponding state (kg/m^3)
 
     Note
     ----
@@ -162,18 +161,9 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
     computed by a model from poliastro.earth.atmosphere
 
     """
-    H = norm(state[:3])
-
     v_vec = state[3:]
     v = norm(v_vec)
     B = C_D * A_over_m
-
-    if H < R:
-        # The model doesn't want to see a negative altitude
-        # The integration will go a little negative searching for H = R
-        H = R
-
-    rho = model.density((H - R) * u.km).to(u.kg / u.km ** 3).value
 
     return -(1.0 / 2.0) * rho * B * v * v_vec
 

@@ -14,8 +14,8 @@ from poliastro.core.elements import rv2coe
 from poliastro.core.perturbations import (
     J2_perturbation,
     J3_perturbation,
+    atmospheric_drag,
     atmospheric_drag_exponential,
-    atmospheric_drag_model,
     radiation_pressure,
     third_body,
 )
@@ -328,8 +328,18 @@ def test_atmospheric_demise_coesa76():
 
     def f(t0, u_, k):
         du_kep = func_twobody(t0, u_, k)
-        ax, ay, az = atmospheric_drag_model(
-            t0, u_, k, R=R, C_D=C_D, A_over_m=A_over_m, model=coesa76
+
+        # Avoid undershooting H below attractor radius R
+        H = max(norm(u_[:3]), R)
+        rho = coesa76.density((H - R) * u.km).to_value(u.kg / u.km ** 3)
+
+        ax, ay, az = atmospheric_drag(
+            t0,
+            u_,
+            k,
+            C_D=C_D,
+            A_over_m=A_over_m,
+            rho=rho,
         )
         du_ad = np.array([0, 0, 0, ax, ay, az])
         return du_kep + du_ad
