@@ -23,7 +23,7 @@ class Jacchia77:
 
     def _altitude_profile(self, alt):
         Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM = _altitude_profile_fast(
-            alt, self.Texo.to(u.K).value, self.x, self.y, self.E5M, self.E6P
+            alt, self.Texo.to_value(u.K), self.x, self.y, self.E5M, self.E6P
         )
         (
             self.Z,

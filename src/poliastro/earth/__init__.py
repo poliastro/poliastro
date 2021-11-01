@@ -95,11 +95,11 @@ class EarthSatellite:
         if gravity is EarthGravity.J2:
             perturbations[J2_perturbation] = {
                 "J2": Earth.J2.value,
-                "R": Earth.R.to(u.km).value,
+                "R": Earth.R.to_value(u.km),
             }
         if atmosphere is not None:
             perturbations[atmospheric_drag_model] = {
-                "R": Earth.R.to(u.km).value,
+                "R": Earth.R.to_value(u.km),
                 "C_D": self.spacecraft.C_D,
                 "A_over_m": (self.spacecraft.A / self.spacecraft.m),
                 "model": atmosphere,

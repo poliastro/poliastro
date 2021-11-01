@@ -223,7 +223,7 @@ class COESA76(COESA):
             A, B, C, D, E = self._get_coefficients_avobe_86(z, p_coeff)
 
             # Solve the polynomial
-            z = z.to(u.km).value
+            z = z.to_value(u.km)
             p = np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E) * u.Pa
 
         return p.to(u.Pa)
@@ -259,7 +259,7 @@ class COESA76(COESA):
             A, B, C, D, E = self._get_coefficients_avobe_86(z, rho_coeff)
 
             # Solve the polynomial
-            z = z.to(u.km).value
+            z = z.to_value(u.km)
             rho = (
                 np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E)
                 * u.kg

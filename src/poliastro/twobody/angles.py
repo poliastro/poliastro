@@ -42,7 +42,7 @@ def D_to_nu(D):
     "Robust resolution of Kepler’s equation in all eccentricity regimes."
     Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
-    return (D_to_nu_fast(D.to(u.rad).value) * u.rad).to(D.unit)
+    return (D_to_nu_fast(D.to_value(u.rad)) * u.rad).to(D.unit)
 
 
 @u.quantity_input(nu=u.rad)
@@ -65,7 +65,7 @@ def nu_to_D(nu):
     "Robust resolution of Kepler’s equation in all eccentricity regimes."
     Celestial Mechanics and Dynamical Astronomy 116, no. 1 (2013): 21-34.
     """
-    return (nu_to_D_fast(nu.to(u.rad).value) * u.rad).to(nu.unit)
+    return (nu_to_D_fast(nu.to_value(u.rad)) * u.rad).to(nu.unit)
 
 
 @u.quantity_input(nu=u.rad, ecc=u.one)
@@ -87,7 +87,7 @@ def nu_to_E(nu, ecc):
         Eccentric anomaly.
 
     """
-    return (nu_to_E_fast(nu.to(u.rad).value, ecc.value) * u.rad).to(nu.unit)
+    return (nu_to_E_fast(nu.to_value(u.rad), ecc.value) * u.rad).to(nu.unit)
 
 
 @u.quantity_input(nu=u.rad, ecc=u.one)
@@ -111,7 +111,7 @@ def nu_to_F(nu, ecc):
     Taken from Curtis, H. (2013). *Orbital mechanics for engineering students*. 167
 
     """
-    return (nu_to_F_fast(nu.to(u.rad).value, ecc.value) * u.rad).to(nu.unit)
+    return (nu_to_F_fast(nu.to_value(u.rad), ecc.value) * u.rad).to(nu.unit)
 
 
 @u.quantity_input(E=u.rad, ecc=u.one)
@@ -133,7 +133,7 @@ def E_to_nu(E, ecc):
         True anomaly.
 
     """
-    return (E_to_nu_fast(E.to(u.rad).value, ecc.value) * u.rad).to(E.unit)
+    return (E_to_nu_fast(E.to_value(u.rad), ecc.value) * u.rad).to(E.unit)
 
 
 @u.quantity_input(F=u.rad, ecc=u.one)
@@ -153,7 +153,7 @@ def F_to_nu(F, ecc):
         True anomaly.
 
     """
-    return (F_to_nu_fast(F.to(u.rad).value, ecc.value) * u.rad).to(F.unit)
+    return (F_to_nu_fast(F.to_value(u.rad), ecc.value) * u.rad).to(F.unit)
 
 
 @u.quantity_input(M=u.rad, ecc=u.one)
@@ -175,7 +175,7 @@ def M_to_E(M, ecc):
         Eccentric anomaly.
 
     """
-    return (M_to_E_fast(M.to(u.rad).value, ecc.value) * u.rad).to(M.unit)
+    return (M_to_E_fast(M.to_value(u.rad), ecc.value) * u.rad).to(M.unit)
 
 
 @u.quantity_input(M=u.rad, ecc=u.one)
@@ -195,7 +195,7 @@ def M_to_F(M, ecc):
         Hyperbolic eccentric anomaly.
 
     """
-    return (M_to_F_fast(M.to(u.rad).value, ecc.value) * u.rad).to(M.unit)
+    return (M_to_F_fast(M.to_value(u.rad), ecc.value) * u.rad).to(M.unit)
 
 
 @u.quantity_input(M=u.rad, ecc=u.one)
@@ -213,7 +213,7 @@ def M_to_D(M):
         Parabolic eccentric anomaly.
 
     """
-    return (M_to_D_fast(M.to(u.rad).value) * u.rad).to(M.unit)
+    return (M_to_D_fast(M.to_value(u.rad)) * u.rad).to(M.unit)
 
 
 @u.quantity_input(E=u.rad, ecc=u.one)
@@ -235,7 +235,7 @@ def E_to_M(E, ecc):
         Mean anomaly.
 
     """
-    return (E_to_M_fast(E.to(u.rad).value, ecc.value) * u.rad).to(E.unit)
+    return (E_to_M_fast(E.to_value(u.rad), ecc.value) * u.rad).to(E.unit)
 
 
 @u.quantity_input(F=u.rad, ecc=u.one)
@@ -255,7 +255,7 @@ def F_to_M(F, ecc):
         Mean anomaly.
 
     """
-    return (F_to_M_fast(F.to(u.rad).value, ecc.value) * u.rad).to(F.unit)
+    return (F_to_M_fast(F.to_value(u.rad), ecc.value) * u.rad).to(F.unit)
 
 
 @u.quantity_input(D=u.rad, ecc=u.one)
@@ -273,7 +273,7 @@ def D_to_M(D):
         Mean anomaly.
 
     """
-    return (D_to_M_fast(D.to(u.rad).value) * u.rad).to(D.unit)
+    return (D_to_M_fast(D.to_value(u.rad)) * u.rad).to(D.unit)
 
 
 @u.quantity_input(nu=u.rad, ecc=u.one)
@@ -294,7 +294,7 @@ def fp_angle(nu, ecc):
     Algorithm taken from Vallado 2007, pp. 113.
 
     """
-    return (fp_angle_fast(nu.to(u.rad).value, ecc.value) * u.rad).to(nu.unit)
+    return (fp_angle_fast(nu.to_value(u.rad), ecc.value) * u.rad).to(nu.unit)
 
 
 @u.quantity_input(ltan=u.hourangle)

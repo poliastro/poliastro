@@ -97,7 +97,7 @@ class COESA:
             Index for the value.
 
         """
-        x = x.to(u.km).value
+        x = x.to_value(u.km)
         x_levels = (x_levels << u.km).value
         i = _get_index_fast(x, x_levels)
         return i

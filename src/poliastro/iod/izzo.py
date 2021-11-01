@@ -36,10 +36,10 @@ def lambert(k, r0, r, tof, M=0, numiter=35, rtol=1e-8):
         Pair of velocity solutions.
 
     """
-    k_ = k.to(u.km ** 3 / u.s ** 2).value
-    r0_ = r0.to(u.km).value
-    r_ = r.to(u.km).value
-    tof_ = tof.to(u.s).value
+    k_ = k.to_value(u.km ** 3 / u.s ** 2)
+    r0_ = r0.to_value(u.km)
+    r_ = r.to_value(u.km)
+    tof_ = tof.to_value(u.s)
 
     sols = izzo_fast(k_, r0_, r_, tof_, M, numiter, rtol)
 

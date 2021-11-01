@@ -11,7 +11,7 @@ def _segments_from_arrays(x, y):
     # Copied pasted from
     # https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/multicolored_line.html
     # because this API is impossible to understand
-    points = np.column_stack([x.to(u.km).value, y.to(u.km).value])[:, None, :]
+    points = np.column_stack([x.to_value(u.km), y.to_value(u.km)])[:, None, :]
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     return segments
 
@@ -83,12 +83,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         )  # Indexing trick to add one extra dimension
 
         (l,) = self._ax.plot(
-            x_center.to(u.km).value,
-            y_center.to(u.km).value,
-            marker,
-            mew=size,
-            color=color,
-            label=name,
+            x_center.to_value(u.km), y_center.to_value(u.km), "o", mew=0, color=color
         )
 
         return l
@@ -108,8 +103,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         self._ax.add_patch(
             mpl_patches.Circle(
-                (x_center.to(u.km).value, y_center.to(u.km).value),
-                radius.to(u.km).value,
+                (x_center.to_value(u.km), y_center.to_value(u.km)),
+                radius.to_value(u.km),
                 lw=0,
                 color=color,
             )
@@ -143,7 +138,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         else:
             lines = self._ax.plot(
-                x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
+                x.to_value(u.km), y.to_value(u.km), linestyle=linestyle, color=colors[0]
             )
 
         self._ax.set_xlabel("$x$ (km)")

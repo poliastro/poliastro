@@ -114,10 +114,10 @@ class LatitudeCrossEvent(Event):
     def __init__(self, orbit, lat, terminal=False, direction=0):
         super().__init__(terminal, direction)
 
-        self._R = orbit.attractor.R.to(u.m).value
-        self._R_polar = orbit.attractor.R_polar.to(u.m).value
+        self._R = orbit.attractor.R.to_value(u.m)
+        self._R_polar = orbit.attractor.R_polar.to_value(u.m)
         self._epoch = orbit.epoch
-        self._lat = lat.to(u.deg).value  # Threshold latitude (in degrees).
+        self._lat = lat.to_value(u.deg)  # Threshold latitude (in degrees).
 
     def __call__(self, t, u_, k):
         self._last_t = t
