@@ -35,6 +35,7 @@ __all__ = [
     "danby",
 ]
 
+
 @jit
 def func_twobody(t0, u_, k):
     """Differential equation for the initial value two body problem.
