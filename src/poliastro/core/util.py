@@ -31,6 +31,16 @@ def circular_velocity(k, a):
 
 @jit
 def rotation_matrix(angle, axis):
+    r"""Rotation matrix. Astropy uses the alias or passive transformation, whereas poliastro uses the alibi or active transformation
+  
+     Parameters
+     ----------
+     
+     angle : numpy.array
+     
+     axis : int
+            0, 1, or 2
+    """
     assert axis in (0, 1, 2)
     angle = np.asarray(angle)
     c = cos(angle)
