@@ -9,6 +9,7 @@ from poliastro.core.thrust import (
     change_a_inc as change_a_inc_fast,
     change_argp as change_argp_fast,
 )
+from poliastro.core.thrust.change_ecc_inc import beta as beta_change_ecc_inc
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
@@ -154,7 +155,7 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     ecc_f = 0.0
     inc_0 = 0.0  # rad, baseline
     argp = 0.0  # rad, the method is efficient for 0 and 180
-    f = 2.4e-7  # km / s2, unused
+    f = 2.4e-7 * (u.km / u.s ** 2)
 
     inc_f = np.radians(inc_f)
     expected_beta = np.radians(expected_beta)
@@ -169,21 +170,24 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
         nu=0 * u.deg,
     )
 
-    _, delta_V, beta, _ = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
+    beta = beta_change_ecc_inc(
+        ecc_0=ecc_0, ecc_f=ecc_f, inc_0=inc_0, inc_f=inc_f, argp=argp
+    )
+    _, delta_V, _ = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f * u.rad, f=f)
 
-    assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
+    assert_allclose(delta_V.to_value(u.km / u.s), expected_delta_V, rtol=1e-2)
     assert_allclose(beta, expected_beta, rtol=1e-2)
 
 
 @pytest.mark.parametrize("ecc_0,ecc_f", [[0.4, 0.0], [0.0, 0.4]])
 def test_geo_cases_numerical(ecc_0, ecc_f):
     a = 42164  # km
-    inc_0 = 0.0  # rad, baseline
-    inc_f = (20.0 * u.deg).to(u.rad).value  # rad
+    inc_0 = 0.0
+    inc_f = 20.0 * u.deg
     argp = 0.0  # rad, the method is efficient for 0 and 180
-    f = 2.4e-7  # km / s2
+    f = 2.4e-7 * (u.km / u.s ** 2)
 
-    # Retrieve r and v from initial orbit
+    # Initial orbit
     s0 = Orbit.from_classical(
         attractor=Earth,
         a=a * u.km,
@@ -193,7 +197,7 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
         argp=argp * u.deg,
         nu=0 * u.deg,
     )
-    a_d, _, _, t_f = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
+    a_d, _, t_f = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
 
     # Propagate orbit
     def f_geo(t0, u_, k):
@@ -202,10 +206,10 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
         du_ad = np.array([0, 0, 0, ax, ay, az])
         return du_kep + du_ad
 
-    sf = s0.propagate(t_f * u.s, method=cowell, f=f_geo, rtol=1e-8)
+    sf = s0.propagate(t_f, method=cowell, f=f_geo, rtol=1e-8)
 
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-2, atol=1e-2)
-    assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
+    assert_allclose(sf.inc.to_value(u.rad), inc_f.to_value(u.rad), rtol=1e-1)
 
 
 def test_soyuz_standard_gto_delta_v_safe():
