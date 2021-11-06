@@ -1,6 +1,7 @@
 """Orbital maneuvers.
 
 """
+import numpy as np
 from astropy import units as u
 
 from poliastro.core.maneuver import (
@@ -10,7 +11,7 @@ from poliastro.core.maneuver import (
 )
 from poliastro.iod.izzo import lambert as lambert_izzo
 from poliastro.util import norm
-import numpy as np
+
 
 class Maneuver:
     r"""Class to represent a Maneuver.
@@ -185,8 +186,8 @@ class Maneuver:
 
         # Time of flight is solved by subtracting both orbit epochs
         tof = orbit_f.epoch - orbit_i.epoch
-        assert tof > 0, f'Time of flight={tof} must be positive'
-        
+        assert tof > 0, f"Time of flight={tof} must be positive"
+
         # Compute all possible solutions to the Lambert transfer
         sols = list(method(k, r_i, r_f, tof, **kwargs))
 
@@ -210,7 +211,7 @@ class Maneuver:
         tc2 = np.linalg.norm(self._dvs.to_value(u.km / u.s), axis=1).sum() * u.km / u.s
         assert np.allclose(tc.value, tc2.value)
         return tc2
-        
+
     @classmethod
     @u.quantity_input(max_delta_r=u.km)
     def correct_pericenter(cls, orbit, max_delta_r):

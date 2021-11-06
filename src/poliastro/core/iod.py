@@ -189,7 +189,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     """
 
     assert tof > 0, "Assert tof must be positive"
-    
+
     # Check collinearity of r1 and r2
     if not cross(r1, r2).any():
         raise ValueError("Lambert solution cannot be computed for collinear vectors")
@@ -374,9 +374,7 @@ def _initial_guess(T, ll, M):
     x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (
         ((M * pi + pi) / (8 * T)) ** (2 / 3) + 1
     )
-    x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (
-        ((8 * T) / (M * pi)) ** (2 / 3) + 1
-    )
+    x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (((8 * T) / (M * pi)) ** (2 / 3) + 1)
 
     return [x_0l, x_0r]
 
@@ -384,7 +382,7 @@ def _initial_guess(T, ll, M):
 @jit
 def _initial_guess_M0(T, ll):
     """Initial guess for single revolution."""
-    T_0 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2) # Equation 19
+    T_0 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # Equation 19
     T_1 = 2 * (1 - ll ** 3) / 3  # Equation 21
     if T >= T_0:
         x_0 = (T_0 / T) ** (2 / 3) - 1

@@ -26,12 +26,20 @@ def _test_rotation_matrix(angle, axis):
     expected = rotation_matrix_astropy(-np.rad2deg(angle), "xyz"[axis])
     result = rotation_matrix_poliastro(angle, axis)
     assert_allclose(expected, result)
+    if axis == 0:
+        expected = rotation_matrix_x(angle)
+    elif axis == 1:
+        expected = rotation_matrix_y(angle)
+    elif axis == 2:
+        expected = rotation_matrix_z(angle)
+    assert_allclose(expected, result)
 
 
 def test_rotation_matrix():
     v = np.array([-0.30387748, -1.4202498, 0.24305655])
     for angle in (0.5, np.array([-np.pi, np.pi])):
         for axis in (0, 1, 2):
+            _test_rotation_matrix(angle, axis)
             _test_rotation_matrix_with_v(v, angle, axis)
 
 
