@@ -1,9 +1,11 @@
 from astropy import units as u
+
 from poliastro.core.thrust.change_ecc_inc import change_ecc_inc as change_ecc_inc_fast
+
 
 def change_ecc_inc(ss_0, ecc_f, inc_f, f):
     """Simultaneous eccentricity and inclination changes. Guidance law from the model. Thrust is aligned with an inertially fixed direction perpendicular to the semimajor axis of the orbit.
-    
+
     Parameters
     ----------
     ss_0 : Orbit
