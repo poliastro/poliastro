@@ -9,8 +9,8 @@ from poliastro.core.util import circular_velocity
 @jit
 def extra_quantities(k, a_0, a_f, inc_0, inc_f, f):
     """Extra quantities given by the Edelbaum (a, i) model."""
-    V_0, beta_0_ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
-    delta_V_ = delta_V(V_0, beta_0_, inc_0, inc_f)
+    V_0, V_f, beta_0_ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
+    delta_V_ = delta_V(V_0, V_f, beta_0_, inc_0, inc_f)
     t_f_ = delta_V_ / f
 
     return delta_V_, t_f_
@@ -38,13 +38,15 @@ def compute_parameters(k, a_0, a_f, inc_0, inc_f):
     V_f = circular_velocity(k, a_f)
     beta_0_ = beta_0(V_0, V_f, inc_0, inc_f)
 
-    return V_0, beta_0_
+    return V_0, V_f, beta_0_
 
 
 @jit
-def delta_V(V_0, beta_0, inc_0, inc_f):
+def delta_V(V_0, V_f, beta_0, inc_0, inc_f):
     """Compute required increment of velocity."""
     delta_i_f = abs(inc_f - inc_0)
+    if (delta_i_f == 0):
+        return abs(V_f - V_0)
     return V_0 * np.cos(beta_0) - V_0 * np.sin(beta_0) / np.tan(
         np.pi / 2 * delta_i_f + beta_0
     )
@@ -91,7 +93,7 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
       Transfer Problem Using Optimal Control Theory", 1997.
     """
 
-    V_0, beta_0_ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
+    V_0, V_f, beta_0_ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
 
     @jit
     def a_d(t0, u_, k):
