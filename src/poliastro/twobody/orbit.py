@@ -19,6 +19,7 @@ from poliastro.core.elements import coe2rv_many
 from poliastro.core.propagation.farnocchia import (
     delta_t_from_nu as delta_t_from_nu_fast,
 )
+from poliastro.core.util import eccentricity_vector
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
@@ -207,9 +208,9 @@ class Orbit:
     def e_vec(self):
         """Eccentricity vector."""
         r, v = self.rv()
-        k = self.attractor.k
-        e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
-        return e_vec.decompose()
+        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+        e_vec = eccentricity_vector(k, r.to_value(u.km), v.to_value(u.km / u.s))
+        return e_vec * u.one
 
     @cached_property
     def h_vec(self):

@@ -242,9 +242,9 @@ inclination:
 >>> ecc_0, ecc_f = 0.4, 0.0
 >>> a = 42164  # km
 >>> inc_0 = 0.0  # rad, baseline
->>> inc_f = (20.0 * u.deg).to(u.rad).value  # rad
+>>> inc_f = 20.0 * u.deg
 >>> argp = 0.0  # rad, the method is efficient for 0 and 180
->>> f = 2.4e-7  # km / s2
+>>> f = 2.4e-7 * (u.km / u.s ** 2)
 
 # Retrieve r and v from initial orbit
 >>> s0 = Orbit.from_classical(
@@ -256,7 +256,7 @@ inclination:
 ...     argp * u.deg,
 ...     0 * u.deg,
 ... )
->>> a_d, _, _, t_f = change_ecc_inc(s0, ecc_f, inc_f, f)
+>>> a_d, _, t_f = change_ecc_inc(s0, ecc_f, inc_f, f)
 
 # Propagate orbit
 >>> def f_geo(t0, u_, k):

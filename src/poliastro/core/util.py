@@ -1,6 +1,12 @@
 import numpy as np
 from numba import njit as jit
 from numpy import cos, sin
+from numpy.linalg import norm as norm
+
+
+@jit
+def eccentricity_vector(k, r, v):
+    return ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
 
 
 @jit
