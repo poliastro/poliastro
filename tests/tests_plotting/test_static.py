@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
@@ -15,6 +17,7 @@ from poliastro.twobody import Orbit
 from poliastro.util import time_range
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_axes_labels_and_title():
     ax = plt.gca()
     op = StaticOrbitPlotter(ax)
@@ -25,6 +28,7 @@ def test_axes_labels_and_title():
     assert ax.get_ylabel() == "$y$ (km)"
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_number_of_lines_for_osculating_orbit():
     op1 = StaticOrbitPlotter()
     ss = iss
@@ -34,6 +38,7 @@ def test_number_of_lines_for_osculating_orbit():
     assert len(l1) == 2
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_legend():
     op = StaticOrbitPlotter()
     ss = iss
@@ -46,6 +51,7 @@ def test_legend():
     assert legend.get_texts()[0].get_text() == label
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_color():
     op = StaticOrbitPlotter()
     ss = iss
@@ -58,6 +64,7 @@ def test_color():
         assert element.get_c() == c
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_plot_trajectory_sets_label():
     expected_label = "67P"
 
@@ -96,6 +103,7 @@ def test_set_frame_plots_same_colors():
     assert colors1 == colors2
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_redraw_keeps_trajectories():
     # See https://github.com/poliastro/poliastro/issues/518
     op = StaticOrbitPlotter()
@@ -130,6 +138,7 @@ def test_plot_ephem_different_plane_raises_error():
     )
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.mpl_image_compare
 def test_basic_plotting():
     fig, ax = plt.subplots()
@@ -139,6 +148,7 @@ def test_basic_plotting():
     return fig
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.mpl_image_compare
 def test_basic_trajectory_plotting():
     fig, ax = plt.subplots()
@@ -150,6 +160,7 @@ def test_basic_trajectory_plotting():
     return fig
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.mpl_image_compare
 def test_basic_orbit_and_trajectory_plotting():
     fig, ax = plt.subplots()
@@ -160,6 +171,7 @@ def test_basic_orbit_and_trajectory_plotting():
     return fig
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.mpl_image_compare
 def test_trail_plotting():
     fig, ax = plt.subplots()
@@ -169,6 +181,7 @@ def test_trail_plotting():
     return fig
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.mpl_image_compare
 def test_plot_different_planes():
     fig, ax = plt.subplots()
