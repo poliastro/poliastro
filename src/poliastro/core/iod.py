@@ -159,7 +159,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
 
 @jit
 def izzo(k, r1, r2, tof, M, numiter, rtol):
-    """Aplies izzo algorithm to solve Lambert's problem.
+    """Applies Izzo's algorithm to solve Lambert's problem.
 
     Parameters
     ----------
@@ -188,9 +188,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
 
     """
 
-    # Check preconditions
-    assert tof > 0
-    assert k > 0
+    assert tof > 0, "Assert tof must be positive"
 
     # Check collinearity of r1 and r2
     if not cross(r1, r2).any():
@@ -269,11 +267,15 @@ def _find_xy(ll, T, M, numiter, rtol):
         raise ValueError("No feasible solution, try lower M")
 
     # Initial guess
-    for x_0 in _initial_guess(T, ll, M):
+    if M == 0:
+        guess = _initial_guess_M0(T, ll)
+    else:
+        guess = _initial_guess(T, ll, M)
+
+    for x_0 in guess:
         # Start Householder iterations from x_0 and find x, y
         x = _householder(x_0, T, ll, M, rtol, numiter)
         y = _compute_y(x, ll)
-
         yield x, y
 
 
@@ -352,50 +354,50 @@ def _compute_T_min(ll, M, numiter, rtol):
     if ll == 1:
         x_T_min = 0.0
         T_min = _tof_equation(x_T_min, 0.0, ll, M)
+    elif M == 0:
+        x_T_min = np.inf
+        T_min = 0.0
     else:
-        if M == 0:
-            x_T_min = np.inf
-            T_min = 0.0
-        else:
-            # Set x_i > 0 to avoid problems at ll = -1
-            x_i = 0.1
-            T_i = _tof_equation(x_i, 0.0, ll, M)
-            x_T_min = _halley(x_i, T_i, ll, rtol, numiter)
-            T_min = _tof_equation(x_T_min, 0.0, ll, M)
+        # Set x_i > 0 to avoid problems at ll = -1
+        x_i = 0.1
+        T_i = _tof_equation(x_i, 0.0, ll, M)
+        x_T_min = _halley(x_i, T_i, ll, rtol, numiter)
+        T_min = _tof_equation(x_T_min, 0.0, ll, M)
 
     return x_T_min, T_min
 
 
 @jit
 def _initial_guess(T, ll, M):
-    """Initial guess."""
-    if M == 0:
-        # Single revolution
-        T_0 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2) + M * pi  # Equation 19
-        T_1 = 2 * (1 - ll ** 3) / 3  # Equation 21
-        if T >= T_0:
-            x_0 = (T_0 / T) ** (2 / 3) - 1
-        elif T < T_1:
-            x_0 = 5 / 2 * T_1 / T * (T_1 - T) / (1 - ll ** 5) + 1
-        else:
-            # This is the real condition, which is not exactly equivalent
-            # elif T_1 < T < T_0
-            # Corrected initial guess,
-            # piecewise equation right after expression (30) in the original paper is incorrect
-            # See https://github.com/poliastro/poliastro/issues/1362
-            x_0 = np.exp(np.log(2) * np.log(T / T_0) / np.log(T_1 / T_0)) - 1
+    """Initial guess for M revolutions."""
+    # Multiple revolution
+    x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (
+        ((M * pi + pi) / (8 * T)) ** (2 / 3) + 1
+    )
+    x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (((8 * T) / (M * pi)) ** (2 / 3) + 1)
 
-        return [x_0]
+    return [x_0l, x_0r]
+
+
+@jit
+def _initial_guess_M0(T, ll):
+    """Initial guess for single revolution."""
+    T_0 = np.arccos(ll) + ll * np.sqrt(1 - ll ** 2)  # Equation 19
+    T_1 = 2 * (1 - ll ** 3) / 3  # Equation 21
+    if T >= T_0:
+        x_0 = (T_0 / T) ** (2 / 3) - 1
+    elif T < T_1:
+        x_0 = 5 / 2 * T_1 / T * (T_1 - T) / (1 - ll ** 5) + 1
     else:
-        # Multiple revolution
-        x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (
-            ((M * pi + pi) / (8 * T)) ** (2 / 3) + 1
-        )
-        x_0r = (((8 * T) / (M * pi)) ** (2 / 3) - 1) / (
-            ((8 * T) / (M * pi)) ** (2 / 3) + 1
-        )
-
-        return [x_0l, x_0r]
+        # This is the real condition, which is not exactly equivalent
+        # elif T_1 < T < T_0
+        # Corrected initial guess,
+        # piecewise equation right after expression (30) in the original paper is incorrect
+        # See https://github.com/poliastro/poliastro/issues/1362
+        # Original exp(log(2) * (log(T / T_0) / log(T_1 / T_0))) - 1
+        # Simplified to:
+        x_0 = ((T / T_0) ** (1 / np.log2(T_1 / T_0))) - 1
+    return [x_0]
 
 
 @jit
@@ -408,7 +410,7 @@ def _halley(p0, T0, ll, tol, maxiter):
     this module and is not really reusable.
 
     """
-    for ii in range(maxiter):
+    for _ in range(maxiter):
         y = _compute_y(p0, ll)
         fder = _tof_equation_p(p0, y, T0, ll)
         fder2 = _tof_equation_p2(p0, y, T0, fder, ll)
@@ -436,7 +438,7 @@ def _householder(p0, T0, ll, M, tol, maxiter):
     this module and is not really reusable.
 
     """
-    for ii in range(maxiter):
+    for _ in range(maxiter):
         y = _compute_y(p0, ll)
         fval = _tof_equation_y(p0, y, T0, ll, M)
         T = fval + T0

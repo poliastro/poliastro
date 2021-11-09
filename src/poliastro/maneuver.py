@@ -1,6 +1,7 @@
 """Orbital maneuvers.
 
 """
+import numpy as np
 from astropy import units as u
 
 from poliastro.core.maneuver import (
@@ -185,6 +186,7 @@ class Maneuver:
 
         # Time of flight is solved by subtracting both orbit epochs
         tof = orbit_f.epoch - orbit_i.epoch
+        assert tof > 0, f"Time of flight={tof} must be positive"
 
         # Compute all possible solutions to the Lambert transfer
         sols = list(method(k, r_i, r_f, tof, **kwargs))
@@ -198,14 +200,17 @@ class Maneuver:
         )
 
     def get_total_time(self):
-        """Returns total time of the maneuver."""
+        """Returns total time of the maneuver (s)."""
         total_time = sum(self._dts, 0 * u.s)
         return total_time
 
     def get_total_cost(self):
-        """Returns total cost of the maneuver."""
+        """Returns total cost of the maneuver (km / s)."""
         dvs = [norm(dv) for dv in self._dvs]
-        return sum(dvs, 0 * u.km / u.s)
+        tc = sum(dvs, 0 * u.km / u.s)
+        tc2 = np.linalg.norm(self._dvs.to_value(u.km / u.s), axis=1).sum() * u.km / u.s
+        assert np.allclose(tc.value, tc2.value)
+        return tc2
 
     @classmethod
     @u.quantity_input(max_delta_r=u.km)

@@ -16,7 +16,8 @@ from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
 
 
 def change_ecc_quasioptimal(ss_0, ecc_f, f):
-    """Guidance law from the model.
+    """Quasi optimal eccentricity-only change, with formulas developed by Pollard
+    Guidance law from the model.
     Thrust is aligned with an inertially fixed direction perpendicular to the
     semimajor axis of the orbit.
 

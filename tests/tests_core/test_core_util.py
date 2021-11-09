@@ -10,6 +10,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 
 from poliastro.core.util import (
     alinspace,
+    cartesian_to_spherical,
     rotation_matrix as rotation_matrix_poliastro,
     spherical_to_cartesian,
 )
@@ -25,12 +26,20 @@ def _test_rotation_matrix(angle, axis):
     expected = rotation_matrix_astropy(-np.rad2deg(angle), "xyz"[axis])
     result = rotation_matrix_poliastro(angle, axis)
     assert_allclose(expected, result)
+    if axis == 0:
+        expected = rotation_matrix_x(angle)
+    elif axis == 1:
+        expected = rotation_matrix_y(angle)
+    elif axis == 2:
+        expected = rotation_matrix_z(angle)
+    assert_allclose(expected, result)
 
 
 def test_rotation_matrix():
     v = np.array([-0.30387748, -1.4202498, 0.24305655])
     for angle in (0.5, np.array([-np.pi, np.pi])):
         for axis in (0, 1, 2):
+            _test_rotation_matrix(angle, axis)
             _test_rotation_matrix_with_v(v, angle, axis)
 
 
@@ -70,19 +79,30 @@ def test_rotation_matrix_z():
 
 
 def test_spherical_to_cartesian():
-    result = spherical_to_cartesian(np.array([0.5, np.pi / 4, -np.pi / 4]))
-    expected = np.array([0.25, -0.25, 0.35355339])
-    assert np.allclose(expected, result)
+    def sph_car(sph, car):
+        result = spherical_to_cartesian(sph)
+        assert np.allclose(car, result)
+        result = cartesian_to_spherical(result)
+        expect = cartesian_to_spherical(car)
+        assert np.allclose(result, expect)
+        result = spherical_to_cartesian(cartesian_to_spherical(car))
+        assert np.allclose(car, result)
 
-    result = spherical_to_cartesian(np.array([0.5, -np.pi / 4, np.pi / 4]))
-    expected = np.array([-0.25, -0.25, 0.35355339])
-    assert np.allclose(expected, result)
+    sph_car(np.array([0.5, np.pi / 4, -np.pi / 4]), np.array([0.25, -0.25, 0.35355339]))
 
-    result = spherical_to_cartesian(
-        np.array([[0.5, np.pi / 4, -np.pi / 4], [0.5, -np.pi / 4, np.pi / 4]])
+    sph_car(
+        np.array([0.5, -np.pi / 4, np.pi / 4]), np.array([-0.25, -0.25, 0.35355339])
     )
-    expected = np.array([[0.25, -0.25, 0.35355339], [-0.25, -0.25, 0.35355339]])
-    assert np.allclose(expected, result)
+
+    sph_car(
+        np.array([[0.5, np.pi / 4, -np.pi / 4], [0.5, -np.pi / 4, np.pi / 4]]),
+        np.array([[0.25, -0.25, 0.35355339], [-0.25, -0.25, 0.35355339]]),
+    )
+
+    sph_car(
+        np.array([2.60564963, 1.75305207, 4.4458828]),
+        np.array([-0.674864797187, -2.472029259161, -0.472269863940]),
+    )
 
 
 angles = partial(st.floats, min_value=-2 * np.pi, max_value=2 * np.pi)

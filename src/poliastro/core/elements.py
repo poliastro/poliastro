@@ -8,7 +8,7 @@ from numpy import cos, cross, sin, sqrt
 from numpy.linalg import norm
 
 from poliastro.core.angles import E_to_nu, F_to_nu
-from poliastro.core.util import rotation_matrix
+from poliastro.core.util import rotation_matrix_x, rotation_matrix_z
 
 
 @jit
@@ -76,9 +76,9 @@ def rv_pqw(k, p, ecc, nu):
 @jit
 def coe_rotation_matrix(inc, raan, argp):
     """Create a rotation matrix for coe transformation"""
-    r = rotation_matrix(raan, 2)
-    r = r @ rotation_matrix(inc, 0)
-    r = r @ rotation_matrix(argp, 2)
+    r = rotation_matrix_z(raan)
+    r = r @ rotation_matrix_x(inc)
+    r = r @ rotation_matrix_z(argp)
     return r
 
 

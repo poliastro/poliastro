@@ -10,32 +10,44 @@ from numba import njit as jit
 from numpy import cross
 from numpy.linalg import norm
 
+from poliastro.core.angles import nu_to_E
 from poliastro.core.elements import rv2coe
 from poliastro.core.util import circular_velocity, eccentricity_vector
 
 
 @jit
 def beta(ecc_0, ecc_f, inc_0, inc_f, argp):
-    # Note: "The argument of perigee will vary during the orbit transfer
-    # due to the natural drift and because e may approach zero.
-    # However, [the equation] still gives a good estimate of the desired
-    # thrust angle."
     return np.arctan(
-        abs(
-            3
-            * np.pi
-            * (inc_f - inc_0)
-            / (
-                4
-                * np.cos(argp)
-                * (
-                    ecc_0
-                    - ecc_f
-                    + np.log((1 + ecc_f) * (-1 + ecc_0) / ((1 + ecc_0) * (-1 + ecc_f)))
-                )
-            )
+        np.sign(ecc_f - ecc_0)
+        * np.sign(inc_f - inc_0)
+        * (3 * np.pi / 4)
+        * ((inc_f - inc_0) / np.cos(argp))
+        / (
+            ecc_0
+            - ecc_f
+            + np.log((ecc_f + 1) * (ecc_0 - 1) / ((ecc_f - 1) * (ecc_0 + 1)))
         )
     )
+    # # Note: "The argument of perigee will vary during the orbit transfer
+    # # due to the natural drift and because e may approach zero.
+    # # However, [the equation] still gives a good estimate of the desired
+    # # thrust angle."
+    # return np.arctan(
+    #     abs(
+    #         3
+    #         * np.pi
+    #         * (inc_f - inc_0)
+    #         / (
+    #             4
+    #             * np.cos(argp)
+    #             * (
+    #                 ecc_0
+    #                 - ecc_f
+    #                 + np.log((1 + ecc_f) * (-1 + ecc_0) / ((1 + ecc_0) * (-1 + ecc_f)))
+    #             )
+    #         )
+    #     )
+    # )
 
 
 @jit
@@ -68,12 +80,13 @@ def change_ecc_inc(k, a, ecc_0, ecc_f, inc_0, inc_f, argp, r, v, f):
     def a_d(t0, u_, k_):
         r_ = u_[:3]
         v_ = u_[3:]
-        nu = rv2coe(k_, r_, v_)[-1]
-        beta_ = beta_0 * np.sign(
-            np.cos(nu)
-        )  # The sign of ß reverses at minor axis crossings
-
-        w_ = cross(r_, v_) / norm(cross(r_, v_))
+        p, ecc, inc, raan, argp, nu = rv2coe(k_, r_, v_)
+        beta_ = np.abs(beta_0) * np.sign(inc_f - inc_0)
+        E = nu_to_E(nu, ecc) + 0.5 * np.pi
+        if 0.5 * np.pi <= E < 1.5 * np.pi:
+            beta_ = -beta_
+        w_ = cross(r_, v_)  # Specific angular momentum vector
+        w_ = w_ / norm(w_)
         accel_v = f * (np.cos(beta_) * thrust_unit + np.sin(beta_) * w_)
         return accel_v
 

@@ -13,7 +13,8 @@ from poliastro.core.thrust.change_argp import change_argp as change_a_inc_fast
 
 
 def change_argp(k, a, ecc, argp_0, argp_f, f):
-    """Guidance law from the model.
+    """Change argument of perigee, with formulas developed by Pollard.
+    Guidance law from the model.
     Thrust is aligned with an inertially fixed direction perpendicular to the
     semimajor axis of the orbit.
 

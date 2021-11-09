@@ -60,11 +60,11 @@ except ImportError:
     from cached_property import cached_property  # type: ignore
 
 
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
+ORBIT_FORMAT = "{r_p:.0f} x {r_a:.1g} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
 # Reference frame
 ORBIT_NO_FRAME_FORMAT = (
-    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
+    "{r_p:.0f} x {r_a:.1g} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 )
 
 
@@ -273,6 +273,25 @@ class Orbit:
         ss = RVState(attractor, r, v, plane)
         return cls(ss, epoch)
 
+    @u.quantity_input(v=u.m / u.s)
+    def apply_impulse(self, v):
+        """Apply impulse to `Orbit`.
+
+        Parameters
+        ----------
+        v : ~astropy.units.Quantity
+            Velocity vector.
+        epoch : ~astropy.time.Time, optional
+            Epoch, default to J2000.
+        plane : ~poliastro.frames.Planes
+            Fundamental plane of the frame.
+
+        """
+        if v.ndim != 1:
+            raise ValueError(f"Vectors must have dimension 1, got {v.ndim}")
+
+        self._state = RVState(self.attractor, self.r, self.v + v, self.plane)
+
     @classmethod
     def from_coords(cls, attractor, coord, plane=Planes.EARTH_EQUATOR):
         """Creates an `Orbit` from an attractor and astropy `SkyCoord`
@@ -375,7 +394,7 @@ class Orbit:
             raise ValueError("Hyperbolic orbits have negative semimajor axis")
 
         if not -np.pi * u.rad <= nu < np.pi * u.rad:
-            warn("Wrapping true anomaly to -π <= nu < π", stacklevel=2)
+            warn("Wrapping true anomaly to -π <= nu < π", stacklevel=3)
             nu = ((nu + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad).to(
                 nu.unit
             )
@@ -1270,6 +1289,7 @@ class Orbit:
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
+        # FIXME: Use the _coe methods to avoid a useless call to rv2coe.
         cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
         new_epoch = self.epoch + time_of_flight
 

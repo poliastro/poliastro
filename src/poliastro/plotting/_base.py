@@ -42,7 +42,7 @@ class BaseOrbitPlotter:
     def _set_attractor(self, attractor):
         if self._attractor is None:
             self._attractor = attractor
-        elif attractor is not self._attractor:
+        elif attractor is not self._attractor and attractor != self._attractor:
             raise NotImplementedError(
                 f"Attractor has already been set to {self._attractor.name}"
             )
@@ -170,7 +170,7 @@ class BaseOrbitPlotter:
 
         if len(maneuver_phases) == 0:
             # For single-impulse maneuver only draw the impulse marker
-            self._draw_impulse(color, f"Impulse - {label}", maneuver_phases[0].r)
+            return ([self._draw_impulse(color, f"Impulse - {label}", final_phase.r)],)
         else:
             coordinates_list = []
 
@@ -201,7 +201,7 @@ class BaseOrbitPlotter:
             )
 
         # Concatenate the different phase coordinates into a single coordinates
-        # instance
+        # instance.
         coordinates = concatenate_representations(coordinates_list)
 
         return self.__add_trajectory(

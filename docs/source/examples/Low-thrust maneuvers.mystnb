@@ -1,0 +1,134 @@
+---
+jupytext:
+  text_representation:
+    extension: .mystnb
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.13.0
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
+# Low-thrust maneuvers
+
+```{code-cell} ipython3
+from matplotlib import pyplot as plt
+from matplotlib import rc
+
+import numpy as np
+from numpy.linalg import norm
+```
+
+```{code-cell} ipython3
+# More info: https://plotly.com/python/renderers/
+import plotly.io as pio
+pio.renderers.default = "plotly_mimetype+notebook_connected"
+rc("pgf", rcfonts=False)
+rc("text", usetex=True)
+```
+
+## Change eccentricity and inclination ##
+
+From Pollard (2000), out-of-plane thrust angle (left figure) and velocity change (right figure) for an inclination change with simultaneous change to a circular orbit for five different values of the initial eccentricity and with ($\omega= 0$° or $180$°). Semimajor axis is constant at $a = 42,164$ km (24-hour period).
+
+```{code-cell} ipython3
+from poliastro.core.util import circular_velocity
+from poliastro.core.thrust.change_ecc_inc import beta as beta_change_ei
+from poliastro.core.thrust.change_ecc_inc import delta_V as delta_V_change_ei
+
+inc_domain = np.radians(np.linspace(0, 30, 100))
+ecc_domain = np.array([0.1, 0.2, 0.4, 0.6, 0.8])
+beta_data = beta_change_ei(ecc_0 = ecc_domain.reshape(-1,1), ecc_f = 0.0, inc_0 = 0.0, inc_f = inc_domain, argp = np.deg2rad(180))
+
+fig, ax = plt.subplots(figsize=(6, 6))
+for ecc,betas in zip(ecc_domain, beta_data):
+    ax.plot(np.degrees(inc_domain), np.degrees(betas), label=f"$e = {ecc:.1f}$")
+ax.set_xlabel("Inclination change (deg)")
+ax.set_ylabel(r"Yaw angle $|\beta| (deg)$")
+ax.set_xlim(0, 30)
+ax.set_ylim(0, 90)
+ax.grid(True)
+ax.legend()
+fig.savefig("change_ei_beta.png")
+plt.close() # Do not display here
+
+k = 398600
+a = 42164
+fig, ax = plt.subplots(figsize=(6, 6))
+delta_V_data =  delta_V_change_ei(V_0=circular_velocity(k, a), ecc_0=ecc_domain.reshape(-1,1), ecc_f=0.0, beta_=beta_data)
+for ecc,delta_Vs in zip(ecc_domain, delta_V_data):
+    ax.plot(np.degrees(inc_domain), delta_Vs, label=f"$e = {ecc:.1f}$")
+
+ax.set_xlabel("Inclination change (deg)")
+ax.set_ylabel(r"$\Delta V$ (km/s)")
+ax.set_xlim(0, 30)
+ax.set_ylim(0, 2.5)
+ax.grid(True)
+ax.legend()
+fig.savefig("change_ei_dV.png")
+plt.close() # Do not display here 
+```
+
+<tr>
+<td><img src="change_ei_beta.png" /></td>
+<td><img src="change_ei_dV.png" /></td>
+</tr>
+
+```{code-cell} ipython3
+from poliastro.twobody.thrust import change_ecc_inc
+from poliastro.twobody import Orbit
+from poliastro.bodies import Sun
+from poliastro.core.propagation import func_twobody
+from poliastro.twobody.propagation import propagate, cowell
+from astropy.time import TimeDelta
+from astropy import units as u
+from numba import njit as jit
+
+orbit = Orbit.from_vectors(Sun, r=np.array([-3.87956134e+08,  1.05155086e+08,  1.30885524e+07]) << u.km,
+                           v=np.array([ -4.96831485, -18.42591704,  -0.09133032]) << (u.km / u.s))
+
+print(f'ecc_0 = {orbit.ecc} inc_0 = {orbit.inc}')
+
+a_d, deltav, t_f = change_ecc_inc(orbit, ecc_f = 0, inc_f = 0 * u.rad, f = 1e-4 << (u.m / u.s ** 2))
+
+print(f'deltav = {deltav} t_f = {t_f}')
+
+def apply_thrust(orbit, t_f, a_d, num = 1):
+    @jit
+    def f(t0, state, k):
+        du_kep = func_twobody(t0, state, k)
+        ax, ay, az = a_d(t0, state, k)
+        du_ad = np.array([0., 0., 0., ax, ay, az])
+        return du_kep + du_ad
+    if num == 1:
+        return orbit.propagate(TimeDelta(t_f), method=cowell, rtol=1e-9, f=f)
+    else:
+        tofs = TimeDelta(np.linspace(0, t_f, num=num))
+        rr2 = propagate(orbit, tofs, method=cowell, rtol=1e-6, f=f)
+        return rr2
+orbit_new = apply_thrust(orbit, t_f, a_d)
+print(f'ecc_f = {orbit_new.ecc} inc_f = {orbit_new.inc}')
+#assert_allclose(new_orbit.inc.to_value(u.rad), 0.)
+#assert_allclose(new_orbit.ecc.value, 0.)
+rr2 = apply_thrust(orbit, t_f, a_d, num = 1000)
+#print(rr2)
+```
+
+```{code-cell} ipython3
+from poliastro.plotting import OrbitPlotter3D
+frame = OrbitPlotter3D()
+frame.set_attractor(Sun)
+frame.plot_trajectory(orbit.sample(), label="Original orbit")
+frame.plot_trajectory(rr2, label="Orbit with artificial thrust")
+frame.plot_trajectory(orbit_new.sample(), label="New orbit")
+```
+
+### References ###
+
+* Pollard, J. E. (2000). “Simplified Analysis of Low-Thrust Orbital Maneuvers”.
+
+```{code-cell} ipython3
+
+```

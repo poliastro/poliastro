@@ -31,6 +31,16 @@ def circular_velocity(k, a):
 
 @jit
 def rotation_matrix(angle, axis):
+    r"""Rotation matrix. Astropy uses the alias or passive transformation, whereas poliastro uses the alibi or active transformation
+
+    Parameters
+    ----------
+
+    angle : numpy.array
+
+    axis : int
+           0, 1, or 2
+    """
     assert axis in (0, 1, 2)
     angle = np.asarray(angle)
     c = cos(angle)
@@ -44,6 +54,48 @@ def rotation_matrix(angle, axis):
     R[..., a1, a2] = -s
     R[..., a2, a1] = s
     R[..., a2, a2] = c
+    return R
+
+
+@jit
+def rotation_matrix_x(angle):
+    angle = np.asarray(angle)
+    c = cos(angle)
+    s = sin(angle)
+    R = np.zeros(angle.shape + (3, 3))
+    R[..., 0, 0] = 1.0
+    R[..., 1, 1] = c
+    R[..., 1, 2] = -s
+    R[..., 2, 1] = s
+    R[..., 2, 2] = c
+    return R
+
+
+@jit
+def rotation_matrix_y(angle):
+    angle = np.asarray(angle)
+    c = cos(angle)
+    s = sin(angle)
+    R = np.zeros(angle.shape + (3, 3))
+    R[..., 1, 1] = 1.0
+    R[..., 2, 2] = c
+    R[..., 2, 0] = -s
+    R[..., 0, 2] = s
+    R[..., 0, 0] = c
+    return R
+
+
+@jit
+def rotation_matrix_z(angle):
+    angle = np.asarray(angle)
+    c = cos(angle)
+    s = sin(angle)
+    R = np.zeros(angle.shape + (3, 3))
+    R[..., 2, 2] = 1.0
+    R[..., 0, 0] = c
+    R[..., 0, 1] = -s
+    R[..., 1, 0] = s
+    R[..., 1, 1] = c
     return R
 
 
@@ -97,3 +149,41 @@ def spherical_to_cartesian(v):
     y = np.asarray(vsin[..., 0] * vsin[..., 1])
     z = np.asarray(vcos[..., 0])
     return norm * np.stack((x, y, z), axis=-1)
+
+
+@jit
+def cartesian_to_spherical(v):
+    r"""Compute spherical coordinates (norm, colat, long) from cartesian coordinates (x,y,z).
+    This function is vectorized. The coordinates are also called (radius, inclination, azimuth).
+
+    .. math::
+
+       norm = \sqrt{x^2 + y^2 + z^2}
+
+       colat = \arccos{\frac{z}{norm}}
+
+       lon = \arctan2(y,x) \mod 2 \pi
+
+    Parameters
+    ----------
+    v : np.array
+        Cartesian coordinates in 3D (x, y, z).
+
+    Returns
+    -------
+
+    v : np.array
+        Spherical coordinates in 3D (norm, colat, long) where norm in [0, inf),
+        colat in [0, pi] and long in [0, 2pi).
+
+    """
+    v = np.asarray(v)
+    norm = np.sqrt((v[..., 0:3] ** 2).sum(axis=-1))
+    colat = np.where(norm > 0, np.arccos(v[..., 2] / norm), 0.0)
+    lon = np.arctan2(v[..., 1], v[..., 0]) % (2 * np.pi)
+
+    norm = np.asarray(norm)
+    colat = np.asarray(colat)
+    lon = np.asarray(lon)
+
+    return np.stack((norm, colat, lon), axis=-1)
