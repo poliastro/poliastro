@@ -12,29 +12,47 @@ from astropy.coordinates import (
     get_body_barycentric,
     get_body_barycentric_posvel,
 )
-from astroquery.jplhorizons import Horizons
 from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
+from poliastro.core.elements import coe2rv_many
+from poliastro.core.propagation.farnocchia import (
+    delta_t_from_nu as delta_t_from_nu_fast,
+)
+from poliastro.core.util import eccentricity_vector
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.propagation import farnocchia, propagate
-
-from ..core.elements import coe2rv_many
-from ..core.propagation.farnocchia import delta_t_from_nu as delta_t_from_nu_fast
-from ..util import find_closest_value, norm
-from ..warnings import OrbitSamplingWarning, PatchedConicsWarning, TimeScaleWarning
-from .angles import D_to_nu, E_to_nu, F_to_nu, M_to_D, M_to_E, M_to_F, raan_from_ltan
-from .elements import (
+from poliastro.twobody.angles import (
+    D_to_nu,
+    E_to_nu,
+    F_to_nu,
+    M_to_D,
+    M_to_E,
+    M_to_F,
+    raan_from_ltan,
+)
+from poliastro.twobody.elements import (
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
     get_inclination_critical_argp,
     hyp_nu_limit,
 )
-from .mean_elements import get_mean_elements
-from .sampling import sample_closed
-from .states import BaseState, ClassicalState, ModifiedEquinoctialState, RVState
+from poliastro.twobody.mean_elements import get_mean_elements
+from poliastro.twobody.propagation import farnocchia, propagate
+from poliastro.twobody.sampling import sample_closed
+from poliastro.twobody.states import (
+    BaseState,
+    ClassicalState,
+    ModifiedEquinoctialState,
+    RVState,
+)
+from poliastro.util import find_closest_value, norm
+from poliastro.warnings import (
+    OrbitSamplingWarning,
+    PatchedConicsWarning,
+    TimeScaleWarning,
+)
 
 try:
     from functools import cached_property  # type: ignore
@@ -78,143 +96,143 @@ class Orbit:
 
     @property
     def attractor(self):
-        """Main attractor. """
+        """Main attractor."""
         return self._state.attractor
 
     @property
     def epoch(self):
-        """Epoch of the orbit. """
+        """Epoch of the orbit."""
         return self._epoch
 
     @property
     def plane(self):
-        """Fundamental plane of the frame. """
+        """Fundamental plane of the frame."""
         return self._state.plane
 
     @cached_property
     def r(self):
-        """Position vector. """
+        """Position vector."""
         return self._state.to_vectors().r
 
     @cached_property
     def v(self):
-        """Velocity vector. """
+        """Velocity vector."""
         return self._state.to_vectors().v
 
     @cached_property
     def a(self):
-        """Semimajor axis. """
+        """Semimajor axis."""
         return self._state.to_classical().a
 
     @cached_property
     def p(self):
-        """Semilatus rectum. """
+        """Semilatus rectum."""
         return self._state.to_classical().p
 
     @cached_property
     def r_p(self):
-        """Radius of pericenter. """
+        """Radius of pericenter."""
         return self.a * (1 - self.ecc)
 
     @cached_property
     def r_a(self):
-        """Radius of apocenter. """
+        """Radius of apocenter."""
         return self.a * (1 + self.ecc)
 
     @cached_property
     def ecc(self):
-        """Eccentricity. """
+        """Eccentricity."""
         return self._state.to_classical().ecc
 
     @cached_property
     def inc(self):
-        """Inclination. """
+        """Inclination."""
         return self._state.to_classical().inc
 
     @cached_property
     def raan(self):
-        """Right ascension of the ascending node. """
+        """Right ascension of the ascending node."""
         return self._state.to_classical().raan
 
     @cached_property
     def argp(self):
-        """Argument of the perigee. """
+        """Argument of the perigee."""
         return self._state.to_classical().argp
 
     @property
     def nu(self):
-        """True anomaly. """
+        """True anomaly."""
         return self._state.to_classical().nu
 
     @cached_property
     def f(self):
-        """Second modified equinoctial element. """
+        """Second modified equinoctial element."""
         return self._state.to_equinoctial().f
 
     @cached_property
     def g(self):
-        """Third modified equinoctial element. """
+        """Third modified equinoctial element."""
         return self._state.to_equinoctial().g
 
     @cached_property
     def h(self):
-        """Fourth modified equinoctial element. """
+        """Fourth modified equinoctial element."""
         return self._state.to_equinoctial().h
 
     @cached_property
     def k(self):
-        """Fifth modified equinoctial element. """
+        """Fifth modified equinoctial element."""
         return self._state.to_equinoctial().k
 
     @cached_property
     def L(self):
-        """True longitude. """
+        """True longitude."""
         return self.raan + self.argp + self.nu
 
     @cached_property
     def period(self):
-        """Period of the orbit. """
+        """Period of the orbit."""
         return self._state.period
 
     @cached_property
     def n(self):
-        """Mean motion. """
+        """Mean motion."""
         return self._state.n
 
     @cached_property
     def energy(self):
-        """Specific energy. """
+        """Specific energy."""
         return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
 
     @cached_property
     def e_vec(self):
-        """Eccentricity vector. """
+        """Eccentricity vector."""
         r, v = self.rv()
-        k = self.attractor.k
-        e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
-        return e_vec.decompose()
+        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+        e_vec = eccentricity_vector(k, r.to_value(u.km), v.to_value(u.km / u.s))
+        return e_vec * u.one
 
     @cached_property
     def h_vec(self):
-        """Specific angular momentum vector. """
-        h_vec = np.cross(self.r.to(u.km).value, self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        """Specific angular momentum vector."""
+        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
     @cached_property
     def h_mag(self):
-        """Specific angular momentum. """
+        """Specific angular momentum."""
         h_mag = norm(self.h_vec)
         return h_mag
 
     @cached_property
     def arglat(self):
-        """Argument of latitude. """
+        """Argument of latitude."""
         arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
 
     @cached_property
     def t_p(self):
-        """Elapsed time since latest perifocal passage. """
+        """Elapsed time since latest perifocal passage."""
         t_p = (
             delta_t_from_nu_fast(
                 self.nu.to_value(u.rad),
@@ -449,7 +467,7 @@ class Orbit:
         else:
             # TODO: The attractor is not really the Sun, but the Solar System
             # Barycenter
-            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.d), epoch)
             ss._frame = ICRS()  # Hack!
 
         return ss
@@ -567,71 +585,6 @@ class Orbit:
         return Orbit.from_coords(self.attractor, coords_dest, plane=plane)
 
     @classmethod
-    def from_horizons(
-        cls,
-        name,
-        attractor,
-        epoch=None,
-        plane=Planes.EARTH_EQUATOR,
-        id_type="smallbody",
-    ):
-        """Return osculating `Orbit` of a body using JPLHorizons module of Astroquery.
-
-        Parameters
-        ----------
-        name : str
-            Name of the body to query for.
-        epoch : ~astropy.time.Time, optional
-            Epoch, default to None.
-        plane : ~poliastro.frames.Planes
-            Fundamental plane of the frame.
-        id_type : str, optional
-            Use "smallbody" for Asteroids and Comets, and "majorbody"
-            for Planets and Satellites.
-
-        """
-        warn(
-            "Orbit.from_horizons is deprecated and will be removed in a future release, "
-            "use Ephem.from_horizons instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        if not epoch:
-            epoch = time.Time.now()
-        if plane == Planes.EARTH_EQUATOR:
-            refplane = "earth"
-        elif plane == Planes.EARTH_ECLIPTIC:
-            refplane = "ecliptic"
-
-        bodies_dict = {
-            "sun": 10,
-            "mercury": 199,
-            "venus": 299,
-            "earth": 399,
-            "mars": 499,
-            "jupiter": 599,
-            "saturn": 699,
-            "uranus": 799,
-            "neptune": 899,
-        }
-        location = f"500@{bodies_dict[attractor.name.lower()]}"
-
-        obj = Horizons(
-            id=name, location=location, epochs=epoch.jd, id_type=id_type
-        ).elements(refplane=refplane)
-        a = obj["a"][0] * u.au
-        ecc = obj["e"][0] * u.one
-        inc = obj["incl"][0] * u.deg
-        raan = obj["Omega"][0] * u.deg
-        argp = obj["w"][0] * u.deg
-        nu = obj["nu"][0] * u.deg
-        ss = cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
-        )
-        return ss
-
-    @classmethod
     def from_sbdb(cls, name, **kwargs):
         """Return osculating `Orbit` by using `SBDB` from Astroquery.
 
@@ -670,17 +623,17 @@ class Orbit:
             )
 
         if "object" not in obj.keys():
-            raise ValueError("Object {} not found".format(name))
+            raise ValueError(f"Object {name} not found")
 
-        a = obj["orbit"]["elements"]["a"].to(u.AU) * u.AU
+        a = obj["orbit"]["elements"]["a"]
         ecc = float(obj["orbit"]["elements"]["e"]) * u.one
-        inc = obj["orbit"]["elements"]["i"].to(u.deg) * u.deg
-        raan = obj["orbit"]["elements"]["om"].to(u.deg) * u.deg
-        argp = obj["orbit"]["elements"]["w"].to(u.deg) * u.deg
+        inc = obj["orbit"]["elements"]["i"]
+        raan = obj["orbit"]["elements"]["om"]
+        argp = obj["orbit"]["elements"]["w"]
 
         # Since JPL provides Mean Anomaly (M) we need to make
         # the conversion to the true anomaly (nu)
-        M = obj["orbit"]["elements"]["ma"].to(u.rad) * u.rad
+        M = obj["orbit"]["elements"]["ma"].to(u.rad)
         # NOTE: It is unclear how this conversion should happen,
         # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
         if ecc < 1:
@@ -694,13 +647,13 @@ class Orbit:
         epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
         ss = cls.from_classical(
-            Sun,
-            a,
-            ecc,
-            inc,
-            raan,
-            argp,
-            nu,
+            attractor=Sun,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
             epoch=epoch.tdb,
             plane=Planes.EARTH_ECLIPTIC,
         )
@@ -739,12 +692,22 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        if alt < 0:
+            raise ValueError("Altitude of an orbit cannot be negative.")
         a = attractor.R + alt
         ecc = 0 * u.one
         argp = 0 * u.deg
 
         return cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+            attractor=attractor,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=arglat,
+            epoch=epoch,
+            plane=plane,
         )
 
     @classmethod
@@ -849,7 +812,15 @@ class Orbit:
             raise ValueError("The orbit for the given parameters doesn't exist")
 
         return cls.from_classical(
-            attractor, a_sync, ecc, inc, raan, argp, nu, epoch, plane
+            attractor=attractor,
+            a=a_sync,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
+            epoch=epoch,
+            plane=plane,
         )
 
     @classmethod
@@ -901,6 +872,10 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        # Temporary fix: raan_from_ltan works only for Earth
+        if attractor.name.lower() != "earth":
+            raise NotImplementedError("Attractors other than Earth not supported yet")
+
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
@@ -912,7 +887,7 @@ class Orbit:
 
         try:
             with np.errstate(invalid="raise"):
-                if (a is None) and (ecc is None) and (inc is None):
+                if all(coe is None for coe in [a, ecc, inc]):
                     # We check sufficient number of parameters
                     raise ValueError(
                         "At least two parameters of the set {a, ecc, inc} are required."
@@ -934,7 +909,7 @@ class Orbit:
                         * R_SSO ** 2
                         * J2_SSO
                         * np.sqrt(k_SSO)
-                        * np.cos(inc.to(u.rad))
+                        * np.cos(inc)
                         / (2 * a ** (7 / 2) * n_sunsync)
                     )
                     ecc = np.sqrt(1 - _ecc_0)
@@ -950,13 +925,17 @@ class Orbit:
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
 
-        # Temporary fix: raan_from_ltan works only for Earth
-        if attractor.name.lower() != "earth":
-            raise NotImplementedError("Attractors other than Earth not supported yet")
-
         raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+            attractor=attractor,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
+            epoch=epoch.tdb,
+            plane=plane,
         )
 
         return ss
@@ -1085,7 +1064,8 @@ class Orbit:
                     f"This has not been implemented for {attractor.name}"
                 )
 
-            assert alt > 0
+            if alt < 0:
+                raise ValueError("Altitude of an orbit cannot be negative")
 
             argp = critical_argps[0] if argp is None else argp
             a = attractor.R + alt
@@ -1106,7 +1086,15 @@ class Orbit:
                         attractor.R, attractor.J2, attractor.J3, a, ecc
                     )
                 return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                    attractor=attractor,
+                    a=a,
+                    ecc=ecc,
+                    inc=inc,
+                    raan=raan,
+                    argp=argp,
+                    nu=arglat,
+                    epoch=epoch,
+                    plane=plane,
                 )
 
             inc = critical_inclinations[0] if inc is None else inc
@@ -1114,7 +1102,15 @@ class Orbit:
             if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
                 ecc = get_eccentricity_critical_inc(ecc)
                 return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                    attractor=attractor,
+                    a=a,
+                    ecc=ecc,
+                    inc=inc,
+                    raan=raan,
+                    argp=argp,
+                    nu=arglat,
+                    epoch=epoch,
+                    plane=plane,
                 )
 
             argp = critical_argps[0]
@@ -1124,12 +1120,20 @@ class Orbit:
             )
 
             return cls.from_classical(
-                attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                attractor=attractor,
+                a=a,
+                ecc=ecc,
+                inc=inc,
+                raan=raan,
+                argp=argp,
+                nu=arglat,
+                epoch=epoch,
+                plane=plane,
             )
 
         except AssertionError as exc:
             raise ValueError(
-                f"The semimajor axis may not be smaller that {attractor.name}'s radius"
+                f"The semimajor axis may not be smaller than the {attractor.name}'s radius"
             ) from exc
 
     def represent_as(self, representation, differential_class=None):
@@ -1174,11 +1178,11 @@ class Orbit:
         return cartesian.represent_as(representation, differential_class)
 
     def rv(self):
-        """Position and velocity vectors. """
+        """Position and velocity vectors."""
         return self.r, self.v
 
     def classical(self):
-        """Classical orbital elements. """
+        """Classical orbital elements."""
         return (
             self.a,
             self.ecc,
@@ -1189,7 +1193,7 @@ class Orbit:
         )
 
     def pqw(self):
-        """Perifocal frame (PQW) vectors. """
+        """Perifocal frame (PQW) vectors."""
         warn(
             "Orbit.pqw is deprecated and will be removed in a future release",
             DeprecationWarning,
@@ -1197,7 +1201,7 @@ class Orbit:
         )
 
         if self.ecc < 1e-8:
-            if abs(self.inc.to(u.rad).value) > 1e-8:
+            if abs(self.inc.to_value(u.rad)) > 1e-8:
                 node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
                 p_vec = node / norm(node)  # Circular inclined
             else:
@@ -1216,7 +1220,7 @@ class Orbit:
 
         try:
             return ORBIT_FORMAT.format(
-                r_p=self.r_p.to(unit).value,
+                r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
                 frame=self.get_frame().__class__.__name__,
@@ -1226,7 +1230,7 @@ class Orbit:
             )
         except NotImplementedError:
             return ORBIT_NO_FRAME_FORMAT.format(
-                r_p=self.r_p.to(unit).value,
+                r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
                 body=self.attractor,
@@ -1328,20 +1332,20 @@ class Orbit:
 
         if time_of_flight < 0:
             if self.ecc >= 1:
-                raise ValueError("True anomaly {:.2f} not reachable".format(value))
+                raise ValueError(f"True anomaly {value:.2f} not reachable")
             else:
                 # For a closed orbit, instead of moving backwards
                 # we need to do another revolution
                 time_of_flight = self.period + time_of_flight
 
         return self.from_classical(
-            self.attractor,
-            self.a,
-            self.ecc,
-            self.inc,
-            self.raan,
-            self.argp,
-            nu,
+            attractor=self.attractor,
+            a=self.a,
+            ecc=self.ecc,
+            inc=self.inc,
+            raan=self.raan,
+            argp=self.argp,
+            nu=nu,
             epoch=self.epoch + time_of_flight,
             plane=self.plane,
         )
@@ -1353,11 +1357,11 @@ class Orbit:
         # the arc cosine, which is in the range [0, 180)
         # Start from -nu_limit
         wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
-        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to(u.rad).value
+        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
 
         limits = [
-            min_anomaly.to(u.rad).value if min_anomaly is not None else -nu_limit,
-            max_anomaly.to(u.rad).value if max_anomaly is not None else nu_limit,
+            min_anomaly.to_value(u.rad) if min_anomaly is not None else -nu_limit,
+            max_anomaly.to_value(u.rad) if max_anomaly is not None else nu_limit,
         ] * u.rad  # type: u.Quantity
 
         # Now we check that none of the provided values
@@ -1419,13 +1423,13 @@ class Orbit:
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
-            np.full(n, self.attractor.k.to(u.m ** 3 / u.s ** 2).value),
-            np.full(n, self.p.to(u.m).value),
+            np.full(n, self.attractor.k.to_value(u.m ** 3 / u.s ** 2)),
+            np.full(n, self.p.to_value(u.m)),
             np.full(n, self.ecc.value),
-            np.full(n, self.inc.to(u.rad).value),
-            np.full(n, self.raan.to(u.rad).value),
-            np.full(n, self.argp.to(u.rad).value),
-            nu_values.to(u.rad).value,
+            np.full(n, self.inc.to_value(u.rad)),
+            np.full(n, self.raan.to_value(u.rad)),
+            np.full(n, self.argp.to_value(u.rad)),
+            nu_values.to_value(u.rad),
         )
 
         # Add units
@@ -1437,18 +1441,6 @@ class Orbit:
         )
 
         return cartesian
-
-    def _generate_time_values(self, nu_vals):
-        # Subtract current anomaly to start from the desired point
-        ecc = self.ecc.value
-        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
-        q = self.r_p.to_value(u.km)
-
-        time_values = [
-            delta_t_from_nu_fast(nu_val, ecc, k, q)
-            for nu_val in nu_vals.to(u.rad).value
-        ] * u.s - self.t_p
-        return time_values
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.
@@ -1466,13 +1458,17 @@ class Orbit:
         orbit_new = self  # Initialize
         states = []
         attractor = self.attractor
+        plane = self.plane
         for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
                 orbit_new = orbit_new.propagate(delta_t)
             r, v = orbit_new.rv()
             vnew = v + delta_v
-            orbit_new = self.from_vectors(attractor, r, vnew, orbit_new.epoch)
-            states.append(orbit_new)
+            orbit_new = self.from_vectors(
+                attractor=attractor, r=r, v=vnew, epoch=orbit_new.epoch, plane=plane
+            )
+            if intermediate:  # Avoid keeping them in memory.
+                states.append(orbit_new)
         if intermediate:
             res = states  # type: Union[Orbit, List[Orbit]]
         else:

@@ -3,7 +3,7 @@ name: New release
 about: Checklist for new release (development only)
 title: Release X.Y.Z checklist
 labels: development
-assignees: Juanlu001
+assignees: astrojuanlu
 ---
 
 ## Preparing the release
@@ -14,20 +14,17 @@ assignees: Juanlu001
   - Commits since last release branch https://github.com/poliastro/poliastro/compare/X.Y.Z...master
   - Issues closed in this milestone https://github.com/poliastro/poliastro/milestone/N?closed=1 (note that there might be issues without milestone!)
   - Pull requests merged since last branching https://github.com/poliastro/poliastro/pulls?q=is%3Apr+is%3Amerged+merged%3A%3E%3D2019-02-09+sort%3Aupdated-asc
-* [ ] Add X.Y.x branch to CI scripts
 
 ## Before the beta release
 
 * [ ] New branch
 * [ ] Bump version **to X.Yb1** in:
-  - `README.rst`
+  - `README.md`
   - `__init__.py`
-  - Sphinx `conf.py`
-* [ ] Check that the release branch will be tested on CI
-* [ ] Check all the badges in `README` point to the appropriate git **branch** (replace `master` by new branch `sed -i 's/master/.../g' README.rst`)
+* [ ] Check all the badges in `README` point to the appropriate git **branch** (replace `main` by new branch `sed -i 's/main/.../g' README.md`)
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `latest` by new tag, without sed!)
-* [ ] Commit
-* [ ] Generate sdist and bdist_wheel with `flit build`
+* [ ] `git commit -m 'Bump to next beta version'`
+* [ ] Generate sdist and bdist_wheel with `python -m build`
 * [ ] `twine upload dist/* --repository-url https://test.pypi.org/legacy/`
 * [ ] Tag
 * [ ] Bump master to next development version
@@ -44,7 +41,7 @@ assignees: Juanlu001
 * [ ] Backport any bugs
 * [ ] Update release date in changelog
 * [ ] Bump version **to X.Y.Z** in:
-  - `README.rst`
+  - `README.md`
   - `__init__.py`
   - Sphinx `conf.py`
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `vX.Yb1` by `vX.Y.Z`)

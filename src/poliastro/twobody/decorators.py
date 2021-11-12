@@ -6,9 +6,8 @@ from functools import wraps
 from astropy import units as u
 
 from poliastro.bodies import Body
-
-from ..frames import Planes
-from .states import RVState
+from poliastro.frames import Planes
+from poliastro.twobody.states import RVState
 
 u.kms = u.km / u.s
 u.km3s2 = u.km ** 3 / u.s ** 2

@@ -25,8 +25,8 @@ from astropy import units as u
 from astropy.constants import G
 from astropy.units import Quantity
 
-from . import constants
-from .frames import Planes
+from poliastro import constants
+from poliastro.frames import Planes
 
 
 # HACK: Constants cannot be hashed
@@ -105,9 +105,7 @@ class Body(
         return cls(parent, k, name, symbol, R, **kwargs)
 
     @classmethod
-    def from_relative(
-        cls, reference, parent=None, k=None, name=None, symbol=None, R=None, **kwargs
-    ):
+    def from_relative(cls, reference, parent, k, name, symbol=None, R=0, **kwargs):
         k = k * reference.k
         R = R * reference.R
         return cls(parent, k, name, symbol, R, **kwargs)
@@ -157,15 +155,15 @@ class SolarSystemPlanet(Body):
             return OrbitPlotter2D(plane=plane).plot_body_orbit(self, epoch, label=label)
 
 
-Sun = SolarSystemPlanet(
+Sun = Body(
     parent=None,
     k=constants.GM_sun,
     name="Sun",
     symbol="\u2609",
     R=constants.R_sun,
     rotational_period=constants.rotational_period_sun,
-    J2=_q(constants.J2_sun),
-    mass=_q(constants.M_sun),
+    J2=constants.J2_sun,
+    mass=constants.M_sun,
 )
 
 
@@ -180,6 +178,7 @@ Mercury = SolarSystemPlanet(
     rotational_period=constants.rotational_period_mercury,
 )
 
+
 Venus = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_venus,
@@ -189,9 +188,11 @@ Venus = SolarSystemPlanet(
     R_mean=constants.R_mean_venus,
     R_polar=constants.R_polar_venus,
     rotational_period=constants.rotational_period_venus,
-    J2=_q(constants.J2_venus),
-    J3=_q(constants.J3_venus),
+    J2=constants.J2_venus,
+    J3=constants.J3_venus,
 )
+
+
 Earth = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_earth,
@@ -201,10 +202,12 @@ Earth = SolarSystemPlanet(
     R_mean=constants.R_mean_earth,
     R_polar=constants.R_polar_earth,
     rotational_period=constants.rotational_period_earth,
-    mass=_q(constants.M_earth),
-    J2=_q(constants.J2_earth),
-    J3=_q(constants.J3_earth),
+    mass=constants.M_earth,
+    J2=constants.J2_earth,
+    J3=constants.J3_earth,
 )
+
+
 Mars = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_mars,
@@ -214,9 +217,11 @@ Mars = SolarSystemPlanet(
     R_mean=constants.R_mean_mars,
     R_polar=constants.R_polar_mars,
     rotational_period=constants.rotational_period_mars,
-    J2=_q(constants.J2_mars),
-    J3=_q(constants.J3_mars),
+    J2=constants.J2_mars,
+    J3=constants.J3_mars,
 )
+
+
 Jupiter = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_jupiter,
@@ -226,8 +231,10 @@ Jupiter = SolarSystemPlanet(
     R_mean=constants.R_mean_jupiter,
     R_polar=constants.R_polar_jupiter,
     rotational_period=constants.rotational_period_jupiter,
-    mass=_q(constants.M_jupiter),
+    mass=constants.M_jupiter,
 )
+
+
 Saturn = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_saturn,
@@ -238,6 +245,8 @@ Saturn = SolarSystemPlanet(
     R_polar=constants.R_polar_saturn,
     rotational_period=constants.rotational_period_saturn,
 )
+
+
 Uranus = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_uranus,
@@ -248,6 +257,8 @@ Uranus = SolarSystemPlanet(
     R_polar=constants.R_polar_uranus,
     rotational_period=constants.rotational_period_uranus,
 )
+
+
 Neptune = SolarSystemPlanet(
     parent=Sun,
     k=constants.GM_neptune,
@@ -259,6 +270,7 @@ Neptune = SolarSystemPlanet(
     rotational_period=constants.rotational_period_neptune,
 )
 
+
 Pluto = Body(
     parent=Sun,
     k=constants.GM_pluto,
@@ -269,6 +281,7 @@ Pluto = Body(
     R_polar=constants.R_polar_pluto,
     rotational_period=constants.rotational_period_pluto,
 )
+
 
 Moon = Body(
     parent=Earth,

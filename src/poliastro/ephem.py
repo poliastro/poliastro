@@ -16,11 +16,10 @@ from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 from scipy.interpolate import interp1d
 
+from poliastro.frames import Planes
+from poliastro.frames.util import get_frame
 from poliastro.twobody.propagation import propagate
-
-from .frames import Planes
-from .frames.util import get_frame
-from .warnings import TimeScaleWarning
+from poliastro.warnings import TimeScaleWarning
 
 EPHEM_FORMAT = (
     "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
@@ -55,8 +54,8 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
         Interpolated function.
 
     """
-    h = (period * rtol).to(u.day).value
-    t_span = (t_span[0].to(u.day).value, t_span[1].to(u.day).value + 0.01)
+    h = (period * rtol).to_value(u.d)
+    t_span = (t_span[0].to_value(u.d), t_span[1].to_value(u.d) + 0.01)
     t_values = np.linspace(*t_span, int((t_span[1] - t_span[0]) / h))  # type: ignore
     r_values = np.zeros((t_values.shape[0], 3))
 
@@ -72,7 +71,7 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
 
         r_values[i] = r.xyz.to(u.km)
 
-    t_values = ((t_values - t_span[0]) * u.day).to(u.s).value
+    t_values = ((t_values - t_span[0]) * u.day).to_value(u.s)
     return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
 
 
@@ -152,8 +151,7 @@ def _get_destination_frame(attractor, plane, epochs):
 class Ephem:
     """Time history of position and velocity of some object at particular epochs.
 
-    Instead of creating Ephem objects directly,
-    you are encouraged to use the available classmethods.
+    Instead of creating Ephem objects directly, use the available classmethods.
 
     Parameters
     ----------
@@ -290,7 +288,7 @@ class Ephem:
                 "uranus": 799,
                 "neptune": 899,
             }
-            location = "500@{}".format(bodies_dict[attractor.name.lower()])
+            location = f"500@{bodies_dict[attractor.name.lower()]}"
         else:
             location = "@ssb"
 

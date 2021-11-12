@@ -1,8 +1,15 @@
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+from hypothesis import given, settings, strategies as st
 
 from poliastro.bodies import Earth
 from poliastro.spheroid_location import SpheroidLocation
+
+
+@st.composite
+def with_units(draw, elements, unit):
+    lat = draw(elements)
+    return lat * unit
 
 
 def test_cartesian_coordinates():
@@ -95,3 +102,18 @@ def test_cartesian_conversion_approximate():
     assert_quantity_allclose(el_cords[0], cords[0], 1e-4)
     assert_quantity_allclose(el_cords[1], cords[1], 1e-4)
     assert_quantity_allclose(el_cords[2], cords[2], 1)
+
+
+@settings(deadline=None)
+@given(
+    lat=with_units(elements=st.floats(min_value=-1e-2, max_value=1e-2), unit=u.rad),
+)
+def test_h_calculation_near_lat_singularity(lat):
+    body = Earth
+    lon = 10 * u.deg
+    h = 5 * u.m
+    p = SpheroidLocation(lon, lat, h, body)
+    cartesian_coords = p.cartesian_cords
+    lat_, lon_, h_ = p.cartesian_to_ellipsoidal(*cartesian_coords)
+
+    assert_quantity_allclose(h_, h)

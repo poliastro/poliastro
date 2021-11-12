@@ -5,7 +5,7 @@ from poliastro.plotting import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.plotting.misc import plot_solar_system
 
 
-@pytest.mark.parametrize("outer,expected", [(True, 8), (False, 4)])
+@pytest.mark.parametrize("outer, expected", [(True, 8), (False, 4)])
 def test_plot_solar_system_has_expected_number_of_orbits(outer, expected):
     assert len(plot_solar_system(outer).trajectories) == expected
 
@@ -15,6 +15,12 @@ def test_plot_solar_system_has_expected_number_of_orbits(outer, expected):
 )
 def test_plot_solar_system_uses_expected_orbitplotter(use_3d, plotter_class):
     assert isinstance(plot_solar_system(use_3d=use_3d, interactive=True), plotter_class)
+
+
+def test_plot_solar_system_raises_error_if_use_3d_and_non_interactive():
+    with pytest.raises(ValueError) as excinfo:
+        plot_solar_system(use_3d=True)
+    assert "The static plotter does not support 3D" in excinfo.exconly()
 
 
 @pytest.mark.mpl_image_compare

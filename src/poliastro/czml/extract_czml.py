@@ -21,7 +21,9 @@ from czml3.types import IntervalValue, TimeInterval
 from erfa import gd2gce
 
 from poliastro.bodies import Earth
-from poliastro.czml.utils import project_point_on_ellipsoid
+from poliastro.core.czml_utils import (
+    project_point_on_ellipsoid as project_point_on_ellipsoid_fast,
+)
 from poliastro.twobody.propagation import propagate
 
 PIC_SATELLITE = (
@@ -77,16 +79,21 @@ class CZMLExtractor:
 
         if not self.attractor:
             self.attractor = Earth
-        elif not (self.attractor.R and self.attractor.R_polar):
+        elif (
+            self.attractor.R is None
+            or self.attractor.R == 0
+            or self.attractor.R_polar is None
+            or self.attractor.R_polar == 0
+        ):
             raise ValueError(
                 "Invalid ellipsoid of attractor.\n"
                 + "Make sure your body has valid 'R' and 'R_polar' parameters"
             )
 
         ellipsoid = (
-            self.attractor.R.to(u.m).value,
-            self.attractor.R.to(u.m).value,
-            self.attractor.R_polar.to(u.m).value,
+            self.attractor.R.to_value(u.m),
+            self.attractor.R.to_value(u.m),
+            self.attractor.R_polar.to_value(u.m),
         )
 
         self.cust_prop = [ellipsoid, pr_map, scene3D]
@@ -113,7 +120,7 @@ class CZMLExtractor:
         """
         cart_cords = []  # type: List[float]
 
-        h = (self.end_epoch - self.orbits[i][2]).to(u.second) / self.orbits[i][1]
+        h = (self.end_epoch - self.orbits[i][2]).to(u.s) / self.orbits[i][1]
 
         # Get rounding factor given the relative tolerance
         rf = 0
@@ -124,7 +131,7 @@ class CZMLExtractor:
         for k in range(self.orbits[i][1] + 2):
             position = propagate(self.orbits[i][0], TimeDelta(k * h), rtol=rtol)
 
-            cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
+            cords = position.represent_as(CartesianRepresentation).xyz.to_value(u.m)
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
             # Flatten list
@@ -148,7 +155,7 @@ class CZMLExtractor:
         """
         cart_cords = []  # type: List[float]
 
-        h = (self.end_epoch - self.orbits[i][2]).to(u.second) / self.orbits[i][1]
+        h = (self.end_epoch - self.orbits[i][2]).to(u.s) / self.orbits[i][1]
 
         # Get rounding factor given the relative tolerance
         rf = 0
@@ -161,18 +168,18 @@ class CZMLExtractor:
         for k in range(self.orbits[i][1] + 2):
             position = propagate(self.orbits[i][0], TimeDelta(k * h), rtol=rtol)
 
-            cords = position.represent_as(CartesianRepresentation).xyz.to(u.meter).value
+            cords = position.represent_as(CartesianRepresentation).xyz.to_value(u.m)
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
             # Flatten list
             cords = list(map(lambda x: round(x[0], rf), cords.tolist()))
             t, p = cords[0], cords[1:]
-            pr_p = project_point_on_ellipsoid(
+            pr_p = project_point_on_ellipsoid_fast(
                 p[0], p[1], p[2], ellipsoid[0], ellipsoid[1], ellipsoid[2]
             )
             # Add a small number to ensure that our point lies above the surface of the
             # ellipsoid. We do this because small losses in precision may cause the point
-            # to lie slightly bellow the surface. An iterative method could be used instead
+            # to lie slightly below the surface. An iterative method could be used instead
             # but the error margin is too small to be worth it.
 
             _cords = t, pr_p[0] + 0.1, pr_p[1] + 0.1, pr_p[2] + 0.1
@@ -373,9 +380,9 @@ class CZMLExtractor:
         if N is None:
             N = self.N
 
-        if orbit.epoch < Time(self.start_epoch):
+        if orbit.epoch < self.start_epoch:
             orbit = orbit.propagate(self.start_epoch - orbit.epoch)
-        elif orbit.epoch > Time(self.end_epoch):
+        elif orbit.epoch > self.end_epoch:
             raise ValueError(
                 "The orbit's epoch cannot exceed the constructor's ending epoch"
             )
@@ -532,12 +539,8 @@ class CZMLExtractor:
             Indicates whether the label is visible
 
         """
-
-        if self.attractor is None:
-            raise ValueError("An attractor must be set up first.")
-
         positions = (
-            positions.represent_as(CartesianRepresentation).get_xyz(1).to(u.meter).value
+            positions.represent_as(CartesianRepresentation).get_xyz(1).to_value(u.m)
         )
 
         epochs = Time(epochs, format="isot")
@@ -546,7 +549,7 @@ class CZMLExtractor:
             raise ValueError("Number of Points and Epochs must be equal.")
 
         epochs = np.fromiter(
-            map(lambda epoch: (epoch - epochs[0]).to(u.second).value, epochs),
+            map(lambda epoch: (epoch - epochs[0]).to_value(u.s), epochs),
             dtype=float,
         )
 

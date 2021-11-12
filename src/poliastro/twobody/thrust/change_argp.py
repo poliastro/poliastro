@@ -7,12 +7,9 @@ References
 * Pollard, J. E. "Evaluation of Low-Thrust Orbital Maneuvers", 1998.
 
 """
-import numpy as np
-from numpy import cross
-from numpy.linalg import norm
+from astropy import units as u
 
-from poliastro.core.elements import rv2coe
-from poliastro.core.thrust.change_argp import extra_quantities
+from poliastro.core.thrust.change_argp import change_argp as change_a_inc_fast
 
 
 def change_argp(k, a, ecc, argp_0, argp_f, f):
@@ -22,23 +19,30 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
 
     Parameters
     ----------
-    f : float
-        Magnitude of constant acceleration
+    k : ~astropy.units.quantity.Quantity
+        Gravitational parameter (km**3 / s**2)
+    a : ~astropy.units.quantity.Quantity
+        Semi-major axis (km)
+    ecc : float
+        Eccentricity
+    argp_0 : ~astropy.units.quantity.Quantity
+        Initial argument of periapsis (rad)
+    argp_f : ~astropy.units.quantity.Quantity
+        Final argument of periapsis (rad)
+    f : ~astropy.units.quantity.Quantity
+        Magnitude of constant acceleration (km / s**2)
+
+    Returns
+    -------
+    a_d, delta_V, t_f : tuple (function, ~astropy.units.quantity.Quantity, ~astropy.time.Time)
     """
+    a_d, delta_V, t_f = change_a_inc_fast(
+        k=k.to_value(u.km ** 3 / u.s ** 2),
+        a=a.to_value(u.km),
+        ecc=ecc,
+        argp_0=argp_0.to_value(u.rad),
+        argp_f=argp_f.to_value(u.rad),
+        f=f.to_value(u.km / u.s ** 2),
+    )
 
-    def a_d(t0, u_, k):
-        r = u_[:3]
-        v = u_[3:]
-        nu = rv2coe(k, r, v)[-1]
-
-        alpha_ = nu - np.pi / 2
-
-        r_ = r / norm(r)
-        w_ = cross(r, v) / norm(cross(r, v))
-        s_ = cross(w_, r_)
-        accel_v = f * (np.cos(alpha_) * s_ + np.sin(alpha_) * r_)
-        return accel_v
-
-    delta_V, t_f = extra_quantities(k, a, ecc, argp_0, argp_f, f, A=0.0)
-
-    return a_d, delta_V, t_f
+    return a_d, delta_V, t_f * u.s

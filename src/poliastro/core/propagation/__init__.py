@@ -3,7 +3,7 @@
 import numpy as np
 from numba import njit as jit
 
-from ..angles import (
+from poliastro.core.angles import (
     D_to_nu,
     E_to_M,
     E_to_nu,
@@ -14,9 +14,9 @@ from ..angles import (
     nu_to_E,
     nu_to_F,
 )
-from ..elements import coe2rv, rv2coe
-from ..stumpff import c2, c3
-from .farnocchia import farnocchia, farnocchia_coe
+from poliastro.core.elements import coe2rv, rv2coe
+from poliastro.core.propagation.farnocchia import farnocchia, farnocchia_coe
+from poliastro.core.stumpff import c2, c3
 
 __all__ = [
     "func_twobody",
@@ -36,6 +36,7 @@ __all__ = [
 ]
 
 
+@jit
 def func_twobody(t0, u_, k):
     """Differential equation for the initial value two body problem.
 
@@ -45,7 +46,7 @@ def func_twobody(t0, u_, k):
     ----------
     t0 : float
         Time.
-    u_ : ~numpy.ndarray
+    u_ : ~np.array
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard gravitational parameter.
@@ -63,7 +64,7 @@ def vallado(k, r0, v0, tof, numiter):
     r"""Solves Kepler's Equation by applying a Newton-Raphson method.
 
     If the position of a body along its orbit wants to be computed
-    for an specific time, it can be solved by terms of the Kepler's Equation:
+    for a specific time, it can be solved by terms of the Kepler's Equation:
 
     .. math::
         E = M + e\sin{E}
@@ -98,13 +99,15 @@ def vallado(k, r0, v0, tof, numiter):
     ----------
 
     k: float
-        Standard gravitational parameter
-    r0: ~numpy.array
-        Initial position vector
-    v0: ~numpy.array
-        Initial velocity vector
+        Standard gravitational parameter.
+    r0: ~np.array
+        Initial position vector.
+    v0: ~np.array
+        Initial velocity vector.
+    tof: float
+        Time of flight.
     numiter: int
-        Number of iterations
+        Number of iterations.
 
     Returns
     -------
@@ -280,23 +283,23 @@ def mikkola(k, r0, v0, tof, rtol=None):
 
     Parameters
     ----------
-    k : ~astropy.units.Quantity
+    k : float
         Standard gravitational parameter of the attractor.
-    r : ~astropy.units.Quantity
+    r : ~np.array
         Position vector.
-    v : ~astropy.units.Quantity
+    v : ~np.array
         Velocity vector.
-    tofs : ~astropy.units.Quantity
-        Array of times to propagate.
+    tof : float
+        Time of flight.
     rtol: float
-        This method does not require of tolerance since it is non iterative.
+        This method does not require tolerance since it is non-iterative.
 
     Returns
     -------
-    rr : ~astropy.units.Quantity
-        Propagated position vectors.
-    vv : ~astropy.units.Quantity
-
+    rr : ~np.array
+        Final velocity vector.
+    vv : ~np.array
+        Final velocity vector.
     Note
     ----
     Original paper: https://doi.org/10.1007/BF01235850
@@ -360,26 +363,26 @@ def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
 @jit
 def markley(k, r0, v0, tof):
-    """Solves the kepler problem by a non iterative method. Relative error is
-    around 1e-18, only limited by machine double-precission errors.
+    """Solves the kepler problem by a non-iterative method. Relative error is
+    around 1e-18, only limited by machine double-precision errors.
 
     Parameters
     ----------
     k : float
-        Standar Gravitational parameter
-    r0 : array
+        Standar Gravitational parameter.
+    r0 : ~np.array
         Initial position vector wrt attractor center.
-    v0 : array
+    v0 : ~np.array
         Initial velocity vector.
     tof : float
         Time of flight.
 
     Returns
     -------
-    rf: array
-        Final position vector
-    vf: array
-        Final velocity vector
+    rr: ~np.array
+        Final position vector.
+    vv: ~np.array
+        Final velocity vector.
 
     Note
     ----
@@ -733,24 +736,26 @@ def pimienta(k, r0, v0, tof):
     Parameters
     ----------
     k : float
-        Standar Gravitational parameter
-    r0 : array
+        Standar Gravitational parameter.
+    r0 : ~np.array
         Initial position vector wrt attractor center.
-    v0 : array
+    v0 : ~np.array
         Initial velocity vector.
     tof : float
         Time of flight.
 
     Returns
     -------
-    rf: array
-        Final position vector
-    vf: array
-        Final velocity vector
+    rr: ~np.array
+        Final position vector.
+    vv: ~np.array
+        Final velocity vector.
 
     Note
     ----
-    This algorithm was drived from the original paper: http://hdl.handle.net/10477/50522
+    This algorithm was derived from the original paper:
+    Pimienta-Peñalver, A. & Crassidis, John. (2013). Accurate Kepler equation
+    solver without transcendental function evaluations. Advances in the Astronautical Sciences. 147. 233-247.
     """
 
     # TODO: implement hyperbolic case
@@ -804,21 +809,23 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
     ----------
     k : float
         Standard gravitational parameter of the attractor.
-    r : 1x3 vector
+    r0 : ~np.array
         Position vector.
-    v : 1x3 vector
+    v0 : ~np.array
         Velocity vector.
     tof : float
         Time of flight.
-    rtol: float
-        Relative error for accuracy of the method.
+    numiter: int, optional
+        Number of iterations, defaults to 150.
+    rtol: float, optional
+        Relative error for accuracy of the method, defaults to 1e-8.
 
     Returns
     -------
-    rr : 1x3 vector
-        Propagated position vectors.
-     vv : 1x3 vector
-
+    rr : ~np.array
+        Final position vector.
+    vv : ~np.array
+        Final velocity vector.
     Note
     ----
     Original paper for the algorithm: https://doi.org/10.1007/BF01238923
@@ -909,20 +916,23 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
     ----------
     k : float
         Standard gravitational parameter of the attractor.
-    r : 1x3 vector
+    r0 : ~np.array
         Position vector.
-    v : 1x3 vector
+    v0 : ~np.array
         Velocity vector.
     tof : float
         Time of flight.
-    rtol: float
-        Relative error for accuracy of the method.
+    numiter: int, optional
+        Number of iterations, defaults to 20.
+    rtol: float, optional
+        Relative error for accuracy of the method, defaults to 1e-8.
 
     Returns
     -------
-    rr : 1x3 vector
-        Propagated position vectors.
-    vv : 1x3 vector
+    rr : ~np.array
+        Final position vector.
+    vv : ~np.array
+        Final velocity vector.
 
     Note
     ----

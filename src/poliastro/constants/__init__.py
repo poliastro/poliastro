@@ -1,4 +1,4 @@
-from .general import (
+from poliastro.constants.general import (
     J2000,
     J2000_TDB,
     J2000_TT,
@@ -58,7 +58,7 @@ from .general import (
     Wdivc_sun,
     rho0_earth,
 )
-from .rotational_elements import (
+from poliastro.constants.rotational_elements import (
     rotational_period_earth,
     rotational_period_jupiter,
     rotational_period_mars,

@@ -4,14 +4,14 @@ from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from ._base import BaseOrbitPlotter, Mixin2D
+from poliastro.plotting._base import BaseOrbitPlotter, Mixin2D
 
 
 def _segments_from_arrays(x, y):
     # Copied pasted from
     # https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/multicolored_line.html
     # because this API is impossible to understand
-    points = np.column_stack([x.to(u.km).value, y.to(u.km).value])[:, None, :]
+    points = np.column_stack([x.to_value(u.km), y.to_value(u.km)])[:, None, :]
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     return segments
 
@@ -77,16 +77,24 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return colors
 
-    def _draw_point(self, radius, color, name, center=None):
+    def _draw_marker(self, marker, size, color, name, center=None):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
 
         (l,) = self._ax.plot(
-            x_center.to(u.km).value, y_center.to(u.km).value, "o", mew=0, color=color
+            x_center.to_value(u.km), y_center.to_value(u.km), "o", mew=0, color=color
         )
 
         return l
+
+    def _draw_point(self, radius, color, name, center=None):
+        point_marker = self._draw_marker("o", 0, color, name, center)
+        return point_marker
+
+    def _draw_impulse(self, color, name, center=None):
+        impulse_marker = self._draw_marker("x", 2, color, name, center)
+        return impulse_marker
 
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
         x_center, y_center = self._project(
@@ -95,8 +103,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         self._ax.add_patch(
             mpl_patches.Circle(
-                (x_center.to(u.km).value, y_center.to(u.km).value),
-                radius.to(u.km).value,
+                (x_center.to_value(u.km), y_center.to_value(u.km)),
+                radius.to_value(u.km),
                 lw=0,
                 color=color,
             )
@@ -130,7 +138,7 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         else:
             lines = self._ax.plot(
-                x.to(u.km).value, y.to(u.km).value, linestyle=linestyle, color=colors[0]
+                x.to_value(u.km), y.to_value(u.km), linestyle=linestyle, color=colors[0]
             )
 
         self._ax.set_xlabel("$x$ (km)")
@@ -187,6 +195,41 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         lines = self._plot_trajectory(
             coordinates, label=label, color=color, trail=trail
+        )
+
+        if label:
+            self._set_legend(label, *lines)
+
+        return lines
+
+    def plot_maneuver(
+        self, initial_orbit, maneuver, label=None, color=None, trail=False
+    ):
+        """Plots the maneuver trajectory applied to the provided initial orbit.
+
+        Parameters
+        ----------
+        initial_orbit: ~poliastro.twobody.orbit.Orbit
+            The base orbit for which the maneuver will be applied.
+        manuever: ~poliastro.maneuver.Maneuver
+            The maneuver to be plotted.
+        label : str, optional
+            Label of the trajectory.
+        color : str, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
+        lines = self._plot_maneuver(
+            initial_orbit, maneuver, label=label, color=color, trail=trail
         )
 
         if label:

@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit as jit
 
-from ..angles import (
+from poliastro.core.angles import (
     D_to_M,
     D_to_nu,
     E_to_M,
@@ -15,7 +15,7 @@ from ..angles import (
     nu_to_E,
     nu_to_F,
 )
-from ..elements import coe2rv, rv2coe
+from poliastro.core.elements import coe2rv, rv2coe
 
 
 @jit
@@ -311,9 +311,9 @@ def farnocchia(k, r0, v0, tof):
     ----------
     k : float
         Standar Gravitational parameter
-    r0 : ~astropy.units.Quantity
+    r0 : ~np.array
         Initial position vector wrt attractor center.
-    v0 : ~astropy.units.Quantity
+    v0 : ~np.array
         Initial velocity vector.
     tof : float
         Time of flight (s).

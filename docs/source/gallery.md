@@ -1,5 +1,5 @@
+(gallery)=
 # Gallery
-
 
 The following page contains a collection of practical examples and problems solved with **poliastro**. From interplanetary transfers, to asteroid-catching missions or even propagation under external perturbations.
 In addition, the user might come across tutorials related on how to use and customize
@@ -23,5 +23,6 @@ the plotting utilities, insight on the {ref}`API <api-reference>` capabilities a
    /examples/Natural and artificial perturbations.mystnb
    /examples/Porkchops with poliastro.mystnb
    /examples/Tisserand.mystnb
+   /examples/Detecting Events.mystnb
    
 ```

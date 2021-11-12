@@ -16,8 +16,9 @@ try:
 except ImportError:
     pass
 
+pytestmark = pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+
 def test_czml_get_document():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -31,7 +32,6 @@ def test_czml_get_document():
     assert repr(doc) == repr(expected_doc)
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_custom_packet():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -70,11 +70,10 @@ def test_czml_custom_packet():
     )
 
     pckt = extractor.packets[-1]
-    # Test that custom packet parameters where set correctly
+    # Test that custom packet parameters were set correctly
     assert repr(pckt) == expected_packet
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 @pytest.mark.xfail(
     strict=False,
     reason="Numerical differences in propagation affect the results, we should change this test",
@@ -326,22 +325,29 @@ def test_czml_add_orbit():
     assert repr(extractor.packets) == expected_doc
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
-def test_czml_add_trajectory():
+def test_czml_add_orbit_negative_rtol_raises_error_if_beyond_range():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
 
     sample_points = 10
-    color = [255, 255, 0]
 
-    x = u.Quantity([1.0, 2.0, 3.0], u.m)
-    y = u.Quantity([4.0, 5.0, 6.0], u.m)
-    z = u.Quantity([7.0, 8.0, 9.0], u.m)
-    positions = CartesianRepresentation(x, y, z)
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
 
-    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
-    epochs = Time(time, format="isot")
+    with pytest.raises(ValueError) as excinfo:
+        extractor.add_orbit(
+            molniya,
+            rtol=1e2,  # rtol > 1.
+            label_text="Molniya",
+            label_fill_color=[125, 80, 120, 255],
+        )
+    assert (
+        "The relative tolerance must be a value in the range (0, 1)"
+        in excinfo.exconly()
+    )
 
+
+@pytest.fixture()
+def expected_doc_add_trajectory():
     expected_doc = """[{
     "id": "document",
     "version": "1.0",
@@ -436,14 +442,53 @@ def test_czml_add_trajectory():
         }
     }
 }]"""
+
+    return expected_doc
+
+
+def test_czml_add_trajectory(expected_doc_add_trajectory):
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+    color = [255, 255, 0]
+
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
+    epochs = Time(time, format="isot")
+
     extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
 
     extractor.add_trajectory(positions, epochs, label_text="Test", path_color=color)
 
-    assert repr(extractor.packets) == expected_doc
+    assert repr(extractor.packets) == expected_doc_add_trajectory
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
+def test_czml_raises_error_if_length_of_points_and_epochs_not_same():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+    color = [255, 255, 0]
+
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30"]
+    epochs = Time(time, format="isot")
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    with pytest.raises(ValueError) as excinfo:
+        extractor.add_trajectory(positions, epochs, label_text="Test", path_color=color)
+    assert "Number of Points and Epochs must be equal." in excinfo.exconly()
+
+
 def test_czml_groundtrack():
 
     start_epoch = molniya.epoch
@@ -671,7 +716,6 @@ def test_czml_groundtrack():
     assert repr(extractor.packets) == expected_doc
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_ground_station():
     start_epoch = iss.epoch
     end_epoch = iss.epoch + molniya.period
@@ -769,7 +813,6 @@ def test_czml_ground_station():
     assert repr(extractor.packets) == expected_doc
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_preamble():
     """
     This test checks the basic preamble (preamble is the only mandatory
@@ -818,7 +861,6 @@ def test_czml_preamble():
     assert repr(extractor.packets) == expected_doc
 
 
-@pytest.mark.skipif("czml3" not in sys.modules, reason="requires czml3")
 def test_czml_invalid_orbit_epoch_error():
     start_epoch = molniya.epoch
     end_epoch = molniya.epoch + molniya.period
@@ -831,3 +873,40 @@ def test_czml_invalid_orbit_epoch_error():
         "ValueError: The orbit's epoch cannot exceed the constructor's ending epoch"
         in excinfo.exconly()
     )
+
+
+def test_czml_add_ground_station_raises_error_if_invalid_coordinates():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+    sample_points = 10
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    with pytest.raises(TypeError) as excinfo:
+        extractor.add_ground_station([0.70930 * u.rad])
+
+    assert (
+        "Invalid coordinates. Coordinates must be of the form [u, v] where u, v are astropy units"
+        in excinfo.exconly()
+    )
+
+
+def test_czml_add_trajectory_raises_error_for_groundtrack_show():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+
+    x = u.Quantity([1.0, 2.0, 3.0], u.m)
+    y = u.Quantity([4.0, 5.0, 6.0], u.m)
+    z = u.Quantity([7.0, 8.0, 9.0], u.m)
+    positions = CartesianRepresentation(x, y, z)
+
+    time = ["2010-01-01T05:00:00", "2010-01-01T05:00:30", "2010-01-01T05:01:00"]
+    epochs = Time(time, format="isot")
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        extractor.add_trajectory(positions, epochs, groundtrack_show=True)
+    assert "Ground tracking for trajectory not implemented yet" in excinfo.exconly()

@@ -1,4 +1,4 @@
 # Select default algorithm
-from .izzo import lambert
+from poliastro.iod.izzo import lambert
 
 __all__ = ["lambert"]

@@ -5,27 +5,59 @@ from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth
 from poliastro.core.propagation import func_twobody
+from poliastro.core.thrust import (
+    change_a_inc as change_a_inc_fast,
+    change_argp as change_argp_fast,
+)
+from poliastro.core.thrust.change_ecc_inc import beta as beta_change_ecc_inc
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import cowell
 from poliastro.twobody.thrust import (
     change_a_inc,
     change_argp,
+    change_ecc_inc,
     change_ecc_quasioptimal,
-    change_inc_ecc,
 )
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "inc_0",
-    [
-        np.radians(28.5),
-        pytest.param(
-            np.radians(90.0), marks=pytest.mark.skip(reason="too long for now")
-        ),
-    ],
+    [np.radians(28.5), np.radians(90.0)],
 )
-def test_leo_geo_numerical(inc_0):
+def test_leo_geo_numerical_safe(inc_0):
+    f = 3.5e-7 * u.km / u.s ** 2  # km / s2
+
+    a_0 = 7000.0 * u.km  # km
+    a_f = 42166.0 * u.km  # km
+    inc_0 = inc_0 * u.rad  # rad
+    inc_f = 0.0 * u.rad  # rad
+
+    k = Earth.k.to(u.km ** 3 / u.s ** 2)
+
+    a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.circular(Earth, a_0 - Earth.R, inc_0)
+
+    # Propagate orbit
+    def f_leo_geo(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f, method=cowell, f=f_leo_geo, rtol=1e-6)
+
+    assert_allclose(sf.a.to(u.km).value, a_f.value, rtol=1e-3)
+    assert_allclose(sf.ecc.value, 0.0, atol=1e-2)
+    assert_allclose(sf.inc.to(u.rad).value, inc_f.value, atol=2e-3)
+
+
+@pytest.mark.parametrize(
+    "inc_0",
+    [np.radians(28.5), np.radians(90.0)],
+)
+def test_leo_geo_numerical_fast(inc_0):
     f = 3.5e-7  # km / s2
 
     a_0 = 7000.0  # km
@@ -34,7 +66,7 @@ def test_leo_geo_numerical(inc_0):
 
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
-    a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+    a_d, _, t_f = change_a_inc_fast(k, a_0, a_f, inc_0, inc_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.circular(Earth, a_0 * u.km - Earth.R, inc_0 * u.rad)
@@ -53,7 +85,6 @@ def test_leo_geo_numerical(inc_0):
     assert_allclose(sf.inc.to(u.rad).value, inc_f, atol=2e-3)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
 )
@@ -64,7 +95,13 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
     expected_t_f = 29.697  # days, reverse-engineered
     expected_delta_V = 0.6158  # km / s, lower than actual result
     s0 = Orbit.from_classical(
-        Earth, a_0 * u.km, ecc_0 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg
+        attractor=Earth,
+        a=a_0 * u.km,
+        ecc=ecc_0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     _, delta_V, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 
@@ -72,7 +109,6 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
     assert_allclose(t_f / 86400, expected_t_f, rtol=1e-4)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
 )
@@ -82,7 +118,13 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(
-        Earth, a_0 * u.km, ecc_0 * u.one, 0 * u.deg, 0 * u.deg, 0 * u.deg, 0 * u.deg
+        attractor=Earth,
+        a=a_0 * u.km,
+        ecc=ecc_0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     a_d, _, t_f = change_ecc_quasioptimal(s0, ecc_f, f)
 
@@ -98,7 +140,6 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-4, atol=1e-4)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ecc_0,inc_f,expected_beta,expected_delta_V",
     [
@@ -114,47 +155,49 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     ecc_f = 0.0
     inc_0 = 0.0  # rad, baseline
     argp = 0.0  # rad, the method is efficient for 0 and 180
-    f = 2.4e-7  # km / s2, unused
+    f = 2.4e-7 * (u.km / u.s ** 2)
 
     inc_f = np.radians(inc_f)
     expected_beta = np.radians(expected_beta)
 
     s0 = Orbit.from_classical(
-        Earth,
-        a * u.km,
-        ecc_0 * u.one,
-        inc_0 * u.deg,
-        0 * u.deg,
-        argp * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=a * u.km,
+        ecc=ecc_0 * u.one,
+        inc=inc_0 * u.deg,
+        raan=0 * u.deg,
+        argp=argp * u.deg,
+        nu=0 * u.deg,
     )
 
-    _, delta_V, beta, _ = change_inc_ecc(s0, ecc_f, inc_f, f)
+    beta = beta_change_ecc_inc(
+        ecc_0=ecc_0, ecc_f=ecc_f, inc_0=inc_0, inc_f=inc_f, argp=argp
+    )
+    _, delta_V, _ = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f * u.rad, f=f)
 
-    assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
+    assert_allclose(delta_V.to_value(u.km / u.s), expected_delta_V, rtol=1e-2)
     assert_allclose(beta, expected_beta, rtol=1e-2)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize("ecc_0,ecc_f", [[0.4, 0.0], [0.0, 0.4]])
 def test_geo_cases_numerical(ecc_0, ecc_f):
     a = 42164  # km
-    inc_0 = 0.0  # rad, baseline
-    inc_f = (20.0 * u.deg).to(u.rad).value  # rad
+    inc_0 = 0.0
+    inc_f = 20.0 * u.deg
     argp = 0.0  # rad, the method is efficient for 0 and 180
-    f = 2.4e-7  # km / s2
+    f = 2.4e-7 * (u.km / u.s ** 2)
 
-    # Retrieve r and v from initial orbit
+    # Initial orbit
     s0 = Orbit.from_classical(
-        Earth,
-        a * u.km,
-        ecc_0 * u.one,
-        inc_0 * u.deg,
-        0 * u.deg,
-        argp * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=a * u.km,
+        ecc=ecc_0 * u.one,
+        inc=inc_0 * u.deg,
+        raan=0 * u.deg,
+        argp=argp * u.deg,
+        nu=0 * u.deg,
     )
-    a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
+    a_d, _, t_f = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
 
     # Propagate orbit
     def f_geo(t0, u_, k):
@@ -163,14 +206,35 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
         du_ad = np.array([0, 0, 0, ax, ay, az])
         return du_kep + du_ad
 
-    sf = s0.propagate(t_f * u.s, method=cowell, f=f_geo, rtol=1e-8)
+    sf = s0.propagate(t_f, method=cowell, f=f_geo, rtol=1e-8)
 
     assert_allclose(sf.ecc.value, ecc_f, rtol=1e-2, atol=1e-2)
-    assert_allclose(sf.inc.to(u.rad).value, inc_f, rtol=1e-1)
+    assert_allclose(sf.inc.to_value(u.rad), inc_f.to_value(u.rad), rtol=1e-1)
 
 
-@pytest.mark.slow
-def test_soyuz_standard_gto_delta_v():
+def test_soyuz_standard_gto_delta_v_safe():
+    # Data from Soyuz Users Manual, issue 2 revision 0
+    r_a = (Earth.R + 35950 * u.km).to(u.km)
+    r_p = (Earth.R + 250 * u.km).to(u.km)
+
+    a = ((r_a + r_p) / 2).to(u.km)  # km
+    ecc = r_a / a - 1
+    argp_0 = (178 * u.deg).to(u.rad)  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad)  # rad
+    f = 2.4e-7 * u.km / u.s ** 2  # km / s2
+
+    k = Earth.k.to(u.km ** 3 / u.s ** 2)
+
+    _, delta_V, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+
+    expected_t_f = 12.0  # days, approximate
+    expected_delta_V = 0.2489  # km / s
+
+    assert_allclose(delta_V, expected_delta_V, rtol=1e-2)
+    assert_allclose((t_f).value / 86400, expected_t_f, rtol=1e-2)
+
+
+def test_soyuz_standard_gto_delta_v_fast():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
     r_p = (Earth.R + 250 * u.km).to(u.km).value
@@ -183,7 +247,7 @@ def test_soyuz_standard_gto_delta_v():
 
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
-    _, delta_V, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+    _, delta_V, t_f = change_argp_fast(k, a, ecc, argp_0, argp_f, f)
 
     expected_t_f = 12.0  # days, approximate
     expected_delta_V = 0.2489  # km / s
@@ -192,8 +256,45 @@ def test_soyuz_standard_gto_delta_v():
     assert_allclose(t_f / 86400, expected_t_f, rtol=1e-2)
 
 
-@pytest.mark.slow
-def test_soyuz_standard_gto_numerical():
+def test_soyuz_standard_gto_numerical_safe():
+    # Data from Soyuz Users Manual, issue 2 revision 0
+    r_a = (Earth.R + 35950 * u.km).to(u.km)
+    r_p = (Earth.R + 250 * u.km).to(u.km)
+
+    a = ((r_a + r_p) / 2).to(u.km)  # km
+    ecc = r_a / a - 1
+    argp_0 = (178 * u.deg).to(u.rad)  # rad
+    argp_f = (178 * u.deg + 5 * u.deg).to(u.rad)  # rad
+    f = 2.4e-7 * u.km / u.s ** 2  # km / s2
+
+    k = Earth.k.to(u.km ** 3 / u.s ** 2)
+
+    a_d, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+
+    # Retrieve r and v from initial orbit
+    s0 = Orbit.from_classical(
+        attractor=Earth,
+        a=a,
+        ecc=(r_a / a - 1) * u.one,
+        inc=6 * u.deg,
+        raan=188.5 * u.deg,
+        argp=178 * u.deg,
+        nu=0 * u.deg,
+    )
+
+    # Propagate orbit
+    def f_soyuz(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = a_d(t0, u_, k)
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
+
+    sf = s0.propagate(t_f, method=cowell, f=f_soyuz, rtol=1e-8)
+
+    assert_allclose(sf.argp.to_value(u.rad), argp_f.to_value(u.rad), rtol=1e-4)
+
+
+def test_soyuz_standard_gto_numerical_fast():
     # Data from Soyuz Users Manual, issue 2 revision 0
     r_a = (Earth.R + 35950 * u.km).to(u.km).value
     r_p = (Earth.R + 250 * u.km).to(u.km).value
@@ -206,17 +307,17 @@ def test_soyuz_standard_gto_numerical():
 
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
-    a_d, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
+    a_d, _, t_f = change_argp_fast(k, a, ecc, argp_0, argp_f, f)
 
     # Retrieve r and v from initial orbit
     s0 = Orbit.from_classical(
-        Earth,
-        a * u.km,
-        (r_a / a - 1) * u.one,
-        6 * u.deg,
-        188.5 * u.deg,
-        178 * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=a * u.km,
+        ecc=(r_a / a - 1) * u.one,
+        inc=6 * u.deg,
+        raan=188.5 * u.deg,
+        argp=178 * u.deg,
+        nu=0 * u.deg,
     )
 
     # Propagate orbit
@@ -231,7 +332,6 @@ def test_soyuz_standard_gto_numerical():
     assert_allclose(sf.argp.to(u.rad).value, argp_f, rtol=1e-4)
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "inc_0, expected_t_f, expected_delta_V, rtol",
     [
@@ -249,7 +349,7 @@ def test_leo_geo_time_and_delta_v(inc_0, expected_t_f, expected_delta_V, rtol):
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
     inc_0 = np.radians(inc_0)  # rad
 
-    _, delta_V, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
+    _, delta_V, t_f = change_a_inc_fast(k, a_0, a_f, inc_0, inc_f, f)
 
     assert_allclose(delta_V, expected_delta_V, rtol=rtol)
     assert_allclose((t_f * u.s).to(u.day).value, expected_t_f, rtol=rtol)

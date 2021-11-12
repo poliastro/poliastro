@@ -6,11 +6,11 @@ Name:         | poliastro
 :------------:|:--------------
 **Website**:  | <https://www.poliastro.space/>
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
-**Version**:  | 0.15.dev0
+**Version**:  | 0.16.dev0
 
 [![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
-[![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=master)
-[![codeclimate](https://api.codeclimate.com/v1/badges/fd2aa5bf8c4b7984d11b/maintainability)](https://codeclimate.com/github/poliastro/poliastro/maintainability)
+[![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/poliastro/poliastro/main.svg)](https://results.pre-commit.ci/latest/github/poliastro/poliastro/main)
 
 [![docs](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/latest/?badge=latest)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/main/COPYING)
@@ -91,7 +91,7 @@ install poliastro using [conda](http://conda.io):
     $ conda install poliastro --channel conda-forge
 ```
 Please check out the [documentation for alternative installation
-methods](https://docs.poliastro.space/en/latest/getting_started.html#alternative-installation-methods).
+methods](https://docs.poliastro.space/en/stable/installation.html#alternative-installation-methods).
 
 # Problems and suggestions
 
@@ -105,7 +105,7 @@ to answer promptly.
 
 poliastro is a community project, hence all contributions are more than
 welcome! For more information, head to
-[CONTRIBUTING.md](https://github.com/poliastro/poliastro/blob/master/CONTRIBUTING.md).
+[CONTRIBUTING.md](https://github.com/poliastro/poliastro/blob/main/CONTRIBUTING.md).
 
 # Support
 
@@ -137,7 +137,7 @@ And this is an example citation format:
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/main/COPYING)
 
 poliastro is released under the MIT license, hence allowing commercial
-use of the library. Please refer to the COPYING file.
+use of the library. Please refer to the [COPYING](https://github.com/poliastro/poliastro/blob/main/COPYING) file.
 
 # Credits
 

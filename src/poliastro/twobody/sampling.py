@@ -1,8 +1,8 @@
 import numpy as np
 from astropy import units as u
 
-from ..util import alinspace
-from .angles import E_to_nu, nu_to_E
+from poliastro.twobody.angles import E_to_nu, nu_to_E
+from poliastro.util import alinspace
 
 
 @u.quantity_input(min_nu=u.rad, ecc=u.one, max_nu=u.rad)

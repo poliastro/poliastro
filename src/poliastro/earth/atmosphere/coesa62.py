@@ -89,10 +89,10 @@ pb_levels = coesa62_data["pb [mbar]"].data * u.mbar
 
 
 class COESA62(COESA):
-    """ Holds the model for U.S Standard Atmosphere 1962. """
+    """Holds the model for U.S Standard Atmosphere 1962."""
 
     def __init__(self):
-        """ Constructor for the class. """
+        """Constructor for the class."""
         super().__init__(
             b_levels, zb_levels, hb_levels, Tb_levels, Lb_levels, pb_levels
         )
@@ -170,10 +170,10 @@ class COESA62(COESA):
         # If 90 < Z < 700 km then eqn 1.2.10-(5) is applied
         else:
             # Converting all the units into SI unit and taking their magnitude
-            Lb_v = Lb.to(u.K / u.m).value
-            r0_v = r0.to(u.m).value
-            z_v = z.to(u.m).value
-            zb_v = zb.to(u.m).value
+            Lb_v = Lb.to_value(u.K / u.m)
+            r0_v = r0.to_value(u.m)
+            z_v = z.to_value(u.m)
+            zb_v = zb.to_value(u.m)
             Tb_v = Tb.value
             g0_v = g0.value
             R_air_v = R_air.value

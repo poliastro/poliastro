@@ -4,13 +4,13 @@ from typing import List
 
 import numpy as np
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation
+from astropy.coordinates import CartesianRepresentation, concatenate_representations
 
-from ..ephem import Ephem
-from ..frames import Planes
-from ..twobody.mean_elements import get_mean_elements
-from ..util import norm, time_range
-from .util import BODY_COLORS, generate_label
+from poliastro.ephem import Ephem
+from poliastro.frames import Planes
+from poliastro.plotting.util import BODY_COLORS, generate_label
+from poliastro.twobody.mean_elements import get_mean_elements
+from poliastro.util import norm, time_range
 
 
 class Trajectory(
@@ -89,7 +89,13 @@ class BaseOrbitPlotter:
     def _get_colors(self, color, trail):
         raise NotImplementedError
 
+    def _draw_marker(self, maker, size, color, name, center=None):
+        raise NotImplementedError
+
     def _draw_point(self, radius, color, name, center=None):
+        raise NotImplementedError
+
+    def _draw_impulse(self, color, name, center=None):
         raise NotImplementedError
 
     def _draw_sphere(self, radius, color, name, center=None):
@@ -140,6 +146,63 @@ class BaseOrbitPlotter:
         # Ensure that the coordinates are cartesian just in case,
         # to avoid weird errors later
         coordinates = coordinates.represent_as(CartesianRepresentation)
+
+        return self.__add_trajectory(
+            coordinates, None, label=str(label), colors=colors, dashed=False
+        )
+
+    def _plot_maneuver(
+        self, initial_orbit, maneuver, *, label=None, color=None, trail=False
+    ):
+        if self._attractor is None:
+            raise ValueError(
+                "An attractor must be set up first, please use "
+                "set_attractor(Major_Body) or plot(orbit)"
+            )
+
+        colors = self._get_colors(color, trail)
+
+        # Apply the maneuver, collect all intermediate states and allocate the
+        # final coordinates list array
+        *maneuver_phases, final_phase = initial_orbit.apply_maneuver(
+            maneuver, intermediate=True
+        )
+
+        if len(maneuver_phases) == 0:
+            # For single-impulse maneuver only draw the impulse marker
+            self._draw_impulse(color, f"Impulse - {label}", maneuver_phases[0].r)
+        else:
+            coordinates_list = []
+
+            # Collect the coordinates for the different maneuver phases
+            for ith_impulse, orbit_phase in enumerate(maneuver_phases):
+
+                # Get the propagation time required before next impulse
+                time_to_next_impulse, _ = maneuver.impulses[ith_impulse + 1]
+
+                # Compute the minimum and maximum anomalies
+                min_nu = orbit_phase.nu
+                max_nu = orbit_phase.propagate(time_to_next_impulse).nu
+
+                # Collect the coordinate points for the i-th orbit phase
+                phase_coordinates = orbit_phase.sample(
+                    min_anomaly=min_nu, max_anomaly=max_nu
+                )
+                coordinates_list.extend(phase_coordinates)
+
+                # Plot the impulse marker
+                self._draw_impulse(
+                    color, f"Impulse {ith_impulse + 1} - {label}", orbit_phase.r
+                )
+
+            # Finally, draw the impulse at the very beginning of the final phase
+            self._draw_impulse(
+                color, f"Impulse {ith_impulse + 2} - {label}", final_phase.r
+            )
+
+        # Concatenate the different phase coordinates into a single coordinates
+        # instance
+        coordinates = concatenate_representations(coordinates_list)
 
         return self.__add_trajectory(
             coordinates, None, label=str(label), colors=colors, dashed=False
@@ -231,6 +294,31 @@ class BaseOrbitPlotter:
         # Do not return the result of self._plot
         # This behavior might be overriden by subclasses
         self._plot_trajectory(coordinates, label=label, color=color, trail=trail)
+
+    def plot_maneuver(
+        self, initial_orbit, maneuver, label=None, color=None, trail=False
+    ):
+        """Plots the maneuver trajectory applied to the provided initial orbit.
+
+        Parameters
+        ----------
+        initial_orbit: ~poliastro.twobody.orbit.Orbit
+            The base orbit for which the maneuver will be applied.
+        manuever: ~poliastro.maneuver.Maneuver
+            The maneuver to be plotted.
+        label : str, optional
+            Label of the trajectory.
+        color : str, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+
+        """
+        # Do not return the result of self._plot
+        # This behavior might be overriden by subclasses
+        self._plot_maneuver(
+            initial_orbit, maneuver, label=label, color=color, trail=trail
+        )
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.

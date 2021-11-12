@@ -50,15 +50,34 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.mathjax',  # Maths visualization
     'sphinx.ext.graphviz',  # Dependency diagrams
+    'sphinx_copybutton',
     'notfound.extension',
     'hoverxref.extension',
     'myst_parser',
     'sphinx_panels',
 ]
 
+# MathJax config
+# See https://github.com/spatialaudio/nbsphinx/issues/572#issuecomment-853389268
+mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+mathjax2_config = {
+    'tex2jax': {
+        'inlineMath': [['$', '$'], ['\\(', '\\)']],
+        'processEscapes': True,
+        'ignoreClass': 'document',
+        'processClass': 'math|output_area',
+    }
+}
+
 # Hoverxref Extension
 hoverxref_auto_ref = True
 hoverxref_mathjax = True
+hoverxref_intersphinx = [
+    "astropy",
+    "numpy",
+    "scipy",
+    "matplotlib",
+]
 hoverxref_domains = ['py']
 hoverxref_role_types = {
     'hoverxref': 'modal',
@@ -84,9 +103,6 @@ suppress_warnings = ['image.nonlocal_uri']
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
-
-# The master toctree document.
-master_doc = 'index'
 
 # General information about the project.
 project = 'poliastro'
@@ -145,14 +161,15 @@ pygments_style = 'sphinx'
 # Intersphinx configuration
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'astropy': ('http://docs.astropy.org/en/stable/', None),
-    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'astropy': ('https://docs.astropy.org/en/stable/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('https://matplotlib.org', None)
 }
 
 if os.environ.get('POLIASTRO_SKIP_NOTEBOOKS') == 'True':
     nbsphinx_execute = 'never'
+    suppress_warnings.append('nbsphinx.thumbnail')
 else:
     nbsphinx_execute = 'always'
 
@@ -171,7 +188,7 @@ html_theme = "sphinx_rtd_theme"
 html_context = {
     'sidebar_external_links_caption': 'Links',
     'sidebar_external_links': [
-        ('<i class="fa fa-rss fa-fw"></i> Blog', 'https://blog.poliastro.space'),
+        ('<i class="fa fa-rss fa-fw"></i> Blog', 'https://www.poliastro.space'),
         ('<i class="fa fa-github fa-fw"></i> Source code', 'https://github.com/poliastro/poliastro'),
         ('<i class="fa fa-bug fa-fw"></i> Issue tracker', 'https://github.com/poliastro/poliastro/issues'),
         ('<i class="fa fa-envelope fa-fw"></i> Mailing list', 'https://groups.io/g/poliastro-dev'),
@@ -345,6 +362,7 @@ nbsphinx_thumbnails = {
     'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
     'examples/Generating orbit groundtracks': '_static/thumbnails/groundtrack.png',
+    'examples/Detecting Events': '_static/thumbnails/eclipse.png',
 }
 
 # Custom nbsphinx format for Jupytext markdown notebooks

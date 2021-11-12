@@ -8,15 +8,15 @@ different propagators available at poliastro:
 +-------------+------------+-----------------+-----------------+
 |   vallado   |      ✓     |        ✓        |        ✓        |
 +-------------+------------+-----------------+-----------------+
-|   mikkola   |      ✓     | NOT IMPLEMENTED |        ✓        |
+|   mikkola   |      ✓     |        ✓        |        ✓        |
 +-------------+------------+-----------------+-----------------+
 |   markley   |      ✓     |        x        |        x        |
 +-------------+------------+-----------------+-----------------+
-|   pimienta  |      ✓     |        ✓        | NOT IMPLEMENTED |
+|   pimienta  |      ✓     |        ✓        |        x        |
 +-------------+------------+-----------------+-----------------+
-|   gooding   |      ✓     | NOT IMPLEMENTED | NOT IMPLEMENTED |
+|   gooding   |      ✓     |        x        |        x        |
 +-------------+------------+-----------------+-----------------+
-|    danby    |      ✓     |        x        |        ✓        |
+|    danby    |      ✓     |        ✓        |        ✓        |
 +-------------+------------+-----------------+-----------------+
 |    cowell   |      ✓     |        ✓        |        ✓        |
 +-------------+------------+-----------------+-----------------+
@@ -53,9 +53,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
     rtol : float, optional
-        Maximum relative error permitted, default to 1e-10.
+        Maximum relative error permitted, defaults to 1e-11.
     events : function(t, u(t)), optional
-        passed to solve_ivp: integration stops when this function
+        Passed to `solve_ivp`: Integration stops when this function
         returns <= 0., assuming you set events.terminal=True
     f : function(t0, u, k), optional
         Objective function, default to Keplerian-only forces.
@@ -74,16 +74,16 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
 
     Note
     -----
-    This method uses a Dormand & Prince method of order 8(5,3) available
-    in the :py:class:`poliastro.integrators` module. If multiple tofs
-    are provided, the method propagates to the maximum value and
-    calculates the other values via dense output
+    This method uses the `solve_ivp` method from `scipy.integrate` using the
+    Dormand & Prince integration method of order 8(5,3) (DOP853).
+    If multiple tofs are provided, the method propagates to the maximum value
+    (unless a terminal event is defined) and calculates the other values via dense output.
 
     """
-    k = k.to(u.km ** 3 / u.s ** 2).value
-    x, y, z = r.to(u.km).value
-    vx, vy, vz = v.to(u.km / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.km ** 3 / u.s ** 2)
+    x, y, z = r.to_value(u.km)
+    vx, vy, vz = v.to_value(u.km / u.s)
+    tofs = tofs.to_value(u.s)
 
     u0 = np.array([x, y, z, vx, vy, vz])
 
@@ -101,16 +101,23 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     if not result.success:
         raise RuntimeError("Integration failed")
 
-    t_end = (
-        min(result.t_events[0]) if result.t_events and len(result.t_events[0]) else None
-    )
+    if events is not None:
+        # Collect only the terminal events
+        terminal_events = [event for event in events if event.terminal]
+
+        # If there are no terminal events, then the last time of integration is the
+        # greatest one from the original array of propagation times
+        if not terminal_events:
+            last_t = max(tofs)
+        else:
+            # Filter the event which triggered first
+            last_t = min([event.last_t for event in terminal_events]).to_value(u.s)
+            tofs = [tof for tof in tofs if tof < last_t] + [last_t]
 
     rrs = []
     vvs = []
     for i in range(len(tofs)):
         t = tofs[i]
-        if t_end is not None and t > t_end:
-            t = t_end
         y = result.sol(t)
         rrs.append(y[:3])
         vvs.append(y[3:])
@@ -140,16 +147,15 @@ def farnocchia(k, r, v, tofs, **kwargs):
         Propagated velocity vectors.
 
     """
-    k = k.to(u.km ** 3 / u.s ** 2).value
-    r0 = r.to(u.km).value
-    v0 = v.to(u.km / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.km ** 3 / u.s ** 2)
+    r0 = r.to_value(u.km)
+    v0 = v.to_value(u.km / u.s)
+    tofs = tofs.to_value(u.s)
 
-    results = [farnocchia_fast(k, r0, v0, tof) for tof in tofs]
-    # TODO: Rewrite to avoid iterating twice
+    results = np.array([farnocchia_fast(k, r0, v0, tof) for tof in tofs])
     return (
-        [result[0] for result in results] * u.km,
-        [result[1] for result in results] * u.km / u.s,
+        results[:, 0] << u.km,
+        results[:, 1] << u.km / u.s,
     )
 
 
@@ -189,16 +195,15 @@ def vallado(k, r, v, tofs, numiter=350, **kwargs):
     and 85 % faster.
 
     """
-    k = k.to(u.km ** 3 / u.s ** 2).value
-    r0 = r.to(u.km).value
-    v0 = v.to(u.km / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.km ** 3 / u.s ** 2)
+    r0 = r.to_value(u.km)
+    v0 = v.to_value(u.km / u.s)
+    tofs = tofs.to_value(u.s)
 
-    results = [_kepler(k, r0, v0, tof, numiter=numiter) for tof in tofs]
-    # TODO: Rewrite to avoid iterating twice
+    results = np.array([_kepler(k, r0, v0, tof, numiter=numiter) for tof in tofs])
     return (
-        [result[0] for result in results] * u.km,
-        [result[1] for result in results] * u.km / u.s,
+        results[:, 0] << u.km,
+        results[:, 1] << u.km / u.s,
     )
 
 
@@ -206,7 +211,9 @@ def _kepler(k, r0, v0, tof, *, numiter):
     # Compute Lagrange coefficients
     f, g, fdot, gdot = vallado_fast(k, r0, v0, tof, numiter)
 
-    assert np.abs(f * gdot - fdot * g - 1) < 1e-5  # Fixed tolerance
+    assert (
+        np.abs(f * gdot - fdot * g - 1) < 1e-5
+    ), "Internal error, solution is not consistent"  # Fixed tolerance
 
     # Return position and velocity vectors
     r = f * r0 + g * v0
@@ -242,18 +249,16 @@ def mikkola(k, r, v, tofs, rtol=None):
     ----
     This method was derived by Seppo Mikola in his paper *A Cubic Approximation
     For Kepler's Equation* with DOI: https://doi.org/10.1007/BF01235850
+
     """
 
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    r0 = r.to(u.m).value
-    v0 = v.to(u.m / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.m ** 3 / u.s ** 2)
+    r0 = r.to_value(u.m)
+    v0 = v.to_value(u.m / u.s)
+    tofs = tofs.to_value(u.s)
 
-    results = [mikkola_fast(k, r0, v0, tof) for tof in tofs]
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
+    results = np.array([mikkola_fast(k, r0, v0, tof) for tof in tofs])
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def markley(k, r, v, tofs, rtol=None):
@@ -284,18 +289,16 @@ def markley(k, r, v, tofs, rtol=None):
     ----
     This method was originally presented by Markley in his paper *Kepler Equation Solver*
     with DOI: https://doi.org/10.1007/BF00691917
+
     """
 
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    r0 = r.to(u.m).value
-    v0 = v.to(u.m / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.m ** 3 / u.s ** 2)
+    r0 = r.to_value(u.m)
+    v0 = v.to_value(u.m / u.s)
+    tofs = tofs.to_value(u.s)
 
-    results = [markley_fast(k, r0, v0, tof) for tof in tofs]
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
+    results = np.array([markley_fast(k, r0, v0, tof) for tof in tofs])
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def pimienta(k, r, v, tofs, rtol=None):
@@ -328,18 +331,16 @@ def pimienta(k, r, v, tofs, rtol=None):
     This algorithm was developed by Pimienta-Peñalver and John L. Crassidis in
     their paper *Accurate Kepler Equation solver without trascendental function
     evaluations*. Original paper is on Buffalo's UBIR repository: http://hdl.handle.net/10477/50522
+
     """
 
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    r0 = r.to(u.m).value
-    v0 = v.to(u.m / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.m ** 3 / u.s ** 2)
+    r0 = r.to_value(u.m)
+    v0 = v.to_value(u.m / u.s)
+    tofs = tofs.to_value(u.s)
 
-    results = [pimienta_fast(k, r0, v0, tof) for tof in tofs]
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
+    results = np.array([pimienta_fast(k, r0, v0, tof) for tof in tofs])
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
@@ -371,18 +372,18 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
     This method was developed by Gooding and Odell in their paper *The
     hyperbolic Kepler equation (and the elliptic equation revisited)* with
     DOI: https://doi.org/10.1007/BF01235540
+
     """
 
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    r0 = r.to(u.m).value
-    v0 = v.to(u.m / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.m ** 3 / u.s ** 2)
+    r0 = r.to_value(u.m)
+    v0 = v.to_value(u.m / u.s)
+    tofs = tofs.to_value(u.s)
 
-    results = [gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
+    results = np.array(
+        [gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
     )
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def danby(k, r, v, tofs, rtol=1e-8):
@@ -413,18 +414,16 @@ def danby(k, r, v, tofs, rtol=1e-8):
     ----
     This algorithm was developed by Danby in his paper *The solution of Kepler
     Equation* with DOI: https://doi.org/10.1007/BF01686811
+
     """
 
-    k = k.to(u.m ** 3 / u.s ** 2).value
-    r0 = r.to(u.m).value
-    v0 = v.to(u.m / u.s).value
-    tofs = tofs.to(u.s).value
+    k = k.to_value(u.m ** 3 / u.s ** 2)
+    r0 = r.to_value(u.m)
+    v0 = v.to_value(u.m / u.s)
+    tofs = tofs.to_value(u.s)
 
-    results = [danby_fast(k, r0, v0, tof) for tof in tofs]
-    return (
-        [result[0] for result in results] * u.m,
-        [result[1] for result in results] * u.m / u.s,
-    )
+    results = np.array([danby_fast(k, r0, v0, tof) for tof in tofs])
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
 def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
@@ -445,13 +444,12 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
     -------
     astropy.coordinates.CartesianRepresentation
         Propagation coordinates.
-
     """
 
     # Check if propagator fulfills orbit requirements
     if orbit.ecc < 1.0 and method not in ELLIPTIC_PROPAGATORS:
         raise ValueError(
-            "Can not use an parabolic/hyperbolic propagator for elliptical orbits."
+            "Can not use an parabolic/hyperbolic propagator for elliptical/circular orbits."
         )
     elif orbit.ecc == 1.0 and method not in PARABOLIC_PROPAGATORS:
         raise ValueError(
@@ -461,8 +459,6 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         raise ValueError(
             "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
         )
-    else:
-        pass
 
     rr, vv = method(
         orbit.attractor.k,
@@ -472,10 +468,6 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         rtol=rtol,
         **kwargs
     )
-
-    # TODO: Turn these into unit tests
-    assert rr.ndim == 2
-    assert vv.ndim == 2
 
     cartesian = CartesianRepresentation(
         rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
@@ -505,5 +497,5 @@ HYPERBOLIC_PROPAGATORS = [
     cowell,
 ]
 ALL_PROPAGATORS = list(
-    set(ELLIPTIC_PROPAGATORS) & set(PARABOLIC_PROPAGATORS) & set(HYPERBOLIC_PROPAGATORS)
+    set(ELLIPTIC_PROPAGATORS + PARABOLIC_PROPAGATORS + HYPERBOLIC_PROPAGATORS)
 )

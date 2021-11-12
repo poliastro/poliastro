@@ -99,10 +99,10 @@ rho_coeff = [
 
 
 class COESA76(COESA):
-    """ Holds the model for U.S Standard Atmosphere 1976. """
+    """Holds the model for U.S Standard Atmosphere 1976."""
 
     def __init__(self):
-        """ Constructor for the class. """
+        """Constructor for the class."""
         super().__init__(
             b_levels, zb_levels, hb_levels, Tb_levels, Lb_levels, pb_levels
         )
@@ -162,16 +162,16 @@ class COESA76(COESA):
             # TODO: Apply air mean molecular weight ratio factor
             Tm = Tb + Lb * (h - hb)
             T = Tm
-        elif z >= self.zb_levels[7] and z < self.zb_levels[8]:
+        elif self.zb_levels[7] <= z and z < self.zb_levels[8]:
             # [86km, 91km)
             T = 186.87 * u.K
-        elif z >= self.zb_levels[8] and z < self.zb_levels[9]:
+        elif self.zb_levels[8] <= z and z < self.zb_levels[9]:
             # [91km, 110km]
             Tc = 263.1905 * u.K
             A = -76.3232 * u.K
             a = -19.9429 * u.km
             T = Tc + A * (1 - ((z - self.zb_levels[8]) / a) ** 2) ** 0.5
-        elif z >= self.zb_levels[9] and z < self.zb_levels[10]:
+        elif self.zb_levels[9] <= z and z < self.zb_levels[10]:
             # [110km, 120km]
             T = 240 * u.K + Lb * (z - self.zb_levels[9])
         else:
@@ -223,7 +223,7 @@ class COESA76(COESA):
             A, B, C, D, E = self._get_coefficients_avobe_86(z, p_coeff)
 
             # Solve the polynomial
-            z = z.to(u.km).value
+            z = z.to_value(u.km)
             p = np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E) * u.Pa
 
         return p.to(u.Pa)
@@ -259,7 +259,7 @@ class COESA76(COESA):
             A, B, C, D, E = self._get_coefficients_avobe_86(z, rho_coeff)
 
             # Solve the polynomial
-            z = z.to(u.km).value
+            z = z.to_value(u.km)
             rho = (
                 np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E)
                 * u.kg

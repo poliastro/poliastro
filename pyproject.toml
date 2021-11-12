@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "flit_core >=3.2,<3.3",
+    "flit_core >=3.4,<4",
     "wheel",
     "oldest-supported-numpy",
 ]
@@ -48,10 +48,10 @@ dependencies = [
     "jplephem",
     "matplotlib >=2.0,!=3.0.1",
     "numba >=0.46 ; python_version<'3.9'",
-    "numba >=0.53.0rc1 ; python_version>='3.9'",
+    "numba >=0.53.0 ; python_version>='3.9'",
     "numpy",
     "pandas",
-    "plotly ~=4.0",
+    "plotly >=4.0,<6",
     "pyerfa",
     "scipy >=1.4.0",
 ]
@@ -65,22 +65,21 @@ Tracker = "https://github.com/poliastro/poliastro/issues"
 Funding = "https://opencollective.com/poliastro"
 
 [project.optional-dependencies]
-jupyter = ["notebook"]
+jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
 dev = [
-    "black==20.8b1",
+    "black==21.9b0",
     "coverage",
-    "docutils",
     "hypothesis",
-    "ipykernel",
+    "import-linter",
     "ipython>=5.0",
-    "ipywidgets>=7.0",
+    "ipywidgets>=7.6",
     "isort",
     "jupyter-client",
     "jupytext",
     "mypy>=0.740",
     "myst-parser>=0.13.1",
-    "nbsphinx>=0.8.4",
+    "nbsphinx>=0.8.6",
     "nbconvert>=5.5",
     "pycodestyle",
     "pytest>=3.2",
@@ -89,14 +88,14 @@ dev = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
-    "sphinx",
+    "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery",
-    "sphinx_rtd_theme==0.5.0",
-    "sphinx-hoverxref==0.5b1",
+    "sphinx_rtd_theme~=1.0.0rc1",
+    "sphinx-hoverxref==0.7b1",
     "sphinx-notfound-page",
     "sphinx_panels",
-    "tox",
+    "sphinx-copybutton>0.2.9",
 ]
 
 [tool.flit.sdist]
@@ -110,3 +109,6 @@ include = [
 exclude = [
     "docs/"
 ]
+
+[tool.isort]
+profile = "black"

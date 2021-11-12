@@ -1,8 +1,9 @@
-from typing import Dict
+from typing import Dict, Union
 
-from astropy.coordinates.baseframe import FrameMeta
+from astropy.coordinates.baseframe import BaseCoordinateFrame
 
 from poliastro.bodies import (
+    Body,
     Earth,
     Jupiter,
     Mars,
@@ -15,10 +16,9 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000
-
-from .ecliptic import GeocentricMeanEcliptic, HeliocentricEclipticJ2000
-from .enums import Planes
-from .equatorial import (
+from poliastro.frames.ecliptic import GeocentricMeanEcliptic, HeliocentricEclipticJ2000
+from poliastro.frames.enums import Planes
+from poliastro.frames.equatorial import (
     GCRS,
     HCRS,
     JupiterICRS,
@@ -29,7 +29,7 @@ from .equatorial import (
     UranusICRS,
     VenusICRS,
 )
-from .fixed import (
+from poliastro.frames.fixed import (
     ITRS,
     JupiterFixed,
     MarsFixed,
@@ -54,7 +54,7 @@ _FRAME_MAPPING = {
     Saturn: {Planes.EARTH_EQUATOR: SaturnICRS, Planes.BODY_FIXED: SaturnFixed},
     Uranus: {Planes.EARTH_EQUATOR: UranusICRS, Planes.BODY_FIXED: UranusFixed},
     Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS, Planes.BODY_FIXED: NeptuneFixed},
-}  # type: Dict[SolarSystemPlanet, Dict[Planes, FrameMeta]]
+}  # type: Dict[Union[Body, SolarSystemPlanet], Dict[Planes, BaseCoordinateFrame]]
 
 
 def get_frame(attractor, plane, obstime=J2000):

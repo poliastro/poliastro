@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import pytest
 from astropy import time, units as u
@@ -58,7 +60,13 @@ def test_elliptic_near_parabolic(ecc, propagator):
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
-        Earth, 10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
+        attractor=Earth,
+        a=10000 * u.km,
+        ecc=ecc * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=1.0 * u.rad,
     )
 
     ss_cowell = ss0.propagate(tof, method=cowell)
@@ -78,7 +86,13 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
-        Earth, -10000 * u.km, ecc * u.one, _a, _a, _a, 1.0 * u.rad
+        attractor=Earth,
+        a=-10000 * u.km,
+        ecc=ecc * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=1.0 * u.rad,
     )
 
     ss_cowell = ss0.propagate(tof, method=cowell)
@@ -126,7 +140,9 @@ def test_propagating_to_certain_nu_is_correct():
     ecc = 1.0 / 3.0 * u.one
     _a = 0.0 * u.rad
     nu = 10 * u.deg
-    elliptic = Orbit.from_classical(Sun, a, ecc, _a, _a, _a, nu)
+    elliptic = Orbit.from_classical(
+        attractor=Sun, a=a, ecc=ecc, inc=_a, raan=_a, argp=_a, nu=nu
+    )
 
     elliptic_at_perihelion = elliptic.propagate_to_anomaly(0.0 * u.rad)
     r_per, _ = elliptic_at_perihelion.rv()
@@ -232,13 +248,13 @@ def test_propagation_zero_time_returns_same_state():
 
 def test_propagation_hyperbolic_zero_time_returns_same_state():
     ss0 = Orbit.from_classical(
-        Earth,
-        -27112.5464 * u.km,
-        1.25 * u.one,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=-27112.5464 * u.km,
+        ecc=1.25 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     r0, v0 = ss0.rv()
     tof = 0 * u.s
@@ -247,15 +263,17 @@ def test_propagation_hyperbolic_zero_time_returns_same_state():
 
     r, v = ss1.rv()
 
-    assert_quantity_allclose(r, r0)
-    assert_quantity_allclose(v, v0)
+    assert_quantity_allclose(r, r0, atol=1e-24 * u.km)
+    assert_quantity_allclose(v, v0, atol=1e-27 * u.km / u.s)
 
 
 def test_apply_zero_maneuver_returns_equal_state():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
     _a = 1.0 * u.deg  # Unused angle
-    ss = Orbit.from_classical(Sun, _d, _, _a, _a, _a, _a)
+    ss = Orbit.from_classical(
+        attractor=Sun, a=_d, ecc=_, inc=_a, raan=_a, argp=_a, nu=_a
+    )
     dt = 0 * u.s
     dv = [0, 0, 0] * u.km / u.s
     orbit_new = ss.apply_maneuver([(dt, dv)])
@@ -335,6 +353,7 @@ def test_propagate_to_date_has_proper_epoch():
     assert (ss1.epoch - final_epoch).sec == approx(0.0, abs=1e-6)
 
 
+@pytest.mark.filterwarnings("ignore::erfa.core.ErfaWarning")
 @pytest.mark.parametrize("propagator", [danby, markley, gooding])
 def test_propagate_long_times_keeps_geometry(propagator):
     # See https://github.com/poliastro/poliastro/issues/265
@@ -408,6 +427,7 @@ def test_propagation_sets_proper_epoch():
     assert propagated.epoch == expected_epoch
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_sample_custom_body_raises_warning_and_returns_coords():
     # See https://github.com/poliastro/poliastro/issues/649
     orbit = Orbit.circular(Moon, 100 * u.km)
@@ -447,3 +467,37 @@ def test_propagate_with_coe(propagator_coe):
     nu_final = propagator_coe(k, p, ecc, inc, raan, argp, nu, period)
 
     assert_quantity_allclose(nu_final, nu)
+
+
+@pytest.mark.parametrize("propagator", ALL_PROPAGATORS)
+def test_propagator_with_zero_eccentricity(propagator):
+    attractor = Earth
+    altitude = 300 * u.km
+    orbit = Orbit.circular(attractor, altitude)
+    time_of_flight = 50 * u.s
+    res = orbit.propagate(time_of_flight, method=propagator)
+
+    assert_quantity_allclose(orbit.a, res.a)
+    assert_quantity_allclose(orbit.ecc, res.ecc, atol=1e-15)
+    assert_quantity_allclose(orbit.inc, res.inc)
+    assert_quantity_allclose(orbit.raan, res.raan)
+    assert_quantity_allclose(orbit.argp, res.argp)
+
+
+@pytest.mark.parametrize("propagator", ALL_PROPAGATORS)
+def test_after_propagation_r_and_v_dimensions(propagator):
+    r0 = [111.340, -228.343, 2413.423] * u.km
+    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
+    tof = time.TimeDelta(50 * u.s)
+    orbit = Orbit.from_vectors(Earth, r0, v0)
+
+    rr, vv = propagator(
+        orbit.attractor.k,
+        orbit.r,
+        orbit.v,
+        tof.reshape(-1).to(u.s),
+        rtol=1e-10,
+    )
+
+    assert rr.ndim == 2
+    assert vv.ndim == 2

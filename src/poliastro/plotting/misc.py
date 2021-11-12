@@ -1,5 +1,7 @@
+import warnings
 from typing import Union
 
+import erfa
 from astropy.time import Time
 
 from poliastro.bodies import (
@@ -12,10 +14,9 @@ from poliastro.bodies import (
     Uranus,
     Venus,
 )
-
-from ..frames import Planes
-from .core import OrbitPlotter2D, OrbitPlotter3D
-from .static import StaticOrbitPlotter
+from poliastro.frames import Planes
+from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
+from poliastro.plotting.static import StaticOrbitPlotter
 
 
 def _plot_bodies(orbit_plotter, outer=True, epoch=None):
@@ -77,8 +78,12 @@ def plot_solar_system(outer=True, epoch=None, use_3d=False, interactive=False):
             "The static plotter does not support 3D, use `interactive=True`"
         )
     elif use_3d:
-        op = _plot_solar_system_3d(epoch, outer)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", erfa.core.ErfaWarning)
+            op = _plot_solar_system_3d(epoch, outer)
     else:
-        op = _plot_solar_system_2d(epoch, outer, interactive)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", erfa.core.ErfaWarning)
+            op = _plot_solar_system_2d(epoch, outer, interactive)
 
     return op

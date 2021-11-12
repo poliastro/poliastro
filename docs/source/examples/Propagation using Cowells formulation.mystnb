@@ -3,8 +3,8 @@ jupytext:
   text_representation:
     extension: .mystnb
     format_name: myst
-    format_version: 0.12
-    jupytext_version: 1.9.1
+    format_version: 0.13
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -33,7 +33,7 @@ $$\ddot{\mathbb{r}} = -\frac{\mu}{|\mathbb{r}|^3} \mathbb{r} + \mathbb{a}_d$$
 
 Let's setup a very simple example with constant acceleration to visualize the effects on the orbit:
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import time
 from astropy import units as u
 
@@ -48,18 +48,19 @@ from poliastro.twobody.propagation import propagate, cowell
 from poliastro.util import norm
 ```
 
-```{code-cell}
+```{code-cell} ipython3
+# More info: https://plotly.com/python/renderers/
 import plotly.io as pio
-pio.renderers.default = "notebook_connected"
+pio.renderers.default = "plotly_mimetype+notebook_connected"
 ```
 
 To provide an acceleration depending on an extra parameter, we can use **closures** like this one:
 
-```{code-cell}
+```{code-cell} ipython3
 accel = 2e-5
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 def constant_accel_factory(accel):
     def constant_accel(t0, u, k):
         v = u[3:]
@@ -69,7 +70,7 @@ def constant_accel_factory(accel):
     return constant_accel
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 def f(t0, state, k):
     du_kep = func_twobody(t0, state, k)
     ax, ay, az = constant_accel_factory(accel)(t0, state, k)
@@ -78,12 +79,12 @@ def f(t0, state, k):
     return du_kep + du_ad
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 times = np.linspace(0, 10 * iss.period, 500)
 times
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 positions = propagate(
     iss,
     time.TimeDelta(times),
@@ -95,7 +96,7 @@ positions = propagate(
 
 And we plot the results:
 
-```{code-cell}
+```{code-cell} ipython3
 frame = OrbitPlotter3D()
 
 frame.set_attractor(Earth)
@@ -104,7 +105,7 @@ frame.plot_trajectory(positions, label="ISS")
 
 ## Error checking
 
-```{code-cell}
+```{code-cell} ipython3
 def state_to_vector(ss):
     r, v = ss.rv()
     x, y, z = r.to(u.km).value
@@ -112,44 +113,44 @@ def state_to_vector(ss):
     return np.array([x, y, z, vx, vy, vz])
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 rtol = 1e-13
 full_periods = 2
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 u0 = state_to_vector(iss)
 tf = ((2 * full_periods + 1) * iss.period / 2)
 
 u0, tf
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 iss_f_kep = iss.propagate(tf, rtol=1e-18)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 r, v = cowell(iss.attractor.k, iss.r, iss.v, [tf] * u.s, rtol=rtol)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 iss_f_num = Orbit.from_vectors(Earth, r[0], v[0], iss.epoch + tf)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 iss_f_num.r, iss_f_kep.r
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 assert np.allclose(iss_f_num.r, iss_f_kep.r, rtol=rtol, atol=1e-08 * u.km)
 assert np.allclose(iss_f_num.v, iss_f_kep.v, rtol=rtol, atol=1e-08 * u.km / u.s)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 assert np.allclose(iss_f_num.a, iss_f_kep.a, rtol=rtol, atol=1e-08 * u.km)
 assert np.allclose(iss_f_num.ecc, iss_f_kep.ecc, rtol=rtol)
 assert np.allclose(iss_f_num.inc, iss_f_kep.inc, rtol=rtol, atol=1e-08 * u.rad)
@@ -166,7 +167,7 @@ $$\frac{\operatorname{d}\!a}{a_0} = 2 \frac{F}{m V_0}\operatorname{d}\!t, \qquad
 
 So let's create a new circular orbit and perform the necessary checks, assuming constant mass and thrust (i.e. constant acceleration):
 
-```{code-cell}
+```{code-cell} ipython3
 ss = Orbit.circular(Earth, 500 * u.km)
 tof = 20 * ss.period
 
@@ -184,23 +185,23 @@ r, v = cowell(ss.attractor.k, ss.r, ss.v, [tof] * u.s, f=f)
 ss_final = Orbit.from_vectors(Earth, r[0], v[0], ss.epoch + tof)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 da_a0 = (ss_final.a - ss.a) / ss.a
 da_a0
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
 2 * dv_v0
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 np.allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 ```
 
 This means **we successfully validated the model against an extremely simple orbit transfer with an approximate analytical solution**. Notice that the final eccentricity, as originally noticed by Edelbaum, is nonzero:
 
-```{code-cell}
+```{code-cell} ipython3
 ss_final.ecc
 ```
 

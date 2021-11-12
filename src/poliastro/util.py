@@ -6,7 +6,7 @@ from astropy import units as u
 from astropy.time import Time
 from numpy.linalg import norm as norm_np
 
-from .core.util import alinspace as alinspace_fast
+from poliastro.core.util import alinspace as alinspace_fast
 
 
 def norm(vec):

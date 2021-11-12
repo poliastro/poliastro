@@ -1,5 +1,153 @@
 # What\'s new
 
+## poliastro 0.15.2 - 2021-06-27
+
+Same as 0.15.1, but fixes error in release artifact.
+
+## poliastro 0.15.1 - 2021-06-27
+
+This release fixes some bugs found after 0.15.0.
+
+### Bugs fixed
+
+- [Issue \#1229](https://github.com/poliastro/poliastro/issues/1229):
+  Unit conversion error when using newer astroquery
+- [Issue \#1245](https://github.com/poliastro/poliastro/issues/1245):
+  Fix incorrect dependency specification for extras
+- \[No issue number\] Allow Plotly 5.0
+- \[No issue number\] Enable intersphinx support for sphinx-hoverxref
+
+Do you want to help with the remaining ones? [Check the current list here!](https://github.com/poliastro/poliastro/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+
+### Contributors
+
+This is the complete list of the people that contributed to this
+release, with a + sign indicating first contribution.
+
+- Javier Tegedor+
+- Jero Bado+
+- Juan Luis Cano
+
+## poliastro 0.15.0 - 2021-05-14
+
+This new major release includes lots of API changes and enhancements,
+as well as the fruitful results from Google Summer of Code 2020.
+
+### Highlights
+
+- **Numerous new Earth-specific capabilities!**
+  María Eugenia (Meuge) contributed lots of new features useful for studying artificial satellites,
+  including formulas to compute the field of view and ground range in {py:mod}`poliastro.twobody.orbit`,
+  and new experimental {py:class}`poliastro.earth.EarthSatellite`
+  and {py:class}`~poliastro.earth.Spacecraft` classes.
+- **poliastro is now validated!**
+  Thanks to a [NumFOCS Small Development Grant](https://numfocus.org/programs/small-development-grants),
+  we created a [validation framework for poliastro](https://github.com/poliastro/validation/)
+  to compare our results with GMAT and Orekit.
+- **Revamped website!**
+  We reorganized our domains
+  and [gave poliastro a nice front page](https://www.poliastro.space).
+- **Support for Python 3.9!**
+  We also dropped support for Python 3.6, as anticipated.
+  The next release will add support for Python 3.10,
+  and depending on development effort we will consider dropping Python 3.7.
+- **Reorganized documentation following the popular [Diátaxis Framework](https://diataxis.fr/)!**
+  Now our docs are splitted in four sections: Tutorials, How-to guides, Background, and Reference.
+  We thank Daniele Procida for creating it and for being an endless source of inspiration.
+- **Migrated all documentation to MyST!**
+  Markdown has much wider adoption than reStructuredText,
+  so we made the decision to switch to Markedly Structured Text,
+  a superset of CommonMark that adds some nice features.
+  We hope that this will make contributing to poliastro documentation easier.
+- **Added a community contributions procedure!**
+  We now have a top-level `contrib/` directory
+  for community contributions that are not yet ready to be part of the poliastro API.
+  Check out [the instructions](https://github.com/poliastro/poliastro/tree/main/contrib)
+  and make yours!
+
+### New features
+
+- New {py:meth}`poliastro.twobody.Orbit.stationary` and {py:meth}`~poliastro.twobody.Orbit.synchronous`
+  methods for all attractors.
+- New experimental {py:class}`poliastro.earth.EarthSatellite` class
+  containing a specialized `propagate` method
+  with some preconfigured perturbations.
+- New experimental {py:class}`poliastro.spacecraft.Spacecraft` class
+  containing physical attributes like area, drag coefficient, and mass.
+- New {py:class}`poliastro.plotting.tisserand.TisserandPlotter` class.
+- New {py:meth}`poliastro.maneuver.Maneuver.correct_pericenter` maneuver.
+- New {py:mod}`poliastro.earth.sensors` module
+  with ground range and field of view calculations,
+  like {py:meth}`~poliastro.earth.sensors.min_and_max_ground_range`
+  and {py:meth}`~poliastro.earth.sensors.ground_range_diff_at_azimuth`.
+- New {py:class}`poliastro.earth.plotting.groundtrack.GroundtrackPlotter` class.
+- New {py:meth}`poliastro.ephem.Ephem.from_orbit` method.
+
+### Bugs fixed
+
+- [Issue \#740](https://github.com/poliastro/poliastro/issues/740): Incorrect Hohmann maneuver when not at pericenter
+- [Issue \#957](https://github.com/poliastro/poliastro/issues/957): poliastro description on PyPI is wrong
+- [Issue \#992](https://github.com/poliastro/poliastro/issues/992): Units error in COESA amtospheric models
+- [Issue \#1021](https://github.com/poliastro/poliastro/issues/1021): Uncaught error in plotting
+- [Issue \#1192](https://github.com/poliastro/poliastro/issues/1192): Wrong W angle for Moon IAU pole
+
+And many more smaller documentation and rendering issues
+introduced during the migration to MyST.
+
+### Backwards incompatible changes
+
+- [We refactored the {py:meth}`poliastro.twobody.propagation.cowell` method](https://github.com/poliastro/poliastro/pull/1053)
+  and rewrote its signature to make it easier to maintain and to use.
+  Code using it will need adjustment,
+  see our {ref}`quickstart` and our {ref}`gallery` for guidance.
+- [The method `Orbit.from_body_ephem` has been removed](https://github.com/poliastro/poliastro/pull/1110),
+  use {py:meth}`poliastro.twobody.Orbit.from_ephem`
+  and {py:class}`poliastro.ephem.Ephem` instead.
+
+### Contributors
+
+This is a complete, alphabetic list of people that contributed to this release,
+with a + sign indicating first contribution.
+This release took longer than usual,
+and therefore the contributors list is larger than ever!
+
+- Abdul Moiz+
+- Abhishek Anant+
+- Abhishek Chaurasia
+- Adarsh Desai+
+- Andrea Carballo+
+- Ángel Ramírez Quispe+
+- Bryan W. Weber+
+- Claudia Millán+
+- Dhruv Sondhi+
+- Ezequiel Pássaro+
+- Giuseppe Di Pasquale+
+- Iago Alonso+
+- Isabel González+
+- Ismael Jiménez+
+- Ishan Srivastava+
+- Jorge Martínez Garrido
+- Jos van 't Hof
+- Juan Luis Cano Rodríguez
+- Matthew Jones+
+- María Eugenia Cruz
+- Nickolai Belakovski+
+- Nidhi Zare+
+- Nihar Salunke+
+- Nirav Madhani+
+- Ole Streicher
+- Orestis Ousoultzoglou+
+- Pablo Castro+
+- Paolo Squadrito+
+- Radhika Jadhav+
+- Rafael Araujo Lehmkuhl+
+- Rishabh Nanawati+
+- Souhit Dey+
+- Tomek Mrugalski
+- Venkitesh+
+- Yash Gondhalekar+
+- Zeke Sikelianos+
+
 ## poliastro 0.14.0 - 2020-05-08
 
 This major release contains crucial new features and bug fixes that have
