@@ -18,6 +18,9 @@
 - Compatibility with Plotly 5 https://github.com/poliastro/poliastro/pull/1262
 - Support for Astropy 4.X? https://github.com/poliastro/poliastro/pull/1217
 - Add ability to change axis units in interactive plots https://github.com/poliastro/poliastro/pull/1318
+- New unit-safe continuous thrust guidance laws https://github.com/poliastro/poliastro/pull/1356, https://github.com/poliastro/poliastro/pull/1366, https://github.com/poliastro/poliastro/pull/1389
+- New util functions `spherical_to_cartesian` https://github.com/poliastro/poliastro/pull/1358 `eccentricity_vector` https://github.com/poliastro/poliastro/pull/1389
+- New `.plot_maneuver` method of orbit plotters https://github.com/poliastro/poliastro/pull/1359 and https://github.com/poliastro/poliastro/pull/1378
 
 ### "Contrib" (TBC)
 
@@ -34,6 +37,8 @@
 - Accelerate parabolic and hyperbolic anomaly computations https://github.com/poliastro/poliastro/pull/1247
 - Accelerate atmosphere computations https://github.com/poliastro/poliastro/pull/1280 and https://github.com/poliastro/poliastro/pull/1282
 - Slightly accelerate propagation for all propagators https://github.com/poliastro/poliastro/pull/1286
+- Accelerate `func_twobody` https://github.com/poliastro/poliastro/pull/1386
+- Vectorize `rotation_matrix` https://github.com/poliastro/poliastro/pull/1373
 
 ### Documentation improvements
 
@@ -44,6 +49,9 @@
 
 - Fix corner case in latitude computation https://github.com/poliastro/poliastro/issues/1290
 - Fix `Jacchia77` method signatures https://github.com/poliastro/poliastro/pull/1334
+- Avoid changing orbit plane in `apply_maneuver` https://github.com/poliastro/poliastro/pull/1369
+- Fix convergence of Izzo algorithm in certain cases https://github.com/poliastro/poliastro/pull/1371
+- Fix semimajor-axis-only continuous thrust guidance law https://github.com/poliastro/poliastro/pull/1390
 
 ### Backwards incompatible changes
 
@@ -54,6 +62,10 @@
 - Continue propagation if `event.terminal` is `False` ???
 - Remove unused `generate_circle` function https://github.com/poliastro/poliastro/pull/1313
 - Now `change_a_inc.compute_parameters` does not return inclination change https://github.com/poliastro/poliastro/pull/1344
+- Renamed `change_inc_ecc` to `change_ecc_inc` for consistency https://github.com/poliastro/poliastro/pull/1346
+- Replaced some assertions by proper errors https://github.com/poliastro/poliastro/pull/1367
+- Replaced `atmospheric_drag_model` by `atmospheric_drag` with a simpler signature https://github.com/poliastro/poliastro/pull/1375
+- Disable atmosphere perturbation in `EarthSatellite` https://github.com/poliastro/poliastro/pull/1375
 
 ### Contributors
 
