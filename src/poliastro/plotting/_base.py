@@ -170,7 +170,7 @@ class BaseOrbitPlotter:
 
         if len(maneuver_phases) == 0:
             # For single-impulse maneuver only draw the impulse marker
-            return ([self._draw_impulse(color, f"Impulse - {label}", final_phase.r)],)
+            return [self._draw_impulse(color, f"Impulse - {label}", final_phase.r)],
         else:
             coordinates_list = []
 
