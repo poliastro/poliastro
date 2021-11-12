@@ -1,0 +1,15 @@
+[importlinter]
+# Include Astropy to properly analyze external submodules,
+# see https://github.com/seddonym/import-linter/issues/111
+root_packages =
+    poliastro
+    astropy
+include_external_packages=True
+
+[importlinter:contract:1]
+name=poliastro.core does not import astropy.units
+type=forbidden
+source_modules=
+    poliastro.core
+forbidden_modules=
+    astropy.units
