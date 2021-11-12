@@ -170,7 +170,7 @@ class BaseOrbitPlotter:
 
         if len(maneuver_phases) == 0:
             # For single-impulse maneuver only draw the impulse marker
-            self._draw_impulse(color, f"Impulse - {label}", maneuver_phases[0].r)
+            return ([self._draw_impulse(color, f"Impulse - {label}", final_phase.r)],)
         else:
             coordinates_list = []
 
@@ -182,9 +182,19 @@ class BaseOrbitPlotter:
 
                 # Compute the minimum and maximum anomalies
                 min_nu = orbit_phase.nu
+                # High level, but inefficient way of solving the Kepler equation,
+                # which is what farnocchia_coe does:
+                # tp0 = delta_t_from_nu(nu, ecc, k, q)
+                # tp = tp0 + tof
+                # max_nu = nu_from_delta_t(tp, ecc, k, q)
                 max_nu = orbit_phase.propagate(time_to_next_impulse).nu
 
                 # Collect the coordinate points for the i-th orbit phase
+                # We use .sample rather than poliastro.twobody.propagation.propagate
+                # because the latter samples time uniformly
+                # and therefore generates a sharp curve close to the perigee,
+                # and that's also why I need to compute the anomalies outside,
+                # see https://github.com/poliastro/poliastro/issues/1364
                 phase_coordinates = orbit_phase.sample(
                     min_anomaly=min_nu, max_anomaly=max_nu
                 )
@@ -201,7 +211,7 @@ class BaseOrbitPlotter:
             )
 
         # Concatenate the different phase coordinates into a single coordinates
-        # instance
+        # instance.
         coordinates = concatenate_representations(coordinates_list)
 
         return self.__add_trajectory(
