@@ -19,6 +19,7 @@ from poliastro.core.elements import coe2rv_many
 from poliastro.core.propagation.farnocchia import (
     delta_t_from_nu as delta_t_from_nu_fast,
 )
+from poliastro.core.util import eccentricity_vector
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
@@ -207,14 +208,14 @@ class Orbit:
     def e_vec(self):
         """Eccentricity vector."""
         r, v = self.rv()
-        k = self.attractor.k
-        e_vec = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
-        return e_vec.decompose()
+        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+        e_vec = eccentricity_vector(k, r.to_value(u.km), v.to_value(u.km / u.s))
+        return e_vec * u.one
 
     @cached_property
     def h_vec(self):
         """Specific angular momentum vector."""
-        h_vec = np.cross(self.r.to(u.km).value, self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km ** 2 / u.s
         return h_vec
 
     @cached_property
@@ -466,7 +467,7 @@ class Orbit:
         else:
             # TODO: The attractor is not really the Sun, but the Solar System
             # Barycenter
-            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.day), epoch)
+            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.d), epoch)
             ss._frame = ICRS()  # Hack!
 
         return ss
@@ -646,13 +647,13 @@ class Orbit:
         epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
 
         ss = cls.from_classical(
-            Sun,
-            a,
-            ecc,
-            inc,
-            raan,
-            argp,
-            nu,
+            attractor=Sun,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
             epoch=epoch.tdb,
             plane=Planes.EARTH_ECLIPTIC,
         )
@@ -698,7 +699,15 @@ class Orbit:
         argp = 0 * u.deg
 
         return cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+            attractor=attractor,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=arglat,
+            epoch=epoch,
+            plane=plane,
         )
 
     @classmethod
@@ -803,7 +812,15 @@ class Orbit:
             raise ValueError("The orbit for the given parameters doesn't exist")
 
         return cls.from_classical(
-            attractor, a_sync, ecc, inc, raan, argp, nu, epoch, plane
+            attractor=attractor,
+            a=a_sync,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
+            epoch=epoch,
+            plane=plane,
         )
 
     @classmethod
@@ -855,6 +872,10 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
+        # Temporary fix: raan_from_ltan works only for Earth
+        if attractor.name.lower() != "earth":
+            raise NotImplementedError("Attractors other than Earth not supported yet")
+
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
@@ -866,7 +887,7 @@ class Orbit:
 
         try:
             with np.errstate(invalid="raise"):
-                if (a is None) and (ecc is None) and (inc is None):
+                if all(coe is None for coe in [a, ecc, inc]):
                     # We check sufficient number of parameters
                     raise ValueError(
                         "At least two parameters of the set {a, ecc, inc} are required."
@@ -888,7 +909,7 @@ class Orbit:
                         * R_SSO ** 2
                         * J2_SSO
                         * np.sqrt(k_SSO)
-                        * np.cos(inc.to(u.rad))
+                        * np.cos(inc)
                         / (2 * a ** (7 / 2) * n_sunsync)
                     )
                     ecc = np.sqrt(1 - _ecc_0)
@@ -904,13 +925,17 @@ class Orbit:
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
 
-        # Temporary fix: raan_from_ltan works only for Earth
-        if attractor.name.lower() != "earth":
-            raise NotImplementedError("Attractors other than Earth not supported yet")
-
         raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
-            attractor, a, ecc, inc, raan, argp, nu, epoch=epoch.tdb, plane=plane
+            attractor=attractor,
+            a=a,
+            ecc=ecc,
+            inc=inc,
+            raan=raan,
+            argp=argp,
+            nu=nu,
+            epoch=epoch.tdb,
+            plane=plane,
         )
 
         return ss
@@ -1061,7 +1086,15 @@ class Orbit:
                         attractor.R, attractor.J2, attractor.J3, a, ecc
                     )
                 return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                    attractor=attractor,
+                    a=a,
+                    ecc=ecc,
+                    inc=inc,
+                    raan=raan,
+                    argp=argp,
+                    nu=arglat,
+                    epoch=epoch,
+                    plane=plane,
                 )
 
             inc = critical_inclinations[0] if inc is None else inc
@@ -1069,7 +1102,15 @@ class Orbit:
             if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
                 ecc = get_eccentricity_critical_inc(ecc)
                 return cls.from_classical(
-                    attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                    attractor=attractor,
+                    a=a,
+                    ecc=ecc,
+                    inc=inc,
+                    raan=raan,
+                    argp=argp,
+                    nu=arglat,
+                    epoch=epoch,
+                    plane=plane,
                 )
 
             argp = critical_argps[0]
@@ -1079,7 +1120,15 @@ class Orbit:
             )
 
             return cls.from_classical(
-                attractor, a, ecc, inc, raan, argp, arglat, epoch, plane
+                attractor=attractor,
+                a=a,
+                ecc=ecc,
+                inc=inc,
+                raan=raan,
+                argp=argp,
+                nu=arglat,
+                epoch=epoch,
+                plane=plane,
             )
 
         except AssertionError as exc:
@@ -1152,7 +1201,7 @@ class Orbit:
         )
 
         if self.ecc < 1e-8:
-            if abs(self.inc.to(u.rad).value) > 1e-8:
+            if abs(self.inc.to_value(u.rad)) > 1e-8:
                 node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
                 p_vec = node / norm(node)  # Circular inclined
             else:
@@ -1171,7 +1220,7 @@ class Orbit:
 
         try:
             return ORBIT_FORMAT.format(
-                r_p=self.r_p.to(unit).value,
+                r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
                 frame=self.get_frame().__class__.__name__,
@@ -1181,7 +1230,7 @@ class Orbit:
             )
         except NotImplementedError:
             return ORBIT_NO_FRAME_FORMAT.format(
-                r_p=self.r_p.to(unit).value,
+                r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
                 body=self.attractor,
@@ -1290,13 +1339,13 @@ class Orbit:
                 time_of_flight = self.period + time_of_flight
 
         return self.from_classical(
-            self.attractor,
-            self.a,
-            self.ecc,
-            self.inc,
-            self.raan,
-            self.argp,
-            nu,
+            attractor=self.attractor,
+            a=self.a,
+            ecc=self.ecc,
+            inc=self.inc,
+            raan=self.raan,
+            argp=self.argp,
+            nu=nu,
             epoch=self.epoch + time_of_flight,
             plane=self.plane,
         )
@@ -1308,11 +1357,11 @@ class Orbit:
         # the arc cosine, which is in the range [0, 180)
         # Start from -nu_limit
         wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
-        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to(u.rad).value
+        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
 
         limits = [
-            min_anomaly.to(u.rad).value if min_anomaly is not None else -nu_limit,
-            max_anomaly.to(u.rad).value if max_anomaly is not None else nu_limit,
+            min_anomaly.to_value(u.rad) if min_anomaly is not None else -nu_limit,
+            max_anomaly.to_value(u.rad) if max_anomaly is not None else nu_limit,
         ] * u.rad  # type: u.Quantity
 
         # Now we check that none of the provided values
@@ -1374,13 +1423,13 @@ class Orbit:
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
-            np.full(n, self.attractor.k.to(u.m ** 3 / u.s ** 2).value),
-            np.full(n, self.p.to(u.m).value),
+            np.full(n, self.attractor.k.to_value(u.m ** 3 / u.s ** 2)),
+            np.full(n, self.p.to_value(u.m)),
             np.full(n, self.ecc.value),
-            np.full(n, self.inc.to(u.rad).value),
-            np.full(n, self.raan.to(u.rad).value),
-            np.full(n, self.argp.to(u.rad).value),
-            nu_values.to(u.rad).value,
+            np.full(n, self.inc.to_value(u.rad)),
+            np.full(n, self.raan.to_value(u.rad)),
+            np.full(n, self.argp.to_value(u.rad)),
+            nu_values.to_value(u.rad),
         )
 
         # Add units
@@ -1392,18 +1441,6 @@ class Orbit:
         )
 
         return cartesian
-
-    def _generate_time_values(self, nu_vals):
-        # Subtract current anomaly to start from the desired point
-        ecc = self.ecc.value
-        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
-        q = self.r_p.to_value(u.km)
-
-        time_values = [
-            delta_t_from_nu_fast(nu_val, ecc, k, q)
-            for nu_val in nu_vals.to(u.rad).value
-        ] * u.s - self.t_p
-        return time_values
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.
@@ -1421,13 +1458,17 @@ class Orbit:
         orbit_new = self  # Initialize
         states = []
         attractor = self.attractor
+        plane = self.plane
         for delta_t, delta_v in maneuver:
             if not delta_t == 0 * u.s:
                 orbit_new = orbit_new.propagate(delta_t)
             r, v = orbit_new.rv()
             vnew = v + delta_v
-            orbit_new = self.from_vectors(attractor, r, vnew, orbit_new.epoch)
-            states.append(orbit_new)
+            orbit_new = self.from_vectors(
+                attractor=attractor, r=r, v=vnew, epoch=orbit_new.epoch, plane=plane
+            )
+            if intermediate:  # Avoid keeping them in memory.
+                states.append(orbit_new)
         if intermediate:
             res = states  # type: Union[Orbit, List[Orbit]]
         else:

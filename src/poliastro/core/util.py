@@ -1,6 +1,12 @@
 import numpy as np
 from numba import njit as jit
 from numpy import cos, sin
+from numpy.linalg import norm as norm
+
+
+@jit
+def eccentricity_vector(k, r, v):
+    return ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
 
 
 @jit
@@ -25,16 +31,20 @@ def circular_velocity(k, a):
 
 @jit
 def rotation_matrix(angle, axis):
+    assert axis in (0, 1, 2)
+    angle = np.asarray(angle)
     c = cos(angle)
     s = sin(angle)
-    if axis == 0:
-        return np.array([[1.0, 0.0, 0.0], [0.0, c, -s], [0.0, s, c]])
-    elif axis == 1:
-        return np.array([[c, 0.0, s], [0.0, 1.0, 0.0], [s, 0.0, c]])
-    elif axis == 2:
-        return np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
-    else:
-        raise ValueError("Invalid axis: must be one of 'x', 'y' or 'z'")
+
+    a1 = (axis + 1) % 3
+    a2 = (axis + 2) % 3
+    R = np.zeros(angle.shape + (3, 3))
+    R[..., axis, axis] = 1.0
+    R[..., a1, a1] = c
+    R[..., a1, a2] = -s
+    R[..., a2, a1] = s
+    R[..., a2, a2] = c
+    return R
 
 
 @jit
@@ -53,3 +63,37 @@ def alinspace(start, stop=None, num=50, endpoint=True):
         return np.linspace(start, stop_, num)
     else:
         return np.linspace(start, stop_, num + 1)[:-1]
+
+
+@jit
+def spherical_to_cartesian(v):
+    r"""Compute cartesian coordinates from spherical coordinates (norm, colat, long). This function is vectorized.
+
+    .. math::
+
+       v = norm \cdot \begin{bmatrix}
+       \sin(colat)\cos(long)\\
+       \sin(colat)\sin(long)\\
+       \cos(colat)\\
+       \end{bmatrix}
+
+    Parameters
+    ----------
+    v : np.array
+        Spherical coordinates in 3D (norm, colat, long). Angles must be in radians.
+
+    Returns
+    -------
+
+    v : np.array
+        Cartesian coordinates (x,y,z)
+
+    """
+    v = np.asarray(v)
+    norm = np.expand_dims(np.asarray(v[..., 0]), -1)
+    vsin = np.sin(v[..., 1:3])
+    vcos = np.cos(v[..., 1:3])
+    x = np.asarray(vsin[..., 0] * vcos[..., 1])
+    y = np.asarray(vsin[..., 0] * vsin[..., 1])
+    z = np.asarray(vcos[..., 0])
+    return norm * np.stack((x, y, z), axis=-1)

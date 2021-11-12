@@ -4,7 +4,6 @@ from astropy import units as u
 
 from poliastro.bodies import Earth, Mars
 from poliastro.earth import EarthSatellite
-from poliastro.earth.atmosphere import COESA76
 from poliastro.earth.enums import EarthGravity
 from poliastro.spacecraft import Spacecraft
 from poliastro.twobody.orbit import Orbit
@@ -38,13 +37,13 @@ def test_orbit_attractor():
 def test_propagate_instance():
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
-        Earth,
-        1000 * u.km,
-        0.75 * u.one,
-        63.4 * u.deg,
-        0 * u.deg,
-        270 * u.deg,
-        80 * u.deg,
+        attractor=Earth,
+        a=1000 * u.km,
+        ecc=0.75 * u.one,
+        inc=63.4 * u.deg,
+        raan=0 * u.deg,
+        argp=270 * u.deg,
+        nu=80 * u.deg,
     )
     C_D = 2.2 * u.one  # Dimensionless (any value would do)
     A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2)
@@ -53,9 +52,9 @@ def test_propagate_instance():
     earth_satellite = EarthSatellite(ss0, spacecraft)
     orbit_with_j2 = earth_satellite.propagate(tof=tof, gravity=EarthGravity.J2)
     orbit_without_perturbation = earth_satellite.propagate(tof)
-    orbit_with_atmosphere_and_j2 = earth_satellite.propagate(
-        tof=tof, gravity=EarthGravity.J2, atmosphere=COESA76()
-    )
+    # orbit_with_atmosphere_and_j2 = earth_satellite.propagate(
+    #     tof=tof, gravity=EarthGravity.J2, atmosphere=COESA76()
+    # )
     assert isinstance(orbit_with_j2, EarthSatellite)
-    assert isinstance(orbit_with_atmosphere_and_j2, EarthSatellite)
+    # assert isinstance(orbit_with_atmosphere_and_j2, EarthSatellite)
     assert isinstance(orbit_without_perturbation, EarthSatellite)

@@ -1,33 +1,32 @@
-import numpy as np
-from numba import njit
-from numpy import cross
-from numpy.linalg import norm
+from astropy import units as u
 
-from poliastro.core.thrust.change_a_inc import (
-    beta,
-    compute_parameters,
-    extra_quantities,
-)
+from poliastro.core.thrust.change_a_inc import change_a_inc as change_a_inc_fast
 
 
 def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
-    """Guidance law from the Edelbaum/Kéchichian theory, optimal transfer between circular inclined orbits
+    """Change semimajor axis and inclination.
+       Guidance law from the Edelbaum/Kéchichian theory, optimal transfer between circular inclined orbits
        (a_0, i_0) --> (a_f, i_f), ecc = 0.
 
     Parameters
     ----------
-    k : float
+    k : ~astropy.units.quantity.Quantity
         Gravitational parameter.
-    a_0 : float
-        Initial semimajor axis.
-    a_f : float
-        Final semimajor axis.
-    inc_0 : float
-        Initial inclination.
-    inc_f : float
-        Final inclination.
-    f : float
-        Magnitude of constant acceleration
+    a_0 : ~astropy.units.quantity.Quantity
+        Initial semimajor axis (km).
+    a_f : ~astropy.units.quantity.Quantity
+        Final semimajor axis (km).
+    inc_0 : ~astropy.units.quantity.Quantity
+        Initial inclination (rad).
+    inc_f : ~astropy.units.quantity.Quantity
+        Final inclination (rad).
+    f : ~astropy.units.quantity.Quantity
+        Magnitude of constant acceleration (km / s**2).
+
+    Returns
+    -------
+    a_d, delta_V, t_f : tuple (function, ~astropy.units.quantity.Quantity, ~astropy.time.Time)
+
 
     Notes
     -----
@@ -40,21 +39,12 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
     * Kéchichian, J. A. "Reformulation of Edelbaum's Low-Thrust
       Transfer Problem Using Optimal Control Theory", 1997.
     """
-
-    V_0, beta_0_, _ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
-
-    @njit
-    def a_d(t0, u_, k):
-        r = u_[:3]
-        v = u_[3:]
-
-        # Change sign of beta with the out-of-plane velocity
-        beta_ = beta(t0, V_0, f, beta_0_) * np.sign(r[0] * (inc_f - inc_0))
-
-        t_ = v / norm(v)
-        w_ = cross(r, v) / norm(cross(r, v))
-        accel_v = f * (np.cos(beta_) * t_ + np.sin(beta_) * w_)
-        return accel_v
-
-    delta_V, t_f = extra_quantities(k, a_0, a_f, inc_0, inc_f, f)
-    return a_d, delta_V, t_f
+    a_d, delta_V, t_f = change_a_inc_fast(
+        k=k.to_value(u.km ** 3 / u.s ** 2),
+        a_0=a_0.to_value(u.km),
+        a_f=a_f.to_value(u.km),
+        inc_0=inc_0.to_value(u.rad),
+        inc_f=inc_f.to_value(u.rad),
+        f=f.to_value(u.km / u.s ** 2),
+    )
+    return a_d, delta_V, t_f * u.s

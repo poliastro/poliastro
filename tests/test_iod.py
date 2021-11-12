@@ -143,3 +143,20 @@ def test_issue840(lambert_vallado, lambert_izzo):
     assert_quantity_allclose(vb_v, expected_vb, rtol=1e-6)
     assert_quantity_allclose(va_i, expected_va, rtol=1e-6)
     assert_quantity_allclose(vb_i, expected_vb, rtol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "lambert_vallado,lambert_izzo", [(vallado.lambert, izzo.lambert)]
+)
+def test_issue1362(lambert_vallado, lambert_izzo):
+
+    k = 1.32712440018e11 * u.km ** 3 / u.s ** 2
+    r0 = [-7.52669489e07, -3.72205805e08, -9.17950811e06] * u.km
+    rf = [-6.15200041e06, -3.91985660e08, -5.06520860e05] * u.km
+    tof = 3489390.108265222 * u.s
+
+    va_v, vb_v = next(lambert_vallado(k, r0, rf, tof))
+    va_i, vb_i = next(lambert_izzo(k, r0, rf, tof))
+
+    assert_quantity_allclose(va_v, va_i, rtol=1e-6)
+    assert_quantity_allclose(vb_v, vb_i, rtol=1e-6)

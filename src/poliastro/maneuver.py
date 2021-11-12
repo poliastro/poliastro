@@ -98,10 +98,10 @@ class Maneuver:
         k = orbit_i.attractor.k
 
         rv = orbit_i.rv()
-        rv = (rv[0].to(u.m).value, rv[-1].to(u.m / u.s).value)
+        rv = (rv[0].to_value(u.m), rv[-1].to_value(u.m / u.s))
 
-        k = k.to(u.m ** 3 / u.s ** 2).value
-        r_f = r_f.to(u.m).value
+        k = k.to_value(u.m ** 3 / u.s ** 2)
+        r_f = r_f.to_value(u.m)
 
         dv_a, dv_b, t_trans = hohmann_fast(k, rv, r_f)
         dv_a, dv_b, t_trans = dv_a * u.m / u.s, dv_b * u.m / u.s, t_trans * u.s
@@ -136,11 +136,11 @@ class Maneuver:
         k = orbit_i.attractor.k
 
         rv = orbit_i.rv()
-        rv = (rv[0].to(u.m).value, rv[-1].to(u.m / u.s).value)
+        rv = (rv[0].to_value(u.m), rv[-1].to_value(u.m / u.s))
 
-        k = k.to(u.m ** 3 / u.s ** 2).value
-        r_b = r_b.to(u.m).value
-        r_f = r_f.to(u.m).value
+        k = k.to_value(u.m ** 3 / u.s ** 2)
+        r_b = r_b.to_value(u.m)
+        r_f = r_f.to_value(u.m)
 
         dv_a, dv_b, dv_c, t_trans1, t_trans2 = bielliptic_fast(
             k,
@@ -243,8 +243,8 @@ class Maneuver:
                 f"The correction maneuver is not yet supported with {orbit.ecc},it should be less than or equal to 0.001"
             )
 
-        R = orbit.attractor.R.to(u.km).value
-        k = orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value
+        R = orbit.attractor.R.to_value(u.km)
+        k = orbit.attractor.k.to_value(u.km ** 3 / u.s ** 2)
         v = orbit.v.value
         a = orbit.a.value
         inc = orbit.inc.value

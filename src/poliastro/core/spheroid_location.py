@@ -155,7 +155,7 @@ def is_visible(cartesian_cords, px, py, pz, N):
 @jit
 def cartesian_to_ellipsoidal(_a, _c, x, y, z):
     """
-    Converts ellipsoidal coordinates to the Cartesian coordinate system for the given ellipsoid.
+    Converts cartesian coordinates to ellipsoidal coordinates for the given ellipsoid.
     Instead of the iterative formula, the function uses the approximation introduced in
     Bowring, B. R. (1976). TRANSFORMATION FROM SPATIAL TO GEOGRAPHICAL COORDINATES
 
@@ -177,11 +177,10 @@ def cartesian_to_ellipsoidal(_a, _c, x, y, z):
     e2_ = e2 / (1 - e2)
     p = np.sqrt(x ** 2 + y ** 2)
     th = np.arctan(z * _a / (p * _c))
-    lon = np.arctan(y / x)
+    lon = np.arctan2(y, x)  # Use `arctan2` so that lon lies in the range: [-pi, +pi]
     lat = np.arctan((z + e2_ * _c * np.sin(th) ** 3) / (p - e2 * _a * np.cos(th) ** 3))
 
     v = _a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
-    h = p / np.cos(lat) - v
-    h = z / np.sin(lat) - (1 - e2) * v
+    h = x / np.cos(lat) - v if lat == 0.0 else z / np.sin(lat) - (1 - e2) * v
 
     return lat, lon, h

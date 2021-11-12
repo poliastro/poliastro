@@ -130,7 +130,7 @@ print("orbital decay seen after", lithobrake_event.last_t.to(u.d).value, "days")
 
 plt.ylabel("h(t)")
 plt.xlabel("t, days")
-plt.plot(tofs.value, rr.norm() - Earth.R)
+plt.plot(tofs[:len(rr)].value, rr.norm() - Earth.R)
 ```
 
 ## Evolution of RAAN due to the J2 perturbation
@@ -244,14 +244,14 @@ frame.plot_trajectory(rr, label="orbit influenced by Moon")
 Apart from natural perturbations, there are artificial thrusts aimed at intentional change of orbit parameters. One of such changes is simultaneous change of eccentricity and inclination:
 
 ```{code-cell} ipython3
-from poliastro.twobody.thrust import change_inc_ecc
+from poliastro.twobody.thrust import change_ecc_inc
 
 ecc_0, ecc_f = 0.4, 0.0
 a = 42164  # km
 inc_0 = 0.0  # rad, baseline
-inc_f = (20.0 * u.deg).to(u.rad).value  # rad
+inc_f = 20.0 * u.deg
 argp = 0.0  # rad, the method is efficient for 0 and 180
-f = 2.4e-6  # km / s2
+f = 2.4e-6 * (u.km / u.s ** 2)
 
 k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 s0 = Orbit.from_classical(
@@ -265,7 +265,7 @@ s0 = Orbit.from_classical(
     epoch=Time(0, format="jd", scale="tdb"),
 )
 
-a_d, _, _, t_f = change_inc_ecc(s0, ecc_f, inc_f, f)
+a_d, _, t_f = change_ecc_inc(s0, ecc_f, inc_f, f)
 
 
 def f(t0, state, k):
@@ -280,7 +280,7 @@ def f(t0, state, k):
     return du_kep + du_ad
 
 
-tofs = TimeDelta(np.linspace(0, t_f * u.s, num=1000))
+tofs = TimeDelta(np.linspace(0, t_f, num=1000))
 
 rr2 = propagate(s0, tofs, method=cowell, rtol=1e-6, f=f)
 ```

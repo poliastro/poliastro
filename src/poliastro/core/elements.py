@@ -100,8 +100,8 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
         Eccentricity.
     inc : float
         Inclination (rad).
-    omega : float
-        Longitude of ascending node (rad).
+    raan : float
+        Longitude of ascending node, omega (rad).
     argp : float
         Argument of perigee (rad).
     nu : float

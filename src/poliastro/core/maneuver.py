@@ -1,4 +1,4 @@
-""" Low level manuever implementations """
+""" Low level maneuver implementations """
 
 import numpy as np
 from numba import njit as jit

@@ -1,6 +1,11 @@
 """ Holds different classes to model atmospheric models """
 
-from poliastro.earth.atmosphere.util import h_to_z, z_to_h
+import astropy.units as u
+
+from poliastro.core.earth_atmosphere.util import (
+    _check_altitude as _check_altitude_fast,
+    _get_index as _get_index_fast,
+)
 
 
 class COESA:
@@ -62,17 +67,14 @@ class COESA:
             Geopotential altitude.
 
         """
+        alt = alt.to_value(u.km)
+        r0 = r0.to_value(u.km)
 
-        # Get geometric and geopotential altitudes
-        if geometric is True:
-            z = alt
-            h = z_to_h(z, r0)
-        else:
-            h = alt
-            z = h_to_z(h, r0)
+        z, h = _check_altitude_fast(alt, r0, geometric)
+        z, h = z * u.km, h * u.km
 
         # Assert in range
-        if z < self.zb_levels[0] or z > self.zb_levels[-1]:
+        if not self.zb_levels[0] <= z <= self.zb_levels[-1]:
             raise ValueError(
                 f"Geometric altitude must be in range [{self.zb_levels[0]}, {self.zb_levels[-1]}]"
             )
@@ -86,7 +88,7 @@ class COESA:
         ----------
         x: ~astropy.units.Quantity
             Element to be searched.
-        x_levels: list
+        x_levels: ~astropy.units.Quantity
             List for searching.
 
         Returns
@@ -95,11 +97,7 @@ class COESA:
             Index for the value.
 
         """
-
-        for i, value in enumerate(x_levels):
-            if i < len(x_levels) and x > value:
-                pass
-            elif x == value:
-                return i
-            else:
-                return i - 1
+        x = x.to_value(u.km)
+        x_levels = (x_levels << u.km).value
+        i = _get_index_fast(x, x_levels)
+        return i

@@ -8,6 +8,7 @@ from astropy.time import Time
 from numpy.testing import assert_allclose
 
 from poliastro.bodies import Earth, Mercury, Moon
+from poliastro.frames import Planes
 from poliastro.maneuver import Maneuver
 from poliastro.twobody import Orbit
 
@@ -64,7 +65,13 @@ def test_hohmann_maneuver(nu):
     alt_f = 35781.34857 * u.km
     _a = 0 * u.deg
     ss_i = Orbit.from_classical(
-        Earth, Earth.R + alt_i, ecc=0 * u.one, inc=_a, raan=_a, argp=_a, nu=nu
+        attractor=Earth,
+        a=Earth.R + alt_i,
+        ecc=0 * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=nu,
     )
 
     # Expected output
@@ -90,7 +97,13 @@ def test_bielliptic_maneuver(nu):
     alt_f = 376310.0 * u.km
     _a = 0 * u.deg
     ss_i = Orbit.from_classical(
-        Earth, Earth.R + alt_i, ecc=0 * u.one, inc=_a, raan=_a, argp=_a, nu=nu
+        attractor=Earth,
+        a=Earth.R + alt_i,
+        ecc=0 * u.one,
+        inc=_a,
+        raan=_a,
+        argp=_a,
+        nu=nu,
     )
 
     # Expected output
@@ -129,10 +142,10 @@ def test_repr_maneuver():
     alt_fi = 376310.0 * u.km
     ss_i = Orbit.from_vectors(Earth, r, v)
 
-    expected_hohmann_manuever = "Number of impulses: 2, Total cost: 3.060548 km / s"
+    expected_hohmann_maneuver = "Number of impulses: 2, Total cost: 3.060548 km / s"
     expected_bielliptic_maneuver = "Number of impulses: 3, Total cost: 3.122556 km / s"
 
-    assert repr(Maneuver.hohmann(ss_i, Earth.R + alt_f)) == expected_hohmann_manuever
+    assert repr(Maneuver.hohmann(ss_i, Earth.R + alt_f)) == expected_hohmann_maneuver
     assert (
         repr(Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_fi))
         == expected_bielliptic_maneuver
@@ -158,13 +171,13 @@ def test_correct_pericenter(
     attractor, max_delta_r, a, ecc, inc, expected_t, expected_v
 ):
     ss0 = Orbit.from_classical(
-        attractor,
-        a,
-        ecc,
-        inc,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=attractor,
+        a=a,
+        ecc=ecc,
+        inc=inc,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
 
     maneuver = Maneuver.correct_pericenter(ss0, max_delta_r)
@@ -174,13 +187,13 @@ def test_correct_pericenter(
 
 def test_correct_pericenter_J2_exception():
     ss0 = Orbit.from_classical(
-        Mercury,
-        1000 * u.km,
-        0 * u.one,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=Mercury,
+        a=1000 * u.km,
+        ecc=0 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     max_delta_r = 30 * u.km
     with pytest.raises(NotImplementedError) as excinfo:
@@ -194,13 +207,13 @@ def test_correct_pericenter_J2_exception():
 
 def test_correct_pericenter_ecc_exception():
     ss0 = Orbit.from_classical(
-        Earth,
-        1000 * u.km,
-        0.5 * u.one,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
-        0 * u.deg,
+        attractor=Earth,
+        a=1000 * u.km,
+        ecc=0.5 * u.one,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        argp=0 * u.deg,
+        nu=0 * u.deg,
     )
     max_delta_r = 30 * u.km
     with pytest.raises(NotImplementedError) as excinfo:
@@ -210,3 +223,11 @@ def test_correct_pericenter_ecc_exception():
         str(excinfo.value)
         == f"The correction maneuver is not yet supported with {ss0.ecc},it should be less than or equal to 0.001"
     )
+
+
+def test_apply_manuever_correct_plane():
+    ceres = Orbit.from_sbdb("Ceres")
+    imp = Maneuver.impulse([0, 0, 0] * u.km / u.s)
+    new_ceres = ceres.apply_maneuver(imp)
+    assert ceres.plane == Planes.EARTH_ECLIPTIC
+    assert new_ceres.plane == ceres.plane

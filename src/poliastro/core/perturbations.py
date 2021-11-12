@@ -1,7 +1,8 @@
 import numpy as np
-from astropy import units as u
 from numba import njit as jit
 from numpy.linalg import norm
+
+from poliastro.core.events import line_of_sight as line_of_sight_fast
 
 
 @jit
@@ -128,7 +129,8 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
     return -(1.0 / 2.0) * rho * B * v * v_vec
 
 
-def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
+@jit
+def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
     r"""Calculates atmospheric drag acceleration (km/s2)
 
     .. math::
@@ -146,13 +148,12 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard Gravitational parameter (km^3/s^2)
-    R : float
-        Radius of the attractor (km)
     C_D: float
         Dimensionless drag coefficient ()
     A_over_m: float
         Frontal area/mass of the spacecraft (km^2/kg)
-    model: A callable model from poliastro.earth.atmosphere
+    rho: float
+        Air density at corresponding state (kg/m^3)
 
     Note
     ----
@@ -160,48 +161,11 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
     computed by a model from poliastro.earth.atmosphere
 
     """
-    H = norm(state[:3])
-
     v_vec = state[3:]
     v = norm(v_vec)
     B = C_D * A_over_m
 
-    if H < R:
-        # The model doesn't want to see a negative altitude
-        # The integration will go a little negative searching for H = R
-        H = R
-
-    rho = model.density((H - R) * u.km).to(u.kg / u.km ** 3).value
-
     return -(1.0 / 2.0) * rho * B * v * v_vec
-
-
-@jit
-def shadow_function(r_sat, r_sun, R):
-    r"""Determines whether the satellite is in attractor's shadow, uses algorithm 12.3 from Howard Curtis
-
-    Parameters
-    ----------
-    r_sat : numpy.ndarray
-        Position of the satellite in the frame of attractor (km).
-    r_sun : numpy.ndarray
-        Position of star in the frame of attractor (km).
-    R : float
-        Radius of body (attractor) that creates the shadow (km).
-
-    Returns
-    -------
-    bool: True if satellite is in Earth's shadow, else False.
-
-    """
-    r_sat_norm = np.sqrt(np.sum(r_sat ** 2))
-    r_sun_norm = np.sqrt(np.sum(r_sun ** 2))
-
-    theta = np.arccos(np.dot(r_sat, r_sun) / r_sat_norm / r_sun_norm)
-    theta_1 = np.arccos(R / r_sat_norm)
-    theta_2 = np.arccos(R / r_sun_norm)
-
-    return theta > theta_1 + theta_2
 
 
 def third_body(t0, state, k, k_third, perturbation_body):
@@ -268,5 +232,5 @@ def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
     r_sat = state[:3]
     P_s = Wdivc_s / (norm(r_star) ** 2)
 
-    nu = float(not (shadow_function(r_sat, r_star, R)))
+    nu = float(line_of_sight_fast(r_sat, r_star, R) > 0)
     return -nu * P_s * (C_R * A_over_m) * r_star / norm(r_star)

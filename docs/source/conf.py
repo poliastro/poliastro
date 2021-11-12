@@ -50,10 +50,23 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.mathjax',  # Maths visualization
     'sphinx.ext.graphviz',  # Dependency diagrams
+    'sphinx_copybutton',
     'notfound.extension',
     'hoverxref.extension',
     'myst_parser',
 ]
+
+# MathJax config
+# See https://github.com/spatialaudio/nbsphinx/issues/572#issuecomment-853389268
+mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+mathjax2_config = {
+    'tex2jax': {
+        'inlineMath': [['$', '$'], ['\\(', '\\)']],
+        'processEscapes': True,
+        'ignoreClass': 'document',
+        'processClass': 'math|output_area',
+    }
+}
 
 # Hoverxref Extension
 hoverxref_auto_ref = True
@@ -89,9 +102,6 @@ suppress_warnings = ['image.nonlocal_uri']
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
-
-# The master toctree document.
-master_doc = 'index'
 
 # General information about the project.
 project = 'poliastro'
@@ -158,6 +168,7 @@ intersphinx_mapping = {
 
 if os.environ.get('POLIASTRO_SKIP_NOTEBOOKS') == 'True':
     nbsphinx_execute = 'never'
+    suppress_warnings.append('nbsphinx.thumbnail')
 else:
     nbsphinx_execute = 'always'
 
@@ -348,6 +359,7 @@ nbsphinx_thumbnails = {
     'examples/Propagation using Cowells formulation': '_static/thumbnails/cowell_thumbnail.png',
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
     'examples/Generating orbit groundtracks': '_static/thumbnails/groundtrack.png',
+    'examples/Detecting Events': '_static/thumbnails/eclipse.png',
 }
 
 # Custom nbsphinx format for Jupytext markdown notebooks

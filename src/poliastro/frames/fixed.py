@@ -76,10 +76,14 @@ class _PlanetaryFixed(BaseRADecFrame):
     @staticmethod
     def to_equatorial(fixed_coo, equatorial_frame):
         # TODO replace w/ something smart (Sun/Earth special cased)
-        if fixed_coo.body == Sun:
-            assert type(equatorial_frame) == HCRS
-        else:
-            assert fixed_coo.body == equatorial_frame.body
+        if fixed_coo.body == Sun and type(equatorial_frame) != HCRS:
+            raise ValueError(
+                f"Equatorial coordinates must be of type `HCRS`, got `{type(equatorial_frame)}` instead."
+            )
+        elif fixed_coo.body != Sun and fixed_coo.body != equatorial_frame.body:
+            raise ValueError(
+                "Fixed and equatorial coordinates must have the same body if the fixed frame body is not Sun"
+            )
 
         r = fixed_coo.cartesian
 
@@ -95,10 +99,14 @@ class _PlanetaryFixed(BaseRADecFrame):
     @staticmethod
     def from_equatorial(equatorial_coo, fixed_frame):
         # TODO replace w/ something smart (Sun/Earth special cased)
-        if fixed_frame.body == Sun:
-            assert type(equatorial_coo) == HCRS
-        else:
-            assert equatorial_coo.body == fixed_frame.body
+        if fixed_frame.body == Sun and type(equatorial_coo) != HCRS:
+            raise ValueError(
+                f"Equatorial coordinates must be of type `HCRS`, got `{type(equatorial_coo)}` instead."
+            )
+        elif fixed_frame.body != Sun and equatorial_coo.body != fixed_frame.body:
+            raise ValueError(
+                "Fixed and equatorial coordinates must have the same body if the fixed frame body is not Sun"
+            )
 
         r = equatorial_coo.cartesian
 
@@ -127,8 +135,8 @@ class _PlanetaryFixed(BaseRADecFrame):
             Right ascension and declination of north pole, and angle of the prime meridian.
 
         """
-        T = (epoch.tdb - J2000).to(u.day).value / 36525
-        d = (epoch.tdb - J2000).to(u.day).value
+        T = (epoch.tdb - J2000).to_value(u.d) / 36525
+        d = (epoch.tdb - J2000).to_value(u.d)
         return cls._rot_elements_at_epoch(T, d)
 
     @staticmethod

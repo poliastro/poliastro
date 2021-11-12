@@ -325,6 +325,27 @@ def test_czml_add_orbit():
     assert repr(extractor.packets) == expected_doc
 
 
+def test_czml_add_orbit_negative_rtol_raises_error_if_beyond_range():
+    start_epoch = iss.epoch
+    end_epoch = iss.epoch + molniya.period
+
+    sample_points = 10
+
+    extractor = CZMLExtractor(start_epoch, end_epoch, sample_points)
+
+    with pytest.raises(ValueError) as excinfo:
+        extractor.add_orbit(
+            molniya,
+            rtol=1e2,  # rtol > 1.
+            label_text="Molniya",
+            label_fill_color=[125, 80, 120, 255],
+        )
+    assert (
+        "The relative tolerance must be a value in the range (0, 1)"
+        in excinfo.exconly()
+    )
+
+
 @pytest.fixture()
 def expected_doc_add_trajectory():
     expected_doc = """[{

@@ -6,7 +6,7 @@ import numpy as np
 from astropy import units as u
 
 from poliastro.bodies import Earth
-from poliastro.core.perturbations import J2_perturbation, atmospheric_drag_model
+from poliastro.core.perturbations import J2_perturbation
 from poliastro.core.propagation import func_twobody
 from poliastro.earth.enums import EarthGravity
 from poliastro.spacecraft import Spacecraft
@@ -95,15 +95,13 @@ class EarthSatellite:
         if gravity is EarthGravity.J2:
             perturbations[J2_perturbation] = {
                 "J2": Earth.J2.value,
-                "R": Earth.R.to(u.km).value,
+                "R": Earth.R.to_value(u.km),
             }
         if atmosphere is not None:
-            perturbations[atmospheric_drag_model] = {
-                "R": Earth.R.to(u.km).value,
-                "C_D": self.spacecraft.C_D,
-                "A_over_m": (self.spacecraft.A / self.spacecraft.m),
-                "model": atmosphere,
-            }
+            # Cannot compute density without knowing the state,
+            # the perturbations parameters are not always fixed
+            # TODO: This whole function probably needs a refactoring
+            raise NotImplementedError
 
         def f(t0, state, k):
             du_kep = func_twobody(t0, state, k)

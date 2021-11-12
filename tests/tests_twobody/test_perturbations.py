@@ -14,8 +14,8 @@ from poliastro.core.elements import rv2coe
 from poliastro.core.perturbations import (
     J2_perturbation,
     J3_perturbation,
+    atmospheric_drag,
     atmospheric_drag_exponential,
-    atmospheric_drag_model,
     radiation_pressure,
     third_body,
 )
@@ -106,7 +106,13 @@ def test_J3_propagation_Earth(test_params):
     k = Earth.k.to(u.km ** 3 / u.s ** 2).value
 
     orbit = Orbit.from_classical(
-        Earth, a_ini, ecc_ini, inc_ini, raan_ini, argp_ini, nu_ini
+        attractor=Earth,
+        a=a_ini,
+        ecc=ecc_ini,
+        inc=inc_ini,
+        raan=raan_ini,
+        argp=argp_ini,
+        nu=nu_ini,
     )
 
     def f(t0, u_, k):
@@ -322,8 +328,18 @@ def test_atmospheric_demise_coesa76():
 
     def f(t0, u_, k):
         du_kep = func_twobody(t0, u_, k)
-        ax, ay, az = atmospheric_drag_model(
-            t0, u_, k, R=R, C_D=C_D, A_over_m=A_over_m, model=coesa76
+
+        # Avoid undershooting H below attractor radius R
+        H = max(norm(u_[:3]), R)
+        rho = coesa76.density((H - R) * u.km).to_value(u.kg / u.km ** 3)
+
+        ax, ay, az = atmospheric_drag(
+            t0,
+            u_,
+            k,
+            C_D=C_D,
+            A_over_m=A_over_m,
+            rho=rho,
         )
         du_ad = np.array([0, 0, 0, ax, ay, az])
         return du_kep + du_ad
@@ -619,13 +635,13 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
 
         with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
             initial = Orbit.from_classical(
-                Earth,
-                10085.44 * u.km,
-                0.025422 * u.one,
-                88.3924 * u.deg,
-                45.38124 * u.deg,
-                227.493 * u.deg,
-                343.4268 * u.deg,
+                attractor=Earth,
+                a=10085.44 * u.km,
+                ecc=0.025422 * u.one,
+                inc=88.3924 * u.deg,
+                raan=45.38124 * u.deg,
+                argp=227.493 * u.deg,
+                nu=343.4268 * u.deg,
                 epoch=epoch,
             )
         # In Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing

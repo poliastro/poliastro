@@ -22,24 +22,28 @@ def _kepler_equation_prime_hyper(F, M, ecc):
     return ecc * np.cosh(F) - 1
 
 
-@jit
-def newton(regime, x0, args=(), tol=1.48e-08, maxiter=50):
-    p0 = 1.0 * x0
-    for iter in range(maxiter):
-        if regime == "hyperbolic":
-            fval = _kepler_equation_hyper(p0, *args)
-            fder = _kepler_equation_prime_hyper(p0, *args)
-        else:
-            fval = _kepler_equation(p0, *args)
-            fder = _kepler_equation_prime(p0, *args)
+def newton_factory(func, fprime):
+    @jit
+    def jit_newton_wrapper(x0, args=(), tol=1.48e-08, maxiter=50):
+        p0 = float(x0)
+        for _ in range(maxiter):
+            fval = func(p0, *args)
+            fder = fprime(p0, *args)
+            newton_step = fval / fder
+            p = p0 - newton_step
+            if abs(p - p0) < tol:
+                return p
+            p0 = p
 
-        newton_step = fval / fder
-        p = p0 - newton_step
-        if abs(p - p0) < tol:
-            return p
-        p0 = p
+        return np.nan
 
-    return np.nan
+    return jit_newton_wrapper
+
+
+_newton_elliptic = newton_factory(_kepler_equation, _kepler_equation_prime)
+_newton_hyperbolic = newton_factory(
+    _kepler_equation_hyper, _kepler_equation_prime_hyper
+)
 
 
 @jit
@@ -285,7 +289,7 @@ def M_to_E(M, ecc):
         E0 = M - ecc
     else:
         E0 = M + ecc
-    E = newton("elliptic", E0, args=(M, ecc))
+    E = _newton_elliptic(E0, args=(M, ecc))
     return E
 
 
@@ -320,7 +324,7 @@ def M_to_F(M, ecc):
             F0 = M - np.sign(M) * ecc
         else:
             F0 = M / (ecc - 1)
-    F = newton("hyperbolic", F0, args=(M, ecc), maxiter=100)
+    F = _newton_hyperbolic(F0, args=(M, ecc), maxiter=100)
     return F
 
 

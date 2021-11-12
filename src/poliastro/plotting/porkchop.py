@@ -82,10 +82,10 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
         c3_arrival = dv_arr ** 2
 
         return (
-            dv_dpt.to(u.km / u.s).value,
-            dv_arr.to(u.km / u.s).value,
-            c3_launch.to(u.km ** 2 / u.s ** 2).value,
-            c3_arrival.to(u.km ** 2 / u.s ** 2).value,
+            dv_dpt.to_value(u.km / u.s),
+            dv_arr.to_value(u.km / u.s),
+            c3_launch.to_value(u.km ** 2 / u.s ** 2),
+            c3_arrival.to_value(u.km ** 2 / u.s ** 2),
             tof.jd,
         )
 
@@ -193,7 +193,7 @@ class PorkchopPlotter:
         else:
             fig = self.ax.figure
 
-        c3_levels = np.linspace(0, self.max_c3.to(u.km ** 2 / u.s ** 2).value, 30)
+        c3_levels = np.linspace(0, self.max_c3.to_value(u.km ** 2 / u.s ** 2), 30)
 
         c = self.ax.contourf(
             [D.to_datetime() for D in self.launch_span],
@@ -233,7 +233,7 @@ class PorkchopPlotter:
 
         if self.vhp:
 
-            vhp_levels = np.linspace(0, self.max_vhp.to(u.km / u.s).value, 5)
+            vhp_levels = np.linspace(0, self.max_vhp.to_value(u.km / u.s), 5)
 
             vhp_contour = self.ax.contour(
                 [D.to_datetime() for D in self.launch_span],
