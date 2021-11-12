@@ -182,9 +182,19 @@ class BaseOrbitPlotter:
 
                 # Compute the minimum and maximum anomalies
                 min_nu = orbit_phase.nu
+                # High level, but inefficient way of solving the Kepler equation,
+                # which is what farnocchia_coe does:
+                # tp0 = delta_t_from_nu(nu, ecc, k, q)
+                # tp = tp0 + tof
+                # max_nu = nu_from_delta_t(tp, ecc, k, q)
                 max_nu = orbit_phase.propagate(time_to_next_impulse).nu
 
                 # Collect the coordinate points for the i-th orbit phase
+                # We use .sample rather than poliastro.twobody.propagation.propagate
+                # because the latter samples time uniformly
+                # and therefore generates a sharp curve close to the perigee,
+                # and that's also why I need to compute the anomalies outside,
+                # see https://github.com/poliastro/poliastro/issues/1364
                 phase_coordinates = orbit_phase.sample(
                     min_anomaly=min_nu, max_anomaly=max_nu
                 )
