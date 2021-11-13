@@ -15,6 +15,7 @@ from poliastro.core.angles import (
     M_to_D as M_to_D_fast,
     M_to_E as M_to_E_fast,
     M_to_F as M_to_F_fast,
+    M_to_nu_elliptic as M_to_nu_elliptic_fast,
     fp_angle as fp_angle_fast,
     nu_to_D as nu_to_D_fast,
     nu_to_E as nu_to_E_fast,
@@ -214,6 +215,26 @@ def M_to_D(M):
 
     """
     return (M_to_D_fast(M.to_value(u.rad)) * u.rad).to(M.unit)
+
+
+@u.quantity_input(M=u.rad, ecc=u.one)
+def M_to_nu_elliptic(M, ecc):
+    """True anomaly from mean anomaly. This is the same as `E_to_nu(M_to_E())` but slightly faster.
+
+    Parameters
+    ----------
+    M : ~astropy.units.Quantity
+        Mean anomaly.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+
+    Returns
+    -------
+    nu : ~astropy.units.Quantity
+        True anomaly.
+
+    """
+    return (M_to_nu_elliptic_fast(M.to_value(u.rad), ecc.value) * u.rad).to(M.unit)
 
 
 @u.quantity_input(E=u.rad, ecc=u.one)

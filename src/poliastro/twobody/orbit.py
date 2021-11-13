@@ -25,11 +25,10 @@ from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import (
     D_to_nu,
-    E_to_nu,
     F_to_nu,
     M_to_D,
-    M_to_E,
     M_to_F,
+    M_to_nu_elliptic,
     raan_from_ltan,
 )
 from poliastro.twobody.elements import (
@@ -638,7 +637,7 @@ class Orbit:
         # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
         if ecc < 1:
             M = (M + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
-            nu = E_to_nu(M_to_E(M, ecc), ecc)
+            nu = M_to_nu_elliptic(M, ecc)
         elif ecc == 1:
             nu = D_to_nu(M_to_D(M))
         else:

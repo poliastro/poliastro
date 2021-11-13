@@ -14,6 +14,7 @@ from poliastro.twobody.angles import (
     F_to_nu,
     M_to_E,
     M_to_F,
+    M_to_nu_elliptic,
     fp_angle,
     nu_to_E,
     nu_to_F,
@@ -140,6 +141,10 @@ def test_mean_to_true():
         expected_nu = expected_nu * u.deg
 
         nu = E_to_nu(M_to_E(M, ecc), ecc)
+
+        assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
+
+        nu = M_to_nu_elliptic(M, ecc)
 
         assert_quantity_allclose(nu, expected_nu, rtol=1e-4)
 

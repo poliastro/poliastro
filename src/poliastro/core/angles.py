@@ -354,6 +354,11 @@ def M_to_D(M):
 
 
 @jit
+def M_to_nu_elliptic(M, ecc):
+    return E_to_nu(M_to_E(M=M, ecc=ecc), ecc=ecc)
+
+
+@jit
 def E_to_M(E, ecc):
     r"""Mean anomaly from eccentric anomaly.
 

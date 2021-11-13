@@ -5,12 +5,11 @@ from poliastro.core.angles import (
     D_to_M,
     D_to_nu,
     E_to_M,
-    E_to_nu,
     F_to_M,
     F_to_nu,
     M_to_D,
-    M_to_E,
     M_to_F,
+    M_to_nu_elliptic,
     nu_to_D,
     nu_to_E,
     nu_to_F,
@@ -228,8 +227,7 @@ def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
         M = n * delta_t
         # This might represent several revolutions,
         # so we wrap the true anomaly
-        E = M_to_E((M + np.pi) % (2 * np.pi) - np.pi, ecc)
-        nu = E_to_nu(E, ecc)
+        nu = M_to_nu_elliptic((M + np.pi) % (2 * np.pi) - np.pi, ecc)
     elif 1 - delta <= ecc < 1:
         E_delta = np.arccos((1 - delta) / ecc)
         # We compute M assuming we are in the strong elliptic case
@@ -241,8 +239,7 @@ def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
             # Strong elliptic, proceed
             # This might represent several revolutions,
             # so we wrap the true anomaly
-            E = M_to_E((M + np.pi) % (2 * np.pi) - np.pi, ecc)
-            nu = E_to_nu(E, ecc)
+            nu = M_to_nu_elliptic((M + np.pi) % (2 * np.pi) - np.pi, ecc)
         else:
             # Near parabolic, recompute M
             n = np.sqrt(k / (2 * q ** 3))
