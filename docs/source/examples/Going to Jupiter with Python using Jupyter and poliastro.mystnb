@@ -88,9 +88,6 @@ ss_efly = Orbit.from_ephem(Sun, earth, date_flyby)
 ic1 = ss_e0.apply_maneuver(man)
 ic1_end = ic1.propagate_to_anomaly(180.0 * u.deg)
 
-# We solve for Earth's position when Juno is at aphelion
-ss_e_ic1 = Orbit.from_ephem(Sun, earth, epoch=ic1_end.epoch)
-
 # We can check new bodies positions
 plotter = StaticOrbitPlotter()
 plotter.plot_body_orbit(Earth, ic1_end.epoch, label="Earth at end of flyby")
