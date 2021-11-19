@@ -2,30 +2,39 @@
 
 ## poliastro 0.16 (Unreleased)
 
+...
+
 ### Highlights
 
-- Lots of new event detectors! https://github.com/poliastro/poliastro/pull/1304
-  check out docs in ...
+- **New event detectors**
+  Yash wrote a number of event detectors meant for our numerical propagator
+  as part of his Google Summer of Code 2021.
+  Have a look at {doc}`/examples/Detecting Events` guide to learn more.
+- **Many performance improvements**
+  Several contributors have helped accelerate more algorithms
+  and move them to the Core layer,
+  which should result in a noticeable improvement in execution time.
 
 ### New features
 
-- New `AltitudeCrossEvent` class https://github.com/poliastro/poliastro/pull/1254
-- New `LatitudeCrossEvent` class https://github.com/poliastro/poliastro/pull/1268
-- New `EclipseEvent` class https://github.com/poliastro/poliastro/pull/1246
-- New `NodeCrossEvent` class https://github.com/poliastro/poliastro/pull/1293
-- New `LosEvent` class https://github.com/poliastro/poliastro/pull/1258
-- Now `alinspace` accepts angle differences beyond $2\pi$ https://github.com/poliastro/poliastro/pull/1249
-- Compatibility with Plotly 5 https://github.com/poliastro/poliastro/pull/1262
-- Support for Astropy 4.X? https://github.com/poliastro/poliastro/pull/1217
-- Add ability to change axis units in interactive plots https://github.com/poliastro/poliastro/pull/1318
-- New unit-safe continuous thrust guidance laws https://github.com/poliastro/poliastro/pull/1356, https://github.com/poliastro/poliastro/pull/1366, https://github.com/poliastro/poliastro/pull/1389
-- New util functions `spherical_to_cartesian` https://github.com/poliastro/poliastro/pull/1358 `eccentricity_vector` https://github.com/poliastro/poliastro/pull/1389
-- New `.plot_maneuver` method of orbit plotters https://github.com/poliastro/poliastro/pull/1359 and https://github.com/poliastro/poliastro/pull/1378
+- New {py:class}`poliastro.twobody.events.AltitudeCrossEvent`,
+  {py:class}`poliastro.twobody.events.LatitudeCrossEvent`,
+  {py:class}`poliastro.twobody.events.EclipseEvent`,
+  {py:class}`poliastro.twobody.events.NodeCrossEvent`,
+  and {py:class}`poliastro.twobody.events.LosEvent` classes.
+- Now {py:meth}`poliastro.core.util.alinspace` accepts angle differences beyond $2\pi$ - Compatibility with Plotly 5 and Astropy 4.3.
+- New ``unit`` parameter of {py:class}`poliastro.plotting.OrbitPlotter2D`
+  and {py:class}`poliastro.plotting.OrbitPlotter3D`
+  that allow changing the axis units.
+- New ``.plot_maneuver`` method of {py:class}`poliastro.plotting.OrbitPlotter2D`
+  and {py:class}`poliastro.plotting.OrbitPlotter3D`.
+- New util functions {py:meth}`poliastro.core.util.spherical_to_cartesian`
+  and {py:meth}`poliastro.core.util.eccentricity_vector`.
 
-### "Contrib" (TBC)
+In addition, we have new community-contributed scripts:
 
-- Relative orbits https://github.com/poliastro/poliastro/pull/1204
-- Mean elements https://github.com/poliastro/poliastro/pull/1211
+- [Relative orbits](https://github.com/poliastro/poliastro/blob/main/contrib/relative.py).
+- [Mean elements](https://github.com/poliastro/poliastro/blob/main/contrib/rv2tle.py).
 
 ### Performance improvements
 
@@ -66,6 +75,8 @@
 - Replaced some assertions by proper errors https://github.com/poliastro/poliastro/pull/1367
 - Replaced `atmospheric_drag_model` by `atmospheric_drag` with a simpler signature https://github.com/poliastro/poliastro/pull/1375
 - Disable atmosphere perturbation in `EarthSatellite` https://github.com/poliastro/poliastro/pull/1375
+- Made continuous thrust guidance laws from {py:mod}`poliastro.twobody.thrust`
+  unit-safe.
 
 ### Contributors
 
