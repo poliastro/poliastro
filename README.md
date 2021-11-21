@@ -39,9 +39,7 @@ from poliastro.examples import molniya
 molniya.plot()
 ```
 
-<p align="center">
-    <image src="https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png">
-</p>
+![Molniya orbit](https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png)
 
 # Documentation
 
@@ -160,11 +158,11 @@ Support us by becoming a sponsor. Your logo will show up here with a link to you
 
 # FAQ
 
-## What\'s up with the name?
+## What's up with the name?
 
 poliastro comes from Polimi, which is the shortened name of the
 Politecnico di Milano, the Italian university where I was studying while
-writing this software. It\'s my tiny tribute to a place I came to love.
+writing this software. It's my tiny tribute to a place I came to love.
 *Grazie mille!*
 
 ## Can I do \<insert awesome thing\> with poliastro?
