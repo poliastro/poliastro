@@ -77,23 +77,29 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return colors
 
-    def _draw_marker(self, marker, size, color, name, center=None):
+    def _draw_marker(self, marker, size, mew, color, name, center=None):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
 
         (l,) = self._ax.plot(
-            x_center.to_value(u.km), y_center.to_value(u.km), "o", mew=0, color=color
+            x_center.to_value(u.km),
+            y_center.to_value(u.km),
+            marker,
+            markersize=size,
+            mew=mew,
+            color=color,
+            label=name,
         )
 
         return l
 
     def _draw_point(self, radius, color, name, center=None):
-        point_marker = self._draw_marker("o", 0, color, name, center)
+        point_marker = self._draw_marker("o", 5, None, color, name, center)
         return point_marker
 
     def _draw_impulse(self, color, name, center=None):
-        impulse_marker = self._draw_marker("x", 2, color, name, center)
+        impulse_marker = self._draw_marker("x", 10, 3, color, name, center)
         return impulse_marker
 
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
@@ -228,14 +234,17 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        lines = self._plot_maneuver(
+        # Collect the labels and lines for each one of the phases of the maneuver
+        lines_list = self._plot_maneuver(
             initial_orbit, maneuver, label=label, color=color, trail=trail
         )
 
+        # Generate the legend labels in the same order as the maneuver impulses
+        # are executed
         if label:
-            self._set_legend(label, *lines)
+            [self._set_legend(lines_label, *lines) for lines_label, lines in lines_list]
 
-        return lines
+        return lines_list
 
     def plot(self, orbit, *, label=None, color=None, trail=False):
         """Plots state and osculating orbit in their plane.
