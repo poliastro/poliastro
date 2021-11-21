@@ -1,6 +1,4 @@
-<p align="center">
-    <a href="https://www.poliastro.space/"><image src="https://www.poliastro.space/images/logo_text.png" alt="poliastro logo" width="675px"></a>
-</p>
+[![poliastro](https://www.poliastro.space/images/logo_text.png)](https://www.poliastro.space/)
 
 Name:         | poliastro
 :------------:|:--------------
