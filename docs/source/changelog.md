@@ -2,7 +2,9 @@
 
 ## poliastro 0.16 (Unreleased)
 
-...
+This new major release includes lots of API changes and enhancements,
+including numerous performance improvements
+as well as the results from Google Summer of Code 2021.
 
 ### Highlights
 
@@ -10,6 +12,12 @@
   Yash wrote a number of event detectors meant for our numerical propagator
   as part of his Google Summer of Code 2021.
   Have a look at {doc}`/examples/Detecting Events` guide to learn more.
+- **New ``.plot_maneuver`` method**
+  The interactive orbit plotters {py:class}`~poliastro.plotting.OrbitPlotter2D`
+  and {py:class}`~poliastro.plotting.OrbitPlotter3D`
+  now have a new method to easily display impulsive burns.
+  See {doc}`/examples/Going to Jupiter with Python using Jupyter and poliastro`
+  for an example.
 - **Many performance improvements**
   Several contributors have helped accelerate more algorithms
   and move them to the Core layer,
@@ -26,8 +34,6 @@
 - New ``unit`` parameter of {py:class}`poliastro.plotting.OrbitPlotter2D`
   and {py:class}`poliastro.plotting.OrbitPlotter3D`
   that allow changing the axis units.
-- New ``.plot_maneuver`` method of {py:class}`poliastro.plotting.OrbitPlotter2D`
-  and {py:class}`poliastro.plotting.OrbitPlotter3D`.
 - New util functions {py:meth}`poliastro.core.util.spherical_to_cartesian`
   and {py:meth}`poliastro.core.util.eccentricity_vector`.
 
@@ -79,6 +85,29 @@ In addition, we have new community-contributed scripts:
   unit-safe.
 
 ### Contributors
+
+This is the complete list of the people that contributed to this
+release, with a + sign indicating first contribution.
+
+- Bibiana Rivadeneira+
+- Dhruv Sondhi
+- Francisco Chicano+
+- Iago Alonso
+- Ismael Jiménez
+- Javier Tegedor
+- Jero Bado
+- Johana Murcia+
+- Jorge Martínez Garrido
+- Juan Luis Cano Rodríguez
+- Juliana Nieto+
+- Manuel López-Ibáñez+
+- Marwan Hawari+
+- Matthew Feickert+
+- Samuel Low+
+- Sreyan Ghosh+
+- Stuart Mumford+
+- Syed Osama Hussain
+- Yash Gondhalekar
 
 ## poliastro 0.15.2 - 2021-06-27
 
