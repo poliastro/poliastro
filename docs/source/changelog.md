@@ -38,43 +38,43 @@ In addition, we have new community-contributed scripts:
 
 ### Performance improvements
 
-- Accelerate flyby computations https://github.com/poliastro/poliastro/pull/1184
-- Accelerate planetary reference frames computations https://github.com/poliastro/poliastro/pull/1190/
-- Accelerate sensor computations https://github.com/poliastro/poliastro/pull/1191
-- Accelerate some low-thrust guidance lows https://github.com/poliastro/poliastro/pull/1250
-- Accelerate CZML computations https://github.com/poliastro/poliastro/pull/1252
-- Accelerate parabolic and hyperbolic anomaly computations https://github.com/poliastro/poliastro/pull/1247
-- Accelerate atmosphere computations https://github.com/poliastro/poliastro/pull/1280 and https://github.com/poliastro/poliastro/pull/1282
-- Slightly accelerate propagation for all propagators https://github.com/poliastro/poliastro/pull/1286
-- Accelerate `func_twobody` https://github.com/poliastro/poliastro/pull/1386
-- Vectorize `rotation_matrix` https://github.com/poliastro/poliastro/pull/1373
+- Accelerated flyby computations ({github}`PR #1184 <#1184>`)
+- Accelerate planetary reference frames computations ({github}`PR #1190 <#1190>`)
+- Accelerate sensor computations ({github}`PR #1191 <#1191>`)
+- Accelerate some low-thrust guidance lows ({github}`PR #1250 <#1250>`)
+- Accelerate CZML computations ({github}`PR #1252 <#1252>`)
+- Accelerate parabolic and hyperbolic anomaly computations ({github}`PR #1247 <#1247>`)
+- Accelerate atmosphere computations ({github}`PR #1280 <#1280>`) and ({github}`PR #1282 <#1282>`)
+- Slightly accelerate propagation for all propagators ({github}`PR #1286 <#1286>`)
+- Accelerate `func_twobody` ({github}`PR #1386 <#1386>`)
+- Vectorize `rotation_matrix` ({github}`PR #1373 <#1373>`)
 
 ### Documentation improvements
 
-- Add new notebook for event detectors https://github.com/poliastro/poliastro/pull/1304
-- Easy way of copying code snippets https://github.com/poliastro/poliastro/pull/1332
+- Add new notebook for event detectors ({github}`PR #1304 <#1304>`)
+- Easy way of copying code snippets ({github}`PR #1332 <#1332>`)
 
 ### Bugs fixed
 
-- Fix corner case in latitude computation https://github.com/poliastro/poliastro/issues/1290
-- Fix `Jacchia77` method signatures https://github.com/poliastro/poliastro/pull/1334
-- Avoid changing orbit plane in `apply_maneuver` https://github.com/poliastro/poliastro/pull/1369
-- Fix convergence of Izzo algorithm in certain cases https://github.com/poliastro/poliastro/pull/1371
-- Fix semimajor-axis-only continuous thrust guidance law https://github.com/poliastro/poliastro/pull/1390
+- Fix corner case in latitude computation ({github}`Issue #1290 <#1290>`)
+- Fix `Jacchia77` method signatures ({github}`PR #1334 <#1334>`)
+- Avoid changing orbit plane in `apply_maneuver` ({github}`PR #1369 <#1369>`)
+- Fix convergence of Izzo algorithm in certain cases ({github}`PR #1371 <#1371>`)
+- Fix semimajor-axis-only continuous thrust guidance law ({github}`PR #1390 <#1390>`)
 
 ### Backwards incompatible changes
 
-- Rename function https://github.com/poliastro/poliastro/pull/1224
-- Switch `shadow_function` sign convention https://github.com/poliastro/poliastro/pull/1243
-- Some `Orbit` classmethods will raise an error if passed a negative altitude https://github.com/poliastro/poliastro/pull/1255
-- `Sun` is not a `SolarSystemPlanet` anymore, but a `Body` https://github.com/poliastro/poliastro/pull/1264
-- Continue propagation if `event.terminal` is `False` ???
-- Remove unused `generate_circle` function https://github.com/poliastro/poliastro/pull/1313
-- Now `change_a_inc.compute_parameters` does not return inclination change https://github.com/poliastro/poliastro/pull/1344
-- Renamed `change_inc_ecc` to `change_ecc_inc` for consistency https://github.com/poliastro/poliastro/pull/1346
-- Replaced some assertions by proper errors https://github.com/poliastro/poliastro/pull/1367
-- Replaced `atmospheric_drag_model` by `atmospheric_drag` with a simpler signature https://github.com/poliastro/poliastro/pull/1375
-- Disable atmosphere perturbation in `EarthSatellite` https://github.com/poliastro/poliastro/pull/1375
+- Rename function ({github}`PR #1224 <#1224>`)
+- Switch `shadow_function` sign convention ({github}`PR #1243 <#1243>`)
+- Some `Orbit` classmethods will raise an error if passed a negative altitude ({github}`PR #1255 <#1255>`)
+- `Sun` is not a `SolarSystemPlanet` anymore, but a `Body` ({github}`PR #1264 <#1264>`)
+- Continue propagation if `event.terminal` is `False`
+- Remove unused `generate_circle` function ({github}`PR #1313 <#1313>`)
+- Now `change_a_inc.compute_parameters` does not return inclination change ({github}`PR #1344 <#1344>`)
+- Renamed `change_inc_ecc` to `change_ecc_inc` for consistency ({github}`PR #1346 <#1346>`)
+- Replaced some assertions by proper errors ({github}`PR #1367 <#1367>`)
+- Replaced `atmospheric_drag_model` by `atmospheric_drag` with a simpler signature ({github}`PR #1375 <#1375>`)
+- Disable atmosphere perturbation in `EarthSatellite` ({github}`PR #1375 <#1375>`)
 - Made continuous thrust guidance laws from {py:mod}`poliastro.twobody.thrust`
   unit-safe.
 

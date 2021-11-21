@@ -14,6 +14,7 @@
 # serve to show the default.
 
 import os
+import sys
 
 # Checking the import state for importlib.metadata.version method
 try:
@@ -24,6 +25,9 @@ except ImportError:
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 import sphinx_rtd_theme
+
+# To add extensions without pip-installing them
+sys.path.append(os.path.abspath("./_ext"))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -54,7 +58,11 @@ extensions = [
     'notfound.extension',
     'hoverxref.extension',
     'myst_parser',
+    'sphinx_github_role',  # See _ext directory
 ]
+
+# GitHub role config
+github_default_org_project = ("poliastro", "poliastro")
 
 # MathJax config
 # See https://github.com/spatialaudio/nbsphinx/issues/572#issuecomment-853389268
