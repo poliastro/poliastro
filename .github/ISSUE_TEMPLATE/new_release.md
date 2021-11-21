@@ -14,6 +14,7 @@ assignees: astrojuanlu
   - Commits since last release branch https://github.com/poliastro/poliastro/compare/X.Y.Z...master
   - Issues closed in this milestone https://github.com/poliastro/poliastro/milestone/N?closed=1 (note that there might be issues without milestone!)
   - Pull requests merged since last branching https://github.com/poliastro/poliastro/pulls?q=is%3Apr+is%3Amerged+merged%3A%3E%3D2019-02-09+sort%3Aupdated-asc
+  - List of contributors: `git shortlog --summary --email ${BRANCHING_COMMIT}..`
 
 ## Before the beta release
 
@@ -21,8 +22,8 @@ assignees: astrojuanlu
 * [ ] Bump version **to X.Yb1** in:
   - `README.md`
   - `__init__.py`
-* [ ] Check all the badges in `README` point to the appropriate git **branch** (replace `main` by new branch `sed -i 's/main/.../g' README.md`)
-* [ ] Check that docs badges and URLs point to appropriate **tag** (replace `latest` by new tag, without sed!)
+* [ ] Check all the badges in `README` point to the appropriate git **branch** (manually replace `main` by new branch)
+* [ ] Check that docs badges and URLs point to appropriate **tag** (manually replace `latest` by new tag)
 * [ ] `git commit -m 'Bump to next beta version'`
 * [ ] Generate sdist and bdist_wheel with `python -m build`
 * [ ] `twine upload dist/* --repository-url https://test.pypi.org/legacy/`
