@@ -4,9 +4,9 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.13.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -15,7 +15,7 @@ kernelspec:
 
 The World Meteorological Organization (WMO) defines the atmosphere as:
 
-*`A hypotetical vertical distribution of atmospheric temperature, pressure and density which by international agreement and for historical reasons, is roughly representative of year-round, midlatitude conditions.`*
+*`A hypothetical vertical distribution of atmospheric temperature, pressure and density which by international agreement and for historical reasons, is roughly representative of year-round, midlatitude conditions.`*
 
 In fact, the atmosphere is the mean that makes the link between the ground and space and it is crucial when studying perturbations since drag affects LEO satellites.
 
@@ -112,7 +112,7 @@ for name in layer_names:
     )
 ```
 
-# Temperature, pressure and density distrubutions
+# Temperature, pressure and density distributions
 
 One of the advantages of COESA76 is that it extends up to 1000 kilometers. The behaviour of previous magnitudes against geometrical altitude can be checked in the following figure. **A logarithmic scale is applied for pressure and density to better see their decay for high altitude values**:
 
@@ -120,7 +120,6 @@ One of the advantages of COESA76 is that it extends up to 1000 kilometers. The b
 # We create the basis for the figure
 fig, axs = plt.subplots(1, 3, figsize=(12, 5))
 fig.suptitle("State variables against altitude", fontweight="bold")
-fig.text(0.04, 0.5, 'Altitude [km]', va='center', rotation='vertical')
 
 # Complete altitude range and initialization of state variables sets
 alt_span = np.linspace(0, 1000, 1001) * u.km
@@ -138,7 +137,7 @@ for alt in alt_span:
 # Temperature plot
 axs[0].set_title("Temperature")
 axs[0].set_xlabel("T [K]")
-axs[0].set_xlabel("Altitude [K]")
+axs[0].set_ylabel("Altitude [K]")
 axs[0].plot(T_span, alt_span)
 
 # Pressure plot
