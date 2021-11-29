@@ -247,13 +247,13 @@ class Ephem:
         *,
         attractor=None,
         plane=Planes.EARTH_EQUATOR,
-        id_type="smallbody",
+        id_type=None,
     ):
         """Return `Ephem` for an object using JPLHorizons module of Astroquery.
 
         Parameters
         ----------
-        name : string
+        name : str
             Name of the body to query for.
         epochs: ~astropy.time.Time
             Epochs to sample the body positions.
@@ -262,9 +262,9 @@ class Ephem:
             if not given the Solar System Barycenter will be used.
         plane : ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
-        id_type : str, optional
-            Use "smallbody" for Asteroids and Comets (default), and "majorbody"
-            for Planets and Satellites.
+        id_type : NoneType or str, optional
+            Use "smallbody" for Asteroids and Comets and None (default) to first
+            search for Planets and Satellites.
 
         """
         if epochs.isscalar:
