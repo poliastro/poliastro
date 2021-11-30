@@ -146,6 +146,13 @@ you need to start from step 1.
 To build the docs, run:
 
 ```console
+$ tox -e docs
+```
+
+Or, alternatively:
+
+```console
+(.venv) $ pip install -e .[doc]  # Installs doc dependencies
 (.venv) $ cd docs
 (.venv) $ make html
 ```
