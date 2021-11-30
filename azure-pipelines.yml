@@ -92,7 +92,7 @@ jobs:
   parameters:
     ${{ if startsWith(variables.Build.SourceBranch, 'refs/tags/v') }}:
       pypi_connection_name: 'pypi_upload'
-    test_extras: 'dev'
+    test_extras: 'test'
     test_command: 'cd $(Build.SourcesDirectory)/tests; pytest -m "not slow and not mpl_image_compare"'
     targets:
     - sdist
