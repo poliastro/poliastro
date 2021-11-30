@@ -143,13 +143,22 @@ you need to start from step 1.
 
 ### Build the documentation
 
-To build the docs, run:
+To build the docs, you will need some system dependencies.
+On Debian-like systems (Ubuntu, Linux Mint, etc),
+they can be installed running:
+
+```console
+$ sudo apt-get update && sudo apt-get install \
+pandoc texlive texlive-latex-extra texlive-fonts-recommended dvipng graphviz cm-super-minimal
+```
+
+Then, either run:
 
 ```console
 $ tox -e docs
 ```
 
-Or, alternatively:
+or, alternatively:
 
 ```console
 (.venv) $ pip install -e .[doc]  # Installs doc dependencies
