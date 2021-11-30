@@ -78,13 +78,13 @@ doc = [
     "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery",
-    "sphinx_rtd_theme~=1.0.0rc1",
+    "sphinx_rtd_theme~=1.0.0",
     "sphinx-hoverxref==0.7b1",
     "sphinx-notfound-page",
     "sphinx-copybutton>0.2.9",
 ]
 test = [
-    "black==21.9b0",
+    "black==21.11b0",
     "coverage",
     "hypothesis",
     "import-linter",
