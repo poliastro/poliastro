@@ -65,12 +65,6 @@ jobs:
       - linux: py39
         name: py39_test
 
-      - windows: py38
-        name: py38_test_windows
-
-      - macos: py38
-        name: py38_test_macos
-
 - template: run-tox-env.yml@OpenAstronomy
   parameters:
     default_python: 3.8
