@@ -40,7 +40,7 @@ jobs:
     posargs: '-vv'
     envs:
       - linux: check
-        name : quality
+        name: quality
 
       - linux: py37
         name: py37_test
