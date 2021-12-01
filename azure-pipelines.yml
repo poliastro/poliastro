@@ -40,7 +40,7 @@ jobs:
     posargs: '-vv'
     envs:
       - linux: check
-        name : quality
+        name: quality
 
       - linux: py37
         name: py37_test
@@ -64,12 +64,6 @@ jobs:
 
       - linux: py39
         name: py39_test
-
-      - windows: py38
-        name: py38_test_windows
-
-      - macos: py38
-        name: py38_test_macos
 
 - template: run-tox-env.yml@OpenAstronomy
   parameters:

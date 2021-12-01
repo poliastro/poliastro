@@ -12,8 +12,7 @@ poliastro requires a number of Python packages, notably:
 - [Plotly](https://plotly.com/), for interactive orbit plotting
 - [SciPy](https://www.scipy.org/), for root finding and numerical propagation
 
-poliastro is usually tested on Linux and Windows on Python 3.7 and 3.8
-against the latest NumPy. It should work on OS X without problems.
+poliastro is supported on Linux, macOS and Windows on Python 3.7 to 3.9.
 
 ## Using conda
 
@@ -21,7 +20,7 @@ The easiest and fastest way to get the package up and running is to
 install poliastro using [conda](https://conda.io/docs/):
 
 ```bash
-$ conda install -c conda-forge poliastro=0.15
+$ conda install -c conda-forge poliastro
 ```
 
 or, better yet, using [mamba](https://mamba.readthedocs.io/),
@@ -29,7 +28,7 @@ which is a super fast replacement for `conda`:
 
 ```bash
 $ conda install -c conda-forge mamba
-$ mamba install -c conda-forge poliastro=0.15
+$ mamba install -c conda-forge poliastro
 ```
 
 ```{note}
