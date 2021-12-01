@@ -20,7 +20,7 @@ The easiest and fastest way to get the package up and running is to
 install poliastro using [conda](https://conda.io/docs/):
 
 ```bash
-$ conda install -c conda-forge poliastro=0.15
+$ conda install -c conda-forge poliastro
 ```
 
 or, better yet, using [mamba](https://mamba.readthedocs.io/),
@@ -28,7 +28,7 @@ which is a super fast replacement for `conda`:
 
 ```bash
 $ conda install -c conda-forge mamba
-$ mamba install -c conda-forge poliastro=0.15
+$ mamba install -c conda-forge poliastro
 ```
 
 ```{note}
