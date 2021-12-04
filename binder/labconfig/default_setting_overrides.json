@@ -1,0 +1,9 @@
+{
+  "@jupyterlab/docmanager-extension:plugin": {
+    "defaultViewers": {
+      "markdown": "Jupytext Notebook",
+      "myst": "Jupytext Notebook"
+    }
+  }
+}
+
