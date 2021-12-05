@@ -231,3 +231,28 @@ def test_apply_manuever_correct_plane():
     new_ceres = ceres.apply_maneuver(imp)
     assert ceres.plane == Planes.EARTH_ECLIPTIC
     assert new_ceres.plane == ceres.plane
+
+def test_lambert_tof_exception():
+    geo = Orbit.circular(
+        attractor = Earth,
+        alt = 36_000 * u.km,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        arglat=0 * u.deg,
+    )
+    man = Maneuver.impulse([0, 1, 0] * u.km / u.s)
+    gto = Orbit.circular(
+        attractor = Earth,
+        alt = 36_000 * u.km,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        arglat=-180 * u.deg,
+    )
+    gto = gto.apply_maneuver(man).propagate_to_anomaly(0 * u.deg)
+    with pytest.raises(ValueError) as excinfo:
+        Maneuver.lambert(gto, geo)
+    assert excinfo.type == ValueError
+    assert (
+        str(excinfo.value)
+        == "Time of Flight must be positive"
+    )
