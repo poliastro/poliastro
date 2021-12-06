@@ -18,7 +18,7 @@ repos:
   - id: mixed-line-ending
 
 - repo: https://github.com/PyCQA/isort
-  rev: 5.9.3
+  rev: 5.10.1
   hooks:
   - id: isort
     args: ["--project=poliastro", "--section-default=THIRDPARTY"]
@@ -29,7 +29,7 @@ repos:
       )
 
 - repo: https://github.com/psf/black
-  rev: 21.10b0
+  rev: 21.12b0
   hooks:
   - id: black-jupyter
     files: |
