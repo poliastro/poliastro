@@ -240,7 +240,7 @@ def test_lambert_tof_exception():
         inc=0 * u.deg,
         raan=0 * u.deg,
         arglat=0 * u.deg,
-        epoch = Time("J2000")
+        epoch=Time("J2000"),
     )
     ss_i = Orbit.circular(
         attractor=Earth,
@@ -248,9 +248,12 @@ def test_lambert_tof_exception():
         inc=0 * u.deg,
         raan=0 * u.deg,
         arglat=0 * u.deg,
-        epoch = Time("J2001")
+        epoch=Time("J2001"),
     )
     with pytest.raises(ValueError) as excinfo:
         Maneuver.lambert(ss_i, ss_f)
     assert excinfo.type == ValueError
-    assert str(excinfo.value) == "Epoch of intial orbit Greater than Epoch of final orbit causing a Negative Time Of Flight"
+    assert (
+        str(excinfo.value)
+        == "Epoch of intial orbit Greater than Epoch of final orbit causing a Negative Time Of Flight"
+    )
