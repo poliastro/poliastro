@@ -231,3 +231,29 @@ def test_apply_manuever_correct_plane():
     new_ceres = ceres.apply_maneuver(imp)
     assert ceres.plane == Planes.EARTH_ECLIPTIC
     assert new_ceres.plane == ceres.plane
+
+
+def test_lambert_tof_exception():
+    ss_f = Orbit.circular(
+        attractor=Earth,
+        alt=36_000 * u.km,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        arglat=0 * u.deg,
+        epoch=Time("J2000"),
+    )
+    ss_i = Orbit.circular(
+        attractor=Earth,
+        alt=36_000 * u.km,
+        inc=0 * u.deg,
+        raan=0 * u.deg,
+        arglat=0 * u.deg,
+        epoch=Time("J2001"),
+    )
+    with pytest.raises(ValueError) as excinfo:
+        Maneuver.lambert(ss_i, ss_f)
+    assert excinfo.type == ValueError
+    assert (
+        str(excinfo.value)
+        == "Epoch of intial orbit Greater than Epoch of final orbit causing a Negative Time Of Flight"
+    )
