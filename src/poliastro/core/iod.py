@@ -189,6 +189,7 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     """
 
     # Check preconditions
+    assert tof > 0
     assert k > 0
 
     # Check collinearity of r1 and r2
