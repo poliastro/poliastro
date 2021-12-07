@@ -253,4 +253,4 @@ def test_lambert_tof_exception():
     with pytest.raises(ValueError) as excinfo:
         Maneuver.lambert(ss_i, ss_f)
     assert excinfo.type == ValueError
-    assert str(excinfo.value) == "Time of Flight must be positive"
+    assert str(excinfo.value) == "Epoch of intial orbit Greater than Epoch of final orbit causing a Negative Time Of Flight"
