@@ -4,13 +4,13 @@ Name:         | poliastro
 :------------:|:--------------
 **Website**:  | <https://www.poliastro.space/>
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
-**Version**:  | 0.16b1
+**Version**:  | 0.16.0
 
 [![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.16.x)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.16.x)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=0.16.x)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/poliastro/poliastro/0.16.x.svg)](https://results.pre-commit.ci/latest/github/poliastro/poliastro/0.16.x)
 
-[![docs](https://img.shields.io/badge/docs-v0.16b1-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/v0.16b1/?badge=v0.16b1)
+[![docs](https://img.shields.io/badge/docs-v0.16.0-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/v0.16.0/?badge=v0.16.0)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/poliastro/poliastro/raw/0.16.x/COPYING)
 [![doi](https://zenodo.org/badge/11178845.svg?style=flat-square)](https://zenodo.org/badge/latestdoi/11178845)
 [![astropy](http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat-square)](http://www.astropy.org/)
@@ -43,7 +43,7 @@ molniya.plot()
 
 # Documentation
 
-[![docs](https://img.shields.io/badge/docs-v0.16b1-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/v0.16b1/?badge=v0.16b1)
+[![docs](https://img.shields.io/badge/docs-v0.16.0-brightgreen.svg?style=flat-square)](https://docs.poliastro.space/en/v0.16.0/?badge=v0.16.0)
 
 Complete documentation, including a user guide and an API reference, can
 be read on the wonderful [Read the Docs](https://readthedocs.org/).
@@ -176,7 +176,7 @@ such as TLE/3LE, OMM, and the like.
 Besides, poliastro is a community project that strives to be easy to use,
 while at the same time producing correct results
 [that are validated](https://github.com/poliastro/validation/)
-against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/v0.16b1/about.html#related-software)
+against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/v0.16.0/about.html#related-software)
 such as GMAT and Orekit.
 Therefore, you might find that its API is very different from
 these projects,
