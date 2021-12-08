@@ -34,27 +34,26 @@ assignees: astrojuanlu
 
 * [ ] Push branch to GitHub **and tags**
 * [ ] Check on Test PyPI that the badges will work
-* [ ] Upload sdist and bdist_wheel to PyPI - *this step cannot be undone if the release is removed!* `twine upload dist/* --repository-url https://upload.pypi.org/legacy/`
+* [ ] Upload sdist and bdist_wheel to PyPI - *this step cannot be undone if the release is removed!* `twine upload dist/*`
 * [ ] Check Read the Docs
 
 ## Before final release
 
-* [ ] Backport any bugs
-* [ ] Update release date in changelog
+* [ ] Backport any bugs to release branch
+* [ ] Update release date in changelog of release branch
 * [ ] Bump version **to X.Y.Z** in:
   - `README.md`
   - `__init__.py`
-  - Sphinx `conf.py`
 * [ ] Check that docs badges and URLs point to appropriate **tag** (replace `vX.Yb1` by `vX.Y.Z`)
-* [ ] Commit
-* [ ] Generate sdist and bdist_wheel
+* [ ] Push commit to release branch and wait for CI to be green
+* [ ] Generate sdist and bdist_wheel running `python -m build`
 * [ ] `twine upload dist/* --repository-url https://test.pypi.org/legacy/`
 * [ ] Tag
 
 ## Final release
 
 * [ ] Push tag to GitHub
-* [ ] Upload sdist and bdist_wheel to PyPI - *this step cannot be undone if the release is removed!* `twine upload dist/* --repository-url https://upload.pypi.org/legacy/`
+* [ ] Upload sdist and bdist_wheel to PyPI - *this step cannot be undone if the release is removed!* `twine upload dist/*`
 * [ ] Check Read the Docs
 * [ ] Create GitHub release
 * [ ] Add Zenodo badge to GitHub release
