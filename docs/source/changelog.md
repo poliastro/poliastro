@@ -1,6 +1,6 @@
 # What's new
 
-## poliastro 0.16 (Unreleased)
+## poliastro 0.16.0 - 2021-12-08
 
 This new major release includes lots of API changes and enhancements,
 including numerous performance improvements
