@@ -76,7 +76,7 @@ def test_ground_range_diff_at_azimuth(
 
 # Example taken from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David A. Vallado, pages 859-860
 @pytest.mark.parametrize(
-    "h, eta_fov, eta_center, beta, phi_nadir, lambda_nadir, expected_delta_lambda, expected_phi_tgt, expected_lambda_tgt",
+    "altitude, fov, boresight, azimuth, nadir_lat, nadir_lon",
     [
         (
             800 * u.km,
@@ -85,27 +85,21 @@ def test_ground_range_diff_at_azimuth(
             (190 * u.deg).to(u.rad),
             (50 * u.deg).to(u.rad),
             (40 * u.deg).to(u.rad),
-            0.06197359 * u.rad,
-            0.82639242 * u.rad,
-            0.75442901 * u.rad,
         ),
     ],
 )
 def test_exception_ground_range_diff_at_azimuth(
-    h,
-    eta_fov,
-    eta_center,
-    beta,
-    phi_nadir,
-    lambda_nadir,
-    expected_delta_lambda,
-    expected_phi_tgt,
-    expected_lambda_tgt,
+    altitude,
+    fov,
+    boresight,
+    azimuth,
+    nadir_lat,
+    nadir_lon,
 ):
 
     R = Earth.R.to(u.km)
     with pytest.raises(ValueError) as excinfo:
         ground_range_diff_at_azimuth(
-            h, eta_center, eta_fov, beta, phi_nadir, lambda_nadir, R
+            altitude, fov, boresight, azimuth, nadir_lat, nadir_lon, R
         )
     assert "beta must be between 0º and 180º" in excinfo.exconly()
