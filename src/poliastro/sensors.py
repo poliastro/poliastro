@@ -88,8 +88,8 @@ def ground_range_diff_at_azimuth(
     Raises
     ------
     ValueError
-        This formula always gives the answer for the short way to the target ot the acute angle, β,
-        which must be greater than 0º and less than 180º.
+        This formula always gives the answer for the short way to the target of the acute azimuth angle,
+        which must be greater or equal than 0º and less than 180º.
 
     """
     altitude = altitude.to_value(u.km)

@@ -87,7 +87,7 @@ def ground_range_diff_at_azimuth(h, η_fov, η_center, β, φ_nadir, λ_nadir, R
     by David A. Vallado, pages 853-860.
 
     """
-    if not 0 < β < np.pi:
+    if not 0 <= β < np.pi:
         raise ValueError("beta must be between 0º and 180º")
 
     r_sat = R + h
