@@ -3,15 +3,12 @@ from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth
-from poliastro.sensors import (
-    ground_range_diff_at_azimuth,
-    min_and_max_ground_range,
-)
+from poliastro.sensors import ground_range_diff_at_azimuth, min_and_max_ground_range
 
 
 # Example taken from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David A. Vallado, pages 859-860
 @pytest.mark.parametrize(
-    "h, eta_fov, eta_center, expected_lambda_max, expected_lambda_min ",
+    "altitude, fov, boresight, expected_lat_lon_max, expected_lat_lon_min",
     [
         (
             800 * u.km,
@@ -30,18 +27,18 @@ from poliastro.sensors import (
     ],
 )
 def test_max_and_min_ground_range(
-    h, eta_fov, eta_center, expected_lambda_max, expected_lambda_min
+    altitude, fov, boresight, expected_lat_lon_max, expected_lat_lon_min
 ):
 
     R = Earth.R.to(u.km)
-    lambda_min, lambda_max = min_and_max_ground_range(h, eta_fov, eta_center, R)
-    assert_quantity_allclose(lambda_max, expected_lambda_max)
-    assert_quantity_allclose(lambda_min, expected_lambda_min)
+    lat_lon_min, lat_lon_max = min_and_max_ground_range(altitude, fov, boresight, R)
+    assert_quantity_allclose(lat_lon_max, expected_lat_lon_max)
+    assert_quantity_allclose(lat_lon_min, expected_lat_lon_min)
 
 
 # Example taken from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David A. Vallado, pages 859-860
 @pytest.mark.parametrize(
-    "h, eta_fov, eta_center, beta, phi_nadir, lambda_nadir, expected_delta_lambda, expected_phi_tgt, expected_lambda_tgt",
+    "altitude, fov, boresight, azimuth, nadir_lat, nadir_lon, expected_ground_range_diff, expected_target_lat, expected_target_lon",
     [
         (
             800 * u.km,
@@ -57,24 +54,24 @@ def test_max_and_min_ground_range(
     ],
 )
 def test_ground_range_diff_at_azimuth(
-    h,
-    eta_fov,
-    eta_center,
-    beta,
-    phi_nadir,
-    lambda_nadir,
-    expected_delta_lambda,
-    expected_phi_tgt,
-    expected_lambda_tgt,
+    altitude,
+    fov,
+    boresight,
+    azimuth,
+    nadir_lat,
+    nadir_lon,
+    expected_ground_range_diff,
+    expected_target_lat,
+    expected_target_lon,
 ):
 
     R = Earth.R.to(u.km)
-    delta_lambda, phi_tgt, lambda_tgt = ground_range_diff_at_azimuth(
-        h, eta_center, eta_fov, beta, phi_nadir, lambda_nadir, R
+    ground_range_diff, target_lat, target_lon = ground_range_diff_at_azimuth(
+        altitude, boresight, fov, azimuth, nadir_lat, nadir_lon, R
     )
-    assert_quantity_allclose(delta_lambda, expected_delta_lambda)
-    assert_quantity_allclose(phi_tgt, expected_phi_tgt)
-    assert_quantity_allclose(lambda_tgt, expected_lambda_tgt)
+    assert_quantity_allclose(ground_range_diff, expected_ground_range_diff)
+    assert_quantity_allclose(target_lat, expected_target_lat)
+    assert_quantity_allclose(target_lon, expected_target_lon)
 
 
 # Example taken from "Fundamentals of Astrodynamics and Applications", 4th ed (2013)" by David A. Vallado, pages 859-860

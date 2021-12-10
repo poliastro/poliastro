@@ -6,79 +6,83 @@ from poliastro.core.sensors import (
 )
 
 
-@u.quantity_input(h=u.km, eta_fov=u.rad, eta_center=u.rad, R=u.km)
-def min_and_max_ground_range(h, eta_fov, eta_center, R):
+@u.quantity_input(altitude=u.km, fov=u.rad, boresight=u.rad, R=u.km)
+def min_and_max_ground_range(altitude, fov, boresight, R):
     """
-    Calculates the minimum and maximum values of ground-range angles.
+    Calculate the minimum and maximum values of ground-range angles.
 
     Parameters
     ----------
-    h: ~astropy.units.Quantity
+    altitude: ~astropy.units.Quantity
         Altitude over surface.
-    eta_fov: ~astropy.units.Quantity
+    fov: ~astropy.units.Quantity
         Angle of the total area that a sensor can observe.
-    eta_center: ~astropy.units.Quantity
+    boresight: ~astropy.units.Quantity
         Center boresight angle.
     R: ~astropy.units.Quantity
         Attractor equatorial radius.
 
     Returns
     -------
-    lambda_min: ~astropy.units.Quantity
+    lat_lon_min: ~astropy.units.Quantity
         Minimum value of latitude and longitude.
-    lambda_max: ~astropy.units.Quantity
+    lat_lon_max: ~astropy.units.Quantity
         Maximum value of latitude and longitude.
 
     """
-    h = h.to_value(u.km)
-    eta_fov = eta_fov.to_value(u.rad)
-    eta_center = eta_center.to_value(u.rad)
+    altitude = altitude.to_value(u.km)
+    fov = fov.to_value(u.rad)
+    boresight = boresight.to_value(u.rad)
     R = R.to_value(u.km)
-    lambda_min, lambda_max = min_and_max_ground_range_fast(h, eta_fov, eta_center, R)
+    lat_lon_min, lat_lon_max = min_and_max_ground_range_fast(
+        altitude, fov, boresight, R
+    )
 
-    return lambda_min * u.rad, lambda_max * u.rad
+    return lat_lon_min * u.rad, lat_lon_max * u.rad
 
 
 @u.quantity_input(
-    h=u.km,
-    eta_fov=u.rad,
-    eta_center=u.rad,
-    beta=u.rad,
-    phi_nadir=u.rad,
-    lambda_nadir=u.rad,
+    altitude=u.km,
+    fov=u.rad,
+    boresight=u.rad,
+    azimuth=u.rad,
+    nadir_lat=u.rad,
+    nadir_lon=u.rad,
     R=u.km,
 )
 def ground_range_diff_at_azimuth(
-    h, eta_fov, eta_center, beta, phi_nadir, lambda_nadir, R
+    altitude, fov, boresight, azimuth, nadir_lat, nadir_lon, R
 ):
     """
-    Calculates the difference in ground-range angles from the eta_center angle and the latitude and longitude of the target
-    for a desired phase angle, beta, used to specify where the sensor is looking.
+    Calculate the difference in ground-range angles.
+
+    Use the boresight angle, the latitude and longitude of the target,
+    and the desired azimuth (which directs where the sensor is looking).
 
     Parameters
     ----------
-    h: ~astropy.units.Quantity
+    altitude: ~astropy.units.Quantity
         Altitude over surface.
-    eta_fov: ~astropy.units.Quantity
+    fov: ~astropy.units.Quantity
         Angle of the total area that a sensor can observe.
-    eta_center: ~astropy.units.Quantity
+    boresight: ~astropy.units.Quantity
         Center boresight angle.
-    beta: ~astropy.units.Quantity
+    azimuth: ~astropy.units.Quantity
         Azimuth angle, used to specify where the sensor is looking.
-    phi_nadir: ~astropy.units.Quantity
+    nadir_lat: ~astropy.units.Quantity
         Latitude angle of nadir point.
-    lambda_nadir: ~astropy.units.Quantity
+    nadir_lon: ~astropy.units.Quantity
         Longitude angle of nadir point.
     R: ~astropy.units.Quantity
         Attractor equatorial radius.
 
     Returns
     -------
-    delta_lambda : ~astropy.units.Quantity
-        The difference in ground-range angles from the eta_center angle.
-    phi_tgt: ~astropy.units.Quantity
+    ground_range_diff : ~astropy.units.Quantity
+        The difference in ground-range angles from the boresight angle.
+    target_lat: ~astropy.units.Quantity
         Latitude angle of the target point.
-    lambda_tgt: ~astropy.units.Quantity
+    target_lon: ~astropy.units.Quantity
         Longitude angle of the target point.
 
     Raises
@@ -88,16 +92,16 @@ def ground_range_diff_at_azimuth(
         which must be greater than 0º and less than 180º.
 
     """
-    h = h.to_value(u.km)
-    eta_fov = eta_fov.to_value(u.rad)
-    eta_center = eta_center.to_value(u.rad)
-    beta = beta.to_value(u.rad)
-    phi_nadir = phi_nadir.to_value(u.rad)
-    lambda_nadir = lambda_nadir.to_value(u.rad)
+    altitude = altitude.to_value(u.km)
+    fov = fov.to_value(u.rad)
+    boresight = boresight.to_value(u.rad)
+    azimuth = azimuth.to_value(u.rad)
+    nadir_lat = nadir_lat.to_value(u.rad)
+    nadir_lon = nadir_lon.to_value(u.rad)
     R = R.to_value(u.km)
 
-    (delta_lambda, phi_tgt, lambda_tgt,) = ground_range_diff_at_azimuth_fast(
-        h, eta_fov, eta_center, beta, phi_nadir, lambda_nadir, R
+    ground_range_diff, target_lat, target_lon = ground_range_diff_at_azimuth_fast(
+        altitude, fov, boresight, azimuth, nadir_lat, nadir_lon, R
     )
 
-    return delta_lambda * u.rad, phi_tgt * u.rad, lambda_tgt * u.rad
+    return ground_range_diff * u.rad, target_lat * u.rad, target_lon * u.rad
