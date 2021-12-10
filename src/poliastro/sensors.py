@@ -70,7 +70,7 @@ def ground_range_diff_at_azimuth(
     lambda_nadir: ~astropy.units.Quantity
         Longitude angle of nadir point.
     R: ~astropy.units.Quantity
-        Earth equatorial radius.
+        Attractor equatorial radius.
 
     Returns
     -------
