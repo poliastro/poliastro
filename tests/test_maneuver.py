@@ -225,6 +225,7 @@ def test_correct_pericenter_ecc_exception():
     )
 
 
+@pytest.mark.remote_data
 def test_apply_manuever_correct_plane():
     ceres = Orbit.from_sbdb("Ceres")
     imp = Maneuver.impulse([0, 0, 0] * u.km / u.s)
