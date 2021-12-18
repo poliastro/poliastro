@@ -24,5 +24,6 @@ the plotting utilities, insight on the {ref}`API <api-reference>` capabilities a
    /examples/Porkchops with poliastro.mystnb
    /examples/Tisserand.mystnb
    /examples/Detecting Events.mystnb
+   /examples/Loading OMM and TLE satellite data.mystnb
    
 ```
