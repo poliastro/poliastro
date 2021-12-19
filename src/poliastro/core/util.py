@@ -64,10 +64,10 @@ def spherical_to_cartesian(v):
 
     """
     v = np.asarray(v)
-    norm = np.expand_dims(np.asarray(v[..., 0]), -1)
+    norm_vecs = np.expand_dims(np.asarray(v[..., 0]), -1)
     vsin = np.sin(v[..., 1:3])
     vcos = np.cos(v[..., 1:3])
     x = np.asarray(vsin[..., 0] * vcos[..., 1])
     y = np.asarray(vsin[..., 0] * vsin[..., 1])
     z = np.asarray(vcos[..., 0])
-    return norm * np.stack((x, y, z), axis=-1)
+    return norm_vecs * np.stack((x, y, z), axis=-1)

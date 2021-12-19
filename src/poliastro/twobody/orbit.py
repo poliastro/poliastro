@@ -590,7 +590,6 @@ class Orbit:
         Orbit
             New orbit.
 
-
         """
         return cls.synchronous(attractor)
 
