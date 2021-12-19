@@ -73,14 +73,14 @@ def rvel(r, v):
 
     vk = 1.0 / XKE * vv2  # smult
     h = np.cross(rr2, vk)  # cross
-    pl = np.dot(h, h)
+    pl = h @ h
     vz = np.array([0.0, 0.0, 1.0])
     n = np.cross(vz, h)
     n = unitv(n)
     rk = np.linalg.norm(rr2)
-    rdotk = np.dot(rr2, vv2) / rk
+    rdotk = (rr2 @ vv2) / rk
     rfdotk = np.linalg.norm(h) * XKE / rk
-    temp = np.dot(rr2, n) / rk
+    temp = (rr2 @ n) / rk
     uk = acose(temp)
     if rr2[2] < 0.0:
         uk = 2 * math.pi - uk
@@ -96,7 +96,7 @@ def rvel(r, v):
         xnodek += 2 * math.pi
     temp = np.sqrt(h[0] ** 2 + h[1] ** 2)
     xinck = math.atan2(temp, h[2])
-    temp = np.dot(vec, n) / ek
+    temp = (vec @ n) / ek
     wk = acose(temp)
     if vec[2] < 0:
         wk = fmod2p(2 * math.pi - wk)

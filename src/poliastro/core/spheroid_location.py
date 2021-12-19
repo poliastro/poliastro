@@ -79,7 +79,7 @@ def tangential_vecs(N):
 
     """
     u = np.array([1.0, 0, 0])
-    u -= u.dot(N) * N
+    u -= (u @ N) * N
     u /= np.linalg.norm(u)
     v = np.cross(N, u)
 
@@ -147,8 +147,8 @@ def is_visible(cartesian_cords, px, py, pz, N):
     c = cartesian_cords
     u = np.array([px, py, pz])
 
-    d = -N.dot(c)
-    p = N.dot(u) + d
+    d = -(N @ c)
+    p = (N @ u) + d
     return p >= 0
 
 

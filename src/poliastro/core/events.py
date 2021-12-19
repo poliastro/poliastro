@@ -40,8 +40,8 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
     P_, Q_ = np.ascontiguousarray(PQW[:, 0]), np.ascontiguousarray(PQW[:, 1])
 
     r_sec_norm = norm(r_sec)
-    beta = np.dot(P_, r_sec) / r_sec_norm
-    zeta = np.dot(Q_, r_sec) / r_sec_norm
+    beta = (P_ @ r_sec) / r_sec_norm
+    zeta = (Q_ @ r_sec) / r_sec_norm
 
     sin_delta_shadow = np.sin((R_sec - pm * R_primary) / r_sec_norm)
 
@@ -79,7 +79,7 @@ def line_of_sight(r1, r2, R):
     r1_norm = np.linalg.norm(r1)
     r2_norm = np.linalg.norm(r2)
 
-    theta = np.arccos(np.dot(r1, r2) / r1_norm / r2_norm)
+    theta = np.arccos((r1 @ r2) / r1_norm / r2_norm)
     theta_1 = np.arccos(R / r1_norm)
     theta_2 = np.arccos(R / r2_norm)
 

@@ -202,7 +202,7 @@ class Orbit:
     @cached_property
     def energy(self):
         """Specific energy."""
-        return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
+        return (self.v @ self.v) / 2 - self.attractor.k / np.sqrt(self.r @ self.r)
 
     @cached_property
     def e_vec(self):

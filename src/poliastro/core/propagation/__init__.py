@@ -129,10 +129,10 @@ def vallado(k, r0, v0, tof, numiter):
     """
 
     # Cache some results
-    dot_r0v0 = np.dot(r0, v0)
-    norm_r0 = np.dot(r0, r0) ** 0.5
+    dot_r0v0 = r0 @ v0
+    norm_r0 = (r0 @ r0) ** 0.5
     sqrt_mu = k ** 0.5
-    alpha = -np.dot(v0, v0) / k + 2 / norm_r0
+    alpha = -(v0 @ v0) / k + 2 / norm_r0
 
     # First guess
     if alpha > 0:

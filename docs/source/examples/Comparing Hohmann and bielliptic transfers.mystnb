@@ -37,7 +37,7 @@ bielliptic_data = np.zeros((len(R), len(Rstar)))
 
 ss_i = Orbit.circular(Earth, 1.8 * u.km)
 r_i = ss_i.a
-v_i = np.sqrt(ss_i.v.dot(ss_i.v))
+v_i = np.sqrt(ss_i.v @ ss_i.v)
 for ii, r in enumerate(R):
     r_f = r * r_i
     man = Maneuver.hohmann(ss_i, r_f)

@@ -6,7 +6,7 @@ from numpy.linalg import norm as norm
 
 @jit
 def eccentricity_vector(k, r, v):
-    return ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
+    return ((v @ v - k / norm(r)) * r - (r @ v) * v) / k
 
 
 @jit
