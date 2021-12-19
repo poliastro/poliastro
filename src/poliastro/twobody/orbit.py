@@ -16,10 +16,6 @@ from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
 from poliastro.core.elements import coe2rv_many
-from poliastro.core.propagation.farnocchia import (
-    delta_t_from_nu as delta_t_from_nu_fast,
-)
-from poliastro.core.util import eccentricity_vector
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
@@ -33,10 +29,14 @@ from poliastro.twobody.angles import (
     raan_from_ltan,
 )
 from poliastro.twobody.elements import (
+    eccentricity_vector,
+    energy,
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
     get_inclination_critical_argp,
+    heliosynchronous,
     hyp_nu_limit,
+    t_p,
 )
 from poliastro.twobody.mean_elements import get_mean_elements
 from poliastro.twobody.propagation import farnocchia, propagate
@@ -202,15 +202,12 @@ class Orbit:
     @cached_property
     def energy(self):
         """Specific energy."""
-        return (self.v @ self.v) / 2 - self.attractor.k / np.sqrt(self.r @ self.r)
+        return energy(self.attractor.k, self.r, self.v)
 
     @cached_property
     def e_vec(self):
         """Eccentricity vector."""
-        r, v = self.rv()
-        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
-        e_vec = eccentricity_vector(k, r.to_value(u.km), v.to_value(u.km / u.s))
-        return e_vec * u.one
+        return eccentricity_vector(self.attractor.k, self.r, self.v)
 
     @cached_property
     def h_vec(self):
@@ -233,16 +230,12 @@ class Orbit:
     @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage."""
-        t_p = (
-            delta_t_from_nu_fast(
-                self.nu.to_value(u.rad),
-                self.ecc.value,
-                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
-                self.r_p.to_value(u.km),
-            )
-            * u.s
+        return t_p(
+            self.nu,
+            self.ecc,
+            self.attractor.k,
+            self.r_p,
         )
-        return t_p
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
@@ -880,48 +873,12 @@ class Orbit:
 
         n_sunsync = (
             np.sqrt(mean_elements.attractor.k / abs(mean_elements.a ** 3)) * u.one
-        ).decompose()
-        R_SSO = attractor.R
-        k_SSO = attractor.k
-        J2_SSO = attractor.J2
+        ).to(1 / u.s)
 
         try:
-            with np.errstate(invalid="raise"):
-                if all(coe is None for coe in [a, ecc, inc]):
-                    # We check sufficient number of parameters
-                    raise ValueError(
-                        "At least two parameters of the set {a, ecc, inc} are required."
-                    )
-                elif a is None and (ecc is not None) and (inc is not None):
-                    # Semi-major axis is the unknown variable
-                    a = (
-                        -3
-                        * R_SSO ** 2
-                        * J2_SSO
-                        * np.sqrt(k_SSO)
-                        / (2 * n_sunsync * (1 - ecc ** 2) ** 2)
-                        * np.cos(inc)
-                    ) ** (2 / 7)
-                elif ecc is None and (a is not None) and (inc is not None):
-                    # Eccentricity is the unknown variable
-                    _ecc_0 = np.sqrt(
-                        -3
-                        * R_SSO ** 2
-                        * J2_SSO
-                        * np.sqrt(k_SSO)
-                        * np.cos(inc)
-                        / (2 * a ** (7 / 2) * n_sunsync)
-                    )
-                    ecc = np.sqrt(1 - _ecc_0)
-                elif inc is None and (ecc is not None) and (a is not None):
-                    # Inclination is the unknown variable
-                    inc = np.arccos(
-                        -2
-                        * a ** (7 / 2)
-                        * n_sunsync
-                        * (1 - ecc ** 2) ** 2
-                        / (3 * R_SSO ** 2 * J2_SSO * np.sqrt(k_SSO))
-                    )
+            a, ecc, inc = heliosynchronous(
+                attractor.k, attractor.R, attractor.J2, n_sunsync, a, ecc, inc
+            )
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
 
@@ -1298,14 +1255,11 @@ class Orbit:
         # Silently wrap anomaly
         nu = (value + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
 
-        delta_t = (
-            delta_t_from_nu_fast(
-                nu.to_value(u.rad),
-                self.ecc.value,
-                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
-                self.r_p.to_value(u.km),
-            )
-            * u.s
+        delta_t = t_p(
+            nu,
+            self.ecc,
+            self.attractor.k,
+            self.r_p,
         )
         tof = delta_t - self.t_p
         return tof
