@@ -1,12 +1,12 @@
 import numpy as np
 from astropy import units as u
 
-from poliastro.core.propagation.farnocchia import (
-    delta_t_from_nu as delta_t_from_nu_fast,
-)
-from poliastro.core.util import (
+from poliastro.core.elements import (
     circular_velocity as circular_velocity_fast,
     eccentricity_vector as eccentricity_vector_fast,
+)
+from poliastro.core.propagation.farnocchia import (
+    delta_t_from_nu as delta_t_from_nu_fast,
 )
 
 u_kms = u.km / u.s

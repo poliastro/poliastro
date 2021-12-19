@@ -12,6 +12,31 @@ from poliastro.core.util import rotation_matrix
 
 
 @jit
+def eccentricity_vector(k, r, v):
+    return ((v @ v - k / norm(r)) * r - (r @ v) * v) / k
+
+
+@jit
+def circular_velocity(k, a):
+    r"""Compute circular velocity for a given body given thegravitational parameter and the semimajor axis.
+
+    .. math::
+
+       v = \sqrt{\frac{\mu}{a}}
+
+    Parameters
+    ----------
+
+    k : float
+        Gravitational Parameter
+    a : float
+        Semimajor Axis
+
+    """
+    return np.sqrt(k / a)
+
+
+@jit
 def rv_pqw(k, p, ecc, nu):
     r"""Returns r and v vectors in perifocal frame.
 

@@ -1,32 +1,6 @@
 import numpy as np
 from numba import njit as jit
 from numpy import cos, sin
-from numpy.linalg import norm as norm
-
-
-@jit
-def eccentricity_vector(k, r, v):
-    return ((v @ v - k / norm(r)) * r - (r @ v) * v) / k
-
-
-@jit
-def circular_velocity(k, a):
-    r"""Compute circular velocity for a given body given thegravitational parameter and the semimajor axis.
-
-    .. math::
-
-       v = \sqrt{\frac{\mu}{a}}
-
-    Parameters
-    ----------
-
-    k : float
-        Gravitational Parameter
-    a : float
-        Semimajor Axis
-
-    """
-    return np.sqrt(k / a)
 
 
 @jit
