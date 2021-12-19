@@ -7,16 +7,19 @@ u_kms = u.km / u.s
 u_km3s2 = u.km ** 3 / u.s ** 2
 
 
+@u.quantity_input(k=u_km3s2, a=u.km)
 def circular_velocity(k, a):
     """Circular velocity for a given body (k) and semimajor axis (a)."""
     return circular_velocity_fast(k.to_value(u_km3s2), a.to_value(u.km)) * u_kms
 
 
+@u.quantity_input(k=u_km3s2, a=u.km)
 def mean_motion(k, a):
     """Mean motion given body (k) and semimajor axis (a)."""
     return np.sqrt(k / abs(a ** 3)).to(1 / u.s) * u.rad
 
 
+@u.quantity_input(k=u_km3s2, a=u.km)
 def period(k, a):
     """Period given body (k) and semimajor axis (a)."""
     n = mean_motion(k, a)
