@@ -5,7 +5,6 @@ import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
     ICRS,
-    Angle,
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric,
@@ -36,7 +35,7 @@ from poliastro.twobody.states import (
     ModifiedEquinoctialState,
     RVState,
 )
-from poliastro.util import find_closest_value, norm
+from poliastro.util import find_closest_value, norm, wrap_angle
 from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
 try:
@@ -1125,7 +1124,7 @@ class Orbit:
 
         """
         # Silently wrap anomaly
-        nu = (value + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
+        nu = wrap_angle(value)
 
         delta_t = t_p(
             nu,
@@ -1182,7 +1181,7 @@ class Orbit:
         # We have to wrap nu in [-180, 180) to compare it with the output of
         # the arc cosine, which is in the range [0, 180)
         # Start from -nu_limit
-        wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
+        wrapped_nu = wrap_angle(self.nu)
         nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
 
         limits = [
@@ -1193,7 +1192,7 @@ class Orbit:
         # Now we check that none of the provided values
         # is outside of the hyperbolic range
         nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
-        if not Angle(limits).is_within_bounds(-nu_max, nu_max):
+        if not ((-nu_max <= limits).all() and (limits < nu_max).all()):
             warn("anomaly outside range, clipping", OrbitSamplingWarning, stacklevel=2)
             limits = limits.clip(-nu_max, nu_max)
 
