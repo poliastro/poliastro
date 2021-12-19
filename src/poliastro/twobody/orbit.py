@@ -10,22 +10,13 @@ from astropy.coordinates import (
     CartesianRepresentation,
     get_body_barycentric,
 )
-from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
 from poliastro.core.elements import coe2rv_many
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import (
-    D_to_nu,
-    E_to_nu,
-    F_to_nu,
-    M_to_D,
-    M_to_E,
-    M_to_F,
-    raan_from_ltan,
-)
+from poliastro.twobody.angles import raan_from_ltan
 from poliastro.twobody.elements import (
     eccentricity_vector,
     energy,
@@ -531,61 +522,9 @@ class Orbit:
         >>> apophis_orbit = Orbit.from_sbdb('apophis')  # doctest: +REMOTE_DATA
 
         """
-        from poliastro.bodies import Sun
+        from poliastro.io import orbit_from_sbdb
 
-        obj = SBDB.query(name, full_precision=True, **kwargs)
-
-        if "count" in obj:
-            # No error till now ---> more than one object has been found
-            # Contains all the name of the objects
-            objects_name = obj["list"]["name"]
-            objects_name_in_str = (
-                ""  # Used to store them in string form each in new line
-            )
-            for i in objects_name:
-                objects_name_in_str += i + "\n"
-
-            raise ValueError(
-                str(obj["count"]) + " different objects found: \n" + objects_name_in_str
-            )
-
-        if "object" not in obj.keys():
-            raise ValueError(f"Object {name} not found")
-
-        a = obj["orbit"]["elements"]["a"]
-        ecc = float(obj["orbit"]["elements"]["e"]) * u.one
-        inc = obj["orbit"]["elements"]["i"]
-        raan = obj["orbit"]["elements"]["om"]
-        argp = obj["orbit"]["elements"]["w"]
-
-        # Since JPL provides Mean Anomaly (M) we need to make
-        # the conversion to the true anomaly (nu)
-        M = obj["orbit"]["elements"]["ma"].to(u.rad)
-        # NOTE: It is unclear how this conversion should happen,
-        # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
-        if ecc < 1:
-            M = (M + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
-            nu = E_to_nu(M_to_E(M, ecc), ecc)
-        elif ecc == 1:
-            nu = D_to_nu(M_to_D(M))
-        else:
-            nu = F_to_nu(M_to_F(M, ecc), ecc)
-
-        epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
-
-        ss = cls.from_classical(
-            attractor=Sun,
-            a=a,
-            ecc=ecc,
-            inc=inc,
-            raan=raan,
-            argp=argp,
-            nu=nu,
-            epoch=epoch.tdb,
-            plane=Planes.EARTH_ECLIPTIC,
-        )
-
-        return ss
+        return orbit_from_sbdb(name, **kwargs)
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
