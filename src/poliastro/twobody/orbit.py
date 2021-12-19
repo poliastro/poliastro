@@ -12,12 +12,12 @@ from astropy.coordinates import (
 )
 
 from poliastro.constants import J2000
-from poliastro.core.elements import coe2rv_many
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.angles import raan_from_ltan
 from poliastro.twobody.elements import (
+    coe2rv_many,
     eccentricity_vector,
     energy,
     get_eccentricity_critical_argp,
@@ -1249,18 +1249,14 @@ class Orbit:
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
-            np.full(n, self.attractor.k.to_value(u.km ** 3 / u.s ** 2)),
-            np.full(n, self.p.to_value(u.km)),
-            np.full(n, self.ecc.value),
-            np.full(n, self.inc.to_value(u.rad)),
-            np.full(n, self.raan.to_value(u.rad)),
-            np.full(n, self.argp.to_value(u.rad)),
-            nu_values.to_value(u.rad),
+            np.tile(self.attractor.k, n),
+            np.tile(self.p, n),
+            np.tile(self.ecc, n),
+            np.tile(self.inc, n),
+            np.tile(self.raan, n),
+            np.tile(self.argp, n),
+            nu_values,
         )
-
-        # Add units
-        rr = rr << u.km
-        vv = vv << (u.km / u.s)
 
         cartesian = CartesianRepresentation(
             rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1

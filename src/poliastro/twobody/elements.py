@@ -3,6 +3,8 @@ from astropy import units as u
 
 from poliastro.core.elements import (
     circular_velocity as circular_velocity_fast,
+    coe2rv as coe2rv_fast,
+    coe2rv_many as coe2rv_many_fast,
     eccentricity_vector as eccentricity_vector_fast,
 )
 from poliastro.core.propagation.farnocchia import (
@@ -182,3 +184,37 @@ def get_eccentricity_critical_inc(ecc=None):
         ecc = 0.0549 * u.one
 
     return ecc
+
+
+def coe2rv(k, p, ecc, inc, raan, argp, nu):
+    rr, vv = coe2rv_fast(
+        k.to_value(u_km3s2),
+        p.to_value(u.km),
+        ecc.to_value(u.one),
+        inc.to_value(u.rad),
+        raan.to_value(u.rad),
+        argp.to_value(u.rad),
+        nu.to_value(u.rad),
+    )
+
+    rr = rr << u.km
+    vv = vv << (u.km / u.s)
+
+    return rr, vv
+
+
+def coe2rv_many(k_arr, p_arr, ecc_arr, inc_arr, raan_arr, argp_arr, nu_arr):
+    rr_arr, vv_arr = coe2rv_many_fast(
+        k_arr.to_value(u_km3s2),
+        p_arr.to_value(u.km),
+        ecc_arr.to_value(u.one),
+        inc_arr.to_value(u.rad),
+        raan_arr.to_value(u.rad),
+        argp_arr.to_value(u.rad),
+        nu_arr.to_value(u.rad),
+    )
+
+    rr_arr = rr_arr << u.km
+    vv_arr = vv_arr << (u.km / u.s)
+
+    return rr_arr, vv_arr
