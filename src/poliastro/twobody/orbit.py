@@ -1324,10 +1324,10 @@ class Orbit:
 
             return StaticOrbitPlotter().plot(self, label=label)
         elif use_3d:
-            from poliastro.plotting.core import OrbitPlotter3D
+            from poliastro.plotting.interactive import OrbitPlotter3D
 
             return OrbitPlotter3D().plot(self, label=label)
         else:
-            from poliastro.plotting.core import OrbitPlotter2D
+            from poliastro.plotting.interactive import OrbitPlotter2D
 
             return OrbitPlotter2D().plot(self, label=label)

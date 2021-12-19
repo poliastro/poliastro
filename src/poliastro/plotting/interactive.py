@@ -1,4 +1,4 @@
-""" Plotting utilities.
+"""Interactive orbit plotters.
 
 """
 from itertools import cycle

@@ -15,7 +15,7 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.frames import Planes
-from poliastro.plotting.core import OrbitPlotter2D, OrbitPlotter3D
+from poliastro.plotting.interactive import OrbitPlotter2D, OrbitPlotter3D
 from poliastro.plotting.static import StaticOrbitPlotter
 
 
