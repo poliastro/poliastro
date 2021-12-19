@@ -1423,8 +1423,8 @@ class Orbit:
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
-            np.full(n, self.attractor.k.to_value(u.m ** 3 / u.s ** 2)),
-            np.full(n, self.p.to_value(u.m)),
+            np.full(n, self.attractor.k.to_value(u.km ** 3 / u.s ** 2)),
+            np.full(n, self.p.to_value(u.km)),
             np.full(n, self.ecc.value),
             np.full(n, self.inc.to_value(u.rad)),
             np.full(n, self.raan.to_value(u.rad)),
@@ -1433,8 +1433,8 @@ class Orbit:
         )
 
         # Add units
-        rr = (rr << u.m).to(u.km)
-        vv = (vv << (u.m / u.s)).to(u.km / u.s)
+        rr = rr << u.km
+        vv = vv << (u.km / u.s)
 
         cartesian = CartesianRepresentation(
             rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
