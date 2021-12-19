@@ -404,10 +404,6 @@ Downloading http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de430.
 
 This in turn will download the ephemerides files from NASA and use them for future computations. For more information, check out [Astropy documentation on ephemerides](https://docs.astropy.org/en/stable/coordinates/solarsystem.html).
 
-```{warning} 
-This is the preferred method over {py:meth}`poliastro.twobody.orbit.Orbit.from_body_ephem`, which is now deprecated and will be removed in the next release.
-```
-
 If we want to retrieve the **osculating orbit** at a given epoch,
 we can do so using {py:meth}`~poliastro.twobody.Orbit.from_ephem`:
 

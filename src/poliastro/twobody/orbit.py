@@ -4,13 +4,11 @@ from warnings import warn
 import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
-    GCRS,
     ICRS,
     Angle,
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric,
-    get_body_barycentric_posvel,
 )
 from astroquery.jplsbdb import SBDB
 
@@ -48,11 +46,7 @@ from poliastro.twobody.states import (
     RVState,
 )
 from poliastro.util import find_closest_value, norm
-from poliastro.warnings import (
-    OrbitSamplingWarning,
-    PatchedConicsWarning,
-    TimeScaleWarning,
-)
+from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
 try:
     from functools import cached_property  # type: ignore
@@ -92,7 +86,6 @@ class Orbit:
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
-        self._frame = None  # HACK: Only needed for Orbit.from_body_ephem
 
     @property
     def attractor(self):
@@ -411,61 +404,6 @@ class Orbit:
         return cls(ss, epoch)
 
     @classmethod
-    def from_body_ephem(cls, body, epoch=None):
-        """Return osculating `Orbit` of a body at a given time."""
-        from poliastro.bodies import Earth, Moon, Sun
-
-        warn(
-            "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
-            "use Ephem.from_body instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        if not epoch:
-            epoch = time.Time.now().tdb
-        elif epoch.scale != "tdb":
-            epoch = epoch.tdb
-            warn(
-                "Input time was converted to scale='tdb' with value "
-                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
-                TimeScaleWarning,
-                stacklevel=2,
-            )
-        try:
-            r, v = get_body_barycentric_posvel(body.name, epoch)
-        except KeyError as exc:
-            raise RuntimeError(
-                """To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:
-
->>> from astropy.coordinates import solar_system_ephemeris
->>> solar_system_ephemeris.set('jpl')
-"""
-            ) from exc
-        if body == Moon:
-            # TODO: The attractor is in fact the Earth-Moon Barycenter
-            icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
-            gcrs_cart = (
-                ICRS(icrs_cart)
-                .transform_to(GCRS(obstime=epoch))
-                .represent_as(CartesianRepresentation)
-            )
-            ss = cls.from_vectors(
-                Earth,
-                gcrs_cart.xyz.to(u.km),
-                gcrs_cart.differentials["s"].d_xyz.to(u.km / u.day),
-                epoch,
-            )
-
-        else:
-            # TODO: The attractor is not really the Sun, but the Solar System
-            # Barycenter
-            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.d), epoch)
-            ss._frame = ICRS()  # Hack!
-
-        return ss
-
-    @classmethod
     def from_ephem(cls, attractor, ephem, epoch):
         """Create osculating orbit from ephemerides at a given epoch.
 
@@ -490,10 +428,6 @@ class Orbit:
         .. versionadded:: 0.14.0
 
         """
-        # HACK: Only needed for Orbit.from_body_ephem
-        if self._frame is not None:
-            return self._frame
-
         return get_frame(self.attractor, self.plane, self.epoch)
 
     def change_attractor(self, new_attractor, force=False):
