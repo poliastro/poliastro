@@ -97,3 +97,41 @@ def spherical_to_cartesian(v):
     y = np.asarray(vsin[..., 0] * vsin[..., 1])
     z = np.asarray(vcos[..., 0])
     return norm * np.stack((x, y, z), axis=-1)
+
+
+@jit
+def cartesian_to_spherical(v):
+    r"""Compute spherical coordinates (norm, colat, long) from cartesian coordinates (x,y,z).
+    This function is vectorized. The coordinates are also called (radius, inclination, azimuth).
+
+    .. math::
+
+       norm = \sqrt{x^2 + y^2 + z^2}
+
+       colat = \arccos{\frac{z}{norm}}
+
+       lon = \arctan2(y,x) \mod 2 \pi
+
+    Parameters
+    ----------
+    v : np.array
+        Cartesian coordinates in 3D (x, y, z).
+
+    Returns
+    -------
+
+    v : np.array
+        Spherical coordinates in 3D (norm, colat, long) where norm in [0, inf),
+        colat in [0, pi] and long in [0, 2pi).
+
+    """
+    v = np.asarray(v)
+    norm = np.sqrt((v[..., 0:3] ** 2).sum(axis=-1))
+    colat = np.where(norm > 0, np.arccos(v[..., 2] / norm), 0.0)
+    lon = np.arctan2(v[..., 1], v[..., 0]) % (2 * np.pi)
+
+    norm = np.asarray(norm)
+    colat = np.asarray(colat)
+    lon = np.asarray(lon)
+
+    return np.stack((norm, colat, lon), axis=-1)
