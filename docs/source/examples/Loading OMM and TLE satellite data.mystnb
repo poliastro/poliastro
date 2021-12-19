@@ -266,8 +266,6 @@ plotter.show()
 We can also plot the trajectory of the ISS for 90 minutes, plus the trajectories of the first 25 debris fragments:
 
 ```{code-cell} ipython3
-:tags: [nbsphinx-thumbnail]
-
 from itertools import islice
 
 epochs = time_range(now, end=now + (90 << u.minute))
