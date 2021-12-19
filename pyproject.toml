@@ -68,6 +68,7 @@ Funding = "https://opencollective.com/poliastro"
 jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
 doc = [
+    "httpx",
     "ipython>=5.0",
     "ipywidgets>=7.6",
     "jupyter-client",
@@ -75,6 +76,7 @@ doc = [
     "myst-parser>=0.13.1",
     "nbsphinx>=0.8.6",
     "nbconvert>=5.5",
+    "sgp4",
     "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery",
