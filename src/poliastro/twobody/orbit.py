@@ -14,7 +14,6 @@ from poliastro.constants import J2000
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import raan_from_ltan
 from poliastro.twobody.elements import (
     coe2rv_many,
     eccentricity_vector,
@@ -694,7 +693,7 @@ class Orbit:
         a=None,
         ecc=None,
         inc=None,
-        ltan=10.0 * u.hourangle,
+        raan=0 * u.deg,
         argp=0 * u.deg,
         nu=0 * u.deg,
         epoch=J2000,
@@ -724,8 +723,8 @@ class Orbit:
             Eccentricity.
         inc: ~astropy.units.Quantity
             Inclination.
-        ltan: ~astropy.units.Quantity
-            Local time of the ascending node which will be translated to the Right ascension of the ascending node.
+        raan: ~astropy.units.Quantity
+            Right ascension of the ascending node.
         argp : ~astropy.units.Quantity
             Argument of the pericenter.
         nu : ~astropy.units.Quantity
@@ -736,10 +735,6 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
-        # Temporary fix: raan_from_ltan works only for Earth
-        if attractor.name.lower() != "earth":
-            raise NotImplementedError("Attractors other than Earth not supported yet")
-
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
@@ -753,7 +748,6 @@ class Orbit:
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
 
-        raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
             attractor=attractor,
             a=a,
