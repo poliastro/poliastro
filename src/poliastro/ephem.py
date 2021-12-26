@@ -82,8 +82,8 @@ def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic")
         kind=kind,
     )
 
-    result_xyz = interpolant_xyz(epochs.jd) * xyz_unit
-    result_d_xyz = interpolant_d_xyz(epochs.jd) * d_xyz_unit
+    result_xyz = interpolant_xyz(epochs.jd) << xyz_unit
+    result_d_xyz = interpolant_d_xyz(epochs.jd) << d_xyz_unit
 
     return CartesianRepresentation(
         result_xyz, differentials=CartesianDifferential(result_d_xyz)
@@ -97,13 +97,13 @@ def _interpolate_sinc(epochs, reference_epochs, coordinates):
     xyz_unit = coordinates.xyz.unit
     d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
-    x = _interp_1d(coordinates.x.value) * xyz_unit
-    y = _interp_1d(coordinates.y.value) * xyz_unit
-    z = _interp_1d(coordinates.z.value) * xyz_unit
+    x = _interp_1d(coordinates.x.value) << xyz_unit
+    y = _interp_1d(coordinates.y.value) << xyz_unit
+    z = _interp_1d(coordinates.z.value) << xyz_unit
 
-    d_x = _interp_1d(coordinates.differentials["s"].d_x.value) * d_xyz_unit
-    d_y = _interp_1d(coordinates.differentials["s"].d_y.value) * d_xyz_unit
-    d_z = _interp_1d(coordinates.differentials["s"].d_z.value) * d_xyz_unit
+    d_x = _interp_1d(coordinates.differentials["s"].d_x.value) << d_xyz_unit
+    d_y = _interp_1d(coordinates.differentials["s"].d_y.value) << d_xyz_unit
+    d_z = _interp_1d(coordinates.differentials["s"].d_z.value) << d_xyz_unit
 
     return CartesianRepresentation(
         x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
@@ -324,8 +324,8 @@ class Ephem:
         if epochs.isscalar:
             epochs = epochs.reshape(1)
 
-        time_of_flights = epochs - orbit.epoch
-        coordinates = propagate(orbit, time_of_flights)
+        times_of_flight = epochs - orbit.epoch
+        coordinates = propagate(orbit, times_of_flight)
 
         return cls(coordinates, epochs, plane)
 
