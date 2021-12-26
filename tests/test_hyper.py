@@ -3,7 +3,7 @@ import pytest
 from numpy.testing import assert_allclose
 from scipy import special
 
-from poliastro.core.hyper import hyp2f1b as hyp2f1
+from poliastro._math.special import hyp2f1b as hyp2f1
 
 
 @pytest.mark.parametrize("x", np.linspace(0, 1, num=11))

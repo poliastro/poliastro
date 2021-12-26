@@ -3,8 +3,7 @@ from numba import njit as jit
 from numpy import cross, pi
 from numpy.linalg import norm
 
-from poliastro.core.hyper import hyp2f1b
-from poliastro.core.stumpff import c2, c3
+from poliastro._math.special import hyp2f1b, stumpff_c2 as c2, stumpff_c3 as c3
 
 
 @jit

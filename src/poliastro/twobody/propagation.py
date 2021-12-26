@@ -25,8 +25,8 @@ different propagators available at poliastro:
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
-from scipy.integrate import DOP853, solve_ivp
 
+from poliastro._math.ivp import DOP853, solve_ivp
 from poliastro.core.propagation import (
     danby as danby_fast,
     farnocchia as farnocchia_fast,
@@ -74,8 +74,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
 
     Note
     -----
-    This method uses the `solve_ivp` method from `scipy.integrate` using the
-    Dormand & Prince integration method of order 8(5,3) (DOP853).
+    This method uses the Dormand & Prince integration method of order 8(5,3) (DOP853).
     If multiple tofs are provided, the method propagates to the maximum value
     (unless a terminal event is defined) and calculates the other values via dense output.
 

@@ -57,8 +57,8 @@ from astropy import units as u
 from astropy.io import ascii
 from astropy.units import imperial
 from astropy.utils.data import get_pkg_data_filename
-from scipy.integrate import quad
 
+from poliastro._math.integrate import quad
 from poliastro.earth.atmosphere.base import COESA
 
 # Constants come from the original paper to achieve pure implementation
