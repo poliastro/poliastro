@@ -112,7 +112,15 @@ def _interpolate_sinc(epochs, reference_epochs, coordinates):
 
 # Taken from https://gist.github.com/endolith/1297227
 def _sinc_interp(x, s, u):
-    """Interpolates x, sampled at "s" instants, at "u" instants."""
+    """Interpolates x, sampled at "s" instants, at "u" instants.
+
+    Notes
+    -----
+    Possibly equivalent to `scipy.signal.resample`,
+    see https://mail.python.org/pipermail/scipy-user/2012-January/031255.html.
+    However, quick experiments show different ringing behavior.
+
+    """
     if len(x) != len(s):
         raise ValueError("x and s must be the same length")
 
