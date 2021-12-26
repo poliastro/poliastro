@@ -377,6 +377,9 @@ nbsphinx_custom_formats = {
 # The sphinx-autoapi tool configuration
 autoapi_type = 'python'
 autoapi_dirs = ['../../src/']
+autoapi_options = [
+    'members', 'undoc-members', 'show-inheritance', 'show-module-summary', 'special-members',
+]
 
 # Make use of custom templates
 autoapi_template_dir = '_autoapi_templates'
