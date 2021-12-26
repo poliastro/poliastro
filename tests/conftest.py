@@ -1,5 +1,8 @@
 import pytest
+from astropy.coordinates import solar_system_ephemeris
 from astropy.time import Time
+
+solar_system_ephemeris.set("builtin")
 
 
 @pytest.fixture
