@@ -42,16 +42,15 @@ def vallado(k, r0, v0, tof, numiter):
 
     Parameters
     ----------
-
-    k: float
+    k : float
         Standard gravitational parameter.
-    r0: ~np.array
+    r0 : numpy.ndarray
         Initial position vector.
-    v0: ~np.array
+    v0 : numpy.ndarray
         Initial velocity vector.
-    tof: float
+    tof : float
         Time of flight.
-    numiter: int
+    numiter : int
         Number of iterations.
 
     Returns
@@ -65,9 +64,8 @@ def vallado(k, r0, v0, tof, numiter):
     gdot: float
         Derivative of the second coefficient
 
-
-    Note
-    ----
+    Notes
+    -----
     The theoretical procedure is explained in section 3.7 of Curtis in really
     deep detail. For analytical example, check in the same book for example 3.6.
 

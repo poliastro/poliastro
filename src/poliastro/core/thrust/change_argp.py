@@ -48,9 +48,7 @@ def change_argp(k, a, ecc, argp_0, argp_f, f):
     Returns
     -------
     a_d : function
-
     delta_V : numpy.array
-
     t_f : float
     """
 

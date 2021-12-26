@@ -13,17 +13,17 @@ def raan_from_ltan(epoch, ltan=12.0):
     Parameters
     ----------
     epoch : ~astropy.time.Time
-         Value of time to calculate the RAAN for
-    ltan: ~astropy.units.Quantity
-         Decimal hour between 0 and 24
+        Value of time to calculate the RAAN for
+    ltan : ~astropy.units.Quantity
+        Decimal hour between 0 and 24
 
     Returns
     -------
     RAAN: ~astropy.units.Quantity
         Right ascension of the ascending node angle in GCRS
 
-    Note
-    ----
+    Notes
+    -----
     Calculations of the sun mean longitude and equation of time
     follow "Fundamentals of Astrodynamics and Applications"
     Fourth edition by Vallado, David A.

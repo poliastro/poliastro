@@ -11,8 +11,8 @@ def hyp2f1b(x):
     .. todo::
         Add more information about this function
 
-    Note
-    ----
+    Notes
+    -----
     More information about hypergeometric function can be checked at
     https://en.wikipedia.org/wiki/Hypergeometric_function
 

@@ -16,7 +16,7 @@ class COESA:
 
         Parameters
         ----------
-        tables: *tables
+        *tables : *tables
             Different tables that define the atmosphere.
 
         """
@@ -52,11 +52,11 @@ class COESA:
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Altitude to be checked.
-        r0: ~astropy.units.Quantity
+        r0 : ~astropy.units.Quantity
             Attractor radius.
-        geometric: bool
+        geometric : bool
             If `True`, assumes geometric altitude kind.
 
         Returns
@@ -86,9 +86,9 @@ class COESA:
 
         Parameters
         ----------
-        x: ~astropy.units.Quantity
+        x : ~astropy.units.Quantity
             Element to be searched.
-        x_levels: ~astropy.units.Quantity
+        x_levels : ~astropy.units.Quantity
             List for searching.
 
         Returns

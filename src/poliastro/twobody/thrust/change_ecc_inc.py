@@ -9,11 +9,11 @@ def change_ecc_inc(ss_0, ecc_f, inc_f, f):
     Parameters
     ----------
     ss_0 : Orbit
-           Initial orbit, containing all the information.
+        Initial orbit, containing all the information.
     ecc_f : float
-            Final eccentricity.
+        Final eccentricity.
     inc_f : ~astropy.units.quantity.Quantity
-            Final inclination.
+        Final inclination.
     f : ~astropy.units.quantity.Quantity
         Magnitude of constant acceleration.
 

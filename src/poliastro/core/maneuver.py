@@ -34,9 +34,9 @@ def hohmann(k, rv, r_f):
     ----------
     k : float
         Standard Gravitational parameter
-    rv: ~np.array, ~np.array
+    rv : numpy.ndarray, numpy.ndarray
         Position and velocity vectors
-    r_f: float
+    r_f : float
         Final altitude of the orbit
 
     """
@@ -100,13 +100,13 @@ def bielliptic(k, r_b, r_f, rv):
 
     Parameters
     ----------
-    k: float
+    k : float
         Standard Gravitational parameter
-    r_b: float
+    r_b : float
         Altitude of the intermediate orbit
-    r_f: float
+    r_f : float
         Final altitude of the orbit
-    rv: ~np.array, ~np.array
+    rv : numpy.ndarray, numpy.ndarray
         Position and velocity vectors
 
     """
@@ -147,21 +147,21 @@ def correct_pericenter(k, R, J2, max_delta_r, v, a, inc, ecc):
 
     Parameters
     ----------
-    k: float
+    k : float
         Standard Gravitational parameter
-    R: float
+    R : float
         Radius of the attractor
-    J2: float
+    J2 : float
         Oblateness factor
-    max_delta_r: float
+    max_delta_r : float
         Maximum satellite’s geocentric distance
-    v: ~np.array
+    v : numpy.ndarray
         Velocity vector
-    a: float
+    a : float
         Semi-major axis
-    inc: float
+    inc : float
         Inclination
-    ecc: float
+    ecc : float
         Eccentricity
 
     Notes

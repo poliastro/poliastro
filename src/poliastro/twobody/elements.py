@@ -137,7 +137,7 @@ def get_eccentricity_critical_argp(R, J2, J3, a, inc):
     a : ~astropy.units.Quantity
         Orbit's semimajor axis
     inc : ~astropy.units.Quantity
-         Inclination.
+        Inclination.
 
     """
     ecc = -J3 * R * np.sin(inc) / 2 / J2 / a
@@ -176,7 +176,7 @@ def get_eccentricity_critical_inc(ecc=None):
 
     Parameters
     ----------
-    ecc: ~astropy.units.Quantity, optional
+    ecc : ~astropy.units.Quantity, optional
         Eccentricity, default to None.
 
     """

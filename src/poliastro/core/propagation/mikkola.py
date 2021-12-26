@@ -103,20 +103,20 @@ def mikkola(k, r0, v0, tof, rtol=None):
     ----------
     k : float
         Standard gravitational parameter of the attractor.
-    r : ~np.array
+    r : numpy.ndarray
         Position vector.
-    v : ~np.array
+    v : numpy.ndarray
         Velocity vector.
     tof : float
         Time of flight.
-    rtol: float
+    rtol : float
         This method does not require tolerance since it is non-iterative.
 
     Returns
     -------
-    rr : ~np.array
+    rr : numpy.ndarray
         Final velocity vector.
-    vv : ~np.array
+    vv : numpy.ndarray
         Final velocity vector.
     Note
     ----

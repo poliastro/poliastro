@@ -8,13 +8,13 @@ def min_and_max_ground_range(h, η_fov, η_center, R):
 
     Parameters
     ----------
-    h: float
+    h : float
         Altitude over surface.
-    η_fov: float
+    η_fov : float
         Angle of the total area that a sensor can observe.
-    η_center: float
+    η_center : float
         Center boresight angle.
-    R: float
+    R : float
         Attractor equatorial radius.
 
     Returns
@@ -57,19 +57,19 @@ def ground_range_diff_at_azimuth(h, η_fov, η_center, β, φ_nadir, λ_nadir, R
 
     Parameters
     ----------
-    h: float
+    h : float
         Altitude over surface.
-    η_fov: float
+    η_fov : float
         Angle of the total area that a sensor can observe.
-    η_center: float
+    η_center : float
         Center boresight angle.
-    β: float
+    β : float
         Phase angle, used to specify where the sensor is looking.
-    φ_nadir: float
+    φ_nadir : float
         Latitude angle of nadir point.
-    λ_nadir: float
+    λ_nadir : float
         Longitude angle of nadir point.
-    R: float
+    R : float
         Earth equatorial radius.
 
     Returns

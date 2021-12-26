@@ -58,7 +58,7 @@ def plot_solar_system(outer=True, epoch=None, use_3d=False, interactive=False):
     .. versionadded:: 0.9.0
 
     Parameters
-    ------------
+    ----------
     outer : bool, optional
         Whether to print the outer Solar System, default to True.
     epoch : ~astropy.time.Time, optional

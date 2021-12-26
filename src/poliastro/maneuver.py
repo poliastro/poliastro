@@ -68,7 +68,7 @@ class Maneuver:
 
         Parameters
         ----------
-        dv: np.array
+        dv : np.array
             Velocity components of the impulse.
 
         """
@@ -81,9 +81,9 @@ class Maneuver:
 
         Parameters
         ----------
-        orbit_i: poliastro.twobody.orbit.Orbit
+        orbit_i : poliastro.twobody.orbit.Orbit
             Initial orbit
-        r_f: astropy.unit.Quantity
+        r_f : astropy.unit.Quantity
             Final altitude of the orbit
 
         """
@@ -117,11 +117,11 @@ class Maneuver:
 
         Parameters
         ----------
-        orbit_i: poliastro.twobody.orbit.Orbit
+        orbit_i : poliastro.twobody.orbit.Orbit
             Initial orbit
-        r_b: astropy.unit.Quantity
+        r_b : astropy.unit.Quantity
             Altitude of the intermediate orbit
-        r_f: astropy.unit.Quantity
+        r_f : astropy.unit.Quantity
             Final altitude of the orbit
 
         """
@@ -168,13 +168,13 @@ class Maneuver:
 
         Parameters
         ----------
-        orbit_i: ~poliastro.twobody.Orbit
+        orbit_i : ~poliastro.twobody.Orbit
             Initial orbit
-        orbit_f: ~poliastro.twobody.Orbit
+        orbit_f : ~poliastro.twobody.Orbit
             Final orbit
-        method: function
+        method : function
             Method for solving Lambert's problem
-        short: keyword, boolean
+        short : bool
             Selects between short and long solution
 
         """
@@ -187,7 +187,8 @@ class Maneuver:
         tof = orbit_f.epoch - orbit_i.epoch
         if tof < 0:
             raise ValueError(
-                "Epoch of intial orbit Greater than Epoch of final orbit causing a Negative Time Of Flight"
+                "Epoch of initial orbit greater than epoch of final orbit, "
+                "causing a negative time of flight"
             )
 
         # Compute all possible solutions to the Lambert transfer
@@ -221,7 +222,7 @@ class Maneuver:
         orbit : Orbit
             Position and velocity of a body with respect to an attractor
             at a given time (epoch).
-        max_delta_r: ~astropy.units.Quantity
+        max_delta_r : ~astropy.units.Quantity
             Maximum satellite’s geocentric distance
 
         Returns

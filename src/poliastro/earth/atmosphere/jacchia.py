@@ -74,7 +74,7 @@ class Jacchia77:
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential altitude.
 
         Returns
@@ -96,7 +96,7 @@ class Jacchia77:
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential altitude.
 
         Returns
@@ -112,10 +112,8 @@ class Jacchia77:
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential altitude.
-        Texo: ~astropy.units.Quantity
-            Exospheric temperature
 
         Returns
         -------
@@ -134,7 +132,7 @@ class Jacchia77:
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential altitude.
 
         Returns

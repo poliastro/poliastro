@@ -189,9 +189,9 @@ class Ephem:
 
         Parameters
         ----------
-        body: ~poliastro.bodies.SolarSystemPlanet
+        body : ~poliastro.bodies.SolarSystemPlanet
             Body.
-        epochs: ~astropy.time.Time
+        epochs : ~astropy.time.Time
             Epochs to sample the body positions.
         attractor : ~poliastro.bodies.SolarSystemPlanet, optional
             Body to use as central location,
@@ -242,7 +242,7 @@ class Ephem:
         ----------
         name : str
             Name of the body to query for.
-        epochs: ~astropy.time.Time
+        epochs : ~astropy.time.Time
             Epochs to sample the body positions.
         attractor : ~poliastro.bodies.SolarSystemPlanet, optional
             Body to use as central location,
@@ -306,11 +306,11 @@ class Ephem:
 
         Parameters
         ----------
-        orbit: ~poliastro.twobody.orbit.Orbit
+        orbit : ~poliastro.twobody.orbit.Orbit
             Orbit.
-        epochs: ~astropy.time.Time
+        epochs : ~astropy.time.Time
             Epochs to sample the orbit positions.
-        plane: ~poliastro.frames.Planes, optional
+        plane : ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
 
         """
@@ -327,7 +327,7 @@ class Ephem:
 
         Parameters
         ----------
-        epochs: ~astropy.time.Time, optional
+        epochs : ~astropy.time.Time, optional
             Epochs to sample the ephemerides,
             if not given the original one from the object will be used.
         method : ~poliastro.ephem.InterpolationMethods, optional

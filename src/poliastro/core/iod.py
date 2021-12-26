@@ -51,29 +51,28 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
 
     Parameters
     ----------
-    k: float
+    k : float
         Gravitational Parameter
-    r0: ~np.array
+    r0 : numpy.ndarray
         Initial position vector
-    r: ~np.array
+    r : numpy.ndarray
         Final position vector
-    tof: ~float
+    tof : ~float
         Time of flight
-    numiter: int
+    numiter : int
         Number of iterations to
-    rtol: int
+    rtol : int
         Number of revolutions
 
     Returns
     -------
-    v0: ~np.array
+    v0: numpy.ndarray
         Initial velocity vector
-    v: ~np.array
+    v: numpy.ndarray
         Final velocity vector
 
     Examples
     --------
-
     >>> from poliastro.core.iod import vallado
     >>> from astropy import units as u
     >>> import numpy as np
@@ -88,8 +87,8 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     >>> print(v1, v2)
     [-5.99249503  1.92536671  3.24563805] km / s [-3.31245851 -4.19661901 -0.38528906] km / s
 
-    Note
-    ----
+    Notes
+    -----
     This procedure can be found in section 5.3 of Curtis, with all the
     theoretical description of the problem. Analytical example can be found
     in the same book under name Example 5.2.
@@ -162,24 +161,23 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
 
     Parameters
     ----------
-    k: float
+    k : float
         Gravitational Constant
-    r1: ~numpy.array
+    r1 : ~numpy.array
         Initial position vector
-    r2: ~numpy.array
+    r2 : ~numpy.array
         Final position vector
-    tof: float
+    tof : float
         Time of flight between both positions
-    M: int
+    M : int
         Number of revolutions
-    numiter: int
+    numiter : int
         Number of iterations
-    rtol: float
+    rtol : float
         Error tolerance
 
     Returns
     -------
-
     v1: ~numpy.array
         Initial velocity vector
     v2: ~numpy.array
@@ -401,8 +399,8 @@ def _initial_guess(T, ll, M):
 def _halley(p0, T0, ll, tol, maxiter):
     """Find a minimum of time of flight equation using the Halley method.
 
-    Note
-    ----
+    Notes
+    -----
     This function is private because it assumes a calling convention specific to
     this module and is not really reusable.
 
@@ -429,8 +427,8 @@ def _halley(p0, T0, ll, tol, maxiter):
 def _householder(p0, T0, ll, M, tol, maxiter):
     """Find a zero of time of flight equation using the Householder method.
 
-    Note
-    ----
+    Notes
+    -----
     This function is private because it assumes a calling convention specific to
     this module and is not really reusable.
 

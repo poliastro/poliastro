@@ -23,13 +23,13 @@ def J2_perturbation(t0, state, k, J2, R):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard Gravitational parameter. (km^3/s^2)
-    J2: float
+    J2 : float
         Oblateness factor
-    R: float
+    R : float
         Attractor radius
 
-    Note
-    ----
+    Notes
+    -----
     The J2 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, (12.30)
 
@@ -57,13 +57,13 @@ def J3_perturbation(t0, state, k, J3, R):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard Gravitational parameter. (km^3/s^2)
-    J3: float
+    J3 : float
         Oblateness factor
-    R: float
+    R : float
         Attractor radius
 
-    Note
-    ----
+    Notes
+    -----
     The J3 accounts for the oblateness of the attractor. The formula is given in
     Howard Curtis, problem 12.8
     This perturbation has not been fully validated, see https://github.com/poliastro/poliastro/pull/398
@@ -89,7 +89,6 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
 
         \vec{p} = -\frac{1}{2}\rho v_{rel}\left ( \frac{C_{d}A}{m} \right )\vec{v_{rel}}
 
-
     .. versionadded:: 0.9.0
 
     Parameters
@@ -102,17 +101,17 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
         Standard Gravitational parameter (km^3/s^2).
     R : float
         Radius of the attractor (km)
-    C_D: float
+    C_D : float
         Dimensionless drag coefficient ()
-    A_over_m: float
+    A_over_m : float
         Frontal area/mass of the spacecraft (km^2/kg)
     H0 : float
         Atmospheric scale height, (km)
-    rho0: float
+    rho0 : float
         Exponent density pre-factor, (kg / km^3)
 
-    Note
-    ----
+    Notes
+    -----
     This function provides the acceleration due to atmospheric drag
     using an overly-simplistic exponential atmosphere model. We follow
     Howard Curtis, section 12.4
@@ -137,7 +136,6 @@ def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
 
         \vec{p} = -\frac{1}{2}\rho v_{rel}\left ( \frac{C_{d}A}{m} \right )\vec{v_{rel}}
 
-
     .. versionadded:: 1.14
 
     Parameters
@@ -148,15 +146,15 @@ def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard Gravitational parameter (km^3/s^2)
-    C_D: float
+    C_D : float
         Dimensionless drag coefficient ()
-    A_over_m: float
+    A_over_m : float
         Frontal area/mass of the spacecraft (km^2/kg)
-    rho: float
+    rho : float
         Air density at corresponding state (kg/m^3)
 
-    Note
-    ----
+    Notes
+    -----
     This function provides the acceleration due to atmospheric drag, as
     computed by a model from poliastro.earth.atmosphere
 
@@ -183,10 +181,12 @@ def third_body(t0, state, k, k_third, perturbation_body):
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard Gravitational parameter (km^3/s^2).
-    perturbation_body: A callable object returning the position of the pertubation body that causes the perturbation
+    perturbation_body : callable
+        A callable object returning the position of the body that causes the perturbation
+        in the attractor frame.
 
-    Note
-    ----
+    Notes
+    -----
     This formula is taken from Howard Curtis, section 12.10. As an example, a third body could be
     the gravity from the Moon acting on a small satellite.
 
@@ -213,17 +213,18 @@ def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
         Standard Gravitational parameter (km^3/s^2).
     R : float
         Radius of the attractor.
-    C_R: float
+    C_R : float
         Dimensionless radiation pressure coefficient, 1 < C_R < 2 ().
-    A_over_m: float
+    A_over_m : float
         Effective spacecraft area/mass of the spacecraft (km^2/kg).
     Wdivc_s : float
         Total star emitted power divided by the speed of light (W * s / km).
-    star: a callable object returning the position of star in attractor frame
-        Star position.
+    star : callable
+        A callable object returning the position of radiating star
+        in the attractor frame.
 
-    Note
-    ----
+    Notes
+    -----
     This function provides the acceleration due to star light pressure. We follow
     Howard Curtis, section 12.9
 

@@ -89,6 +89,7 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
         Position of the secondary body.
     n : ~astropy.units.Quantity
         Normal vector to the orbital plane.
+
     Returns
     -------
     list:

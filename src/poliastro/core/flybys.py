@@ -14,13 +14,13 @@ def compute_flyby(v_spacecraft, v_body, k, r_p, theta):
     ----------
     k : float
         Standard Gravitational parameter.
-    r_p: float
+    r_p : float
         Radius of periapsis, measured from the center of the body.
-    v_spacecraft: float
+    v_spacecraft : float
         Velocity of the spacecraft, relative to the attractor of the body.
-    v_body: float
+    v_body : float
         Velocity of the body, relative to its attractor.
-    theta: float
+    theta : float
         Aim angle of the B vector.
 
     Returns

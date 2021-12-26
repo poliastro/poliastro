@@ -69,22 +69,22 @@ def markley(k, r0, v0, tof):
     ----------
     k : float
         Standar Gravitational parameter.
-    r0 : ~np.array
+    r0 : numpy.ndarray
         Initial position vector wrt attractor center.
-    v0 : ~np.array
+    v0 : numpy.ndarray
         Initial velocity vector.
     tof : float
         Time of flight.
 
     Returns
     -------
-    rr: ~np.array
+    rr: numpy.ndarray
         Final position vector.
-    vv: ~np.array
+    vv: numpy.ndarray
         Final velocity vector.
 
-    Note
-    ----
+    Notes
+    -----
     The following algorithm was taken from http://dx.doi.org/10.1007/BF00691917.
 
     """

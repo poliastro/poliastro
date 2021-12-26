@@ -13,13 +13,13 @@ class Spacecraft:
 
         Parameters
         ----------
-        A: ~astropy.units.Quantity
+        A : ~astropy.units.Quantity
             Area of the spacecraft (km^2)
-        C_D: ~astropy.units.Quantity
+        C_D : ~astropy.units.Quantity
             Dimensionless drag coefficient ()
-        m: ~astropy.units.Quantity
+        m : ~astropy.units.Quantity
             Mass of the Spacecraft (kg)
-        metadata: Dict[object, dict]
+        **metadata : Dict[object, dict]
             Optional keyword arguments to Spacecraft
 
         """
