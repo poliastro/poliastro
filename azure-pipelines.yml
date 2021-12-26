@@ -40,7 +40,7 @@ jobs:
     posargs: '-vv'
     envs:
       - linux: check
-        name : quality
+        name: quality
 
       - linux: py37
         name: py37_test
@@ -65,12 +65,6 @@ jobs:
       - linux: py39
         name: py39_test
 
-      - windows: py38
-        name: py38_test_windows
-
-      - macos: py38
-        name: py38_test_macos
-
 - template: run-tox-env.yml@OpenAstronomy
   parameters:
     default_python: 3.8
@@ -92,7 +86,7 @@ jobs:
   parameters:
     ${{ if startsWith(variables.Build.SourceBranch, 'refs/tags/v') }}:
       pypi_connection_name: 'pypi_upload'
-    test_extras: 'dev'
+    test_extras: 'test'
     test_command: 'cd $(Build.SourcesDirectory)/tests; pytest -m "not slow and not mpl_image_compare"'
     targets:
     - sdist

@@ -254,6 +254,7 @@ def test_body_frame_raises_warning_if_time_is_not_tdb_with_proper_time(recwarn):
     assert expected_epoch_string in str(w.message)
 
 
+@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.mpl_image_compare
 def test_plot_maneuver():
     # Data from Vallado, example 6.1
@@ -276,7 +277,7 @@ def test_plot_maneuver():
     # Plot the maneuver
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
-    plotter.plot(ss_i, color="blue", label="Initial orbit")
-    plotter.plot_maneuver(ss_i, man)
+    plotter.plot(ss_i, label="Initial orbit", color="blue")
+    plotter.plot_maneuver(ss_i, man, label="Hohmann maneuver", color="red")
 
     return fig

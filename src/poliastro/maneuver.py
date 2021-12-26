@@ -185,6 +185,10 @@ class Maneuver:
 
         # Time of flight is solved by subtracting both orbit epochs
         tof = orbit_f.epoch - orbit_i.epoch
+        if tof < 0:
+            raise ValueError(
+                "Epoch of intial orbit Greater than Epoch of final orbit causing a Negative Time Of Flight"
+            )
 
         # Compute all possible solutions to the Lambert transfer
         sols = list(method(k, r_i, r_f, tof, **kwargs))

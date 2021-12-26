@@ -14,6 +14,7 @@
 # serve to show the default.
 
 import os
+import sys
 
 # Checking the import state for importlib.metadata.version method
 try:
@@ -54,7 +55,11 @@ extensions = [
     'notfound.extension',
     'hoverxref.extension',
     'myst_parser',
+    'sphinx_github_role',  # See _ext directory
 ]
+
+# GitHub role config
+github_default_org_project = ("poliastro", "poliastro")
 
 # MathJax config
 # See https://github.com/spatialaudio/nbsphinx/issues/572#issuecomment-853389268
@@ -360,6 +365,7 @@ nbsphinx_thumbnails = {
     'examples/CZML Tutorial': '_static/thumbnails/cesium_thumbnail.png',
     'examples/Generating orbit groundtracks': '_static/thumbnails/groundtrack.png',
     'examples/Detecting Events': '_static/thumbnails/eclipse.png',
+    'examples/Loading OMM and TLE satellite data': '_static/thumbnails/omm_debris.png',
 }
 
 # Custom nbsphinx format for Jupytext markdown notebooks
@@ -371,6 +377,9 @@ nbsphinx_custom_formats = {
 # The sphinx-autoapi tool configuration
 autoapi_type = 'python'
 autoapi_dirs = ['../../src/']
+autoapi_options = [
+    'members', 'undoc-members', 'show-inheritance', 'show-module-summary', 'special-members',
+]
 
 # Make use of custom templates
 autoapi_template_dir = '_autoapi_templates'

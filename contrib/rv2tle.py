@@ -10,18 +10,17 @@ GitHub repository with MIT license here: https://github.com/interplanetarychris/
 Variables names have been kept similar to the original implementation, for easier comparison
 """
 
+import math
+
+import numpy as np
 from astropy import coordinates as coord, units as u
 from astropy.coordinates import TEME
 from astropy.time import Time
-from poliastro.twobody import Orbit
+from sgp4.api import SGP4_ERRORS, WGS84, Satrec
+
 from poliastro.bodies import Earth
 from poliastro.examples import iss
-from poliastro.twobody import angles
-
-import numpy as np
-import math
-
-from sgp4.api import Satrec, SGP4_ERRORS, WGS84
+from poliastro.twobody import Orbit, angles
 
 
 def unitv(v):
@@ -89,17 +88,17 @@ def rvel(r, v):
     vy = -1 / rk * rr2
     vec = vz + vy
     ek = np.linalg.norm(vec)
-    if (ek > 1.0):
+    if ek > 1.0:
         print(ek)
         return  # open orbit
     xnodek = math.atan2(n[1], n[0])
-    if (xnodek < 0.0):
+    if xnodek < 0.0:
         xnodek += 2 * math.pi
     temp = np.sqrt(h[0] ** 2 + h[1] ** 2)
     xinck = math.atan2(temp, h[2])
     temp = np.dot(vec, n) / ek
     wk = acose(temp)
-    if (vec[2] < 0):
+    if vec[2] < 0:
         wk = fmod2p(2 * math.pi - wk)
     aodp = pl / (1.0 - ek ** 2)
     xn = XKE * aodp ** (-1.5)
@@ -130,9 +129,8 @@ def rvel(r, v):
         x3thm1 = 3 * theta2 - 1
         x1mth2 = 1 - theta2
         x7thm1 = 7 * theta2 - 1
-        r = (rk - 0.5 * temp1 * x1mth2 * cos2u) \
-            / (1 - 1.5 * temp2 * betal * x3thm1)
-        u = uk + .25 * temp2 * x7thm1 * sin2u
+        r = (rk - 0.5 * temp1 * x1mth2 * cos2u) / (1 - 1.5 * temp2 * betal * x3thm1)
+        u = uk + 0.25 * temp2 * x7thm1 * sin2u
         xnodeo = xnodek - 1.5 * temp2 * cosio * sin2u
         xincl = xinck - 1.5 * temp2 * cosio * sinio * cos2u
         rdot = rdotk + xn * temp1 * x1mth2 * sin2u
@@ -154,7 +152,7 @@ def rvel(r, v):
     ecose = 1 - r / adop
     esine = r * rdot / (XKE * np.sqrt(aodp))  # needed for Kepler's eqn
     elsq = 1 - pl / adop  # intermediate eccentricity squared
-    xlcof = .125 * A3OVK2 * sinio * (3 + 5 * cosio) / (1 + cosio)
+    xlcof = 0.125 * A3OVK2 * sinio * (3 + 5 * cosio) / (1 + cosio)
     aycof = 0.25 * A3OVK2 * sinio
     temp1 = esine / (1 + np.sqrt(1 - elsq))
     cosu = math.cos(u)
@@ -189,7 +187,7 @@ def rvel(r, v):
         if math.fabs(a2 - eo) < 1e-13:
             break
 
-    capu = math.atan2(sinepw, cosepw) - esine    # Kepler's equation
+    capu = math.atan2(sinepw, cosepw) - esine  # Kepler's equation
     xll = temp * xlcof * axn
 
     # xll adjusts the intermediate true longitude
@@ -225,7 +223,21 @@ def el2rv(inc, raan, ecc, argp, mean_anomaly, mean_motion, epoch):
 
     time_tle = epoch.jd - 2433281.5
     sat = Satrec()
-    sat.sgp4init(WGS84, 'i', 0, time_tle, 0.0, 0.0, 0.0, ecc, argp, inc, mean_anomaly, mean_motion, raan)
+    sat.sgp4init(
+        WGS84,
+        "i",
+        0,
+        time_tle,
+        0.0,
+        0.0,
+        0.0,
+        ecc,
+        argp,
+        inc,
+        mean_anomaly,
+        mean_motion,
+        raan,
+    )
 
     errorCode, rTEME, vTEME = sat.sgp4(epoch.jd1, epoch.jd2)
     if errorCode != 0:
@@ -247,14 +259,16 @@ def rv2el(rr, vv, epoch):
     Computes mean orbital elements from state vector
     """
 
-    epoch_time = Time(epoch, format='datetime', scale='utc')
+    epoch_time = Time(epoch, format="datetime", scale="utc")
 
     # SPG4 k-elements from state vector
     inck, raank, ecck, argpk, mAnomalyk, mMotionk = rvel(rr, vv)
 
     # SPG4 propagation of k-elements to rr', vv'
     pos, vel = el2rv(inck, raank, ecck, argpk, mAnomalyk, mMotionk, epoch_time)
-    inc2, raan2, ecc2, argp2, mAnomaly2, mMotion2 = rvel(pos, vel)  # SPG4 x-elements from state vectors
+    inc2, raan2, ecc2, argp2, mAnomaly2, mMotion2 = rvel(
+        pos, vel
+    )  # SPG4 x-elements from state vectors
 
     # First correction
     incz = 2 * inck - inc2
@@ -288,7 +302,7 @@ if __name__ == "__main__":
     print()
 
     # Reference epoch
-    epoch = Time(iss.epoch, format='datetime', scale='utc')
+    epoch = Time(iss.epoch, format="datetime", scale="utc")
 
     # Store poliastro orbital elements (osculating)
     ecc_anomaly = angles.nu_to_E(iss.nu, iss.ecc)
@@ -300,15 +314,37 @@ if __name__ == "__main__":
     # Display differences
     print("                Poliastro(osc)              rv2el(mean)")
     print(f"Ecc            :    {iss.ecc:10.5f}{'':15}{ecc:10.5f}")
-    print(f"Incl  [deg]    :    {math.degrees(iss.inc.value):10.5f}{'':15}{math.degrees(inc):10.5f}")
-    print(f"n [deg/min]    :    {math.degrees(iss.n.to(u.rad/u.minute).value):10.5f}{'':15}{math.degrees(m_mot):10.5f}")
-    print(f"RAAN  [deg]    :    {math.degrees(iss.raan.value):10.5f}{'':15}{math.degrees(raan):10.5f}")
-    print(f"Argp + M [deg] :    {math.degrees(iss.argp.value+mean_anomaly.value):10.5f}{'':15}{math.degrees(argp+m_ano):10.5f}")
+    print(
+        f"Incl  [deg]    :    {math.degrees(iss.inc.value):10.5f}{'':15}{math.degrees(inc):10.5f}"
+    )
+    print(
+        f"n [deg/min]    :    {math.degrees(iss.n.to(u.rad/u.minute).value):10.5f}{'':15}{math.degrees(m_mot):10.5f}"
+    )
+    print(
+        f"RAAN  [deg]    :    {math.degrees(iss.raan.value):10.5f}{'':15}{math.degrees(raan):10.5f}"
+    )
+    print(
+        f"Argp + M [deg] :    {math.degrees(iss.argp.value+mean_anomaly.value):10.5f}{'':15}{math.degrees(argp+m_ano):10.5f}"
+    )
     print()
 
     # Obtain state vector from spg4 and mean elements
     sat = Satrec()
-    sat.sgp4init(WGS84, 'i', 0, epoch.jd - 2433281.5, 0.0, 0.0, 0.0, ecc, argp, inc, m_ano, m_mot, raan)
+    sat.sgp4init(
+        WGS84,
+        "i",
+        0,
+        epoch.jd - 2433281.5,
+        0.0,
+        0.0,
+        0.0,
+        ecc,
+        argp,
+        inc,
+        m_ano,
+        m_mot,
+        raan,
+    )
     errorCode, rTEME, vTEME = sat.sgp4(epoch.jd1, epoch.jd2)
     if errorCode != 0:
         raise RuntimeError(SGP4_ERRORS[errorCode])

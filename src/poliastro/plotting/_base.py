@@ -4,7 +4,7 @@ from typing import List
 
 import numpy as np
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation, concatenate_representations
+from astropy.coordinates import CartesianRepresentation
 
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
@@ -160,8 +160,6 @@ class BaseOrbitPlotter:
                 "set_attractor(Major_Body) or plot(orbit)"
             )
 
-        colors = self._get_colors(color, trail)
-
         # Apply the maneuver, collect all intermediate states and allocate the
         # final coordinates list array
         *maneuver_phases, final_phase = initial_orbit.apply_maneuver(
@@ -170,43 +168,61 @@ class BaseOrbitPlotter:
 
         if len(maneuver_phases) == 0:
             # For single-impulse maneuver only draw the impulse marker
-            self._draw_impulse(color, f"Impulse - {label}", maneuver_phases[0].r)
+            impulse_label = f"Impulse 1 - {label}"
+            impulse_lines = ([self._draw_impulse(color, impulse_label, final_phase.r)],)
+            return [(impulse_label, impulse_lines)]
         else:
-            coordinates_list = []
+            # Declare for holding (label, lines) for each impulse and trajectory
+            lines_list = []
 
             # Collect the coordinates for the different maneuver phases
             for ith_impulse, orbit_phase in enumerate(maneuver_phases):
+
+                # Plot the impulse marker and collect its label and lines
+                impulse_label = f"Impulse {ith_impulse + 1} - {label}"
+                impulse_lines = (
+                    [self._draw_impulse(color, impulse_label, orbit_phase.r)],
+                )
+                lines_list.append((impulse_label, impulse_lines))
+
+                # HACK: if no color is provided, get the one randomly generated
+                # for previous impulse lines
+                color = impulse_lines[0][0].get_color() if color is None else color
 
                 # Get the propagation time required before next impulse
                 time_to_next_impulse, _ = maneuver.impulses[ith_impulse + 1]
 
                 # Compute the minimum and maximum anomalies
                 min_nu = orbit_phase.nu
+                # High level, but inefficient way of solving the Kepler equation,
+                # which is what farnocchia_coe does:
+                # tp0 = delta_t_from_nu(nu, ecc, k, q)
+                # tp = tp0 + tof
+                # max_nu = nu_from_delta_t(tp, ecc, k, q)
                 max_nu = orbit_phase.propagate(time_to_next_impulse).nu
 
                 # Collect the coordinate points for the i-th orbit phase
+                # We use .sample rather than poliastro.twobody.propagation.propagate
+                # because the latter samples time uniformly
+                # and therefore generates a sharp curve close to the perigee,
+                # and that's also why I need to compute the anomalies outside,
+                # see https://github.com/poliastro/poliastro/issues/1364
                 phase_coordinates = orbit_phase.sample(
                     min_anomaly=min_nu, max_anomaly=max_nu
                 )
-                coordinates_list.extend(phase_coordinates)
 
-                # Plot the impulse marker
-                self._draw_impulse(
-                    color, f"Impulse {ith_impulse + 1} - {label}", orbit_phase.r
+                # Plot the phase trajectory and collect its label and lines
+                trajectory_lines = self._plot_trajectory(
+                    phase_coordinates, label=label, color=color, trail=trail
                 )
+                lines_list.append((label, trajectory_lines))
 
             # Finally, draw the impulse at the very beginning of the final phase
-            self._draw_impulse(
-                color, f"Impulse {ith_impulse + 2} - {label}", final_phase.r
-            )
+            impulse_label = f"Impulse {ith_impulse + 2} - {label}"
+            impulse_lines = ([self._draw_impulse(color, impulse_label, final_phase.r)],)
+            lines_list.append((impulse_label, impulse_lines))
 
-        # Concatenate the different phase coordinates into a single coordinates
-        # instance
-        coordinates = concatenate_representations(coordinates_list)
-
-        return self.__add_trajectory(
-            coordinates, None, label=str(label), colors=colors, dashed=False
-        )
+        return lines_list
 
     def _plot(self, orbit, *, label=None, color=None, trail=False):
         colors = self._get_colors(color, trail)

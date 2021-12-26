@@ -1,12 +1,10 @@
-<p align="center">
-    <a href="https://www.poliastro.space/"><image src="https://www.poliastro.space/images/logo_text.png" alt="poliastro logo" width="675px"></a>
-</p>
+[![poliastro](https://www.poliastro.space/images/logo_text.png)](https://www.poliastro.space/)
 
 Name:         | poliastro
 :------------:|:--------------
 **Website**:  | <https://www.poliastro.space/>
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
-**Version**:  | 0.16.dev0
+**Version**:  | 0.17.dev0
 
 [![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=main)
@@ -41,9 +39,7 @@ from poliastro.examples import molniya
 molniya.plot()
 ```
 
-<p align="center">
-    <image src="https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png">
-</p>
+![Molniya orbit](https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png)
 
 # Documentation
 
@@ -77,8 +73,7 @@ poliastro requires the following Python packages:
 - plotly, for 2D and 3D interactive orbit plotting
 - SciPy, for root finding and numerical propagation
 
-poliastro is tested on Linux, OS X and Windows on Python 3.7 and 3.8
-against latest NumPy.
+poliastro is supported on Linux, macOS and Windows on Python 3.7 to 3.9.
 
 [![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
 
@@ -162,11 +157,11 @@ Support us by becoming a sponsor. Your logo will show up here with a link to you
 
 # FAQ
 
-## What\'s up with the name?
+## What's up with the name?
 
 poliastro comes from Polimi, which is the shortened name of the
 Politecnico di Milano, the Italian university where I was studying while
-writing this software. It\'s my tiny tribute to a place I came to love.
+writing this software. It's my tiny tribute to a place I came to love.
 *Grazie mille!*
 
 ## Can I do \<insert awesome thing\> with poliastro?

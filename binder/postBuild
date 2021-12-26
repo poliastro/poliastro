@@ -1,0 +1,6 @@
+# Stop everything if one command fails
+set -e
+
+# See https://github.com/mwouts/jupytext/issues/803#issuecomment-982170660
+mkdir -p ${HOME}/.jupyter/labconfig
+cp binder/labconfig/* ${HOME}/.jupyter/labconfig

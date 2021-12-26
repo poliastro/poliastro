@@ -67,8 +67,27 @@ Funding = "https://opencollective.com/poliastro"
 [project.optional-dependencies]
 jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
-dev = [
-    "black==21.9b0",
+doc = [
+    "httpx",
+    "ipython>=5.0",
+    "ipywidgets>=7.6",
+    "jupyter-client",
+    "jupytext",
+    "myst-parser>=0.13.1",
+    "nbsphinx>=0.8.6",
+    "nbconvert>=5.5",
+    "sgp4",
+    "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
+    "sphinx-autoapi",
+    "sphinx-gallery",
+    "sphinx_rtd_theme~=1.0.0",
+    "sphinx-hoverxref==0.7b1",
+    "sphinx-notfound-page",
+    "sphinx-copybutton>0.2.9",
+    "sphinx-github-role~=0.1.0",
+]
+test = [
+    "black==21.11b0",
     "coverage",
     "hypothesis",
     "import-linter",
@@ -79,8 +98,6 @@ dev = [
     "jupytext",
     "mypy>=0.740",
     "myst-parser>=0.13.1",
-    "nbsphinx>=0.8.6",
-    "nbconvert>=5.5",
     "pycodestyle",
     "pytest>=3.2",
     "pytest-cov<2.6.0",  # https://github.com/pytest-dev/pytest-cov/issues/222
@@ -88,13 +105,6 @@ dev = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
-    "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
-    "sphinx-autoapi",
-    "sphinx-gallery",
-    "sphinx_rtd_theme~=1.0.0rc1",
-    "sphinx-hoverxref==0.7b1",
-    "sphinx-notfound-page",
-    "sphinx-copybutton>0.2.9",
 ]
 
 [tool.flit.sdist]
