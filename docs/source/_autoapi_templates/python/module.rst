@@ -62,8 +62,8 @@ Submodules
 {% set visible_children = obj.children|selectattr("display")|rejectattr("imported")|list %}
 {% endif %}
 {% if visible_children %}
-{{ obj.type|title }} Contents
-{{ "-" * obj.type|length }}---------
+Summary
+-------
 
 {% set visible_classes = visible_children|selectattr("type", "equalto", "class")|list %}
 {% set visible_functions = visible_children|selectattr("type", "equalto", "function")|list %}
@@ -102,6 +102,10 @@ Functions
 {% endif %}
 {% endblock %}
 {% endif %}
+
+Contents
+--------
+
 {% for obj_item in visible_children %}
 {{ obj_item.rendered|indent(0) }}
 {% endfor %}
