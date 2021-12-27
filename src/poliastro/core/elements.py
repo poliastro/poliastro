@@ -170,13 +170,12 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     The modified equinoctial orbital elements are a set of orbital elements that are useful for
     trajectory analysis and optimization. They are valid for circular, elliptic, and hyperbolic
     orbits. These direct modified equinoctial equations exhibit no singularity for zero
-    eccentricity and orbital inclinations equal to 0 and 90 degrees. However, two of the
-    components are singular for an orbital inclination of 180 degrees.
+    eccentricity and orbital inclinations equal to 0 and 90 degrees. However, the h and k
+    components are singular for an orbital inclination of 180 degrees since the retrograde factor
+    is not yet supported.
 
     Parameters
     ----------
-    k : float
-        Standard gravitational parameter (km^3 / s^2).
     p : float
         Semi-latus rectum or parameter (km).
     ecc : float
@@ -220,10 +219,14 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
         \end{align}
 
     """
+    if inc == np.pi:
+        raise ValueError(
+            "Cannot compute modified equinoctial set for 180 degrees orbit inclination due to `h` and `k` singularity."
+        )
+
     lonper = raan + argp
     f = ecc * np.cos(lonper)
     g = ecc * np.sin(lonper)
-    # TODO: Check polar case (see [Walker, 1985])
     h = np.tan(inc / 2) * np.cos(raan)
     k = np.tan(inc / 2) * np.sin(raan)
     L = lonper + nu
@@ -443,3 +446,74 @@ def mee2coe(p, f, g, h, k, L):
     argp = (lonper - raan) % (2 * np.pi)
     nu = (L - lonper) % (2 * np.pi)
     return p, ecc, inc, raan, argp, nu
+
+
+@jit
+def mee2rv(p, f, g, h, k, L):
+    """Calculates position and velocity vector from modified equinoctial elements.
+
+    Parameters
+    ----------
+    p: float
+        Semi-latus rectum
+    f: float
+        Equinoctial parameter f
+    g: float
+        Equinoctial parameter g
+    h: float
+        Equinoctial parameter h
+    k: float
+        Equinoctial parameter k
+    L: float
+        Longitude
+
+    Returns
+    -------
+    r: np.array
+        Position vector.
+    v: np.array
+        Velocity vector.
+
+    Note
+    ----
+    The definition of `r` and `v` is taken from
+    https://spsweb.fltops.jpl.nasa.gov/portaldataops/mpg/MPG_Docs/Source%20Docs/EquinoctalElements-modified.pdf,
+    Equation 3a and 3b.
+
+    """
+    w = 1 + f * np.cos(L) + g * np.sin(L)
+    r = p / w
+    s2 = 1 + h ** 2 + k ** 2
+    alpha2 = h ** 2 - k ** 2
+
+    rx = (r / s2)(np.cos(L) + alpha2 ** 2 * np.cos(L) + 2 * h * k * np.sin(L))
+    ry = (r / s2)(np.sin(L) - alpha2 ** 2 * np.sin(L) + 2 * h * k * np.cos(L))
+    rz = (2 * r / s2)(h * np.sin(L) - k * np.cos(L))
+
+    vx = (
+        (-1 / s2)
+        * (np.sqrt(k / p))
+        * (
+            np.sin(L)
+            + alpha2 * np.sin(L)
+            - 2 * h * k * np.cos(L)
+            + g
+            - 2 * f * h * k
+            + alpha2 * g
+        )
+    )
+    vy = (
+        (-1 / s2)
+        * (np.sqrt(k / p))
+        * (
+            -np.cos(L)
+            + alpha2 * np.cos(L)
+            + 2 * h * k * np.sin(L)
+            - f
+            + 2 * g * h * k
+            + alpha2 * f
+        )
+    )
+    vz = (2 / s2) * (np.sqrt(k / p)) * (h * np.cos(L) + k * np.sin(L) + f * h + g * k)
+
+    return np.array([rx, ry, rz]), np.array([vx, vy, vz])

@@ -1,6 +1,6 @@
 from astropy import units as u
 
-from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe
+from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
 from poliastro.twobody.elements import mean_motion, period
 
 
@@ -256,3 +256,14 @@ class ModifiedEquinoctialState(BaseState):
             nu * u.rad,
             self.plane,
         )
+
+    def to_vectors(self):
+        r, v = mee2rv(
+            self.p.to(u.km).value,
+            self.f.to(u.rad).value,
+            self.g.to(u.rad).value,
+            self.h.to(u.rad).value,
+            self.k.to(u.rad).value,
+            self.L.to(u.rad).value,
+        )
+        return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
