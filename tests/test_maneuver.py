@@ -256,5 +256,5 @@ def test_lambert_tof_exception():
     assert excinfo.type == ValueError
     assert (
         str(excinfo.value)
-        == "Epoch of intial orbit Greater than Epoch of final orbit causing a Negative Time Of Flight"
+        == "Epoch of initial orbit greater than epoch of final orbit, causing a negative time of flight"
     )
