@@ -60,8 +60,10 @@ class TisserandPlotter:
             Desired Vinf for the flyby
         num_contours : int
             Number of contour lines for flyby speed
+        alpha_lim : tuple
+            Minimum and maximum flyby angles.
         N : int
-            Number of points for flyby angle
+            Number of points for flyby angle.
 
         Notes
         -----

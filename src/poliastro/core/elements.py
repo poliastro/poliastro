@@ -200,11 +200,9 @@ def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
 
 @jit
 def coe2mee(p, ecc, inc, raan, argp, nu):
-    r"""Converts from classical orbital elements to modified equinoctial
-    orbital elements.
+    r"""Converts from classical orbital elements to modified equinoctial orbital elements.
 
-    The definition of the modified equinoctial orbital elements is taken from
-    [Walker, 1985].
+    The definition of the modified equinoctial orbital elements is taken from [Walker, 1985].
 
     The modified equinoctial orbital elements are a set of orbital elements that are useful for
     trajectory analysis and optimization. They are valid for circular, elliptic, and hyperbolic
@@ -221,7 +219,7 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
         Eccentricity.
     inc : float
         Inclination (rad).
-    omega : float
+    raan : float
         Longitude of ascending node (rad).
     argp : float
         Argument of perigee (rad).

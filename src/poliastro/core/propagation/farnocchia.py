@@ -99,6 +99,10 @@ def M_to_D_near_parabolic(M, ecc, tol=1.48e-08, maxiter=50):
         Mean anomaly in radians.
     ecc : float
         Eccentricity (~1).
+    tol : float, optional
+        Absolute tolerance for Newton convergence.
+    maxiter : int, optional
+        Maximum number of iterations for Newton convergence.
 
     Returns
     -------

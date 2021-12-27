@@ -204,7 +204,7 @@ class GroundtrackPlotter:
         return trace
 
     def plot(self, earth_ss, t_span, label, color, line_style={}, marker={}):
-        """Plots desired Earth satellite orbit for a given time span
+        """Plots desired Earth satellite orbit for a given time span.
 
         Parameters
         ----------
@@ -212,6 +212,8 @@ class GroundtrackPlotter:
             Desired Earth's satellite to who's grountrack will be plotted
         t_span : ~astropy.time.TimeDelta
             A collection of epochs
+        label : str
+            Label for the groundtrack.
         color : string
             Desired lines and traces color
         line_style : dict

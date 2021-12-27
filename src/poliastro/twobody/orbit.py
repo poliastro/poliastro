@@ -508,6 +508,8 @@ class Orbit:
         ----------
         name : str
             Name of the body to make the request.
+        **kwargs
+            Extra kwargs for astroquery.
 
         Returns
         -------
@@ -716,6 +718,8 @@ class Orbit:
 
         Parameters
         ----------
+        attractor : ~poliastro.bodies.SolarSystemPlanet
+            Attractor.
         a : ~astropy.units.Quantity
             Semi-major axis.
         ecc : ~astropy.units.Quantity

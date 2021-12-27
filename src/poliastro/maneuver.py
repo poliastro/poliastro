@@ -33,7 +33,7 @@ class Maneuver:
 
         Parameters
         ----------
-        impulses : list
+        *args : list
             List of pairs (delta_time, delta_velocity)
 
         """
@@ -176,6 +176,8 @@ class Maneuver:
             Method for solving Lambert's problem
         short : bool
             Selects between short and long solution
+        **kwargs
+            Extra kwargs for Lambert method.
 
         """
         # Get initial algorithm conditions

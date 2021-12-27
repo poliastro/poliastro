@@ -137,6 +137,8 @@ def farnocchia(k, r, v, tofs, **kwargs):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
+    **kwargs
+        Unused.
 
     Returns
     -------
@@ -173,6 +175,8 @@ def vallado(k, r, v, tofs, numiter=350, **kwargs):
         Array of times to propagate.
     numiter : int, optional
         Maximum number of iterations, default to 35.
+    **kwargs
+        Unused.
 
     Returns
     -------
@@ -343,8 +347,10 @@ def pimienta(k, r, v, tofs, rtol=None):
 
 
 def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
-    """Solves the Elliptic Kepler Equation with a cubic convergence and
-    accuracy better than 10e-12 rad is normally achieved. It is not valid for
+    """Propagate the orbit using the Gooding method.
+
+    The Gooding method solves the Elliptic Kepler Equation with a cubic convergence,
+    and accuracy better than 10e-12 rad is normally achieved. It is not valid for
     eccentricities equal or greater than 1.0.
 
     Parameters
@@ -357,6 +363,8 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
+    numiter : int
+        Maximum number of iterations for convergence.
     rtol : float
         This method does not require of tolerance since it is non iterative.
 
@@ -438,6 +446,8 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         Propagation method, default to farnocchia.
     rtol : float, optional
         Relative tolerance, default to 1e-10.
+    **kwargs
+        Extra kwargs for propagation method.
 
     Returns
     -------

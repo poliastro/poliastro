@@ -129,8 +129,7 @@ def distance(cartesian_cords, px, py, pz):
 
 @jit
 def is_visible(cartesian_cords, px, py, pz, N):
-    """Determines whether an object located at a given point is visible from the given location.
-    Returns true if true, false otherwise.
+    """Determine whether an object located at a given point is visible from the given location.
 
     Parameters
     ----------
@@ -142,6 +141,8 @@ def is_visible(cartesian_cords, px, py, pz, N):
         y-coordinate of the point
     pz : float
         z-coordinate of the point
+    N : numpy.ndarray
+        Normal vector of the ellipsoid at the given location.
 
     """
     c = cartesian_cords

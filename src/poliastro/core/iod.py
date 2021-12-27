@@ -57,6 +57,8 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
         Initial position vector
     r : numpy.ndarray
         Final position vector
+    short : bool
+        True for short path, False for long one.
     tof : ~float
         Time of flight
     numiter : int

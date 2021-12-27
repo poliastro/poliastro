@@ -167,7 +167,7 @@ def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
 
 
 def third_body(t0, state, k, k_third, perturbation_body):
-    r"""Calculates 3rd body acceleration (km/s2)
+    r"""Calculate third body acceleration (km/s2).
 
     .. math::
 
@@ -180,7 +180,9 @@ def third_body(t0, state, k, k_third, perturbation_body):
     state : numpy.ndarray
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
-        Standard Gravitational parameter (km^3/s^2).
+        Standard Gravitational parameter of the attractor (km^3/s^2).
+    k_third : float
+        Standard Gravitational parameter of the third body (km^3/s^2).
     perturbation_body : callable
         A callable object returning the position of the body that causes the perturbation
         in the attractor frame.

@@ -62,8 +62,10 @@ class CZMLExtractor:
         N : int
             Default number of sample points. Unless otherwise specified, the
             number of sampled data points will be N when calling add_orbit()
-        attractor : poliastro.Body
+        attractor : poliastro.bodies.Body
             Attractor of the orbits
+        pr_map : str
+            A URL to the projection of the defined ellipsoid (UV map).
         scene3D : bool
             Determines the scene mode. If set to true, the scene is set to 3D
             mode, otherwise it's the orthographic projection.
@@ -209,11 +211,14 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        ellipsoid : list(int)
+        ellipsoid : list[int]
             Defines the attractor ellipsoid. The list must have three numbers
             representing the radii in the x, y and z axis
         pr_map : str
-            A URL to the projection of the defined ellipsoid (UV map)
+            A URL to the projection of the defined ellipsoid (UV map).
+        scene3D : bool
+            If set to true, the scene is set to 3D mode,
+            otherwise it's the orthographic projection.
 
         """
 
