@@ -175,7 +175,7 @@ such as TLE/3LE, OMM, and the like.
 Besides, poliastro is a community project that strives to be easy to use,
 while at the same time producing correct results
 [that are validated](https://github.com/poliastro/validation/)
-against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/latest/about.html#related-software)
+against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/latest/related.html)
 such as GMAT and Orekit.
 Therefore, you might find that its API is very different from
 these projects,
