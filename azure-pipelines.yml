@@ -3,7 +3,7 @@ variables:
   CI_NAME: Azure Pipelines
   CI_BUILD_ID: $(Build.BuildId)
   CI_BUILD_URL: "https://dev.azure.com/poliastro/poliastro/_build/results?buildId=$(Build.BuildId)"
-  CIBW_BUILD: cp37-* cp38-*
+  CIBW_BUILD: cp38-*
   CIBW_SKIP: "*-win32 *-manylinux1_i686"
 
 resources:
@@ -41,9 +41,6 @@ jobs:
     envs:
       - linux: check
         name: quality
-
-      - linux: py37
-        name: py37_test
 
       - linux: py38-fast
         name: py38_fast_test

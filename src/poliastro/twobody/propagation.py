@@ -110,7 +110,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
             last_t = max(tofs)
         else:
             # Filter the event which triggered first
-            last_t = min([event.last_t for event in terminal_events]).to_value(u.s)
+            last_t = min(event.last_t for event in terminal_events).to_value(u.s)
             tofs = [tof for tof in tofs if tof < last_t] + [last_t]
 
     rrs = []
