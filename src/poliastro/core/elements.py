@@ -13,6 +13,23 @@ from poliastro.core.util import rotation_matrix
 
 @jit
 def eccentricity_vector(k, r, v):
+    r"""Eccentricity vector.
+
+    .. math::
+
+       \vec{e} = \frac{1}{\mu} \left(
+           \left( v^{2} - \frac{\mu}{r}\right ) \vec{r}  - (\vec{r} \cdot \vec{v})\vec{v}
+       \right)
+
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter (km^3 / s^2).
+    r : numpy.ndarray
+        Position vector (km)
+    v : numpy.ndarray
+        Velocity vector (km / s)
+    """
     return ((v @ v - k / norm(r)) * r - (r @ v) * v) / k
 
 
