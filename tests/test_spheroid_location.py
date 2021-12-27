@@ -35,8 +35,8 @@ def test_tangential_vectors():
     N = p.N
     v1, v2 = p.tangential_vecs
 
-    assert abs(N.dot(v1)) <= 1e-7
-    assert abs(N.dot(v2)) <= 1e-7
+    assert abs(N @ v1) <= 1e-7
+    assert abs(N @ v2) <= 1e-7
 
 
 def test_visible():

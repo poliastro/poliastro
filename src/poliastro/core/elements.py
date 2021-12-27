@@ -12,6 +12,48 @@ from poliastro.core.util import rotation_matrix
 
 
 @jit
+def eccentricity_vector(k, r, v):
+    r"""Eccentricity vector.
+
+    .. math::
+
+       \vec{e} = \frac{1}{\mu} \left(
+           \left( v^{2} - \frac{\mu}{r}\right ) \vec{r}  - (\vec{r} \cdot \vec{v})\vec{v}
+       \right)
+
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter (km^3 / s^2).
+    r : numpy.ndarray
+        Position vector (km)
+    v : numpy.ndarray
+        Velocity vector (km / s)
+    """
+    return ((v @ v - k / norm(r)) * r - (r @ v) * v) / k
+
+
+@jit
+def circular_velocity(k, a):
+    r"""Compute circular velocity for a given body given thegravitational parameter and the semimajor axis.
+
+    .. math::
+
+       v = \sqrt{\frac{\mu}{a}}
+
+    Parameters
+    ----------
+
+    k : float
+        Gravitational Parameter
+    a : float
+        Semimajor Axis
+
+    """
+    return np.sqrt(k / a)
+
+
+@jit
 def rv_pqw(k, p, ecc, nu):
     r"""Returns r and v vectors in perifocal frame.
 
@@ -341,9 +383,9 @@ def rv2coe(k, r, v, tol=1e-8):
 
     h = cross(r, v)
     n = cross([0, 0, 1], h)
-    e = ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
+    e = ((v @ v - k / norm(r)) * r - (r @ v) * v) / k
     ecc = norm(e)
-    p = h.dot(h) / k
+    p = (h @ h) / k
     inc = np.arccos(h[2] / norm(h))
 
     circular = ecc < tol
@@ -352,12 +394,12 @@ def rv2coe(k, r, v, tol=1e-8):
     if equatorial and not circular:
         raan = 0
         argp = np.arctan2(e[1], e[0]) % (2 * np.pi)  # Longitude of periapsis
-        nu = np.arctan2(h.dot(cross(e, r)) / norm(h), r.dot(e))
+        nu = np.arctan2((h @ cross(e, r)) / norm(h), r @ e)
     elif not equatorial and circular:
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
         argp = 0
         # Argument of latitude
-        nu = np.arctan2(r.dot(cross(h, n)) / norm(h), r.dot(n))
+        nu = np.arctan2((r @ cross(h, n)) / norm(h), r @ n)
     elif equatorial and circular:
         raan = 0
         argp = 0
@@ -366,17 +408,17 @@ def rv2coe(k, r, v, tol=1e-8):
         a = p / (1 - (ecc ** 2))
         ka = k * a
         if a > 0:
-            e_se = r.dot(v) / sqrt(ka)
-            e_ce = norm(r) * v.dot(v) / k - 1
+            e_se = (r @ v) / sqrt(ka)
+            e_ce = norm(r) * (v @ v) / k - 1
             nu = E_to_nu(np.arctan2(e_se, e_ce), ecc)
         else:
-            e_sh = r.dot(v) / sqrt(-ka)
+            e_sh = (r @ v) / sqrt(-ka)
             e_ch = norm(r) * (norm(v) ** 2) / k - 1
             nu = F_to_nu(np.log((e_ch + e_sh) / (e_ch - e_sh)) / 2, ecc)
 
         raan = np.arctan2(n[1], n[0]) % (2 * np.pi)
-        px = r.dot(n)
-        py = r.dot(cross(h, n)) / norm(h)
+        px = r @ n
+        py = (r @ cross(h, n)) / norm(h)
         argp = (np.arctan2(py, px) - nu) % (2 * np.pi)
 
     nu = (nu + np.pi) % (2 * np.pi) - np.pi

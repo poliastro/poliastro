@@ -10,8 +10,7 @@ from numba import njit as jit
 from numpy import cross
 from numpy.linalg import norm
 
-from poliastro.core.elements import rv2coe
-from poliastro.core.util import circular_velocity, eccentricity_vector
+from poliastro.core.elements import circular_velocity, eccentricity_vector, rv2coe
 
 
 @jit

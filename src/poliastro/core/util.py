@@ -1,32 +1,6 @@
 import numpy as np
 from numba import njit as jit
 from numpy import cos, sin
-from numpy.linalg import norm as norm
-
-
-@jit
-def eccentricity_vector(k, r, v):
-    return ((v.dot(v) - k / (norm(r))) * r - r.dot(v) * v) / k
-
-
-@jit
-def circular_velocity(k, a):
-    r"""Compute circular velocity for a given body given thegravitational parameter and the semimajor axis.
-
-    .. math::
-
-       v = \sqrt{\frac{\mu}{a}}
-
-    Parameters
-    ----------
-
-    k : float
-        Gravitational Parameter
-    a : float
-        Semimajor Axis
-
-    """
-    return np.sqrt(k / a)
 
 
 @jit
@@ -90,10 +64,10 @@ def spherical_to_cartesian(v):
 
     """
     v = np.asarray(v)
-    norm = np.expand_dims(np.asarray(v[..., 0]), -1)
+    norm_vecs = np.expand_dims(np.asarray(v[..., 0]), -1)
     vsin = np.sin(v[..., 1:3])
     vcos = np.cos(v[..., 1:3])
     x = np.asarray(vsin[..., 0] * vcos[..., 1])
     y = np.asarray(vsin[..., 0] * vsin[..., 1])
     z = np.asarray(vcos[..., 0])
-    return norm * np.stack((x, y, z), axis=-1)
+    return norm_vecs * np.stack((x, y, z), axis=-1)

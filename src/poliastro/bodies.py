@@ -146,11 +146,11 @@ class SolarSystemPlanet(Body):
                 self, epoch, label=label
             )
         elif use_3d:
-            from poliastro.plotting.core import OrbitPlotter3D
+            from poliastro.plotting.interactive import OrbitPlotter3D
 
             return OrbitPlotter3D(plane=plane).plot_body_orbit(self, epoch, label=label)
         else:
-            from poliastro.plotting.core import OrbitPlotter2D
+            from poliastro.plotting.interactive import OrbitPlotter2D
 
             return OrbitPlotter2D(plane=plane).plot_body_orbit(self, epoch, label=label)
 

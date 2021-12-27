@@ -4,39 +4,26 @@ from warnings import warn
 import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
-    GCRS,
     ICRS,
-    Angle,
     CartesianDifferential,
     CartesianRepresentation,
     get_body_barycentric,
-    get_body_barycentric_posvel,
 )
-from astroquery.jplsbdb import SBDB
 
 from poliastro.constants import J2000
-from poliastro.core.elements import coe2rv_many
-from poliastro.core.propagation.farnocchia import (
-    delta_t_from_nu as delta_t_from_nu_fast,
-)
-from poliastro.core.util import eccentricity_vector
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.angles import (
-    D_to_nu,
-    E_to_nu,
-    F_to_nu,
-    M_to_D,
-    M_to_E,
-    M_to_F,
-    raan_from_ltan,
-)
 from poliastro.twobody.elements import (
+    coe2rv_many,
+    eccentricity_vector,
+    energy,
     get_eccentricity_critical_argp,
     get_eccentricity_critical_inc,
     get_inclination_critical_argp,
+    heliosynchronous,
     hyp_nu_limit,
+    t_p,
 )
 from poliastro.twobody.mean_elements import get_mean_elements
 from poliastro.twobody.propagation import farnocchia, propagate
@@ -47,12 +34,8 @@ from poliastro.twobody.states import (
     ModifiedEquinoctialState,
     RVState,
 )
-from poliastro.util import find_closest_value, norm
-from poliastro.warnings import (
-    OrbitSamplingWarning,
-    PatchedConicsWarning,
-    TimeScaleWarning,
-)
+from poliastro.util import find_closest_value, norm, wrap_angle
+from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
 try:
     from functools import cached_property  # type: ignore
@@ -92,7 +75,6 @@ class Orbit:
         """
         self._state = state  # type: BaseState
         self._epoch = epoch  # type: time.Time
-        self._frame = None  # HACK: Only needed for Orbit.from_body_ephem
 
     @property
     def attractor(self):
@@ -202,15 +184,12 @@ class Orbit:
     @cached_property
     def energy(self):
         """Specific energy."""
-        return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
+        return energy(self.attractor.k, self.r, self.v)
 
     @cached_property
     def e_vec(self):
         """Eccentricity vector."""
-        r, v = self.rv()
-        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
-        e_vec = eccentricity_vector(k, r.to_value(u.km), v.to_value(u.km / u.s))
-        return e_vec * u.one
+        return eccentricity_vector(self.attractor.k, self.r, self.v)
 
     @cached_property
     def h_vec(self):
@@ -233,16 +212,12 @@ class Orbit:
     @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage."""
-        t_p = (
-            delta_t_from_nu_fast(
-                self.nu.to_value(u.rad),
-                self.ecc.value,
-                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
-                self.r_p.to_value(u.km),
-            )
-            * u.s
+        return t_p(
+            self.nu,
+            self.ecc,
+            self.attractor.k,
+            self.r_p,
         )
-        return t_p
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
@@ -418,61 +393,6 @@ class Orbit:
         return cls(ss, epoch)
 
     @classmethod
-    def from_body_ephem(cls, body, epoch=None):
-        """Return osculating `Orbit` of a body at a given time."""
-        from poliastro.bodies import Earth, Moon, Sun
-
-        warn(
-            "Orbit.from_body_ephem is deprecated and will be removed in a future release, "
-            "use Ephem.from_body instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        if not epoch:
-            epoch = time.Time.now().tdb
-        elif epoch.scale != "tdb":
-            epoch = epoch.tdb
-            warn(
-                "Input time was converted to scale='tdb' with value "
-                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
-                TimeScaleWarning,
-                stacklevel=2,
-            )
-        try:
-            r, v = get_body_barycentric_posvel(body.name, epoch)
-        except KeyError as exc:
-            raise RuntimeError(
-                """To compute the position and velocity of the Moon and Pluto use the JPL ephemeris:
-
->>> from astropy.coordinates import solar_system_ephemeris
->>> solar_system_ephemeris.set('jpl')
-"""
-            ) from exc
-        if body == Moon:
-            # TODO: The attractor is in fact the Earth-Moon Barycenter
-            icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
-            gcrs_cart = (
-                ICRS(icrs_cart)
-                .transform_to(GCRS(obstime=epoch))
-                .represent_as(CartesianRepresentation)
-            )
-            ss = cls.from_vectors(
-                Earth,
-                gcrs_cart.xyz.to(u.km),
-                gcrs_cart.differentials["s"].d_xyz.to(u.km / u.day),
-                epoch,
-            )
-
-        else:
-            # TODO: The attractor is not really the Sun, but the Solar System
-            # Barycenter
-            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.d), epoch)
-            ss._frame = ICRS()  # Hack!
-
-        return ss
-
-    @classmethod
     def from_ephem(cls, attractor, ephem, epoch):
         """Create osculating orbit from ephemerides at a given epoch.
 
@@ -497,10 +417,6 @@ class Orbit:
         .. versionadded:: 0.14.0
 
         """
-        # HACK: Only needed for Orbit.from_body_ephem
-        if self._frame is not None:
-            return self._frame
-
         return get_frame(self.attractor, self.plane, self.epoch)
 
     def change_attractor(self, new_attractor, force=False):
@@ -604,61 +520,9 @@ class Orbit:
         >>> apophis_orbit = Orbit.from_sbdb('apophis')  # doctest: +REMOTE_DATA
 
         """
-        from poliastro.bodies import Sun
+        from poliastro.io import orbit_from_sbdb
 
-        obj = SBDB.query(name, full_precision=True, **kwargs)
-
-        if "count" in obj:
-            # No error till now ---> more than one object has been found
-            # Contains all the name of the objects
-            objects_name = obj["list"]["name"]
-            objects_name_in_str = (
-                ""  # Used to store them in string form each in new line
-            )
-            for i in objects_name:
-                objects_name_in_str += i + "\n"
-
-            raise ValueError(
-                str(obj["count"]) + " different objects found: \n" + objects_name_in_str
-            )
-
-        if "object" not in obj.keys():
-            raise ValueError(f"Object {name} not found")
-
-        a = obj["orbit"]["elements"]["a"]
-        ecc = float(obj["orbit"]["elements"]["e"]) * u.one
-        inc = obj["orbit"]["elements"]["i"]
-        raan = obj["orbit"]["elements"]["om"]
-        argp = obj["orbit"]["elements"]["w"]
-
-        # Since JPL provides Mean Anomaly (M) we need to make
-        # the conversion to the true anomaly (nu)
-        M = obj["orbit"]["elements"]["ma"].to(u.rad)
-        # NOTE: It is unclear how this conversion should happen,
-        # see https://ssd-api.jpl.nasa.gov/doc/sbdb.html
-        if ecc < 1:
-            M = (M + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
-            nu = E_to_nu(M_to_E(M, ecc), ecc)
-        elif ecc == 1:
-            nu = D_to_nu(M_to_D(M))
-        else:
-            nu = F_to_nu(M_to_F(M, ecc), ecc)
-
-        epoch = time.Time(obj["orbit"]["epoch"].to(u.d), format="jd")
-
-        ss = cls.from_classical(
-            attractor=Sun,
-            a=a,
-            ecc=ecc,
-            inc=inc,
-            raan=raan,
-            argp=argp,
-            nu=nu,
-            epoch=epoch.tdb,
-            plane=Planes.EARTH_ECLIPTIC,
-        )
-
-        return ss
+        return orbit_from_sbdb(name, **kwargs)
 
     @classmethod
     @u.quantity_input(alt=u.m, inc=u.rad, raan=u.rad, arglat=u.rad)
@@ -723,7 +587,6 @@ class Orbit:
         -------
         Orbit
             New orbit.
-
 
         """
         return cls.synchronous(attractor)
@@ -830,7 +693,7 @@ class Orbit:
         a=None,
         ecc=None,
         inc=None,
-        ltan=10.0 * u.hourangle,
+        raan=0 * u.deg,
         argp=0 * u.deg,
         nu=0 * u.deg,
         epoch=J2000,
@@ -860,8 +723,8 @@ class Orbit:
             Eccentricity.
         inc: ~astropy.units.Quantity
             Inclination.
-        ltan: ~astropy.units.Quantity
-            Local time of the ascending node which will be translated to the Right ascension of the ascending node.
+        raan: ~astropy.units.Quantity
+            Right ascension of the ascending node.
         argp : ~astropy.units.Quantity
             Argument of the pericenter.
         nu : ~astropy.units.Quantity
@@ -872,60 +735,19 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
-        # Temporary fix: raan_from_ltan works only for Earth
-        if attractor.name.lower() != "earth":
-            raise NotImplementedError("Attractors other than Earth not supported yet")
-
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
             np.sqrt(mean_elements.attractor.k / abs(mean_elements.a ** 3)) * u.one
-        ).decompose()
-        R_SSO = attractor.R
-        k_SSO = attractor.k
-        J2_SSO = attractor.J2
+        ).to(1 / u.s)
 
         try:
-            with np.errstate(invalid="raise"):
-                if all(coe is None for coe in [a, ecc, inc]):
-                    # We check sufficient number of parameters
-                    raise ValueError(
-                        "At least two parameters of the set {a, ecc, inc} are required."
-                    )
-                elif a is None and (ecc is not None) and (inc is not None):
-                    # Semi-major axis is the unknown variable
-                    a = (
-                        -3
-                        * R_SSO ** 2
-                        * J2_SSO
-                        * np.sqrt(k_SSO)
-                        / (2 * n_sunsync * (1 - ecc ** 2) ** 2)
-                        * np.cos(inc)
-                    ) ** (2 / 7)
-                elif ecc is None and (a is not None) and (inc is not None):
-                    # Eccentricity is the unknown variable
-                    _ecc_0 = np.sqrt(
-                        -3
-                        * R_SSO ** 2
-                        * J2_SSO
-                        * np.sqrt(k_SSO)
-                        * np.cos(inc)
-                        / (2 * a ** (7 / 2) * n_sunsync)
-                    )
-                    ecc = np.sqrt(1 - _ecc_0)
-                elif inc is None and (ecc is not None) and (a is not None):
-                    # Inclination is the unknown variable
-                    inc = np.arccos(
-                        -2
-                        * a ** (7 / 2)
-                        * n_sunsync
-                        * (1 - ecc ** 2) ** 2
-                        / (3 * R_SSO ** 2 * J2_SSO * np.sqrt(k_SSO))
-                    )
+            a, ecc, inc = heliosynchronous(
+                attractor.k, attractor.R, attractor.J2, n_sunsync, a, ecc, inc
+            )
         except FloatingPointError:
             raise ValueError("No SSO orbit with given parameters can be found.")
 
-        raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
             attractor=attractor,
             a=a,
@@ -1296,16 +1118,13 @@ class Orbit:
 
         """
         # Silently wrap anomaly
-        nu = (value + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
+        nu = wrap_angle(value)
 
-        delta_t = (
-            delta_t_from_nu_fast(
-                nu.to_value(u.rad),
-                self.ecc.value,
-                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
-                self.r_p.to_value(u.km),
-            )
-            * u.s
+        delta_t = t_p(
+            nu,
+            self.ecc,
+            self.attractor.k,
+            self.r_p,
         )
         tof = delta_t - self.t_p
         return tof
@@ -1356,7 +1175,7 @@ class Orbit:
         # We have to wrap nu in [-180, 180) to compare it with the output of
         # the arc cosine, which is in the range [0, 180)
         # Start from -nu_limit
-        wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
+        wrapped_nu = wrap_angle(self.nu)
         nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
 
         limits = [
@@ -1367,7 +1186,7 @@ class Orbit:
         # Now we check that none of the provided values
         # is outside of the hyperbolic range
         nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
-        if not Angle(limits).is_within_bounds(-nu_max, nu_max):
+        if not ((-nu_max <= limits).all() and (limits < nu_max).all()):
             warn("anomaly outside range, clipping", OrbitSamplingWarning, stacklevel=2)
             limits = limits.clip(-nu_max, nu_max)
 
@@ -1423,18 +1242,14 @@ class Orbit:
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
-            np.full(n, self.attractor.k.to_value(u.m ** 3 / u.s ** 2)),
-            np.full(n, self.p.to_value(u.m)),
-            np.full(n, self.ecc.value),
-            np.full(n, self.inc.to_value(u.rad)),
-            np.full(n, self.raan.to_value(u.rad)),
-            np.full(n, self.argp.to_value(u.rad)),
-            nu_values.to_value(u.rad),
+            np.tile(self.attractor.k, n),
+            np.tile(self.p, n),
+            np.tile(self.ecc, n),
+            np.tile(self.inc, n),
+            np.tile(self.raan, n),
+            np.tile(self.argp, n),
+            nu_values,
         )
-
-        # Add units
-        rr = (rr << u.m).to(u.km)
-        vv = (vv << (u.m / u.s)).to(u.km / u.s)
 
         cartesian = CartesianRepresentation(
             rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
@@ -1498,10 +1313,10 @@ class Orbit:
 
             return StaticOrbitPlotter().plot(self, label=label)
         elif use_3d:
-            from poliastro.plotting.core import OrbitPlotter3D
+            from poliastro.plotting.interactive import OrbitPlotter3D
 
             return OrbitPlotter3D().plot(self, label=label)
         else:
-            from poliastro.plotting.core import OrbitPlotter2D
+            from poliastro.plotting.interactive import OrbitPlotter2D
 
             return OrbitPlotter2D().plot(self, label=label)

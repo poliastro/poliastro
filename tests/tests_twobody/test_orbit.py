@@ -752,16 +752,7 @@ def test_heliosynchronous_orbit_enough_arguments():
     with pytest.raises(ValueError) as excinfo:
         Orbit.heliosynchronous(Earth, a=None, ecc=None, inc=None)
 
-    assert (
-        "At least two parameters of the set {a, ecc, inc} are required."
-        in excinfo.exconly()
-    )
-
-
-def test_heliosynchronous_orbit_without_earth():
-    with pytest.raises(NotImplementedError) as excinfo:
-        Orbit.heliosynchronous(Mars, a=800 * u.km + Mars.R, ecc=0 * u.one)
-    assert "Attractors other than Earth not supported yet" in excinfo.exconly()
+    assert "Two parameters of (a, ecc, inc) are required" in excinfo.exconly()
 
 
 def test_heliosynchronous_orbit_inc():

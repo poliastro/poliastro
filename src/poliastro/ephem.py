@@ -126,7 +126,7 @@ def _sinc_interp(x, s, u):
     T = s[1] - s[0]
 
     sincM = np.tile(u, (len(s), 1)) - np.tile(s[:, np.newaxis], (1, len(u)))
-    y = np.dot(x, np.sinc(sincM / T))
+    y = x @ np.sinc(sincM / T)
 
     return y
 

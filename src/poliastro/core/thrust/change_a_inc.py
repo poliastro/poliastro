@@ -3,7 +3,7 @@ from numba import njit as jit
 from numpy import cross
 from numpy.linalg import norm
 
-from poliastro.core.util import circular_velocity
+from poliastro.core.elements import circular_velocity
 
 
 @jit

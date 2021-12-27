@@ -3,6 +3,7 @@
 """
 import numpy as np
 from astropy import units as u
+from astropy.coordinates import Angle
 from astropy.time import Time
 from numpy.linalg import norm as norm_np
 
@@ -82,3 +83,8 @@ def alinspace(start, stop=None, *, num=50, endpoint=True):
         alinspace_fast(start.to_value(u.rad), stop.to_value(u.rad), num, endpoint)
         * u.rad
     )
+
+
+@u.quantity_input(angle=u.rad, limit=u.rad)
+def wrap_angle(angle, limit=180 * u.deg):
+    return Angle(angle).wrap_at(limit)
