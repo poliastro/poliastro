@@ -1,23 +1,24 @@
 from enum import Enum, auto
 from warnings import warn
 
+import numpy as np
 from astropy import units as u
 from astropy.coordinates import (
+    GCRS,
     ICRS,
     BarycentricMeanEcliptic,
     CartesianDifferential,
     CartesianRepresentation,
+    get_body_barycentric,
     get_body_barycentric_posvel,
 )
 from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 
-from poliastro._math.interpolate import sinc_interp, spline_interp
-from poliastro.bodies import Earth
+from poliastro._math.interpolate import interp1d, sinc_interp, spline_interp
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.twobody.propagation import propagate
-from poliastro.util import time_range
 from poliastro.warnings import TimeScaleWarning
 
 EPHEM_FORMAT = (
@@ -32,7 +33,7 @@ class InterpolationMethods(Enum):
     SPLINES = auto()
 
 
-def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
+def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
     """Interpolates ephemerides data
 
     Parameters
@@ -49,23 +50,29 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
 
     Returns
     -------
-    interpolant : callable
-        Interpolant function that receives time increment in seconds
-        since the initial epoch.
+    intrp : ~scipy.interpolate.interpolate.interp1d
+        Interpolated function.
 
     """
-    epochs = time_range(
-        Time(t_span[0], format="jd", scale="tdb"),
-        end=Time(t_span[1], format="jd", scale="tdb"),
-        periods=int(((t_span[1] - t_span[0]) / (period * rtol)).to_value(u.one)),
-    )
-    ephem = Ephem.from_body(body, epochs, attractor=attractor)
+    h = (period * rtol).to_value(u.d)
+    t_span = (t_span[0].to_value(u.d), t_span[1].to_value(u.d) + 0.01)
+    t_values = np.linspace(*t_span, int((t_span[1] - t_span[0]) / h))  # type: ignore
+    r_values = np.zeros((t_values.shape[0], 3))
 
-    def interpolant(t):
-        coords = ephem.sample(epochs[0] + (t << u.s))
-        return coords.xyz[:, 0].to_value(u.km)
+    for i, t in enumerate(t_values):
+        epoch = Time(t, format="jd", scale="tdb")
 
-    return interpolant
+        r = get_body_barycentric(body.name, epoch)
+        r = (
+            ICRS(x=r.x, y=r.y, z=r.z, representation_type=CartesianRepresentation)
+            .transform_to(GCRS(obstime=epoch))
+            .represent_as(CartesianRepresentation)
+        )
+
+        r_values[i] = r.xyz.to(u.km)
+
+    t_values = ((t_values - t_span[0]) * u.day).to_value(u.s)
+    return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
 
 
 def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic"):
