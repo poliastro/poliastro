@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##############################################################################
 ##############################################################################
 ##                                                                          ##
@@ -138,7 +136,7 @@ class RelativeOrb:
 
         # Compute auxiliary relative elements used in state transition matrix.
         self.ix = (iD - iC).to_value(u.rad)
-        self.iy = ((np.sin(iC) * (rD - rC))).to_value(u.rad)
+        self.iy = (np.sin(iC) * (rD - rC)).to_value(u.rad)
         self.ex = ((eD * np.cos(wD)) - (eC * np.cos(wC))).to_value(u.one)
         self.ey = ((eD * np.sin(wD)) - (eC * np.sin(wC))).to_value(u.one)
         self.da = ((aD - aC) / aC).to_value(u.one)

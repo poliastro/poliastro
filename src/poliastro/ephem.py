@@ -14,8 +14,8 @@ from astropy.coordinates import (
 )
 from astropy.time import Time
 from astroquery.jplhorizons import Horizons
-from scipy.interpolate import interp1d
 
+from poliastro._math.interpolate import interp1d, sinc_interp, spline_interp
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.twobody.propagation import propagate
@@ -79,17 +79,19 @@ def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic")
     xyz_unit = coordinates.xyz.unit
     d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
-    # TODO: Avoid building interpolant every time?
-    # Does it have a performance impact?
-    interpolant_xyz = interp1d(reference_epochs.jd, coordinates.xyz.value, kind=kind)
-    interpolant_d_xyz = interp1d(
-        reference_epochs.jd,
-        coordinates.differentials["s"].d_xyz.value,
-        kind=kind,
+    result_xyz = (
+        spline_interp(coordinates.xyz.value, reference_epochs.jd, epochs.jd, kind=kind)
+        << xyz_unit
     )
-
-    result_xyz = interpolant_xyz(epochs.jd) * xyz_unit
-    result_d_xyz = interpolant_d_xyz(epochs.jd) * d_xyz_unit
+    result_d_xyz = (
+        spline_interp(
+            coordinates.differentials["s"].d_xyz.value,
+            reference_epochs.jd,
+            epochs.jd,
+            kind=kind,
+        )
+        << d_xyz_unit
+    )
 
     return CartesianRepresentation(
         result_xyz, differentials=CartesianDifferential(result_d_xyz)
@@ -98,37 +100,22 @@ def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic")
 
 def _interpolate_sinc(epochs, reference_epochs, coordinates):
     def _interp_1d(arr):
-        return _sinc_interp(arr, reference_epochs.jd, epochs.jd)
+        return sinc_interp(arr, reference_epochs.jd, epochs.jd)
 
     xyz_unit = coordinates.xyz.unit
     d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
-    x = _interp_1d(coordinates.x.value) * xyz_unit
-    y = _interp_1d(coordinates.y.value) * xyz_unit
-    z = _interp_1d(coordinates.z.value) * xyz_unit
+    x = _interp_1d(coordinates.x.value) << xyz_unit
+    y = _interp_1d(coordinates.y.value) << xyz_unit
+    z = _interp_1d(coordinates.z.value) << xyz_unit
 
-    d_x = _interp_1d(coordinates.differentials["s"].d_x.value) * d_xyz_unit
-    d_y = _interp_1d(coordinates.differentials["s"].d_y.value) * d_xyz_unit
-    d_z = _interp_1d(coordinates.differentials["s"].d_z.value) * d_xyz_unit
+    d_x = _interp_1d(coordinates.differentials["s"].d_x.value) << d_xyz_unit
+    d_y = _interp_1d(coordinates.differentials["s"].d_y.value) << d_xyz_unit
+    d_z = _interp_1d(coordinates.differentials["s"].d_z.value) << d_xyz_unit
 
     return CartesianRepresentation(
         x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
     )
-
-
-# Taken from https://gist.github.com/endolith/1297227
-def _sinc_interp(x, s, u):
-    """Interpolates x, sampled at "s" instants, at "u" instants."""
-    if len(x) != len(s):
-        raise ValueError("x and s must be the same length")
-
-    # Find the period and assume it's constant
-    T = s[1] - s[0]
-
-    sincM = np.tile(u, (len(s), 1)) - np.tile(s[:, np.newaxis], (1, len(u)))
-    y = x @ np.sinc(sincM / T)
-
-    return y
 
 
 _INTERPOLATION_MAPPING = {
@@ -330,8 +317,8 @@ class Ephem:
         if epochs.isscalar:
             epochs = epochs.reshape(1)
 
-        time_of_flights = epochs - orbit.epoch
-        coordinates = propagate(orbit, time_of_flights)
+        times_of_flight = epochs - orbit.epoch
+        coordinates = propagate(orbit, times_of_flight)
 
         return cls(coordinates, epochs, plane)
 

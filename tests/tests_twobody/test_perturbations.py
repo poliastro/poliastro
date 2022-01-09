@@ -3,7 +3,7 @@ import functools
 import numpy as np
 import pytest
 from astropy import units as u
-from astropy.coordinates import Angle, solar_system_ephemeris
+from astropy.coordinates import Angle
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from numpy.linalg import norm
@@ -540,66 +540,65 @@ sun_geo = {
 def test_3rd_body_Curtis(test_params):
     # Based on example 12.11 from Howard Curtis
     body = test_params["body"]
-    with solar_system_ephemeris.set("builtin"):
-        j_date = 2454283.0 * u.day
-        tof = (test_params["tof"]).to(u.s).value
-        body_r = build_ephem_interpolant(
-            body,
-            test_params["period"],
-            (j_date, j_date + test_params["tof"]),
-            rtol=1e-2,
+    j_date = 2454283.0 * u.day
+    tof = (test_params["tof"]).to(u.s).value
+    body_r = build_ephem_interpolant(
+        body,
+        test_params["period"],
+        (j_date, j_date + test_params["tof"]),
+        rtol=1e-2,
+    )
+
+    epoch = Time(j_date, format="jd", scale="tdb")
+    initial = Orbit.from_classical(Earth, *test_params["orbit"], epoch=epoch)
+
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = third_body(
+            t0,
+            u_,
+            k,
+            k_third=body.k.to(u.km ** 3 / u.s ** 2).value,
+            perturbation_body=body_r,
         )
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
 
-        epoch = Time(j_date, format="jd", scale="tdb")
-        initial = Orbit.from_classical(Earth, *test_params["orbit"], epoch=epoch)
+    rr, vv = cowell(
+        Earth.k,
+        initial.r,
+        initial.v,
+        np.linspace(0, tof, 400) * u.s,
+        rtol=1e-10,
+        f=f,
+    )
 
-        def f(t0, u_, k):
-            du_kep = func_twobody(t0, u_, k)
-            ax, ay, az = third_body(
-                t0,
-                u_,
-                k,
-                k_third=body.k.to(u.km ** 3 / u.s ** 2).value,
-                perturbation_body=body_r,
-            )
-            du_ad = np.array([0, 0, 0, ax, ay, az])
-            return du_kep + du_ad
+    incs, raans, argps = [], [], []
+    for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
+        angles = Angle(
+            rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)[2:5] * u.rad
+        )  # inc, raan, argp
+        angles = angles.wrap_at(180 * u.deg)
+        incs.append(angles[0].value)
+        raans.append(angles[1].value)
+        argps.append(angles[2].value)
 
-        rr, vv = cowell(
-            Earth.k,
-            initial.r,
-            initial.v,
-            np.linspace(0, tof, 400) * u.s,
-            rtol=1e-10,
-            f=f,
-        )
+    # Averaging over 5 last values in the way Curtis does
+    inc_f, raan_f, argp_f = (
+        np.mean(incs[-5:]),
+        np.mean(raans[-5:]),
+        np.mean(argps[-5:]),
+    )
 
-        incs, raans, argps = [], [], []
-        for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
-            angles = Angle(
-                rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)[2:5] * u.rad
-            )  # inc, raan, argp
-            angles = angles.wrap_at(180 * u.deg)
-            incs.append(angles[0].value)
-            raans.append(angles[1].value)
-            argps.append(angles[2].value)
-
-        # Averaging over 5 last values in the way Curtis does
-        inc_f, raan_f, argp_f = (
-            np.mean(incs[-5:]),
-            np.mean(raans[-5:]),
-            np.mean(argps[-5:]),
-        )
-
-        assert_quantity_allclose(
-            [
-                (raan_f * u.rad).to(u.deg) - test_params["orbit"][3],
-                (inc_f * u.rad).to(u.deg) - test_params["orbit"][2],
-                (argp_f * u.rad).to(u.deg) - test_params["orbit"][4],
-            ],
-            [test_params["raan"], test_params["inc"], test_params["argp"]],
-            rtol=1e-1,
-        )
+    assert_quantity_allclose(
+        [
+            (raan_f * u.rad).to(u.deg) - test_params["orbit"][3],
+            (inc_f * u.rad).to(u.deg) - test_params["orbit"][2],
+            (argp_f * u.rad).to(u.deg) - test_params["orbit"][4],
+        ],
+        [test_params["raan"], test_params["inc"], test_params["argp"]],
+        rtol=1e-1,
+    )
 
 
 @pytest.fixture(scope="module")
@@ -628,74 +627,71 @@ def normalize_to_Curtis(t0, sun_r):
 )
 def test_solar_pressure(t_days, deltas_expected, sun_r):
     # Based on example 12.9 from Howard Curtis
-    with solar_system_ephemeris.set("builtin"):
-        j_date = 2_438_400.5 * u.day
-        tof = 600 * u.day
-        epoch = Time(j_date, format="jd", scale="tdb")
+    j_date = 2_438_400.5 * u.day
+    tof = 600 * u.day
+    epoch = Time(j_date, format="jd", scale="tdb")
 
-        with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
-            initial = Orbit.from_classical(
-                attractor=Earth,
-                a=10085.44 * u.km,
-                ecc=0.025422 * u.one,
-                inc=88.3924 * u.deg,
-                raan=45.38124 * u.deg,
-                argp=227.493 * u.deg,
-                nu=343.4268 * u.deg,
-                epoch=epoch,
-            )
-        # In Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
-        sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
+    with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
+        initial = Orbit.from_classical(
+            attractor=Earth,
+            a=10085.44 * u.km,
+            ecc=0.025422 * u.one,
+            inc=88.3924 * u.deg,
+            raan=45.38124 * u.deg,
+            argp=227.493 * u.deg,
+            nu=343.4268 * u.deg,
+            epoch=epoch,
+        )
+    # In Curtis, the mean distance to Sun is used. In order to validate against it, we have to do the same thing
+    sun_normalized = functools.partial(normalize_to_Curtis, sun_r=sun_r)
 
-        def f(t0, u_, k):
-            du_kep = func_twobody(t0, u_, k)
-            ax, ay, az = radiation_pressure(
-                t0,
-                u_,
-                k,
-                R=Earth.R.to(u.km).value,
-                C_R=2.0,
-                A_over_m=2e-4 / 100,
-                Wdivc_s=Wdivc_sun.value,
-                star=sun_normalized,
-            )
-            du_ad = np.array([0, 0, 0, ax, ay, az])
-            return du_kep + du_ad
+    def f(t0, u_, k):
+        du_kep = func_twobody(t0, u_, k)
+        ax, ay, az = radiation_pressure(
+            t0,
+            u_,
+            k,
+            R=Earth.R.to(u.km).value,
+            C_R=2.0,
+            A_over_m=2e-4 / 100,
+            Wdivc_s=Wdivc_sun.value,
+            star=sun_normalized,
+        )
+        du_ad = np.array([0, 0, 0, ax, ay, az])
+        return du_kep + du_ad
 
-        rr, vv = cowell(
-            Earth.k,
-            initial.r,
-            initial.v,
-            np.linspace(0, (tof).to(u.s).value, 4000) * u.s,
-            rtol=1e-8,
-            f=f,
+    rr, vv = cowell(
+        Earth.k,
+        initial.r,
+        initial.v,
+        np.linspace(0, (tof).to(u.s).value, 4000) * u.s,
+        rtol=1e-8,
+        f=f,
+    )
+
+    delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []
+    for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
+        orbit_params = rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)
+        delta_eccs.append(orbit_params[1] - initial.ecc.value)
+        delta_incs.append((orbit_params[2] * u.rad).to(u.deg).value - initial.inc.value)
+        delta_raans.append(
+            (orbit_params[3] * u.rad).to(u.deg).value - initial.raan.value
+        )
+        delta_argps.append(
+            (orbit_params[4] * u.rad).to(u.deg).value - initial.argp.value
         )
 
-        delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []
-        for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
-            orbit_params = rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)
-            delta_eccs.append(orbit_params[1] - initial.ecc.value)
-            delta_incs.append(
-                (orbit_params[2] * u.rad).to(u.deg).value - initial.inc.value
-            )
-            delta_raans.append(
-                (orbit_params[3] * u.rad).to(u.deg).value - initial.raan.value
-            )
-            delta_argps.append(
-                (orbit_params[4] * u.rad).to(u.deg).value - initial.argp.value
-            )
-
-        # Averaging over 5 last values in the way Curtis does
-        index = int(1.0 * t_days / tof.to(u.day).value * 4000)  # type: ignore
-        delta_ecc, delta_inc, delta_raan, delta_argp = (
-            np.mean(delta_eccs[index - 5 : index]),
-            np.mean(delta_incs[index - 5 : index]),
-            np.mean(delta_raans[index - 5 : index]),
-            np.mean(delta_argps[index - 5 : index]),
-        )
-        assert_quantity_allclose(
-            [delta_ecc, delta_inc, delta_raan, delta_argp],
-            deltas_expected,
-            rtol=1e0,  # TODO: Excessively low, rewrite test?
-            atol=1e-4,
-        )
+    # Averaging over 5 last values in the way Curtis does
+    index = int(1.0 * t_days / tof.to(u.day).value * 4000)  # type: ignore
+    delta_ecc, delta_inc, delta_raan, delta_argp = (
+        np.mean(delta_eccs[index - 5 : index]),
+        np.mean(delta_incs[index - 5 : index]),
+        np.mean(delta_raans[index - 5 : index]),
+        np.mean(delta_argps[index - 5 : index]),
+    )
+    assert_quantity_allclose(
+        [delta_ecc, delta_inc, delta_raan, delta_argp],
+        deltas_expected,
+        rtol=1e0,  # TODO: Excessively low, rewrite test?
+        atol=1e-4,
+    )

@@ -153,10 +153,10 @@ class EclipseEvent(Event):
     def __call__(self, t, u_, k):
         # Solve for primary and secondary bodies position w.r.t. solar system
         # barycenter at a particular epoch.
-        (r_primary_wrt_ssb, _), (r_secondary_wrt_ssb, _) = [
+        (r_primary_wrt_ssb, _), (r_secondary_wrt_ssb, _) = (
             get_body_barycentric_posvel(body.name, self._epoch + t * u.s)
             for body in (self._primary_body, self._secondary_body)
-        ]
+        )
         r_sec = ((r_secondary_wrt_ssb - r_primary_wrt_ssb).xyz << u.km).value
 
         return r_sec

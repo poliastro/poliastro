@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit as jit
 
-from poliastro.core.stumpff import c2, c3
+from poliastro._math.special import stumpff_c2 as c2, stumpff_c3 as c3
 
 
 @jit

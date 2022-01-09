@@ -35,7 +35,7 @@ def test_body_from_parameters_returns_body_object():
 
 def test_body_printing_has_name_and_symbol():
     name = "2 Pallas"
-    symbol = u"\u26b4"
+    symbol = "\u26b4"
     k = 1.41e10 * u.m ** 3 / u.s ** 2
     pallas2 = Body(None, k, name, symbol)
     assert name in str(pallas2)
