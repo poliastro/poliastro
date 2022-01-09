@@ -39,7 +39,7 @@ def func_twobody(t0, u_, k):
     ----------
     t0 : float
         Time.
-    u_ : ~np.array
+    u_ : numpy.ndarray
         Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
     k : float
         Standard gravitational parameter.

@@ -58,7 +58,6 @@ def spherical_to_cartesian(v):
 
     Returns
     -------
-
     v : np.array
         Cartesian coordinates (x,y,z)
 

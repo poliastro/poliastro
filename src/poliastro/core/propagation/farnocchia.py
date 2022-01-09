@@ -99,6 +99,10 @@ def M_to_D_near_parabolic(M, ecc, tol=1.48e-08, maxiter=50):
         Mean anomaly in radians.
     ecc : float
         Eccentricity (~1).
+    tol : float, optional
+        Absolute tolerance for Newton convergence.
+    maxiter : int, optional
+        Maximum number of iterations for Newton convergence.
 
     Returns
     -------
@@ -311,15 +315,15 @@ def farnocchia(k, r0, v0, tof):
     ----------
     k : float
         Standar Gravitational parameter
-    r0 : ~np.array
+    r0 : numpy.ndarray
         Initial position vector wrt attractor center.
-    v0 : ~np.array
+    v0 : numpy.ndarray
         Initial velocity vector.
     tof : float
         Time of flight (s).
 
-    Note
-    ----
+    Notes
+    -----
     This method takes initial :math:`\vec{r}, \vec{v}`, calculates classical orbit parameters,
     increases mean anomaly and performs inverse transformation to get final :math:`\vec{r}, \vec{v}`
     The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9

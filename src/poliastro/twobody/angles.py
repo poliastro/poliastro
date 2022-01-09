@@ -104,7 +104,7 @@ def nu_to_F(nu, ecc):
     F : ~astropy.units.Quantity
         Hyperbolic eccentric anomaly.
 
-    Note
+    Notes
     -----
     Taken from Curtis, H. (2013). *Orbital mechanics for engineering students*. 167
 
@@ -287,7 +287,7 @@ def fp_angle(nu, ecc):
     ecc : ~astropy.units.Quantity
         Eccentricity.
 
-    Note
+    Notes
     -----
     Algorithm taken from Vallado 2007, pp. 113.
 

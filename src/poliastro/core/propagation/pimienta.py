@@ -346,22 +346,22 @@ def pimienta(k, r0, v0, tof):
     ----------
     k : float
         Standar Gravitational parameter.
-    r0 : ~np.array
+    r0 : numpy.ndarray
         Initial position vector wrt attractor center.
-    v0 : ~np.array
+    v0 : numpy.ndarray
         Initial velocity vector.
     tof : float
         Time of flight.
 
     Returns
     -------
-    rr: ~np.array
+    rr: numpy.ndarray
         Final position vector.
-    vv: ~np.array
+    vv: numpy.ndarray
         Final velocity vector.
 
-    Note
-    ----
+    Notes
+    -----
     This algorithm was derived from the original paper:
     Pimienta-Peñalver, A. & Crassidis, John. (2013). Accurate Kepler equation
     solver without transcendental function evaluations. Advances in the Astronautical Sciences. 147. 233-247.

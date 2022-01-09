@@ -11,22 +11,22 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
 
     Parameters
     ----------
-    k: float
+    k : float
         Standard gravitational parameter (km^3 / s^2).
-    u_: ~np.array
+    u_ : numpy.ndarray
         Satellite position and velocity vector with respect to the primary body.
-    r_sec: ~np.array
+    r_sec : numpy.ndarray
         Position vector of the secondary body with respect to the primary body.
-    R_sec: float
+    R_sec : float
         Equatorial radius of the secondary body.
-    R_primary: float
+    R_primary : float
         Equatorial radius of the primary body.
-    umbra: bool
+    umbra : bool
         Whether to calculate the shadow function for umbra or penumbra, defaults to True
         i.e. calculates for umbra.
 
-    Note
-    ----
+    Notes
+    -----
     The shadow function is taken from Escobal, P. (1985). Methods of orbit determination.
     The current implementation assumes circular bodies and doesn't account for flattening.
 
@@ -62,11 +62,11 @@ def line_of_sight(r1, r2, R):
 
     Parameters
     ----------
-    r1: ~np.array
+    r1 : numpy.ndarray
         The position vector of the first object with respect to a central attractor.
-    r2: ~np.array
+    r2 : numpy.ndarray
         The position vector of the second object with respect to a central attractor.
-    R: float
+    R : float
         The radius of the central attractor.
 
     Returns

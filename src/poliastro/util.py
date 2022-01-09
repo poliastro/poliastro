@@ -29,6 +29,8 @@ def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=
 
     Parameters
     ----------
+    start : ~astropy.time.Time or ~astropy.units.Quantity
+        Start time.
     periods : int, optional
         Number of periods, default to 50.
     spacing : ~astropy.time.Time or ~astropy.units.Quantity, optional

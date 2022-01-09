@@ -18,16 +18,15 @@ class SpheroidLocation:
 
     def __init__(self, lon, lat, h, body):
         """
-
         Parameters
         ----------
-        lon: ~astropy.units.quantity.Quantity
+        lon : ~astropy.units.quantity.Quantity
             Geodetic longitude
-        lat: ~astropy.units.quantity.Quantity
+        lat : ~astropy.units.quantity.Quantity
             Geodetic latitude
-        h: ~astropy.units.quantity.Quantity
+        h : ~astropy.units.quantity.Quantity
             Geodetic height
-        body: ~poliastro.bodies.Body
+        body : ~poliastro.bodies.Body
             Planetary body the spheroid location lies on
 
         """
@@ -96,11 +95,11 @@ class SpheroidLocation:
 
         Parameters
         ----------
-        px: ~astropy.units.quantity.Quantity
+        px : ~astropy.units.quantity.Quantity
             x-coordinate of the point
-        py: ~astropy.units.quantity.Quantity
+        py : ~astropy.units.quantity.Quantity
             y-coordinate of the point
-        pz: ~astropy.units.quantity.Quantity
+        pz : ~astropy.units.quantity.Quantity
             z-coordinate of the point
 
         """
@@ -117,11 +116,11 @@ class SpheroidLocation:
 
         Parameters
         ----------
-        px: ~astropy.units.quantity.Quantity
+        px : ~astropy.units.quantity.Quantity
             x-coordinate of the point
-        py: ~astropy.units.quantity.Quantity
+        py : ~astropy.units.quantity.Quantity
             y-coordinate of the point
-        pz: ~astropy.units.quantity.Quantity
+        pz : ~astropy.units.quantity.Quantity
             z-coordinate of the point
 
         """
@@ -136,11 +135,11 @@ class SpheroidLocation:
 
         Parameters
         ----------
-        x: ~astropy.units.quantity.Quantity
+        x : ~astropy.units.quantity.Quantity
             x coordinate
-        y: ~astropy.units.quantity.Quantity
+        y : ~astropy.units.quantity.Quantity
             y coordinate
-        z: ~astropy.units.quantity.Quantity
+        z : ~astropy.units.quantity.Quantity
             z coordinate
 
         """

@@ -262,9 +262,9 @@ class Orbit:
 
         Parameters
         ----------
-        attractor: Body
+        attractor : Body
             Main attractor
-        coord: ~astropy.coordinates.SkyCoord or ~astropy.coordinates.BaseCoordinateFrame
+        coord : ~astropy.coordinates.SkyCoord or ~astropy.coordinates.BaseCoordinateFrame
             Position and velocity vectors in any reference frame. Note that coord must have
             a representation and its differential with respect to time.
         plane : ~poliastro.frames.Planes, optional
@@ -426,9 +426,9 @@ class Orbit:
 
         Parameters
         ----------
-        new_attractor: poliastro.bodies.Body
+        new_attractor : poliastro.bodies.Body
             Desired new attractor.
-        force: bool
+        force : bool
             If `True`, changes attractor even if physically has no-sense.
 
         Returns
@@ -506,8 +506,10 @@ class Orbit:
 
         Parameters
         ----------
-        name: str
+        name : str
             Name of the body to make the request.
+        **kwargs
+            Extra kwargs for astroquery.
 
         Returns
         -------
@@ -550,7 +552,7 @@ class Orbit:
             Right ascension of the ascending node, default to 0 deg.
         arglat : ~astropy.units.Quantity, optional
             Argument of latitude, default to 0 deg.
-        epoch: ~astropy.time.Time, optional
+        epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
@@ -655,7 +657,6 @@ class Orbit:
 
         Notes
         -----
-
         Thus:
 
         .. math::
@@ -717,13 +718,15 @@ class Orbit:
 
         Parameters
         ----------
-        a: ~astropy.units.Quantity
+        attractor : ~poliastro.bodies.SolarSystemPlanet
+            Attractor.
+        a : ~astropy.units.Quantity
             Semi-major axis.
-        ecc: ~astropy.units.Quantity
+        ecc : ~astropy.units.Quantity
             Eccentricity.
-        inc: ~astropy.units.Quantity
+        inc : ~astropy.units.Quantity
             Inclination.
-        raan: ~astropy.units.Quantity
+        raan : ~astropy.units.Quantity
             Right ascension of the ascending node.
         argp : ~astropy.units.Quantity
             Argument of the pericenter.
@@ -783,7 +786,7 @@ class Orbit:
             Argument of the pericenter.
         nu : ~astropy.units.Quantity
             True anomaly.
-        epoch: ~astropy.time.Time, optional
+        epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.
@@ -867,7 +870,7 @@ class Orbit:
             Argument of latitude, default to 0 deg.
         ecc : ~astropy.units.Quantity
             Eccentricity, default to the eccentricity of the Moon's orbit around the Earth
-        epoch: ~astropy.time.Time, optional
+        epoch : ~astropy.time.Time, optional
             Epoch, default to J2000.
         plane : ~poliastro.frames.Planes
             Fundamental plane of the frame.

@@ -72,7 +72,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     RuntimeError
         If the algorithm didn't converge.
 
-    Note
+    Notes
     -----
     This method uses the Dormand & Prince integration method of order 8(5,3) (DOP853).
     If multiple tofs are provided, the method propagates to the maximum value
@@ -137,6 +137,8 @@ def farnocchia(k, r, v, tofs, **kwargs):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
+    **kwargs
+        Unused.
 
     Returns
     -------
@@ -173,6 +175,8 @@ def vallado(k, r, v, tofs, numiter=350, **kwargs):
         Array of times to propagate.
     numiter : int, optional
         Maximum number of iterations, default to 35.
+    **kwargs
+        Unused.
 
     Returns
     -------
@@ -186,7 +190,7 @@ def vallado(k, r, v, tofs, numiter=350, **kwargs):
     RuntimeError
         If the algorithm didn't converge.
 
-    Note
+    Notes
     -----
     This algorithm is based on Vallado implementation, and does basic Newton
     iteration on the Kepler equation written using universal variables. Battin
@@ -235,7 +239,7 @@ def mikkola(k, r, v, tofs, rtol=None):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
-    rtol: float
+    rtol : float
         This method does not require of tolerance since it is non iterative.
 
     Returns
@@ -244,8 +248,8 @@ def mikkola(k, r, v, tofs, rtol=None):
         Propagated position vectors.
     vv : ~astropy.units.Quantity
 
-    Note
-    ----
+    Notes
+    -----
     This method was derived by Seppo Mikola in his paper *A Cubic Approximation
     For Kepler's Equation* with DOI: https://doi.org/10.1007/BF01235850
 
@@ -274,7 +278,7 @@ def markley(k, r, v, tofs, rtol=None):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
-    rtol: float
+    rtol : float
         This method does not require of tolerance since it is non iterative.
 
     Returns
@@ -284,8 +288,8 @@ def markley(k, r, v, tofs, rtol=None):
     vv : ~astropy.units.Quantity
         Propagated velocity vectors.
 
-    Note
-    ----
+    Notes
+    -----
     This method was originally presented by Markley in his paper *Kepler Equation Solver*
     with DOI: https://doi.org/10.1007/BF00691917
 
@@ -315,7 +319,7 @@ def pimienta(k, r, v, tofs, rtol=None):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
-    rtol: float
+    rtol : float
         This method does not require of tolerance since it is non iterative.
 
     Returns
@@ -325,8 +329,8 @@ def pimienta(k, r, v, tofs, rtol=None):
     vv : ~astropy.units.Quantity
         Propagated velocity vectors.
 
-    Note
-    ----
+    Notes
+    -----
     This algorithm was developed by Pimienta-Peñalver and John L. Crassidis in
     their paper *Accurate Kepler Equation solver without trascendental function
     evaluations*. Original paper is on Buffalo's UBIR repository: http://hdl.handle.net/10477/50522
@@ -343,8 +347,10 @@ def pimienta(k, r, v, tofs, rtol=None):
 
 
 def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
-    """Solves the Elliptic Kepler Equation with a cubic convergence and
-    accuracy better than 10e-12 rad is normally achieved. It is not valid for
+    """Propagate the orbit using the Gooding method.
+
+    The Gooding method solves the Elliptic Kepler Equation with a cubic convergence,
+    and accuracy better than 10e-12 rad is normally achieved. It is not valid for
     eccentricities equal or greater than 1.0.
 
     Parameters
@@ -357,7 +363,9 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
-    rtol: float
+    numiter : int
+        Maximum number of iterations for convergence.
+    rtol : float
         This method does not require of tolerance since it is non iterative.
 
     Returns
@@ -366,8 +374,8 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
         Propagated position vectors.
     vv : ~astropy.units.Quantity
 
-    Note
-    ----
+    Notes
+    -----
     This method was developed by Gooding and Odell in their paper *The
     hyperbolic Kepler equation (and the elliptic equation revisited)* with
     DOI: https://doi.org/10.1007/BF01235540
@@ -399,7 +407,7 @@ def danby(k, r, v, tofs, rtol=1e-8):
         Velocity vector.
     tofs : ~astropy.units.Quantity
         Array of times to propagate.
-    rtol: float
+    rtol : float
         Relative error for accuracy of the method.
 
     Returns
@@ -409,8 +417,8 @@ def danby(k, r, v, tofs, rtol=1e-8):
     vv : ~astropy.units.Quantity
         Propagated velocity vectors.
 
-    Note
-    ----
+    Notes
+    -----
     This algorithm was developed by Danby in his paper *The solution of Kepler
     Equation* with DOI: https://doi.org/10.1007/BF01686811
 
@@ -438,6 +446,8 @@ def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs)
         Propagation method, default to farnocchia.
     rtol : float, optional
         Relative tolerance, default to 1e-10.
+    **kwargs
+        Extra kwargs for propagation method.
 
     Returns
     -------

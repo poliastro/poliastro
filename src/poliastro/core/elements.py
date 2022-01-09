@@ -43,7 +43,6 @@ def circular_velocity(k, a):
 
     Parameters
     ----------
-
     k : float
         Gravitational Parameter
     a : float
@@ -65,12 +64,11 @@ def rv_pqw(k, p, ecc, nu):
         Semi-latus rectum or parameter (km).
     ecc : float
         Eccentricity.
-    nu: float
+    nu : float
         True anomaly (rad).
 
     Returns
     -------
-
     r: ndarray
         Position. Dimension 3 vector
     v: ndarray
@@ -158,7 +156,6 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
 
     Notes
     -----
-
     .. math::
         \begin{align}
             \vec{r}_{IJK} &= [ROT3(-\Omega)][ROT1(-i)][ROT3(-\omega)]\vec{r}_{PQW}
@@ -203,11 +200,9 @@ def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
 
 @jit
 def coe2mee(p, ecc, inc, raan, argp, nu):
-    r"""Converts from classical orbital elements to modified equinoctial
-    orbital elements.
+    r"""Converts from classical orbital elements to modified equinoctial orbital elements.
 
-    The definition of the modified equinoctial orbital elements is taken from
-    [Walker, 1985].
+    The definition of the modified equinoctial orbital elements is taken from [Walker, 1985].
 
     The modified equinoctial orbital elements are a set of orbital elements that are useful for
     trajectory analysis and optimization. They are valid for circular, elliptic, and hyperbolic
@@ -224,12 +219,12 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
         Eccentricity.
     inc : float
         Inclination (rad).
-    omega : float
+    raan : float
         Longitude of ascending node (rad).
     argp : float
         Argument of perigee (rad).
     nu : float
-       True anomaly (rad).
+        True anomaly (rad).
 
     Returns
     -------
@@ -283,9 +278,9 @@ def rv2coe(k, r, v, tol=1e-8):
     ----------
     k : float
         Standard gravitational parameter (km^3 / s^2)
-    r : array
+    r : numpy.ndarray
         Position vector (km)
-    v : array
+    v : numpy.ndarray
         Velocity vector (km / s)
     tol : float, optional
         Tolerance for eccentricity and inclination checks, default to 1e-8
@@ -447,17 +442,17 @@ def mee2coe(p, f, g, h, k, L):
 
     Parameters
     ----------
-    p: float
+    p : float
         Semi-latus rectum
-    f: float
+    f : float
         Equinoctial parameter f
-    g: float
+    g : float
         Equinoctial parameter g
-    h: float
+    h : float
         Equinoctial parameter h
-    k: float
+    k : float
         Equinoctial parameter k
-    L: float
+    L : float
         Longitude
 
     Returns
@@ -475,7 +470,7 @@ def mee2coe(p, f, g, h, k, L):
     nu: float
         True anomaly
 
-    Note
+    Notes
     -----
     The conversion is always safe because arctan2 works also for 0, 0
     arguments.

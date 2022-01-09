@@ -318,9 +318,9 @@ class BaseOrbitPlotter:
 
         Parameters
         ----------
-        initial_orbit: ~poliastro.twobody.orbit.Orbit
+        initial_orbit : ~poliastro.twobody.orbit.Orbit
             The base orbit for which the maneuver will be applied.
-        manuever: ~poliastro.maneuver.Maneuver
+        maneuver : ~poliastro.maneuver.Maneuver
             The maneuver to be plotted.
         label : str, optional
             Label of the trajectory.

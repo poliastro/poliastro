@@ -35,8 +35,8 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     RuntimeError
         If it was not possible to compute the orbit.
 
-    Note
-    ----
+    Notes
+    -----
     This uses the universal variable approach found in Battin, Mueller & White
     with the bisection iteration suggested by Vallado. Multiple revolutions
     not supported.

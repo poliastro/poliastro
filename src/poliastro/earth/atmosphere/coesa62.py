@@ -102,9 +102,9 @@ class COESA62(COESA):
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential altitude.
-        geometric: bool
+        geometric : bool
             If `True`, assumes geometric altitude kind.
 
         Returns
@@ -136,9 +136,9 @@ class COESA62(COESA):
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential altitude.
-        geometric: bool
+        geometric : bool
             If `True`, assumes geometric altitude.
 
         Returns
@@ -196,9 +196,9 @@ class COESA62(COESA):
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential altitude.
-        geometric: bool
+        geometric : bool
             If `True`, assumes geometric altitude.
 
         Returns
@@ -222,9 +222,9 @@ class COESA62(COESA):
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: bool
+        geometric : bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns
@@ -247,9 +247,9 @@ class COESA62(COESA):
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: bool
+        geometric : bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns
@@ -275,9 +275,9 @@ class COESA62(COESA):
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: bool
+        geometric : bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns
@@ -303,9 +303,9 @@ class COESA62(COESA):
 
         Parameters
         ----------
-        alt: ~astropy.units.Quantity
+        alt : ~astropy.units.Quantity
             Geometric/Geopotential height.
-        geometric: bool
+        geometric : bool
             If `True`, assumes that `alt` argument is geometric kind.
 
         Returns

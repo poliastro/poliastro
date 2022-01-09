@@ -47,6 +47,8 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
     rtol : float, optional
         Relative tolerance. Controls the number of sampled data points,
         defaults to 1e-5.
+    attractor : ~poliastro.bodies.Body, optional
+        Attractor, default to Earth.
 
     Returns
     -------
@@ -189,9 +191,9 @@ class Ephem:
 
         Parameters
         ----------
-        body: ~poliastro.bodies.SolarSystemPlanet
+        body : ~poliastro.bodies.SolarSystemPlanet
             Body.
-        epochs: ~astropy.time.Time
+        epochs : ~astropy.time.Time
             Epochs to sample the body positions.
         attractor : ~poliastro.bodies.SolarSystemPlanet, optional
             Body to use as central location,
@@ -242,7 +244,7 @@ class Ephem:
         ----------
         name : str
             Name of the body to query for.
-        epochs: ~astropy.time.Time
+        epochs : ~astropy.time.Time
             Epochs to sample the body positions.
         attractor : ~poliastro.bodies.SolarSystemPlanet, optional
             Body to use as central location,
@@ -306,11 +308,11 @@ class Ephem:
 
         Parameters
         ----------
-        orbit: ~poliastro.twobody.orbit.Orbit
+        orbit : ~poliastro.twobody.orbit.Orbit
             Orbit.
-        epochs: ~astropy.time.Time
+        epochs : ~astropy.time.Time
             Epochs to sample the orbit positions.
-        plane: ~poliastro.frames.Planes, optional
+        plane : ~poliastro.frames.Planes, optional
             Fundamental plane of the frame, default to Earth Equator.
 
         """
@@ -327,12 +329,14 @@ class Ephem:
 
         Parameters
         ----------
-        epochs: ~astropy.time.Time, optional
+        epochs : ~astropy.time.Time, optional
             Epochs to sample the ephemerides,
             if not given the original one from the object will be used.
         method : ~poliastro.ephem.InterpolationMethods, optional
             Interpolation method to use for epochs outside of the original ones,
             default to splines.
+        **kwargs
+            Extra kwargs for interpolation method.
 
         Returns
         -------
@@ -357,6 +361,8 @@ class Ephem:
         ----------
         epochs : ~astropy.time.Time, optional
             Epochs to sample the ephemerides, default to now.
+        **kwargs
+            Extra kwargs for interpolation method.
 
         """
         coordinates = self.sample(epochs, **kwargs)

@@ -27,7 +27,6 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
     -------
     a_d, delta_V, t_f : tuple (function, ~astropy.units.quantity.Quantity, ~astropy.time.Time)
 
-
     Notes
     -----
     Edelbaum theory, reformulated by Kéchichian.

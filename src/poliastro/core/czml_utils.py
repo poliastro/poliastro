@@ -9,16 +9,16 @@ def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
 
     Parameters
     ----------
-    x, y, z: float
+    x, y, z : float
         A point of the line
-    u1, u2, u3: float
+    u1, u2, u3 : float
         The line vector
-    a, b, c: float
+    a, b, c : float
         The ellipsoidal axises
 
     Returns
     -------
-    p0, p1: ~np.array
+    p0, p1: numpy.ndarray
         This returns both of the points intersecting the ellipsoid.
 
     """
@@ -85,10 +85,9 @@ def project_point_on_ellipsoid(x, y, z, a, b, c):
 
     Parameters
     ----------
-    x, y, z: float
+    x, y, z : float
         Cartesian coordinates of point
-
-    a, b, c: float
+    a, b, c : float
         Semi-axes of the ellipsoid
 
     """

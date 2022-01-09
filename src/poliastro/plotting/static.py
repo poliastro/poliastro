@@ -38,6 +38,8 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             Number of points to use in plots, default to 150.
         dark : bool, optional
             If set as True, plots the orbit in Dark mode.
+        plane : ~poliastro.frames.Planes
+            Reference plane of the coordinates.
 
         """
         super().__init__(num_points=num_points, plane=plane)
@@ -215,9 +217,9 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         Parameters
         ----------
-        initial_orbit: ~poliastro.twobody.orbit.Orbit
+        initial_orbit : ~poliastro.twobody.orbit.Orbit
             The base orbit for which the maneuver will be applied.
-        manuever: ~poliastro.maneuver.Maneuver
+        maneuver : ~poliastro.maneuver.Maneuver
             The maneuver to be plotted.
         label : str, optional
             Label of the trajectory.

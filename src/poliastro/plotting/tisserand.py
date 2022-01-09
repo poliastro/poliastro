@@ -26,9 +26,9 @@ class TisserandPlotter:
 
         Parameters
         ----------
-        kind: TisserandKind
+        kind : TisserandKind
             Nature for the Tisserand
-        axes: ~matplotlib.pyplot.axes
+        axes : ~matplotlib.pyplot.axes
             Axes for the figure
 
         """
@@ -54,17 +54,19 @@ class TisserandPlotter:
 
         Parameters
         ----------
-        body: ~poliastro.bodies.Body
+        body : ~poliastro.bodies.Body
             Body to be plotted Tisserand
-        vinf_array: ~astropy.units.Quantity
+        vinf_array : ~astropy.units.Quantity
             Desired Vinf for the flyby
-        num_contours: int
+        num_contours : int
             Number of contour lines for flyby speed
-        N: int
-            Number of points for flyby angle
+        alpha_lim : tuple
+            Minimum and maximum flyby angles.
+        N : int
+            Number of points for flyby angle.
 
-        Note
-        ----
+        Notes
+        -----
         The algorithm for generating Tisserand plots is the one depicted in
         "Preliminary Trajectory Design of a Mission to Enceladus" by David
         Falcato Fialho Palma, section 3.6
@@ -101,7 +103,7 @@ class TisserandPlotter:
 
         Parameters
         ----------
-        data: list
+        data : list
             Array containing [RR_P, RR_A, EE, TT, color]
 
         Returns
@@ -130,13 +132,13 @@ class TisserandPlotter:
 
         Parameters
         ----------
-        body: ~poliastro.bodies.Body
+        body : ~poliastro.bodies.Body
             Body to be plotted Tisserand
-        vinf: ~astropy.units.Quantity
+        vinf : ~astropy.units.Quantity
             Vinf velocity line
-        alpha_lim: tuple
+        alpha_lim : tuple
             Minimum and maximum flyby angles
-        color: str
+        color : str
             String representing for the color lines
 
         Returns
@@ -168,13 +170,13 @@ class TisserandPlotter:
 
         Parameters
         ----------
-        body: ~poliastro.bodies.Body
+        body : ~poliastro.bodies.Body
             Body to be plotted Tisserand
-        vinf_span: tuple
+        vinf_span : tuple
             Minimum and maximum Vinf velocities
-        num_contours: int
+        num_contours : int
             Number of points to iterate over previously defined velocities
-        color: str
+        color : str
             String representing for the color lines
 
         Returns

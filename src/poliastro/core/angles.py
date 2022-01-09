@@ -460,9 +460,9 @@ def fp_angle(nu, ecc):
 
     Parameters
     ----------
-    nu: float
+    nu : float
         True anomaly in radians.
-    ecc: float
+    ecc : float
         Eccentricity.
 
     Returns

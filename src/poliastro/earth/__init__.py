@@ -29,7 +29,7 @@ class EarthSatellite:
         orbit : Orbit
             Position and velocity of a body with respect to an attractor
             at a given time (epoch).
-        spacecraft: Spacecraft
+        spacecraft : Spacecraft
 
         Raises
         ------
@@ -63,12 +63,11 @@ class EarthSatellite:
 
         Parameters
         ----------
-
         tof : ~astropy.units.Quantity, ~astropy.time.Time, ~astropy.time.TimeDelta
             Scalar time to propagate.
         atmosphere:
             a callable model from poliastro.earth.atmosphere
-        gravity: EarthGravity
+        gravity : EarthGravity
             There are two possible values, SPHERICAL and J2. Only J2 is implemented at the moment. Default value is None.
         *args:
             parameters used in perturbation models.

@@ -10,15 +10,15 @@ def cartesian_cords(_a, _c, _lon, _lat, _h):
 
     Parameters
     ----------
-    _a: float
+    _a : float
         Semi-major axis
-    _c: float
+    _c : float
         Semi-minor axis
-    _lon: float
+    _lon : float
         Geodetic longitude
-    _lat: float
+    _lat : float
         Geodetic latitude
-    _h: float
+    _h : float
         Geodetic height
 
     """
@@ -37,9 +37,9 @@ def f(_a, _c):
 
     Parameters
     ----------
-    _a: float
+    _a : float
         Semi-major axis
-    _c: float
+    _c : float
         Semi-minor axis
 
     """
@@ -52,13 +52,13 @@ def N(a, b, c, cartesian_cords):
 
     Parameters
     ----------
-    a: float
+    a : float
         Semi-major axis
-    b: float
+    b : float
         Equatorial radius
-    c: float
+    c : float
         Semi-minor axis
-    cartesian_cords: ~np.array
+    cartesian_cords : numpy.ndarray
         Cartesian coordinates
 
     """
@@ -74,7 +74,7 @@ def tangential_vecs(N):
 
     Parameters
     ----------
-    N: ~np.array
+    N : numpy.ndarray
         Normal vector of the ellipsoid
 
     """
@@ -92,11 +92,11 @@ def radius_of_curvature(_a, _c, _lat):
 
     Parameters
     ----------
-    _a: float
+    _a : float
         Semi-major axis
-    _c: float
+    _c : float
         Semi-minor axis
-    _lat: float
+    _lat : float
         Geodetic latitude
 
     """
@@ -111,13 +111,13 @@ def distance(cartesian_cords, px, py, pz):
 
     Parameters
     ----------
-    cartesian_cords: ~np.array
+    cartesian_cords : numpy.ndarray
         Cartesian coordinates
-    px: float
+    px : float
         x-coordinate of the point
-    py: float
+    py : float
         y-coordinate of the point
-    pz: float
+    pz : float
         z-coordinate of the point
 
     """
@@ -129,19 +129,20 @@ def distance(cartesian_cords, px, py, pz):
 
 @jit
 def is_visible(cartesian_cords, px, py, pz, N):
-    """Determines whether an object located at a given point is visible from the given location.
-    Returns true if true, false otherwise.
+    """Determine whether an object located at a given point is visible from the given location.
 
     Parameters
     ----------
-    cartesian_cords: ~np.array
+    cartesian_cords : numpy.ndarray
         Cartesian coordinates
-    px: float
+    px : float
         x-coordinate of the point
-    py: float
+    py : float
         y-coordinate of the point
-    pz: float
+    pz : float
         z-coordinate of the point
+    N : numpy.ndarray
+        Normal vector of the ellipsoid at the given location.
 
     """
     c = cartesian_cords
@@ -161,15 +162,15 @@ def cartesian_to_ellipsoidal(_a, _c, x, y, z):
 
     Parameters
     ----------
-    _a: float
+    _a : float
         Semi-major axis
-    _c: float
+    _c : float
         Semi-minor axis
-    x: float
+    x : float
         x coordinate
-    y: float
+    y : float
         y coordinate
-    z: float
+    z : float
         z coordinate
 
     """

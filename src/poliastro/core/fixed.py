@@ -25,9 +25,9 @@ def sun_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries i.e. 36525 days.
-    d: float
+    d : float
         Interval in days from the standard epoch.
 
     Returns
@@ -49,9 +49,9 @@ def mercury_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries.
-    d: float
+    d : float
         Interval in days from the standard epoch.
 
     Returns
@@ -84,9 +84,9 @@ def venus_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries.
-    d: float
+    d : float
         Interval in days from the standard epoch.
 
     Returns
@@ -108,9 +108,9 @@ def mars_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries
-    d: float
+    d : float
         Interval in days from the standard epoch
 
     Returns
@@ -178,9 +178,9 @@ def jupiter_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries
-    d: float
+    d : float
         Interval in days from the standard epoch
 
     Returns
@@ -224,9 +224,9 @@ def saturn_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries.
-    d: float
+    d : float
         Interval in days from the standard epoch.
 
     Returns
@@ -248,9 +248,9 @@ def uranus_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries.
-    d: float
+    d : float
         Interval in days from the standard epoch.
 
     Returns
@@ -272,9 +272,9 @@ def neptune_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries.
-    d: float
+    d : float
         Interval in days from the standard epoch.
 
     Returns
@@ -298,9 +298,9 @@ def moon_rot_elements_at_epoch(T, d):
 
     Parameters
     ----------
-    T: float
+    T : float
         Interval from the standard epoch, in Julian centuries.
-    d: float
+    d : float
         Interval in days from the standard epoch.
 
     Returns

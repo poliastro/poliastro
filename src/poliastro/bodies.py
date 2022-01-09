@@ -133,6 +133,8 @@ class SolarSystemPlanet(Body):
         interactive : bool, optional
             Produce an interactive (rather than static) image of the orbit, default to False.
             This option requires Plotly properly installed and configured for your environment.
+        plane : ~poliastro.frames.Planes
+            Reference plane of the coordinates.
 
         """
         if not interactive and use_3d:

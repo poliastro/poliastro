@@ -116,11 +116,11 @@ class PorkchopPlotter:
         Time span for launch
     arrival_span: astropy.time.Time
         Time span for arrival
-    ax: matplotlib.axes.Axes:
+    ax: matplotlib.axes.Axes
         For custom figures
-    tfl: boolean
+    tfl: bool
         For plotting time flight contour lines
-    vhp: boolean
+    vhp: bool
         For plotting arrival velocity contour lines
     max_c3: float
         Sets the maximum C3 value for porkchop
@@ -156,19 +156,19 @@ class PorkchopPlotter:
 
         Returns
         -------
-        dv_launch: np.ndarray
+        dv_launch: numpy.ndarray
             Launch delta v
-        dv_arrival: np.ndarray
+        dv_arrival: numpy.ndarray
             Arrival delta v
-        c3_launch: np.ndarray
+        c3_launch: numpy.ndarray
             Characteristic launch energy
-        c3_arrrival: np.ndarray
+        c3_arrrival: numpy.ndarray
             Characteristic arrival energy
-        tof: np.ndarray
+        tof: numpy.ndarray
             Time of flight for each transfer
 
-        Example
-        -------
+        Examples
+        --------
         >>> from poliastro.plotting.porkchop import PorkchopPlotter
         >>> from poliastro.bodies import Earth, Mars
         >>> from poliastro.util import time_range

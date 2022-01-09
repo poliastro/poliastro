@@ -47,22 +47,22 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
     ----------
     k : float
         Standard gravitational parameter of the attractor.
-    r0 : ~np.array
+    r0 : numpy.ndarray
         Position vector.
-    v0 : ~np.array
+    v0 : numpy.ndarray
         Velocity vector.
     tof : float
         Time of flight.
-    numiter: int, optional
+    numiter : int, optional
         Number of iterations, defaults to 150.
-    rtol: float, optional
+    rtol : float, optional
         Relative error for accuracy of the method, defaults to 1e-8.
 
     Returns
     -------
-    rr : ~np.array
+    rr : numpy.ndarray
         Final position vector.
-    vv : ~np.array
+    vv : numpy.ndarray
         Final velocity vector.
     Note
     ----

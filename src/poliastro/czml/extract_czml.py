@@ -55,16 +55,18 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        start_epoch: ~astropy.time.core.Time
+        start_epoch : ~astropy.time.core.Time
             Starting epoch
-        end_epoch: ~astropy.time.core.Time
+        end_epoch : ~astropy.time.core.Time
             Ending epoch
-        N: int
+        N : int
             Default number of sample points. Unless otherwise specified, the
             number of sampled data points will be N when calling add_orbit()
-        attractor: poliastro.Body
+        attractor : poliastro.bodies.Body
             Attractor of the orbits
-        scene3D: bool
+        pr_map : str
+            A URL to the projection of the defined ellipsoid (UV map).
+        scene3D : bool
             Determines the scene mode. If set to true, the scene is set to 3D
             mode, otherwise it's the orthographic projection.
 
@@ -107,13 +109,13 @@ class CZMLExtractor:
 
     def _init_orbit_packet_cords_(self, i, rtol):
         """
-
         Parameters
         ----------
-        i: int
+        i : int
             Index of referenced orbit
-        rtol: float
+        rtol : float
             Maximum relative error permitted
+
         Returns
         -------
         coordinate list
@@ -141,12 +143,11 @@ class CZMLExtractor:
 
     def _init_groundtrack_packet_cords_(self, i, rtol):
         """
-
         Parameters
         ----------
-        i: int
+        i : int
             Index of referenced orbit
-        rtol: float
+        rtol : float
             Maximum relative error permitted
 
         Returns
@@ -210,11 +211,14 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        ellipsoid: list(int)
+        ellipsoid : list[int]
             Defines the attractor ellipsoid. The list must have three numbers
             representing the radii in the x, y and z axis
-        pr_map: str
-            A URL to the projection of the defined ellipsoid (UV map)
+        pr_map : str
+            A URL to the projection of the defined ellipsoid (UV map).
+        scene3D : bool
+            If set to true, the scene is set to 3D mode,
+            otherwise it's the orthographic projection.
 
         """
 
@@ -250,20 +254,20 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        pos: list [~astropy.units.Quantity]
+        pos : list[~astropy.units.Quantity]
             Coordinates of ground station,
             list of geodetic latitude and longitude [lon, lat] (0 elevation)
-        id_description: str
+        id_description : str
             Set ground station description
-        label_fill_color: list (int)
+        label_fill_color : list[int]
             Fill Color in rgba format
-        label_outline_color: list (int)
+        label_outline_color : list[int]
             Outline Color in rgba format
-        label_font: str
+        label_font : str
             Set label font style and size (CSS syntax)
-        label_text: str
+        label_text : str
             Set label text
-        label_show: bool
+        label_show : bool
             Indicates whether the label is visible
         """
         if (
@@ -338,42 +342,42 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        orbit: poliastro.twobody.orbit.Orbit
+        orbit : poliastro.twobody.orbit.Orbit
             Orbit to be added
-        rtol: float
+        rtol : float
             Maximum relative error permitted
-        N: int
+        N : int
             Number of sample points
-        groundtrack_show: bool
+        groundtrack_show : bool
             If set to true, the groundtrack is
             displayed.
-        groundtrack_lead_time: float
+        groundtrack_lead_time : float
             The time the animation is ahead of the real-time groundtrack
-        groundtrack_trail_time: float
+        groundtrack_trail_time : float
             The time the animation is behind the real-time groundtrack
-        groundtrack_width: int
+        groundtrack_width : int
             Groundtrack width
-        groundtrack_color: list (int)
+        groundtrack_color : list[int]
             Rgba groundtrack color. By default, it is set to the path color
-        id_name: str
+        id_name : str
             Set orbit name
-        id_description: str
+        id_description : str
             Set orbit description
-        path_width: int
+        path_width : int
             Path width
-        path_show: bool
+        path_show : bool
             Indicates whether the path is visible
-        path_color: list (int)
+        path_color : list[int]
             Rgba path color
-        label_fill_color: list (int)
+        label_fill_color : list[int]
             Fill Color in rgba format
-        label_outline_color: list (int)
+        label_outline_color : list[int]
             Outline Color in rgba format
-        label_font: str
+        label_font : str
             Set label font style and size (CSS syntax)
-        label_text: str
+        label_text : str
             Set label text
-        label_show: bool
+        label_show : bool
             Indicates whether the label is visible
         """
 
@@ -502,40 +506,40 @@ class CZMLExtractor:
 
         Parameters
         ----------
-        positions: ~astropy.coordinates.CartesianRepresentation
+        positions : ~astropy.coordinates.CartesianRepresentation
             Trajectory to plot.
-        epochs: ~astropy.time.Time
+        epochs : ~astropy.time.Time
             Epochs for positions.
-        groundtrack_show: bool
+        groundtrack_show : bool
             If set to true, the groundtrack is
             displayed.
-        groundtrack_lead_time: float
+        groundtrack_lead_time : float
             The time the animation is ahead of the real-time groundtrack
-        groundtrack_trail_time: float
+        groundtrack_trail_time : float
             The time the animation is behind the real-time groundtrack
-        groundtrack_width: int
+        groundtrack_width : int
             Groundtrack width
-        groundtrack_color: list (int)
+        groundtrack_color : list[int]
             Rgba groundtrack color. By default, it is set to the path color
-        id_name: str
+        id_name : str
             Set orbit name
-        id_description: str
+        id_description : str
             Set orbit description
-        path_width: int
+        path_width : int
             Path width
-        path_show: bool
+        path_show : bool
             Indicates whether the path is visible
-        path_color: list (int)
+        path_color : list[int]
             Rgba path color
-        label_fill_color: list (int)
+        label_fill_color : list[int]
             Fill Color in rgba format
-        label_outline_color: list (int)
+        label_outline_color : list[int]
             Outline Color in rgba format
-        label_font: str
+        label_font : str
             Set label font style and size (CSS syntax)
-        label_text: str
+        label_text : str
             Set label text
-        label_show: bool
+        label_show : bool
             Indicates whether the label is visible
 
         """

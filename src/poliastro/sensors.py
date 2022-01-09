@@ -13,13 +13,13 @@ def min_and_max_ground_range(altitude, fov, boresight, R):
 
     Parameters
     ----------
-    altitude: ~astropy.units.Quantity
+    altitude : ~astropy.units.Quantity
         Altitude over surface.
-    fov: ~astropy.units.Quantity
+    fov : ~astropy.units.Quantity
         Angle of the total area that a sensor can observe.
-    boresight: ~astropy.units.Quantity
+    boresight : ~astropy.units.Quantity
         Center boresight angle.
-    R: ~astropy.units.Quantity
+    R : ~astropy.units.Quantity
         Attractor equatorial radius.
 
     Returns
@@ -61,19 +61,19 @@ def ground_range_diff_at_azimuth(
 
     Parameters
     ----------
-    altitude: ~astropy.units.Quantity
+    altitude : ~astropy.units.Quantity
         Altitude over surface.
-    fov: ~astropy.units.Quantity
+    fov : ~astropy.units.Quantity
         Angle of the total area that a sensor can observe.
-    boresight: ~astropy.units.Quantity
+    boresight : ~astropy.units.Quantity
         Center boresight angle.
-    azimuth: ~astropy.units.Quantity
+    azimuth : ~astropy.units.Quantity
         Azimuth angle, used to specify where the sensor is looking.
-    nadir_lat: ~astropy.units.Quantity
+    nadir_lat : ~astropy.units.Quantity
         Latitude angle of nadir point.
-    nadir_lon: ~astropy.units.Quantity
+    nadir_lon : ~astropy.units.Quantity
         Longitude angle of nadir point.
-    R: ~astropy.units.Quantity
+    R : ~astropy.units.Quantity
         Attractor equatorial radius.
 
     Returns

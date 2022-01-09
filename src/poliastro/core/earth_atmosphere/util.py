@@ -9,9 +9,9 @@ def geometric_to_geopotential(z, r0):
 
     Parameters
     ----------
-    z: float
+    z : float
         Geometric altitude.
-    r0: float
+    r0 : float
         Planet/Natural satellite radius.
 
     Returns
@@ -33,9 +33,9 @@ def geopotential_to_geometric(h, r0):
 
     Parameters
     ----------
-    h: float
+    h : float
         Geopotential altitude.
-    r0: float
+    r0 : float
         Planet/Natural satellite radius.
 
     Returns
@@ -57,11 +57,11 @@ def gravity(z, g0, r0):
 
     Parameters
     ----------
-    z: float
+    z : float
         Geometric height.
-    g0: float
+    g0 : float
         Gravity value at sea level.
-    r0: float
+    r0 : float
         Planet/Natural satellite radius.
 
     Returns
@@ -80,9 +80,9 @@ def _get_index(x, x_levels):
 
     Parameters
     ----------
-    x: float
+    x : float
         Element to be searched.
-    x_levels: list
+    x_levels : list
         List for searching.
 
     Returns

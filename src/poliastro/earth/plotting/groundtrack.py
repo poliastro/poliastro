@@ -22,9 +22,9 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        fig: ~plotly.graph_objects.Figure
+        fig : ~plotly.graph_objects.Figure
             Figure instance for the canvas
-        color_palette: dict
+        color_palette : dict
             A color palette for background map
 
         """
@@ -54,7 +54,7 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        config: dict
+        **config : dict
             A collection of custom values for geo figure
 
         """
@@ -66,7 +66,7 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        config: dict
+        **config : dict
             A collection of custom values for figure layout
 
         """
@@ -83,16 +83,16 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        ss: ~poliastro.twobody.orbit
+        ss : ~poliastro.twobody.orbit
             Orbit to be propagated
-        t_deltas: ~astropy.time.DeltaTime
+        t_deltas : ~astropy.time.DeltaTime
             Desired observation time
 
         Returns
         -------
-        raw_xyz: array
+        raw_xyz : numpy.ndarray
             A collection of raw cartessian position vectors
-        raw_epochs: array
+        raw_epochs : numpy.ndarray
             Associated epoch with previously raw coordinates
         """
 
@@ -107,9 +107,9 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        raw_xyz: array
+        raw_xyz : numpy.ndarray
             A collection of rwa position coordinates
-        raw_obstime: array
+        raw_obstime : numpy.ndarray
             Associated observation time
 
         Returns
@@ -132,13 +132,13 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        ss: ~poliastro.twobody.Orbit
+        ss : ~poliastro.twobody.Orbit
             EarthSatellite's associated Orbit
-        t_deltas: ~astropy.time.DeltaTime
+        t_deltas : ~astropy.time.DeltaTime
             Collection of epochs
-        label: string
+        label : string
             Name for the trace
-        line_style: dict
+        line_style : dict
             Dictionary for customizing groundtrack line trace
 
         Returns
@@ -169,11 +169,11 @@ class GroundtrackPlotter:
 
         Parameters
         ----------
-        ss: ~poliastro.twobody.Orbit
+        ss : ~poliastro.twobody.Orbit
             EarthSatellite's orbit
-        label: string
+        label : string
             Label for the orbit
-        marker: dict
+        marker : dict
             Dicitonary holding plotly marker configuration
 
         Returns
@@ -204,19 +204,21 @@ class GroundtrackPlotter:
         return trace
 
     def plot(self, earth_ss, t_span, label, color, line_style={}, marker={}):
-        """Plots desired Earth satellite orbit for a given time span
+        """Plots desired Earth satellite orbit for a given time span.
 
         Parameters
         ----------
-        earth_ss: ~poliastro.earth.EarthSatellite
+        earth_ss : ~poliastro.earth.EarthSatellite
             Desired Earth's satellite to who's grountrack will be plotted
-        t_span: ~astropy.time.TimeDelta
+        t_span : ~astropy.time.TimeDelta
             A collection of epochs
-        color: string
+        label : str
+            Label for the groundtrack.
+        color : string
             Desired lines and traces color
-        line_style: dict
+        line_style : dict
             Dictionary for customizing groundtrack line trace
-        marker: dict
+        marker : dict
             Dictionary for customizing groundtrack marker trace
 
         Returns
