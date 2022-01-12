@@ -11,6 +11,8 @@ from poliastro.core.events import line_of_sight
 from poliastro.core.perturbations import atmospheric_drag_exponential
 from poliastro.core.propagation import func_twobody
 from poliastro.twobody import Orbit
+from poliastro.twobody.angles import nu_to_E
+from poliastro.twobody.elements import mean_motion
 from poliastro.twobody.events import (
     AltitudeCrossEvent,
     LatitudeCrossEvent,
@@ -18,6 +20,7 @@ from poliastro.twobody.events import (
     LosEvent,
     NodeCrossEvent,
     PenumbraEvent,
+    SatelliteViewEvent,
     UmbraEvent,
 )
 from poliastro.twobody.propagation import cowell
@@ -481,3 +484,91 @@ def test_LOS_event():
     )
 
     assert_quantity_allclose(los_event.last_t, t_los)
+
+
+def test_satellite_view_event():
+    # Calculates event time using equation 5.14 from Escobal's book.
+    attractor = Earth
+    tof = 2 * u.d
+    epoch = Time("2020-01-01", scale="utc")
+    coe = (
+        6828137.0 * u.m,
+        0.0073 * u.one,
+        87.0 * u.deg,
+        20.0 * u.deg,
+        10.0 * u.deg,
+        0 * u.deg,
+    )
+    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
+
+    satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
+
+    events = [satellite_view_event]
+    rr, vv = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events,
+    )
+
+    # Create a dummy orbit with position and velocity vector from event epoch.
+    orb = Orbit.from_vectors(attractor, rr[-1], vv[-1])
+    ecc = orb.ecc
+
+    # Eccentric anomaly at event epoch
+    E = nu_to_E(orb.nu, orb.ecc)
+
+    # At orbit's epoch, it is at perigee since true anomaly is zero.
+    t_perigee = 0 * u.s
+    n = mean_motion(orb.attractor.k, orb.a)
+
+    # Equation 5.14 from Escobal.
+    expected_view_t = t_perigee + (E - ecc * np.sin(E) * u.rad) / n
+
+    assert_quantity_allclose(satellite_view_event.last_t, expected_view_t)
+
+
+def test_eclipse_does_not_trigger_when_satellite_view_event_triggers():
+    # Same parameters as `test_penumbra_event_crossing`
+    expected_view_t = Time("2020-01-01 00:00:00.044", scale="utc")
+    expected_penumbra_t = Time("2020-01-01 00:04:26.060", scale="utc")  # From Orekit.
+    attractor = Earth
+    tof = 2 * u.d
+    epoch = Time("2020-01-01", scale="utc")
+    coe = (
+        6828137.0 * u.m,
+        0.0073 * u.one,
+        87.0 * u.deg,
+        20.0 * u.deg,
+        10.0 * u.deg,
+        0 * u.deg,
+    )
+    orbit = Orbit.from_classical(attractor, *coe, epoch=epoch)
+
+    penumbra_event = PenumbraEvent(orbit, terminal=True)
+    satellite_view_event = SatelliteViewEvent(orbit, terminal=True)
+
+    # Satellite view
+    events_1 = [satellite_view_event]
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events_1,
+    )
+
+    # Eclipse
+    events_2 = [penumbra_event]
+    rr, _ = cowell(
+        attractor.k,
+        orbit.r,
+        orbit.v,
+        [tof] * u.s,
+        events=events_2,
+    )
+
+    expected_view_t.isclose(epoch + satellite_view_event.last_t)
+    expected_penumbra_t.isclose(epoch + satellite_view_event.last_t)
+    assert satellite_view_event.last_t < penumbra_event.last_t

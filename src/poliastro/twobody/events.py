@@ -8,6 +8,7 @@ from numpy.linalg import norm
 from poliastro.core.events import (
     eclipse_function as eclipse_function_fast,
     line_of_sight as line_of_sight_fast,
+    satellite_view as satellite_view_fast,
 )
 from poliastro.core.spheroid_location import (
     cartesian_to_ellipsoidal as cartesian_to_ellipsoidal_fast,
@@ -283,3 +284,31 @@ class LosEvent(Event):
         # Need to cast `pos_coord` to array since `norm` inside numba only works for arrays, not lists.
         delta_angle = line_of_sight_fast(u_[:3], np.array(pos_coord), self._R)
         return delta_angle
+
+
+class SatelliteViewEvent(EclipseEvent):
+    """Detects whether a satellite can view a surface illuminated on the primary
+    attractor, by a secondary body.
+
+    Parameters
+    ----------
+    orbit: poliastro.twobody.orbit.Orbit
+        Orbit of the satellite.
+    terminal: bool, optional
+        Whether to terminate integration when the event occurs, defaults to False.
+    direction: float, optional
+        Handle triggering of event based on whether the satellite enters the visibility
+        region or leaves the region, defaults to 0 i.e., event is triggered at both,
+        entry and exit points.
+
+    """
+
+    def __init__(self, orbit, terminal=False, direction=0):
+        super().__init__(orbit, terminal, direction)
+
+    def __call__(self, t, u_, k):
+        self._last_t = t
+        r_sec = super().__call__(t, u_, k)
+
+        view_function = satellite_view_fast(self.k, u_, r_sec)
+        return view_function
