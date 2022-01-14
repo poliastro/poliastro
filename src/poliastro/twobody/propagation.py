@@ -473,7 +473,7 @@ def recseries(k, r, v, tofs, rtol=1e-6):
     # rough approximation orders for requried tolerance
     if rtol>1e-6:
         order=8
-    esle:
+    else:
         order=16
 
     results = np.array([recseries_fast(k, r0, v0, tof, order) for tof in tofs])
