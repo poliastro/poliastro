@@ -470,9 +470,16 @@ def recseries(k, r, v, tofs, rtol=1e-6):
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
+    
+    # angular momentum vector
+    h = np.cross(r0,v0)
+    # eccentricity vector
+    e = np.cross(v0,h)/k - r0/np.linalg.norm(r0)
+    # eccentricity magnitude
+    ecc = np.linalg.norm(e)
 
     # rough estiamte of order from tolerance
-    order = 2 * int(-np.log10(rtol))
+    order = order = int( -2*np.log10(rtol) + 10*np.tanh(ecc) )
 
     results = np.array([recseries_fast(k, r0, v0, tof, order) for tof in tofs])
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
