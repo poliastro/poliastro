@@ -9,7 +9,7 @@ from poliastro.core.propagation.gooding import gooding, gooding_coe
 from poliastro.core.propagation.markley import markley, markley_coe
 from poliastro.core.propagation.mikkola import mikkola, mikkola_coe
 from poliastro.core.propagation.pimienta import pimienta, pimienta_coe
-from poliastro.core.propagation.recSeries import recseries, recseries_coe
+from poliastro.core.propagation.recseries import recseries, recseries_coe
 from poliastro.core.propagation.vallado import vallado
 
 __all__ = [
