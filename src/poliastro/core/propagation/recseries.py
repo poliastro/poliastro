@@ -36,7 +36,7 @@ def recseries_coe(k, p, ecc, inc, raan, argp, nu, tof, order=8):
         M = M - 2 * np.pi * np.floor(M / 2 / np.pi)
 
         # compute eccentric anomaly through recursive series
-        E = M + e # Using initial guess from vallado to improve convergence
+        E = M + e  # Using initial guess from vallado to improve convergence
         for i in range(0, order):
             E = M + ecc * np.sin(E)
 
