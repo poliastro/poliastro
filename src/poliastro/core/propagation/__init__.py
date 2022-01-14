@@ -10,6 +10,7 @@ from poliastro.core.propagation.markley import markley, markley_coe
 from poliastro.core.propagation.mikkola import mikkola, mikkola_coe
 from poliastro.core.propagation.pimienta import pimienta, pimienta_coe
 from poliastro.core.propagation.vallado import vallado
+from poliastro.core.propagation.recSeries import recSeries, recSeries_coe
 
 __all__ = [
     "func_twobody",
@@ -26,6 +27,8 @@ __all__ = [
     "gooding",
     "danby_coe",
     "danby",
+    "recSeries_coe",
+    "recSeries",
 ]
 
 
