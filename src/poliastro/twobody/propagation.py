@@ -471,7 +471,9 @@ def recseries(k, r, v, tofs, rtol=1e-8):
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
 
-    results = np.array([recseries_fast(k, r0, v0, tof, method='rtol',rtol=rtol) for tof in tofs])
+    results = np.array(
+        [recseries_fast(k, r0, v0, tof, method="rtol", rtol=rtol) for tof in tofs]
+    )
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
