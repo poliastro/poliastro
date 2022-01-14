@@ -436,7 +436,7 @@ def danby(k, r, v, tofs, rtol=1e-8):
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
-def recseries(k, r, v, tofs, rtol=1e-6):
+def recseries(k, r, v, tofs, rtol=1e-8):
     """Kepler solver for elliptical orbits with recursive series approximation
     method. The order of the series is a user defined parameter.
     Parameters
@@ -471,17 +471,7 @@ def recseries(k, r, v, tofs, rtol=1e-6):
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
 
-    # angular momentum vector
-    h = np.cross(r0, v0)
-    # eccentricity vector
-    e = np.cross(v0, h) / k - r0 / np.linalg.norm(r0)
-    # eccentricity magnitude
-    ecc = np.linalg.norm(e)
-
-    # rough estiamte of order from tolerance
-    order = int(-2 * np.log10(rtol) + 10 * np.tanh(ecc))
-
-    results = np.array([recseries_fast(k, r0, v0, tof, order) for tof in tofs])
+    results = np.array([recseries_fast(k, r0, v0, tof, method='rtol',rtol=rtol) for tof in tofs])
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
