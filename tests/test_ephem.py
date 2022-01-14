@@ -13,12 +13,12 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
 from poliastro.bodies import Earth, Venus
-from poliastro.ephem import Ephem, InterpolationMethods
+from poliastro.ephem import Ephem, SincInterpolator, SplineInterpolator
 from poliastro.frames import Planes
 from poliastro.twobody.orbit import Orbit
 from poliastro.warnings import TimeScaleWarning
 
-AVAILABLE_INTERPOLATION_METHODS = InterpolationMethods.__members__.values()
+AVAILABLE_INTERPOLATORS = [SincInterpolator(), SplineInterpolator()]
 AVAILABLE_PLANES = Planes.__members__.values()
 
 
@@ -81,27 +81,27 @@ def test_ephem_fails_if_dimensions_are_not_correct(epochs, coordinates):
     )
 
 
-@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+@pytest.mark.parametrize("interpolator", AVAILABLE_INTERPOLATORS)
 def test_ephem_sample_no_arguments_returns_exactly_same_input(
-    epochs, coordinates, method
+    epochs, coordinates, interpolator
 ):
     unused_plane = Planes.EARTH_EQUATOR
     ephem = Ephem(coordinates, epochs, unused_plane)
 
-    result_coordinates = ephem.sample(method=method)
+    result_coordinates = ephem.sample(interpolator=interpolator)
 
     # Exactly the same
     assert np.all(result_coordinates == coordinates)
 
 
-@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+@pytest.mark.parametrize("interpolator", AVAILABLE_INTERPOLATORS)
 def test_ephem_sample_scalar_epoch_returns_1_dimensional_coordinates(
-    epochs, coordinates, method
+    epochs, coordinates, interpolator
 ):
     unused_plane = Planes.EARTH_EQUATOR
     ephem = Ephem(coordinates, epochs, unused_plane)
 
-    result_coordinates = ephem.sample(epochs[0], method=method)
+    result_coordinates = ephem.sample(epochs[0], interpolator=interpolator)
 
     # Exactly the same
     assert result_coordinates.ndim == 1
@@ -119,40 +119,40 @@ def test_ephem_str_matches_expected_representation(epochs, coordinates):
     assert repr(ephem) == str(ephem) == expected_str
 
 
-@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+@pytest.mark.parametrize("interpolator", AVAILABLE_INTERPOLATORS)
 def test_ephem_sample_scalar_epoch_and_coordinates_returns_exactly_same_input(
-    epochs, coordinates, method
+    epochs, coordinates, interpolator
 ):
     unused_plane = Planes.EARTH_EQUATOR
     coordinates = coordinates[0].reshape(-1)
     epochs = epochs[0].reshape(-1)
     ephem = Ephem(coordinates, epochs, unused_plane)
 
-    result_coordinates = ephem.sample(epochs[0], method=method)
+    result_coordinates = ephem.sample(epochs[0], interpolator=interpolator)
 
     # Exactly the same
     assert result_coordinates == coordinates
 
 
-@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
-def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method):
+@pytest.mark.parametrize("interpolator", AVAILABLE_INTERPOLATORS)
+def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, interpolator):
     unused_plane = Planes.EARTH_EQUATOR
     ephem = Ephem(coordinates, epochs, unused_plane)
 
-    result_coordinates = ephem.sample(epochs, method=method)
+    result_coordinates = ephem.sample(epochs, interpolator=interpolator)
 
     # TODO: Should it return exactly the same?
     assert_coordinates_allclose(result_coordinates, coordinates, atol_scale=1e-17)
 
 
-@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+@pytest.mark.parametrize("interpolator", AVAILABLE_INTERPOLATORS)
 def test_ephem_sample_existing_epochs_returns_corresponding_input(
-    epochs, coordinates, method
+    epochs, coordinates, interpolator
 ):
     unused_plane = Planes.EARTH_EQUATOR
     ephem = Ephem(coordinates, epochs, unused_plane)
 
-    result_coordinates = ephem.sample(epochs[::2], method=method)
+    result_coordinates = ephem.sample(epochs[::2], interpolator=interpolator)
 
     # Exactly the same
     assert_coordinates_allclose(result_coordinates, coordinates[::2], atol_scale=1e-17)
@@ -184,7 +184,7 @@ def test_rv_scalar_epoch_returns_scalar_vectors(coordinates, epochs):
     assert_quantity_allclose(v, expected_v)
 
 
-@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+@pytest.mark.parametrize("interpolator", AVAILABLE_INTERPOLATORS)
 @pytest.mark.parametrize(
     "plane, FrameClass, rtol",
     [
@@ -192,7 +192,7 @@ def test_rv_scalar_epoch_returns_scalar_vectors(coordinates, epochs):
         (Planes.EARTH_ECLIPTIC, BarycentricMeanEcliptic, 1e-5),
     ],
 )
-def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol):
+def test_ephem_from_body_has_expected_properties(interpolator, plane, FrameClass, rtol):
     epochs = Time(
         ["2020-03-01 12:00:00", "2020-03-17 00:00:00.000", "2020-04-01 12:00:00.000"],
         scale="tdb",
@@ -223,7 +223,7 @@ def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol
     )
 
     earth = Ephem.from_body(Earth, epochs, plane=plane)
-    coordinates = earth.sample(method=method)
+    coordinates = earth.sample(interpolator=interpolator)
 
     assert earth.epochs is epochs
     assert_coordinates_allclose(coordinates, expected_coordinates, rtol=rtol)
@@ -340,9 +340,9 @@ def test_from_orbit_scalar_epoch_uses_reshaped_epochs():
     assert ephem.epochs == expected_epochs
 
 
-@pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
+@pytest.mark.parametrize("interpolator", AVAILABLE_INTERPOLATORS)
 @pytest.mark.parametrize("rtol", [1e-7, 1e-5])
-def test_from_orbit_has_desired_properties(method, rtol):
+def test_from_orbit_has_desired_properties(interpolator, rtol):
     epochs = Time(
         [
             "2020-02-01 12:00:00",

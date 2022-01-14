@@ -1,24 +1,22 @@
-from enum import Enum, auto
 from warnings import warn
 
-import numpy as np
 from astropy import units as u
 from astropy.coordinates import (
-    GCRS,
     ICRS,
     BarycentricMeanEcliptic,
     CartesianDifferential,
     CartesianRepresentation,
-    get_body_barycentric,
     get_body_barycentric_posvel,
 )
 from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 
 from poliastro._math.interpolate import interp1d, sinc_interp, spline_interp
+from poliastro.bodies import Earth
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.twobody.propagation import propagate
+from poliastro.util import time_range
 from poliastro.warnings import TimeScaleWarning
 
 EPHEM_FORMAT = (
@@ -26,14 +24,7 @@ EPHEM_FORMAT = (
 )
 
 
-class InterpolationMethods(Enum):
-    """Interpolation methods to sample the ephemerides."""
-
-    SINC = auto()
-    SPLINES = auto()
-
-
-def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
+def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
     """Interpolates ephemerides data
 
     Parameters
@@ -52,78 +43,78 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
 
     Returns
     -------
-    intrp : ~scipy.interpolate.interpolate.interp1d
-        Interpolated function.
+    interpolant : callable
+        Interpolant function that receives time increment in seconds
+        since the initial epoch.
 
     """
-    h = (period * rtol).to_value(u.d)
-    t_span = (t_span[0].to_value(u.d), t_span[1].to_value(u.d) + 0.01)
-    t_values = np.linspace(*t_span, int((t_span[1] - t_span[0]) / h))  # type: ignore
-    r_values = np.zeros((t_values.shape[0], 3))
+    epochs = time_range(
+        Time(t_span[0], format="jd", scale="tdb"),
+        end=Time(t_span[1], format="jd", scale="tdb"),
+        periods=int(((t_span[1] - t_span[0]) / (period * rtol)).to_value(u.one)),
+    )
+    ephem = Ephem.from_body(body, epochs, attractor=attractor)
 
-    for i, t in enumerate(t_values):
-        epoch = Time(t, format="jd", scale="tdb")
+    interpolant = interp1d(
+        (epochs - epochs[0]).to_value(u.s),
+        ephem._coordinates.xyz.to_value(u.km),
+    )
+    return interpolant
 
-        r = get_body_barycentric(body.name, epoch)
-        r = (
-            ICRS(x=r.x, y=r.y, z=r.z, representation_type=CartesianRepresentation)
-            .transform_to(GCRS(obstime=epoch))
-            .represent_as(CartesianRepresentation)
+
+class BaseInterpolator:
+    def interpolate(self, epochs, reference_epochs, coordinates):
+        raise NotImplementedError
+
+
+class SincInterpolator:
+    def interpolate(self, epochs, reference_epochs, coordinates):
+        def _interp_1d(arr):
+            return sinc_interp(arr, reference_epochs.jd, epochs.jd)
+
+        xyz_unit = coordinates.xyz.unit
+        d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
+
+        x = _interp_1d(coordinates.x.value) << xyz_unit
+        y = _interp_1d(coordinates.y.value) << xyz_unit
+        z = _interp_1d(coordinates.z.value) << xyz_unit
+
+        d_x = _interp_1d(coordinates.differentials["s"].d_x.value) << d_xyz_unit
+        d_y = _interp_1d(coordinates.differentials["s"].d_y.value) << d_xyz_unit
+        d_z = _interp_1d(coordinates.differentials["s"].d_z.value) << d_xyz_unit
+
+        return CartesianRepresentation(
+            x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
         )
 
-        r_values[i] = r.xyz.to(u.km)
 
-    t_values = ((t_values - t_span[0]) * u.day).to_value(u.s)
-    return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
+class SplineInterpolator:
+    def __init__(self, kind="cubic"):
+        self._kind = kind
 
+    def interpolate(self, epochs, reference_epochs, coordinates):
+        xyz_unit = coordinates.xyz.unit
+        d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
-def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic"):
-    xyz_unit = coordinates.xyz.unit
-    d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
-
-    result_xyz = (
-        spline_interp(coordinates.xyz.value, reference_epochs.jd, epochs.jd, kind=kind)
-        << xyz_unit
-    )
-    result_d_xyz = (
-        spline_interp(
-            coordinates.differentials["s"].d_xyz.value,
-            reference_epochs.jd,
-            epochs.jd,
-            kind=kind,
+        result_xyz = (
+            spline_interp(
+                coordinates.xyz.value, reference_epochs.jd, epochs.jd, kind=self._kind
+            )
+            << xyz_unit
         )
-        << d_xyz_unit
-    )
+        result_d_xyz = (
+            spline_interp(
+                coordinates.differentials["s"].d_xyz.value,
+                reference_epochs.jd,
+                epochs.jd,
+                kind=self._kind,
+            )
+            << d_xyz_unit
+        )
 
-    return CartesianRepresentation(
-        result_xyz, differentials=CartesianDifferential(result_d_xyz)
-    )
-
-
-def _interpolate_sinc(epochs, reference_epochs, coordinates):
-    def _interp_1d(arr):
-        return sinc_interp(arr, reference_epochs.jd, epochs.jd)
-
-    xyz_unit = coordinates.xyz.unit
-    d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
-
-    x = _interp_1d(coordinates.x.value) << xyz_unit
-    y = _interp_1d(coordinates.y.value) << xyz_unit
-    z = _interp_1d(coordinates.z.value) << xyz_unit
-
-    d_x = _interp_1d(coordinates.differentials["s"].d_x.value) << d_xyz_unit
-    d_y = _interp_1d(coordinates.differentials["s"].d_y.value) << d_xyz_unit
-    d_z = _interp_1d(coordinates.differentials["s"].d_z.value) << d_xyz_unit
-
-    return CartesianRepresentation(
-        x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
-    )
-
-
-_INTERPOLATION_MAPPING = {
-    InterpolationMethods.SINC: _interpolate_sinc,
-    InterpolationMethods.SPLINES: _interpolate_splines,
-}
+        return CartesianRepresentation(
+            result_xyz, differentials=CartesianDifferential(result_d_xyz)
+        )
 
 
 def _get_destination_frame(attractor, plane, epochs):
@@ -324,7 +315,7 @@ class Ephem:
 
         return cls(coordinates, epochs, plane)
 
-    def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):
+    def sample(self, epochs=None, *, interpolator=SplineInterpolator()):
         """Returns coordinates at specified epochs.
 
         Parameters
@@ -332,11 +323,9 @@ class Ephem:
         epochs : ~astropy.time.Time, optional
             Epochs to sample the ephemerides,
             if not given the original one from the object will be used.
-        method : ~poliastro.ephem.InterpolationMethods, optional
+        interpolator : ~poliastro.ephem.BaseInterpolator, optional
             Interpolation method to use for epochs outside of the original ones,
             default to splines.
-        **kwargs
-            Extra kwargs for interpolation method.
 
         Returns
         -------
@@ -347,9 +336,10 @@ class Ephem:
         if epochs is None or epochs.isscalar and (epochs == self.epochs).all():
             return self._coordinates
 
-        # TODO: Proper type annotation
-        coordinates = _INTERPOLATION_MAPPING[method](  # type: ignore
-            epochs.reshape(-1), self.epochs, self._coordinates, **kwargs
+        coordinates = interpolator.interpolate(
+            epochs.reshape(-1),
+            self.epochs,
+            self._coordinates,
         )
 
         return coordinates
