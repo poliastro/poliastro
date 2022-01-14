@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit as jit
 
-from poliastro.core.angles import E_to_M, nu_to_E, E_to_nu
+from poliastro.core.angles import E_to_M, E_to_nu, nu_to_E
 from poliastro.core.elements import coe2rv, rv2coe
 
 
@@ -12,35 +12,35 @@ def recSeries_coe(k, p, ecc, inc, raan, argp, nu, tof, order=8):
     semi_axis_a = p / (1 - ecc ** 2)
     # mean angular motion
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
-    
+
     if ecc == 0:
         # Solving for circular orbit
-        
+
         # compute initial mean anoamly
-        M0 = nu # For circular orbit (M = E = nu)
+        M0 = nu  # For circular orbit (M = E = nu)
         # final mean anaomaly
         M = M0 + n * tof
         # snapping anomaly to [0,pi] range
         nu = M - 2 * np.pi * np.floor(M / 2 / np.pi)
-        
+
         return nu
 
     elif ecc < 1.0:
         # Solving for elliptical orbit
-        
+
         # compute initial mean anoamly
         M0 = E_to_M(nu_to_E(nu, ecc), ecc)
         # final mean anaomaly
         M = M0 + n * tof
         # snapping anomaly to [0,pi] range
         M = M - 2 * np.pi * np.floor(M / 2 / np.pi)
-        
+
         # compute eccentric anomaly through recursive series
         E = M
-        for i in range(0,order):
-            E = M + ecc*np.sin(E)
-        
-        return E_to_nu(E,ecc)
+        for i in range(0, order):
+            E = M + ecc * np.sin(E)
+
+        return E_to_nu(E, ecc)
 
     else:
         # Parabolic/Hyperbolic orbits are not supported
@@ -77,8 +77,8 @@ def recSeries(k, r0, v0, tof, order=8):
     Notes
     -----
     This algorithm uses series discussed in the paper *Recursive solution to
-    Kepler’s problem for elliptical orbits - application in robust 
-    Newton-Raphson and co-planar closest approach estimation* 
+    Kepler’s problem for elliptical orbits - application in robust
+    Newton-Raphson and co-planar closest approach estimation*
     with DOI: http://dx.doi.org/10.13140/RG.2.2.18578.58563/1
     """
 
