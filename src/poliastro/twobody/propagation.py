@@ -435,6 +435,7 @@ def danby(k, r, v, tofs, rtol=1e-8):
     results = np.array([danby_fast(k, r0, v0, tof) for tof in tofs])
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
+
 def recseries(k, r, v, tofs, rtol=1e-6):
     """Kepler solver for elliptical orbits with recursive series approximation
     method. The order of the series is a user defined parameter.
@@ -462,22 +463,23 @@ def recseries(k, r, v, tofs, rtol=1e-6):
     Kepler’s problem for elliptical orbits - application in robust
     Newton-Raphson and co-planar closest approach estimation*
     with DOI: http://dx.doi.org/10.13140/RG.2.2.18578.58563/1
-    
+
     """
 
     k = k.to_value(u.m ** 3 / u.s ** 2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
-    
+
     # rough approximation orders for requried tolerance
-    if rtol>1e-6:
-        order=8
+    if rtol > 1e-6:
+        order = 8
     else:
-        order=16
+        order = 16
 
     results = np.array([recseries_fast(k, r0, v0, tof, order) for tof in tofs])
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
+
 
 def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
