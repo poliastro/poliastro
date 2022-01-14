@@ -6,7 +6,7 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 
 @jit
-def recSeries_coe(k, p, ecc, inc, raan, argp, nu, tof, order=8):
+def recseries_coe(k, p, ecc, inc, raan, argp, nu, tof, order=8):
 
     # semi-major axis
     semi_axis_a = p / (1 - ecc ** 2)
@@ -36,7 +36,7 @@ def recSeries_coe(k, p, ecc, inc, raan, argp, nu, tof, order=8):
         M = M - 2 * np.pi * np.floor(M / 2 / np.pi)
 
         # compute eccentric anomaly through recursive series
-        E = M
+        E = M + e # Using initial guess from vallado to improve convergence
         for i in range(0, order):
             E = M + ecc * np.sin(E)
 
@@ -50,7 +50,7 @@ def recSeries_coe(k, p, ecc, inc, raan, argp, nu, tof, order=8):
 
 
 @jit
-def recSeries(k, r0, v0, tof, order=8):
+def recseries(k, r0, v0, tof, order=8):
     """Kepler solver for elliptical orbits with recursive series approximation
     method. The order of the series is a user defined parameter.
 
