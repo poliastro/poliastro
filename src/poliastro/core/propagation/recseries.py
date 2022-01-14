@@ -6,7 +6,9 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 
 @jit
-def recseries_coe(k, p, ecc, inc, raan, argp, nu, tof, method='rtol', order=8, numiter=100, rtol=1e-8):
+def recseries_coe(
+    k, p, ecc, inc, raan, argp, nu, tof, method="rtol", order=8, numiter=100, rtol=1e-8
+):
 
     # semi-major axis
     semi_axis_a = p / (1 - ecc ** 2)
@@ -34,21 +36,21 @@ def recseries_coe(k, p, ecc, inc, raan, argp, nu, tof, method='rtol', order=8, n
         M = M0 + n * tof
         # snapping anomaly to [0,pi] range
         M = M - 2 * np.pi * np.floor(M / 2 / np.pi)
-        
-        # set recursion iteration 
-        if method == 'rtol':
+
+        # set recursion iteration
+        if method == "rtol":
             Niter = numiter
-        elif method == 'order':
+        elif method == "order":
             Niter = order
         else:
             raise ValueError("Unknown recursion termination method ('rtol','order').")
-        
+
         # compute eccentric anomaly through recursive series
         E = M + ecc  # Using initial guess from vallado to improve convergence
         for i in range(0, Niter):
             En = M + ecc * np.sin(E)
             # check for break condition
-            if method=='rtol' and (abs(En-E)/abs(E))<rtol:
+            if method == "rtol" and (abs(En - E) / abs(E)) < rtol:
                 break
             E = En
 
@@ -62,7 +64,7 @@ def recseries_coe(k, p, ecc, inc, raan, argp, nu, tof, method='rtol', order=8, n
 
 
 @jit
-def recseries(k, r0, v0, tof, method='rtol', order=8, numiter=100, rtol=1e-8):
+def recseries(k, r0, v0, tof, method="rtol", order=8, numiter=100, rtol=1e-8):
     """Kepler solver for elliptical orbits with recursive series approximation
     method. The order of the series is a user defined parameter.
 
@@ -102,6 +104,8 @@ def recseries(k, r0, v0, tof, method='rtol', order=8, numiter=100, rtol=1e-8):
 
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
-    nu = recseries_coe(k, p, ecc, inc, raan, argp, nu, tof, method, order, numiter, rtol)
+    nu = recseries_coe(
+        k, p, ecc, inc, raan, argp, nu, tof, method, order, numiter, rtol
+    )
 
     return coe2rv(k, p, ecc, inc, raan, argp, nu)
