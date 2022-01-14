@@ -479,7 +479,7 @@ def recseries(k, r, v, tofs, rtol=1e-6):
     ecc = np.linalg.norm(e)
 
     # rough estiamte of order from tolerance
-    order = order = int(-2 * np.log10(rtol) + 10 * np.tanh(ecc))
+    order = int(-2 * np.log10(rtol) + 10 * np.tanh(ecc))
 
     results = np.array([recseries_fast(k, r0, v0, tof, order) for tof in tofs])
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
