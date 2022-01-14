@@ -12,7 +12,7 @@ poliastro requires a number of Python packages, notably:
 - [Plotly](https://plotly.com/), for interactive orbit plotting
 - [SciPy](https://www.scipy.org/), for root finding and numerical propagation
 
-poliastro is supported on Linux, macOS and Windows on Python 3.8 to 3.9.
+poliastro is supported on Linux, macOS and Windows on Python 3.8 to 3.10.
 
 ## Using conda
 
