@@ -20,6 +20,8 @@ different propagators available at poliastro:
 +-------------+------------+-----------------+-----------------+
 |    cowell   |      ✓     |        ✓        |        ✓        |
 +-------------+------------+-----------------+-----------------+
+|  recseries  |      ✓     |        x        |        x        |
++-------------+------------+-----------------+-----------------+
 
 """
 import numpy as np
@@ -35,6 +37,7 @@ from poliastro.core.propagation import (
     markley as markley_fast,
     mikkola as mikkola_fast,
     pimienta as pimienta_fast,
+    recseries as recseries_fast,
     vallado as vallado_fast,
 )
 
@@ -433,6 +436,47 @@ def danby(k, r, v, tofs, rtol=1e-8):
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
+def recseries(k, r, v, tofs, rtol=1e-8):
+    """Kepler solver for elliptical orbits with recursive series approximation
+    method. The order of the series is a user defined parameter.
+    Parameters
+    ----------
+    k : float
+        Standard gravitational parameter of the attractor.
+    r0 : numpy.ndarray
+        Position vector.
+    v0 : numpy.ndarray
+        Velocity vector.
+    tof : float
+        Time of flight.
+    rtol : float
+        Relative error for accuracy of the method.
+    Returns
+    -------
+    rr : numpy.ndarray
+        Final position vector.
+    vv : numpy.ndarray
+        Final velocity vector.
+    Notes
+    -----
+    This algorithm uses series discussed in the paper *Recursive solution to
+    Kepler’s problem for elliptical orbits - application in robust
+    Newton-Raphson and co-planar closest approach estimation*
+    with DOI: http://dx.doi.org/10.13140/RG.2.2.18578.58563/1
+
+    """
+
+    k = k.to_value(u.m ** 3 / u.s ** 2)
+    r0 = r.to_value(u.m)
+    v0 = v.to_value(u.m / u.s)
+    tofs = tofs.to_value(u.s)
+
+    results = np.array(
+        [recseries_fast(k, r0, v0, tof, method="rtol", rtol=rtol) for tof in tofs]
+    )
+    return results[:, 0] << u.m, results[:, 1] << u.m / u.s
+
+
 def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
     """Propagate an orbit some time and return the result.
 
@@ -494,6 +538,7 @@ ELLIPTIC_PROPAGATORS = [
     gooding,
     danby,
     cowell,
+    recseries,
 ]
 PARABOLIC_PROPAGATORS = [farnocchia, vallado, mikkola, pimienta, gooding, cowell]
 HYPERBOLIC_PROPAGATORS = [
