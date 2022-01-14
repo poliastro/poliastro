@@ -11,7 +11,7 @@ from astropy.coordinates import (
 from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 
-from poliastro._math.interpolate import sinc_interp, spline_interp
+from poliastro._math.interpolate import interp1d, sinc_interp, spline_interp
 from poliastro.bodies import Earth
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
@@ -55,10 +55,10 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
     )
     ephem = Ephem.from_body(body, epochs, attractor=attractor)
 
-    def interpolant(t):
-        coords = ephem.sample(epochs[0] + (t << u.s))
-        return coords.xyz[:, 0].to_value(u.km)
-
+    interpolant = interp1d(
+        (epochs - epochs[0]).to_value(u.s),
+        ephem._coordinates.xyz.to_value(u.km),
+    )
     return interpolant
 
 
