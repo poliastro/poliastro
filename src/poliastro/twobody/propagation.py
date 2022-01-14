@@ -471,13 +471,7 @@ def recseries(k, r, v, tofs, rtol=1e-6):
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
 
-    # rough approximation orders for requried tolerance
-    if rtol > 1e-6:
-        order = 8
-    else:
-        order = 16
-
-    results = np.array([recseries_fast(k, r0, v0, tof, order) for tof in tofs])
+    results = np.array([recseries_fast(k, r0, v0, tof, order=4) for tof in tofs])
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
