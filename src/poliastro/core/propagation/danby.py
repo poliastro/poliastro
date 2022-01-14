@@ -13,7 +13,7 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
 
     if ecc == 0:
         # Solving for circular orbit
-        M0 = E_to_M(nu_to_E(nu, ecc), ecc)
+        M0 = nu # for circular orbit M = E = nu
         M = M0 + n * tof
         nu = M - 2 * np.pi * np.floor(M / 2 / np.pi)
         return nu
