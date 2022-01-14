@@ -9,7 +9,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "poliastro"
 readme = "README.md"
-requires-python = ">=3.8,<3.10"
+requires-python = ">=3.8,<3.11"
 license = {file = "COPYING"}
 authors = [
     {name = "Juan Luis Cano Rodríguez", email = "hello@juanlu.space"}
@@ -32,10 +32,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
@@ -87,7 +86,7 @@ doc = [
     "sphinx-github-role~=0.1.0",
 ]
 test = [
-    "black==21.11b0",
+    "black==21.11b1",
     "coverage",
     "hypothesis",
     "import-linter",

@@ -62,6 +62,9 @@ jobs:
       - linux: py39
         name: py39_test
 
+      - linux: py310
+        name: py310_test
+
 - template: run-tox-env.yml@OpenAstronomy
   parameters:
     default_python: 3.8
