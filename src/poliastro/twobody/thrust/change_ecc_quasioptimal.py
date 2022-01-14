@@ -10,9 +10,9 @@ import numpy as np
 from astropy import units as u
 from numba import njit
 from numpy import cross
-from numpy.linalg import norm
 
 from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
+from poliastro.util import norm
 
 
 def change_ecc_quasioptimal(ss_0, ecc_f, f):

@@ -1,6 +1,7 @@
 import numpy as np
 from numba import njit as jit
 
+from poliastro._math.linalg import norm
 from poliastro._math.special import stumpff_c2 as c2, stumpff_c3 as c3
 
 
@@ -73,7 +74,7 @@ def vallado(k, r0, v0, tof, numiter):
 
     # Cache some results
     dot_r0v0 = r0 @ v0
-    norm_r0 = (r0 @ r0) ** 0.5
+    norm_r0 = norm(r0)
     sqrt_mu = k ** 0.5
     alpha = -(v0 @ v0) / k + 2 / norm_r0
 

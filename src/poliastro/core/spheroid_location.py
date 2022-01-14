@@ -3,6 +3,8 @@
 import numpy as np
 from numba import njit as jit
 
+from poliastro._math.linalg import norm
+
 
 @jit
 def cartesian_cords(_a, _c, _lon, _lat, _h):
@@ -64,7 +66,7 @@ def N(a, b, c, cartesian_cords):
     """
     x, y, z = cartesian_cords
     N = np.array([2 * x / a ** 2, 2 * y / b ** 2, 2 * z / c ** 2])
-    N /= np.linalg.norm(N)
+    N /= norm(N)
     return N
 
 
@@ -80,7 +82,7 @@ def tangential_vecs(N):
     """
     u = np.array([1.0, 0, 0])
     u -= (u @ N) * N
-    u /= np.linalg.norm(u)
+    u /= norm(u)
     v = np.cross(N, u)
 
     return u, v
@@ -123,7 +125,7 @@ def distance(cartesian_cords, px, py, pz):
     """
     c = cartesian_cords
     u = np.array([px, py, pz])
-    d = np.linalg.norm(c - u)
+    d = norm(c - u)
     return d
 
 

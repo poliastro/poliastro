@@ -5,8 +5,8 @@ convert between different elements that define the orbit of a body.
 import numpy as np
 from numba import njit as jit, prange
 from numpy import cos, cross, sin, sqrt
-from numpy.linalg import norm
 
+from poliastro._math.linalg import norm
 from poliastro.core.angles import E_to_nu, F_to_nu
 from poliastro.core.util import rotation_matrix
 

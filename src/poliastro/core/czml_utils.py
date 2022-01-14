@@ -1,6 +1,8 @@
 import numpy as np
 from numba import njit as jit
 
+from poliastro._math.linalg import norm
+
 
 @jit
 def intersection_ellipsoid_line(x, y, z, u1, u2, u3, a, b, c):
@@ -93,7 +95,7 @@ def project_point_on_ellipsoid(x, y, z, a, b, c):
     """
     p1, p2 = intersection_ellipsoid_line(x, y, z, x, y, z, a, b, c)
 
-    norm_1 = np.linalg.norm(np.array([p1[0] - x, p1[1] - y, p1[2] - z]))
-    norm_2 = np.linalg.norm(np.array([p2[0] - x, p2[1] - y, p2[2] - z]))
+    norm_1 = norm(np.array([p1[0] - x, p1[1] - y, p1[2] - z]))
+    norm_2 = norm(np.array([p2[0] - x, p2[1] - y, p2[2] - z]))
 
     return p1 if norm_1 <= norm_2 else p2
