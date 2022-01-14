@@ -37,8 +37,8 @@ from poliastro.core.propagation import (
     markley as markley_fast,
     mikkola as mikkola_fast,
     pimienta as pimienta_fast,
-    vallado as vallado_fast,
     recseries as recseries_fast,
+    vallado as vallado_fast,
 )
 
 
