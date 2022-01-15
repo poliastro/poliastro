@@ -164,24 +164,17 @@ Politecnico di Milano, the Italian university where I was studying while
 writing this software. It's my tiny tribute to a place I came to love.
 *Grazie mille!*
 
-## Can I do \<insert awesome thing\> with poliastro?
+## Is poliastro validated?
 
-poliastro has been historically focused on interplanetary applications,
-but we have been adding more features for artificial satellites in LEO.
-Therefore, you might find that some features are currently lacking,
-in particular propagation of General Perturbations orbital data
-such as TLE/3LE, OMM, and the like.
-
-Besides, poliastro is a community project that strives to be easy to use,
+Yes! poliastro is a community project that strives to be easy to use,
 while at the same time producing correct results
 [that are validated](https://github.com/poliastro/validation/)
 against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/latest/related.html)
 such as GMAT and Orekit.
-Therefore, you might find that its API is very different from
-these projects,
-and also that some advanced features are missing
-(such as detailed spherical harmonics modeling of the Earth beyond J2 and J3).
-We encourage you to [open an issue](https://github.com/poliastro/validation/issues/new)
+
+## Can I suggest new features for poliastro?
+
+Sure, we encourage you to [open an issue](https://github.com/poliastro/validation/issues/new)
 so we can discuss future feature additions!
 
 ## What\'s the future of the project?
