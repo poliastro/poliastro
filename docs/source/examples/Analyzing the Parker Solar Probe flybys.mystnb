@@ -66,7 +66,7 @@ flyby_1_time
 ```
 
 ```{code-cell} ipython3
-r_mag_ref = norm(Ephem.from_body(Venus, flyby_1_time).rv()[0])
+r_mag_ref = norm(Ephem.from_body(Venus, flyby_1_time).rv()[0].squeeze())
 r_mag_ref.to(u.au)
 ```
 
