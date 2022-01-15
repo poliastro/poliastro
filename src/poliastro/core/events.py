@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit as jit
-from numpy.linalg import norm
 
+from poliastro._math.linalg import norm
 from poliastro.core.elements import coe_rotation_matrix, rv2coe
 
 
@@ -76,8 +76,8 @@ def line_of_sight(r1, r2, R):
         located by r1 and r2, else negative.
 
     """
-    r1_norm = np.linalg.norm(r1)
-    r2_norm = np.linalg.norm(r2)
+    r1_norm = norm(r1)
+    r2_norm = norm(r2)
 
     theta = np.arccos((r1 @ r2) / r1_norm / r2_norm)
     theta_1 = np.arccos(R / r1_norm)

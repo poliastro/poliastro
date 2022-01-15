@@ -8,8 +8,8 @@ References
 import numpy as np
 from numba import njit as jit
 from numpy import cross
-from numpy.linalg import norm
 
+from poliastro._math.linalg import norm
 from poliastro.core.elements import circular_velocity, eccentricity_vector, rv2coe
 
 

@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit as jit
-from numpy.linalg import norm
 
+from poliastro._math.linalg import norm
 from poliastro.core.events import line_of_sight as line_of_sight_fast
 
 

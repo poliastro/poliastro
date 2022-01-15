@@ -3,8 +3,8 @@ from warnings import warn
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
-from numpy.linalg import norm
 
+from poliastro._math.linalg import norm
 from poliastro.core.events import (
     eclipse_function as eclipse_function_fast,
     line_of_sight as line_of_sight_fast,

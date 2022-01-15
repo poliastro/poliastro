@@ -1,8 +1,8 @@
 import numpy as np
 from numba import njit as jit
 from numpy import cross, pi
-from numpy.linalg import norm
 
+from poliastro._math.linalg import norm
 from poliastro._math.special import hyp2f1b, stumpff_c2 as c2, stumpff_c3 as c3
 
 
@@ -98,8 +98,8 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     """
     t_m = 1 if short else -1
 
-    norm_r0 = (r0 @ r0) ** 0.5
-    norm_r = (r @ r) ** 0.5
+    norm_r0 = norm(r0)
+    norm_r = norm(r)
     norm_r0_times_norm_r = norm_r0 * norm_r
     norm_r0_plus_norm_r = norm_r0 + norm_r
 
