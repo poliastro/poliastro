@@ -1,4 +1,5 @@
 import pickle
+
 import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
@@ -77,6 +78,7 @@ def test_from_relative():
     )
     assert Earth.k == VALUECHECK.k
     assert Earth.R == VALUECHECK.R
+
 
 def test_attractor_identity_does_not_change_when_pickling(tmp_path):
     d = tmp_path / "tmp"
