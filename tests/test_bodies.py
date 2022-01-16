@@ -1,8 +1,11 @@
+import pickle
+
 import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Body, Earth, Jupiter, Sun
+from poliastro.examples import iss
 
 
 def test_body_has_k_given_in_constructor():
@@ -75,3 +78,17 @@ def test_from_relative():
     )
     assert Earth.k == VALUECHECK.k
     assert Earth.R == VALUECHECK.R
+
+
+def test_attractor_identity_does_not_change_when_pickling(tmp_path):
+    d = tmp_path / "tmp"
+    d.mkdir()
+    f = d / "orbit.pkl"
+
+    with open(f"{f}", "wb") as fh:
+        pickle.dump(iss, fh)
+
+    with open(f"{f}", "rb") as fh:
+        iss_pickle = pickle.load(fh)
+
+    assert id(iss.attractor) == id(iss_pickle.attractor)
