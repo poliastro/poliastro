@@ -36,6 +36,7 @@ from poliastro.twobody.propagation import (
     markley,
     mikkola,
     pimienta,
+    propagate,
     vallado,
 )
 from poliastro.util import norm
@@ -388,6 +389,18 @@ def test_long_propagations_vallado_agrees_farnocchia():
     r_k, v_k = halleys.propagate(tof, method=vallado).rv()
     assert_quantity_allclose(r_mm, r_k)
     assert_quantity_allclose(v_mm, v_k)
+
+
+def test_farnocchia_propagation_very_high_ecc_does_not_fail():
+    # Regression test for #1296.
+    r = np.array([-500, 1500, 4012.09]) << u.km
+    v = np.array([5021.38, -2900.7, 1000.354]) << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r, v, epoch=time.Time("2020-01-01"))
+
+    tofs = [74] << u.s  # tof = 74s and above is the critical region.
+    coords = propagate(orbit, tofs)
+
+    assert not np.isnan(coords.get_xyz()).any()
 
 
 @st.composite
