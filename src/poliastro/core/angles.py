@@ -314,16 +314,7 @@ def M_to_F(M, ecc):
     This uses a Newton iteration on the hyperbolic Kepler equation.
 
     """
-    if ecc < 1.6:
-        if -np.pi < M < 0 or np.pi < M:
-            F0 = M - ecc
-        else:
-            F0 = M + ecc
-    else:
-        if ecc < 3.6 and np.pi < np.abs(M):
-            F0 = M - np.sign(M) * ecc
-        else:
-            F0 = M / (ecc - 1)
+    F0 = np.arcsinh(M / ecc)
     F = _newton_hyperbolic(F0, args=(M, ecc), maxiter=100)
     return F
 
