@@ -164,6 +164,20 @@ class RVState(BaseState):
     """State defined by its position and velocity vectors."""
 
     def __init__(self, attractor, r, v, plane):
+        """Constructor.
+
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        r : ~astropy.units.Quantity
+            Position vector wrt attractor center.
+        v : ~astropy.units.Quantity
+            Velocity vector.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane for the elements.
+
+        """
         super().__init__(attractor, plane)
         self._r = r
         self._v = v
