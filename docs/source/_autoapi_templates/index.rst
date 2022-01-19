@@ -17,7 +17,7 @@ core utilities and high-level ones.
   since they provide low-level utilities.
 
 * **High-level API:** All logical files included in this part define the main
-  poliastro objects such us :py:class:`poliastro.twobody.Orbit`,
+  poliastro objects such as :py:class:`poliastro.twobody.Orbit`,
   :py:class:`poliastro.maneuver.Maneuver`, and their interaction with each other.
   In their definitions, they make use of previously presented core routines
   and extend them in such a way that
