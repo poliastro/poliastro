@@ -275,6 +275,7 @@ class ModifiedEquinoctialState(BaseState):
         return self._L
 
     def to_classical(self):
+        """Converts to classical orbital elements representation."""
         p, ecc, inc, raan, argp, nu = mee2coe(
             self.p.to_value(u.km),
             self.f.to_value(u.rad),
