@@ -76,6 +76,28 @@ class ClassicalState(BaseState):
     """State defined by its classical orbital elements."""
 
     def __init__(self, attractor, p, ecc, inc, raan, argp, nu, plane):
+        """Constructor.
+
+        Parameters
+        ----------
+        attractor : Body
+            Main attractor.
+        p : ~astropy.units.Quantity
+            Semilatus rectum.
+        ecc : ~astropy.units.Quantity
+            Eccentricity.
+        inc : ~astropy.units.Quantity
+            Inclination.
+        raan : ~astropy.units.Quantity
+            Right ascension of the ascending node.
+        argp : ~astropy.units.Quantity
+            Argument of the perigee.
+        nu : ~astropy.units.Quantity
+            True anomaly.
+        plane : ~poliastro.frames.enums.Planes
+            Reference plane for the elements.
+
+        """
         super().__init__(attractor, plane)
         self._p = p
         self._ecc = ecc
