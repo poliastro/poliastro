@@ -1,2 +1,3 @@
+from poliastro.twobody.orbit.scalar import Orbit
 
-from .core import Orbit
+__all__ = ["Orbit"]
