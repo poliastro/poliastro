@@ -239,6 +239,8 @@ class RVState(BaseState):
 
 
 class ModifiedEquinoctialState(BaseState):
+    """State defined by modified equinoctial elements representation."""
+
     def __init__(self, attractor, p, f, g, h, k, L, plane):
         super().__init__(attractor, plane)
         self._p = p
