@@ -4,3 +4,7 @@ source = src
 [run]
 branch = True
 source = src
+
+[report]
+omit =
+    contrib/*
