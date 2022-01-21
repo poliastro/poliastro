@@ -4,6 +4,11 @@
 - natural dynamics propagation
 - dynamics + State-Transition-Matrix propagation
 - compute characteristic values of CR3BP
+- a test file with 4 differnt orbit types propagated and STM
+   - Lunar Gateway station NRHO
+   - Distant Retrograde Orbit
+   - Butterfly Orbit
+   - Vertical Lyapanov Orbit
 
 ## Functionality Left To Implement
 - CR3BP rotating to inertial frame convertion
