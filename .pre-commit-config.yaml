@@ -25,7 +25,8 @@ repos:
     files: |
       (?x)(
         ^src/|
-        ^tests/
+        ^tests/|
+        ^contrib/
       )
 
 - repo: https://github.com/psf/black
@@ -35,5 +36,6 @@ repos:
     files: |
       (?x)(
         ^src/|
-        ^tests/
+        ^tests/|
+        ^contrib/
       )
