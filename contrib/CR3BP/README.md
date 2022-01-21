@@ -23,3 +23,7 @@
 ## Functionality I Required Help With
 - Integration of code with astropy constants and units without breaking JIT Compilation
 - Integration of ploting with existing poliastro interactive plotter (currently in the test file I use matplotlib and mplot3d)
+
+## About Me
+I am Kevin, a Space Engineering graduate from Politecnico di Milano. I love working with mission design, flight dynamics and simulations. Most of my work was done with MATLAB and I have some experience with C++, but I am quite a noob with Python. So in case you find any error in my implementation, discussion of new functionality to add and improvement to my code, feel free to contact me through my email.
+- email : kevincharls.work@gmail.com
