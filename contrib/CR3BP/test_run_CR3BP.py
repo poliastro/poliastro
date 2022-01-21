@@ -1,3 +1,21 @@
+"""
+********************************************************************
+      Test file for implementation check of CR3BP library.
+********************************************************************
+
+Last update: 21/01/2022
+
+Description
+-----------
+Contains a few sample orbit propagations to test the CR3BP library.
+
+The orbits currently found in test file include:
+    - L2 southern NRHO (9:2 NRHO of Lunar Gateway Station)
+    - Distant Retrograde Orbit (DRO)
+    - Butterfly Orbit
+    - L2 Vertical Orbit
+"""
+
 # Testing CR3BP implementation
 
 import numpy as np
@@ -19,6 +37,29 @@ mu, kstr, lstr, tstr, vstr, nstr = getChar_CR3BP(k1,k2,r12)
 
 
 # -- Lunar Gateway Station Orbit - 9:2 NRHO
+
+"""
+The orbit is a Near-Rectilinear Halo Orbit (NRHO) around the L2 Lagragian
+point of the Earth-Moon system. The orbit presented here is a southern 
+sub-family of the L2-NRHO. This orbit is 9:2 resonant orbit currenly set
+as the candidate orbit for the Lunar Gateway Station (LOP-G). Its called 
+9:2 resonant since a spacecraft would complete 9 orbits in the NRHO for
+every 2 lunar month (slightly different from lunar orbit period).
+
+The exact orbital elements presented here are from the auther's simulations.
+The orbit states were obtained starting form guess solutions given in various
+references. A few are provided below:
+    
+Ref: White Paper: Gateway Destination Orbit Model: A Continuous 15 Year NRHO 
+    Reference Trajectory - NASA, 2019
+Ref: Strategies for Low-Thrust Transfer Design Based on Direct Collocation 
+    Techniques - Park, Howell and Folta
+
+The NRHO are subfamily of the Halo orbits. The 'Near-Rectilinear' term comes
+from the very elongated state of the orbit considering a regular Halo. Halo 
+orbits occur in all three co-linear equilibrum points L1,L2 and L3. They occur
+in a pair of variants (nothern and southern) due to symmetry of CR3BP.
+"""
 
 # 9:2 L2 souther NRHO orbit
 r0 = np.array([[1.021881345465263,0,-0.182000000000000]])
@@ -46,7 +87,23 @@ ax.set_ylabel("y-axis [nd]")
 ax.set_zlabel("z-axis [nd]")
 
 ax.plot3D(rf[:,0],rf[:,1],rf[:,2],'b')
+plt.show()
 
+
+"""
+All other orbits in this section are computed from guess solutions available
+in Grebow's Master and PhD thesis. He lists a quite detailed set of methods
+to compute most of the major periodic orbits I have presented here. All of 
+them use differntial correction methods which are not yet implemented in this
+library. 
+
+Ref: GENERATING PERIODIC ORBITS IN THE CIRCULAR RESTRICTED THREEBODY PROBLEM
+    WITH APPLICATIONS TO LUNAR SOUTH POLE COVERAGE 
+    - D.Grebow 2006 (Master thesis)
+Ref: TRAJECTORY DESIGN IN THE EARTH-MOON SYSTEM
+    AND LUNAR SOUTH POLE COVERAGE 
+    - D.Grebow 2010 (PhD desertation)
+"""
 
 
 # -- DRO orbit
@@ -79,7 +136,7 @@ ax.set_ylabel("y-axis [nd]")
 ax.set_zlabel("z-axis [nd]")
 
 ax.plot3D(rf[:,0],rf[:,1],rf[:,2],'m')
-
+plt.show()
 
 
 
@@ -112,8 +169,8 @@ ax.set_xlabel("x-axis [nd]")
 ax.set_ylabel("y-axis [nd]")
 ax.set_zlabel("z-axis [nd]")
 
-ax.plot3D(rf[:,0],rf[:,1],rf[:,2],'m')
-
+ax.plot3D(rf[:,0],rf[:,1],rf[:,2],'r')
+plt.show()
 
 
 # -- Vertical orbit
@@ -144,8 +201,8 @@ ax.set_xlabel("x-axis [nd]")
 ax.set_ylabel("y-axis [nd]")
 ax.set_zlabel("z-axis [nd]")
 
-ax.plot3D(rf[:,0],rf[:,1],rf[:,2],'m')
-
+ax.plot3D(rf[:,0],rf[:,1],rf[:,2],'g')
+plt.show()
 
 
 # -- Propage STM
