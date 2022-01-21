@@ -25,7 +25,7 @@ Ref: GENERATING PERIODIC ORBITS IN THE CIRCULAR RESTRICTED THREEBODY PROBLEM
 Ref: TRAJECTORY DESIGN IN THE EARTH-MOON SYSTEM
     AND LUNAR SOUTH POLE COVERAGE
     - D.Grebow 2010 (PhD desertation)
-    
+
 A Matlab version of the original library developed can be found in link below.
 CR3BP MATLAB Library : https://github.com/JackCrusoe47/CR3BP_MATLAB_Library
 """
