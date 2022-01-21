@@ -23,7 +23,6 @@ import numpy as np
 from astropy import units as u
 from CR3BP import getChar_CR3BP, propagate, propagateSTM
 
-
 from poliastro.bodies import Earth, Moon
 
 # Earth-Moon system properties
