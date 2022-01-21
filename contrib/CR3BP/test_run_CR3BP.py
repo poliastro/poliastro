@@ -1,220 +1,400 @@
 """
 ********************************************************************
-      Test file for implementation check of CR3BP library.
+       Circular Restricted Three-Body Problem (CR3BP) Library
 ********************************************************************
 
 Last update: 21/01/2022
 
 Description
 -----------
-Contains a few sample orbit propagations to test the CR3BP library.
+A library of functions to solve the CR3BP orbit model. Currently, the library
+provides the following functionality:
+    * CR3BP system characterisitic values computation
+    * CR3BP dynamics propagation
+    * CR3BP State Transition Matrix propagation
 
-The orbits currently found in test file include:
-    - L2 southern NRHO (9:2 NRHO of Lunar Gateway Station)
-    - Distant Retrograde Orbit (DRO)
-    - Butterfly Orbit
-    - L2 Vertical Orbit
-"""
-
-# Testing CR3BP implementation
-
-import matplotlib.pyplot as plt
-import numpy as np
-from astropy import units as u
-from CR3BP import getChar_CR3BP, propagate, propagateSTM
-from mpl_toolkits import mplot3d
-
-from poliastro.bodies import Earth, Moon
-
-# Earth-Moon system properties
-k1 = Earth.k.to(u.km ** 3 / u.s ** 2).value
-k2 = Moon.k.to(u.km ** 3 / u.s ** 2).value
-r12 = 384747.99198  # Earth-Moon distance
-
-# Compute CR3BP characterisitic values
-mu, kstr, lstr, tstr, vstr, nstr = getChar_CR3BP(k1, k2, r12)
-
-
-# -- Lunar Gateway Station Orbit - 9:2 NRHO
-
-"""
-The orbit is a Near-Rectilinear Halo Orbit (NRHO) around the L2 Lagragian
-point of the Earth-Moon system. The orbit presented here is a southern 
-sub-family of the L2-NRHO. This orbit is 9:2 resonant orbit currenly set
-as the candidate orbit for the Lunar Gateway Station (LOP-G). Its called 
-9:2 resonant since a spacecraft would complete 9 orbits in the NRHO for
-every 2 lunar month (slightly different from lunar orbit period).
-
-The exact orbital elements presented here are from the auther's simulations.
-The orbit states were obtained starting form guess solutions given in various
-references. A few are provided below:
-    
-Ref: White Paper: Gateway Destination Orbit Model: A Continuous 15 Year NRHO 
-    Reference Trajectory - NASA, 2019
-Ref: Strategies for Low-Thrust Transfer Design Based on Direct Collocation 
-    Techniques - Park, Howell and Folta
-
-The NRHO are subfamily of the Halo orbits. The 'Near-Rectilinear' term comes
-from the very elongated state of the orbit considering a regular Halo. Halo 
-orbits occur in all three co-linear equilibrum points L1,L2 and L3. They occur
-in a pair of variants (nothern and southern) due to symmetry of CR3BP.
-"""
-
-# 9:2 L2 souther NRHO orbit
-r0 = np.array([[1.021881345465263, 0, -0.182000000000000]])
-v0 = np.array([0, -0.102950816739606, 0])
-tf = 1.509263667286943
-
-# number of points to plot
-Nplt = 300
-tofs = np.linspace(0, tf, Nplt)
-
-# propagate the base trajectory
-rf, vf = propagate(mu, r0, v0, tofs, rtol=1e-11)
-
-# ploting orbit
-rf = np.array(rf)
-
-fig = plt.figure()
-ax = plt.axes(projection="3d")
-ax.set_box_aspect(
-    (np.ptp(rf[:, 0]), np.ptp(rf[:, 1]), np.ptp(rf[:, 2]))
-)  # aspect ratio is 1:1:1 in data space
-# ploting the moon
-ax.plot3D(1 - mu, 0, 0, "ok")
-ax.set_title("L2 Southern NRHO")
-ax.set_xlabel("x-axis [nd]")
-ax.set_ylabel("y-axis [nd]")
-ax.set_zlabel("z-axis [nd]")
-
-ax.plot3D(rf[:, 0], rf[:, 1], rf[:, 2], "b")
-plt.show()
-
-
-"""
-All other orbits in this section are computed from guess solutions available
-in Grebow's Master and PhD thesis. He lists a quite detailed set of methods
-to compute most of the major periodic orbits I have presented here. All of 
-them use differntial correction methods which are not yet implemented in this
-library. 
+References
+-----------
+Most of the equations implemented can be found in a wide range of litrature
+on celestial mechancis. But a major portion of the work was directly refered
+from Daniel Grebow's master and PhD thesis works. They are listed below.
 
 Ref: GENERATING PERIODIC ORBITS IN THE CIRCULAR RESTRICTED THREEBODY PROBLEM
-    WITH APPLICATIONS TO LUNAR SOUTH POLE COVERAGE 
+    WITH APPLICATIONS TO LUNAR SOUTH POLE COVERAGE
     - D.Grebow 2006 (Master thesis)
 Ref: TRAJECTORY DESIGN IN THE EARTH-MOON SYSTEM
-    AND LUNAR SOUTH POLE COVERAGE 
+    AND LUNAR SOUTH POLE COVERAGE
     - D.Grebow 2010 (PhD desertation)
+    
+A Matlab version of the original library developed can be found in link below.
+CR3BP MATLAB Library : https://github.com/JackCrusoe47/CR3BP_MATLAB_Library
 """
 
+import numpy as np
+from numba import njit as jit
 
-# -- DRO orbit
-
-# DRO orbit states
-
-r0 = np.array([0.783390492345344, 0, 0])
-v0 = np.array([0, 0.548464515316651, 0])
-tf = 3.63052604667440
-
-# number of points to plot
-Nplt = 300
-tofs = np.linspace(0, tf, Nplt)
-
-# propagate the base trajectory
-rf, vf = propagate(mu, r0, v0, tofs, rtol=1e-11)
+from poliastro._math.ivp import DOP853, solve_ivp
 
 
-# ploting orbit
-rf = np.array(rf)
+@jit
+def getChar_CR3BP(k1, k2, r12):
+    """Characteristic values for Circular Restricted Three Body Problem (CR3BP).
+    All parameters are in non-dimensional form.
 
-fig = plt.figure()
-ax = plt.axes(projection="3d")
-ax.set_box_aspect(
-    (np.ptp(rf[:, 0]), np.ptp(rf[:, 1]), np.ptp(rf[:, 2]))
-)  # aspect ratio is 1:1:1 in data space
-# ploting the moon
-ax.plot3D(1 - mu, 0, 0, "ok")
-ax.set_title("Distant Restrograde orbit (DRO)")
-ax.set_xlabel("x-axis [nd]")
-ax.set_ylabel("y-axis [nd]")
-ax.set_zlabel("z-axis [nd]")
+    Parameters
+    ----------
+    k1 : float
+        Primary body gravitational parameter.
+    k2 : float
+        Secondary body gravitational parameter.
+    r12 : float
+        mean distance between two bodies
+    Returns
+    ----------
+    mu : float
+        CR3BP mass ratio.
+    kstr : float
+        Characterisitc gravitational parameter.
+    lstr : float
+        Characterisitc length.
+    tstr : float
+        Characterisitc time.
+    vstr : float
+        Characterisitc velocity.
+    nstr : float
+        Characterisitc angular velocity.
+    """
 
-ax.plot3D(rf[:, 0], rf[:, 1], rf[:, 2], "m")
-plt.show()
+    # characteristic gravitational parameter
+    kstr = k1 + k2
 
+    # characteristic mass
+    # mstr = kstr/G
 
-# -- Butterfly orbit
+    # characteristic length
+    lstr = r12
 
-# Butterfly orbit states
+    # characteristic time
+    tstr = (lstr ** 3 / kstr) ** 0.5
 
-r0 = np.array([1.03599510774957, 0, 0.173944812752286])
-v0 = np.array([0, -0.0798042160573269, 0])
-tf = 2.78676904546834
+    # characteristic velocity
+    vstr = lstr / tstr
 
-# number of points to plot
-Nplt = 300
-tofs = np.linspace(0, tf, Nplt)
+    # characteristic angular velocity
+    nstr = (kstr / r12 ** 3) ** 0.5
 
-# propagate the base trajectory
-rf, vf = propagate(mu, r0, v0, tofs, rtol=1e-11)
+    # CR3BP mass ratio
+    mu = k2 / kstr
 
-# ploting orbit
-rf = np.array(rf)
-
-fig = plt.figure()
-ax = plt.axes(projection="3d")
-ax.set_box_aspect(
-    (np.ptp(rf[:, 0]), np.ptp(rf[:, 1]), np.ptp(rf[:, 2]))
-)  # aspect ratio is 1:1:1 in data space
-# ploting the moon
-ax.plot3D(1 - mu, 0, 0, "ok")
-ax.set_title("Butterfly orbit")
-ax.set_xlabel("x-axis [nd]")
-ax.set_ylabel("y-axis [nd]")
-ax.set_zlabel("z-axis [nd]")
-
-ax.plot3D(rf[:, 0], rf[:, 1], rf[:, 2], "r")
-plt.show()
-
-
-# -- Vertical orbit
-
-# Vertical orbit states
-
-r0 = np.array([0.504689989562366, 0, 0.836429774762193])
-v0 = np.array([0, 0.552722840538063, 0])
-tf = 6.18448756121754
-
-# number of points to plot
-Nplt = 300
-tofs = np.linspace(0, tf, Nplt)
-
-# propagate the base trajectory
-rf, vf = propagate(mu, r0, v0, tofs, rtol=1e-11)
-
-# ploting orbit
-rf = np.array(rf)
-
-fig = plt.figure()
-ax = plt.axes(projection="3d")
-ax.set_box_aspect(
-    (np.ptp(rf[:, 0]), np.ptp(rf[:, 1]), np.ptp(rf[:, 2]))
-)  # aspect ratio is 1:1:1 in data space
-# ploting the moon
-ax.plot3D(1 - mu, 0, 0, "ok")
-ax.set_title("L2 Vertical orbit")
-ax.set_xlabel("x-axis [nd]")
-ax.set_ylabel("y-axis [nd]")
-ax.set_zlabel("z-axis [nd]")
-
-ax.plot3D(rf[:, 0], rf[:, 1], rf[:, 2], "g")
-plt.show()
+    return mu, kstr, lstr, tstr, vstr, nstr
 
 
-# -- Propage STM
+@jit
+def getJacobian_CR3BP(u_, mu):
+    """Compute state matrix A of Circular Restricted Three Body Problem (CR3BP).
+    All parameters are in non-dimensional form.
 
-# propagate base trajectory with state-transition-matrix
-STM0 = np.eye(6)
-rf, vf, STM = propagateSTM(mu, r0, v0, STM0, tofs, rtol=1e-11)
+    Parameters
+    ----------
+    u_ : numpy.ndarray
+        Six component state vector [rx, ry, rz, vx, vy, vz] (nd).
+    mu : float
+        CR3BP mass ratio (m2/(m1+m2))
+    """
+    rx, ry, rz, vx, vy, vz = u_
 
-# STM is a matrix of partial derivatives which are used in Newton-Raphson
-# methods for trajectory design
+    # distance to primary body
+    r13 = ((rx + mu) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    # distance to secondary body
+    r23 = ((rx - (1 - mu)) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+
+    # computing velocity square
+    v2 = vx ** 2 + vy ** 2 + vz ** 2
+
+    # compute Jacobi constant for trajectory
+    C = (rx ** 2 + ry ** 2) + 2 * (1 - mu) / r13 + 2 * mu / r23 - v2
+
+    return C
+
+
+@jit
+def getUdiff_CR3BP(r_, mu):
+    """Compute Hetian of pseudo-potential of Circular Restricted Three Body
+    Problem (CR3BP).
+    All parameters are in non-dimensional form.
+
+    Parameters
+    ----------
+    r_ : numpy.ndarray
+        Three component position vector [rx, ry, rz] (nd).
+    mu : float
+        CR3BP mass ratio (m2/(m1+m2))
+    """
+
+    # extracting components of position
+    rx, ry, rz = r_
+
+    # distance to primary body
+    r13 = ((rx + mu) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    # distance to secondary body
+    r23 = ((rx - (1 - mu)) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+
+    # computing the double derivates with position
+    Uxx = 1 - (1 - mu) / r13 ** 3 - mu / r23 ** 3
+    +3 * (1 - mu) * (rx + mu) ** 2 / r13 ** 5 + 3 * mu * (rx + mu - 1) ** 2 / r23 ** 5
+    Uyy = 1 - (1 - mu) / r13 ** 3 - mu / r23 ** 3 + 3 * (1 - mu) * ry ** 2 / r13 ** 5
+    +3 * mu * ry ** 2 / r23 ** 5
+    Uzz = -(1 - mu) / r13 ** 3 - mu / r23 ** 3 + 3 * (1 - mu) * rz ** 2 / r13 ** 5
+    +3 * mu * rz ** 2 / r23 ** 5
+    Uxy = (
+        3 * ry * (1 - mu) * (rx + mu) / r13 ** 5
+        + 3 * ry * mu * (rx - (1 - mu)) / r23 ** 5
+    )
+    Uxz = (
+        3 * rz * (1 - mu) * (rx + mu) / r13 ** 5
+        + 3 * rz * mu * (rx - (1 - mu)) / r23 ** 5
+    )
+    Uyz = 3 * ry * rz * (1 - mu) / r13 ** 5 + 3 * ry * rz * mu / r23 ** 5
+
+    # exploiting the symmetry
+    Uyx = Uxy
+    Uzx = Uxz
+    Uzy = Uyz
+
+    # final Hetian matrix
+    Udiff = np.array([[Uxx, Uxy, Uxz], [Uyx, Uyy, Uyz], [Uzx, Uzy, Uzz]])
+
+    return Udiff
+
+
+@jit
+def getA_CR3BP(r_, mu):
+    """Compute state matrix A of Circular Restricted Three Body Problem (CR3BP).
+    All parameters are in non-dimensional form.
+
+    Parameters
+    ----------
+    r_ : numpy.ndarray
+        Three component position vector [rx, ry, rz] (nd).
+    mu : float
+        CR3BP mass ratio (m2/(m1+m2))
+    """
+
+    # Compute Hetian of psuedo-potential function(U)
+    Udiff = getUdiff_CR3BP(r_, mu)
+
+    # intialize A matrix
+    A = np.zeros((6, 6))
+
+    # adding upper left zeros
+    A[0:3, 0:3] = np.zeros((3, 3))
+    # adding upper right identity matrix
+    A[0:3, 3:6] = np.ones((3, 3))
+    # adding lower left hetian of pseudo-potential
+    A[3:6, 0:3] = Udiff
+    # adding lower right Omega matrix
+    A[3:6, 3:6] = np.array([[0, 2, 0], [-2, 0, 0], [0, 0, 0]])
+
+    return A
+
+
+@jit
+def func_CR3BP(t, u_, mu):
+    """Differential equation for the initial value Circular Restricted Three
+    Body Problem (CR3BP).
+    All parameters are in non-dimensional form.
+
+    Parameters
+    ----------
+    t  : float
+        Time (nd).
+    u_ : numpy.ndarray
+        Six component state vector [rx, ry, rz, vx, vy, vz] (nd).
+    mu : float
+        CR3BP mass ratio (m2/(m1+m2))
+    """
+
+    # extracting states
+    rx, ry, rz, vx, vy, vz = u_
+
+    # distance to primary body
+    r13 = ((rx + mu) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    # distance to secondary body
+    r23 = ((rx - (1 - mu)) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+
+    # computing three-body dyamics
+    r_dot = np.array([vx, vy, vz])
+    v_dot = np.array(
+        [
+            rx
+            + 2 * vy
+            - (1 - mu) * (rx + mu) / (r13 ** 3)
+            - mu * (rx - 1 + mu) / (r23 ** 3),
+            ry - 2 * vx - (1 - mu) * ry / (r13 ** 3) - mu * ry / (r23 ** 3),
+            -(1 - mu) * rz / (r13 ** 3) - mu * rz / (r23 ** 3),
+        ]
+    )
+
+    # state derivatives
+    du = np.append(r_dot, v_dot)
+
+    return du
+
+
+@jit
+def func_STM(t, u_, mu):
+
+    # extract STM from dynamics vector 6:42 elements
+    STM = u_[6:].reshape(6, 6)  # reshaped to a 6x6 matrix
+
+    # get A matrix
+    A = getA_CR3BP(u_[:3], mu)
+
+    # compute STM derivatie
+    STMdot = A @ STM
+
+    # convert derivative matrix to a vector
+    du = STMdot.reshape(1, 36)
+
+    return du
+
+
+@jit
+def func_CR3BP_STM(t, u_, mu):
+    """Differential equation for the initial value Circular Restricted Three
+    Body Problem (CR3BP) with State Transition Matrix Propagation.
+    All parameters are in non-dimensional form.
+
+    Parameters
+    ----------
+    t  : float
+        Time (nd).
+    u_ : numpy.ndarray
+        42 component vector [state + STM] (nd).
+    mu : float
+        CR3BP mass ratio (m2/(m1+m2))
+    """
+
+    # compute CR3BP state dynamics
+    du_state = func_CR3BP(t, u_[0:6], mu)
+
+    # compute CR3BP STM dynamics
+    du_STM = func_STM(t, u_, mu)
+
+    # full derivative vector
+    du = np.append(du_state, du_STM)
+
+    return du
+
+
+def propagate(mu, r0, v0, tofs, rtol=1e-11, f=func_CR3BP):
+    """Propagate an CR3BP orbit some time and return the result.
+
+    Parameters
+    ----------
+    mu : float
+        CR3BP mass ratio (nd)
+    r0 : numpy.ndarray
+        Position vector (nd).
+    v0 : numpy.ndarray
+        Velocity vector (nd).
+    tofs : numpy.ndarray
+        Array of times to propagate (nd).
+    rtol : float, optional
+        Maximum relative error permitted, defaults to 1e-11.
+    f : function(t0, u, k), optional
+        Objective function, default to natural CR3BP modell.
+
+    Returns
+    -------
+    rr : numpy.ndarray
+        Propagated position vectors (nd).
+    vv : numpy.ndarray
+        Propagated velocity vectors (nd).
+    """
+
+    u0 = np.append(r0, v0)
+
+    result = solve_ivp(
+        f,
+        (0, max(tofs)),
+        u0,
+        args=(mu,),
+        rtol=rtol,
+        atol=1e-12,
+        method=DOP853,
+        dense_output=True,
+    )
+
+    if not result.success:
+        raise RuntimeError("Integration failed")
+
+    rrs = []
+    vvs = []
+    for i in range(len(tofs)):
+        t = tofs[i]
+        y = result.sol(t)
+        rrs.append(y[:3])
+        vvs.append(y[3:])
+
+    return rrs, vvs
+
+
+def propagateSTM(mu, r0, v0, STM0, tofs, rtol=1e-11, f=func_CR3BP_STM):
+    """Propagate an CR3BP orbit with STM some time and return the result.
+
+    Parameters
+    ----------
+    mu : float
+        CR3BP mass ratio (nd)
+    r0 : numpy.ndarray
+        Position vector (nd).
+    v0 : numpy.ndarray
+        Velocity vector (nd).
+    STM0 : numpy.ndarray
+        6x6 intial STM matrix (nd)
+    tofs : numpy.ndarray
+        Array of times to propagate (nd).
+    rtol : float, optional
+        Maximum relative error permitted, defaults to 1e-11.
+    f : function(t0, u, k), optional
+        Objective function, default to natural CR3BP modell.
+
+    Returns
+    -------
+    rr : numpy.ndarray
+        Propagated position vectors (nd).
+    vv : numpy.ndarray
+        Propagated velocity vectors (nd).
+    STM : numpy.ndarray
+        Propagated STM matrix (nd)
+    """
+
+    u0 = np.append(r0, v0)
+    u0 = np.append(u0, STM0.reshape(1, 36))
+
+    result = solve_ivp(
+        f,
+        (0, max(tofs)),
+        u0,
+        args=(mu,),
+        rtol=rtol,
+        atol=1e-12,
+        method=DOP853,
+        dense_output=True,
+    )
+
+    if not result.success:
+        raise RuntimeError("Integration failed")
+
+    rrs = []
+    vvs = []
+    STMs = []
+    for i in range(len(tofs)):
+        t = tofs[i]
+        y = result.sol(t)
+        rrs.append(y[:3])
+        vvs.append(y[3:6])
+        STMs.append(y[6:].reshape(6, 6))
+
+    return rrs, vvs, STMs
