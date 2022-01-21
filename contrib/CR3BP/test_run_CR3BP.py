@@ -39,23 +39,23 @@ mu, kstr, lstr, tstr, vstr, nstr = getChar_CR3BP(k1, k2, r12)
 
 """
 The orbit is a Near-Rectilinear Halo Orbit (NRHO) around the L2 Lagragian
-point of the Earth-Moon system. The orbit presented here is a southern 
+point of the Earth-Moon system. The orbit presented here is a southern
 sub-family of the L2-NRHO. This orbit is 9:2 resonant orbit currenly set
-as the candidate orbit for the Lunar Gateway Station (LOP-G). Its called 
+as the candidate orbit for the Lunar Gateway Station (LOP-G). Its called
 9:2 resonant since a spacecraft would complete 9 orbits in the NRHO for
 every 2 lunar month (slightly different from lunar orbit period).
 
 The exact orbital elements presented here are from the auther's simulations.
 The orbit states were obtained starting form guess solutions given in various
 references. A few are provided below:
-    
-Ref: White Paper: Gateway Destination Orbit Model: A Continuous 15 Year NRHO 
+
+Ref: White Paper: Gateway Destination Orbit Model: A Continuous 15 Year NRHO
     Reference Trajectory - NASA, 2019
-Ref: Strategies for Low-Thrust Transfer Design Based on Direct Collocation 
+Ref: Strategies for Low-Thrust Transfer Design Based on Direct Collocation
     Techniques - Park, Howell and Folta
 
 The NRHO are subfamily of the Halo orbits. The 'Near-Rectilinear' term comes
-from the very elongated state of the orbit considering a regular Halo. Halo 
+from the very elongated state of the orbit considering a regular Halo. Halo
 orbits occur in all three co-linear equilibrum points L1,L2 and L3. They occur
 in a pair of variants (nothern and southern) due to symmetry of CR3BP.
 """
@@ -94,15 +94,15 @@ plt.show()
 """
 All other orbits in this section are computed from guess solutions available
 in Grebow's Master and PhD thesis. He lists a quite detailed set of methods
-to compute most of the major periodic orbits I have presented here. All of 
+to compute most of the major periodic orbits I have presented here. All of
 them use differntial correction methods which are not yet implemented in this
-library. 
+library.
 
 Ref: GENERATING PERIODIC ORBITS IN THE CIRCULAR RESTRICTED THREEBODY PROBLEM
-    WITH APPLICATIONS TO LUNAR SOUTH POLE COVERAGE 
+    WITH APPLICATIONS TO LUNAR SOUTH POLE COVERAGE
     - D.Grebow 2006 (Master thesis)
 Ref: TRAJECTORY DESIGN IN THE EARTH-MOON SYSTEM
-    AND LUNAR SOUTH POLE COVERAGE 
+    AND LUNAR SOUTH POLE COVERAGE
     - D.Grebow 2010 (PhD desertation)
 """
 
