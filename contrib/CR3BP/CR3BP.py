@@ -1,3 +1,35 @@
+"""
+********************************************************************
+       Circular Restricted Three-Body Problem (CR3BP) Library
+********************************************************************
+
+Last update: 21/01/2022
+
+Description
+-----------
+A library of functions to solve the CR3BP orbit model. Currently, the library
+provides the following functionality:
+    * CR3BP system characterisitic values computation
+    * CR3BP dynamics propagation
+    * CR3BP State Transition Matrix propagation
+    
+References
+-----------
+Most of the equations implemented can be found in a wide range of litrature 
+on celestial mechancis. But a major portion of the work was directly refered 
+from Daniel Grebow's master and PhD thesis works. They are listed below.
+
+Ref: GENERATING PERIODIC ORBITS IN THE CIRCULAR RESTRICTED THREEBODY PROBLEM
+    WITH APPLICATIONS TO LUNAR SOUTH POLE COVERAGE 
+    - D.Grebow 2006 (Master thesis)
+Ref: TRAJECTORY DESIGN IN THE EARTH-MOON SYSTEM
+    AND LUNAR SOUTH POLE COVERAGE 
+    - D.Grebow 2010 (PhD desertation)
+    
+A Matlab version of the original library developed can be found in link below.    
+CR3BP MATLAB Library : https://github.com/JackCrusoe47/CR3BP_MATLAB_Library
+"""
+
 import numpy as np
 from numba import njit as jit
 
