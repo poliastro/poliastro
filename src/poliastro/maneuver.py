@@ -163,7 +163,7 @@ class Maneuver:
         )
 
     @classmethod
-    def lambert(cls, orbit_i, orbit_f, method=lambert_izzo, short=True, **kwargs):
+    def lambert(cls, orbit_i, orbit_f, method=lambert_izzo, **kwargs):
         """Computes Lambert maneuver between two different points.
 
         Parameters
@@ -174,12 +174,10 @@ class Maneuver:
             Final orbit
         method : function
             Method for solving Lambert's problem
-        short : bool
-            Selects between short and long solution
         **kwargs
             Extra kwargs for Lambert method.
-
         """
+
         # Get initial algorithm conditions
         k = orbit_i.attractor.k
         r_i = orbit_i.r
@@ -194,10 +192,7 @@ class Maneuver:
             )
 
         # Compute all possible solutions to the Lambert transfer
-        sols = list(method(k, r_i, r_f, tof, **kwargs))
-
-        # Return short or long solution
-        dv_a, dv_b = sols[0] if short else sols[-1]
+        dv_a, dv_b = method(k, r_i, r_f, tof, **kwargs)
 
         return cls(
             (0 * u.s, (dv_a - orbit_i.v).decompose()),

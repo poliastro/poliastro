@@ -7,7 +7,7 @@ from poliastro._math.special import hyp2f1b, stumpff_c2 as c2, stumpff_c3 as c3
 
 
 @jit
-def vallado(k, r0, r, tof, short, numiter, rtol):
+def vallado(k, r0, r, tof, M, prograde, lowpath, numiter, rtol):
     r"""Solves the Lambert's problem.
 
     The algorithm returns the initial velocity vector and the final one, these are
@@ -57,10 +57,15 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
         Initial position vector
     r : numpy.ndarray
         Final position vector
-    short : bool
-        True for short path, False for long one.
     tof : ~float
         Time of flight
+    M : int
+        Number of revolutions
+    prograde: boolean
+        Controls the desired inclination of the transfer orbit.
+    lowpath: boolean
+        If `True` or `False`, gets the transfer orbit whose vacant focus is
+        below or above the chord line, respectively.
     numiter : int
         Number of iterations to
     rtol : int
@@ -83,7 +88,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     >>> r1 = np.array([5000, 10000, 2100]) * u.km # Initial position vector
     >>> r2 = np.array([-14600, 2500, 7000]) * u.km # Final position vector
     >>> tof = 3600 * u.s # Time of flight
-    >>> v1, v2 = vallado(k.value, r1.value, r2.value, tof.value, short=True, numiter=35, rtol=1e-8)
+    >>> v1, v2 = vallado(k.value, r1.value, r2.value, tof.value, M=0, prograde=True, lowpath=True, numiter=35, rtol=1e-8)
     >>> v1 = v1 * u.km / u.s
     >>> v2 = v2 * u.km / u.s
     >>> print(v1, v2)
@@ -96,7 +101,15 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
     in the same book under name Example 5.2.
 
     """
-    t_m = 1 if short else -1
+
+    # TODO: expand for the multi-revolution case.
+    # Issue: https://github.com/poliastro/poliastro/issues/858
+    if M > 0:
+        raise NotImplementedError(
+            "Multi-revolution scenario not supported for Vallado. See issue https://github.com/poliastro/poliastro/issues/858"
+        )
+
+    t_m = 1 if prograde else -1
 
     norm_r0 = norm(r0)
     norm_r = norm(r)
@@ -158,7 +171,7 @@ def vallado(k, r0, r, tof, short, numiter, rtol):
 
 
 @jit
-def izzo(k, r1, r2, tof, M, numiter, rtol):
+def izzo(k, r1, r2, tof, M, prograde, lowpath, numiter, rtol):
     """Aplies izzo algorithm to solve Lambert's problem.
 
     Parameters
@@ -173,6 +186,11 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
         Time of flight between both positions
     M : int
         Number of revolutions
+    prograde: boolean
+        Controls the desired inclination of the transfer orbit.
+    lowpath: boolean
+        If `True` or `False`, gets the transfer orbit whose vacant focus is
+        below or above the chord line, respectively.
     numiter : int
         Number of iterations
     rtol : float
@@ -210,30 +228,35 @@ def izzo(k, r1, r2, tof, M, numiter, rtol):
     # Geometry of the problem
     ll = np.sqrt(1 - min(1.0, c_norm / s))
 
+    # Compute the fundamental tangential directions
     if i_h[2] < 0:
         ll = -ll
-        i_h = -i_h
+        i_t1, i_t2 = cross(i_r1, i_h), cross(i_r2, i_h)
+    else:
+        i_t1, i_t2 = cross(i_h, i_r1), cross(i_h, i_r2)
 
-    i_t1, i_t2 = cross(i_h, i_r1), cross(i_h, i_r2)  # Fixed from paper
+    # Correct transfer angle parameter and tangential vectors if required
+    ll, i_t1, i_t2 = (ll, i_t1, i_t2) if prograde else (-ll, -i_t1, -i_t2)
 
     # Non dimensional time of flight
     T = np.sqrt(2 * k / s ** 3) * tof
 
     # Find solutions
-    xy = _find_xy(ll, T, M, numiter, rtol)
+    x, y = _find_xy(ll, T, M, numiter, lowpath, rtol)
 
     # Reconstruct
     gamma = np.sqrt(k * s / 2)
     rho = (r1_norm - r2_norm) / c_norm
     sigma = np.sqrt(1 - rho ** 2)
 
-    for x, y in xy:
-        V_r1, V_r2, V_t1, V_t2 = _reconstruct(
-            x, y, r1_norm, r2_norm, ll, gamma, rho, sigma
-        )
-        v1 = V_r1 * i_r1 + V_t1 * i_t1
-        v2 = V_r2 * i_r2 + V_t2 * i_t2
-        yield v1, v2
+    # Compute the radial and tangential components at r0 and r
+    V_r1, V_r2, V_t1, V_t2 = _reconstruct(x, y, r1_norm, r2_norm, ll, gamma, rho, sigma)
+
+    # Solve for the initial and final velocity
+    v1 = V_r1 * (r1 / r1_norm) + V_t1 * i_t1
+    v2 = V_r2 * (r2 / r2_norm) + V_t2 * i_t2
+
+    return v1, v2
 
 
 @jit
@@ -247,7 +270,7 @@ def _reconstruct(x, y, r1, r2, ll, gamma, rho, sigma):
 
 
 @jit
-def _find_xy(ll, T, M, numiter, rtol):
+def _find_xy(ll, T, M, numiter, lowpath, rtol):
     """Computes all x, y for given number of revolutions."""
     # For abs(ll) == 1 the derivative is not continuous
     assert abs(ll) < 1
@@ -268,12 +291,13 @@ def _find_xy(ll, T, M, numiter, rtol):
         raise ValueError("No feasible solution, try lower M")
 
     # Initial guess
-    for x_0 in _initial_guess(T, ll, M):
-        # Start Householder iterations from x_0 and find x, y
-        x = _householder(x_0, T, ll, M, rtol, numiter)
-        y = _compute_y(x, ll)
+    x_0 = _initial_guess(T, ll, M, lowpath)
 
-        yield x, y
+    # Start Householder iterations from x_0 and find x, y
+    x = _householder(x_0, T, ll, M, rtol, numiter)
+    y = _compute_y(x, ll)
+
+    return x, y
 
 
 @jit
@@ -366,7 +390,7 @@ def _compute_T_min(ll, M, numiter, rtol):
 
 
 @jit
-def _initial_guess(T, ll, M):
+def _initial_guess(T, ll, M, lowpath):
     """Initial guess."""
     if M == 0:
         # Single revolution
@@ -384,7 +408,7 @@ def _initial_guess(T, ll, M):
             # See https://github.com/poliastro/poliastro/issues/1362
             x_0 = np.exp(np.log(2) * np.log(T / T_0) / np.log(T_1 / T_0)) - 1
 
-        return [x_0]
+        return x_0
     else:
         # Multiple revolution
         x_0l = (((M * pi + pi) / (8 * T)) ** (2 / 3) - 1) / (
@@ -394,7 +418,14 @@ def _initial_guess(T, ll, M):
             ((8 * T) / (M * pi)) ** (2 / 3) + 1
         )
 
-        return [x_0l, x_0r]
+        # Select one of the solutions according to desired type of path
+        x_0 = (
+            np.max(np.array([x_0l, x_0r]))
+            if lowpath
+            else np.min(np.array([x_0l, x_0r]))
+        )
+
+        return x_0
 
 
 @jit
