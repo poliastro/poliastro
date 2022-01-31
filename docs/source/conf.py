@@ -366,6 +366,7 @@ nbsphinx_thumbnails = {
     'examples/Generating orbit groundtracks': '_static/thumbnails/groundtrack.png',
     'examples/Detecting Events': '_static/thumbnails/eclipse.png',
     'examples/Loading OMM and TLE satellite data': '_static/thumbnails/omm_debris.png',
+    'examples/Multirevolutions solution in Lamberts problem': '_static/thumbnails/lambert_paths.png',
 }
 
 # Custom nbsphinx format for Jupytext markdown notebooks

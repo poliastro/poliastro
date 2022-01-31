@@ -93,7 +93,7 @@ fig
 T_ref = 1
 ll_ref = 0
 
-(x_ref, _), = iod._find_xy(ll_ref, T_ref, 0, 10, 1e-8)
+x_ref, _ = iod._find_xy(ll_ref, T_ref, M=0, numiter=10, lowpath=True, rtol=1e-8)
 x_ref
 ```
 
@@ -122,7 +122,7 @@ tof = 76.0 * u.min
 expected_va = [2.058925, 2.915956, 0.0] * u.km / u.s
 expected_vb = [-3.451569, 0.910301, 0.0] * u.km / u.s
 
-(v0, v), = izzo.lambert(k, r0, r, tof)
+v0, v = izzo.lambert(k, r0, r, tof)
 v
 ```
 
@@ -135,7 +135,7 @@ tof = 1.0 * u.h
 expected_va = [-5.9925, 1.9254, 3.2456] * u.km / u.s
 expected_vb = [-3.3125, -4.1966, -0.38529] * u.km / u.s
 
-(v0, v), = izzo.lambert(k, r0, r, tof)
+v0, v = izzo.lambert(k, r0, r, tof)
 v
 ```
 
@@ -158,12 +158,13 @@ expected_vb_r = [-5.53841370, 0.01822220, 5.49641054] * u.km / u.s
 ```
 
 ```{code-cell} ipython3
-(v0, v), = izzo.lambert(k, r0, r, tof, M=0)
+v0, v = izzo.lambert(k, r0, r, tof, M=0)
 v
 ```
 
 ```{code-cell} ipython3
-(_, v_l), (_, v_r) = izzo.lambert(k, r0, r, tof, M=1)
+_, v_l = izzo.lambert(k, r0, r, tof, M=1, lowpath=True)
+_, v_r = izzo.lambert(k, r0, r, tof, M=1, lowpath=False)
 ```
 
 ```{code-cell} ipython3

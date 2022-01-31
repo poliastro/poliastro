@@ -137,7 +137,7 @@ nh_tof = nh_flyby_date - nh_date
 nh_r_0, v_earth = Ephem.from_body(Earth, nh_date).rv(nh_date)
 nh_r_f, v_jup = Ephem.from_body(Jupiter, nh_flyby_date).rv(nh_flyby_date)
 
-(nh_v_0, nh_v_f), = iod.lambert(Sun.k, nh_r_0, nh_r_f, nh_tof)
+nh_v_0, nh_v_f = iod.lambert(Sun.k, nh_r_0, nh_r_f, nh_tof)
 ```
 
 The hyperbolic excess velocity is measured with respect to the Earth:
