@@ -17,7 +17,7 @@ def test_vallado75(lambert):
     expected_va = [2.058925, 2.915956, 0.0] * u.km / u.s
     expected_vb = [-3.451569, 0.910301, 0.0] * u.km / u.s
 
-    va, vb = next(lambert(k, r0, r, tof))
+    va, vb = lambert(k, r0, r, tof)
     assert_quantity_allclose(va, expected_va, rtol=1e-5)
     assert_quantity_allclose(vb, expected_vb, rtol=1e-4)
 
@@ -32,7 +32,7 @@ def test_curtis52(lambert):
     expected_va = [-5.9925, 1.9254, 3.2456] * u.km / u.s
     expected_vb = [-3.3125, -4.1966, -0.38529] * u.km / u.s
 
-    va, vb = next(lambert(k, r0, r, tof))
+    va, vb = lambert(k, r0, r, tof)
     assert_quantity_allclose(va, expected_va, rtol=1e-4)
     assert_quantity_allclose(vb, expected_vb, rtol=1e-4)
 
@@ -48,7 +48,7 @@ def test_curtis53(lambert):
     # ERRATA: j component is positive
     expected_va = [-2.4356, 0.26741, 0.0] * u.km / u.s
 
-    va, vb = next(lambert(k, r0, r, tof, numiter=numiter))
+    va, vb = lambert(k, r0, r, tof, numiter=numiter)
     assert_quantity_allclose(va, expected_va, rtol=1e-4)
 
 
@@ -62,7 +62,7 @@ def test_molniya_der_zero_full_revolution(lambert):
     expected_va = [2.000652697, 0.387688615, -2.666947760] * u.km / u.s
     expected_vb = [-3.79246619, -1.77707641, 6.856814395] * u.km / u.s
 
-    va, vb = next(lambert(k, r0, r, tof, M=0))
+    va, vb = lambert(k, r0, r, tof, M=0)
     assert_quantity_allclose(va, expected_va, rtol=1e-6)
     assert_quantity_allclose(vb, expected_vb, rtol=1e-6)
 
@@ -80,7 +80,8 @@ def test_molniya_der_one_full_revolution(lambert):
     expected_va_r = [-2.45759553, 1.16945801, 0.43161258] * u.km / u.s
     expected_vb_r = [-5.53841370, 0.01822220, 5.49641054] * u.km / u.s
 
-    (va_l, vb_l), (va_r, vb_r) = lambert(k, r0, r, tof, M=1)
+    va_l, vb_l = lambert(k, r0, r, tof, M=1, lowpath=False)
+    va_r, vb_r = lambert(k, r0, r, tof, M=1, lowpath=True)
 
     assert_quantity_allclose(va_l, expected_va_l, rtol=1e-5)
     assert_quantity_allclose(vb_l, expected_vb_l, rtol=1e-5)
@@ -96,7 +97,7 @@ def test_raises_exception_for_non_feasible_solution(lambert):
     tof = 5 * u.h
 
     with pytest.raises(ValueError) as excinfo:
-        next(lambert(k, r0, r, tof, M=1))
+        lambert(k, r0, r, tof, M=1)
     assert "ValueError: No feasible solution, try lower M" in excinfo.exconly()
 
 
@@ -108,7 +109,7 @@ def test_collinear_vectors_input(lambert):
     tof = 5 * u.h
 
     with pytest.raises(ValueError) as excinfo:
-        next(lambert(k, r0, r, tof, M=0))
+        lambert(k, r0, r, tof, M=0)
     assert (
         "ValueError: Lambert solution cannot be computed for collinear vectors"
         in excinfo.exconly()
@@ -136,8 +137,8 @@ def test_issue840(lambert_vallado, lambert_izzo):
     expected_va = [0.36591277, 5.8228806, 0.0] * u.km / u.s
     expected_vb = [3.99397599, 4.78236576, 0.0] * u.km / u.s
 
-    va_v, vb_v = next(lambert_vallado(k, r0, rf, tof, short=False))
-    va_i, vb_i = next(lambert_izzo(k, r0, rf, tof))
+    va_v, vb_v = lambert_vallado(k, r0, rf, tof, prograde=False)
+    va_i, vb_i = lambert_izzo(k, r0, rf, tof)
 
     assert_quantity_allclose(va_v, expected_va, rtol=1e-6)
     assert_quantity_allclose(vb_v, expected_vb, rtol=1e-6)
@@ -155,8 +156,22 @@ def test_issue1362(lambert_vallado, lambert_izzo):
     rf = [-6.15200041e06, -3.91985660e08, -5.06520860e05] * u.km
     tof = 3489390.108265222 * u.s
 
-    va_v, vb_v = next(lambert_vallado(k, r0, rf, tof))
-    va_i, vb_i = next(lambert_izzo(k, r0, rf, tof))
+    va_v, vb_v = lambert_vallado(k, r0, rf, tof)
+    va_i, vb_i = lambert_izzo(k, r0, rf, tof)
 
     assert_quantity_allclose(va_v, va_i, rtol=1e-6)
     assert_quantity_allclose(vb_v, vb_i, rtol=1e-6)
+
+
+def test_vallado_not_implemented_multirev():
+    k = 1.0 * u.m ** 3 / u.s ** 2
+    r0 = [1, 0, 0] * u.m
+    r = [0, 1, 0] * u.m
+    tof = 1 * u.s
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        vallado.lambert(k, r0, r, tof, M=1)
+    assert (
+        "Multi-revolution scenario not supported for Vallado. See issue https://github.com/poliastro/poliastro/issues/858"
+        in excinfo.exconly()
+    )
