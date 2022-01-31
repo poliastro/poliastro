@@ -104,7 +104,7 @@ from poliastro import iod
 ```
 
 ```{code-cell} ipython3
-((v0, v1_pre),) = iod.lambert(Sun.k, r0, r1, tof.to(u.s))
+v0, v1_pre = iod.lambert(Sun.k, r0, r1, tof.to(u.s))
 ```
 
 ```{code-cell} ipython3
