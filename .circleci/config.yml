@@ -7,7 +7,7 @@ jobs:
     environment:
       PIP_PREFER_BINARY: true
       PIP_PROGRESS_BAR: "off"
-      TOXENV: quality
+      TOXENV: check
     steps:
       - checkout
       - run: python -m pip install tox
