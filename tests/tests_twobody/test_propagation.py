@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 import pytest
 from astropy import time, units as u
@@ -440,7 +438,6 @@ def test_propagation_sets_proper_epoch():
     assert propagated.epoch == expected_epoch
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_sample_custom_body_raises_warning_and_returns_coords():
     # See https://github.com/poliastro/poliastro/issues/649
     orbit = Orbit.circular(Moon, 100 * u.km)
