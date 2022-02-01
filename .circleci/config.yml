@@ -1,0 +1,85 @@
+version: 2.1
+
+jobs:
+  quality: &test-template
+    docker:
+      - image: python:3.8
+    environment:
+      PIP_PREFER_BINARY: true
+      PIP_PROGRESS_BAR: "off"
+      TOXENV: quality
+    steps:
+      - checkout
+      - run: python -m pip install tox
+      - run: tox
+
+  py38-fast:
+    <<: *test-template
+    environment:
+      TOXENV: py38-fast
+
+  py38-online:
+    <<: *test-template
+    environment:
+      TOXENV: py38-online
+
+  py38-slow:
+    <<: *test-template
+    environment:
+      TOXENV: py38-slow
+
+  py38-images:
+    <<: *test-template
+    environment:
+      TOXENV: py38-images
+
+  py38-coverage:
+    <<: *test-template
+    environment:
+      TOXENV: py38-coverage
+    steps:
+      - checkout
+      - run: python -m pip install tox
+      - run: tox
+      - run: python -m pip install codecov && codecov
+
+  py39:
+    <<: *test-template
+    docker:
+      - image: python:3.9
+    environment:
+      TOXENV: py39
+
+  py310:
+    <<: *test-template
+    docker:
+      - image: python:3.10
+    environment:
+      TOXENV: py310
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - quality
+      - py38-fast:
+          requires:
+            - quality
+      - py38-online:
+          requires:
+            - quality
+      - py38-slow:
+          requires:
+            - quality
+      - py38-images:
+          requires:
+            - quality
+      - py38-coverage:
+          requires:
+            - quality
+      - py39:
+          requires:
+            - quality
+      - py310:
+          requires:
+            - quality
