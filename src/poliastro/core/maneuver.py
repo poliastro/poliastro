@@ -37,7 +37,7 @@ def hohmann(k, rv, r_f):
     rv : numpy.ndarray, numpy.ndarray
         Position and velocity vectors
     r_f : float
-        Final altitude of the orbit
+        Final orbital radius
 
     """
     _, ecc, inc, raan, argp, nu = rv2coe(k, *rv)
@@ -105,7 +105,7 @@ def bielliptic(k, r_b, r_f, rv):
     r_b : float
         Altitude of the intermediate orbit
     r_f : float
-        Final altitude of the orbit
+        Final orbital radius
     rv : numpy.ndarray, numpy.ndarray
         Position and velocity vectors
 
