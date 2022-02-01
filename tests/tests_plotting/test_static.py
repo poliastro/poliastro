@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation

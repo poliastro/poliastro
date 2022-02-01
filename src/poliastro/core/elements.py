@@ -2,6 +2,8 @@
 convert between different elements that define the orbit of a body.
 """
 
+import sys
+
 import numpy as np
 from numba import njit as jit, prange
 from numpy import cos, cross, sin, sqrt
@@ -185,7 +187,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     return ijk
 
 
-@jit(parallel=True)
+@jit(parallel=sys.maxsize > 2 ** 31)
 def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
 
     n = nu.shape[0]
