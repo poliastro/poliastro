@@ -3,7 +3,6 @@ convert between different elements that define the orbit of a body.
 """
 
 import sys
-
 import numpy as np
 from numba import njit as jit, prange
 from numpy import cos, cross, sin, sqrt
