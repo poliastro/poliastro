@@ -84,7 +84,7 @@ class Maneuver:
         orbit_i: poliastro.twobody.orbit.Orbit
             Initial orbit
         r_f: astropy.unit.Quantity
-            Final altitude of the orbit
+            Final orbital radius
 
         """
 
@@ -122,7 +122,7 @@ class Maneuver:
         r_b: astropy.unit.Quantity
             Altitude of the intermediate orbit
         r_f: astropy.unit.Quantity
-            Final altitude of the orbit
+            Final orbital radius
 
         """
 
