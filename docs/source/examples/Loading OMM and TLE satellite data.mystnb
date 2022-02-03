@@ -4,7 +4,7 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.13.1
+    jupytext_version: 1.13.6
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -222,6 +222,8 @@ CartesianDifferential(vs << (u.km / u.s), xyz_axis=-1)
 Mixing all together, and leveraging poliastro `Ephem` objects, we can compute ephemerides from GP orbital data:
 
 ```{code-cell} ipython3
+from warnings import warn
+
 from astropy.coordinates import TEME, GCRS
 
 from poliastro.ephem import Ephem
@@ -230,7 +232,15 @@ from poliastro.frames import Planes
 
 def ephem_from_gp(sat, times):
     errors, rs, vs = sat.sgp4_array(times.jd1, times.jd2)
-    assert (errors == 0).all()
+    if not (errors == 0).all():
+        warn(
+            "Some objects could not be propagated, "
+            "proceeding with the rest",
+            stacklevel=2,
+        )
+        rs = rs[errors == 0]
+        vs = vs[errors == 0]
+        times = times[errors == 0]
 
     cart_teme = CartesianRepresentation(
         rs << u.km,
