@@ -1,4 +1,0 @@
-# For application deployments, like Binder
-git+https://github.com/poliastro/poliastro.git#egg=poliastro
-
-jupytext>=1.13.3  # https://github.com/mwouts/jupytext/issues/271
