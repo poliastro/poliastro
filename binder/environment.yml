@@ -1,0 +1,4 @@
+name: python 3.10
+dependencies:
+- python=3.10
+- jupytext>=1.13.3
