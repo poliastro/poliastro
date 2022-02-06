@@ -94,7 +94,7 @@ GitHub, and all contributions and feedback are more than welcome. You
 can test poliastro in your browser using [Binder](https://mybinder.org/), a cloud Jupyter
 notebook server:
 
-[![image](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://mybinder.org/v2/gh/poliastro/poliastro/main?filepath=index.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poliastro/poliastro/main?labpath=index.ipynb)
 
 See [benchmarks](https://benchmarks.poliastro.space/) for the
 performance analysis of poliastro.
@@ -106,6 +106,7 @@ MIT license, allowing commercial use of the library.
 from poliastro.examples import molniya
 molniya.plot()
 ```
+
 ## Success stories
 
 > *\"My team and I used Poliastro for our final project in our Summer
