@@ -6,7 +6,7 @@ Name:         | poliastro
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
 **Version**:  | 0.17.dev0
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
+[![poliastro](https://img.shields.io/circleci/build/gh/poliastro/poliastro/main?style=flat-square)](https://circleci.com/gh/poliastro/poliastro/?branch=main)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=main)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/poliastro/poliastro/main.svg)](https://results.pre-commit.ci/latest/github/poliastro/poliastro/main)
 
@@ -75,7 +75,7 @@ poliastro requires the following Python packages:
 
 poliastro is supported on Linux, macOS and Windows on Python 3.8 to 3.10.
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=main)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=main)
+[![poliastro](https://img.shields.io/circleci/build/gh/poliastro/poliastro/main?style=flat-square)](https://circleci.com/gh/poliastro/poliastro/?branch=main)
 
 # Installation
 
