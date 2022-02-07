@@ -23,8 +23,8 @@ def test_classical_state_has_elements_given_in_constructor():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = ClassicalState(Sun, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, None)
-    assert ss.p == a * (1 - ecc ** 2)
+    ss = ClassicalState(Sun, a * (1 - ecc**2), ecc, inc, raan, argp, nu, None)
+    assert ss.p == a * (1 - ecc**2)
     assert ss.ecc == ecc
     assert ss.inc == inc
     assert ss.raan == raan
@@ -53,7 +53,7 @@ def test_mean_motion():
     _nu = 20 * u.deg
 
     ss = ClassicalState(
-        attractor, a * (1 - _ecc ** 2), _ecc, _inc, _raan, _argp, _nu, None
+        attractor, a * (1 - _ecc**2), _ecc, _inc, _raan, _argp, _nu, None
     )
 
     expected_mean_motion = (2 * np.pi / period) * u.rad
@@ -70,7 +70,7 @@ def test_coe_to_mee_raises_singularity_error_orbit_equatorial_and_retrograde():
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
 
-    ss = ClassicalState(Sun, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, None)
+    ss = ClassicalState(Sun, a * (1 - ecc**2), ecc, inc, raan, argp, nu, None)
     with pytest.raises(ValueError) as excinfo:
         ss.to_equinoctial()
     assert (

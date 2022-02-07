@@ -540,7 +540,7 @@ def test_orbit_get_frame_returns_proper_frame(attractor, expected_frame_class):
 
 
 def test_orbit_from_custom_body_raises_error_when_asked_frame():
-    attractor = Body(Sun, 1 * u.km ** 3 / u.s ** 2, "_DummyPlanet")
+    attractor = Body(Sun, 1 * u.km**3 / u.s**2, "_DummyPlanet")
 
     r = [1e09, -4e09, -1e09] * u.km
     v = [5e00, -1e01, -4e00] * u.km / u.s
@@ -826,7 +826,7 @@ def test_expected_mean_anomaly():
 
 def test_expected_angular_momentum():
     # Example from Curtis
-    expected_ang_mag = 72472 * u.km ** 2
+    expected_ang_mag = 72472 * u.km**2
 
     attractor = Earth
 
@@ -876,7 +876,7 @@ def test_convert_from_rv_to_coe():
 
     r, v = Orbit.from_classical(
         attractor=attractor,
-        a=p / (1 - ecc ** 2),
+        a=p / (1 - ecc**2),
         ecc=ecc,
         inc=inc,
         raan=raan,

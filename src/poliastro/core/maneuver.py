@@ -42,7 +42,7 @@ def hohmann(k, rv, r_f):
     """
     _, ecc, inc, raan, argp, nu = rv2coe(k, *rv)
     h_i = norm(cross(*rv))
-    p_i = h_i ** 2 / k
+    p_i = h_i**2 / k
 
     r_i, v_i = rv_pqw(k, p_i, ecc, nu)
 
@@ -61,7 +61,7 @@ def hohmann(k, rv, r_f):
     dv_a = rot_matrix @ dv_a
     dv_b = rot_matrix @ dv_b
 
-    t_trans = np.pi * np.sqrt(a_trans ** 3 / k)
+    t_trans = np.pi * np.sqrt(a_trans**3 / k)
 
     return dv_a, dv_b, t_trans
 
@@ -112,7 +112,7 @@ def bielliptic(k, r_b, r_f, rv):
     """
     _, ecc, inc, raan, argp, nu = rv2coe(k, *rv)
     h_i = norm(cross(*rv))
-    p_i = h_i ** 2 / k
+    p_i = h_i**2 / k
 
     r_i, v_i = rv_pqw(k, p_i, ecc, nu)
 
@@ -135,8 +135,8 @@ def bielliptic(k, r_b, r_f, rv):
     dv_b = rot_matrix @ dv_b
     dv_c = rot_matrix @ dv_c
 
-    t_trans1 = np.pi * np.sqrt(a_trans1 ** 3 / k)
-    t_trans2 = np.pi * np.sqrt(a_trans2 ** 3 / k)
+    t_trans1 = np.pi * np.sqrt(a_trans1**3 / k)
+    t_trans2 = np.pi * np.sqrt(a_trans2**3 / k)
 
     return dv_a, dv_b, dv_c, t_trans1, t_trans2
 
@@ -179,10 +179,10 @@ def correct_pericenter(k, R, J2, max_delta_r, v, a, inc, ecc):
     This is smaller than typical variations in thruster performance between burns.
 
     """
-    p = a * (1 - ecc ** 2)
-    n = (k / a ** 3) ** 0.5
+    p = a * (1 - ecc**2)
+    n = (k / a**3) ** 0.5
 
-    dw = ((3 * n * R ** 2 * J2) / (4 * p ** 2)) * (4 - 5 * np.sin(inc) ** 2)
+    dw = ((3 * n * R**2 * J2) / (4 * p**2)) * (4 - 5 * np.sin(inc) ** 2)
 
     delta_w = 2 * (1 + ecc) * max_delta_r
     delta_w /= a * ecc * (1 - ecc)

@@ -65,7 +65,7 @@ def N(a, b, c, cartesian_cords):
 
     """
     x, y, z = cartesian_cords
-    N = np.array([2 * x / a ** 2, 2 * y / b ** 2, 2 * z / c ** 2])
+    N = np.array([2 * x / a**2, 2 * y / b**2, 2 * z / c**2])
     N /= norm(N)
     return N
 
@@ -178,7 +178,7 @@ def cartesian_to_ellipsoidal(_a, _c, x, y, z):
     """
     e2 = 1 - (_c / _a) ** 2
     e2_ = e2 / (1 - e2)
-    p = np.sqrt(x ** 2 + y ** 2)
+    p = np.sqrt(x**2 + y**2)
     th = np.arctan(z * _a / (p * _c))
     lon = np.arctan2(y, x)  # Use `arctan2` so that lon lies in the range: [-pi, +pi]
     lat = np.arctan((z + e2_ * _c * np.sin(th) ** 3) / (p - e2 * _a * np.cos(th) ** 3))

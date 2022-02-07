@@ -47,7 +47,7 @@ def test_J2_propagation_Earth():
 
     rr, vv = cowell(Earth.k, orbit.r, orbit.v, tofs, f=f)
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km**3 / u.s**2).value
 
     _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
     _, _, _, raan, argp, _ = rv2coe(k, rr[0].to(u.km).value, vv[0].to(u.km / u.s).value)
@@ -103,7 +103,7 @@ def test_J3_propagation_Earth(test_params):
     argp_ini = 1.0 * u.rad
     inc_ini = test_params["inc"]
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km**3 / u.s**2).value
 
     orbit = Orbit.from_classical(
         attractor=Earth,
@@ -199,7 +199,7 @@ def test_atmospheric_drag_exponential():
     # Given the expression for \dot{r} / r, aproximate \Delta r \approx F_r * \Delta t
 
     R = Earth.R.to(u.km).value
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km**3 / u.s**2).value
 
     # Parameters of a circular orbit with h = 250 km (any value would do, but not too small)
     orbit = Orbit.circular(Earth, 250 * u.km)
@@ -208,13 +208,13 @@ def test_atmospheric_drag_exponential():
 
     # Parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
-        u.km ** 2 / u.kg
+    A_over_m = ((np.pi / 4.0) * (u.m**2) / (100 * u.kg)).to_value(
+        u.km**2 / u.kg
     )  # km^2/kg
     B = C_D * A_over_m
 
     # Parameters of the atmosphere
-    rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
+    rho0 = rho0_earth.to(u.kg / u.km**3).value  # kg/km^3
     H0 = H0_earth.to(u.km).value  # km
     tof = 100000  # s
 
@@ -254,12 +254,12 @@ def test_atmospheric_demise():
 
     # Parameters of a body
     C_D = 2.2  # dimentionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
-        u.km ** 2 / u.kg
+    A_over_m = ((np.pi / 4.0) * (u.m**2) / (100 * u.kg)).to_value(
+        u.km**2 / u.kg
     )  # km^2/kg
 
     # Parameters of the atmosphere
-    rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
+    rho0 = rho0_earth.to(u.kg / u.km**3).value  # kg/km^3
     H0 = H0_earth.to(u.km).value  # km
 
     tofs = [365] * u.d  # Actually hits the ground a bit after day 48
@@ -315,8 +315,8 @@ def test_atmospheric_demise_coesa76():
 
     # Parameters of a body
     C_D = 2.2  # Dimensionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
-        u.km ** 2 / u.kg
+    A_over_m = ((np.pi / 4.0) * (u.m**2) / (100 * u.kg)).to_value(
+        u.km**2 / u.kg
     )  # km^2/kg
 
     tofs = [365] * u.d
@@ -331,7 +331,7 @@ def test_atmospheric_demise_coesa76():
 
         # Avoid undershooting H below attractor radius R
         H = max(norm(u_[:3]), R)
-        rho = coesa76.density((H - R) * u.km).to_value(u.kg / u.km ** 3)
+        rho = coesa76.density((H - R) * u.km).to_value(u.kg / u.km**3)
 
         ax, ay, az = atmospheric_drag(
             t0,
@@ -558,7 +558,7 @@ def test_3rd_body_Curtis(test_params):
             t0,
             u_,
             k,
-            k_third=body.k.to(u.km ** 3 / u.s ** 2).value,
+            k_third=body.k.to(u.km**3 / u.s**2).value,
             perturbation_body=body_r,
         )
         du_ad = np.array([0, 0, 0, ax, ay, az])
@@ -576,7 +576,7 @@ def test_3rd_body_Curtis(test_params):
     incs, raans, argps = [], [], []
     for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
         angles = Angle(
-            rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)[2:5] * u.rad
+            rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)[2:5] * u.rad
         )  # inc, raan, argp
         angles = angles.wrap_at(180 * u.deg)
         incs.append(angles[0].value)
@@ -671,7 +671,7 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
 
     delta_eccs, delta_incs, delta_raans, delta_argps = [], [], [], []
     for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
-        orbit_params = rv2coe(Earth.k.to(u.km ** 3 / u.s ** 2).value, ri, vi)
+        orbit_params = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
         delta_eccs.append(orbit_params[1] - initial.ecc.value)
         delta_incs.append((orbit_params[2] * u.rad).to(u.deg).value - initial.inc.value)
         delta_raans.append(

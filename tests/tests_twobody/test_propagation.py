@@ -161,7 +161,7 @@ def test_propagating_to_certain_nu_is_correct():
     for nu in np.random.uniform(low=-np.pi, high=np.pi, size=10):
         elliptic = elliptic.propagate_to_anomaly(nu * u.rad)
         r, _ = elliptic.rv()
-        assert_quantity_allclose(norm(r), a * (1.0 - ecc ** 2) / (1 + ecc * np.cos(nu)))
+        assert_quantity_allclose(norm(r), a * (1.0 - ecc**2) / (1 + ecc * np.cos(nu)))
 
 
 def test_propagate_to_anomaly_in_the_past_fails_for_open_orbits():
@@ -219,7 +219,7 @@ def test_propagation_parabolic(propagator):
     orbit = orbit.propagate(0.8897 / 2.0 * u.h, method=propagator)
 
     _, _, _, _, _, nu0 = rv2coe(
-        Earth.k.to(u.km ** 3 / u.s ** 2).value,
+        Earth.k.to(u.km**3 / u.s**2).value,
         orbit.r.to(u.km).value,
         orbit.v.to(u.km / u.s).value,
     )
@@ -326,7 +326,7 @@ def test_cowell_propagation_circle_to_circle():
     assert_quantity_allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 
     dv = abs(norm(ss_final.v) - norm(ss.v))
-    accel_dt = accel * u.km / u.s ** 2 * tofs[0]
+    accel_dt = accel * u.km / u.s**2 * tofs[0]
     assert_quantity_allclose(dv, accel_dt, rtol=1e-2)
 
 
@@ -462,7 +462,7 @@ def test_propagate_with_coe(propagator_coe):
 
     period = iss.period
     a, ecc, inc, raan, argp, nu = iss.classical()
-    p = a * (1 - ecc ** 2)
+    p = a * (1 - ecc**2)
 
     # Delete the units
     p = p.to_value(u.km)
@@ -472,7 +472,7 @@ def test_propagate_with_coe(propagator_coe):
     raan = raan.to_value(u.rad)
     argp = argp.to_value(u.rad)
     nu = nu.to_value(u.rad)
-    k = iss.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+    k = iss.attractor.k.to_value(u.km**3 / u.s**2)
 
     nu_final = propagator_coe(k, p, ecc, inc, raan, argp, nu, period)
 

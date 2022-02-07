@@ -56,7 +56,7 @@ R = 8314.32 * u.J / u.kmol / u.K
 R_air = 287.053 * u.J / u.kg / u.K
 k = 1.380622e-23 * u.J / u.K
 Na = 6.022169e-26 / u.kmol
-g0 = 9.80665 * u.m / u.s ** 2
+g0 = 9.80665 * u.m / u.s**2
 r0 = 6356.766 * u.km
 M0 = 28.9644 * u.kg / u.kmol
 P0 = 101325 * u.Pa
@@ -224,7 +224,7 @@ class COESA76(COESA):
 
             # Solve the polynomial
             z = z.to_value(u.km)
-            p = np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E) * u.Pa
+            p = np.exp(A * z**4 + B * z**3 + C * z**2 + D * z + E) * u.Pa
 
         return p.to(u.Pa)
 
@@ -261,12 +261,12 @@ class COESA76(COESA):
             # Solve the polynomial
             z = z.to_value(u.km)
             rho = (
-                np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E)
+                np.exp(A * z**4 + B * z**3 + C * z**2 + D * z + E)
                 * u.kg
-                / u.m ** 3
+                / u.m**3
             )
 
-        return rho.to(u.kg / u.m ** 3)
+        return rho.to(u.kg / u.m**3)
 
     def properties(self, alt, geometric=True):
         """Solves temperature, pressure, density at given height.
@@ -345,7 +345,7 @@ class COESA76(COESA):
             )
         T = self.temperature(alt, geometric).value
         # Using eqn-(51)
-        mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.N * u.s / (u.m) ** 2)
+        mu = (beta.value * T**1.5 / (T + S.value)) * (u.N * u.s / (u.m) ** 2)
 
         return mu
 
@@ -373,7 +373,7 @@ class COESA76(COESA):
             )
         T = self.temperature(alt, geometric=geometric).value
         # Using eqn-(53)
-        k = (2.64638e-3 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
+        k = (2.64638e-3 * T**1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
             u.J / u.m / u.s / u.K
         )
 

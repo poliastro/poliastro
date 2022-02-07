@@ -26,8 +26,8 @@ from CR3BP import getChar_CR3BP, propagate, propagateSTM
 from poliastro.bodies import Earth, Moon
 
 # Earth-Moon system properties
-k1 = Earth.k.to(u.km ** 3 / u.s ** 2).value
-k2 = Moon.k.to(u.km ** 3 / u.s ** 2).value
+k1 = Earth.k.to(u.km**3 / u.s**2).value
+k2 = Moon.k.to(u.km**3 / u.s**2).value
 r12 = 384747.99198  # Earth-Moon distance
 
 # Compute CR3BP characterisitic values

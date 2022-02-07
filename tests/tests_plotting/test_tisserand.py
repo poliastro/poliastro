@@ -17,7 +17,7 @@ def test_tisserand_plotting():
     ax.set_xlabel("$R_{p} [AU]$")
     ax.set_ylabel("Heliocentric Energy [km2 / s2]")
     ax.set_xscale("log")
-    ax.set_xlim(10 ** -0.4, 10 ** 0.15)
+    ax.set_xlim(10**-0.4, 10**0.15)
     ax.set_ylim(-700, 0)
 
     # Generate a Tisserand plotter

@@ -75,13 +75,13 @@ def getChar_CR3BP(k1, k2, r12):
     lstr = r12
 
     # characteristic time
-    tstr = (lstr ** 3 / kstr) ** 0.5
+    tstr = (lstr**3 / kstr) ** 0.5
 
     # characteristic velocity
     vstr = lstr / tstr
 
     # characteristic angular velocity
-    nstr = (kstr / r12 ** 3) ** 0.5
+    nstr = (kstr / r12**3) ** 0.5
 
     # CR3BP mass ratio
     mu = k2 / kstr
@@ -104,15 +104,15 @@ def getJacobian_CR3BP(u_, mu):
     rx, ry, rz, vx, vy, vz = u_
 
     # distance to primary body
-    r13 = ((rx + mu) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    r13 = ((rx + mu) ** 2 + ry**2 + rz**2) ** 0.5
     # distance to secondary body
-    r23 = ((rx - (1 - mu)) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    r23 = ((rx - (1 - mu)) ** 2 + ry**2 + rz**2) ** 0.5
 
     # computing velocity square
-    v2 = vx ** 2 + vy ** 2 + vz ** 2
+    v2 = vx**2 + vy**2 + vz**2
 
     # compute Jacobi constant for trajectory
-    C = (rx ** 2 + ry ** 2) + 2 * (1 - mu) / r13 + 2 * mu / r23 - v2
+    C = (rx**2 + ry**2) + 2 * (1 - mu) / r13 + 2 * mu / r23 - v2
 
     return C
 
@@ -135,26 +135,26 @@ def getUdiff_CR3BP(r_, mu):
     rx, ry, rz = r_
 
     # distance to primary body
-    r13 = ((rx + mu) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    r13 = ((rx + mu) ** 2 + ry**2 + rz**2) ** 0.5
     # distance to secondary body
-    r23 = ((rx - (1 - mu)) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    r23 = ((rx - (1 - mu)) ** 2 + ry**2 + rz**2) ** 0.5
 
     # computing the double derivates with position
-    Uxx = 1 - (1 - mu) / r13 ** 3 - mu / r23 ** 3
-    +3 * (1 - mu) * (rx + mu) ** 2 / r13 ** 5 + 3 * mu * (rx + mu - 1) ** 2 / r23 ** 5
-    Uyy = 1 - (1 - mu) / r13 ** 3 - mu / r23 ** 3 + 3 * (1 - mu) * ry ** 2 / r13 ** 5
-    +3 * mu * ry ** 2 / r23 ** 5
-    Uzz = -(1 - mu) / r13 ** 3 - mu / r23 ** 3 + 3 * (1 - mu) * rz ** 2 / r13 ** 5
-    +3 * mu * rz ** 2 / r23 ** 5
+    Uxx = 1 - (1 - mu) / r13**3 - mu / r23**3
+    +3 * (1 - mu) * (rx + mu) ** 2 / r13**5 + 3 * mu * (rx + mu - 1) ** 2 / r23**5
+    Uyy = 1 - (1 - mu) / r13**3 - mu / r23**3 + 3 * (1 - mu) * ry**2 / r13**5
+    +3 * mu * ry**2 / r23**5
+    Uzz = -(1 - mu) / r13**3 - mu / r23**3 + 3 * (1 - mu) * rz**2 / r13**5
+    +3 * mu * rz**2 / r23**5
     Uxy = (
-        3 * ry * (1 - mu) * (rx + mu) / r13 ** 5
-        + 3 * ry * mu * (rx - (1 - mu)) / r23 ** 5
+        3 * ry * (1 - mu) * (rx + mu) / r13**5
+        + 3 * ry * mu * (rx - (1 - mu)) / r23**5
     )
     Uxz = (
-        3 * rz * (1 - mu) * (rx + mu) / r13 ** 5
-        + 3 * rz * mu * (rx - (1 - mu)) / r23 ** 5
+        3 * rz * (1 - mu) * (rx + mu) / r13**5
+        + 3 * rz * mu * (rx - (1 - mu)) / r23**5
     )
-    Uyz = 3 * ry * rz * (1 - mu) / r13 ** 5 + 3 * ry * rz * mu / r23 ** 5
+    Uyz = 3 * ry * rz * (1 - mu) / r13**5 + 3 * ry * rz * mu / r23**5
 
     # exploiting the symmetry
     Uyx = Uxy
@@ -218,9 +218,9 @@ def func_CR3BP(t, u_, mu):
     rx, ry, rz, vx, vy, vz = u_
 
     # distance to primary body
-    r13 = ((rx + mu) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    r13 = ((rx + mu) ** 2 + ry**2 + rz**2) ** 0.5
     # distance to secondary body
-    r23 = ((rx - (1 - mu)) ** 2 + ry ** 2 + rz ** 2) ** 0.5
+    r23 = ((rx - (1 - mu)) ** 2 + ry**2 + rz**2) ** 0.5
 
     # computing three-body dyamics
     r_dot = np.array([vx, vy, vz])
@@ -228,10 +228,10 @@ def func_CR3BP(t, u_, mu):
         [
             rx
             + 2 * vy
-            - (1 - mu) * (rx + mu) / (r13 ** 3)
-            - mu * (rx - 1 + mu) / (r23 ** 3),
-            ry - 2 * vx - (1 - mu) * ry / (r13 ** 3) - mu * ry / (r23 ** 3),
-            -(1 - mu) * rz / (r13 ** 3) - mu * rz / (r23 ** 3),
+            - (1 - mu) * (rx + mu) / (r13**3)
+            - mu * (rx - 1 + mu) / (r23**3),
+            ry - 2 * vx - (1 - mu) * ry / (r13**3) - mu * ry / (r23**3),
+            -(1 - mu) * rz / (r13**3) - mu * rz / (r23**3),
         ]
     )
 

@@ -129,7 +129,7 @@ def test_minimum_time_of_flight_convergence(M):
     "lambert_vallado,lambert_izzo", [(vallado.lambert, izzo.lambert)]
 )
 def test_issue840(lambert_vallado, lambert_izzo):
-    k = c.GM_earth.to(u.km ** 3 / u.s ** 2)
+    k = c.GM_earth.to(u.km**3 / u.s**2)
     r0 = [10000.0, 0, 0] * u.km
     rf = [8000.0, -5000, 0] * u.km
     tof = 2 * u.hour
@@ -151,7 +151,7 @@ def test_issue840(lambert_vallado, lambert_izzo):
 )
 def test_issue1362(lambert_vallado, lambert_izzo):
 
-    k = 1.32712440018e11 * u.km ** 3 / u.s ** 2
+    k = 1.32712440018e11 * u.km**3 / u.s**2
     r0 = [-7.52669489e07, -3.72205805e08, -9.17950811e06] * u.km
     rf = [-6.15200041e06, -3.91985660e08, -5.06520860e05] * u.km
     tof = 3489390.108265222 * u.s
@@ -164,7 +164,7 @@ def test_issue1362(lambert_vallado, lambert_izzo):
 
 
 def test_vallado_not_implemented_multirev():
-    k = 1.0 * u.m ** 3 / u.s ** 2
+    k = 1.0 * u.m**3 / u.s**2
     r0 = [1, 0, 0] * u.m
     r = [0, 1, 0] * u.m
     tof = 1 * u.s

@@ -162,7 +162,7 @@ class OrbitCreationMixin:
             )
 
         ss = ClassicalState(
-            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, plane
+            attractor, a * (1 - ecc**2), ecc, inc, raan, argp, nu, plane
         )
         return cls(ss, epoch)
 
@@ -458,7 +458,7 @@ class OrbitCreationMixin:
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
-            np.sqrt(mean_elements.attractor.k / abs(mean_elements.a ** 3)) * u.one
+            np.sqrt(mean_elements.attractor.k / abs(mean_elements.a**3)) * u.one
         ).to(1 / u.s)
 
         try:

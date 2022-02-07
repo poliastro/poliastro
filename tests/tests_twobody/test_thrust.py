@@ -25,14 +25,14 @@ from poliastro.twobody.thrust import (
     [np.radians(28.5), np.radians(90.0)],
 )
 def test_leo_geo_numerical_safe(inc_0):
-    f = 3.5e-7 * u.km / u.s ** 2  # km / s2
+    f = 3.5e-7 * u.km / u.s**2  # km / s2
 
     a_0 = 7000.0 * u.km  # km
     a_f = 42166.0 * u.km  # km
     inc_0 = inc_0 * u.rad  # rad
     inc_f = 0.0 * u.rad  # rad
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2)
+    k = Earth.k.to(u.km**3 / u.s**2)
 
     a_d, _, t_f = change_a_inc(k, a_0, a_f, inc_0, inc_f, f)
 
@@ -64,7 +64,7 @@ def test_leo_geo_numerical_fast(inc_0):
     a_f = 42166.0  # km
     inc_f = 0.0  # rad
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km**3 / u.s**2).value
 
     a_d, _, t_f = change_a_inc_fast(k, a_0, a_f, inc_0, inc_f, f)
 
@@ -155,7 +155,7 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     ecc_f = 0.0
     inc_0 = 0.0  # rad, baseline
     argp = 0.0  # rad, the method is efficient for 0 and 180
-    f = 2.4e-7 * (u.km / u.s ** 2)
+    f = 2.4e-7 * (u.km / u.s**2)
 
     inc_f = np.radians(inc_f)
     expected_beta = np.radians(expected_beta)
@@ -185,7 +185,7 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
     inc_0 = 0.0
     inc_f = 20.0 * u.deg
     argp = 0.0  # rad, the method is efficient for 0 and 180
-    f = 2.4e-7 * (u.km / u.s ** 2)
+    f = 2.4e-7 * (u.km / u.s**2)
 
     # Initial orbit
     s0 = Orbit.from_classical(
@@ -221,9 +221,9 @@ def test_soyuz_standard_gto_delta_v_safe():
     ecc = r_a / a - 1
     argp_0 = (178 * u.deg).to(u.rad)  # rad
     argp_f = (178 * u.deg + 5 * u.deg).to(u.rad)  # rad
-    f = 2.4e-7 * u.km / u.s ** 2  # km / s2
+    f = 2.4e-7 * u.km / u.s**2  # km / s2
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2)
+    k = Earth.k.to(u.km**3 / u.s**2)
 
     _, delta_V, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
 
@@ -245,7 +245,7 @@ def test_soyuz_standard_gto_delta_v_fast():
     argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
     f = 2.4e-7  # km / s2
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km**3 / u.s**2).value
 
     _, delta_V, t_f = change_argp_fast(k, a, ecc, argp_0, argp_f, f)
 
@@ -265,9 +265,9 @@ def test_soyuz_standard_gto_numerical_safe():
     ecc = r_a / a - 1
     argp_0 = (178 * u.deg).to(u.rad)  # rad
     argp_f = (178 * u.deg + 5 * u.deg).to(u.rad)  # rad
-    f = 2.4e-7 * u.km / u.s ** 2  # km / s2
+    f = 2.4e-7 * u.km / u.s**2  # km / s2
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2)
+    k = Earth.k.to(u.km**3 / u.s**2)
 
     a_d, _, t_f = change_argp(k, a, ecc, argp_0, argp_f, f)
 
@@ -305,7 +305,7 @@ def test_soyuz_standard_gto_numerical_fast():
     argp_f = (178 * u.deg + 5 * u.deg).to(u.rad).value  # rad
     f = 2.4e-7  # km / s2
 
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km**3 / u.s**2).value
 
     a_d, _, t_f = change_argp_fast(k, a, ecc, argp_0, argp_f, f)
 
@@ -346,7 +346,7 @@ def test_leo_geo_time_and_delta_v(inc_0, expected_t_f, expected_delta_V, rtol):
     a_0 = 7000.0  # km
     a_f = 42166.0  # km
     inc_f = 0.0  # rad
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+    k = Earth.k.to(u.km**3 / u.s**2).value
     inc_0 = np.radians(inc_0)  # rad
 
     _, delta_V, t_f = change_a_inc_fast(k, a_0, a_f, inc_0, inc_f, f)

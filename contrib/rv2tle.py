@@ -100,7 +100,7 @@ def rvel(r, v):
     wk = acose(temp)
     if vec[2] < 0:
         wk = fmod2p(2 * math.pi - wk)
-    aodp = pl / (1.0 - ek ** 2)
+    aodp = pl / (1.0 - ek**2)
     xn = XKE * aodp ** (-1.5)
 
     # In the first loop the osculating elements rk, uk, xnodek, xinck, rdotk,
@@ -138,7 +138,7 @@ def rvel(r, v):
         pl = (r * rfdot / XKE) ** 2
 
         # vis-viva equation
-        adop = 1 / (2 / r - (rdot ** 2 + rfdot ** 2) / (XKE ** 2))
+        adop = 1 / (2 / r - (rdot**2 + rfdot**2) / (XKE**2))
 
         xn = XKE * aodp ** (-1.5)
         if math.fabs(a2 - pl) < 1e-13:
@@ -172,7 +172,7 @@ def rvel(r, v):
 
     for _ in range(0, 99):
         a2 = eo
-        beta = 1 - eo ** 2
+        beta = 1 - eo**2
         aynl = aycof / (aodp * beta)
         ayn = eo * math.sin(omegao) + aynl
         cosepw = r * cosu / aodp + axn - ayn * temp1
@@ -204,10 +204,10 @@ def rvel(r, v):
     temp = 1.5 * CK2 * x3thm1 / (beta * beta2)
     for _ in range(0, 99):
         a2 = a1
-        d0 = temp / (a0 ** 2)
+        d0 = temp / (a0**2)
         a0 = aodp * (1.0 - d0)
-        d1 = temp / (a1 ** 2)
-        a1 = a0 / (1 - d1 / 3 - d1 ** 2 - 134 * d1 ** 3 / 81)
+        d1 = temp / (a1**2)
+        a1 = a0 / (1 - d1 / 3 - d1**2 - 134 * d1**3 / 81)
         if math.fabs(a2 - a1) < 1e-3:
             break
 
