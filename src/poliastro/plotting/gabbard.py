@@ -42,12 +42,6 @@ class GabbardPlotter:
             The Orbits whose perigee and apogee will be plotted.
         """
         apogees, perigees, periods = self._get_orbit_property_list(orbits)
-
-        apogee_paths = plt.scatter(periods, apogees, marker = "o", color = "blue", label = "Apogee")
-        perigee_paths = plt.scatter(periods, perigees, marker = "o", color = "red", label = "Perigee")
-
-        self._ax.set_xlabel("Period(min)")
-        self._ax.set_ylabel("Altitude(km)")
         
         apogee_paths = plt.scatter(
             periods, apogees, marker="o", color="blue", label="Apogee"
