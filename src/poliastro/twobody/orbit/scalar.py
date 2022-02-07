@@ -183,7 +183,7 @@ class Orbit(OrbitCreationMixin):
     @cached_property
     def h_vec(self):
         """Specific angular momentum vector."""
-        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km**2 / u.s
         return h_vec
 
     @cached_property

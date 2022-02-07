@@ -249,7 +249,7 @@ def test_tempertaure(z):
 
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_pressure(z):
-    expected_p = jacchia77_solutions[z][9] * (u.N * u.m ** -2)
+    expected_p = jacchia77_solutions[z][9] * (u.N * u.m**-2)
     pressure = Jacchia77(1000 * u.K).pressure(z)
     p = np.log10(pressure.value) * pressure.unit
 
@@ -259,7 +259,7 @@ def test_pressure(z):
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_density(z):
     expected_rho = jacchia77_solutions[z][10] * (
-        u.kg ** 2 * u.mol * u.K ** -1 * u.m ** -3
+        u.kg**2 * u.mol * u.K**-1 * u.m**-3
     )
     density = Jacchia77(1000 * u.K).density(z)
     rho = np.log10(density.value) * density.unit

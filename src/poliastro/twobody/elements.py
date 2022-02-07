@@ -12,7 +12,7 @@ from poliastro.core.propagation.farnocchia import (
 )
 
 u_kms = u.km / u.s
-u_km3s2 = u.km ** 3 / u.s ** 2
+u_km3s2 = u.km**3 / u.s**2
 
 
 @u.quantity_input(k=u_km3s2, a=u.km)
@@ -24,7 +24,7 @@ def circular_velocity(k, a):
 @u.quantity_input(k=u_km3s2, a=u.km)
 def mean_motion(k, a):
     """Mean motion given body (k) and semimajor axis (a)."""
-    return np.sqrt(k / abs(a ** 3)).to(1 / u.s) * u.rad
+    return np.sqrt(k / abs(a**3)).to(1 / u.s) * u.rad
 
 
 @u.quantity_input(k=u_km3s2, a=u.km)
@@ -74,10 +74,10 @@ def heliosynchronous(k, R, J2, n_sunsync, a=None, ecc=None, inc=None):
         if a is None and (ecc is not None) and (inc is not None):
             a = (
                 -3
-                * R ** 2
+                * R**2
                 * J2
                 * np.sqrt(k)
-                / (2 * n_sunsync * (1 - ecc ** 2) ** 2)
+                / (2 * n_sunsync * (1 - ecc**2) ** 2)
                 * np.cos(inc)
             ) ** (2 / 7)
         elif ecc is None and (a is not None) and (inc is not None):
@@ -85,7 +85,7 @@ def heliosynchronous(k, R, J2, n_sunsync, a=None, ecc=None, inc=None):
                 1
                 - np.sqrt(
                     -3
-                    * R ** 2
+                    * R**2
                     * J2
                     * np.sqrt(k)
                     * np.cos(inc)
@@ -98,8 +98,8 @@ def heliosynchronous(k, R, J2, n_sunsync, a=None, ecc=None, inc=None):
                 -2
                 * a ** (7 / 2)
                 * n_sunsync
-                * (1 - ecc ** 2) ** 2
-                / (3 * R ** 2 * J2 * np.sqrt(k))
+                * (1 - ecc**2) ** 2
+                / (3 * R**2 * J2 * np.sqrt(k))
             )
         else:
             raise ValueError("Two parameters of (a, ecc, inc) are required")

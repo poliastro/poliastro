@@ -10,7 +10,7 @@ from poliastro.frames import Planes
 from poliastro.twobody.states import RVState
 
 u.kms = u.km / u.s
-u.km3s2 = u.km ** 3 / u.s ** 2
+u.km3s2 = u.km**3 / u.s**2
 
 
 def state_from_vector(func):

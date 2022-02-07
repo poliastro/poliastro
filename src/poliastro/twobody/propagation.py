@@ -82,7 +82,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     (unless a terminal event is defined) and calculates the other values via dense output.
 
     """
-    k = k.to_value(u.km ** 3 / u.s ** 2)
+    k = k.to_value(u.km**3 / u.s**2)
     x, y, z = r.to_value(u.km)
     vx, vy, vz = v.to_value(u.km / u.s)
     tofs = tofs.to_value(u.s)
@@ -151,7 +151,7 @@ def farnocchia(k, r, v, tofs, **kwargs):
         Propagated velocity vectors.
 
     """
-    k = k.to_value(u.km ** 3 / u.s ** 2)
+    k = k.to_value(u.km**3 / u.s**2)
     r0 = r.to_value(u.km)
     v0 = v.to_value(u.km / u.s)
     tofs = tofs.to_value(u.s)
@@ -201,7 +201,7 @@ def vallado(k, r, v, tofs, numiter=350, **kwargs):
     and 85 % faster.
 
     """
-    k = k.to_value(u.km ** 3 / u.s ** 2)
+    k = k.to_value(u.km**3 / u.s**2)
     r0 = r.to_value(u.km)
     v0 = v.to_value(u.km / u.s)
     tofs = tofs.to_value(u.s)
@@ -258,7 +258,7 @@ def mikkola(k, r, v, tofs, rtol=None):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -298,7 +298,7 @@ def markley(k, r, v, tofs, rtol=None):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -340,7 +340,7 @@ def pimienta(k, r, v, tofs, rtol=None):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -385,7 +385,7 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -427,7 +427,7 @@ def danby(k, r, v, tofs, rtol=1e-8):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -466,7 +466,7 @@ def recseries(k, r, v, tofs, rtol=1e-8):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)

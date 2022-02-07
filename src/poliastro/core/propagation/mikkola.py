@@ -16,7 +16,7 @@ from poliastro.core.elements import coe2rv, rv2coe
 @jit
 def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
-    a = p / (1 - ecc ** 2)
+    a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(a) ** 3)
 
     # Solve for specific geometrical case
@@ -33,23 +33,23 @@ def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     # Equation (9b)
     if beta >= 0:
-        z = (beta + np.sqrt(beta ** 2 + alpha ** 3)) ** (1 / 3)
+        z = (beta + np.sqrt(beta**2 + alpha**3)) ** (1 / 3)
     else:
-        z = (beta - np.sqrt(beta ** 2 + alpha ** 3)) ** (1 / 3)
+        z = (beta - np.sqrt(beta**2 + alpha**3)) ** (1 / 3)
 
     s = z - alpha / z
 
     # Apply initial correction
     if ecc < 1.0:
-        ds = -0.078 * s ** 5 / (1 + ecc)
+        ds = -0.078 * s**5 / (1 + ecc)
     else:
-        ds = 0.071 * s ** 5 / (1 + 0.45 * s ** 2) / (1 + 4 * s ** 2) / ecc
+        ds = 0.071 * s**5 / (1 + 0.45 * s**2) / (1 + 4 * s**2) / ecc
 
     s += ds
 
     # Solving for the true anomaly
     if ecc < 1.0:
-        E = M + ecc * (3 * s - 4 * s ** 3)
+        E = M + ecc * (3 * s - 4 * s**3)
         f = E - ecc * np.sin(E) - M
         f1 = 1.0 - ecc * np.cos(E)
         f2 = ecc * np.sin(E)
@@ -57,7 +57,7 @@ def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
         f4 = -f2
         f5 = -f3
     else:
-        E = 3 * np.log(s + np.sqrt(1 + s ** 2))
+        E = 3 * np.log(s + np.sqrt(1 + s**2))
         f = -E + ecc * np.sinh(E) - M
         f1 = -1.0 + ecc * np.cosh(E)
         f2 = ecc * np.sinh(E)
@@ -68,9 +68,9 @@ def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
     # Apply Taylor expansion
     u1 = -f / f1
     u2 = -f / (f1 + 0.5 * f2 * u1)
-    u3 = -f / (f1 + 0.5 * f2 * u2 + (1.0 / 6.0) * f3 * u2 ** 2)
+    u3 = -f / (f1 + 0.5 * f2 * u2 + (1.0 / 6.0) * f3 * u2**2)
     u4 = -f / (
-        f1 + 0.5 * f2 * u3 + (1.0 / 6.0) * f3 * u3 ** 2 + (1.0 / 24.0) * f4 * (u3 ** 3)
+        f1 + 0.5 * f2 * u3 + (1.0 / 6.0) * f3 * u3**2 + (1.0 / 24.0) * f4 * (u3**3)
     )
     u5 = -f / (
         f1

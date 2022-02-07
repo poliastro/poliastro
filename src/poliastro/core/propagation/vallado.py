@@ -75,7 +75,7 @@ def vallado(k, r0, v0, tof, numiter):
     # Cache some results
     dot_r0v0 = r0 @ v0
     norm_r0 = norm(r0)
-    sqrt_mu = k ** 0.5
+    sqrt_mu = k**0.5
     alpha = -(v0 @ v0) / k + 2 / norm_r0
 
     # First guess
@@ -130,10 +130,10 @@ def vallado(k, r0, v0, tof, numiter):
         raise RuntimeError("Maximum number of iterations reached")
 
     # Compute Lagrange coefficients
-    f = 1 - xi ** 2 / norm_r0 * c2_psi
-    g = tof - xi ** 3 / sqrt_mu * c3_psi
+    f = 1 - xi**2 / norm_r0 * c2_psi
+    g = tof - xi**3 / sqrt_mu * c3_psi
 
-    gdot = 1 - xi ** 2 / norm_r * c2_psi
+    gdot = 1 - xi**2 / norm_r * c2_psi
     fdot = sqrt_mu / (norm_r * norm_r0) * xi * (psi * c3_psi - 1)
 
     return f, g, fdot, gdot

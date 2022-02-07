@@ -187,7 +187,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     return ijk
 
 
-@jit(parallel=sys.maxsize > 2 ** 31)
+@jit(parallel=sys.maxsize > 2**31)
 def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
 
     n = nu.shape[0]
@@ -402,7 +402,7 @@ def rv2coe(k, r, v, tol=1e-8):
         argp = 0
         nu = np.arctan2(r[1], r[0]) % (2 * np.pi)  # True longitude
     else:
-        a = p / (1 - (ecc ** 2))
+        a = p / (1 - (ecc**2))
         ka = k * a
         if a > 0:
             e_se = (r @ v) / sqrt(ka)
@@ -478,8 +478,8 @@ def mee2coe(p, f, g, h, k, L):
     arguments.
 
     """
-    ecc = np.sqrt(f ** 2 + g ** 2)
-    inc = 2 * np.arctan(np.sqrt(h ** 2 + k ** 2))
+    ecc = np.sqrt(f**2 + g**2)
+    inc = 2 * np.arctan(np.sqrt(h**2 + k**2))
     lonper = np.arctan2(g, f)
     raan = np.arctan2(k, h) % (2 * np.pi)
     argp = (lonper - raan) % (2 * np.pi)
@@ -522,11 +522,11 @@ def mee2rv(p, f, g, h, k, L):
     """
     w = 1 + f * np.cos(L) + g * np.sin(L)
     r = p / w
-    s2 = 1 + h ** 2 + k ** 2
-    alpha2 = h ** 2 - k ** 2
+    s2 = 1 + h**2 + k**2
+    alpha2 = h**2 - k**2
 
-    rx = (r / s2)(np.cos(L) + alpha2 ** 2 * np.cos(L) + 2 * h * k * np.sin(L))
-    ry = (r / s2)(np.sin(L) - alpha2 ** 2 * np.sin(L) + 2 * h * k * np.cos(L))
+    rx = (r / s2)(np.cos(L) + alpha2**2 * np.cos(L) + 2 * h * k * np.sin(L))
+    ry = (r / s2)(np.sin(L) - alpha2**2 * np.sin(L) + 2 * h * k * np.cos(L))
     rz = (2 * r / s2)(h * np.sin(L) - k * np.cos(L))
 
     vx = (

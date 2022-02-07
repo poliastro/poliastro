@@ -100,7 +100,7 @@ class Maneuver:
         rv = orbit_i.rv()
         rv = (rv[0].to_value(u.m), rv[-1].to_value(u.m / u.s))
 
-        k = k.to_value(u.m ** 3 / u.s ** 2)
+        k = k.to_value(u.m**3 / u.s**2)
         r_f = r_f.to_value(u.m)
 
         dv_a, dv_b, t_trans = hohmann_fast(k, rv, r_f)
@@ -138,7 +138,7 @@ class Maneuver:
         rv = orbit_i.rv()
         rv = (rv[0].to_value(u.m), rv[-1].to_value(u.m / u.s))
 
-        k = k.to_value(u.m ** 3 / u.s ** 2)
+        k = k.to_value(u.m**3 / u.s**2)
         r_b = r_b.to_value(u.m)
         r_f = r_f.to_value(u.m)
 
@@ -246,7 +246,7 @@ class Maneuver:
             )
 
         R = orbit.attractor.R.to_value(u.km)
-        k = orbit.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+        k = orbit.attractor.k.to_value(u.km**3 / u.s**2)
         v = orbit.v.value
         a = orbit.a.value
         inc = orbit.inc.value

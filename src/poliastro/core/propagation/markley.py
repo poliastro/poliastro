@@ -15,30 +15,30 @@ from poliastro.core.elements import coe2rv, rv2coe
 def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
-    a = p / (1 - ecc ** 2)
-    n = np.sqrt(k / a ** 3)
+    a = p / (1 - ecc**2)
+    n = np.sqrt(k / a**3)
     M = M0 + n * tof
 
     # Range between -pi and pi
     M = (M + np.pi) % (2 * np.pi) - np.pi
 
     # Equation (20)
-    alpha = (3 * np.pi ** 2 + 1.6 * (np.pi - np.abs(M)) / (1 + ecc)) / (np.pi ** 2 - 6)
+    alpha = (3 * np.pi**2 + 1.6 * (np.pi - np.abs(M)) / (1 + ecc)) / (np.pi**2 - 6)
 
     # Equation (5)
     d = 3 * (1 - ecc) + alpha * ecc
 
     # Equation (9)
-    q = 2 * alpha * d * (1 - ecc) - M ** 2
+    q = 2 * alpha * d * (1 - ecc) - M**2
 
     # Equation (10)
-    r = 3 * alpha * d * (d - 1 + ecc) * M + M ** 3
+    r = 3 * alpha * d * (d - 1 + ecc) * M + M**3
 
     # Equation (14)
-    w = (np.abs(r) + np.sqrt(q ** 3 + r ** 2)) ** (2 / 3)
+    w = (np.abs(r) + np.sqrt(q**3 + r**2)) ** (2 / 3)
 
     # Equation (15)
-    E = (2 * r * w / (w ** 2 + w * q + q ** 2) + M) / d
+    E = (2 * r * w / (w**2 + w * q + q**2) + M) / d
 
     # Equation (26)
     f0 = _kepler_equation(E, M, ecc)
@@ -49,9 +49,9 @@ def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     # Equation (22)
     delta3 = -f0 / (f1 - 0.5 * f0 * f2 / f1)
-    delta4 = -f0 / (f1 + 0.5 * delta3 * f2 + 1 / 6 * delta3 ** 2 * f3)
+    delta4 = -f0 / (f1 + 0.5 * delta3 * f2 + 1 / 6 * delta3**2 * f3)
     delta5 = -f0 / (
-        f1 + 0.5 * delta4 * f2 + 1 / 6 * delta4 ** 2 * f3 + 1 / 24 * delta4 ** 3 * f4
+        f1 + 0.5 * delta4 * f2 + 1 / 6 * delta4**2 * f3 + 1 / 24 * delta4**3 * f4
     )
 
     E += delta5

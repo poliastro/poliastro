@@ -52,7 +52,7 @@ def lambert(k, r0, r, tof, M=0, prograde=True, lowpath=True, numiter=35, rtol=1e
     not supported.
 
     """
-    k_ = k.to_value(u.km ** 3 / u.s ** 2)
+    k_ = k.to_value(u.km**3 / u.s**2)
     r0_ = r0.to_value(u.km)
     r_ = r.to_value(u.km)
     tof_ = tof.to_value(u.s)

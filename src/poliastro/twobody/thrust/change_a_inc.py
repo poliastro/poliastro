@@ -39,11 +39,11 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
       Transfer Problem Using Optimal Control Theory", 1997.
     """
     a_d, delta_V, t_f = change_a_inc_fast(
-        k=k.to_value(u.km ** 3 / u.s ** 2),
+        k=k.to_value(u.km**3 / u.s**2),
         a_0=a_0.to_value(u.km),
         a_f=a_f.to_value(u.km),
         inc_0=inc_0.to_value(u.rad),
         inc_f=inc_f.to_value(u.rad),
-        f=f.to_value(u.km / u.s ** 2),
+        f=f.to_value(u.km / u.s**2),
     )
     return a_d, delta_V, t_f * u.s

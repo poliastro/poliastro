@@ -103,7 +103,7 @@ class Body(
         return self.__str__()
 
     @classmethod
-    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
+    @u.quantity_input(k=u.km**3 / u.s**2, R=u.km)
     def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
         return cls(parent, k, name, symbol, R, **kwargs)
 

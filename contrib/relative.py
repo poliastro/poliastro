@@ -254,7 +254,7 @@ class RelativeOrb:
         """
 
         # Ensure the conversion of the attractor's gravitational constant.
-        mu = mu.to(u.km ** 3 / u.s ** 2)
+        mu = mu.to(u.km**3 / u.s**2)
 
         # The general flow of the program, is to first solve for the radial
         # position and velocity (in the inertial frame) via Kepler's equation.
@@ -267,11 +267,11 @@ class RelativeOrb:
         # With the eccentric anomaly, we can solve for position and velocity
         # in the local orbital frame, using the polar equation for an ellipse.
         pos_X = a * (np.cos(eccAnom) - e)
-        pos_Y = a * np.sqrt(1 - e ** 2) * np.sin(eccAnom)
-        pos_norm = np.sqrt(pos_X ** 2 + pos_Y ** 2)
+        pos_Y = a * np.sqrt(1 - e**2) * np.sin(eccAnom)
+        pos_norm = np.sqrt(pos_X**2 + pos_Y**2)
         vel_const = np.sqrt(mu * a) / pos_norm
         vel_X = vel_const * (-1 * np.sin(eccAnom))
-        vel_Y = vel_const * (np.sqrt(1 - e ** 2) * np.cos(eccAnom))
+        vel_Y = vel_const * (np.sqrt(1 - e**2) * np.cos(eccAnom))
 
         # To perform the conversion from local orbit plane to an ECI frame, we
         # need perform the 313 Euler angle rotation in the following sequence:
@@ -343,7 +343,7 @@ class RelativeOrb:
             relVelArrayX, relVelArrayY, relVelArrayZ = [], [], []
 
             # Get the gravitational constant in u.km**3 / u.s**2
-            mu = self.satC.attractor.k.to(u.km ** 3 / u.s ** 2)
+            mu = self.satC.attractor.k.to(u.km**3 / u.s**2)
 
             # Initialise pi in terms of astropy units
             pi = np.pi * 1 * u.rad

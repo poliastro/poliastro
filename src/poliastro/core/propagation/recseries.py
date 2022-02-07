@@ -11,7 +11,7 @@ def recseries_coe(
 ):
 
     # semi-major axis
-    semi_axis_a = p / (1 - ecc ** 2)
+    semi_axis_a = p / (1 - ecc**2)
     # mean angular motion
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
 

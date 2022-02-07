@@ -187,7 +187,7 @@ def _altitude_profile(alt, Texo, x, y, E5M, E6P):
             CO2[iz] = CO2[iz - 1] * y * np.exp(-wmO2 * x)
             CO[iz] = CO[iz - 1] * y * np.exp(-wmO * x)
             CAr[iz] = CAr[iz - 1] * y * np.exp(-wmAr * x)
-            CHe[iz] = CHe[iz - 1] * (y ** 0.62) * np.exp(-wmHe * x)
+            CHe[iz] = CHe[iz - 1] * (y**0.62) * np.exp(-wmHe * x)
             CH[iz] = 0
 
     _O_and_O2_correction(alt, Texo, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM)

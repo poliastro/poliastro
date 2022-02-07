@@ -14,7 +14,7 @@ def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=150, rtol=1e-8):
         )
 
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
-    semi_axis_a = p / (1 - ecc ** 2)
+    semi_axis_a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
     M = M0 + n * tof
 
@@ -22,15 +22,15 @@ def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=150, rtol=1e-8):
     n = 0
     c = ecc * np.cos(M)
     s = ecc * np.sin(M)
-    psi = s / np.sqrt(1 - 2 * c + ecc ** 2)
+    psi = s / np.sqrt(1 - 2 * c + ecc**2)
     f = 1.0
-    while f ** 2 >= rtol and n <= numiter:
+    while f**2 >= rtol and n <= numiter:
         xi = np.cos(psi)
         eta = np.sin(psi)
         fd = (1 - c * xi) + s * eta
         fdd = c * eta + s * xi
         f = psi - fdd
-        psi = psi - f * fd / (fd ** 2 - 0.5 * f * fdd)
+        psi = psi - f * fd / (fd**2 - 0.5 * f * fdd)
         n += 1
 
     E = M + psi

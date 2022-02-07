@@ -146,7 +146,7 @@ class EclipseEvent(Event):
         self._primary_body = orbit.attractor
         self._secondary_body = orbit.attractor.parent
         self._epoch = orbit.epoch
-        self.k = self._primary_body.k.to_value(u.km ** 3 / u.s ** 2)
+        self.k = self._primary_body.k.to_value(u.km**3 / u.s**2)
         self.R_sec = self._secondary_body.R.to_value(u.km)
         self.R_primary = self._primary_body.R.to_value(u.km)
 

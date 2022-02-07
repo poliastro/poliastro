@@ -36,14 +36,14 @@ def test_coefficients_over_86km():
 
 # SOLUTIONS DIRECTLY TAKEN FROM COESA76 REPORT
 coesa76_solutions = {
-    0.5 * u.km: [284.90 * u.K, 9.5461e2 * u.mbar, 1.1673 * u.kg / u.m ** 3],
-    1.0 * u.km: [281.651 * u.K, 8.9876e2 * u.mbar, 1.1117 * u.kg / u.m ** 3],
-    10 * u.km: [223.252 * u.K, 2.6499e2 * u.mbar, 4.1351e-1 * u.kg / u.m ** 3],
-    77 * u.km: [204.493 * u.K, 1.7286e-2 * u.mbar, 2.9448e-5 * u.kg / u.m ** 3],
-    86 * u.km: [186.87 * u.K, 3.7338e-3 * u.mbar, 6.958e-6 * u.kg / u.m ** 3],
-    92 * u.km: [186.96 * u.K, 1.2887e-3 * u.mbar, 2.393e-6 * u.kg / u.m ** 3],
-    230 * u.km: [915.78 * u.K, 3.9276e-7 * u.mbar, 1.029e-10 * u.kg / u.m ** 3],
-    1000 * u.km: [1000.0 * u.K, 7.5138e-11 * u.mbar, 3.561e-15 * u.kg / u.m ** 3],
+    0.5 * u.km: [284.90 * u.K, 9.5461e2 * u.mbar, 1.1673 * u.kg / u.m**3],
+    1.0 * u.km: [281.651 * u.K, 8.9876e2 * u.mbar, 1.1117 * u.kg / u.m**3],
+    10 * u.km: [223.252 * u.K, 2.6499e2 * u.mbar, 4.1351e-1 * u.kg / u.m**3],
+    77 * u.km: [204.493 * u.K, 1.7286e-2 * u.mbar, 2.9448e-5 * u.kg / u.m**3],
+    86 * u.km: [186.87 * u.K, 3.7338e-3 * u.mbar, 6.958e-6 * u.kg / u.m**3],
+    92 * u.km: [186.96 * u.K, 1.2887e-3 * u.mbar, 2.393e-6 * u.kg / u.m**3],
+    230 * u.km: [915.78 * u.K, 3.9276e-7 * u.mbar, 1.029e-10 * u.kg / u.m**3],
+    1000 * u.km: [1000.0 * u.K, 7.5138e-11 * u.mbar, 3.561e-15 * u.kg / u.m**3],
 }
 
 

@@ -33,12 +33,12 @@ def test_altitude_crossing():
 
     # Parameters of a body
     C_D = 2.2  # Dimensionless (any value would do)
-    A_over_m = ((np.pi / 4.0) * (u.m ** 2) / (100 * u.kg)).to_value(
-        u.km ** 2 / u.kg
+    A_over_m = ((np.pi / 4.0) * (u.m**2) / (100 * u.kg)).to_value(
+        u.km**2 / u.kg
     )  # km^2/kg
 
     # Parameters of the atmosphere
-    rho0 = rho0_earth.to(u.kg / u.km ** 3).value  # kg/km^3
+    rho0 = rho0_earth.to(u.kg / u.km**3).value  # kg/km^3
     H0 = H0_earth.to(u.km).value  # km
 
     tofs = [50] * u.d
