@@ -139,8 +139,8 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
     f11 = 5.4486432e10 * c15 * x_bar4 + 3.1135104e9 * c13 * x_bar2 + 39916800 * c11
     f12 = 2.17945728e11 * c15 * x_bar3 + 6.2270208e9 * c13 * x_bar
     f13 = 6.53837184 * c15 * x_bar2 + 6.2270208e9 * c13
-    f14 = 1.307674368e13 * c15 * x_bar
-    f15 = 1.307674368e13 * c15
+    f14 = 1.307674368e12 * c15 * x_bar
+    f15 = 1.307674368e12 * c15
 
     # Solving g parameters defined by equations (37a), (37b), (37c) and (37d)
     g1 = 1 / 2
