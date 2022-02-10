@@ -174,9 +174,6 @@ autoapi_add_toctree_entry = False
 
 exclude_patterns.extend(["autoapi/index.rst", "autoapi/poliastro/index.rst"])
 
-# Ignore sphinx-autoapi warnings on multiple target description
-suppress_warnings.append("ref.python")
-
 # Ignore sphinx-autoapi warnings on reimported objects
 # See https://github.com/readthedocs/sphinx-autoapi/issues/285
 suppress_warnings.append("autoapi.python_import_resolution")
