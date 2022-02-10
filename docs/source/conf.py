@@ -174,7 +174,7 @@ autoapi_options = [
 ]
 autoapi_add_toctree_entry = False
 
-exclude_patterns.append("autoapi/index.rst")
+exclude_patterns.extend(["autoapi/index.rst", "autoapi/poliastro/index.rst"])
 
 # Ignore sphinx-autoapi warnings on multiple target description
 suppress_warnings.append("ref.python")
