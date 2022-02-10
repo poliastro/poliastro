@@ -1,5 +1,9 @@
 # What's new
 
+## poliastro 0.16.2 - 2022-02-10
+
+Same as 0.16.1, but fixes the documentation building process.
+
 ## poliastro 0.16.1 - 2022-02-10
 
 This release adds support for Python 3.10,
