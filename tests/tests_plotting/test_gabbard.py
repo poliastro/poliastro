@@ -39,6 +39,7 @@ def test_static_gabbard_plotting():
 
     return fig
 
+
 @pytest.mark.parametrize(
     "dark, expected_color", [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))]
 )
