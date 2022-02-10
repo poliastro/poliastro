@@ -160,8 +160,8 @@ molniya.plot()
 maxdepth: 2
 caption: Tutorials
 ---
-installation.md
-quickstart.md
+installation
+quickstart
 ```
 
 ```{toctree} 
@@ -169,8 +169,8 @@ quickstart.md
 maxdepth: 2
 caption: How-to guides & Examples
 ---
-gallery.md
-contributing.md
+gallery
+contributing
 ```
 
 ```{toctree} 
@@ -178,9 +178,9 @@ contributing.md
 maxdepth: 2 
 caption: Reference
 ---
-api.md
-bibliography.md
-changelog.md
+api
+bibliography
+changelog
 ```
 
 ```{toctree}
@@ -188,9 +188,9 @@ changelog.md
 maxdepth: 2
 caption: Background
 ---
-history.md
-related.md
-background.md
+history
+related
+background
 ```
 
 ```{note}
