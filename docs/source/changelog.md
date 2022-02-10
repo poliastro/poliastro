@@ -29,14 +29,14 @@ and restructures the API documentation to make it more useful.
 This is the complete list of the people that contributed to this
 release, with a + sign indicating first contribution.
 
-- Abhishek K. M.
-- Carlosbogo
+- Abhishek K. M.+
+- Carlosbogo+
 - Juan Luis Cano Rodríguez
-- Luis Grau
+- Luis Grau+
 - Ole Streicher
 - Sebastian M. Ernst
-- TreshUp
-- Varenyam Bhardwaj
+- TreshUp+
+- Varenyam Bhardwaj+
 - Yash Gondhalekar
 
 ## poliastro 0.16.0 - 2021-12-08
