@@ -39,6 +39,13 @@ def test_static_gabbard_plotting():
 
     return fig
 
+@pytest.mark.parametrize(
+    "dark, expected_color", [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))]
+)
+def test_dark_mode_plots_dark_plot(dark, expected_color):
+    gbp = GabbardPlotter(dark=dark)
+    assert gbp._ax.get_facecolor() == expected_color
+
 
 debris_orbits_list = []
 

@@ -7,7 +7,7 @@ from poliastro.plotting.util import generate_label
 class GabbardPlotter:
     """GabbardPlotter class."""
 
-    def __init__(self, ax, dark=False, altitude_unit=u.km, period_unit=u.min):
+    def __init__(self, ax=None, dark=False, altitude_unit=u.km, period_unit=u.min):
 
         self._ax = ax
         if not self._ax:
