@@ -383,11 +383,9 @@ autoapi_dirs = ['../../src/']
 autoapi_options = [
     'members', 'undoc-members', 'show-inheritance', 'show-module-summary', 'special-members',
 ]
+autoapi_add_toctree_entry = False
 
-# Make use of custom templates
-autoapi_template_dir = '_autoapi_templates'
-exclude_patterns.append('_autoapi_templates/index.rst')
-exclude_patterns.append('_autoapi_templates/python/module.rst')
+exclude_patterns.append('autoapi/index.rst')
 
 # Ignore sphinx-autoapi warnings on multiple target description
 suppress_warnings.append('ref.python')
