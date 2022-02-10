@@ -113,7 +113,7 @@ suppress_warnings = ['image.nonlocal_uri']
 
 # General information about the project.
 project = 'poliastro'
-copyright = u'2013-2021, Juan Luis Cano Rodríguez and the poliastro development team'
+copyright = u'2013, Juan Luis Cano Rodríguez and the poliastro development team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
