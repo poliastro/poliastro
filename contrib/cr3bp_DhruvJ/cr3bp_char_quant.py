@@ -22,27 +22,29 @@ Useful ideas:
 
 Physical Qunatities obtained from: JPL’s ephemerides file de405.spk and https://ssd.jpl.nasa.gov/?planet_pos
 """
-import numpy as np
 import copy
 
+import numpy as np
+
+
 def mu_calc(mu_pi):
-    """ Calculate mu of CR3BP
+    """Calculate mu of CR3BP
     Parameters
     ----------
     mu_pi : ndarray, float
         mu_pi[0] = mu of P1
         mu_pi[1] = mu of P2
-    
+
     Returns
     -------
     mu: float, M2/(M1+M2)
         M1 and M2 are mass of Primary Bodies and M2<M1
     """
-    return mu_pi[1]/(mu_pi[0]+mu_pi[1])
+    return mu_pi[1] / (mu_pi[0] + mu_pi[1])
 
 
 def tstar_calc(mu_pi, dist):
-    """ Calculate t* of CR3BP
+    """Calculate t* of CR3BP
     Parameters
     ----------
     dist: float, [nd]
@@ -57,10 +59,11 @@ def tstar_calc(mu_pi, dist):
         sqrt(dist^3/m*)
         Non-dimensional time of P1-P2 system
     """
-    return (dist**3/(mu_pi[0]+mu_pi[1]))**0.5  
+    return (dist**3 / (mu_pi[0] + mu_pi[1])) ** 0.5
 
-def bodies_char(b1,b2):
-    """ Calculates mu, dist[km], t* [nd] of the 'body_i - body_j system'
+
+def bodies_char(b1, b2):
+    """Calculates mu, dist[km], t* [nd] of the 'body_i - body_j system'
     Parameters
     ----------
     b1 : string
@@ -79,74 +82,75 @@ def bodies_char(b1,b2):
         Non-dimensional time of P1-P2 system
     """
     # Body values
-    mu = {} #km^4 kg^-1 s^-2
-    mu['Sun'] = 132712440017.99
-    mu['Moon'] = 4902.8005821478
-    mu['Earth'] = 398600.4415
+    mu = {}  # km^4 kg^-1 s^-2
+    mu["Sun"] = 132712440017.99
+    mu["Moon"] = 4902.8005821478
+    mu["Earth"] = 398600.4415
 
-    mu['Mars'] = 42828.314258067 # Mars, GM
-    mu['Jupiter'] = 126712767.8578 # Jupiter, GM
-    mu['Saturn'] = 37940626.061137 # Saturn, GM
-    mu['Uranus'] = 5794549.0070719 # Uranus, GM
-    mu['Neptune'] = 6836534.0638793 # Neptune, GM
-    mu['Pluto'] = 981.600887707 # Pluto, GM
-    
-    mu['Phobos'] = 0.0007112 # Phobos, GM
-    mu['Titan'] = 8978.1382 # Titan, GM
-    mu['Ganymede'] = 9887.834 # Ganymede, GM
-    mu['Titania'] = 228.2 # Titania, GM
-    mu['Triton'] = 1427.598 # Triton, GM
-    mu['Charon'] = 102.30 # Charon, GM
+    mu["Mars"] = 42828.314258067  # Mars, GM
+    mu["Jupiter"] = 126712767.8578  # Jupiter, GM
+    mu["Saturn"] = 37940626.061137  # Saturn, GM
+    mu["Uranus"] = 5794549.0070719  # Uranus, GM
+    mu["Neptune"] = 6836534.0638793  # Neptune, GM
+    mu["Pluto"] = 981.600887707  # Pluto, GM
 
-    
+    mu["Phobos"] = 0.0007112  # Phobos, GM
+    mu["Titan"] = 8978.1382  # Titan, GM
+    mu["Ganymede"] = 9887.834  # Ganymede, GM
+    mu["Titania"] = 228.2  # Titania, GM
+    mu["Triton"] = 1427.598  # Triton, GM
+    mu["Charon"] = 102.30  # Charon, GM
+
     #############
-    distances = {} #km
-    distances['EarthMoon'] = 384400 
-    distances['SunEarth'] = 149600000
+    distances = {}  # km
+    distances["EarthMoon"] = 384400
+    distances["SunEarth"] = 149600000
 
-    distances['SunMars'] = 227944135
-    distances['SunJupiter'] = 778279959
-    distances['SunSaturn'] = 1427387908
-    distances['SunUranus'] = 2870480873
-    distances['SunNeptune'] = 4498337290
-    distances['SunPluto'] =  5907150229  
-    
-    distances['MarsPhobos'] = 9376
-    distances['JupiterGanymede'] = 1070400
-    distances['SaturnTitan'] = 1221865
-    distances['UranusTitania'] = 436300
-    distances['NeptuneTriton'] = 354759
-    distances['PlutoCharon'] = 17536
+    distances["SunMars"] = 227944135
+    distances["SunJupiter"] = 778279959
+    distances["SunSaturn"] = 1427387908
+    distances["SunUranus"] = 2870480873
+    distances["SunNeptune"] = 4498337290
+    distances["SunPluto"] = 5907150229
+
+    distances["MarsPhobos"] = 9376
+    distances["JupiterGanymede"] = 1070400
+    distances["SaturnTitan"] = 1221865
+    distances["UranusTitania"] = 436300
+    distances["NeptuneTriton"] = 354759
+    distances["PlutoCharon"] = 17536
     #########
-    
+
     mu_pi = []
-   
+
     try:
         temp1 = mu[b1]
         temp2 = mu[b2]
     except KeyError:
-        print('KeyError-> Incorrect/Does Not Exist Input Bodies name')
+        print("KeyError-> Incorrect/Does Not Exist Input Bodies name")
         return 0, 0, 0
-    
+
     # Sort P1 and P2 based on their mu values
-    if mu[b1] >= mu[b2]: #b1 is the bigger primary
+    if mu[b1] >= mu[b2]:  # b1 is the bigger primary
         mu_pi.append(mu[b1])
         mu_pi.append(mu[b2])
-        bodies = b1+b2
-    else: # b2 is the bigger primary
+        bodies = b1 + b2
+    else:  # b2 is the bigger primary
         mu_pi.append(mu[b2])
         mu_pi.append(mu[b1])
 
-        # To create string to get distance     
-        bodies = b2+b1
-    
-    mu = mu_calc(mu_pi) 
-    
+        # To create string to get distance
+        bodies = b2 + b1
+
+    mu = mu_calc(mu_pi)
+
     try:
-        dist =  distances[bodies]
+        dist = distances[bodies]
     except KeyError:
-        print('KeyError-> Error in combination of bodies P1-P2, typo/DNE/combo not created')
+        print(
+            "KeyError-> Error in combination of bodies P1-P2, typo/DNE/combo not created"
+        )
         return 0, 0, 0
     else:
         tstar = tstar_calc(mu_pi, dist)
-        return mu, dist, tstar    
+        return mu, dist, tstar
