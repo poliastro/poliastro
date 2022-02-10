@@ -178,7 +178,7 @@ contributing.md
 maxdepth: 2 
 caption: Reference
 ---
-autoapi/index.rst
+api.md
 bibliography.md
 changelog.md
 ```
