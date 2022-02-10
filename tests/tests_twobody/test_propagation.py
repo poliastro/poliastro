@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 import pytest
 from astropy import time, units as u
@@ -36,6 +34,7 @@ from poliastro.twobody.propagation import (
     markley,
     mikkola,
     pimienta,
+    propagate,
     vallado,
 )
 from poliastro.util import norm
@@ -390,6 +389,18 @@ def test_long_propagations_vallado_agrees_farnocchia():
     assert_quantity_allclose(v_mm, v_k)
 
 
+def test_farnocchia_propagation_very_high_ecc_does_not_fail():
+    # Regression test for #1296.
+    r = np.array([-500, 1500, 4012.09]) << u.km
+    v = np.array([5021.38, -2900.7, 1000.354]) << u.km / u.s
+    orbit = Orbit.from_vectors(Earth, r, v, epoch=time.Time("2020-01-01"))
+
+    tofs = [74] << u.s  # tof = 74s and above is the critical region.
+    coords = propagate(orbit, tofs)
+
+    assert not np.isnan(coords.get_xyz()).any()
+
+
 @st.composite
 def with_units(draw, elements, unit):
     value = draw(elements)
@@ -427,7 +438,6 @@ def test_propagation_sets_proper_epoch():
     assert propagated.epoch == expected_epoch
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_sample_custom_body_raises_warning_and_returns_coords():
     # See https://github.com/poliastro/poliastro/issues/649
     orbit = Orbit.circular(Moon, 100 * u.km)

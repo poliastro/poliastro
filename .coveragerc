@@ -4,6 +4,7 @@ source = src
 [run]
 branch = True
 source = src
+
+[report]
 omit =
-    src/poliastro/tests/*
-    src/poliastro/twobody/tests/*
+    contrib/*

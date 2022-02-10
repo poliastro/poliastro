@@ -6,7 +6,7 @@ Name:         | poliastro
 **Author**:   | Juan Luis Cano Rodríguez [![orcid](https://img.shields.io/badge/id-0000--0002--2187--161X-a6ce39.svg)](http://orcid.org/0000-0002-2187-161X)
 **Version**:  | 0.16.0
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.16.x)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.16.x)
+[![poliastro](https://img.shields.io/circleci/build/gh/poliastro/poliastro/main?style=flat-square)](https://circleci.com/gh/poliastro/poliastro/?branch=0.16.x)
 [![codecov](https://img.shields.io/codecov/c/github/poliastro/poliastro.svg?style=flat-square)](https://codecov.io/github/poliastro/poliastro?branch=0.16.x)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/poliastro/poliastro/0.16.x.svg)](https://results.pre-commit.ci/latest/github/poliastro/poliastro/0.16.x)
 
@@ -52,14 +52,14 @@ be read on the wonderful [Read the Docs](https://readthedocs.org/).
 
 # Examples
 
-[![mybinder](https://img.shields.io/badge/launch-binder-e66581.svg?style=flat-square)](https://beta.mybinder.org/v2/gh/poliastro/poliastro/0.16.x?filepath=index.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poliastro/poliastro/0.16.x?labpath=index.ipynb)
 
 In the examples directory you can find several Jupyter notebooks with
 specific applications of poliastro. You can launch a cloud Jupyter
-server using [binder](https://beta.mybinder.org/) to edit the notebooks
+server using [binder](https://mybinder.org/) to edit the notebooks
 without installing anything. Try it out!
 
-<https://beta.mybinder.org/v2/gh/poliastro/poliastro/0.16.x?filepath=index.ipynb>
+<https://mybinder.org/v2/gh/poliastro/poliastro/0.16.x?labpath=index.ipynb>
 
 # Requirements
 
@@ -73,10 +73,9 @@ poliastro requires the following Python packages:
 - plotly, for 2D and 3D interactive orbit plotting
 - SciPy, for root finding and numerical propagation
 
-poliastro is tested on Linux, OS X and Windows on Python 3.7 and 3.8
-against latest NumPy.
+poliastro is supported on Linux, macOS and Windows on Python 3.8 to 3.10.
 
-[![azure_pipelines](https://dev.azure.com/poliastro/poliastro/_apis/build/status/poliastro.poliastro?branchName=0.16.x)](https://dev.azure.com/poliastro/poliastro/_build/latest?definitionId=1&branchName=0.16.x)
+[![poliastro](https://img.shields.io/circleci/build/gh/poliastro/poliastro/main?style=flat-square)](https://circleci.com/gh/poliastro/poliastro/?branch=0.16.x)
 
 # Installation
 
@@ -176,7 +175,7 @@ such as TLE/3LE, OMM, and the like.
 Besides, poliastro is a community project that strives to be easy to use,
 while at the same time producing correct results
 [that are validated](https://github.com/poliastro/validation/)
-against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/v0.16.0/about.html#related-software)
+against other [commonly used Astrodynamics software](https://docs.poliastro.space/en/v0.16.1/related.html)
 such as GMAT and Orekit.
 Therefore, you might find that its API is very different from
 these projects,

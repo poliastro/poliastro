@@ -1,5 +1,4 @@
 import pickle
-import sys
 from collections import OrderedDict
 from functools import partial
 from unittest import mock
@@ -387,7 +386,6 @@ def test_orbit_no_frame_representation():
     assert str(ss) == repr(ss) == expected_str
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_sample_numpoints():
     _d = 1.0 * u.AU  # Unused distance
     _ = 0.5 * u.one  # Unused dimensionless value
@@ -400,7 +398,6 @@ def test_sample_numpoints():
     assert len(positions) == 50
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.parametrize("num_points", [3, 5, 7, 9, 11, 101])
 def test_sample_num_points(num_points):
     # Data from Vallado, example 2.4
@@ -417,7 +414,6 @@ def test_sample_num_points(num_points):
     # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_sample_big_orbits():
     # See https://github.com/poliastro/poliastro/issues/265
     ss = Orbit.from_vectors(
@@ -429,7 +425,6 @@ def test_sample_big_orbits():
     assert len(positions) == 15
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_hyperbolic_nu_value_check(hyperbolic):
     positions = hyperbolic.sample(100)
 
@@ -437,7 +432,6 @@ def test_hyperbolic_nu_value_check(hyperbolic):
     assert len(positions) == 100
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_hyperbolic_modulus_wrapped_nu():
     ss = Orbit.from_vectors(
         Sun,
@@ -451,7 +445,6 @@ def test_hyperbolic_modulus_wrapped_nu():
     assert_quantity_allclose(positions[0].xyz, ss.r)
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.parametrize("min_anomaly", [-30 * u.deg, -10 * u.deg])
 @pytest.mark.parametrize("max_anomaly", [10 * u.deg, 30 * u.deg])
 def test_sample_hyperbolic_limits(hyperbolic, min_anomaly, max_anomaly):
@@ -464,7 +457,6 @@ def test_sample_hyperbolic_limits(hyperbolic, min_anomaly, max_anomaly):
     assert len(coords) == num_points
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_sample_hyperbolic_outside_limits(hyperbolic):
     with pytest.warns(OrbitSamplingWarning, match="anomaly outside range, clipping"):
         hyperbolic.sample(3, min_anomaly=-np.pi * u.rad)
@@ -482,7 +474,6 @@ def test_orbit_is_pickable(hyperbolic):
     assert ss_result.epoch == hyperbolic.epoch
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_orbit_plot_is_static():
     # Data from Curtis, example 4.3
     r = [-6_045, -3_490, 2_500] * u.km
@@ -507,7 +498,6 @@ def test_orbit_plot_static_3d():
         ss.plot(use_3d=True)
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 @pytest.mark.parametrize("use_3d", [False, True])
 def test_orbit_plot_is_not_static(use_3d):
     from plotly.graph_objects import Figure
@@ -1079,7 +1069,6 @@ def test_propagate_to_anomaly_gives_expected_result():
     )
 
 
-@pytest.mark.xfail(sys.maxsize < 2 ** 32, reason="not supported for 32 bit systems")
 def test_sample_with_out_of_range_anomaly_works():
     # From "Going to Jupiter with Python using Jupyter and poliastro.ipynb"
     ic1 = Orbit.from_vectors(

@@ -9,7 +9,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "poliastro"
 readme = "README.md"
-requires-python = ">=3.7,<3.10"
+requires-python = ">=3.8,<3.11"
 license = {file = "COPYING"}
 authors = [
     {name = "Juan Luis Cano Rodríguez", email = "hello@juanlu.space"}
@@ -32,10 +32,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
@@ -68,7 +67,7 @@ Funding = "https://opencollective.com/poliastro"
 jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
 dev = [
-    "black==21.9b0",
+    "black==21.12b0",
     "coverage",
     "hypothesis",
     "import-linter",
@@ -77,6 +76,7 @@ dev = [
     "isort",
     "jupyter-client",
     "jupytext",
+    "httpx",
     "mypy>=0.740",
     "myst-parser>=0.13.1",
     "nbsphinx>=0.8.6",
@@ -88,9 +88,10 @@ dev = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
+    "sgp4",
     "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
-    "sphinx-gallery",
+    "sphinx-gallery<=0.7.0",  # Just to avoid the jupytext warning
     "sphinx_rtd_theme~=1.0.0rc1",
     "sphinx-hoverxref==0.7b1",
     "sphinx-notfound-page",

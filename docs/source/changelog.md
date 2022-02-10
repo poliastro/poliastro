@@ -1,5 +1,44 @@
 # What's new
 
+## poliastro 0.16.1 - 2022-02-10
+
+This release adds support for Python 3.10,
+fixes some bugs found after 0.16.0,
+adds a new example to read OMM and TLE data,
+and restructures the API documentation to make it more useful.
+
+### New features
+
+- Add support for Python 3.10 (supported Python versions are 3.8, 3.9, and 3.10)
+
+### Documentation improvements
+
+- Add notebook on OMM and TLE data ({github}`PR #1428 <#1428>`)
+- Restructure the API index page to make it more informative ({github}`PR #1476 <#1476>`)
+- Fix various typos, spelling errors, missing docstrings, and broken links
+- Fix Binder environment ({github}`Issue #1460 <#1460>`)
+
+### Bugs fixed
+
+- Make `Orbit.plot()` work for 32bit ({github}`Issue #1399 <#1399>`)
+- Fix pickling behaviour of `Body` objects ({github}`Issue #1395 <#1395>`)
+- Fix propagation of highly hyperbolic orbits ({github}`Issue #1296 <#1296>`)
+
+### Contributors
+
+This is the complete list of the people that contributed to this
+release, with a + sign indicating first contribution.
+
+- Abhishek K. M.
+- Carlosbogo
+- Juan Luis Cano Rodríguez
+- Luis Grau
+- Ole Streicher
+- Sebastian M. Ernst
+- TreshUp
+- Varenyam Bhardwaj
+- Yash Gondhalekar
+
 ## poliastro 0.16.0 - 2021-12-08
 
 This new major release includes lots of API changes and enhancements,
