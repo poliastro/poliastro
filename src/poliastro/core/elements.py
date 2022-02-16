@@ -71,9 +71,9 @@ def rv_pqw(k, p, ecc, nu):
 
     Returns
     -------
-    r: ndarray
+    r: numpy.ndarray
         Position. Dimension 3 vector
-    v: ndarray
+    v: numpy.ndarray
         Velocity. Dimension 3 vector
 
     Notes
@@ -151,9 +151,9 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
 
     Returns
     -------
-    r_ijk: np.array
+    r_ijk: numpy.ndarray
         Position vector in basis ijk.
-    v_ijk: np.array
+    v_ijk: numpy.ndarray
         Velocity vector in basis ijk.
 
     Notes
@@ -508,9 +508,9 @@ def mee2rv(p, f, g, h, k, L):
 
     Returns
     -------
-    r: np.array
+    r: numpy.ndarray
         Position vector.
-    v: np.array
+    v: numpy.ndarray
         Velocity vector.
 
     Note

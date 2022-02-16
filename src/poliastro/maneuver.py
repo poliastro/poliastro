@@ -68,7 +68,7 @@ class Maneuver:
 
         Parameters
         ----------
-        dv : np.array
+        dv : numpy.ndarray
             Velocity components of the impulse.
 
         """
