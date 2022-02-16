@@ -75,7 +75,7 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
     Returns
     -------
     a_d : function
-    delta_V : numpy.array
+    delta_V : numpy.ndarray
     t_f : float
 
     Notes
