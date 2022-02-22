@@ -104,17 +104,15 @@ def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP
         )
         return 0
 
-        
-
     # Skeleton function for CR3BP + STM Numerical Integration
     def NDDE_STM(t, x):
 
         n = 1
-        d, r = rel_dist_cr3bp(mu,x) # Relative position vectors
-        
-        dx = np.empty((len(x),),dtype=datatype)
-        
-        #CR3BP: 6 states 
+        d, r = rel_dist_cr3bp(mu, x)  # Relative position vectors
+
+        dx = np.empty((len(x),), dtype=datatype)
+
+        # CR3BP: 6 states
 
         # CR3BP: 6 states
         dx[0] = x[3]
@@ -260,8 +258,9 @@ def save_prop_data_cr3p(fun, stm_bool, datatype):
 
     return results
 
-def rel_dist_cr3bp(mu,states):
-    """Compute distance between a satellite(P3) defined in P1-P2 barycenter 
+
+def rel_dist_cr3bp(mu, states):
+    """Compute distance between a satellite(P3) defined in P1-P2 barycenter
         to P1 and P2 in CR3BP
     Dhruv Jain, Jan 9 2022
 
@@ -353,13 +352,17 @@ def ui_partials_acc_cr3bp(mu, states):
         M1 and M2 are mass of Primary Bodies and M2<M1
     states : numpy ndarray (6x1)
         States are defined about the barycenter of the two primaries, P1 and P2
-    """    
-    d, r = rel_dist_cr3bp(mu,states)
-    Ux = states[0] - (1-mu)/d**3*(states[0]+mu) - mu/r**3*(states[0]-1+mu)
-    Uy = states[1] - (1-mu)/d**3*states[1] - mu/r**3*states[1]
-    Uz = - (1-mu)/d**3*states[2] - mu/r**3*states[2]
-    ax = 2*states[4] + Ux
-    ay = -2*states[3] + Uy
+    """
+    d, r = rel_dist_cr3bp(mu, states)
+    Ux = (
+        states[0]
+        - (1 - mu) / d**3 * (states[0] + mu)
+        - mu / r**3 * (states[0] - 1 + mu)
+    )
+    Uy = states[1] - (1 - mu) / d**3 * states[1] - mu / r**3 * states[1]
+    Uz = -(1 - mu) / d**3 * states[2] - mu / r**3 * states[2]
+    ax = 2 * states[4] + Ux
+    ay = -2 * states[3] + Uy
     az = Uz
 
     return Ux, Uy, Uz, ax, ay, az

@@ -53,12 +53,12 @@ def spherical_to_cartesian(v):
 
     Parameters
     ----------
-    v : np.array
+    v : numpy.ndarray
         Spherical coordinates in 3D (norm, colat, long). Angles must be in radians.
 
     Returns
     -------
-    v : np.array
+    v : numpy.ndarray
         Cartesian coordinates (x,y,z)
 
     """
