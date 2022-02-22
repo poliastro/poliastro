@@ -22,10 +22,23 @@ Useful ideas:
 
 Physical Qunatities obtained from: JPL’s ephemerides file de405.spk and https://ssd.jpl.nasa.gov/?planet_pos
 """
-from poliastro.bodies import Sun, Earth, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
-
 import copy
+
 import numpy as np
+
+from poliastro.bodies import (
+    Earth,
+    Jupiter,
+    Mars,
+    Mercury,
+    Moon,
+    Neptune,
+    Pluto,
+    Saturn,
+    Sun,
+    Uranus,
+    Venus,
+)
 
 
 def mu_calc(mu_pi):
@@ -83,24 +96,24 @@ def bodies_char(b1, b2):
         Non-dimensional time of P1-P2 system
     """
     # Body values
-    mu = {} #km^3 kg^-1 s^-2
-    mu['Sun'] = Sun.k.value*1e-9
-    mu['Moon'] = Moon.k.value*1e-9
-    mu['Earth'] = Earth.k.value*1e-9 
+    mu = {}  # km^3 kg^-1 s^-2
+    mu["Sun"] = Sun.k.value * 1e-9
+    mu["Moon"] = Moon.k.value * 1e-9
+    mu["Earth"] = Earth.k.value * 1e-9
 
-    mu['Mars'] = Mars.k.value*1e-9 
-    mu['Jupiter'] = Jupiter.k.value*1e-9 
-    mu['Saturn'] = Saturn.k.value*1e-9
-    mu['Uranus'] = Uranus.k.value*1e-9 
-    mu['Neptune'] = Neptune.k.value*1e-9 
-    mu['Pluto'] = Pluto.k.value*1e-9
-    
-    mu['Phobos'] = 0.0007112 # Phobos, GM
-    mu['Titan'] = 8978.1382 # Titan, GM
-    mu['Ganymede'] = 9887.834 # Ganymede, GM
-    mu['Titania'] = 228.2 # Titania, GM
-    mu['Triton'] = 1427.598 # Triton, GM
-    mu['Charon'] = 102.30 # Charon, GM
+    mu["Mars"] = Mars.k.value * 1e-9
+    mu["Jupiter"] = Jupiter.k.value * 1e-9
+    mu["Saturn"] = Saturn.k.value * 1e-9
+    mu["Uranus"] = Uranus.k.value * 1e-9
+    mu["Neptune"] = Neptune.k.value * 1e-9
+    mu["Pluto"] = Pluto.k.value * 1e-9
+
+    mu["Phobos"] = 0.0007112  # Phobos, GM
+    mu["Titan"] = 8978.1382  # Titan, GM
+    mu["Ganymede"] = 9887.834  # Ganymede, GM
+    mu["Titania"] = 228.2  # Titania, GM
+    mu["Triton"] = 1427.598  # Triton, GM
+    mu["Charon"] = 102.30  # Charon, GM
 
     #############
     distances = {}  # km
