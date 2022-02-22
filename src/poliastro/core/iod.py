@@ -57,7 +57,7 @@ def vallado(k, r0, r, tof, M, prograde, lowpath, numiter, rtol):
         Initial position vector
     r : numpy.ndarray
         Final position vector
-    tof : ~float
+    tof : float
         Time of flight
     M : int
         Number of revolutions
@@ -178,9 +178,9 @@ def izzo(k, r1, r2, tof, M, prograde, lowpath, numiter, rtol):
     ----------
     k : float
         Gravitational Constant
-    r1 : ~numpy.array
+    r1 : numpy.ndarray
         Initial position vector
-    r2 : ~numpy.array
+    r2 : numpy.ndarray
         Final position vector
     tof : float
         Time of flight between both positions
@@ -198,9 +198,9 @@ def izzo(k, r1, r2, tof, M, prograde, lowpath, numiter, rtol):
 
     Returns
     -------
-    v1: ~numpy.array
+    v1: numpy.ndarray
         Initial velocity vector
-    v2: ~numpy.array
+    v2: numpy.ndarray
         Final velocity vector
 
     """
