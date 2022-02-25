@@ -6,19 +6,19 @@ Created on 10 Nov 2021 22:43:38 2022
 
 Objective: This file contains functions to compute various characteristic quantities
            for a Cirular Restircted Three Body Problem (CR3BP) model setup
-           
+
            Features: 
                1. Compute CR3BP 'mu', mass ratio of P1-P2 primary bodies
                2. Compute CR3BP 'l*', characterisitic lenght of P1-P2 primary bodies
                3. Comptue CR3BP 't*', charcterisitic time of P1-P2 primary bodies
-               
-Useful ideas: 
+
+Useful ideas:
 1. To non-dimensioanlize a physical position vector: divide by l*
 2. To dimensioanlize a [nd] position vector: multiply by l*
 3. To non-dimensionalize a physical veloctiy vecotr, multiply by t*/l*
 4. To dimensionalize a [nd] veloctiy vecotr, multiply by l*/t*
 5. Position of P1 = [-mu, 0, 0] [nd] {x,y,z}
-5. Position of P2 = [1-mu, 0, 0] [nd] {x,y,z} 
+5. Position of P2 = [1-mu, 0, 0] [nd] {x,y,z}
 
 Physical Qunatities obtained from: JPL’s ephemerides file de405.spk and https://ssd.jpl.nasa.gov/?planet_pos
 """

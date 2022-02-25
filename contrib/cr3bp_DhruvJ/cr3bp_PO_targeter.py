@@ -3,7 +3,7 @@ Created on Mon Feb 21 20:37:16 2022
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
     dhruvj9922@gmail.com
-       
+
 Objective: This file contains functions required to target a Periodic Orbit in the Circular Restricted
     Three Body Problem (CR3BP) model
 
@@ -21,8 +21,6 @@ These are some of the referneces that provide a comprehensive brackground and ha
 3. V. Szebehely, "Theory of Orbits: The Restricted Problem of Three Bodies", 1967
 4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006
 """
-import copy
-
 import numpy as np
 from cr3bp_master import prop_cr3bp
 

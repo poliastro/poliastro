@@ -3,12 +3,12 @@ Created on Jan 8 21:42:49 2022
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
-       
+
 Objective: This file contains key functions required to numerically integrate a
     state defined about the barycenter of two primaries in the Circular Restricted
     Three Body Problem (CR3BP) model
-   
-    Features: 
+
+    Features:
         1. Integrate CR3BP EOMs
         2. Integrate CR3BP EOMs + Compute the State Transition Matrix for each state
         3. Optional events function is added to numerical integrator to track when states move from -y to +y region and/or visa versa
