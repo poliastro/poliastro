@@ -139,8 +139,10 @@ def bodies_char(b1, b2):
         temp1 = mu[b1]
         temp2 = mu[b2]
         if temp1 == temp2:
-            print('Same bodies passed as P1 and P2. Please pass the secondary body of P1 as P2')
-            return 0,0,0
+            print(
+                "Same bodies passed as P1 and P2. Please pass the secondary body of P1 as P2"
+            )
+            return 0, 0, 0
     except KeyError:
         print("KeyError-> Incorrect/Does Not Exist Input Bodies name")
         return 0, 0, 0
