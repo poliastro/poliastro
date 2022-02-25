@@ -7,7 +7,7 @@ Created on 10 Nov 2021 22:43:38 2022
 Objective: This file contains functions to compute various characteristic quantities
            for a Cirular Restircted Three Body Problem (CR3BP) model setup
 
-           Features: 
+           Features:
                1. Compute CR3BP 'mu', mass ratio of P1-P2 primary bodies
                2. Compute CR3BP 'l*', characterisitic lenght of P1-P2 primary bodies
                3. Comptue CR3BP 't*', charcterisitic time of P1-P2 primary bodies
