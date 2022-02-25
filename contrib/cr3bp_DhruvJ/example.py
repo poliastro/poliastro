@@ -24,14 +24,14 @@ print("Earth-Moon Li:", li)
 
 # Arbitrary state
 ic = [1.05903, -0.067492, -0.103524, -0.170109, 0.0960234, -0.135279]
-JC0 = JC(mu, ic[0:3], ic[3:6]) # Compute Jacobi Constant
+JC0 = JC(mu, ic[0:3], ic[3:6])  # Compute Jacobi Constant
 print("Jacobi constant:", JC0)
 
 # Propagate the arbitrary state for time = 0 to tf
 tf = 10
 results = prop_cr3bp(mu, ic, tf, stm_bool=0, xcross_cond=1)
 
-#Plot P1, P2, Libration points and configuration space state history of the arbirtray state
+# Plot P1, P2, Libration points and configuration space state history of the arbirtray state
 pltnum = 1
 plt.figure(pltnum)
 ax = plt.axes(projection="3d")
