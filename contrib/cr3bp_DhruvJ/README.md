@@ -10,7 +10,7 @@ I hope to add the capability to investiage the dynamical flows in CR3BP for Poli
 
 I will also be working to leverage the preexisisting functions of poliastro to further streamline these features and tweak cr3bp_master.py to be a class. 
 
-The current work requires the widely used scipy, numpy and matplotlib libraries. 
+The current work requires the widely used numpy and matplotlib libraries. 
 
 ## Future Work: 
 I want to make the entire setup more robust. Create a good starting point for users to compute families of periodic orbits and understand the general dynamical flows in CR3BP

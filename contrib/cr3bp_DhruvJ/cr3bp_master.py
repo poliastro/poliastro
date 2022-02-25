@@ -3,11 +3,11 @@ Created on Jan 8 21:42:49 2022
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
-        
-Objective: This file contains key functions required to numerically integrate a 
+       
+Objective: This file contains key functions required to numerically integrate a
     state defined about the barycenter of two primaries in the Circular Restricted
     Three Body Problem (CR3BP) model
-    
+   
     Features: 
         1. Integrate CR3BP EOMs
         2. Integrate CR3BP EOMs + Compute the State Transition Matrix for each state
@@ -17,11 +17,11 @@ Objective: This file contains key functions required to numerically integrate a
 References
 ____________
 This work heavily relies on the work done by the various past and current members of the Multi-Body Dynamics Research Group and Prof. Kathleen C. Howell
-These are some of the referneces that provide a comprehensive brackground and have been the foundation for the work: 
+These are some of the referneces that provide a comprehensive brackground and have been the foundation for the work:
 1. E. Zimovan, "Characteristics and Design Strategies for Near Rectilinear Halo Orbits Within the Earth-Moon System," M.S., August 2017
 2. E. Zimovan Spreen, "Trajectory Design and Targeting for Applications to the Exploration Program in Cislunar Space," Ph.D., May 2021
 3. V. Szebehely, "Theory of Orbits: The Restricted Problem of Three Bodies", 1967
-4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006 
+4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006
 """
 
 import numpy as np

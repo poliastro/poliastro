@@ -8,7 +8,6 @@ This is an exmaple file to test the CR3BP functions
 """
 
 import matplotlib.pyplot as plt
-import numpy as np
 from cr3bp_char_quant import bodies_char
 from cr3bp_lib_JC_calc import JC, lib_pt_loc
 from cr3bp_master import prop_cr3bp

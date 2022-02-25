@@ -5,9 +5,9 @@ Created on 7 Jan 22 12:24:03 2021
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, MSAAE Purdue University
         dhruvj9922@gmail.com
 
-Objectve: This function has the two following features:  
+Objectve: This function has the two following features:
     1. Calculate the position [nd] of 5 libration points for a system in CR3BP
-    2. Compute Jacobi Constant [nd] 
+    2. Compute Jacobi Constant [nd]
 """
 import numpy as np
 

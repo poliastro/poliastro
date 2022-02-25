@@ -22,10 +22,6 @@ Useful ideas:
 
 Physical Qunatities obtained from: JPL’s ephemerides file de405.spk and https://ssd.jpl.nasa.gov/?planet_pos
 """
-import copy
-
-import numpy as np
-
 from poliastro.bodies import (
     Earth,
     Jupiter,
@@ -98,6 +94,8 @@ def bodies_char(b1, b2):
     # Body values
     mu = {}  # km^3 kg^-1 s^-2
     mu["Sun"] = Sun.k.value * 1e-9
+    mu["Mercury"] = Mercury.k.value * 1e-9
+    mu["Venus"] = Venus.k.value * 1e-9
     mu["Moon"] = Moon.k.value * 1e-9
     mu["Earth"] = Earth.k.value * 1e-9
 
@@ -140,6 +138,9 @@ def bodies_char(b1, b2):
     try:
         temp1 = mu[b1]
         temp2 = mu[b2]
+        if temp1 == temp2:
+            print('Same bodies passed as P1 and P2. Please pass the secondary body of P1 as P2')
+            return 0,0,0
     except KeyError:
         print("KeyError-> Incorrect/Does Not Exist Input Bodies name")
         return 0, 0, 0

@@ -3,11 +3,11 @@ Created on Mon Feb 21 20:37:16 2022
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
     dhruvj9922@gmail.com
-        
+       
 Objective: This file contains functions required to target a Periodic Orbit in the Circular Restricted
     Three Body Problem (CR3BP) model
-    
-    Features: 
+
+    Features:
         1. Setup multiple nodes to use a Multiple Shooter Targeter
         2. (will be added)Periodic Orbit Multiple Shooter Targeter (Acts as a single shooter if n_node == 1)
         3. (will be added)Newton-Raphson Solver
@@ -15,15 +15,14 @@ Objective: This file contains functions required to target a Periodic Orbit in t
 References
 ____________
 This work heavily relies on the work done by the various past and current members of the Multi-Body Dynamics Research Group and Prof. Kathleen C. Howell
-These are some of the referneces that provide a comprehensive brackground and have been the foundation for the work: 
+These are some of the referneces that provide a comprehensive brackground and have been the foundation for the work:
 1. E. Zimovan, "Characteristics and Design Strategies for Near Rectilinear Halo Orbits Within the Earth-Moon System," M.S., August 2017
 2. E. Zimovan Spreen, "Trajectory Design and Targeting for Applications to the Exploration Program in Cislunar Space," Ph.D., May 2021
 3. V. Szebehely, "Theory of Orbits: The Restricted Problem of Three Bodies", 1967
-4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006 
+4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006
 """
 import numpy as np
 from cr3bp_master import prop_cr3bp
-import copy
 
 def multi_shooter_nodes_setup_cr3bp(mu, ic, tf, n_node, node_place_opt = 'time', int_tol=1e-12):
     """
