@@ -13,6 +13,7 @@ from urllib.request import urlopen, Request
 from astropy.time import Time
 import astropy.units as u
 import numpy as np
+import plotly.graph_objects as go
 
 from poliastro.bodies import Sun
 from poliastro.frames import Planes
@@ -30,15 +31,22 @@ from poliastro.core.angles import (
 CWD = os.path.dirname(__file__)
 MPC_URL = 'https://minorplanetcenter.net/Extended_Files/neam00_extended.json.gz'
 DATA_FN = os.path.join(CWD, 'data.json')
+PLOT_FN = os.path.join(CWD, 'benchmark.htm')
 
 
-def benchmark(limit_exp: float = 2.0, limit_exp_step: float = 0.5):
+def benchmark(
+    limit_exp: float = 2.0, # 10 ** limit_exp
+    limit_exp_step: float = 0.5,
+    plot_fn: str = PLOT_FN,
+    data_fn: str = DATA_FN,
+    data_url: str = MPC_URL,
+):
     "run and plot simple benchmark"
 
     assert limit_exp >= 0
     steps = (10 ** np.arange(0, limit_exp + limit_exp_step, limit_exp_step)).astype('i8')
 
-    bodies = _get_bodies()
+    bodies = _get_bodies(data_fn = data_fn, data_url = data_url)
     limit = int(steps[-1])
     assert limit <= len(bodies)
     orbs = _orbs_from_mpc(bodies[:limit])
@@ -69,7 +77,24 @@ def benchmark(limit_exp: float = 2.0, limit_exp_step: float = 0.5):
     if gc_flag:
         gc.enable()
 
-    print(steps, times)
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x = steps,
+            y = np.array(times) / steps,
+            name = 'Iterative',
+            # line = dict(color = 'firebrick', width = 4)
+        )
+    )
+
+    fig.update_layout(
+        title = 'Simple Orbit Propagation Benchmark',
+        xaxis_title = 'Number of Propagations',
+        yaxis_title = 'Time per Iteration [s]',
+    )
+
+    fig.write_html(plot_fn, auto_open = True)
 
 
 def _download(url: str, binary: bool = True) -> Union[str, bytes]:
@@ -87,7 +112,7 @@ def _download(url: str, binary: bool = True) -> Union[str, bytes]:
     return data.decode('utf-8')
 
 
-def _get_bodies(data_fn: str = DATA_FN, data_url: str = MPC_URL) -> list[dict]:
+def _get_bodies(data_fn: str, data_url: str) -> list[dict]:
     "load MPC data from disk and/or internet"
 
     if not os.path.exists(data_fn):
