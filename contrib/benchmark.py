@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import gc
 from gzip import decompress
 import json
 from multiprocessing import Pool, cpu_count
 import os
+from time import time
 from typing import Union
 from urllib.request import urlopen, Request
 
@@ -28,12 +30,43 @@ CWD = os.path.dirname(__file__)
 MPC_URL = 'https://minorplanetcenter.net/Extended_Files/neam00_extended.json.gz'
 DATA_FN = os.path.join(CWD, 'data.json')
 
-def benchmark():
+def benchmark(limit_exp: float = 2.0, limit_exp_step: float = 0.5):
 
-    bodies = _get_bodies()[:100] # TODO limit
-    orbs = _orbs_from_mpc(bodies)
+    assert limit_exp >= 0
+    steps = (10 ** np.arange(0, limit_exp + limit_exp_step, limit_exp_step)).astype('i8')
 
-    print(len(orbs), type(orbs))
+    bodies = _get_bodies()
+    limit = int(steps[-1])
+    assert limit <= len(bodies)
+    orbs = _orbs_from_mpc(bodies[:limit])
+
+    epoch = Time('2022-01-01 00:00')
+
+    _ = orbs[-1].propagate(epoch) # JIT warm-up
+
+    gc_flag = gc.isenabled()
+    if gc_flag:
+        gc.disable() # consistent benchmarks
+
+    times = []
+    for idx, iterations in enumerate(steps):
+
+        print(f'Benchmark {idx:d} of {len(steps)}, {iterations:d} iteratations ...')
+        selected_orbs = orbs[:int(iterations)]
+
+        start_time = time() # START
+
+        _ = [orb.propagate(epoch) for orb in selected_orbs]
+
+        times.append(time() - start_time) # STOP
+
+        gc.collect()
+        print(f'... finished in {times[-1]:e} seconds.')
+
+    if gc_flag:
+        gc.enable()
+
+    print(steps, times)
 
 def _download(down_url: str, binary: bool = True) -> Union[str, bytes]:
 
