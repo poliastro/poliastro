@@ -3,6 +3,7 @@
 
 from gzip import decompress
 import json
+from multiprocessing import Pool, cpu_count
 import os
 from typing import Union
 from urllib.request import urlopen, Request
@@ -29,7 +30,8 @@ DATA_FN = os.path.join(CWD, 'data.json')
 
 def benchmark():
 
-    orbs = [_orbit_from_mpc(body) for body in _get_data()[:10]] # TODO limit
+    bodies = _get_bodies()[:100] # TODO limit
+    orbs = _orbs_from_mpc(bodies)
 
     print(len(orbs), type(orbs))
 
@@ -46,7 +48,7 @@ def _download(down_url: str, binary: bool = True) -> Union[str, bytes]:
 
     return data
 
-def _get_data() -> list[dict]:
+def _get_bodies() -> list[dict]:
 
     if not os.path.exists(DATA_FN):
         raw = _download(NEA_MPC_URL)
@@ -58,7 +60,7 @@ def _get_data() -> list[dict]:
 
     return json.loads(decompress(raw))
 
-def _orbit_from_mpc(body: dict) -> Orbit:
+def _orb_from_mpc(body: dict) -> Orbit:
 
     nu = _true_anomaly_from_mean(
         ecc = body['e'],
@@ -81,6 +83,20 @@ def _orbit_from_mpc(body: dict) -> Orbit:
         epoch = Time(body["Epoch"], format = 'jd'),
         plane = Planes.EARTH_ECLIPTIC,
     )
+
+def _orbs_from_mpc(bodies: list[dict]) -> list[Orbit]:
+
+    with Pool(cpu_count()) as pool:
+        tasks = [
+            pool.apply_async(
+                func = _orb_from_mpc,
+                args = (body,),
+            )
+            for body in bodies
+        ]
+        orbs = [task.get() for task in tasks]
+
+    return orbs
 
 def _true_anomaly_from_mean(ecc: float, M: float) -> float:
 
