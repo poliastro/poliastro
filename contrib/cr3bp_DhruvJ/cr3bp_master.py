@@ -92,14 +92,13 @@ def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP
         ic = np.concatenate(
             (ic, np.identity(6).flatten())
         )  # Appends the IC for STM: I_6x6
-        print(ic)
     elif len(ic) == 42:
         stm_bool = 1  # To make sure stm_boolis set to 1 if all 42 states are passed
     if len(ic) == 6:
         stm_bool == 0
-    elif len(ic) != 6 or len(ic) != 42:
+    elif len(ic) != 6 and len(ic) != 42:
         print(
-            "Initial conditions are niether of length 6 nor 42, recheck the input, len is"
+            "Initial conditions are neither of length 6 nor 42, recheck the input, len is "
             + str(len(ic))
         )
         return 0
