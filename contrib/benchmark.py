@@ -25,7 +25,7 @@ from poliastro.core.angles import (
 )
 
 CWD = os.path.dirname(__file__)
-NEA_MPC_URL = 'https://minorplanetcenter.net/Extended_Files/neam00_extended.json.gz'
+MPC_URL = 'https://minorplanetcenter.net/Extended_Files/neam00_extended.json.gz'
 DATA_FN = os.path.join(CWD, 'data.json')
 
 def benchmark():
@@ -51,7 +51,7 @@ def _download(down_url: str, binary: bool = True) -> Union[str, bytes]:
 def _get_bodies() -> list[dict]:
 
     if not os.path.exists(DATA_FN):
-        raw = _download(NEA_MPC_URL)
+        raw = _download(MPC_URL)
         with open(DATA_FN, mode = 'wb') as f:
             f.write(raw)
     else:
