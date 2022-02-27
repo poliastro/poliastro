@@ -64,7 +64,7 @@ def benchmark(limit_exp: float = 2.0, limit_exp_step: float = 0.5):
         times.append(time() - start_time) # STOP
 
         gc.collect()
-        print(f'... finished in {times[-1]:e} seconds.')
+        print(f'... finished in {times[-1]:e} seconds ({times[-1]/iterations:e} seconds per iteration).')
 
     if gc_flag:
         gc.enable()
