@@ -26,11 +26,14 @@ from poliastro.core.angles import (
     M_to_F,
 )
 
+
 CWD = os.path.dirname(__file__)
 MPC_URL = 'https://minorplanetcenter.net/Extended_Files/neam00_extended.json.gz'
 DATA_FN = os.path.join(CWD, 'data.json')
 
+
 def benchmark(limit_exp: float = 2.0, limit_exp_step: float = 0.5):
+    "run and plot simple benchmark"
 
     assert limit_exp >= 0
     steps = (10 ** np.arange(0, limit_exp + limit_exp_step, limit_exp_step)).astype('i8')
@@ -68,32 +71,38 @@ def benchmark(limit_exp: float = 2.0, limit_exp_step: float = 0.5):
 
     print(steps, times)
 
-def _download(down_url: str, binary: bool = True) -> Union[str, bytes]:
 
-    httprequest = Request(down_url)
+def _download(url: str, binary: bool = True) -> Union[str, bytes]:
+    "simple, dependency-free http fetch"
+
+    httprequest = Request(url)
 
     with urlopen(httprequest) as response:
         assert response.status == 200
         data = response.read()
 
-    if not binary:
-        return data.decode('utf-8')
+    if binary:
+        return data
 
-    return data
+    return data.decode('utf-8')
 
-def _get_bodies() -> list[dict]:
 
-    if not os.path.exists(DATA_FN):
-        raw = _download(MPC_URL)
-        with open(DATA_FN, mode = 'wb') as f:
+def _get_bodies(data_fn: str = DATA_FN, data_url: str = MPC_URL) -> list[dict]:
+    "load MPC data from disk and/or internet"
+
+    if not os.path.exists(data_fn):
+        raw = _download(data_url)
+        with open(data_fn, mode = 'wb') as f:
             f.write(raw)
     else:
-        with open(DATA_FN, mode = 'rb') as f:
+        with open(data_fn, mode = 'rb') as f:
             raw = f.read()
 
     return json.loads(decompress(raw))
 
+
 def _orb_from_mpc(body: dict) -> Orbit:
+    "convert MPC single body dict into Orbit object"
 
     nu = _true_anomaly_from_mean(
         ecc = body['e'],
@@ -117,7 +126,9 @@ def _orb_from_mpc(body: dict) -> Orbit:
         plane = Planes.EARTH_ECLIPTIC,
     )
 
+
 def _orbs_from_mpc(bodies: list[dict]) -> list[Orbit]:
+    "convert list of MPC single body dicts into list of Orbit objects (parallel)"
 
     with Pool(cpu_count()) as pool:
         tasks = [
@@ -131,7 +142,9 @@ def _orbs_from_mpc(bodies: list[dict]) -> list[Orbit]:
 
     return orbs
 
+
 def _true_anomaly_from_mean(ecc: float, M: float) -> float:
+    "see issue #1013"
 
     if ecc < 1:
         M = (M + np.pi) % (2 * np.pi) - np.pi
@@ -140,6 +153,7 @@ def _true_anomaly_from_mean(ecc: float, M: float) -> float:
         return D_to_nu(M_to_D(M))
     else:
         return F_to_nu(M_to_F(M, ecc), ecc)
+
 
 if __name__ == '__main__':
 
