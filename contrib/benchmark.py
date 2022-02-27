@@ -149,10 +149,9 @@ def _true_anomaly_from_mean(ecc: float, M: float) -> float:
     if ecc < 1:
         M = (M + np.pi) % (2 * np.pi) - np.pi
         return E_to_nu(M_to_E(M, ecc), ecc)
-    elif ecc == 1:
+    if ecc == 1:
         return D_to_nu(M_to_D(M))
-    else:
-        return F_to_nu(M_to_F(M, ecc), ecc)
+    return F_to_nu(M_to_F(M, ecc), ecc)
 
 
 if __name__ == '__main__':
