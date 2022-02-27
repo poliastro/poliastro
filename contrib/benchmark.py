@@ -40,6 +40,7 @@ def benchmark(
     plot_fn: str = PLOT_FN,
     data_fn: str = DATA_FN,
     data_url: str = MPC_URL,
+    min_iterations: int = 10 ** 3, # just like in timeit
 ):
     "run and plot simple benchmark"
 
@@ -65,11 +66,25 @@ def benchmark(
         print(f'Benchmark {idx:d} of {len(steps)}, {iterations:d} iteratations ...')
         selected_orbs = orbs[:int(iterations)]
 
-        start_time = time() # START
+        if iterations >= min_iterations:
 
-        _ = [orb.propagate(epoch) for orb in selected_orbs]
+            start_time = time() # START
+            _ = [orb.propagate(epoch) for orb in selected_orbs]
+            times.append(time() - start_time) # STOP
 
-        times.append(time() - start_time) # STOP
+        else:
+
+            repetitions = int(np.ceil(min_iterations / iterations))
+            print(f'... {repetitions:d} repetitions...')
+            repetition_times = []
+
+            for _ in range(repetitions):
+
+                start_time = time() # START
+                _ = [orb.propagate(epoch) for orb in selected_orbs]
+                repetition_times.append(time() - start_time) # STOP
+
+            times.append(float(np.mean(repetition_times)))
 
         gc.collect()
         print(f'... finished in {times[-1]:e} seconds ({times[-1]/iterations:e} seconds per iteration).')
