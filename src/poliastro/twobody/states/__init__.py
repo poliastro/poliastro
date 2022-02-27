@@ -1,9 +1,8 @@
-
 from poliastro.twobody.states.scalar import (
     BaseState,
     ClassicalState,
-    RVState,
     ModifiedEquinoctialState,
+    RVState,
 )
 
 __all__ = [

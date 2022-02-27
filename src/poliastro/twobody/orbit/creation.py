@@ -509,7 +509,9 @@ class OrbitCreationMixin:
             Fundamental plane of the frame.
 
         """
-        ss = ClassicalState(epoch, attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane)
+        ss = ClassicalState(
+            epoch, attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane
+        )
         return cls(ss)
 
     @classmethod

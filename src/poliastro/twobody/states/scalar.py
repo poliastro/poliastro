@@ -1,4 +1,3 @@
-
 from abc import ABC, abstractmethod
 
 from astropy import time, units as u
