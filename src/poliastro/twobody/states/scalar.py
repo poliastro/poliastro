@@ -1,12 +1,16 @@
+
+from abc import ABC, abstractmethod
+
 from astropy import units as u
 
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
 from poliastro.twobody.elements import mean_motion, period
 
 
-class BaseState:
+class BaseState(ABC):
     """Base State class, meant to be subclassed."""
 
+    @abstractmethod
     def __init__(self, attractor, plane):
         """Constructor.
 
