@@ -35,7 +35,7 @@ PLOT_FN = os.path.join(CWD, 'benchmark.htm')
 
 
 def benchmark(
-    limit_exp: float = 2.0, # 10 ** limit_exp
+    limit_exp: float = 3.0, # 10 ** limit_exp
     limit_exp_step: float = 0.5,
     plot_fn: str = PLOT_FN,
     data_fn: str = DATA_FN,
@@ -53,7 +53,7 @@ def benchmark(
 
     epoch = Time('2022-01-01 00:00')
 
-    _ = orbs[-1].propagate(epoch) # JIT warm-up
+    _ = orbs[-1].propagate(epoch) # JIT warm-up TODO for all tested orbits beforehand, i.e. different code paths?
 
     gc_flag = gc.isenabled()
     if gc_flag:
@@ -84,15 +84,17 @@ def benchmark(
             x = steps,
             y = np.array(times) / steps,
             name = 'Iterative',
-            # line = dict(color = 'firebrick', width = 4)
+            line = dict(width = 2)
         )
     )
 
     fig.update_layout(
         title = 'Simple Orbit Propagation Benchmark',
         xaxis_title = 'Number of Propagations',
-        yaxis_title = 'Time per Iteration [s]',
+        yaxis_title = 'Time per Propagation [s]',
     )
+    fig.update_xaxes(type = "log")
+    fig.update_yaxes(type = "log")
 
     fig.write_html(plot_fn, auto_open = True)
 
