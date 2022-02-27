@@ -39,4 +39,4 @@ def get_mean_elements(body, epoch=J2000):
             f"No available mean elements for {body}. It must be an instance of `poliastro.bodies.SolarSystemPlanet`"
         ) from e
 
-    return RVState(body.parent, r, v, plane=Planes.EARTH_ECLIPTIC).to_classical()
+    return RVState(epoch, body.parent, r, v, plane=Planes.EARTH_ECLIPTIC).to_classical()

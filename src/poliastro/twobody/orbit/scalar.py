@@ -51,19 +51,16 @@ class Orbit(OrbitCreationMixin):
 
     """
 
-    def __init__(self, state, epoch):
+    def __init__(self, state):
         """Constructor.
 
         Parameters
         ----------
         state : BaseState
             Position and velocity or orbital elements.
-        epoch : ~astropy.time.Time
-            Epoch of the orbit.
 
         """
         self._state = state  # type: BaseState
-        self._epoch = epoch  # type: time.Time
 
     @property
     def attractor(self):
@@ -73,7 +70,7 @@ class Orbit(OrbitCreationMixin):
     @property
     def epoch(self):
         """Epoch of the orbit."""
-        return self._epoch
+        return self._state.epoch
 
     @property
     def plane(self):

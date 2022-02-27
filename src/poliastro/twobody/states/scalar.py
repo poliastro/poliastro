@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 
-from astropy import units as u
+from astropy import time, units as u
 
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
 from poliastro.twobody.elements import mean_motion, period
@@ -11,19 +11,27 @@ class BaseState(ABC):
     """Base State class, meant to be subclassed."""
 
     @abstractmethod
-    def __init__(self, attractor, plane):
+    def __init__(self, epoch, attractor, plane):
         """Constructor.
 
         Parameters
         ----------
+        epoch : ~astropy.time.Time
+            Epoch of the orbit.
         attractor : Body
             Main attractor.
         plane : ~poliastro.frames.enums.Planes
             Reference plane for the elements.
 
         """
+        self._epoch = epoch  # type: time.Time
         self._attractor = attractor
         self._plane = plane
+
+    @property
+    def epoch(self):
+        """Epoch of the orbit."""
+        return self._epoch
 
     @property
     def plane(self):
@@ -79,11 +87,13 @@ class BaseState(ABC):
 class ClassicalState(BaseState):
     """State defined by its classical orbital elements."""
 
-    def __init__(self, attractor, p, ecc, inc, raan, argp, nu, plane):
+    def __init__(self, epoch, attractor, p, ecc, inc, raan, argp, nu, plane):
         """Constructor.
 
         Parameters
         ----------
+        epoch : ~astropy.time.Time
+            Epoch of the orbit.
         attractor : Body
             Main attractor.
         p : ~astropy.units.Quantity
@@ -100,9 +110,8 @@ class ClassicalState(BaseState):
             True anomaly.
         plane : ~poliastro.frames.enums.Planes
             Reference plane for the elements.
-
         """
-        super().__init__(attractor, plane)
+        super().__init__(epoch, attractor, plane)
         self._p = p
         self._ecc = ecc
         self._inc = inc
@@ -157,7 +166,7 @@ class ClassicalState(BaseState):
             self.nu.to_value(u.rad),
         )
 
-        return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
+        return RVState(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
@@ -175,6 +184,7 @@ class ClassicalState(BaseState):
         )
 
         return ModifiedEquinoctialState(
+            self.epoch,
             self.attractor,
             p * u.km,
             f * u.rad,
@@ -189,11 +199,13 @@ class ClassicalState(BaseState):
 class RVState(BaseState):
     """State defined by its position and velocity vectors."""
 
-    def __init__(self, attractor, r, v, plane):
+    def __init__(self, epoch, attractor, r, v, plane):
         """Constructor.
 
         Parameters
         ----------
+        epoch : ~astropy.time.Time
+            Epoch of the orbit.
         attractor : Body
             Main attractor.
         r : ~astropy.units.Quantity
@@ -204,7 +216,7 @@ class RVState(BaseState):
             Reference plane for the elements.
 
         """
-        super().__init__(attractor, plane)
+        super().__init__(epoch, attractor, plane)
         self._r = r
         self._v = v
 
@@ -231,6 +243,7 @@ class RVState(BaseState):
         )
 
         return ClassicalState(
+            self.epoch,
             self.attractor,
             p * u.km,
             ecc * u.one,
@@ -245,11 +258,13 @@ class RVState(BaseState):
 class ModifiedEquinoctialState(BaseState):
     """State defined by modified equinoctial elements representation."""
 
-    def __init__(self, attractor, p, f, g, h, k, L, plane):
+    def __init__(self, epoch, attractor, p, f, g, h, k, L, plane):
         """Constructor.
 
         Parameters
         ----------
+        epoch : ~astropy.time.Time
+            Epoch of the orbit.
         attractor : Body
             Main attractor.
         p : ~astropy.units.Quantity
@@ -268,7 +283,7 @@ class ModifiedEquinoctialState(BaseState):
             Reference plane for the elements.
 
         """
-        super().__init__(attractor, plane)
+        super().__init__(epoch, attractor, plane)
         self._p = p
         self._f = f
         self._g = g
@@ -318,6 +333,7 @@ class ModifiedEquinoctialState(BaseState):
         )
 
         return ClassicalState(
+            self.epoch,
             self.attractor,
             p * u.km,
             ecc * u.one,
@@ -338,4 +354,4 @@ class ModifiedEquinoctialState(BaseState):
             self.k.to(u.rad).value,
             self.L.to(u.rad).value,
         )
-        return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
+        return RVState(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)

@@ -51,8 +51,8 @@ class OrbitCreationMixin:
                 f"Vectors must have dimension 1, got {r.ndim} and {v.ndim}"
             )
 
-        ss = RVState(attractor, r, v, plane)
-        return cls(ss, epoch)
+        ss = RVState(epoch, attractor, r, v, plane)
+        return cls(ss)
 
     @classmethod
     def from_coords(cls, attractor, coord, plane=Planes.EARTH_EQUATOR):
@@ -162,9 +162,9 @@ class OrbitCreationMixin:
             )
 
         ss = ClassicalState(
-            attractor, a * (1 - ecc**2), ecc, inc, raan, argp, nu, plane
+            epoch, attractor, a * (1 - ecc**2), ecc, inc, raan, argp, nu, plane
         )
-        return cls(ss, epoch)
+        return cls(ss)
 
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
@@ -195,8 +195,8 @@ class OrbitCreationMixin:
             Fundamental plane of the frame.
 
         """
-        ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L, plane)
-        return cls(ss, epoch)
+        ss = ModifiedEquinoctialState(epoch, attractor, p, f, g, h, k, L, plane)
+        return cls(ss)
 
     @classmethod
     def from_ephem(cls, attractor, ephem, epoch):
@@ -509,8 +509,8 @@ class OrbitCreationMixin:
             Fundamental plane of the frame.
 
         """
-        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane)
-        return cls(ss, epoch)
+        ss = ClassicalState(epoch, attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane)
+        return cls(ss)
 
     @classmethod
     @u.quantity_input(
