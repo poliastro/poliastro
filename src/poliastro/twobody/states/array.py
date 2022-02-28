@@ -27,6 +27,10 @@ class BaseStateArray(ABC):
         self._attractor = attractor
         self._plane = plane
 
+    def copy(self):
+        """Copy state array."""
+        raise NotImplementedError
+
     @property
     def epoch(self):
         """Array of epochs of each individual state (orbit)."""
@@ -118,6 +122,20 @@ class ClassicalStateArray(BaseStateArray):
         self._argp = argp
         self._nu = nu
 
+    def copy(self):
+        """Copy state array."""
+        return type(self)(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            p = self._p.copy(),
+            ecc = self._ecc.copy(),
+            inc = self._inc.copy(),
+            raan = self._raan.copy(),
+            argp = self._argp.copy(),
+            nu = self._nu.copy(),
+            plane = self._plane,
+        )
+
     @property
     def p(self):
         """Semilatus rectum array."""
@@ -169,7 +187,7 @@ class ClassicalStateArray(BaseStateArray):
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
-        return self # TODO copy?
+        return self.copy()
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
@@ -219,6 +237,16 @@ class RVStateArray(BaseStateArray):
         self._r = r
         self._v = v
 
+    def copy(self):
+        """Copy state array."""
+        return type(self)(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            r = self._r.copy(),
+            v = self._v.copy(),
+            plane = self._plane,
+        )
+
     @property
     def r(self):
         """Position vector array."""
@@ -231,7 +259,7 @@ class RVStateArray(BaseStateArray):
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
-        return self # TODO copy
+        return self.copy()
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
@@ -289,6 +317,20 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
         self._h = h
         self._k = k
         self._L = L
+
+    def copy(self):
+        """Copy state array."""
+        return type(self)(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            p = self._p.copy(),
+            f = self._f.copy(),
+            g = self._g.copy(),
+            h = self._h.copy(),
+            k = self._k.copy(),
+            L = self._L.copy(),
+            plane = self._plane,
+        )
 
     @property
     def p(self):
@@ -357,4 +399,4 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
-        return self # TODO copy?
+        return self.copy()
