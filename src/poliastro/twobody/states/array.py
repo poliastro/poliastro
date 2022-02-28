@@ -183,7 +183,7 @@ class ClassicalStateArray(BaseStateArray):
             argp = argp,
             nu = nu,
             plane = self._plane,
-        )
+        )  # type: ignore
 
     def __setitem__(self, idx, value):
         """Set item or slice from state array."""
@@ -345,7 +345,7 @@ class RVStateArray(BaseStateArray):
             r = r,
             v = v,
             plane = self._plane,
-        )
+        )  # type: ignore
 
     def __setitem__(self, idx, value):
         """Set item or slice from state array."""
@@ -477,7 +477,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             k = k,
             L = L,
             plane = self._plane,
-        )
+        )  # type: ignore
 
     def __setitem__(self, idx, value):
         """Set item or slice from state array."""
