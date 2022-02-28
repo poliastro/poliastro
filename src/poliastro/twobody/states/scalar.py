@@ -354,3 +354,7 @@ class ModifiedEquinoctialState(BaseState):
             self.L.to(u.rad).value,
         )
         return RVState(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
+
+    def to_equinoctial(self):
+        """Converts to modified equinoctial elements representation."""
+        return self
