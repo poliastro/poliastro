@@ -16,11 +16,11 @@ class BaseStateArray(ABC):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Array of epochs of each individual state (orbit).
         attractor : Body
-            Main attractor.
+            Common main attractor.
         plane : ~poliastro.frames.enums.Planes
-            Reference plane for the elements.
+            Common reference plane for the elements.
 
         """
         self._epoch = epoch  # type: time.Time
@@ -29,28 +29,28 @@ class BaseStateArray(ABC):
 
     @property
     def epoch(self):
-        """Epoch of the orbit."""
+        """Array of epochs of each individual state (orbit)."""
         return self._epoch
 
     @property
     def plane(self):
-        """Fundamental plane of the frame."""
+        """Common fundamental plane of the frame."""
         return self._plane
 
     @property
     def attractor(self):
-        """Main attractor."""
+        """Common main attractor."""
         return self._attractor
 
     @property
     def n(self):
-        """Mean motion."""
-        return mean_motion(self.attractor.k, self.to_classical().a)
+        """Mean motion array."""
+        return mean_motion(self.attractor.k, self.to_classical().a) # TODO check
 
     @property
     def period(self):
-        """Period of the orbit."""
-        return period(self.attractor.k, self.to_classical().a)
+        """Period of the orbit array."""
+        return period(self.attractor.k, self.to_classical().a) # TODO check
 
     def to_vectors(self):
         """Converts to position and velocity vector representation.
@@ -92,23 +92,23 @@ class ClassicalStateArray(BaseStateArray):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Array of epochs of each individual state (orbit).
         attractor : Body
-            Main attractor.
+            Common main attractor.
         p : ~astropy.units.Quantity
-            Semilatus rectum.
+            Semilatus rectum array.
         ecc : ~astropy.units.Quantity
-            Eccentricity.
+            Eccentricity array.
         inc : ~astropy.units.Quantity
-            Inclination.
+            Inclination array.
         raan : ~astropy.units.Quantity
-            Right ascension of the ascending node.
+            Right ascension of the ascending node array.
         argp : ~astropy.units.Quantity
-            Argument of the perigee.
+            Argument of the perigee array.
         nu : ~astropy.units.Quantity
-            True anomaly.
+            True anomaly array.
         plane : ~poliastro.frames.enums.Planes
-            Reference plane for the elements.
+            Common reference plane for the elements.
         """
         super().__init__(epoch, attractor, plane)
         self._p = p
@@ -120,37 +120,37 @@ class ClassicalStateArray(BaseStateArray):
 
     @property
     def p(self):
-        """Semilatus rectum."""
+        """Semilatus rectum array."""
         return self._p
 
     @property
     def a(self):
-        """Semimajor axis."""
+        """Semimajor axis array."""
         return self.p / (1 - self.ecc**2)
 
     @property
     def ecc(self):
-        """Eccentricity."""
+        """Eccentricity array."""
         return self._ecc
 
     @property
     def inc(self):
-        """Inclination."""
+        """Inclination array."""
         return self._inc
 
     @property
     def raan(self):
-        """Right ascension of the ascending node."""
+        """Right ascension of the ascending node array."""
         return self._raan
 
     @property
     def argp(self):
-        """Argument of the perigee."""
+        """Argument of the perigee array."""
         return self._argp
 
     @property
     def nu(self):
-        """True anomaly."""
+        """True anomaly array."""
         return self._nu
 
     def to_vectors(self):
@@ -163,13 +163,13 @@ class ClassicalStateArray(BaseStateArray):
             self.raan.to_value(u.rad),
             self.argp.to_value(u.rad),
             self.nu.to_value(u.rad),
-        )
+        ) # TODO check
 
-        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
+        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane) # TODO check
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
-        return self
+        return self # TODO copy?
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
@@ -180,7 +180,7 @@ class ClassicalStateArray(BaseStateArray):
             self.raan.to_value(u.rad),
             self.argp.to_value(u.rad),
             self.nu.to_value(u.rad),
-        )
+        ) # TODO check
 
         return ModifiedEquinoctialStateArray(
             self.epoch,
@@ -204,15 +204,15 @@ class RVStateArray(BaseStateArray):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Array of epochs of each individual state (orbit).
         attractor : Body
-            Main attractor.
+            Common main attractor.
         r : ~astropy.units.Quantity
-            Position vector wrt attractor center.
+            Position vector wrt attractor center array.
         v : ~astropy.units.Quantity
-            Velocity vector.
+            Velocity vector array.
         plane : ~poliastro.frames.enums.Planes
-            Reference plane for the elements.
+            Common reference plane for the elements.
 
         """
         super().__init__(epoch, attractor, plane)
@@ -221,17 +221,17 @@ class RVStateArray(BaseStateArray):
 
     @property
     def r(self):
-        """Position vector."""
+        """Position vector array."""
         return self._r
 
     @property
     def v(self):
-        """Velocity vector."""
+        """Velocity vector array."""
         return self._v
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
-        return self
+        return self # TODO copy
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
@@ -239,7 +239,7 @@ class RVStateArray(BaseStateArray):
             self.attractor.k.to_value(u.km**3 / u.s**2),
             self.r.to_value(u.km),
             self.v.to_value(u.km / u.s),
-        )
+        ) # TODO check
 
         return ClassicalStateArray(
             self.epoch,
@@ -263,23 +263,23 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Array of epochs of each individual state (orbit).
         attractor : Body
-            Main attractor.
+            Common main attractor.
         p : ~astropy.units.Quantity
-            Semilatus rectum.
+            Semilatus rectum array.
         f : ~astropy.units.Quantity
-            Second modified equinoctial element.
+            Second modified equinoctial element array.
         g : ~astropy.units.Quantity
-            Third modified equinoctial element.
+            Third modified equinoctial element array.
         h : ~astropy.units.Quantity
-            Fourth modified equinoctial element.
+            Fourth modified equinoctial element array.
         k : ~astropy.units.Quantity
-            Fifth modified equinoctial element.
+            Fifth modified equinoctial element array.
         L : ~astropy.units.Quantity
-            True longitude.
+            True longitude array.
         plane : ~poliastro.frames.enums.Planes
-            Reference plane for the elements.
+            Common reference plane for the elements.
 
         """
         super().__init__(epoch, attractor, plane)
@@ -292,32 +292,32 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
 
     @property
     def p(self):
-        """Semilatus rectum."""
+        """Semilatus rectum array."""
         return self._p
 
     @property
     def f(self):
-        """Second modified equinoctial element."""
+        """Second modified equinoctial element array."""
         return self._f
 
     @property
     def g(self):
-        """Third modified equinoctial element."""
+        """Third modified equinoctial element array."""
         return self._g
 
     @property
     def h(self):
-        """Fourth modified equinoctial element."""
+        """Fourth modified equinoctial element array."""
         return self._h
 
     @property
     def k(self):
-        """Fifth modified equinoctial element."""
+        """Fifth modified equinoctial element array."""
         return self._k
 
     @property
     def L(self):
-        """True longitude."""
+        """True longitude array."""
         return self._L
 
     def to_classical(self):
@@ -329,7 +329,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             self.h.to_value(u.rad),
             self.k.to_value(u.rad),
             self.L.to_value(u.rad),
-        )
+        ) # TODO check
 
         return ClassicalStateArray(
             self.epoch,
@@ -352,5 +352,9 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             self.h.to(u.rad).value,
             self.k.to(u.rad).value,
             self.L.to(u.rad).value,
-        )
+        ) # TODO check
         return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
+
+    def to_equinoctial(self):
+        """Converts to modified equinoctial elements representation."""
+        return self # TODO copy?
