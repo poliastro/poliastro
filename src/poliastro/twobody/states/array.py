@@ -50,6 +50,24 @@ class BaseStateArray(ABC):
         raise NotImplementedError
 
     @property
+    @abstractmethod
+    def ndim(self):
+        """Number of dimensions of array."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def shape(self):
+        """Shape of array."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def size(self):
+        """Size of array."""
+        raise NotImplementedError
+
+    @property
     def epoch(self):
         """Array of epochs of each individual state (orbit)."""
         return self._epoch
@@ -181,6 +199,21 @@ class ClassicalStateArray(BaseStateArray):
         )
 
     @property
+    def ndim(self):
+        """Number of dimensions of array."""
+        raise self._p.ndim
+
+    @property
+    def shape(self):
+        """Shape of array."""
+        return self._p.shape
+
+    @property
+    def size(self):
+        """Size of array."""
+        return self._p.size
+
+    @property
     def p(self):
         """Semilatus rectum array."""
         return self._p
@@ -310,6 +343,21 @@ class RVStateArray(BaseStateArray):
         )
 
     @property
+    def ndim(self):
+        """Number of dimensions of array."""
+        raise self._r.ndim
+
+    @property
+    def shape(self):
+        """Shape of array."""
+        return self._r.shape
+
+    @property
+    def size(self):
+        """Size of array."""
+        return self._r.size
+
+    @property
     def r(self):
         """Position vector array."""
         return self._r
@@ -419,6 +467,21 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             L = self._L.copy(),
             plane = self._plane,
         )
+
+    @property
+    def ndim(self):
+        """Number of dimensions of array."""
+        raise self._p.ndim
+
+    @property
+    def shape(self):
+        """Shape of array."""
+        return self._p.shape
+
+    @property
+    def size(self):
+        """Size of array."""
+        return self._p.size
 
     @property
     def p(self):
