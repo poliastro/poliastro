@@ -16,7 +16,7 @@ class BaseState(ABC):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Epoch of the state (orbit).
         attractor : Body
             Main attractor.
         plane : ~poliastro.frames.enums.Planes
@@ -29,7 +29,7 @@ class BaseState(ABC):
 
     @property
     def epoch(self):
-        """Epoch of the orbit."""
+        """Epoch of the state (orbit)."""
         return self._epoch
 
     @property
@@ -92,7 +92,7 @@ class ClassicalState(BaseState):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Epoch of the state (orbit).
         attractor : Body
             Main attractor.
         p : ~astropy.units.Quantity
@@ -204,7 +204,7 @@ class RVState(BaseState):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Epoch of the state (orbit).
         attractor : Body
             Main attractor.
         r : ~astropy.units.Quantity
@@ -263,7 +263,7 @@ class ModifiedEquinoctialState(BaseState):
         Parameters
         ----------
         epoch : ~astropy.time.Time
-            Epoch of the orbit.
+            Epoch of the state (orbit).
         attractor : Body
             Main attractor.
         p : ~astropy.units.Quantity
