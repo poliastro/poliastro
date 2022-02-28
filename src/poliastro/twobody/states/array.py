@@ -5,6 +5,12 @@ from astropy import time, units as u
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
 from poliastro.twobody.elements import mean_motion, period
 
+from .scalar import (
+    ClassicalState,
+    ModifiedEquinoctialState,
+    RVState,
+)
+
 
 class BaseStateArray(ABC):
     """Base State class, meant to be subclassed."""
@@ -23,10 +29,17 @@ class BaseStateArray(ABC):
             Common reference plane for the elements.
 
         """
+        assert epoch.ndim == 0
         self._epoch = epoch  # type: time.Time
         self._attractor = attractor
         self._plane = plane
 
+    @abstractmethod
+    def __getitem__(self, idx):
+        """Get item or slice from state array."""
+        raise NotImplementedError
+
+    @abstractmethod
     def copy(self):
         """Copy state array."""
         raise NotImplementedError
@@ -115,12 +128,34 @@ class ClassicalStateArray(BaseStateArray):
             Common reference plane for the elements.
         """
         super().__init__(epoch, attractor, plane)
+        assert p.shape == ecc.shape == inc.shape == raan.shape == argp.shape == nu.shape
         self._p = p
         self._ecc = ecc
         self._inc = inc
         self._raan = raan
         self._argp = argp
         self._nu = nu
+
+    def __getitem__(self, idx):
+        """Get item or slice from state array."""
+        p = self._p[idx]
+        ecc = self._ecc[idx]
+        inc = self._inc[idx]
+        raan = self._raan[idx]
+        argp = self._argp[idx]
+        nu = self._nu[idx]
+        cls = ClassicalState if p.ndim == 0 else type(self)
+        return cls(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            p = p,
+            ecc = ecc,
+            inc = inc,
+            raan = raan,
+            argp = argp,
+            nu = nu,
+            plane = self._plane,
+        )
 
     def copy(self):
         """Copy state array."""
@@ -234,8 +269,22 @@ class RVStateArray(BaseStateArray):
 
         """
         super().__init__(epoch, attractor, plane)
+        assert r.shape == v.shape
         self._r = r
         self._v = v
+
+    def __getitem__(self, idx):
+        """Get item or slice from state array."""
+        r = self._r[idx]
+        v = self._v[idx]
+        cls = RVState if r.ndim == 0 else type(self)
+        return cls(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            r = r,
+            v = v,
+            plane = self._plane,
+        )
 
     def copy(self):
         """Copy state array."""
@@ -311,12 +360,34 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
 
         """
         super().__init__(epoch, attractor, plane)
+        assert p.shape == f.shape == g.shape == h.shape == k.shape == L.shape
         self._p = p
         self._f = f
         self._g = g
         self._h = h
         self._k = k
         self._L = L
+
+    def __getitem__(self, idx):
+        """Get item or slice from state array."""
+        p = self._p[idx]
+        f = self._f[idx]
+        g = self._g[idx]
+        h = self._h[idx]
+        k = self._k[idx]
+        L = self._L[idx]
+        cls = ModifiedEquinoctialState if p.ndim == 0 else type(self)
+        return cls(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            p = p,
+            f = f,
+            g = g,
+            h = h,
+            k = k,
+            L = L,
+            plane = self._plane,
+        )
 
     def copy(self):
         """Copy state array."""
