@@ -25,16 +25,17 @@ import numpy as np
 from cr3bp_lib_JC_calc import JC
 from cr3bp_master import prop_cr3bp, ui_partials_acc_cr3bp
 
-def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints, sym_period_targ=1/2, palc_args=None, conv_tol=1e-12, int_tol=1e-12, Nmax=50):
+def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints, sym_period_targ=1/2, JCd = None, palc_args=None, conv_tol=1e-12, int_tol=1e-12, Nmax=50):
     # sym_period_targ = 1/2 -> symmetry after half period, 1/4 -> after quarter period, 1-> periodicity
     # lyap, halo, axial, vertical write free_vars and constraints for each and sym_period_targ
     # tfguess = period
     # xd
-    #palc
+    # palc
     # note care about palc and JC rn
     # test periodicity
-    # To do: palc, JC constraint, periodicity and xd
-    
+    # To do: palc, JC constraint(if jc then no palc), periodicity and xd
+
+    # Targeter logical error check    
     if 'jc' in free_vars:
         print('Jacobi Constant cannot be a free variable')
         return 0
@@ -56,7 +57,7 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
             tf = results_stm['tevents'][0][0]
     else:# If need to used time fixed targeter or periodicity targeter 
         tf = tf_guess*sym_period_targ 
-
+    
     results_stm = prop_cr3bp(mu, initial_guess, tf, stm_bool=1, tol=int_tol, xcross_cond=0)        
     ic = initial_guess
     
@@ -65,25 +66,39 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
     xdesired = np.zeros(len(constraints_index))
     DF = np.zeros((len(xfree),len(xconstraint)))
     
-    print(constraints_index, free_vars_index, tf)
+    print(constraints_index, free_vars_index, free_vars, tf)
     
     stm_col_index = [free_vars_index[i] for i in range(len(xfree)) if free_vars_index[i] < 6]
     stm_row_index = [constraints_index[i] for i in range(len(xconstraint)) if constraints_index[i] < 6]
     stm_col_len = len(stm_col_index)
     stm_row_len = len(stm_row_index)
     
+    # Setup Free Variable Vector
     if 't' in free_vars:
         xfree[:-1] = ic[stm_col_index]
         xfree[-1] = tf
     else:
         xfree = ic[stm_col_index]
     
+    # Setup Constraint Vector, xconstraint where FX = xconstraint - xdesired
     if 'jc' in constraints:
         xconstraint[:-1] = results_stm['states'][-1,stm_row_index]
         xconstraint[-1] = JC(mu,ic[0:3],ic[3:6])
     else:
         xconstraint = results_stm['states'][-1,stm_row_index]
-
+    
+    # Setup Desired vetor, xdesired where FX = xcontraint - xdesired
+    if sym_period_targ == 1:
+        if 'jc' in constraints:
+            xdesired[:-1] = results_stm['states'][0,stm_row_index]  
+            xdesired[-1] = JCd
+        else:
+            xdesired = results_stm['states'][0,stm_row_index] 
+        # Create identity like matrix to be subtracted from STM    
+        identity_mat = np.eye(6)
+        temp = identity_mat[stm_row_index,:]
+        identity_temp = temp[:,stm_col_index]
+            
     count = 0
     
     iterflag = False
@@ -96,15 +111,28 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
         Ux, Uy, Uz, ax, ay, az = ui_partials_acc_cr3bp(mu, states_final)
         Dot_states = np.array([states_final[3], states_final[4], states_final[5], ax, ay, az])
         
+        # Compute d(JC)/d(x)
+        Ux_ic, Uy_ic, Uz_ic, _,_,_ = ui_partials_acc_cr3bp(mu, ic)
+        dJC_dx = np.array([2*Ux_ic, 2*Uy_ic, 2*Uz_ic, -2*ic[3], -2*ic[4], -2*ic[5]])
+        
         stm_temp = results_stm["stm"][stm_row_index, :, -1]
-        DF[:stm_row_len,:stm_col_len] = stm_temp[:, stm_col_index]  
+
+        # Setup DF
+        DF[:stm_row_len,:stm_col_len] = stm_temp[:, stm_col_index]          
+        if 'jc' in constraints:
+            DF[-1,:stm_col_len] = dJC_dx[stm_col_index]  
         
         if 't' in free_vars:
-            DF[:,-1] = Dot_states[stm_row_index] 
+            DF[:stm_row_len,-1] = Dot_states[stm_row_index] 
+        
+        if sym_period_targ == 1:
+            DF[:stm_row_len,:stm_col_len] = DF[:stm_row_len,:stm_col_len] - identity_temp           
             
         FX = xconstraint-xdesired
+        # Update Free variable vector
         xfree = newton_raphson_update(xfree, FX, DF)
         
+        # Update Initial Condition and Time
         if 't' in free_vars:
             ic[stm_col_index] = xfree[:-1]
             tf = xfree[-1]
@@ -113,11 +141,20 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
 
         results_stm = prop_cr3bp(mu, ic, tf, stm_bool=1, tol=int_tol, xcross_cond=0)        
         
+        # Update xconstraint
         if 'jc' in constraints:
             xconstraint[:-1] = results_stm['states'][-1,stm_row_index]
             xconstraint[-1] = JC(mu,ic[0:3],ic[3:6])
         else:
             xconstraint = results_stm['states'][-1,stm_row_index]
+
+        # Update xdesired            
+        if sym_period_targ == 1:
+            if 'jc' in constraints:
+                xdesired[:-1] = results_stm['states'][0,stm_row_index]  
+                xdesired[-1] = JCd
+            else:
+                xdesired = results_stm['states'][0,stm_row_index] 
         
         print(count, np.linalg.norm(xconstraint-xdesired), np.argmax(np.abs(xconstraint-xdesired)),np.max(np.abs(xconstraint-xdesired)))
         

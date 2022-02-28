@@ -19,33 +19,50 @@ mu, dist_e_m, tstar = bodies_char("Earth", "Moon")
 lib_loc = lib_pt_loc(mu)
 li = lib_loc[0,:] # 0 for L1 and  1 for L2
 
+orbit_results = []
+
+# ig= ig_lyap_orb_collinear_li_cr3bp(mu, pert_x=0.01)
+
+# tf_guess = 5
+
+# free_vars = ['vy','t']
+# constraints = ['y','vx']
+
+# results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints)
+# orbit_results.append(results)
+# tf_guess = results['t'][-1]
+# ig = copy.copy(results['states'][0,:])
+# ig[0] += 0.0008 
+    
+    
+# free_vars = ['vx','vy','t']
+# constraints = ['x','y','vx']
+
 ig = np.array([1.0842, 0, 0, 0, -0.5417,0.8415])
 tf_guess = 6.1305
 
-orbit_results = []
-
 free_vars = ['x','vz','t']
-constraints = ['y','vx','vz']
-
-for i in range(8):
-    results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints,sym_period_targ=1/4)
+constraints = ['x','vy','vz']
+    
+for i in range(50):
+    results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints,sym_period_targ=1)
     orbit_results.append(results)
-    print('JC:',JC(mu,results['states'][0,0:3],results['states'][0,3:6]))
     tf_guess = results['t'][-1]
+    print('JC:',JC(mu,results['states'][0,0:3],results['states'][0,3:6]),tf_guess)
     ig = copy.copy(results['states'][0,:])
     print(ig)
-    ig[4] += -0.1
+    ig[4] += -0.0001
 
-free_vars = ['x','vy','vz','t']
-constraints = ['y','vx','vz','jc']
-JCd = round(JC(mu,results['states'][0,0:3],results['states'][0,3:6]),4)
+# free_vars = ['x','vy','vz','t']
+# constraints = ['y','vx','vz','jc']
+# JCd = round(JC(mu,results['states'][0,0:3],results['states'][0,3:6]),4)
 
-# Continue in JC
-for i in range(5):
-    results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints, JCd=JCd,sym_period_targ=1/4)
-    orbit_results.append(results)
-    print('JC:',JC(mu,results['states'][0,0:3],results['states'][0,3:6]))
-    JCd += -1e-4
+# # Continue in JC
+# for i in range(5):
+#     results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints, JCd=JCd,sym_period_targ=1/4)
+#     orbit_results.append(results)
+#     print('JC:',JC(mu,results['states'][0,0:3],results['states'][0,3:6]))
+#     JCd += -1e-4
     
 plt.figure(1)
 ax = plt.axes(projection='3d')
