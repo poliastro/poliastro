@@ -40,6 +40,11 @@ class BaseStateArray(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def __setitem__(self, idx, value):
+        """Set item or slice from state array."""
+        raise NotImplementedError
+
+    @abstractmethod
     def copy(self):
         """Copy state array."""
         raise NotImplementedError
@@ -156,6 +161,10 @@ class ClassicalStateArray(BaseStateArray):
             nu = nu,
             plane = self._plane,
         )
+
+    def __setitem__(self, idx, value):
+        """Set item or slice from state array."""
+        raise NotImplementedError # TODO
 
     def copy(self):
         """Copy state array."""
@@ -286,6 +295,10 @@ class RVStateArray(BaseStateArray):
             plane = self._plane,
         )
 
+    def __setitem__(self, idx, value):
+        """Set item or slice from state array."""
+        raise NotImplementedError # TODO
+
     def copy(self):
         """Copy state array."""
         return type(self)(
@@ -388,6 +401,10 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             L = L,
             plane = self._plane,
         )
+
+    def __setitem__(self, idx, value):
+        """Set item or slice from state array."""
+        raise NotImplementedError # TODO
 
     def copy(self):
         """Copy state array."""
