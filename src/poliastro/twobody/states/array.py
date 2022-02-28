@@ -6,7 +6,7 @@ from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
 from poliastro.twobody.elements import mean_motion, period
 
 
-class BaseState(ABC):
+class BaseStateArray(ABC):
     """Base State class, meant to be subclassed."""
 
     @abstractmethod
@@ -83,7 +83,7 @@ class BaseState(ABC):
         raise NotImplementedError
 
 
-class ClassicalState(BaseState):
+class ClassicalStateArray(BaseStateArray):
     """State defined by its classical orbital elements."""
 
     def __init__(self, epoch, attractor, p, ecc, inc, raan, argp, nu, plane):
@@ -165,7 +165,7 @@ class ClassicalState(BaseState):
             self.nu.to_value(u.rad),
         )
 
-        return RVState(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
+        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
@@ -182,7 +182,7 @@ class ClassicalState(BaseState):
             self.nu.to_value(u.rad),
         )
 
-        return ModifiedEquinoctialState(
+        return ModifiedEquinoctialStateArray(
             self.epoch,
             self.attractor,
             p * u.km,
@@ -195,7 +195,7 @@ class ClassicalState(BaseState):
         )
 
 
-class RVState(BaseState):
+class RVStateArray(BaseStateArray):
     """State defined by its position and velocity vectors."""
 
     def __init__(self, epoch, attractor, r, v, plane):
@@ -241,7 +241,7 @@ class RVState(BaseState):
             self.v.to_value(u.km / u.s),
         )
 
-        return ClassicalState(
+        return ClassicalStateArray(
             self.epoch,
             self.attractor,
             p * u.km,
@@ -254,7 +254,7 @@ class RVState(BaseState):
         )
 
 
-class ModifiedEquinoctialState(BaseState):
+class ModifiedEquinoctialStateArray(BaseStateArray):
     """State defined by modified equinoctial elements representation."""
 
     def __init__(self, epoch, attractor, p, f, g, h, k, L, plane):
@@ -331,7 +331,7 @@ class ModifiedEquinoctialState(BaseState):
             self.L.to_value(u.rad),
         )
 
-        return ClassicalState(
+        return ClassicalStateArray(
             self.epoch,
             self.attractor,
             p * u.km,
@@ -353,4 +353,4 @@ class ModifiedEquinoctialState(BaseState):
             self.k.to(u.rad).value,
             self.L.to(u.rad).value,
         )
-        return RVState(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
+        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
