@@ -49,6 +49,11 @@ class BaseStateArray(ABC):
         """Copy state array."""
         raise NotImplementedError
 
+    @abstractmethod
+    def reshape(self, *args):
+        """Reshape state array."""
+        raise NotImplementedError
+
     @property
     @abstractmethod
     def ndim(self):
@@ -198,6 +203,20 @@ class ClassicalStateArray(BaseStateArray):
             plane = self._plane,
         )
 
+    def reshape(self, *args):
+        """Reshape state array."""
+        return type(self)(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            p = self._p.reshape(*args),
+            ecc = self._ecc.reshape(*args),
+            inc = self._inc.reshape(*args),
+            raan = self._raan.reshape(*args),
+            argp = self._argp.reshape(*args),
+            nu = self._nu.reshape(*args),
+            plane = self._plane,
+        )
+
     @property
     def ndim(self):
         """Number of dimensions of array."""
@@ -342,6 +361,16 @@ class RVStateArray(BaseStateArray):
             plane = self._plane,
         )
 
+    def reshape(self, *args):
+        """Reshape state array."""
+        return type(self)(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            r = self._r.reshape(*args),
+            v = self._v.reshape(*args),
+            plane = self._plane,
+        )
+
     @property
     def ndim(self):
         """Number of dimensions of array."""
@@ -465,6 +494,20 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             h = self._h.copy(),
             k = self._k.copy(),
             L = self._L.copy(),
+            plane = self._plane,
+        )
+
+    def reshape(self, *args):
+        """Reshape state array."""
+        return type(self)(
+            epoch = self._epoch,
+            attractor = self._attractor,
+            p = self._p.reshape(*args),
+            f = self._f.reshape(*args),
+            g = self._g.reshape(*args),
+            h = self._h.reshape(*args),
+            k = self._k.reshape(*args),
+            L = self._L.reshape(*args),
             plane = self._plane,
         )
 
