@@ -26,12 +26,12 @@ from poliastro.util import norm, wrap_angle
 from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
 
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
+ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"  # TODO import from orbit module?
 # String representation for orbits around bodies without predefined
 # Reference frame
 ORBIT_NO_FRAME_FORMAT = (
     "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
-)
+)  # TODO import from orbit module?
 
 
 class OrbitArray:  # TODO creation mixin
@@ -63,7 +63,7 @@ class OrbitArray:  # TODO creation mixin
 
     @property
     def epoch(self):
-        """Epoch of the orbit array."""
+        """Epoch array of the orbit array."""
         return self._state.epoch
 
     @property
@@ -73,125 +73,125 @@ class OrbitArray:  # TODO creation mixin
 
     @property
     def r(self):
-        """Position vector."""
+        """Position vector array."""
         return self._state.to_vectors().r
 
     @property
     def v(self):
-        """Velocity vector."""
+        """Velocity vector array."""
         return self._state.to_vectors().v
 
     @property
     def a(self):
-        """Semimajor axis."""
+        """Semimajor axis array."""
         return self._state.to_classical().a
 
     @property
     def p(self):
-        """Semilatus rectum."""
+        """Semilatus rectum array."""
         return self._state.to_classical().p
 
     @property
     def r_p(self):
-        """Radius of pericenter."""
+        """Radius of pericenter array."""
         return self.a * (1 - self.ecc)
 
     @property
     def r_a(self):
-        """Radius of apocenter."""
+        """Radius of apocenter array."""
         return self.a * (1 + self.ecc)
 
     @property
     def ecc(self):
-        """Eccentricity."""
+        """Eccentricity array."""
         return self._state.to_classical().ecc
 
     @property
     def inc(self):
-        """Inclination."""
+        """Inclination array."""
         return self._state.to_classical().inc
 
     @property
     def raan(self):
-        """Right ascension of the ascending node."""
+        """Right ascension of the ascending node array."""
         return self._state.to_classical().raan
 
     @property
     def argp(self):
-        """Argument of the perigee."""
+        """Argument of the perigee array."""
         return self._state.to_classical().argp
 
     @property
     def nu(self):
-        """True anomaly."""
+        """True anomaly array."""
         return self._state.to_classical().nu
 
     @property
     def f(self):
-        """Second modified equinoctial element."""
+        """Second modified equinoctial element array."""
         return self._state.to_equinoctial().f
 
     @property
     def g(self):
-        """Third modified equinoctial element."""
+        """Third modified equinoctial element array."""
         return self._state.to_equinoctial().g
 
     @property
     def h(self):
-        """Fourth modified equinoctial element."""
+        """Fourth modified equinoctial element array."""
         return self._state.to_equinoctial().h
 
     @property
     def k(self):
-        """Fifth modified equinoctial element."""
+        """Fifth modified equinoctial element array."""
         return self._state.to_equinoctial().k
 
     @property
     def L(self):
-        """True longitude."""
+        """True longitude array."""
         return self.raan + self.argp + self.nu
 
     @property
     def period(self):
-        """Period of the orbit."""
+        """Period of the orbit array."""
         return self._state.period
 
     @property
     def n(self):
-        """Mean motion."""
+        """Mean motion array."""
         return self._state.n
 
     @property
     def energy(self):
-        """Specific energy."""
+        """Specific energy array."""
         return energy(self.attractor.k, self.r, self.v)
 
     @property
     def e_vec(self):
-        """Eccentricity vector."""
+        """Eccentricity vector array."""
         return eccentricity_vector(self.attractor.k, self.r, self.v)
 
     @property
     def h_vec(self):
-        """Specific angular momentum vector."""
+        """Specific angular momentum vector array."""
         h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km**2 / u.s
         return h_vec
 
     @property
     def h_mag(self):
-        """Specific angular momentum."""
+        """Specific angular momentum array."""
         h_mag = norm(self.h_vec)
         return h_mag
 
     @property
     def arglat(self):
-        """Argument of latitude."""
+        """Argument of latitude array."""
         arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
 
     @property
     def t_p(self):
-        """Elapsed time since latest perifocal passage."""
+        """Elapsed time since latest perifocal passage array."""
         return t_p(
             self.nu,
             self.ecc,
