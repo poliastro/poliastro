@@ -351,7 +351,8 @@ class RVStateArray(BaseStateArray):
             Common reference plane for the elements.
 
         """
-        assert epoch.shape == r.shape == v.shape
+        assert epoch.shape == r.shape[:-1] == v.shape[:-1]
+        assert r.shape[-1] == v.shape[-1] == 3
         super().__init__(epoch, attractor, plane)
         self._r = r
         self._v = v
