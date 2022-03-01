@@ -276,6 +276,7 @@ class ClassicalStateArray(BaseStateArray):
 
         r_flat = r.reshape((-1,))
         v_flat = v.reshape((-1,))
+
         k = self._attractor.k.to_value(u.km**3 / u.s**2)
         p_flat = self.p.to_value(u.km).reshape((-1,))
         ecc_flat = self.ecc.value.reshape((-1,))
@@ -303,14 +304,37 @@ class ClassicalStateArray(BaseStateArray):
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
-        p, f, g, h, k, L = coe2mee(
-            self.p.to_value(u.km),
-            self.ecc.value,
-            self.inc.to_value(u.rad),
-            self.raan.to_value(u.rad),
-            self.argp.to_value(u.rad),
-            self.nu.to_value(u.rad),
-        ) # TODO check
+
+        p = np.zeros(self._p.shape, dtype = self._p.dtype)
+        f = np.zeros(self._p.shape, dtype = self._p.dtype)
+        g = np.zeros(self._p.shape, dtype = self._p.dtype)
+        h = np.zeros(self._p.shape, dtype = self._p.dtype)
+        k = np.zeros(self._p.shape, dtype = self._p.dtype)
+        L = np.zeros(self._p.shape, dtype = self._p.dtype)
+
+        p_flat = p.reshape((-1,))
+        f_flat = f.reshape((-1,))
+        g_flat = g.reshape((-1,))
+        h_flat = h.reshape((-1,))
+        k_flat = k.reshape((-1,))
+        L_flat = L.reshape((-1,))
+
+        p__flat = self.p.to_value(u.km).reshape((-1,))
+        ecc_flat = self.ecc.value.reshape((-1,))
+        inc_flat = self.inc.to_value(u.rad).reshape((-1,))
+        raan_flat = self.raan.to_value(u.rad).reshape((-1,))
+        argp_flat = self.argp.to_value(u.rad).reshape((-1,))
+        nu_flat = self.nu.to_value(u.rad).reshape((-1,))
+
+        for idx in range(p_flat.size):  # TODO replace with vector implementation
+            p_flat[idx], f_flat[idx], g_flat[idx], h_flat[idx], k_flat[idx], L_flat[idx] = coe2mee(
+                p__flat[idx],
+                ecc_flat[idx],
+                inc_flat[idx],
+                raan_flat[idx],
+                argp_flat[idx],
+                nu_flat[idx],
+            )
 
         return ModifiedEquinoctialStateArray(
             self.epoch,
