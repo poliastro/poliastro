@@ -647,7 +647,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
                 g_flat[idx],
                 h_flat[idx],
                 k_flat[idx],
-                self.L.to_value(u.rad),
+                L_flat[idx],
             )
 
         return ClassicalStateArray(
@@ -664,14 +664,30 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
-        r, v = mee2rv(
-            self.p.to(u.km).value,
-            self.f.to(u.rad).value,
-            self.g.to(u.rad).value,
-            self.h.to(u.rad).value,
-            self.k.to(u.rad).value,
-            self.L.to(u.rad).value,
-        ) # TODO check
+
+        r = np.zeros(self._p.shape, dtype = self._p.dtype)
+        v = np.zeros(self._p.shape, dtype = self._p.dtype)
+
+        r_flat = r.reshape((-1,))
+        v_flat = v.reshape((-1,))
+
+        p_flat = self.p.to(u.km).value.reshape((-1,))
+        f_flat = self.f.to(u.rad).value.reshape((-1,))
+        g_flat = self.g.to(u.rad).value.reshape((-1,))
+        h_flat = self.h.to(u.rad).value.reshape((-1,))
+        k_flat = self.k.to(u.rad).value.reshape((-1,))
+        L_flat = self.L.to(u.rad).value.reshape((-1,))
+
+        for idx in range(r_flat.size):  # TODO replace with vector implementation
+            r_flat[idx], v_flat[idx] = mee2rv(
+                p_flat[idx],
+                f_flat[idx],
+                g_flat[idx],
+                h_flat[idx],
+                k_flat[idx],
+                L_flat[idx],
+            )
+
         return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_equinoctial(self):
