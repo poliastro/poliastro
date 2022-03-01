@@ -19,7 +19,6 @@ from poliastro.twobody.elements import (
     hyp_nu_limit,
     t_p,
 )
-from poliastro.twobody.orbit.creation import OrbitCreationMixin
 from poliastro.twobody.propagation import farnocchia, propagate
 from poliastro.twobody.sampling import sample_closed
 from poliastro.twobody.states import BaseState
@@ -40,7 +39,7 @@ ORBIT_NO_FRAME_FORMAT = (
 )
 
 
-class Orbit(OrbitCreationMixin):
+class Orbit:  # TODO creation mixin
     """Position and velocity of a body with respect to an attractor
     at a given time (epoch).
 
