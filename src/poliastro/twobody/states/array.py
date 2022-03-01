@@ -30,7 +30,6 @@ class BaseStateArray(ABC):
             Common reference plane for the elements.
 
         """
-        assert epoch.ndim == 0
         self._epoch = epoch  # type: time.Time
         self._attractor = attractor
         self._plane = plane
@@ -156,8 +155,8 @@ class ClassicalStateArray(BaseStateArray):
         plane : ~poliastro.frames.enums.Planes
             Common reference plane for the elements.
         """
+        assert epoch.spahe == p.shape == ecc.shape == inc.shape == raan.shape == argp.shape == nu.shape
         super().__init__(epoch, attractor, plane)
-        assert p.shape == ecc.shape == inc.shape == raan.shape == argp.shape == nu.shape
         self._p = p
         self._ecc = ecc
         self._inc = inc
@@ -167,6 +166,7 @@ class ClassicalStateArray(BaseStateArray):
 
     def __getitem__(self, idx):
         """Get item or slice from state array."""
+        epoch = self._epoch[idx]
         p = self._p[idx]
         ecc = self._ecc[idx]
         inc = self._inc[idx]
@@ -175,7 +175,7 @@ class ClassicalStateArray(BaseStateArray):
         nu = self._nu[idx]
         cls = ClassicalState if p.ndim == 0 else type(self)
         return cls(
-            epoch = self._epoch,
+            epoch = epoch,
             attractor = self._attractor,
             p = p,
             ecc = ecc,
@@ -193,7 +193,7 @@ class ClassicalStateArray(BaseStateArray):
     def copy(self):
         """Copy state array."""
         return type(self)(
-            epoch = self._epoch,
+            epoch = self._epoch.copy(),
             attractor = self._attractor,
             p = self._p.copy(),
             ecc = self._ecc.copy(),
@@ -207,7 +207,7 @@ class ClassicalStateArray(BaseStateArray):
     def reshape(self, *args):
         """Reshape state array."""
         return type(self)(
-            epoch = self._epoch,
+            epoch = self._epoch.reshape(*args),
             attractor = self._attractor,
             p = self._p.reshape(*args),
             ecc = self._ecc.reshape(*args),
@@ -296,7 +296,7 @@ class ClassicalStateArray(BaseStateArray):
                 nu_flat[idx],
             )
 
-        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
+        return RVStateArray(self.epoch.copy(), self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
@@ -337,7 +337,7 @@ class ClassicalStateArray(BaseStateArray):
             )
 
         return ModifiedEquinoctialStateArray(
-            self.epoch,
+            self.epoch.copy(),
             self.attractor,
             p * u.km,
             f * u.rad,
@@ -369,18 +369,19 @@ class RVStateArray(BaseStateArray):
             Common reference plane for the elements.
 
         """
+        assert epoch.shape == r.shape == v.shape
         super().__init__(epoch, attractor, plane)
-        assert r.shape == v.shape
         self._r = r
         self._v = v
 
     def __getitem__(self, idx):
         """Get item or slice from state array."""
+        epoch = self._epoch[idx]
         r = self._r[idx]
         v = self._v[idx]
         cls = RVState if r.ndim == 0 else type(self)
         return cls(
-            epoch = self._epoch,
+            epoch = epoch,
             attractor = self._attractor,
             r = r,
             v = v,
@@ -394,7 +395,7 @@ class RVStateArray(BaseStateArray):
     def copy(self):
         """Copy state array."""
         return type(self)(
-            epoch = self._epoch,
+            epoch = self._epoch.copy(),
             attractor = self._attractor,
             r = self._r.copy(),
             v = self._v.copy(),
@@ -404,7 +405,7 @@ class RVStateArray(BaseStateArray):
     def reshape(self, *args):
         """Reshape state array."""
         return type(self)(
-            epoch = self._epoch,
+            epoch = self._epoch.reshape(*args),
             attractor = self._attractor,
             r = self._r.reshape(*args),
             v = self._v.reshape(*args),
@@ -469,7 +470,7 @@ class RVStateArray(BaseStateArray):
             )
 
         return ClassicalStateArray(
-            self.epoch,
+            self.epoch.copy(),
             self.attractor,
             p * u.km,
             ecc * u.one,
@@ -509,8 +510,8 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             Common reference plane for the elements.
 
         """
+        assert epoch.shape == p.shape == f.shape == g.shape == h.shape == k.shape == L.shape
         super().__init__(epoch, attractor, plane)
-        assert p.shape == f.shape == g.shape == h.shape == k.shape == L.shape
         self._p = p
         self._f = f
         self._g = g
@@ -520,6 +521,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
 
     def __getitem__(self, idx):
         """Get item or slice from state array."""
+        epoch = self._epoch[idx]
         p = self._p[idx]
         f = self._f[idx]
         g = self._g[idx]
@@ -528,7 +530,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
         L = self._L[idx]
         cls = ModifiedEquinoctialState if p.ndim == 0 else type(self)
         return cls(
-            epoch = self._epoch,
+            epoch = epoch,
             attractor = self._attractor,
             p = p,
             f = f,
@@ -546,7 +548,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
     def copy(self):
         """Copy state array."""
         return type(self)(
-            epoch = self._epoch,
+            epoch = self._epoch.copy(),
             attractor = self._attractor,
             p = self._p.copy(),
             f = self._f.copy(),
@@ -560,7 +562,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
     def reshape(self, *args):
         """Reshape state array."""
         return type(self)(
-            epoch = self._epoch,
+            epoch = self._epoch.reshape(*args),
             attractor = self._attractor,
             p = self._p.reshape(*args),
             f = self._f.reshape(*args),
@@ -651,7 +653,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             )
 
         return ClassicalStateArray(
-            self.epoch,
+            self.epoch.copy(),
             self.attractor,
             p * u.km,
             ecc * u.one,
@@ -688,7 +690,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
                 L_flat[idx],
             )
 
-        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
+        return RVStateArray(self.epoch.copy(), self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
