@@ -279,7 +279,7 @@ class ClassicalStateArray(BaseStateArray):
             self.nu.to_value(u.rad),
         ) # TODO check
 
-        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane) # TODO check
+        return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
