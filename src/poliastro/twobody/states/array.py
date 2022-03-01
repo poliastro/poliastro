@@ -282,7 +282,7 @@ class ClassicalStateArray(BaseStateArray):
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
-        return self.copy()
+        return self
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
@@ -406,7 +406,7 @@ class RVStateArray(BaseStateArray):
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
-        return self.copy()
+        return self
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
@@ -646,4 +646,4 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
-        return self.copy()
+        return self
