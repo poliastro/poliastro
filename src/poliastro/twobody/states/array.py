@@ -391,8 +391,8 @@ class RVStateArray(BaseStateArray):
         return type(self)(
             epoch = self._epoch.reshape(*args),
             attractor = self._attractor,
-            r = self._r.reshape(*args),
-            v = self._v.reshape(*args),
+            r = self._r.reshape(*args, 3),
+            v = self._v.reshape(*args, 3),
             plane = self._plane,
         )
 
