@@ -25,11 +25,6 @@ from poliastro.twobody.states import BaseStateArray
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
-try:
-    from functools import cached_property  # type: ignore
-except ImportError:
-    from cached_property import cached_property  # type: ignore
-
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
@@ -76,52 +71,52 @@ class OrbitArray:  # TODO creation mixin
         """Common fundamental plane of the frame."""
         return self._state.plane
 
-    @cached_property
+    @property
     def r(self):
         """Position vector."""
         return self._state.to_vectors().r
 
-    @cached_property
+    @property
     def v(self):
         """Velocity vector."""
         return self._state.to_vectors().v
 
-    @cached_property
+    @property
     def a(self):
         """Semimajor axis."""
         return self._state.to_classical().a
 
-    @cached_property
+    @property
     def p(self):
         """Semilatus rectum."""
         return self._state.to_classical().p
 
-    @cached_property
+    @property
     def r_p(self):
         """Radius of pericenter."""
         return self.a * (1 - self.ecc)
 
-    @cached_property
+    @property
     def r_a(self):
         """Radius of apocenter."""
         return self.a * (1 + self.ecc)
 
-    @cached_property
+    @property
     def ecc(self):
         """Eccentricity."""
         return self._state.to_classical().ecc
 
-    @cached_property
+    @property
     def inc(self):
         """Inclination."""
         return self._state.to_classical().inc
 
-    @cached_property
+    @property
     def raan(self):
         """Right ascension of the ascending node."""
         return self._state.to_classical().raan
 
-    @cached_property
+    @property
     def argp(self):
         """Argument of the perigee."""
         return self._state.to_classical().argp
@@ -131,70 +126,70 @@ class OrbitArray:  # TODO creation mixin
         """True anomaly."""
         return self._state.to_classical().nu
 
-    @cached_property
+    @property
     def f(self):
         """Second modified equinoctial element."""
         return self._state.to_equinoctial().f
 
-    @cached_property
+    @property
     def g(self):
         """Third modified equinoctial element."""
         return self._state.to_equinoctial().g
 
-    @cached_property
+    @property
     def h(self):
         """Fourth modified equinoctial element."""
         return self._state.to_equinoctial().h
 
-    @cached_property
+    @property
     def k(self):
         """Fifth modified equinoctial element."""
         return self._state.to_equinoctial().k
 
-    @cached_property
+    @property
     def L(self):
         """True longitude."""
         return self.raan + self.argp + self.nu
 
-    @cached_property
+    @property
     def period(self):
         """Period of the orbit."""
         return self._state.period
 
-    @cached_property
+    @property
     def n(self):
         """Mean motion."""
         return self._state.n
 
-    @cached_property
+    @property
     def energy(self):
         """Specific energy."""
         return energy(self.attractor.k, self.r, self.v)
 
-    @cached_property
+    @property
     def e_vec(self):
         """Eccentricity vector."""
         return eccentricity_vector(self.attractor.k, self.r, self.v)
 
-    @cached_property
+    @property
     def h_vec(self):
         """Specific angular momentum vector."""
         h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km**2 / u.s
         return h_vec
 
-    @cached_property
+    @property
     def h_mag(self):
         """Specific angular momentum."""
         h_mag = norm(self.h_vec)
         return h_mag
 
-    @cached_property
+    @property
     def arglat(self):
         """Argument of latitude."""
         arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
 
-    @cached_property
+    @property
     def t_p(self):
         """Elapsed time since latest perifocal passage."""
         return t_p(
