@@ -21,7 +21,7 @@ from poliastro.twobody.elements import (
 )
 from poliastro.twobody.propagation import farnocchia, propagate
 from poliastro.twobody.sampling import sample_closed
-from poliastro.twobody.states import BaseState
+from poliastro.twobody.states import BaseStateArray
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
@@ -39,8 +39,8 @@ ORBIT_NO_FRAME_FORMAT = (
 )
 
 
-class Orbit:  # TODO creation mixin
-    """Position and velocity of a body with respect to an attractor
+class OrbitArray:  # TODO creation mixin
+    """Position and velocity of an array of body with respect to a common attractor
     at a given time (epoch).
 
     Regardless of how the Orbit is created, the implicit
@@ -55,25 +55,25 @@ class Orbit:  # TODO creation mixin
 
         Parameters
         ----------
-        state : BaseState
+        state : BaseStateArray
             Position and velocity or orbital elements.
 
         """
-        self._state = state  # type: BaseState
+        self._state = state  # type: BaseStateArray
 
     @property
     def attractor(self):
-        """Main attractor."""
+        """Common main attractor."""
         return self._state.attractor
 
     @property
     def epoch(self):
-        """Epoch of the orbit."""
+        """Epoch of the orbit array."""
         return self._state.epoch
 
     @property
     def plane(self):
-        """Fundamental plane of the frame."""
+        """Common fundamental plane of the frame."""
         return self._state.plane
 
     @cached_property
