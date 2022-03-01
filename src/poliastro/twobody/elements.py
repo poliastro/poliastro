@@ -24,7 +24,6 @@ def circular_velocity(k, a):
 @u.quantity_input(k=u_km3s2, a=u.km)
 def mean_motion(k, a):
     """Mean motion given body (k) and semimajor axis (a)."""
-    assert k.shape == a.shape
     return np.sqrt(k / np.abs(a**3)).to(1 / u.s) * u.rad
 
 
