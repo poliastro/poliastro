@@ -253,11 +253,11 @@ class ClassicalStateArray(BaseStateArray):
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
 
-        r = np.zeros(self._p.shape, dtype = self._p.dtype)
-        v = np.zeros(self._p.shape, dtype = self._p.dtype)
+        r = np.zeros((*self._p.shape, 3), dtype = self._p.dtype)
+        v = np.zeros((*self._p.shape, 3), dtype = self._p.dtype)
 
-        r_flat = r.reshape((-1,))
-        v_flat = v.reshape((-1,))
+        r_flat = r.reshape((-1, 3))
+        v_flat = v.reshape((-1, 3))
 
         k = self._attractor.k.to_value(u.km**3 / u.s**2)
         p_flat = self.p.to_value(u.km).reshape((-1,))
@@ -268,7 +268,7 @@ class ClassicalStateArray(BaseStateArray):
         nu_flat = self.nu.to_value(u.rad).reshape((-1,))
 
         for idx in range(r_flat.size):  # TODO replace with vector implementation
-            r_flat[idx], v_flat[idx] = coe2rv(
+            r_flat[idx, :], v_flat[idx, :] = coe2rv(
                 k,
                 p_flat[idx],
                 ecc_flat[idx],
@@ -619,11 +619,11 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
 
-        r = np.zeros(self._p.shape, dtype = self._p.dtype)
-        v = np.zeros(self._p.shape, dtype = self._p.dtype)
+        r = np.zeros((*self._p.shape, 3), dtype = self._p.dtype)
+        v = np.zeros((*self._p.shape, 3), dtype = self._p.dtype)
 
-        r_flat = r.reshape((-1,))
-        v_flat = v.reshape((-1,))
+        r_flat = r.reshape((-1, 3))
+        v_flat = v.reshape((-1, 3))
 
         p_flat = self.p.to(u.km).value.reshape((-1,))
         f_flat = self.f.to(u.rad).value.reshape((-1,))
@@ -633,7 +633,7 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
         L_flat = self.L.to(u.rad).value.reshape((-1,))
 
         for idx in range(r_flat.size):  # TODO replace with vector implementation
-            r_flat[idx], v_flat[idx] = mee2rv(
+            r_flat[idx, :], v_flat[idx, :] = mee2rv(
                 p_flat[idx],
                 f_flat[idx],
                 g_flat[idx],
