@@ -95,7 +95,7 @@ class BaseStateArray(ABC):
     @property
     def period(self):
         """Period of the orbit array."""
-        return period(self.attractor.k, self.to_classical().a) # TODO check
+        return period(self.attractor.k, self.to_classical().a)
 
     def to_vectors(self):
         """Converts to position and velocity vector representation.
