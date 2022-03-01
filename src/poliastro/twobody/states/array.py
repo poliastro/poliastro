@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from astropy import time, units as u
+import numpy as np
 
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
 from poliastro.twobody.elements import mean_motion, period
@@ -269,15 +270,30 @@ class ClassicalStateArray(BaseStateArray):
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
-        r, v = coe2rv(
-            self.attractor.k.to_value(u.km**3 / u.s**2),
-            self.p.to_value(u.km),
-            self.ecc.value,
-            self.inc.to_value(u.rad),
-            self.raan.to_value(u.rad),
-            self.argp.to_value(u.rad),
-            self.nu.to_value(u.rad),
-        ) # TODO check
+
+        r = np.zeros(self._p.shape, dtype = self._p.dtype)
+        v = np.zeros(self._p.shape, dtype = self._p.dtype)
+
+        r_flat = r.reshape((-1,))
+        v_flat = v.reshape((-1,))
+        k = self._attractor.k.to_value(u.km**3 / u.s**2)
+        p_flat = self.p.to_value(u.km).reshape((-1,))
+        ecc_flat = self.ecc.value.reshape((-1,))
+        inc_flat = self.inc.to_value(u.rad).reshape((-1,))
+        raan_flat = self.raan.to_value(u.rad).reshape((-1,))
+        argp_flat = self.argp.to_value(u.rad).reshape((-1,))
+        nu_flat = self.nu.to_value(u.rad).reshape((-1,))
+
+        for idx in range(r_flat.size):  # TODO replace with vector implementation
+            r_flat[idx], v_flat[idx] = coe2rv(
+                k,
+                p_flat[idx],
+                ecc_flat[idx],
+                inc_flat[idx],
+                raan_flat[idx],
+                argp_flat[idx],
+                nu_flat[idx],
+            )
 
         return RVStateArray(self.epoch, self.attractor, r * u.km, v * u.km / u.s, self.plane)
 
