@@ -360,6 +360,7 @@ class RVStateArray(BaseStateArray):
     def __getitem__(self, idx):
         """Get item or slice from state array."""
         epoch = self._epoch[idx]
+        idx = (*idx, slice(None, None, None)) if isinstance(idx, tuple) else (idx, slice(None, None, None))
         r = self._r[idx]
         v = self._v[idx]
         cls = RVState if r.ndim == 0 else type(self)
