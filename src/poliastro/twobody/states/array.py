@@ -428,14 +428,14 @@ class RVStateArray(BaseStateArray):
         nu_flat = nu.reshape((-1,))
 
         k = self.attractor.k.to_value(u.km**3 / u.s**2)
-        r_flat = self.r.to_value(u.km).reshape((-1,))
-        v_flat = self.v.to_value(u.km / u.s).reshape((-1,))
+        r_flat = self.r.to_value(u.km).reshape((-1, 3))
+        v_flat = self.v.to_value(u.km / u.s).reshape((-1, 3))
 
         for idx in range(p_flat.size):  # TODO replace with vector implementation
             p_flat[idx], ecc_flat[idx], inc_flat[idx], raan_flat[idx], argp_flat[idx], nu_flat[idx] = rv2coe(
                 k,
-                r_flat[idx],
-                v_flat[idx],
+                r_flat[idx, :],
+                v_flat[idx, :],
             )
 
         return ClassicalStateArray(
