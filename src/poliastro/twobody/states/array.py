@@ -90,7 +90,7 @@ class BaseStateArray(ABC):
     @property
     def n(self):
         """Mean motion array."""
-        return mean_motion(self.attractor.k, self.to_classical().a) # TODO check
+        return mean_motion(self.attractor.k, self.to_classical().a)
 
     @property
     def period(self):
