@@ -55,22 +55,19 @@ class BaseStateArray(ABC):
         raise NotImplementedError
 
     @property
-    @abstractmethod
     def ndim(self):
         """Number of dimensions of array."""
-        raise NotImplementedError
+        return self._epoch.ndim
 
     @property
-    @abstractmethod
     def shape(self):
         """Shape of array."""
-        raise NotImplementedError
+        return self._epoch.shape
 
     @property
-    @abstractmethod
     def size(self):
         """Size of array."""
-        raise NotImplementedError
+        return self._epoch.size
 
     @property
     def epoch(self):
@@ -217,21 +214,6 @@ class ClassicalStateArray(BaseStateArray):
             nu = self._nu.reshape(*args),
             plane = self._plane,
         )
-
-    @property
-    def ndim(self):
-        """Number of dimensions of array."""
-        raise self._p.ndim
-
-    @property
-    def shape(self):
-        """Shape of array."""
-        return self._p.shape
-
-    @property
-    def size(self):
-        """Size of array."""
-        return self._p.size
 
     @property
     def p(self):
@@ -413,21 +395,6 @@ class RVStateArray(BaseStateArray):
         )
 
     @property
-    def ndim(self):
-        """Number of dimensions of array."""
-        raise self._r.ndim
-
-    @property
-    def shape(self):
-        """Shape of array."""
-        return self._r.shape
-
-    @property
-    def size(self):
-        """Size of array."""
-        return self._r.size
-
-    @property
     def r(self):
         """Position vector array."""
         return self._r
@@ -572,21 +539,6 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
             L = self._L.reshape(*args),
             plane = self._plane,
         )
-
-    @property
-    def ndim(self):
-        """Number of dimensions of array."""
-        raise self._p.ndim
-
-    @property
-    def shape(self):
-        """Shape of array."""
-        return self._p.shape
-
-    @property
-    def size(self):
-        """Size of array."""
-        return self._p.size
 
     @property
     def p(self):
