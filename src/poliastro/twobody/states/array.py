@@ -618,14 +618,37 @@ class ModifiedEquinoctialStateArray(BaseStateArray):
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
-        p, ecc, inc, raan, argp, nu = mee2coe(
-            self.p.to_value(u.km),
-            self.f.to_value(u.rad),
-            self.g.to_value(u.rad),
-            self.h.to_value(u.rad),
-            self.k.to_value(u.rad),
-            self.L.to_value(u.rad),
-        ) # TODO check
+
+        p = np.zeros(self._p.shape, dtype = self._p.dtype)
+        ecc = np.zeros(self._p.shape, dtype = self._p.dtype)
+        inc = np.zeros(self._p.shape, dtype = self._p.dtype)
+        raan = np.zeros(self._p.shape, dtype = self._p.dtype)
+        argp = np.zeros(self._p.shape, dtype = self._p.dtype)
+        nu = np.zeros(self._p.shape, dtype = self._p.dtype)
+
+        p_flat = p.reshape((-1,))
+        ecc_flat = ecc.reshape((-1,))
+        inc_flat = inc.reshape((-1,))
+        raan_flat = raan.reshape((-1,))
+        argp_flat = argp.reshape((-1,))
+        nu_flat = nu.reshape((-1,))
+
+        p__flat = self.p.to_value(u.km).reshape((-1,))
+        f_flat = self.f.to_value(u.rad).reshape((-1,))
+        g_flat = self.g.to_value(u.rad).reshape((-1,))
+        h_flat = self.h.to_value(u.rad).reshape((-1,))
+        k_flat = self.k.to_value(u.rad).reshape((-1,))
+        L_flat = self.L.to_value(u.rad).reshape((-1,))
+
+        for idx in range(p_flat.size):  # TODO replace with vector implementation
+            p_flat[idx], ecc_flat[idx], inc_flat[idx], raan_flat[idx], argp_flat[idx], nu_flat[idx] = mee2coe(
+                p__flat[idx],
+                f_flat[idx],
+                g_flat[idx],
+                h_flat[idx],
+                k_flat[idx],
+                self.L.to_value(u.rad),
+            )
 
         return ClassicalStateArray(
             self.epoch,
