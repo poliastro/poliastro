@@ -200,8 +200,19 @@ class OrbitArray:  # TODO creation mixin
     @property
     def h_vec(self):
         """Specific angular momentum vector array."""
-        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km**2 / u.s
-        return h_vec
+
+        r = self.r
+        v = self.v
+        h_vec = np.zeros(r.shape, dtype = r.dtype)
+
+        r_flat = r.to_value(u.km).reshape((-1, 3))
+        v_flat = v.to(u.km / u.s).reshape((-1, 3))
+        h_vec_flat = h_vec.reshape((-1, 3))
+
+        for idx in range(h_vec_flat.size):  # TODO replace with vector implementation
+            h_vec_flat[idx, :] = np.cross(r_flat[idx, :], v_flat[idx, :])
+
+        return h_vec * u.km**2 / u.s
 
     @property
     def h_mag(self):
