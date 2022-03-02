@@ -72,6 +72,10 @@ class OrbitArray:  # TODO creation mixin
         """Copy orbit array."""
         return type(self)(self._state.copy())
 
+    def reshape(self, *args):
+        """Reshape orbit array."""
+        return type(self)(self._state.reshape(*args))
+
     @property
     def attractor(self):
         """Common main attractor."""
