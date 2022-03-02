@@ -64,6 +64,10 @@ class OrbitArray:  # TODO creation mixin
         cls = type(self) if isinstance(state, BaseStateArray) else Orbit
         return cls(self._state[idx])  # type: ignore
 
+    def __setitem__(self, idx, value):
+        """Set item or slice from array array."""
+        raise NotImplementedError # TODO
+
     @property
     def attractor(self):
         """Common main attractor."""
