@@ -238,12 +238,27 @@ class OrbitArray:  # TODO creation mixin
     @property
     def t_p(self):
         """Elapsed time since latest perifocal passage array."""
-        return t_p(
-            self.nu,
-            self.ecc,
-            self.attractor.k,
-            self.r_p,
-        )
+
+        nu = self.nu  # on demand
+        ecc = self.ecc  # on demand
+        k = self.attractor.k
+        r_p = self.r_p  # on demand
+        tp = np.zeros(self._state.epoch.shape, dtype = nu.dtype)
+
+        nu_flat = nu.reshape((-1,))
+        ecc_flat = ecc.reshape((-1,))
+        r_p_flat = r_p.reshape((-1,))
+        tp_flat = tp.reshape((-1,))
+
+        for idx in range(nu.size):  # TODO replace with vector implementation
+            tp_flat[idx] = t_p(
+                nu_flat[idx],
+                ecc_flat[idx],
+                k,
+                r_p_flat[idx],
+            )
+
+        return tp
 
     def get_frame(self):
         """Get equivalent reference frame of the orbit.
