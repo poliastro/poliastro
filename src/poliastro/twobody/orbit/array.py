@@ -164,7 +164,20 @@ class OrbitArray:  # TODO creation mixin
     @property
     def energy(self):
         """Specific energy array."""
-        return energy(self.attractor.k, self.r, self.v)
+
+        r = self.r
+        v = self.v
+        e = np.zeros(self._state.epoch.shape, dtype = r.dtype)
+        k = self.attractor.k
+
+        r_flat = r.reshape((-1, 3))
+        v_flat = v.reshape((-1, 3))
+        e_flat = e.reshape((-1,))
+
+        for idx in range(e_flat.size):  # TODO replace with vector implementation
+            e_flat[idx] = energy(k, r_flat[idx, :], v_flat[idx, :])
+
+        return e
 
     @property
     def e_vec(self):
