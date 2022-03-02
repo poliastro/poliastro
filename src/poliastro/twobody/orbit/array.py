@@ -165,8 +165,8 @@ class OrbitArray:  # TODO creation mixin
     def energy(self):
         """Specific energy array."""
 
-        r = self.r
-        v = self.v
+        r = self.r  # on demand
+        v = self.v  # on demand
         e = np.zeros(self._state.epoch.shape, dtype = r.dtype)
         k = self.attractor.k
 
@@ -183,8 +183,8 @@ class OrbitArray:  # TODO creation mixin
     def e_vec(self):
         """Eccentricity vector array."""
 
-        r = self.r
-        v = self.v
+        r = self.r  # on demand
+        v = self.v  # on demand
         e = np.zeros(r.shape, dtype = r.dtype)
         k = self.attractor.k
 
@@ -192,7 +192,7 @@ class OrbitArray:  # TODO creation mixin
         v_flat = v.reshape((-1, 3))
         e_flat = e.reshape((-1, 3))
 
-        for idx in range(e_flat.size):  # TODO replace with vector implementation
+        for idx in range(self.epoch.size):  # TODO replace with vector implementation
             e_flat[idx, :] = eccentricity_vector(k, r_flat[idx, :], v_flat[idx, :])
 
         return e
@@ -201,8 +201,8 @@ class OrbitArray:  # TODO creation mixin
     def h_vec(self):
         """Specific angular momentum vector array."""
 
-        r = self.r
-        v = self.v
+        r = self.r  # on demand
+        v = self.v  # on demand
         h_vec = np.zeros(r.shape, dtype = r.dtype)
 
         r_flat = r.to_value(u.km).reshape((-1, 3))
@@ -217,7 +217,16 @@ class OrbitArray:  # TODO creation mixin
     @property
     def h_mag(self):
         """Specific angular momentum array."""
-        h_mag = norm(self.h_vec)
+
+        h_vec = self.h_vec  # on demand
+        h_mag = np.zeros(self._state.epoch.shape, dtype = h_vec.dtype)
+
+        h_vec_flat = h_vec.reshape((-1, 3))
+        h_mag_flat = h_mag.reshape((-1,))
+
+        for idx in range(h_mag_flat.size):  # TODO replace with vector implementation
+            h_mag_flat[idx] = norm(h_vec_flat[idx, :])
+
         return h_mag
 
     @property
