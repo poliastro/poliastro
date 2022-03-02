@@ -25,6 +25,8 @@ from poliastro.twobody.states import BaseStateArray
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
+from .scalar import Orbit
+
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"  # TODO import from orbit module?
 # String representation for orbits around bodies without predefined
@@ -55,6 +57,12 @@ class OrbitArray:  # TODO creation mixin
 
         """
         self._state = state  # type: BaseStateArray
+
+    def __getitem__(self, idx):
+        """Get item or slice from orbit array."""
+        state = self._state[idx]
+        cls = type(self) if isinstance(state, BaseStateArray) else Orbit
+        return cls(self._state[idx])  # type: ignore
 
     @property
     def attractor(self):
