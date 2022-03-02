@@ -182,7 +182,20 @@ class OrbitArray:  # TODO creation mixin
     @property
     def e_vec(self):
         """Eccentricity vector array."""
-        return eccentricity_vector(self.attractor.k, self.r, self.v)
+
+        r = self.r
+        v = self.v
+        e = np.zeros(r.shape, dtype = r.dtype)
+        k = self.attractor.k
+
+        r_flat = r.reshape((-1, 3))
+        v_flat = v.reshape((-1, 3))
+        e_flat = e.reshape((-1, 3))
+
+        for idx in range(e_flat.size):  # TODO replace with vector implementation
+            e_flat[idx, :] = eccentricity_vector(k, r_flat[idx, :], v_flat[idx, :])
+
+        return e
 
     @property
     def h_vec(self):
