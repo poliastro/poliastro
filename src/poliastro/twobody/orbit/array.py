@@ -68,6 +68,10 @@ class OrbitArray:  # TODO creation mixin
         """Set item or slice from array array."""
         raise NotImplementedError # TODO
 
+    def copy(self):
+        """Copy orbit array."""
+        return type(self)(self._state.copy())
+
     @property
     def attractor(self):
         """Common main attractor."""
