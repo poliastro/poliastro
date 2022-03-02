@@ -77,6 +77,21 @@ class OrbitArray:  # TODO creation mixin
         return type(self)(self._state.reshape(*args))
 
     @property
+    def ndim(self):
+        """Number of dimensions of array."""
+        return self._state.ndim
+
+    @property
+    def shape(self):
+        """Shape of array."""
+        return self._state.shape
+
+    @property
+    def size(self):
+        """Size of array."""
+        return self._state.size
+
+    @property
     def attractor(self):
         """Common main attractor."""
         return self._state.attractor
