@@ -413,12 +413,12 @@ class RVStateArray(BaseStateArray):
     def to_classical(self):
         """Converts to classical orbital elements representation."""
 
-        p = np.zeros(self._r.shape, dtype = self._r.dtype)
-        ecc = np.zeros(self._r.shape, dtype = self._r.dtype)
-        inc = np.zeros(self._r.shape, dtype = self._r.dtype)
-        raan = np.zeros(self._r.shape, dtype = self._r.dtype)
-        argp = np.zeros(self._r.shape, dtype = self._r.dtype)
-        nu = np.zeros(self._r.shape, dtype = self._r.dtype)
+        p = np.zeros(self._epoch.shape, dtype = self._r.dtype)
+        ecc = np.zeros(self._epoch.shape, dtype = self._r.dtype)
+        inc = np.zeros(self._epoch.shape, dtype = self._r.dtype)
+        raan = np.zeros(self._epoch.shape, dtype = self._r.dtype)
+        argp = np.zeros(self._epoch.shape, dtype = self._r.dtype)
+        nu = np.zeros(self._epoch.shape, dtype = self._r.dtype)
 
         p_flat = p.reshape((-1,))
         ecc_flat = ecc.reshape((-1,))
