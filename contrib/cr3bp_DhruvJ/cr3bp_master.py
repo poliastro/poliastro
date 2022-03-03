@@ -38,7 +38,7 @@ def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP
         M1 and M2 are mass of Primary Bodies and M2<M1
     ic : numpy ndarray (6x1), {Can handle all 42 states for CR3BP+STM integration}
         States are defined about the barycenter of the two primaries, P1 and P2
-        Initial condition: 6 states to compute a trajectory];
+        Initial condition: 6 states to compute a trajectory;
         [0:x0, 1:y0, 2:z0, 3:vx0, 4:vy0, 5:vz0] [non-dimensional] [nd]
     tf : float
         Integration time [nd]
@@ -51,8 +51,9 @@ def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP
         1: CR3BP + STM EOM Integration
         The default is 0.
     xcross_cond : int, optional
-        0 => No, else x crossing condition
-
+        0 => No y-crossing check
+        1 => Events function to check when crossed y axis in any direction
+        2 => Events function to check when corssed y axis from -y to +y
         DESCRIPTION. The default is 0.
     int_method : string, optional
         Specify integration scheme: 'DOP853' or 'LSODA'

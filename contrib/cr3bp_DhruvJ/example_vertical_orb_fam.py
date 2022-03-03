@@ -1,62 +1,86 @@
 """
-Created on Sat Feb 26 23:19:40 2022
-
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
 
-NPC of Vertical family in vy and JC
+Obj: To compute family of L2 Vertical Orbit 
+    Single Shooter Variabl Time Setup
+    1. Continue in 'x' + XZ plane symmetry and X-axis symmetry use => targets Period/4 states
+    2. Continue in 'x' + Periodicity targeter => targets Period states
+    1. Continue in 'jc' + XZ plane symmetry and X-axis symmetry use => targets Period/4 states
+    
+Initial Condition obtained from: 
+D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Problem with Applications to Lunar South Pole Coverage," M.S., May 2006.
 """
-import copy
+
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.graph_objs as go
+
 from cr3bp_char_quant import bodies_char
-from cr3bp_lib_JC_calc import lib_pt_loc, JC
-from cr3bp_master import prop_cr3bp
-from cr3bp_initial_guess_generator import ig_lyap_orb_collinear_li_cr3bp
+from cr3bp_lib_JC_calc import lib_pt_loc
 from cr3bp_PO_targeter import po_single_shooter_cr3bp
+from cr3bp_fam_continuation import npc_po_fam_cr3bp
+from cr3bp_plot_orbits import plot_orbits
+
 
 mu, dist_e_m, tstar = bodies_char("Earth", "Moon")
 lib_loc = lib_pt_loc(mu)
-li = lib_loc[0,:] # 0 for L1 and  1 for L2
+li = lib_loc[1,:] # 0 for L1 and  1 for L2
 
+# From D. Grebow
 ig = np.array([1.0842, 0, 0, 0, -0.5417,0.8415])
 tf_guess = 6.1305
 
 orbit_results = []
 
-free_vars = ['x','vz','t']
+free_vars = ['x','vy','vz','t']
 constraints = ['y','vx','vz']
 
-for i in range(8):
-    results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints,sym_period_targ=1/4)
-    orbit_results.append(results)
-    print('JC:',JC(mu,results['states'][0,0:3],results['states'][0,3:6]))
-    tf_guess = results['t'][-1]
-    ig = copy.copy(results['states'][0,:])
-    print(ig)
-    ig[4] += -0.1
+# Target Lyapunov orbit using Single Shooter Variable Time setup 
+#        Exploits XZ plane symmetry and X-axis symmetry(sym_perioid_targ set to 1/4)
+#        Continue in 'x' using Natural Paramter Continuaton to compute 20 family members
+targeted_po_fam, targeted_po_char = npc_po_fam_cr3bp(mu, po_single_shooter_cr3bp, ig, tf_guess, 
+                                      free_vars, constraints, sym_period_targ=1/4, JCd = None, 
+                                      step_size = -1e-4, num_fam_members = 20, param_continue='x', line_search=True)
 
-free_vars = ['x','vy','vz','t']
-constraints = ['y','vx','vz','jc']
-JCd = round(JC(mu,results['states'][0,0:3],results['states'][0,3:6]),4)
+constraints = ['y','x','vz']
+# Target Lyapunov orbit using Single Shooter Variable Time setup 
+#        Exploits Periodcity(sym_perioid_targ set to 1)
+#        Continue in 'x' using Natural Paramter Continuaton to compute 20 family members
+targeted_po_fam_updated, targeted_po_char_updated = npc_po_fam_cr3bp(mu, po_single_shooter_cr3bp, ig, tf_guess, 
+                                      free_vars, constraints, sym_period_targ=1, JCd = None, 
+                                      step_size = -1e-4, num_fam_members = 20, param_continue='x', line_search=True)
+targeted_po_fam.extend(targeted_po_fam_updated)
+for keys in targeted_po_char_updated.keys():
+    targeted_po_char[keys].extend(targeted_po_char_updated[keys])
 
-# Continue in JC
-for i in range(5):
-    results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints, JCd=JCd,sym_period_targ=1/4)
-    orbit_results.append(results)
-    print('JC:',JC(mu,results['states'][0,0:3],results['states'][0,3:6]))
-    JCd += -1e-4
+constraints = ['y','vx','vz']
+# Target Lyapunov orbit using Single Shooter Variable Time setup 
+#        Exploits Periodcity(sym_perioid_targ set to 1)
+#        Continue in 'x' using Natural Paramter Continuaton to compute 20 family members
+targeted_po_fam_updated, targeted_po_char_updated = npc_po_fam_cr3bp(mu, po_single_shooter_cr3bp, ig, tf_guess, 
+                                      free_vars, constraints, sym_period_targ=1/4, JCd = None, 
+                                      step_size = -1e-2*6, num_fam_members = 50, param_continue='jc', line_search=True)
+targeted_po_fam.extend(targeted_po_fam_updated)
+for keys in targeted_po_char_updated.keys():
+    targeted_po_char[keys].extend(targeted_po_char_updated[keys])
     
-plt.figure(1)
-ax = plt.axes(projection='3d')
-ax.set_title('EM, L1 Halo Orbit Family, tol = 1e-12')
-for i in range(len(orbit_results)):
-    ax.plot3D(orbit_results[i]["states"][:,0], orbit_results[i]["states"][:,1],orbit_results[i]["states"][:,2])
-# plt.plot(li[0],li[1],'ro',label='L1')
-# plt.plot(1-mu,0,'b*')
-ax.scatter(li[0],li[1],li[2],color='red')
-ax.set_box_aspect([ub - lb for lb, ub in (getattr(ax, f'get_{a}lim')() for a in 'xyz')])
-ax.set_ylabel("y [nd]")
-ax.set_xlabel("x [nd]")
-ax.set_zlabel("z [nd]")
-plt.show()
+    
+"""
+Plot family
+"""
+if targeted_po_char != None:
+    colourby = targeted_po_char['jc']
+    colourmap='plasma'
+    cb_label = 'JC'
+    title = 'EM_L2_Vertical_family'
+    data_trace = []
+    # Add L2
+    data_trace.append(go.Scatter3d(x=[li[0]], y=[0], z=[0], marker=dict(
+                color='red',
+                size=2)))
+    # Add Earth
+    data_trace.append(go.Scatter3d(x=[-mu], y=[0], z=[0], marker=dict(
+                color='blue',
+                size=10)))
+    
+    plot_orbits(mu,targeted_po_fam,colourby, cb_label, title=title,data_trace=data_trace)

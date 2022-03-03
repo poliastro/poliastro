@@ -8,9 +8,10 @@ Objective: This file contains functions required to target a Periodic Orbit in t
     Three Body Problem (CR3BP) model
 
     Features:
-        1. Setup multiple nodes to use a Multiple Shooter Targeter
-        2. (will be added)Periodic Orbit Multiple Shooter Targeter (Acts as a single shooter if n_node == 1)
-        3. (will be added)Newton-Raphson Solver
+        1. Single Shooter Targeter: Variable time targeter capable of targeting states, JC and periodicity
+        2. Setup multiple nodes to use a Multiple Shooter Targeter
+        3. (will be added)Periodic Orbit Multiple Shooter Targeter (Acts as a single shooter if n_node == 1)
+        4. (will be added)Newton-Raphson Solver
 
 References
 ____________
@@ -22,34 +23,80 @@ These are some of the referneces that provide a comprehensive brackground and ha
 4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006
 """
 import numpy as np
+import copy
 from cr3bp_lib_JC_calc import JC
 from cr3bp_master import prop_cr3bp, ui_partials_acc_cr3bp
 
 def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints, sym_period_targ=1/2, JCd = None, palc_args=None, conv_tol=1e-12, int_tol=1e-12, Nmax=50):
-    # sym_period_targ = 1/2 -> symmetry after half period, 1/4 -> after quarter period, 1-> periodicity
-    # lyap, halo, axial, vertical write free_vars and constraints for each and sym_period_targ
-    # tfguess = period
-    # xd
-    # palc
-    # note care about palc and JC rn
-    # test periodicity
-    # To do: palc, JC constraint(if jc then no palc), periodicity and xd
+    """Single shooter targeter for a Periodic Orbit defined in the CR3BP model
+    Dhruv Jain, 26 Feb 2022
 
-    # Targeter logical error check    
+    Parameters
+    ----------
+    mu :  float, M2/(M1+M2)
+        M1 and M2 are mass of Primary Bodies and M2<M1
+    initial_guess : numpy ndarray (6x1)
+        States are defined about the barycenter of the two primaries, P1 and P2
+        Initial guess: 6 states to target a Periodic Orbti;
+        [0:x0, 1:y0, 2:z0, 3:vx0, 4:vy0, 5:vz0] [non-dimensional] [nd]
+    tf_guess : float
+        Period guess of a periodic orbit[nd], should be positive, not validated for negative time
+    free_vars : list of strings
+        Describes the parameters set as free variables
+        Possible paramters: ['x','y','z','vx','vy','vz','t']
+    constraints : list of strings
+        Describes the parameters set as constraints
+        Possible paramters: ['x','y','z','vx','vy','vz','jc']
+    sym_period_targ : float, optional
+        Describes the fraction of period to be targeted. The default is 1/2.
+        1/4: Usually use for vertical orbits to use XZ plane AND X-axis symmetry to target states after Period/4
+        1/2: Usually use for lyapunov, halo, axial to leverage XZ plane OR X-axis symmetry to target states after Period/2
+        1: Usually use to target orbits that do not have XZ plane OR X-axis symmetry, target orbit periodicity
+    JCd : float, optional
+        Desired value of JC to be targeted. The default is None.
+    palc_args : TYPE, optional**************************************************************************************************************
+        DESCRIPTION. The default is None.**************************************************************************************************************
+    conv_tol : float, optional
+        Convergence tolerance of the constraint vector -> Acceptable tolerance of L2 norm of the constraint vector . The default is 1e-12.
+    int_tol : float, optional
+        Absolute = Relative Integration Tolerance
+        The default is 1e-12.
+    Nmax : int, optional
+        Max allowable iteration of targeter while loop. The default is 50.
+
+    Returns
+    -------
+    results : Targeted Periodic Orbit - Dictionary
+        't': time history, [nd]
+        'states': state history, [:,i] => 6 states @ t = t_i, [nd]
+        'yevents': states at prescribed event, [nd]
+        'tevents': time stamp of yevents, [nd]
+        'stm': STM element history, [:,:,i] => STM @ t = t_i
+    iterflag: Boolean/None
+        True: Targeter unable to converge
+        None: Targeter Setup is incorrect
+        False: Succesfully targeted
+    """
+    
+    iterflag = None
+    # Free vairables and Constraints paramters logical error check    
     if 'jc' in free_vars:
         print('Jacobi Constant cannot be a free variable')
-        return 0
+        return 0, iterflag
     if 't' in constraints:
         print('Time should not be a constraint, instead make the tf_guess to be desired time and not add \'t\' as a free variable')
+        return 0, iterflag
     
     if sym_period_targ not in [1/4,1/2,1]:
         print('Not a valid fraction of period to target')
         return 0
     
-    free_vars_index, constraints_index = map_vars_index_cr3bp(free_vars, constraints)
+    # Map paramter strings to index
+    free_vars_index = map_vars_index_cr3bp(free_vars)
+    constraints_index = map_vars_index_cr3bp(constraints)
         
-    # Use events function to compute ycrossing if symmetry is to be used for targeter
-    if ('t' not in free_vars or sym_period_targ !=1):        
+    # Use events function to compute y-crossing if symmetry is to be used for targeter
+    if 't' in free_vars and sym_period_targ !=1:        
         results_stm = prop_cr3bp(mu, initial_guess, tf_guess, tol=int_tol, xcross_cond=1)
         if len(results_stm['tevents'][0][:]) > 1: # condition so that it works for corrected solutions
             tf = results_stm['tevents'][0][1]
@@ -59,14 +106,15 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
         tf = tf_guess*sym_period_targ 
     
     results_stm = prop_cr3bp(mu, initial_guess, tf, stm_bool=1, tol=int_tol, xcross_cond=0)        
-    ic = initial_guess
+    ic = copy.copy(initial_guess)
     
+    # Initialize key components of targeter
     xfree = np.zeros(len(free_vars_index))
     xconstraint = np.zeros(len(constraints_index))
     xdesired = np.zeros(len(constraints_index))
     DF = np.zeros((len(xfree),len(xconstraint)))
     
-    print(constraints_index, free_vars_index, free_vars, tf)
+    print('FX:', constraints,'X:', free_vars,'\nTf0:', tf,'JC0:', JC(mu,ic[0:3],ic[3:6]))
     
     stm_col_index = [free_vars_index[i] for i in range(len(xfree)) if free_vars_index[i] < 6]
     stm_row_index = [constraints_index[i] for i in range(len(xconstraint)) if constraints_index[i] < 6]
@@ -88,25 +136,29 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
         xconstraint = results_stm['states'][-1,stm_row_index]
     
     # Setup Desired vetor, xdesired where FX = xcontraint - xdesired
+    if 'jc' in constraints:
+        # xdesired[:-1] = 0 #results_stm['states'][0,stm_row_index]  
+        xdesired[-1] = JCd
+    # Updated desired to be inital state of orbit    
     if sym_period_targ == 1:
-        if 'jc' in constraints:
-            xdesired[:-1] = results_stm['states'][0,stm_row_index]  
-            xdesired[-1] = JCd
-        else:
-            xdesired = results_stm['states'][0,stm_row_index] 
+        xdesired[:stm_row_len] = results_stm['states'][0,stm_row_index] 
+        
+    if sym_period_targ == 1:
         # Create identity like matrix to be subtracted from STM    
         identity_mat = np.eye(6)
         temp = identity_mat[stm_row_index,:]
         identity_temp = temp[:,stm_col_index]
-            
+    
+    
     count = 0
-    
-    iterflag = False
-    
+        
+    print('Iteration:',count,'|FX|=',np.linalg.norm(xconstraint-xdesired),xconstraint[:],xdesired[:])
+   
+    iterflag = False    
     # Targeter loop: Use L2-norm of constraint vector and #iterations as stopping condition
-    while np.linalg.norm(xconstraint-xdesired) > conv_tol and count <= Nmax:
-    
+    while np.linalg.norm(xconstraint-xdesired) > conv_tol and count <= Nmax:    
         # Update STM after each iteration to converge faster
+        
         states_final = results_stm["states"][-1,:]
         Ux, Uy, Uz, ax, ay, az = ui_partials_acc_cr3bp(mu, states_final)
         Dot_states = np.array([states_final[3], states_final[4], states_final[5], ax, ay, az])
@@ -115,9 +167,10 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
         Ux_ic, Uy_ic, Uz_ic, _,_,_ = ui_partials_acc_cr3bp(mu, ic)
         dJC_dx = np.array([2*Ux_ic, 2*Uy_ic, 2*Uz_ic, -2*ic[3], -2*ic[4], -2*ic[5]])
         
+        #Extract required elements of the Monodromy matrix for the targeter setup
         stm_temp = results_stm["stm"][stm_row_index, :, -1]
 
-        # Setup DF
+        # Setup DF, Jacobian Matrix
         DF[:stm_row_len,:stm_col_len] = stm_temp[:, stm_col_index]          
         if 'jc' in constraints:
             DF[-1,:stm_col_len] = dJC_dx[stm_col_index]  
@@ -129,6 +182,7 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
             DF[:stm_row_len,:stm_col_len] = DF[:stm_row_len,:stm_col_len] - identity_temp           
             
         FX = xconstraint-xdesired
+        
         # Update Free variable vector
         xfree = newton_raphson_update(xfree, FX, DF)
         
@@ -149,21 +203,23 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
             xconstraint = results_stm['states'][-1,stm_row_index]
 
         # Update xdesired            
+        if 'jc' in constraints:
+            xdesired[-1] = JCd            
+            # Updated desired to be inital state of orbit    
         if sym_period_targ == 1:
-            if 'jc' in constraints:
-                xdesired[:-1] = results_stm['states'][0,stm_row_index]  
-                xdesired[-1] = JCd
-            else:
-                xdesired = results_stm['states'][0,stm_row_index] 
+            xdesired[:stm_row_len] = results_stm['states'][0,stm_row_index] 
+            
         
-        print(count, np.linalg.norm(xconstraint-xdesired), np.argmax(np.abs(xconstraint-xdesired)),np.max(np.abs(xconstraint-xdesired)))
+        print('Iteration:',count,'|FX|=',np.linalg.norm(xconstraint-xdesired),xconstraint[:],xdesired[:])
         
         count = count + 1 
     
     if count > Nmax:
         iterflag = True
-        print('STOPPPPPPPPPPPPPPPPPPPP')
-        
+        print('\nMaximum number of iterations exceeded. Recompute with smaller step size, different continuaton paramter, or recheck setup.\n')
+   
+    # Use targeted states to generate targeted Periodic orbit
+    print(tf,sym_period_targ)
     results_stm = prop_cr3bp(mu, ic, tf*1/sym_period_targ, stm_bool=1, tol=int_tol, xcross_cond=0)      
     
     return results_stm, iterflag
@@ -293,51 +349,37 @@ def multi_shooter_nodes_setup_cr3bp(mu, ic, tf, n_node, node_place_opt="time", i
 
     return ic_node, t_node
 
-def map_vars_index_cr3bp(free_vars, constraints):
+def map_vars_index_cr3bp(var_names=None):
     """
-    Map variables defined in free variables and constraints to numerical index
+    Map variables defined in free variables or constraints to numerical index
     Dhruv Jain, Feb 25 2022
     
     Parameters
     ----------
-    free_vars : list of strings
-        Contains strings expressing the free variables
-    constraints : list of strings
-        Contains strings expressing the constraints
-
+    vars_name : list of strings
+        Contains strings expressing parameters
+    
     Returns
     -------
-    free_vars_index : list of int
-        Integer index code to represent free variables
-    constraints_index : list of int
-        Integer index code to represnet constraints
+    vars_index : list of int
+        Integer index code to represent the parameters
     """    
     
     variable_dict = {'x': 0, 'y': 1, 'z': 2, 'vx': 3, 'vy': 4, 'vz': 5, 'jc': 6, 't':7}
+    vars_index = []
     
-    free_vars_index = []
-    constraints_index = []
-    
-    for i in range(len(free_vars)):
-        # Check and handle KeyError
-        try: 
-            free_vars_index.append(variable_dict[free_vars[i]])
-        except KeyError:
-            print(free_vars[i],'is not a valid free variable')
-            free_vars_index = 0
-            break
-            
-    for j in range(len(constraints)):
-        # Check and handle KeyError
-        try:
-            constraints_index.append(variable_dict[constraints[j]])
-        except KeyError:
-            print(constraints[j],'is not a valid constraint')
-            constraints_index = 0
-            break        
-    
+    if var_names != None:
+        for i in range(len(var_names)):
+            # Check and handle KeyError
+            try: 
+                vars_index.append(variable_dict[var_names[i]])
+            except KeyError:
+                print(vars_index[i],'is not a valid free variable')
+                vars_index = 0
+                break
+
+        
     # Sort the indices to handle variables passed in any order
-    free_vars_index = sorted(free_vars_index)
-    constraints_index = sorted(constraints_index)
+    vars_index = sorted(vars_index)
     
-    return free_vars_index, constraints_index
+    return vars_index
