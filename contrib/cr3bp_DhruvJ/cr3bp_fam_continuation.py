@@ -178,16 +178,8 @@ def npc_po_fam_cr3bp(
                     )
                 else:
                     iterflag = False
-<<<<<<< HEAD
         elif iterflag == False:
-            print('# PO family member = ',count_fam_member+1,'\n')    
-=======
-        elif iterflag == None:
-            print("Recheck targeter setup")
-            break
-        else:
             print("# PO family member = ", count_fam_member + 1, "\n")
->>>>>>> 60903721f8eb4fdadc53e3270ec19cebf32b407a
             targeted_po_fam.append(results)
             tf_guess = results["t"][-1]
             initial_guess = copy.copy(
@@ -212,15 +204,10 @@ def npc_po_fam_cr3bp(
             targeted_po_char["eigenvectors:"].append(eigenvects)
 
             count_fam_member += 1
-<<<<<<< HEAD
         else:
             print('Recheck targeter setup')
             break
 
-            
-=======
-
->>>>>>> 60903721f8eb4fdadc53e3270ec19cebf32b407a
     return targeted_po_fam, targeted_po_char
 
 
@@ -381,16 +368,8 @@ def palc_po_fam_cr3bp(
                     )
                 else:
                     iterflag = False
-<<<<<<< HEAD
         elif iterflag == False:
             print('# PO family member = ', count_fam_member+1,'\n')    
-=======
-        elif iterflag == None:
-            print("Recheck targeter setup")
-            break
-        else:
-            print("# PO family member = ", count_fam_member + 1, "\n")
->>>>>>> 60903721f8eb4fdadc53e3270ec19cebf32b407a
             targeted_po_fam.append(results)
             tf_guess = results["t"][-1]
             initial_guess = copy.copy(
@@ -427,13 +406,8 @@ def palc_po_fam_cr3bp(
             targeted_po_char["eigenvectors:"].append(eigenvects)
 
             count_fam_member += 1
-<<<<<<< HEAD
         else:
             print('Recheck targeter setup')
             break
     
     return targeted_po_fam, targeted_po_char
-=======
-
-    return targeted_po_fam, targeted_po_char
->>>>>>> 60903721f8eb4fdadc53e3270ec19cebf32b407a

@@ -106,7 +106,6 @@ for keys in targeted_po_char_updated.keys():
 """
 Plot family
 """
-<<<<<<< HEAD
 # if targeted_po_char != None:
 colourby = targeted_po_char['jc']
 colourmap='plasma'
@@ -128,33 +127,3 @@ data_trace.append(go.Scatter3d(x=[-mu], y=[0], z=[0], marker=dict(
 
 
 plot_orbits(mu,targeted_po_fam,colourby, cb_label, title=title,data_trace=data_trace, save=False)
-=======
-if targeted_po_char != None:
-    colourby = targeted_po_char["jc"]
-    colourmap = "plasma"
-    cb_label = "JC"
-    title = "EM_L4_Northern_Axial_family"
-    data_trace = []
-    # Add L4
-    data_trace.append(
-        go.Scatter3d(x=[li[0]], y=[0], z=[0], marker=dict(color="red", size=2))
-    )
-    # Add Moon
-    data_trace.append(
-        go.Scatter3d(x=[1 - mu], y=[0], z=[0], marker=dict(color="grey", size=7))
-    )
-    # Add Earth
-    data_trace.append(
-        go.Scatter3d(x=[-mu], y=[0], z=[0], marker=dict(color="blue", size=10))
-    )
-
-    plot_orbits(
-        mu,
-        targeted_po_fam,
-        colourby,
-        cb_label,
-        title=title,
-        data_trace=data_trace,
-        save=False,
-    )
->>>>>>> 60903721f8eb4fdadc53e3270ec19cebf32b407a

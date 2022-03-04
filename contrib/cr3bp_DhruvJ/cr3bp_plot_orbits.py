@@ -104,7 +104,7 @@ def plot_orbits(
         hoverinfo="none",
     )
     fig.add_trace(colorbar_trace)
-    if data_trace != None:
+    if data_trace is not None:
         for i in range(len(data_trace)):
             fig.add_trace(data_trace[i])
 
@@ -116,7 +116,7 @@ def plot_orbits(
         showlegend=False,
     )
 
-    if save == True:
+    if save is True:
         fig.write_html(title + ".html")
     else:
         fig.show()

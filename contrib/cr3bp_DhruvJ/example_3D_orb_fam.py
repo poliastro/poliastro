@@ -5,8 +5,8 @@ Created on Sat Feb 26 23:09:08 2022
         dhruvj9922@gmail.com
 
 Obj: Test Periodic Orbit Single Shooter
-    
-Initial Condition obtained from: 
+
+Initial Condition obtained from:
 D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Problem with Applications to Lunar South Pole Coverage," M.S., May 2006.
 """
 

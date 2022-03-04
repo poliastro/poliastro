@@ -111,7 +111,7 @@ def po_single_shooter_cr3bp(
         print("Not a valid fraction of period to target")
         return 0
 
-    if palc_args != None:
+    if palc_args is not None:
         print("PALC constraint included")
 
     # Map paramter strings to index
@@ -194,7 +194,7 @@ def po_single_shooter_cr3bp(
         identity_temp = temp[:, stm_col_index]
 
     # Create FX
-    if palc_args == None:
+    if palc_args is None:
         FX = xconstraint - xdesired
     else:
         FX = np.zeros((len(xconstraint) + 1))
@@ -243,7 +243,7 @@ def po_single_shooter_cr3bp(
             )
 
         # Update Free variable vector, include PALC constraint if PALC is being used
-        if palc_args == None:
+        if palc_args is None:
             xfree = newton_raphson_update(xfree, FX, DF)
         else:
             DG[:-1, :] = DF
@@ -273,7 +273,7 @@ def po_single_shooter_cr3bp(
         if sym_period_targ == 1:
             xdesired[:stm_row_len] = results_stm["states"][0, stm_row_index]
         # Update FX
-        if palc_args == None:
+        if palc_args is None:
             FX = xconstraint - xdesired
         else:
             FX[:-1] = xconstraint - xdesired
@@ -473,7 +473,7 @@ def map_vars_index_cr3bp(var_names=None):
     variable_dict = {"x": 0, "y": 1, "z": 2, "vx": 3, "vy": 4, "vz": 5, "jc": 6, "t": 7}
     vars_index = []
 
-    if var_names != None:
+    if var_names is not None:
         for i in range(len(var_names)):
             # Check and handle KeyError
             try:
