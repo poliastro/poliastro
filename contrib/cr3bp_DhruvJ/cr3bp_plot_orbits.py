@@ -1,7 +1,6 @@
 """
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
-        Credits: Noah Sadaka (Multi-Body Dynamics Research Group, Purdue University) for his help with plotly!
 
 Objective: Plot 3D family of orbits with a colorbar using Plotly
 """
@@ -17,10 +16,10 @@ def plot_orbits(mu, targeted_po_orbits, colourby, cb_label = 'JC', colourmap = '
     
     Parameters
     ----------
-    mu : TYPE
-        DESCRIPTION.
-    targeted_po_orbits : TYPE
-        DESCRIPTION.
+    mu :  float, M2/(M1+M2)
+        M1 and M2 are mass of Primary Bodies and M2<M1
+    targeted_po_orbits : List of dictionary
+        Targeted Periodic Orbit Information - Dictionary
     colourby : list of float
         Quantity by which to color orbit family members
     cb_label : string, optional
@@ -33,11 +32,6 @@ def plot_orbits(mu, targeted_po_orbits, colourby, cb_label = 'JC', colourmap = '
         To add additional traces
     save : boolean, optional
         Choose if save the plot or not. The default is False.
-
-    Returns
-    -------
-    None.
-
     """
     
     layout = go.Layout(autosize=True)
@@ -95,9 +89,6 @@ def plot_orbits(mu, targeted_po_orbits, colourby, cb_label = 'JC', colourmap = '
                                                 tickfont=dict(size=14))),
                                   hoverinfo='none')
     fig.add_trace(colorbar_trace)
-    fig.add_trace(go.Scatter3d(x=[1-mu], y=[0], z=[0], marker=dict(
-                color='grey',
-                size=7)))
     if data_trace != None:
         for i in range(len(data_trace)):
             fig.add_trace(data_trace[i])

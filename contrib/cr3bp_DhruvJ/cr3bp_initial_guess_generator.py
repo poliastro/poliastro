@@ -5,11 +5,10 @@ Created on Mon Feb 21 20:37:16 2022
     dhruvj9922@gmail.com
 
 Objective: This file contains functions required to target a Periodic Orbit in the Circular Restricted
-    Three Body Problem (CR3BP) model
+          Three Body Problem (CR3BP) model
 
     Features:
-        1. Compute inital guess for L1, L2, L3 Lyapunov orbits using linear approximation
-        2. Compute inital guess for L4 and L5, short and long period orbits using linear approximation
+       1. Compute inital guess for L1, L2, L3 Lyapunov orbits using linear approximation
 
 References
 ____________

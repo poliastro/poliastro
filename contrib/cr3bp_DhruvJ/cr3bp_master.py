@@ -54,7 +54,7 @@ def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP
         0 => No y-crossing check
         1 => Events function to check when crossed y axis in any direction
         2 => Events function to check when corssed y axis from -y to +y
-        DESCRIPTION. The default is 0.
+        The default is 0.
     int_method : string, optional
         Specify integration scheme: 'DOP853' or 'LSODA'
         The default is 'DOP853'.

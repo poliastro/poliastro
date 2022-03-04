@@ -2,6 +2,12 @@
 Created on Sat Feb 26 23:09:08 2022
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
+        dhruvj9922@gmail.com
+
+Obj: Test Periodic Orbit Single Shooter
+    
+Initial Condition obtained from: 
+D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Problem with Applications to Lunar South Pole Coverage," M.S., May 2006.
 """
 
 import copy
@@ -9,8 +15,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from cr3bp_char_quant import bodies_char
 from cr3bp_lib_JC_calc import lib_pt_loc
-from cr3bp_master import prop_cr3bp
-from cr3bp_initial_guess_generator import ig_lyap_orb_collinear_li_cr3bp
 from cr3bp_PO_targeter import po_single_shooter_cr3bp
 
 
@@ -43,7 +47,6 @@ ax.set_title('EM, L1 Halo Orbit Family, tol = 1e-12')
 for i in range(len(orbit_results)):
     ax.plot3D(orbit_results[i]["states"][:,0], orbit_results[i]["states"][:,1],orbit_results[i]["states"][:,2])
 plt.plot(li[0],li[1],'ro',label='L1')
-# plt.plot(1-mu,0,'b*')
 ax.scatter(li[0],li[1],li[2],color='red')
 ax.set_box_aspect([ub - lb for lb, ub in (getattr(ax, f'get_{a}lim')() for a in 'xyz')])
 ax.set_ylabel("y [nd]")

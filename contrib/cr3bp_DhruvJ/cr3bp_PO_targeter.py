@@ -8,10 +8,12 @@ Objective: This file contains functions required to target a Periodic Orbit in t
     Three Body Problem (CR3BP) model
 
     Features:
-        1. Single Shooter Targeter: Variable time targeter capable of targeting states, JC and periodicity
-        2. Setup multiple nodes to use a Multiple Shooter Targeter
-        3. (will be added)Periodic Orbit Multiple Shooter Targeter (Acts as a single shooter if n_node == 1)
-        4. (will be added)Newton-Raphson Solver
+        1. Single Shooter Targeter: 
+            -> Variable time targeter capable of targeting states, JC and periodicity 
+            -> Pseudo-Arc Length Compatible
+            -> Line Search to update step size         
+        2. Newton-Raphson Solver 
+        3. Setup multiple nodes to use a Multiple Shooter Targeter
 
 References
 ____________
@@ -54,8 +56,11 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
         1: Usually use to target orbits that do not have XZ plane OR X-axis symmetry, target orbit periodicity
     JCd : float, optional
         Desired value of JC to be targeted. The default is None.
-    palc_args : TYPE, optional**************************************************************************************************************
-        DESCRIPTION. The default is None.**************************************************************************************************************
+    palc_args : dictionary containting information for Pseudo-Arc Length Continuation, optional
+        'delta_s': step-size
+        'free_var_prev': Free variables of the previously converged orbit
+        'delta_X*_prev': Null-Vector of DF of previously converged solution
+        The default is None
     conv_tol : float, optional
         Convergence tolerance of the constraint vector -> Acceptable tolerance of L2 norm of the constraint vector . The default is 1e-12.
     int_tol : float, optional
@@ -86,15 +91,18 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
     if 't' in constraints:
         print('Time should not be a constraint, instead make the tf_guess to be desired time and not add \'t\' as a free variable')
         return 0, iterflag
-    
     if sym_period_targ not in [1/4,1/2,1]:
         print('Not a valid fraction of period to target')
         return 0
+    
+    if palc_args != None:
+        print('PALC constraint included') 
     
     # Map paramter strings to index
     free_vars_index = map_vars_index_cr3bp(free_vars)
     constraints_index = map_vars_index_cr3bp(constraints)
         
+    
     # Use events function to compute y-crossing if symmetry is to be used for targeter
     if 't' in free_vars and sym_period_targ !=1:        
         results_stm = prop_cr3bp(mu, initial_guess, tf_guess, tol=int_tol, xcross_cond=1)
@@ -108,11 +116,13 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
     results_stm = prop_cr3bp(mu, initial_guess, tf, stm_bool=1, tol=int_tol, xcross_cond=0)        
     ic = copy.copy(initial_guess)
     
+    
     # Initialize key components of targeter
     xfree = np.zeros(len(free_vars_index))
     xconstraint = np.zeros(len(constraints_index))
     xdesired = np.zeros(len(constraints_index))
-    DF = np.zeros((len(xfree),len(xconstraint)))
+    DF = np.zeros((len(xconstraint),len(xfree)))
+    DG = np.zeros((len(xfree),len(xfree))) # DF for PALC
     
     print('FX:', constraints,'X:', free_vars,'\nTf0:', tf,'JC0:', JC(mu,ic[0:3],ic[3:6]))
     
@@ -141,22 +151,28 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
         xdesired[-1] = JCd
     # Updated desired to be inital state of orbit    
     if sym_period_targ == 1:
-        xdesired[:stm_row_len] = results_stm['states'][0,stm_row_index] 
-        
+        xdesired[:stm_row_len] = results_stm['states'][0,stm_row_index]    
     if sym_period_targ == 1:
         # Create identity like matrix to be subtracted from STM    
         identity_mat = np.eye(6)
         temp = identity_mat[stm_row_index,:]
         identity_temp = temp[:,stm_col_index]
     
-    
+    # Create FX        
+    if palc_args == None:        
+        FX = xconstraint-xdesired
+    else:
+        FX = np.zeros((len(xconstraint)+1))
+        FX[:-1] = xconstraint-xdesired
+        FX[-1] = np.matmul(np.transpose(xfree-palc_args['free_var_prev']), palc_args['delta_X*_prev']) - palc_args['delta_s'] 
+        
     count = 0
         
-    print('Iteration:',count,'|FX|=',np.linalg.norm(xconstraint-xdesired),xconstraint[:],xdesired[:])
+    print('Iteration:',count,'|FX|=',np.linalg.norm(FX))
    
     iterflag = False    
     # Targeter loop: Use L2-norm of constraint vector and #iterations as stopping condition
-    while np.linalg.norm(xconstraint-xdesired) > conv_tol and count <= Nmax:    
+    while np.linalg.norm(FX) > conv_tol and count <= Nmax:    
         # Update STM after each iteration to converge faster
         
         states_final = results_stm["states"][-1,:]
@@ -170,21 +186,23 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
         #Extract required elements of the Monodromy matrix for the targeter setup
         stm_temp = results_stm["stm"][stm_row_index, :, -1]
 
+
         # Setup DF, Jacobian Matrix
         DF[:stm_row_len,:stm_col_len] = stm_temp[:, stm_col_index]          
         if 'jc' in constraints:
-            DF[-1,:stm_col_len] = dJC_dx[stm_col_index]  
-        
+            DF[-1,:stm_col_len] = dJC_dx[stm_col_index]        
         if 't' in free_vars:
             DF[:stm_row_len,-1] = Dot_states[stm_row_index] 
-        
         if sym_period_targ == 1:
             DF[:stm_row_len,:stm_col_len] = DF[:stm_row_len,:stm_col_len] - identity_temp           
             
-        FX = xconstraint-xdesired
-        
-        # Update Free variable vector
-        xfree = newton_raphson_update(xfree, FX, DF)
+        # Update Free variable vector, include PALC constraint if PALC is being used        
+        if palc_args == None:        
+            xfree = newton_raphson_update(xfree, FX, DF)
+        else:
+            DG[:-1,:] = DF
+            DG[-1,:] = palc_args['delta_X*_prev'] 
+            xfree = newton_raphson_update(xfree, FX, DG)
         
         # Update Initial Condition and Time
         if 't' in free_vars:
@@ -208,9 +226,14 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
             # Updated desired to be inital state of orbit    
         if sym_period_targ == 1:
             xdesired[:stm_row_len] = results_stm['states'][0,stm_row_index] 
-            
+        # Update FX        
+        if palc_args == None:        
+            FX = xconstraint-xdesired
+        else:
+            FX[:-1] = xconstraint-xdesired
+            FX[-1] = np.matmul(np.transpose(xfree-palc_args['free_var_prev']), palc_args['delta_X*_prev']) - palc_args['delta_s'] 
         
-        print('Iteration:',count,'|FX|=',np.linalg.norm(xconstraint-xdesired),xconstraint[:],xdesired[:])
+        print('Iteration:',count+1,'|FX|=',np.linalg.norm(FX))
         
         count = count + 1 
     
@@ -220,7 +243,24 @@ def po_single_shooter_cr3bp(mu, initial_guess, tf_guess, free_vars, constraints,
    
     # Use targeted states to generate targeted Periodic orbit
     print(tf,sym_period_targ)
-    results_stm = prop_cr3bp(mu, ic, tf*1/sym_period_targ, stm_bool=1, tol=int_tol, xcross_cond=0)      
+    results_stm = prop_cr3bp(mu, ic, tf*1/sym_period_targ, stm_bool=1, tol=int_tol, xcross_cond=0)
+    
+    # Compute Jacobian if retargeted orbit cannot meet while loop condition, priimarily used for Pseudo-Arc Length Continuation
+    if count == 0:    
+        states_final = results_stm["states"][-1,:]
+        Ux, Uy, Uz, ax, ay, az = ui_partials_acc_cr3bp(mu, states_final)
+        Dot_states = np.array([states_final[3], states_final[4], states_final[5], ax, ay, az])
+        # Setup DF, Jacobian Matrix
+        stm_temp = results_stm["stm"][stm_row_index, :, -1]
+        DF[:stm_row_len,:stm_col_len] = stm_temp[:, stm_col_index]          
+        if 't' in free_vars:
+            DF[:stm_row_len,-1] = Dot_states[stm_row_index] 
+        if sym_period_targ == 1:
+            DF[:stm_row_len,:stm_col_len] = DF[:stm_row_len,:stm_col_len] - identity_temp           
+
+    # Used for PALC
+    results_stm['DF'] = DF
+    results_stm['free_vars_targeted'] = xfree     
     
     return results_stm, iterflag
 
@@ -378,7 +418,6 @@ def map_vars_index_cr3bp(var_names=None):
                 vars_index = 0
                 break
 
-        
     # Sort the indices to handle variables passed in any order
     vars_index = sorted(vars_index)
     
