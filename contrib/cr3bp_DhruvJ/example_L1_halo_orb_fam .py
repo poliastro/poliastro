@@ -14,17 +14,21 @@ D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Pro
 <<<<<<< HEAD
 import numpy as np
 import plotly.graph_objs as go
+
 =======
 import copy
 import pickle
+
 >>>>>>> 60903721f8eb4fdadc53e3270ec19cebf32b407a
 
 import numpy as np
 import plotly.graph_objs as go
 from cr3bp_char_quant import bodies_char
+
 <<<<<<< HEAD
 from cr3bp_lib_JC_calc import lib_pt_loc
 from cr3bp_PO_targeter import po_single_shooter_cr3bp
+
 =======
 >>>>>>> 60903721f8eb4fdadc53e3270ec19cebf32b407a
 from cr3bp_fam_continuation import npc_po_fam_cr3bp, palc_po_fam_cr3bp

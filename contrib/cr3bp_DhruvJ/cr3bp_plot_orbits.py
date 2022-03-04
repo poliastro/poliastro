@@ -120,5 +120,5 @@ def plot_orbits(
         fig.write_html(title + ".html")
     else:
         fig.show()
-    
+
     return None
