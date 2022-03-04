@@ -21,16 +21,34 @@ These are some of the referneces that provide a comprehensive brackground and ha
 4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006
 """
 import copy
+
 import numpy as np
 import scipy as sci
 from cr3bp_lib_JC_calc import JC
 from cr3bp_PO_targeter import map_vars_index_cr3bp
 
-def npc_po_fam_cr3bp(mu, shooter_func, initial_guess, tf_guess, free_vars, constraints, sym_period_targ=1/2, JCd = None, conv_tol=1e-12, int_tol=1e-12, Nmax=10, step_size = 1e-4, num_fam_members = 1, param_continue='x', line_search=False):
+
+def npc_po_fam_cr3bp(
+    mu,
+    shooter_func,
+    initial_guess,
+    tf_guess,
+    free_vars,
+    constraints,
+    sym_period_targ=1 / 2,
+    JCd=None,
+    conv_tol=1e-12,
+    int_tol=1e-12,
+    Nmax=10,
+    step_size=1e-4,
+    num_fam_members=1,
+    param_continue="x",
+    line_search=False,
+):
     """
     Natural Parameter Continuation to compute a family of Periodic Orbits
     Dhruv Jain, Feb 28 2022
-    
+
     Parameters
     ----------
     mu :  float, M2/(M1+M2)
@@ -74,8 +92,8 @@ def npc_po_fam_cr3bp(mu, shooter_func, initial_guess, tf_guess, free_vars, const
 
     Returns
     -------
-    targeted_po_fam: list of dictionary 
-         Contains list of periodic orbit dictionary elements 
+    targeted_po_fam: list of dictionary
+         Contains list of periodic orbit dictionary elements
     targeted_po_char: dictionary
         Contains key characterisitcs of each member of the family computed:
         'ic': Targeted Initial Condition
@@ -87,87 +105,126 @@ def npc_po_fam_cr3bp(mu, shooter_func, initial_guess, tf_guess, free_vars, const
     """
 
     # Check if paramter to be continued in is defined as a free variable
-    if param_continue in free_vars or param_continue == 'jc' :
+    if param_continue in free_vars or param_continue == "jc":
         free_vars = copy.copy(free_vars)
         constraints = copy.copy(constraints)
-        
+
         # Remove paramter to be continued in from free variable, if not 'jc'
-        if param_continue != 'jc':
+        if param_continue != "jc":
             free_vars.remove(param_continue)
-        
+
         # To add 'jc' to constraints if family to be continued in JC without explicitly defining it
-        if param_continue == 'jc' and 'jc' not in constraints:
-            constraints.append('jc')
+        if param_continue == "jc" and "jc" not in constraints:
+            constraints.append("jc")
 
         param_conti_index = map_vars_index_cr3bp([param_continue])[0]
-        
+
     else:
-        print('Paramter that is to be continued in is not defined as a free variable or constraint. Make sure to that the parameter to be continued in can be varied and included in free_vars/constraints')
+        print(
+            "Paramter that is to be continued in is not defined as a free variable or constraint. Make sure to that the parameter to be continued in can be varied and included in free_vars/constraints"
+        )
         return None, None
-    
+
     # Assign a value of JCd if continuing in JC but JCd is not given
-    if 'jc' in constraints and JCd == None:
-        JCd = JC(mu,initial_guess[0:3],initial_guess[3:6])
-    
-    print('JCd',JCd)
-        
+    if "jc" in constraints and JCd == None:
+        JCd = JC(mu, initial_guess[0:3], initial_guess[3:6])
+
+    print("JCd", JCd)
+
     targeted_po_fam = []
-    targeted_po_char = {'ic':[],'tf':[],'jc':[],'eigenvalues':[],'eigenvectors:':[],'monodromy':[]}
-    
+    targeted_po_char = {
+        "ic": [],
+        "tf": [],
+        "jc": [],
+        "eigenvalues": [],
+        "eigenvectors:": [],
+        "monodromy": [],
+    }
+
     iterflag = False
     count_fam_member = 0
     step_size0 = step_size
-    
-    while count_fam_member < num_fam_members and iterflag == False:    
-        
-        results, iterflag = shooter_func(mu, initial_guess, tf_guess, free_vars, constraints, sym_period_targ=sym_period_targ, JCd = JCd, conv_tol=conv_tol, int_tol=int_tol, Nmax=Nmax) 
-        
+
+    while count_fam_member < num_fam_members and iterflag == False:
+
+        results, iterflag = shooter_func(
+            mu,
+            initial_guess,
+            tf_guess,
+            free_vars,
+            constraints,
+            sym_period_targ=sym_period_targ,
+            JCd=JCd,
+            conv_tol=conv_tol,
+            int_tol=int_tol,
+            Nmax=Nmax,
+        )
+
         if iterflag == True:
             # Use Line Search: Update Step size and recompute
             if line_search == True:
-                step_size = step_size*0.8
-                print('Line search is used to update step size to:',step_size,'\n')
+                step_size = step_size * 0.8
+                print("Line search is used to update step size to:", step_size, "\n")
                 if param_conti_index < 6:
-                    initial_guess[param_conti_index] -= step_size 
-                elif param_continue == 't':
+                    initial_guess[param_conti_index] -= step_size
+                elif param_continue == "t":
                     tf_guess -= step_size
-                elif param_continue == 'jc':
-                    JCd -= step_size 
-                
-                if abs(step_size) < abs(step_size0*0.1):
-                    print('Updated step size is too small compared to given step size. Rerun with smaller step size')
+                elif param_continue == "jc":
+                    JCd -= step_size
+
+                if abs(step_size) < abs(step_size0 * 0.1):
+                    print(
+                        "Updated step size is too small compared to given step size. Rerun with smaller step size"
+                    )
                 else:
                     iterflag = False
         elif iterflag == None:
-            print('Recheck targeter setup')
+            print("Recheck targeter setup")
             break
         else:
-            print('# PO family member = ',count_fam_member+1,'\n')    
+            print("# PO family member = ", count_fam_member + 1, "\n")
             targeted_po_fam.append(results)
-            tf_guess = results['t'][-1]
-            initial_guess = copy.copy(results['states'][0,:]) # To not update save data as values are passed as object reference
+            tf_guess = results["t"][-1]
+            initial_guess = copy.copy(
+                results["states"][0, :]
+            )  # To not update save data as values are passed as object reference
             if param_conti_index < 6:
-                initial_guess[param_conti_index] += step_size 
-            elif param_continue == 't':
+                initial_guess[param_conti_index] += step_size
+            elif param_continue == "t":
                 tf_guess += step_size
-            elif param_continue == 'jc':
-                JCd += step_size 
-            
+            elif param_continue == "jc":
+                JCd += step_size
+
             # Save key characterisitcs
-            targeted_po_char['ic'].append(copy.copy(results['states'][0,:]))
-            targeted_po_char['tf'].append(copy.copy(results['t'][-1]))
-            targeted_po_char['jc'].append(copy.copy(JC(mu,results['states'][0,0:3],results['states'][0,3:6])))
-            targeted_po_char['monodromy'].append(results['stm'][:,:,-1])
-            eigenvals, eigenvects = np.linalg.eig(results['stm'][:,:,-1])
-            targeted_po_char['eigenvalues'].append(eigenvals)
-            targeted_po_char['eigenvectors:'].append(eigenvects)
+            targeted_po_char["ic"].append(copy.copy(results["states"][0, :]))
+            targeted_po_char["tf"].append(copy.copy(results["t"][-1]))
+            targeted_po_char["jc"].append(
+                copy.copy(JC(mu, results["states"][0, 0:3], results["states"][0, 3:6]))
+            )
+            targeted_po_char["monodromy"].append(results["stm"][:, :, -1])
+            eigenvals, eigenvects = np.linalg.eig(results["stm"][:, :, -1])
+            targeted_po_char["eigenvalues"].append(eigenvals)
+            targeted_po_char["eigenvectors:"].append(eigenvects)
 
             count_fam_member += 1
-            
+
     return targeted_po_fam, targeted_po_char
 
 
-def palc_po_fam_cr3bp(mu, shooter_func, targeted_orbit, free_vars, constraints, sym_period_targ=1/2, conv_tol=1e-12, int_tol=1e-12, Nmax=10, step_size = 1e-4, num_fam_members = 1, line_search=False):   
+def palc_po_fam_cr3bp(
+    mu,
+    shooter_func,
+    targeted_orbit,
+    free_vars,
+    constraints,
+    sym_period_targ=1 / 2,
+    conv_tol=1e-12,
+    int_tol=1e-12,
+    Nmax=10,
+    step_size=1e-4,
+    num_fam_members=1,
+    line_search=False,
+):
     """
     Pseudo-Arc Length Continuation to compute a family of Periodic Orbits
     Dhruv Jain, Feb 28 2022
@@ -207,8 +264,8 @@ def palc_po_fam_cr3bp(mu, shooter_func, targeted_orbit, free_vars, constraints, 
 
     Returns
     -------
-    targeted_po_fam: list of dictionary 
-         Contains list of periodic orbit dictionary elements 
+    targeted_po_fam: list of dictionary
+         Contains list of periodic orbit dictionary elements
     targeted_po_char: dictionary
         Contains key characterisitcs of each member of the family computed:
         'ic': Targeted Initial Condition
@@ -219,96 +276,138 @@ def palc_po_fam_cr3bp(mu, shooter_func, targeted_orbit, free_vars, constraints, 
         'eigenvectors': Eigenvectors
 
     """
-    print('\nAssumes the details of the orbit passed are that of a targeted Periodic Orbit\n')
+    print(
+        "\nAssumes the details of the orbit passed are that of a targeted Periodic Orbit\n"
+    )
 
-    if 'jc' in constraints:
-        print('JC cannot be constrained when using PALC')
+    if "jc" in constraints:
+        print("JC cannot be constrained when using PALC")
         return None, None
-    if len(free_vars) != len(constraints)+1:
-        print('Recheck Free variable and constraint setup as Null space needs to be exactly one')
+    if len(free_vars) != len(constraints) + 1:
+        print(
+            "Recheck Free variable and constraint setup as Null space needs to be exactly one"
+        )
         return None, None
 
     # Retarget as one of the parameters would have been removed from NPC or any other targetere setup and DF will not be large enough to be fully determined with PALC constraint
-    retargeted_orbit, iterflag = shooter_func(mu, targeted_orbit['states'][0,:], targeted_orbit['t'][-1], free_vars, constraints, sym_period_targ=sym_period_targ)
+    retargeted_orbit, iterflag = shooter_func(
+        mu,
+        targeted_orbit["states"][0, :],
+        targeted_orbit["t"][-1],
+        free_vars,
+        constraints,
+        sym_period_targ=sym_period_targ,
+    )
     null_vec = np.ones(len(free_vars))
-    
+
     # print(retargeted_orbit)
-    
+
     # Setup PALC arguments to target PALC based orbits
-    palc_args = {}    
-    palc_args['delta_s'] = step_size
-    
+    palc_args = {}
+    palc_args["delta_s"] = step_size
+
     # Compute Null Space
-    free_var_prev_null_vect = sci.linalg.null_space(retargeted_orbit['DF'])
+    free_var_prev_null_vect = sci.linalg.null_space(retargeted_orbit["DF"])
     if np.size(free_var_prev_null_vect, 1) != 1:
-        print('Null space is not one, nullity is',np.size(free_var_prev_null_vect, 1),'continuing with first null vector')
+        print(
+            "Null space is not one, nullity is",
+            np.size(free_var_prev_null_vect, 1),
+            "continuing with first null vector",
+        )
         free_var_prev_null_vect = free_var_prev_null_vect[0]
-    
+
     free_var_prev_null_vect = free_var_prev_null_vect.flatten()
-    
+
     # Check if sign of null vector is same as previous null vector, if not then change the sign
     null_vecs_dot = np.dot(free_var_prev_null_vect, null_vec)
-    null_vec = free_var_prev_null_vect*np.sign(null_vecs_dot)
-    palc_args['free_var_prev'] = retargeted_orbit['free_vars_targeted']
-    palc_args['delta_X*_prev'] = null_vec
-    
-    
+    null_vec = free_var_prev_null_vect * np.sign(null_vecs_dot)
+    palc_args["free_var_prev"] = retargeted_orbit["free_vars_targeted"]
+    palc_args["delta_X*_prev"] = null_vec
+
     targeted_po_fam = []
-    targeted_po_char = {'ic':[],'tf':[],'jc':[],'eigenvalues':[],'eigenvectors:':[],'monodromy':[]}
-    
+    targeted_po_char = {
+        "ic": [],
+        "tf": [],
+        "jc": [],
+        "eigenvalues": [],
+        "eigenvectors:": [],
+        "monodromy": [],
+    }
+
     iterflag = False
     count_fam_member = 0
     step_size0 = step_size
-    initial_guess = retargeted_orbit['states'][0,:]
-    tf_guess = retargeted_orbit['t'][-1]
-    
-    while count_fam_member < num_fam_members and iterflag == False:    
-        
-        results, iterflag = shooter_func(mu, initial_guess, tf_guess, free_vars, constraints, sym_period_targ=sym_period_targ, palc_args=palc_args,conv_tol=conv_tol, int_tol=int_tol, Nmax=Nmax) 
-        
+    initial_guess = retargeted_orbit["states"][0, :]
+    tf_guess = retargeted_orbit["t"][-1]
+
+    while count_fam_member < num_fam_members and iterflag == False:
+
+        results, iterflag = shooter_func(
+            mu,
+            initial_guess,
+            tf_guess,
+            free_vars,
+            constraints,
+            sym_period_targ=sym_period_targ,
+            palc_args=palc_args,
+            conv_tol=conv_tol,
+            int_tol=int_tol,
+            Nmax=Nmax,
+        )
+
         if iterflag == True:
             # Use Line Search: Update Step size and recompute
             if line_search == True:
-                step_size = step_size*0.8
-                print('Line search is used to update step size to:',step_size,'\n')
-                palc_args['delta_s'] = step_size 
-                
-                if abs(step_size) < abs(step_size0*0.1):
-                    print('Updated step size is too small compared to given step size. Rerun with smaller step size')
+                step_size = step_size * 0.8
+                print("Line search is used to update step size to:", step_size, "\n")
+                palc_args["delta_s"] = step_size
+
+                if abs(step_size) < abs(step_size0 * 0.1):
+                    print(
+                        "Updated step size is too small compared to given step size. Rerun with smaller step size"
+                    )
                 else:
                     iterflag = False
         elif iterflag == None:
-            print('Recheck targeter setup')
+            print("Recheck targeter setup")
             break
         else:
-            print('# PO family member = ', count_fam_member+1,'\n')    
+            print("# PO family member = ", count_fam_member + 1, "\n")
             targeted_po_fam.append(results)
-            tf_guess = results['t'][-1]
-            initial_guess = copy.copy(results['states'][0,:]) # To not update save data as values are passed as object reference
-            
+            tf_guess = results["t"][-1]
+            initial_guess = copy.copy(
+                results["states"][0, :]
+            )  # To not update save data as values are passed as object reference
+
             # Compute Null Space
-            free_var_prev_null_vect = sci.linalg.null_space(results['DF'])
+            free_var_prev_null_vect = sci.linalg.null_space(results["DF"])
             if np.size(free_var_prev_null_vect, 1) != 1:
-                print('Null space is not one, nullity is',np.size(free_var_prev_null_vect, 1),'continuing with first null vector')
+                print(
+                    "Null space is not one, nullity is",
+                    np.size(free_var_prev_null_vect, 1),
+                    "continuing with first null vector",
+                )
                 free_var_prev_null_vect = free_var_prev_null_vect[0]
-            
+
             free_var_prev_null_vect = free_var_prev_null_vect.flatten()
-            
+
             # Check if sign of null vector is same as previous null vector, if not then change the sign
             null_vecs_dot = np.dot(free_var_prev_null_vect, null_vec)
-            null_vec = free_var_prev_null_vect*np.sign(null_vecs_dot)
-            palc_args['free_var_prev'] = results['free_vars_targeted']
-            palc_args['delta_X*_prev'] = null_vec
-            
+            null_vec = free_var_prev_null_vect * np.sign(null_vecs_dot)
+            palc_args["free_var_prev"] = results["free_vars_targeted"]
+            palc_args["delta_X*_prev"] = null_vec
+
             # Save key characterisitcs
-            targeted_po_char['ic'].append(copy.copy(results['states'][0,:]))
-            targeted_po_char['tf'].append(copy.copy(results['t'][-1]))
-            targeted_po_char['jc'].append(copy.copy(JC(mu,results['states'][0,0:3],results['states'][0,3:6])))
-            targeted_po_char['monodromy'].append(results['stm'][:,:,-1])
-            eigenvals, eigenvects = np.linalg.eig(results['stm'][:,:,-1])
-            targeted_po_char['eigenvalues'].append(eigenvals)
-            targeted_po_char['eigenvectors:'].append(eigenvects)
+            targeted_po_char["ic"].append(copy.copy(results["states"][0, :]))
+            targeted_po_char["tf"].append(copy.copy(results["t"][-1]))
+            targeted_po_char["jc"].append(
+                copy.copy(JC(mu, results["states"][0, 0:3], results["states"][0, 3:6]))
+            )
+            targeted_po_char["monodromy"].append(results["stm"][:, :, -1])
+            eigenvals, eigenvects = np.linalg.eig(results["stm"][:, :, -1])
+            targeted_po_char["eigenvalues"].append(eigenvals)
+            targeted_po_char["eigenvectors:"].append(eigenvects)
 
             count_fam_member += 1
-    
+
     return targeted_po_fam, targeted_po_char
