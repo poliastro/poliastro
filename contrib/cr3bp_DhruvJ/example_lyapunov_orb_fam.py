@@ -1,7 +1,7 @@
 """
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
-        
+
 Obj: To compute family of L1 Lyapunov Orbit
     Test linear initial guess for Lyapunov Orbit
     Single Shooter Variabl Time Setup
@@ -9,9 +9,9 @@ Obj: To compute family of L1 Lyapunov Orbit
     2. Continue in 'jc' + Periodicity targeter => targets Period states
     3. Continue in 'jc' + Periodicity targeter with line_search=> targets Period states
     4. Continue in 'jc' + XZ plane symmetry targeter with line_search=> targets Period states
-    
-Note: If the step size is too big and targeting periodicity with FX = ['y','vx']then the may converge 
-      to states at next XZ plane corssing instead of targeting states after 1 period
+
+Note: If the step size is too big and targeting periodicity with FX = ['y','vx']then the may converge
+to states at next XZ plane corssing instead of targeting states after 1 period
 """
 import plotly.graph_objs as go
 

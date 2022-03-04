@@ -138,10 +138,7 @@ def npc_po_fam_cr3bp(mu, shooter_func, initial_guess, tf_guess, free_vars, const
                     print('Updated step size is too small compared to given step size. Rerun with smaller step size')
                 else:
                     iterflag = False
-        elif iterflag == None:
-            print('Recheck targeter setup')
-            break
-        else:
+        elif iterflag == False:
             print('# PO family member = ',count_fam_member+1,'\n')    
             targeted_po_fam.append(results)
             tf_guess = results['t'][-1]
@@ -163,6 +160,10 @@ def npc_po_fam_cr3bp(mu, shooter_func, initial_guess, tf_guess, free_vars, const
             targeted_po_char['eigenvectors:'].append(eigenvects)
 
             count_fam_member += 1
+        else:
+            print('Recheck targeter setup')
+            break
+
             
     return targeted_po_fam, targeted_po_char
 
@@ -277,10 +278,7 @@ def palc_po_fam_cr3bp(mu, shooter_func, targeted_orbit, free_vars, constraints, 
                     print('Updated step size is too small compared to given step size. Rerun with smaller step size')
                 else:
                     iterflag = False
-        elif iterflag == None:
-            print('Recheck targeter setup')
-            break
-        else:
+        elif iterflag == False:
             print('# PO family member = ', count_fam_member+1,'\n')    
             targeted_po_fam.append(results)
             tf_guess = results['t'][-1]
@@ -310,5 +308,8 @@ def palc_po_fam_cr3bp(mu, shooter_func, targeted_orbit, free_vars, constraints, 
             targeted_po_char['eigenvectors:'].append(eigenvects)
 
             count_fam_member += 1
+        else:
+            print('Recheck targeter setup')
+            break
     
     return targeted_po_fam, targeted_po_char

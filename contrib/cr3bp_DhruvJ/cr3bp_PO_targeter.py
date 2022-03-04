@@ -8,10 +8,10 @@ Objective: This file contains functions required to target a Periodic Orbit in t
     Three Body Problem (CR3BP) model
 
     Features:
-        1. Single Shooter Targeter: 
-            -> Variable time targeter capable of targeting states, JC and periodicity 
+        1. Single Shooter Targeter:
+            -> Variable time targeter capable of targeting states, JC and periodicity
             -> Pseudo-Arc Length Compatible
-            -> Line Search to update step size         
+            -> Line Search to update step size
         2. Newton-Raphson Solver 
         3. Setup multiple nodes to use a Multiple Shooter Targeter
 

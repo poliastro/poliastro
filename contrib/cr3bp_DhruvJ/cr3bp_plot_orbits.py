@@ -100,3 +100,5 @@ def plot_orbits(mu, targeted_po_orbits, colourby, cb_label = 'JC', colourmap = '
         fig.write_html(title+'.html')
     else:
         fig.show()
+    
+    return None
