@@ -301,7 +301,9 @@ class OrbitArray:  # TODO creation mixin
         .. versionadded:: 0.14.0
 
         """
-        return get_frame(self.attractor, self.plane, self.epoch)
+        # TODO returns object of subclass of `astropy.coordinates.BaseRADecFrame` - as dtype perhaps?
+        # return get_frame(self.attractor, self.plane, self.epoch)
+        raise NotImplementedError
 
     def change_attractor(self, new_attractor, force=False):
         """Changes orbit attractor.
