@@ -374,19 +374,21 @@ class OrbitArray:  # TODO creation mixin
             Fundamental plane of the frame.
 
         """
-        if plane is self.plane:
-            return self
-
-        coords_orig = self.get_frame().realize_frame(
-            self.represent_as(CartesianRepresentation, CartesianDifferential)
-        )
-
-        dest_frame = get_frame(self.attractor, plane, obstime=self.epoch)
-
-        coords_dest = coords_orig.transform_to(dest_frame)
-        coords_dest.representation_type = CartesianRepresentation
-
-        return Orbit.from_coords(self.attractor, coords_dest, plane=plane)
+        raise NotImplementedError
+        # TODO requires `OrbitArray.get_frame`, probably makes sense for an array
+        # if plane is self.plane:
+        #     return self
+        #
+        # coords_orig = self.get_frame().realize_frame(
+        #     self.represent_as(CartesianRepresentation, CartesianDifferential)
+        # )
+        #
+        # dest_frame = get_frame(self.attractor, plane, obstime=self.epoch)
+        #
+        # coords_dest = coords_orig.transform_to(dest_frame)
+        # coords_dest.representation_type = CartesianRepresentation
+        #
+        # return Orbit.from_coords(self.attractor, coords_dest, plane=plane)
 
     def represent_as(self, representation, differential_class=None):
         """Converts the orbit to a specific representation.
