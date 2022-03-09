@@ -450,23 +450,8 @@ class OrbitArray:  # TODO creation mixin
 
     def pqw(self):
         """Perifocal frame (PQW) vectors."""
-        warn(
-            "Orbit.pqw is deprecated and will be removed in a future release",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        if self.ecc < 1e-8:
-            if abs(self.inc.to_value(u.rad)) > 1e-8:
-                node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
-                p_vec = node / norm(node)  # Circular inclined
-            else:
-                p_vec = [1, 0, 0] * u.one  # Circular equatorial
-        else:
-            p_vec = self.e_vec / self.ecc
-        w_vec = self.h_vec / norm(self.h_vec)
-        q_vec = np.cross(w_vec, p_vec) * u.one
-        return p_vec, q_vec, w_vec
+        raise NotImplementedError
+        # TODO already deprecated in `Orbit`
 
     def __str__(self):
         if self.a > 1e7 * u.km:
