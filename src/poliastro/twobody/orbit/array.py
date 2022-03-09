@@ -323,45 +323,47 @@ class OrbitArray:  # TODO creation mixin
             Orbit with new attractor
 
         """
-        if self.attractor == new_attractor:
-            return self
-        elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
-            r_soi = laplace_radius(new_attractor)
-            barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
-            # Transforming new_attractor's frame into frame of attractor
-            new_attractor_r = (
-                ICRS(barycentric_position)
-                .transform_to(self.get_frame())
-                .represent_as(CartesianRepresentation)
-                .xyz
-            )
-            distance = norm(self.r - new_attractor_r)
-        elif self.attractor.parent == new_attractor:  # "Earth -> Sun"
-            r_soi = laplace_radius(self.attractor)
-            distance = norm(self.r)
-        else:
-            raise ValueError("Cannot change to unrelated attractor")
-
-        if distance > r_soi and not force:
-            raise ValueError(
-                "Orbit is out of new attractor's SOI. If required, use 'force=True'."
-            )
-        elif self.ecc < 1.0 and not force:
-            raise ValueError("Orbit will never leave the SOI of its current attractor")
-        else:
-            warn(
-                "Leaving the SOI of the current attractor",
-                PatchedConicsWarning,
-                stacklevel=2,
-            )
-
-        new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
-        coords = self.get_frame().realize_frame(
-            self.represent_as(CartesianRepresentation, CartesianDifferential)
-        )
-        ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
-
-        return ss
+        raise NotImplementedError
+        # TODO could make sense for arrays, though it uses information from each individual orbit (?)
+        # if self.attractor == new_attractor:
+        #     return self
+        # elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
+        #     r_soi = laplace_radius(new_attractor)
+        #     barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
+        #     # Transforming new_attractor's frame into frame of attractor
+        #     new_attractor_r = (
+        #         ICRS(barycentric_position)
+        #         .transform_to(self.get_frame())
+        #         .represent_as(CartesianRepresentation)
+        #         .xyz
+        #     )
+        #     distance = norm(self.r - new_attractor_r)
+        # elif self.attractor.parent == new_attractor:  # "Earth -> Sun"
+        #     r_soi = laplace_radius(self.attractor)
+        #     distance = norm(self.r)
+        # else:
+        #     raise ValueError("Cannot change to unrelated attractor")
+        #
+        # if distance > r_soi and not force:
+        #     raise ValueError(
+        #         "Orbit is out of new attractor's SOI. If required, use 'force=True'."
+        #     )
+        # elif self.ecc < 1.0 and not force:
+        #     raise ValueError("Orbit will never leave the SOI of its current attractor")
+        # else:
+        #     warn(
+        #         "Leaving the SOI of the current attractor",
+        #         PatchedConicsWarning,
+        #         stacklevel=2,
+        #     )
+        #
+        # new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
+        # coords = self.get_frame().realize_frame(
+        #     self.represent_as(CartesianRepresentation, CartesianDifferential)
+        # )
+        # ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
+        #
+        # return ss
 
     def change_plane(self, plane):
         """Changes fundamental plane.
