@@ -425,11 +425,13 @@ class OrbitArray:  # TODO creation mixin
         # As we do not know the differentials, we first convert to cartesian,
         # then let the frame represent_as do the rest
         # TODO: Perhaps this should be public API as well?
-        cartesian = CartesianRepresentation(
-            *self.r, differentials=CartesianDifferential(*self.v)
-        )
-
-        return cartesian.represent_as(representation, differential_class)
+        raise NotImplementedError
+        # TODO array version most certainly makes sense. `CartesianRepresentation` needs investigation
+        # cartesian = CartesianRepresentation(
+        #     *self.r, differentials=CartesianDifferential(*self.v)
+        # )
+        #
+        # return cartesian.represent_as(representation, differential_class)
 
     def rv(self):
         """Position and velocity vectors."""
