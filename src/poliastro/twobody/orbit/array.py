@@ -28,12 +28,12 @@ from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 from .scalar import Orbit
 
 
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"  # TODO import from orbit module?
+ORBITARRAY_FORMAT = "{r_p} x {r_a} x {inc} ({frame}) orbits around {body} at epochs {epoch} ({scale})"  # TODO better format
 # String representation for orbits around bodies without predefined
 # Reference frame
-ORBIT_NO_FRAME_FORMAT = (
-    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
-)  # TODO import from orbit module?
+ORBITARRAY_NO_FRAME_FORMAT = (
+    "{r_p} x {r_a} x {inc} orbits around {body} at epochs {epoch} ({scale})"
+)  # TODO better format
 
 
 class OrbitArray:  # TODO creation mixin
@@ -454,29 +454,29 @@ class OrbitArray:  # TODO creation mixin
         # TODO already deprecated in `Orbit`
 
     def __str__(self):
-        if self.a > 1e7 * u.km:
+        if np.any(self.a > 1e7 * u.km):
             unit = u.au
         else:
             unit = u.km
 
         try:
-            return ORBIT_FORMAT.format(
+            return ORBITARRAY_FORMAT.format(
                 r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
-                frame=self.get_frame().__class__.__name__,
+                frame=self.get_frame().__class__.__name__,  # TODO not implemented for array
                 body=self.attractor,
                 epoch=self.epoch,
                 scale=self.epoch.scale.upper(),
             )
         except NotImplementedError:
-            return ORBIT_NO_FRAME_FORMAT.format(
-                r_p=self.r_p.to_value(unit),
-                r_a=self.r_a.to(unit),
-                inc=self.inc.to(u.deg),
+            return ORBITARRAY_NO_FRAME_FORMAT.format(
+                r_p=repr(self.r_p.to_value(unit)),
+                r_a=repr(self.r_a.to(unit)),
+                inc=repr(self.inc.to(u.deg)),
                 body=self.attractor,
-                epoch=self.epoch,
-                scale=self.epoch.scale.upper(),
+                epoch=repr(self.epoch),
+                scale=repr(self.epoch.scale.upper()),
             )
 
     def __repr__(self):
