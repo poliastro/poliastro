@@ -27,13 +27,10 @@ from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
 from .scalar import Orbit
 
-
 ORBITARRAY_FORMAT = "{r_p} x {r_a} x {inc} ({frame}) orbits around {body} at epochs {epoch} ({scale})"  # TODO better format
 # String representation for orbits around bodies without predefined
 # Reference frame
-ORBITARRAY_NO_FRAME_FORMAT = (
-    "{r_p} x {r_a} x {inc} orbits around {body} at epochs {epoch} ({scale})"
-)  # TODO better format
+ORBITARRAY_NO_FRAME_FORMAT = "{r_p} x {r_a} x {inc} orbits around {body} at epochs {epoch} ({scale})"  # TODO better format
 
 
 class OrbitArray:  # TODO creation mixin
@@ -66,7 +63,7 @@ class OrbitArray:  # TODO creation mixin
 
     def __setitem__(self, idx, value):
         """Set item or slice from array array."""
-        raise NotImplementedError # TODO
+        raise NotImplementedError  # TODO
 
     def copy(self):
         """Copy orbit array."""
@@ -202,7 +199,7 @@ class OrbitArray:  # TODO creation mixin
 
         r = self.r  # on demand
         v = self.v  # on demand
-        e = np.zeros(self.shape, dtype = r.dtype)
+        e = np.zeros(self.shape, dtype=r.dtype)
         k = self.attractor.k
 
         r_flat = r.reshape((-1, 3))
@@ -220,7 +217,7 @@ class OrbitArray:  # TODO creation mixin
 
         r = self.r  # on demand
         v = self.v  # on demand
-        e = np.zeros((*self.shape, 3), dtype = r.dtype)
+        e = np.zeros((*self.shape, 3), dtype=r.dtype)
         k = self.attractor.k
 
         r_flat = r.reshape((-1, 3))
@@ -238,7 +235,7 @@ class OrbitArray:  # TODO creation mixin
 
         r = self.r  # on demand
         v = self.v  # on demand
-        h_vec = np.zeros((*self.shape, 3), dtype = r.dtype)
+        h_vec = np.zeros((*self.shape, 3), dtype=r.dtype)
 
         r_flat = r.to_value(u.km).reshape((-1, 3))
         v_flat = v.to(u.km / u.s).reshape((-1, 3))
@@ -254,7 +251,7 @@ class OrbitArray:  # TODO creation mixin
         """Specific angular momentum array."""
 
         h_vec = self.h_vec  # on demand
-        h_mag = np.zeros(self.shape, dtype = h_vec.dtype)
+        h_mag = np.zeros(self.shape, dtype=h_vec.dtype)
 
         h_vec_flat = h_vec.reshape((-1, 3))
         h_mag_flat = h_mag.reshape((-1,))
@@ -278,7 +275,7 @@ class OrbitArray:  # TODO creation mixin
         ecc = self.ecc  # on demand
         k = self.attractor.k
         r_p = self.r_p  # on demand
-        tp = np.zeros(self.shape, dtype = nu.dtype)
+        tp = np.zeros(self.shape, dtype=nu.dtype)
 
         nu_flat = nu.reshape((-1,))
         ecc_flat = ecc.reshape((-1,))

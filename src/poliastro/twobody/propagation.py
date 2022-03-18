@@ -552,5 +552,5 @@ HYPERBOLIC_PROPAGATORS = [
 ]
 ALL_PROPAGATORS = sorted(
     set(ELLIPTIC_PROPAGATORS + PARABOLIC_PROPAGATORS + HYPERBOLIC_PROPAGATORS),
-    key = lambda func: func.__name__,  # enable parallel testing with guaranteed order of propagators
+    key=lambda func: func.__name__,  # enable parallel testing with guaranteed order of propagators
 )
