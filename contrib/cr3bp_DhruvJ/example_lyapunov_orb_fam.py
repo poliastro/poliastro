@@ -83,7 +83,7 @@ for keys in targeted_po_char_jc.keys():
     targeted_po_char[keys].extend(targeted_po_char_jc[keys])
 
 """
-Constraint updated to show that periodicity can be targeted with other states + line search 
+Constraint updated to show that periodicity can be targeted with other states + line search
 """
 constraints = [
     "y",

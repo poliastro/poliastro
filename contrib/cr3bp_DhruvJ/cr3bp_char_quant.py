@@ -23,7 +23,6 @@ Useful ideas:
 Physical Qunatities obtained from: JPL’s ephemerides file de405.spk and https://ssd.jpl.nasa.gov/?planet_pos
 """
 
-
 def mu_calc(mu_pi):
     """Calculate mu of CR3BP
     Parameters
@@ -80,17 +79,17 @@ def bodies_char(b1, b2):
     """
     # Body values
     mu = {}  # km^3 kg^-1 s^-2
-    mu["Sun"] = 132712440017.99
-    mu["Moon"] = 4902.8005821478
-    mu["Earth"] = 398600.4415
+    mu['Sun'] = 132712440017.99
+    mu['Moon'] = 4902.8005821478
+    mu['Earth'] = 398600.4415
 
-    mu["Mars"] = 42828.314258067  # Mars, GM
-    mu["Jupiter"] = 126712767.8578  # Jupiter, GM
-    mu["Saturn"] = 37940626.061137  # Saturn, GM
-    mu["Uranus"] = 5794549.0070719  # Uranus, GM
-    mu["Neptune"] = 6836534.0638793  # Neptune, GM
-    mu["Pluto"] = 981.600887707  # Pluto, GM
-
+    mu['Mars'] = 42828.314258067 # Mars, GM
+    mu['Jupiter'] = 126712767.8578 # Jupiter, GM
+    mu['Saturn'] = 37940626.061137 # Saturn, GM
+    mu['Uranus'] = 5794549.0070719 # Uranus, GM
+    mu['Neptune'] = 6836534.0638793 # Neptune, GM
+    mu['Pluto'] = 981.600887707 # Pluto, GM
+    
     mu["Phobos"] = 0.0007112  # Phobos, GM
     mu["Titan"] = 8978.1382  # Titan, GM
     mu["Ganymede"] = 9887.834  # Ganymede, GM

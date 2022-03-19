@@ -25,9 +25,8 @@ import copy
 import numpy as np
 import scipy as sci
 from cr3bp_lib_JC_calc import JC
-from cr3bp_master import ui_partials_acc_cr3bp
 from cr3bp_PO_targeter import map_vars_index_cr3bp
-
+from cr3bp_master import ui_partials_acc_cr3bp
 
 def npc_po_fam_cr3bp(
     mu,
@@ -127,7 +126,7 @@ def npc_po_fam_cr3bp(
         return None, None
 
     # Assign a value of JCd if continuing in JC but JCd is not given
-    if "jc" in constraints and JCd == None:
+    if "jc" in constraints and JCd is None:
         JCd = JC(mu, initial_guess[0:3], initial_guess[3:6])
 
     print("JCd", JCd)
@@ -146,7 +145,7 @@ def npc_po_fam_cr3bp(
     count_fam_member = 0
     step_size0 = step_size
 
-    while count_fam_member < num_fam_members and iterflag == False:
+    while count_fam_member < num_fam_members and iterflag is False:
 
         results, iterflag = shooter_func(
             mu,
@@ -161,9 +160,9 @@ def npc_po_fam_cr3bp(
             Nmax=Nmax,
         )
 
-        if iterflag == True:
+        if iterflag is True:
             # Use Line Search: Update Step size and recompute
-            if line_search == True:
+            if line_search is True:
                 step_size = step_size * 0.8
                 print("Line search is used to update step size to:", step_size, "\n")
                 if param_conti_index < 6:
@@ -179,7 +178,7 @@ def npc_po_fam_cr3bp(
                     )
                 else:
                     iterflag = False
-        elif iterflag == False:
+        elif iterflag is False:
             print("# PO family member = ", count_fam_member + 1, "\n")
             targeted_po_fam.append(results)
             tf_guess = results["t"][-1]
@@ -206,7 +205,7 @@ def npc_po_fam_cr3bp(
 
             count_fam_member += 1
         else:
-            print("Recheck targeter setup")
+            print('Recheck targeter setup')
             break
 
     return targeted_po_fam, targeted_po_char
@@ -284,7 +283,7 @@ def palc_po_fam_cr3bp(
     if "jc" in constraints:
         print("JC cannot be constrained when using PALC")
         return None, None
-
+    
     if sym_period_targ == 1:
         null_vect_dim_check = 2
     else:
@@ -312,37 +311,20 @@ def palc_po_fam_cr3bp(
 
     if sym_period_targ == 1:
         # Setup Phase Condition, all states are free variables
-        _, _, _, ax, ay, az = ui_partials_acc_cr3bp(
-            mu, retargeted_orbit["states"][0, :]
-        )
-        palc_args["dx/dtheta"] = (
-            np.array(
-                [
-                    retargeted_orbit["states"][0, 3],
-                    retargeted_orbit["states"][0, 4],
-                    retargeted_orbit["states"][0, 5],
-                    ax,
-                    ay,
-                    az,
-                ]
-            )
-            * retargeted_orbit["t"][-1]
-            / (2 * np.pi)
-        )
+        _, _, _, ax, ay, az = ui_partials_acc_cr3bp(mu, retargeted_orbit['states'][0,:])
+        palc_args["dx/dtheta"] = np.array([retargeted_orbit['states'][0,3], retargeted_orbit['states'][0,4], retargeted_orbit['states'][0,5], ax, ay, az])*retargeted_orbit['t'][-1]/(2*np.pi)
         free_vars_index = map_vars_index_cr3bp(free_vars)
-        stm_col_index = [
-            free_vars_index[i] for i in range(len(free_vars)) if free_vars_index[i] < 6
-        ]
+        stm_col_index = [free_vars_index[i] for i in range(len(free_vars)) if free_vars_index[i] < 6]
         palc_args["dx/dtheta"] = palc_args["dx/dtheta"][stm_col_index]
-
-        palc_args["prev_conv_soln"] = retargeted_orbit["states"][0, :]
+        
+        palc_args['prev_conv_soln'] = retargeted_orbit['states'][0,:]
         # Assuming 7 free var, 6 states + time
-        DF = np.zeros((len(free_vars) - 1, len(free_vars)))
-        DF[:-1, :] = retargeted_orbit["DF"]
-
-        DF[-1, :-1] = palc_args["dx/dtheta"]  # Time phase constraint part is 0
-        retargeted_orbit["DF"] = copy.copy(DF)
-
+        DF = np.zeros((len(free_vars)-1,len(free_vars)))
+        DF[:-1,:] = retargeted_orbit["DF"]
+        
+        DF[-1,:-1] = palc_args["dx/dtheta"] # Time phase constraint part is 0
+        retargeted_orbit["DF"] = copy.copy(DF)        
+        
     # Compute Null Space
     free_var_prev_null_vect = sci.linalg.null_space(retargeted_orbit["DF"])
     if np.size(free_var_prev_null_vect, 1) != 1:
@@ -360,6 +342,7 @@ def palc_po_fam_cr3bp(
     null_vec = free_var_prev_null_vect * np.sign(null_vecs_dot)
     palc_args["free_var_prev"] = retargeted_orbit["free_vars_targeted"]
     palc_args["delta_X*_prev"] = null_vec
+    
 
     targeted_po_fam = []
     targeted_po_char = {
@@ -377,7 +360,7 @@ def palc_po_fam_cr3bp(
     initial_guess = retargeted_orbit["states"][0, :]
     tf_guess = retargeted_orbit["t"][-1]
 
-    while count_fam_member < num_fam_members and iterflag == False:
+    while count_fam_member < num_fam_members and iterflag is False:
 
         results, iterflag = shooter_func(
             mu,
@@ -392,9 +375,9 @@ def palc_po_fam_cr3bp(
             Nmax=Nmax,
         )
 
-        if iterflag == True:
+        if iterflag is True:
             # Use Line Search: Update Step size and recompute
-            if line_search == True:
+            if line_search is True:
                 step_size = step_size * 0.8
                 print("Line search is used to update step size to:", step_size, "\n")
                 palc_args["delta_s"] = step_size
@@ -405,8 +388,8 @@ def palc_po_fam_cr3bp(
                     )
                 else:
                     iterflag = False
-        elif iterflag == False:
-            print("# PO family member = ", count_fam_member + 1, "\n")
+        elif iterflag is False:
+            print('# PO family member = ', count_fam_member+1,'\n')    
             targeted_po_fam.append(results)
             tf_guess = results["t"][-1]
             initial_guess = copy.copy(
@@ -421,38 +404,21 @@ def palc_po_fam_cr3bp(
                     np.size(free_var_prev_null_vect, 1),
                     "continuing with first null vector",
                 )
-                free_var_prev_null_vect = free_var_prev_null_vect[:, 0]
-
+                free_var_prev_null_vect = free_var_prev_null_vect[:,0]
+            
             free_var_prev_null_vect = free_var_prev_null_vect.flatten()
 
             # Check if sign of null vector is same as previous null vector, if not then change the sign
             null_vecs_dot = np.dot(free_var_prev_null_vect, null_vec)
             null_vec = free_var_prev_null_vect * np.sign(null_vecs_dot)
             palc_args["free_var_prev"] = results["free_vars_targeted"]
-            palc_args["prev_conv_soln"] = results["states"][0, :]
+            palc_args['prev_conv_soln'] = results['states'][0,:]
             palc_args["delta_X*_prev"] = null_vec
-
-            _, _, _, ax, ay, az = ui_partials_acc_cr3bp(mu, results["states"][0, :])
-            palc_args["dx/dtheta"] = (
-                np.array(
-                    [
-                        results["states"][0, 3],
-                        results["states"][0, 4],
-                        results["states"][0, 5],
-                        ax,
-                        ay,
-                        az,
-                    ]
-                )
-                * results["t"][-1]
-                / (2 * np.pi)
-            )
+            
+            _, _, _, ax, ay, az = ui_partials_acc_cr3bp(mu, results['states'][0,:])
+            palc_args["dx/dtheta"] = np.array([results['states'][0,3], results['states'][0,4], results['states'][0,5], ax, ay, az])*results['t'][-1]/(2*np.pi)
             free_vars_index = map_vars_index_cr3bp(free_vars)
-            stm_col_index = [
-                free_vars_index[i]
-                for i in range(len(free_vars))
-                if free_vars_index[i] < 6
-            ]
+            stm_col_index = [free_vars_index[i] for i in range(len(free_vars)) if free_vars_index[i] < 6]
             palc_args["dx/dtheta"] = palc_args["dx/dtheta"][stm_col_index]
 
             # Save key characterisitcs
@@ -467,9 +433,9 @@ def palc_po_fam_cr3bp(
             targeted_po_char["eigenvectors:"].append(eigenvects)
 
             count_fam_member += 1
-
+            
         else:
-            print("Recheck targeter setup")
+            print('Recheck targeter setup')
             break
-
+    
     return targeted_po_fam, targeted_po_char

@@ -13,10 +13,11 @@ D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Pro
 import numpy as np
 import plotly.graph_objs as go
 from cr3bp_char_quant import bodies_char
-from cr3bp_fam_continuation import npc_po_fam_cr3bp, palc_po_fam_cr3bp
 from cr3bp_lib_JC_calc import lib_pt_loc
-from cr3bp_plot_orbits import plot_orbits
 from cr3bp_PO_targeter import po_single_shooter_cr3bp
+from cr3bp_fam_continuation import npc_po_fam_cr3bp, palc_po_fam_cr3bp
+from cr3bp_plot_orbits import plot_orbits
+
 
 mu, dist_e_m, tstar = bodies_char("Earth", "Moon")
 lib_loc = lib_pt_loc(mu)
@@ -73,31 +74,23 @@ for keys in targeted_po_char_updated.keys():
 Plot family
 """
 # if targeted_po_char != None:
-colourby = targeted_po_char["jc"]
-colourmap = "plasma"
-cb_label = "JC"
-title = "EM_L1_Halo_family_PALC"
+colourby = targeted_po_char['jc']
+colourmap='plasma'
+cb_label = 'JC'
+title = 'EM_L1_Halo_family_PALC'
 data_trace = []
 # Add L1
-data_trace.append(
-    go.Scatter3d(x=[li[0]], y=[0], z=[0], marker=dict(color="red", size=2))
-)
+data_trace.append(go.Scatter3d(x=[li[0]], y=[0], z=[0], marker=dict(
+            color='red',
+            size=2)))
 # Add Moon
-data_trace.append(
-    go.Scatter3d(x=[1 - mu], y=[0], z=[0], marker=dict(color="grey", size=7))
-)
+data_trace.append(go.Scatter3d(x=[1-mu], y=[0], z=[0], marker=dict(
+            color='grey',
+            size=7)))
 
 # Add Earth
-data_trace.append(
-    go.Scatter3d(x=[-mu], y=[0], z=[0], marker=dict(color="blue", size=10))
-)
+data_trace.append(go.Scatter3d(x=[-mu], y=[0], z=[0], marker=dict(
+            color='blue',
+            size=10)))
 
-plot_orbits(
-    mu,
-    targeted_po_fam,
-    colourby,
-    cb_label,
-    title=title,
-    data_trace=data_trace,
-    save=False,
-)
+plot_orbits(mu,targeted_po_fam,colourby, cb_label, title=title,data_trace=data_trace, save=False)
