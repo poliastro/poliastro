@@ -5,7 +5,7 @@
 Obj: To compute family of L3 Axial Orbit
     Single Shooter Variabl Time Setup
     1. Continue in 'vz' + X-axis symmetry => targets Period/2 states
-    2. PALC
+    2. PALC+ X-axis symmetry => targets Period/2 states
 
 Initial Condition obtained from:
 D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Problem with Applications to Lunar South Pole Coverage," M.S., May 2006.
@@ -63,7 +63,7 @@ targeted_po_fam_updated, targeted_po_char_updated = palc_po_fam_cr3bp(
     free_vars,
     constraints,
     sym_period_targ=1 / 2,
-    step_size=1e-2 * 3,
+    step_size=1e-2 * 0.5,
     num_fam_members=50,
     line_search=True,
 )
@@ -90,4 +90,4 @@ data_trace.append(go.Scatter3d(x=[1-mu], y=[0], z=[0], marker=dict(
             color='grey',
             size=7)))
 
-plot_orbits(mu,targeted_po_fam,colourby, cb_label, title=title,data_trace=data_trace, save=True)
+plot_orbits(mu,targeted_po_fam,colourby, cb_label, title=title,data_trace=data_trace, save=False)

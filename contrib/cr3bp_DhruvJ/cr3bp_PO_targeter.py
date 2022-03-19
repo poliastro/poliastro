@@ -141,7 +141,11 @@ def po_single_shooter_cr3bp(
     xfree = np.zeros(len(free_vars_index))
     xconstraint = np.zeros(len(constraints_index))
     xdesired = np.zeros(len(constraints_index))
-    DF = np.zeros((len(xconstraint), len(xfree)))
+    
+    if palc_args is not None and sym_period_targ == 1:
+        DF = np.zeros((len(xconstraint)+1, len(xfree))) # To account for phase constraint when PALC used
+    else:    
+        DF = np.zeros((len(xconstraint), len(xfree)))
     DG = np.zeros((len(xfree), len(xfree)))  # DF for PALC
 
     print(
@@ -155,14 +159,8 @@ def po_single_shooter_cr3bp(
         JC(mu, ic[0:3], ic[3:6]),
     )
 
-    stm_col_index = [
-        free_vars_index[i] for i in range(len(xfree)) if free_vars_index[i] < 6
-    ]
-    stm_row_index = [
-        constraints_index[i]
-        for i in range(len(xconstraint))
-        if constraints_index[i] < 6
-    ]
+    stm_col_index = [free_vars_index[i] for i in range(len(xfree)) if free_vars_index[i] < 6]
+    stm_row_index = [constraints_index[i] for i in range(len(xconstraint)) if constraints_index[i] < 6]
     stm_col_len = len(stm_col_index)
     stm_row_len = len(stm_row_index)
 
@@ -172,6 +170,7 @@ def po_single_shooter_cr3bp(
         xfree[-1] = tf
     else:
         xfree = ic[stm_col_index]
+
 
     # Setup Constraint Vector, xconstraint where FX = xconstraint - xdesired
     if "jc" in constraints:
@@ -197,15 +196,19 @@ def po_single_shooter_cr3bp(
     if palc_args is None:
         FX = xconstraint - xdesired
     else:
-        FX = np.zeros((len(xconstraint) + 1))
-        FX[:-1] = xconstraint - xdesired
-        FX[-1] = (
-            np.matmul(
-                np.transpose(xfree - palc_args["free_var_prev"]),
-                palc_args["delta_X*_prev"],
-            )
-            - palc_args["delta_s"]
-        )
+        # Check if need to add phase constraint
+        if sym_period_targ == 1:
+            FX = np.zeros((len(xconstraint) + 2))
+            FX[:-2] = xconstraint - xdesired
+            # Phase Constraint
+            FX[-2] = np.dot(ic[stm_col_index]-palc_args['prev_conv_soln'][stm_col_index],palc_args['dx/dtheta'])
+            
+        else:
+            FX = np.zeros((len(xconstraint) + 1))
+            FX[:-1] = xconstraint - xdesired
+            
+        # PALC Constraint
+        FX[-1] = (np.matmul(np.transpose(xfree - palc_args["free_var_prev"]), palc_args["delta_X*_prev"]) - palc_args["delta_s"])
 
     count = 0
 
@@ -218,15 +221,11 @@ def po_single_shooter_cr3bp(
 
         states_final = results_stm["states"][-1, :]
         Ux, Uy, Uz, ax, ay, az = ui_partials_acc_cr3bp(mu, states_final)
-        Dot_states = np.array(
-            [states_final[3], states_final[4], states_final[5], ax, ay, az]
-        )
+        Dot_states = np.array([states_final[3], states_final[4], states_final[5], ax, ay, az])
 
         # Compute d(JC)/d(x)
         Ux_ic, Uy_ic, Uz_ic, _, _, _ = ui_partials_acc_cr3bp(mu, ic)
-        dJC_dx = np.array(
-            [2 * Ux_ic, 2 * Uy_ic, 2 * Uz_ic, -2 * ic[3], -2 * ic[4], -2 * ic[5]]
-        )
+        dJC_dx = np.array([2 * Ux_ic, 2 * Uy_ic, 2 * Uz_ic, -2 * ic[3], -2 * ic[4], -2 * ic[5]])
 
         # Extract required elements of the Monodromy matrix for the targeter setup
         stm_temp = results_stm["stm"][stm_row_index, :, -1]
@@ -238,14 +237,15 @@ def po_single_shooter_cr3bp(
         if "t" in free_vars:
             DF[:stm_row_len, -1] = Dot_states[stm_row_index]
         if sym_period_targ == 1:
-            DF[:stm_row_len, :stm_col_len] = (
-                DF[:stm_row_len, :stm_col_len] - identity_temp
-            )
+            DF[:stm_row_len, :stm_col_len] = (DF[:stm_row_len, :stm_col_len] - identity_temp)
+            # Account for Phase constraint with PALC
+            if palc_args is not None:
+                DF[-1,:len(palc_args['dx/dtheta'])] = palc_args['dx/dtheta']
 
         # Update Free variable vector, include PALC constraint if PALC is being used
         if palc_args is None:
             xfree = newton_raphson_update(xfree, FX, DF)
-        else:
+        else:                       
             DG[:-1, :] = DF
             DG[-1, :] = palc_args["delta_X*_prev"]
             xfree = newton_raphson_update(xfree, FX, DG)
@@ -271,19 +271,24 @@ def po_single_shooter_cr3bp(
             xdesired[-1] = JCd
             # Updated desired to be inital state of orbit
         if sym_period_targ == 1:
-            xdesired[:stm_row_len] = results_stm["states"][0, stm_row_index]
+            xdesired[:stm_row_len] = results_stm["states"][0, stm_row_index]       
         # Update FX
         if palc_args is None:
             FX = xconstraint - xdesired
         else:
-            FX[:-1] = xconstraint - xdesired
-            FX[-1] = (
-                np.matmul(
-                    np.transpose(xfree - palc_args["free_var_prev"]),
-                    palc_args["delta_X*_prev"],
-                )
-                - palc_args["delta_s"]
-            )
+            # Check if need to add phase constraint
+            if sym_period_targ == 1:
+                FX = np.zeros((len(xconstraint) + 2))
+                FX[:-2] = xconstraint - xdesired
+                # Phase Constraint
+                FX[-2] = np.dot(ic[stm_col_index]-palc_args['prev_conv_soln'][stm_col_index],palc_args['dx/dtheta'])
+                
+            else:
+                FX = np.zeros((len(xconstraint) + 1))
+                FX[:-1] = xconstraint - xdesired
+                
+            # PALC Constraint
+            FX[-1] = (np.matmul(np.transpose(xfree - palc_args["free_var_prev"]),palc_args["delta_X*_prev"]) - palc_args["delta_s"])
 
         print("Iteration:", count + 1, "|FX|=", np.linalg.norm(FX))
 
@@ -297,26 +302,20 @@ def po_single_shooter_cr3bp(
 
     # Use targeted states to generate targeted Periodic orbit
     print(tf, sym_period_targ)
-    results_stm = prop_cr3bp(
-        mu, ic, tf * 1 / sym_period_targ, stm_bool=1, tol=int_tol, xcross_cond=0
-    )
+    results_stm = prop_cr3bp(mu, ic, tf * 1 / sym_period_targ, stm_bool=1, tol=int_tol, xcross_cond=0)
 
     # Compute Jacobian if retargeted orbit cannot meet while loop condition, priimarily used for Pseudo-Arc Length Continuation
     if count == 0:
         states_final = results_stm["states"][-1, :]
         Ux, Uy, Uz, ax, ay, az = ui_partials_acc_cr3bp(mu, states_final)
-        Dot_states = np.array(
-            [states_final[3], states_final[4], states_final[5], ax, ay, az]
-        )
+        Dot_states = np.array([states_final[3], states_final[4], states_final[5], ax, ay, az])
         # Setup DF, Jacobian Matrix
         stm_temp = results_stm["stm"][stm_row_index, :, -1]
         DF[:stm_row_len, :stm_col_len] = stm_temp[:, stm_col_index]
         if "t" in free_vars:
             DF[:stm_row_len, -1] = Dot_states[stm_row_index]
         if sym_period_targ == 1:
-            DF[:stm_row_len, :stm_col_len] = (
-                DF[:stm_row_len, :stm_col_len] - identity_temp
-            )
+            DF[:stm_row_len, :stm_col_len] = (DF[:stm_row_len, :stm_col_len] - identity_temp)
 
     # Used for PALC
     results_stm["DF"] = DF

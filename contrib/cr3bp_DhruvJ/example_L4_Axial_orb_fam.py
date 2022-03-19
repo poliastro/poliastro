@@ -5,8 +5,7 @@
 Obj: To compute family of L4 Axial Orbit
     Single Shooter Variabl Time Setup
     1. Continue in 'vy' + Periodicity (sym_period_targ=1)
-    2. Continue in 'jc' + Periodicity (sym_period_targ=1)
-    3. Continue in 't' + Periodicity (sym_period_targ=1)
+    2. PALC + Periodicity (sym_period_targ=1) {Phase Constraint is added}
 
 Initial Condition obtained from:
 sD. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Problem with Applications to Lunar South Pole Coverage," M.S., May 2006.
@@ -15,7 +14,7 @@ sD. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Pr
 import numpy as np
 import plotly.graph_objs as go
 from cr3bp_char_quant import bodies_char
-from cr3bp_fam_continuation import npc_po_fam_cr3bp
+from cr3bp_fam_continuation import npc_po_fam_cr3bp, palc_po_fam_cr3bp
 from cr3bp_lib_JC_calc import lib_pt_loc
 from cr3bp_plot_orbits import plot_orbits
 from cr3bp_PO_targeter import po_single_shooter_cr3bp
@@ -52,56 +51,31 @@ targeted_po_fam, targeted_po_char = npc_po_fam_cr3bp(
     sym_period_targ=1,
     JCd=None,
     step_size=1e-3,
-    num_fam_members=3,
+    num_fam_members=2,
     param_continue="vy",
     line_search=True,
 )
 
-# Target Axial orbit using Single Shooter Variable Time setup
-#        Exploits Periodicity(sym_perioid_targ set to 1)
-#        Continue in 'jc' using Natural Paramter Continuaton
-ig = targeted_po_fam[-1]["states"][0, :]
-tf_guess = targeted_po_fam[-1]["t"][-1]
-targeted_po_fam_updated, targeted_po_char_updated = npc_po_fam_cr3bp(
-    mu,
-    po_single_shooter_cr3bp,
-    ig,
-    tf_guess,
-    free_vars,
-    constraints,
-    sym_period_targ=1,
-    JCd=None,
-    step_size=-1e-3 * 4,
-    num_fam_members=150,
-    param_continue="jc",
-    line_search=True,
-)
-targeted_po_fam.extend(targeted_po_fam_updated)
-for keys in targeted_po_char_updated.keys():
-    targeted_po_char[keys].extend(targeted_po_char_updated[keys])
+'''
+PALC
+'''
 
-# Target Axial orbit using Single Shooter Variable Time setup
-#        Exploits Periodicity(sym_perioid_targ set to 1)
-#        Continue in 't' using Natural Paramter Continuaton
-ig = targeted_po_fam[-1]["states"][0, :]
-tf_guess = targeted_po_fam[-1]["t"][-1]
-targeted_po_fam_updated, targeted_po_char_updated = npc_po_fam_cr3bp(
+targeted_orbit = targeted_po_fam[-1]
+targeted_po_fam_updated, targeted_po_char_updated = palc_po_fam_cr3bp(
     mu,
     po_single_shooter_cr3bp,
-    ig,
-    tf_guess,
+    targeted_orbit,
     free_vars,
     constraints,
     sym_period_targ=1,
-    JCd=None,
-    step_size=1e-3 * 8,
-    num_fam_members=60,
-    param_continue="t",
+    step_size=7e-2,
+    num_fam_members=30,
     line_search=True,
 )
 targeted_po_fam.extend(targeted_po_fam_updated)
 for keys in targeted_po_char_updated.keys():
     targeted_po_char[keys].extend(targeted_po_char_updated[keys])
+    
 
 """
 Plot family
