@@ -127,11 +127,11 @@ strict_optional = false
 ignore_missing_imports = true
 
 [tool.coverage.paths]
-source = "src"
+source = ["src"]
 
 [tool.coverage.run]
 branch = true
-source = "src"
+source = ["src"]
 
 [tool.coverage.report]
 omit = ["contrib/*"]
