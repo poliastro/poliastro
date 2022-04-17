@@ -19,29 +19,22 @@ from poliastro.twobody.elements import (
     hyp_nu_limit,
     t_p,
 )
-from poliastro.twobody.orbit.creation import OrbitCreationMixin
 from poliastro.twobody.propagation import farnocchia, propagate
 from poliastro.twobody.sampling import sample_closed
-from poliastro.twobody.states import BaseState
+from poliastro.twobody.states import BaseStateArray
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
 
-try:
-    from functools import cached_property  # type: ignore
-except ImportError:
-    from cached_property import cached_property  # type: ignore
+from .scalar import Orbit
 
-
-ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
+ORBITARRAY_FORMAT = "{r_p} x {r_a} x {inc} ({frame}) orbits around {body} at epochs {epoch} ({scale})"  # TODO better format
 # String representation for orbits around bodies without predefined
 # Reference frame
-ORBIT_NO_FRAME_FORMAT = (
-    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
-)
+ORBITARRAY_NO_FRAME_FORMAT = "{r_p} x {r_a} x {inc} orbits around {body} at epochs {epoch} ({scale})"  # TODO better format
 
 
-class Orbit(OrbitCreationMixin):
-    """Position and velocity of a body with respect to an attractor
+class OrbitArray:  # TODO creation mixin
+    """Position and velocity of an array of body with respect to a common attractor
     at a given time (epoch).
 
     Regardless of how the Orbit is created, the implicit
@@ -56,154 +49,248 @@ class Orbit(OrbitCreationMixin):
 
         Parameters
         ----------
-        state : BaseState
+        state : BaseStateArray
             Position and velocity or orbital elements.
 
         """
-        self._state = state  # type: BaseState
+        self._state = state  # type: BaseStateArray
+
+    def __getitem__(self, idx):
+        """Get item or slice from orbit array."""
+        state = self._state[idx]
+        cls = type(self) if isinstance(state, BaseStateArray) else Orbit
+        return cls(self._state[idx])  # type: ignore
+
+    def __setitem__(self, idx, value):
+        """Set item or slice from array array."""
+        raise NotImplementedError  # TODO
+
+    def copy(self):
+        """Copy orbit array."""
+        return type(self)(self._state.copy())
+
+    def reshape(self, *args):
+        """Reshape orbit array."""
+        return type(self)(self._state.reshape(*args))
+
+    @property
+    def ndim(self):
+        """Number of dimensions of array."""
+        return self._state.ndim
+
+    @property
+    def shape(self):
+        """Shape of array."""
+        return self._state.shape
+
+    @property
+    def size(self):
+        """Size of array."""
+        return self._state.size
 
     @property
     def attractor(self):
-        """Main attractor."""
+        """Common main attractor."""
         return self._state.attractor
 
     @property
     def epoch(self):
-        """Epoch of the orbit."""
+        """Epoch array of the orbit array."""
         return self._state.epoch
 
     @property
     def plane(self):
-        """Fundamental plane of the frame."""
+        """Common fundamental plane of the frame."""
         return self._state.plane
 
-    @cached_property
+    @property
     def r(self):
-        """Position vector."""
+        """Position vector array."""
         return self._state.to_vectors().r
 
-    @cached_property
+    @property
     def v(self):
-        """Velocity vector."""
+        """Velocity vector array."""
         return self._state.to_vectors().v
 
-    @cached_property
+    @property
     def a(self):
-        """Semimajor axis."""
+        """Semimajor axis array."""
         return self._state.to_classical().a
 
-    @cached_property
+    @property
     def p(self):
-        """Semilatus rectum."""
+        """Semilatus rectum array."""
         return self._state.to_classical().p
 
-    @cached_property
+    @property
     def r_p(self):
-        """Radius of pericenter."""
+        """Radius of pericenter array."""
         return self.a * (1 - self.ecc)
 
-    @cached_property
+    @property
     def r_a(self):
-        """Radius of apocenter."""
+        """Radius of apocenter array."""
         return self.a * (1 + self.ecc)
 
-    @cached_property
+    @property
     def ecc(self):
-        """Eccentricity."""
+        """Eccentricity array."""
         return self._state.to_classical().ecc
 
-    @cached_property
+    @property
     def inc(self):
-        """Inclination."""
+        """Inclination array."""
         return self._state.to_classical().inc
 
-    @cached_property
+    @property
     def raan(self):
-        """Right ascension of the ascending node."""
+        """Right ascension of the ascending node array."""
         return self._state.to_classical().raan
 
-    @cached_property
+    @property
     def argp(self):
-        """Argument of the perigee."""
+        """Argument of the perigee array."""
         return self._state.to_classical().argp
 
     @property
     def nu(self):
-        """True anomaly."""
+        """True anomaly array."""
         return self._state.to_classical().nu
 
-    @cached_property
+    @property
     def f(self):
-        """Second modified equinoctial element."""
+        """Second modified equinoctial element array."""
         return self._state.to_equinoctial().f
 
-    @cached_property
+    @property
     def g(self):
-        """Third modified equinoctial element."""
+        """Third modified equinoctial element array."""
         return self._state.to_equinoctial().g
 
-    @cached_property
+    @property
     def h(self):
-        """Fourth modified equinoctial element."""
+        """Fourth modified equinoctial element array."""
         return self._state.to_equinoctial().h
 
-    @cached_property
+    @property
     def k(self):
-        """Fifth modified equinoctial element."""
+        """Fifth modified equinoctial element array."""
         return self._state.to_equinoctial().k
 
-    @cached_property
+    @property
     def L(self):
-        """True longitude."""
+        """True longitude array."""
         return self.raan + self.argp + self.nu
 
-    @cached_property
+    @property
     def period(self):
-        """Period of the orbit."""
+        """Period of the orbit array."""
         return self._state.period
 
-    @cached_property
+    @property
     def n(self):
-        """Mean motion."""
+        """Mean motion array."""
         return self._state.n
 
-    @cached_property
+    @property
     def energy(self):
-        """Specific energy."""
-        return energy(self.attractor.k, self.r, self.v)
+        """Specific energy array."""
 
-    @cached_property
+        r = self.r  # on demand
+        v = self.v  # on demand
+        e = np.zeros(self.shape, dtype=r.dtype)
+        k = self.attractor.k
+
+        r_flat = r.reshape((-1, 3))
+        v_flat = v.reshape((-1, 3))
+        e_flat = e.reshape((-1,))
+
+        for idx in range(self.size):  # TODO replace with vector implementation
+            e_flat[idx] = energy(k, r_flat[idx, :], v_flat[idx, :])
+
+        return e
+
+    @property
     def e_vec(self):
-        """Eccentricity vector."""
-        return eccentricity_vector(self.attractor.k, self.r, self.v)
+        """Eccentricity vector array."""
 
-    @cached_property
+        r = self.r  # on demand
+        v = self.v  # on demand
+        e = np.zeros((*self.shape, 3), dtype=r.dtype)
+        k = self.attractor.k
+
+        r_flat = r.reshape((-1, 3))
+        v_flat = v.reshape((-1, 3))
+        e_flat = e.reshape((-1, 3))
+
+        for idx in range(self.size):  # TODO replace with vector implementation
+            e_flat[idx, :] = eccentricity_vector(k, r_flat[idx, :], v_flat[idx, :])
+
+        return e
+
+    @property
     def h_vec(self):
-        """Specific angular momentum vector."""
-        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km**2 / u.s
-        return h_vec
+        """Specific angular momentum vector array."""
 
-    @cached_property
+        r = self.r  # on demand
+        v = self.v  # on demand
+        h_vec = np.zeros((*self.shape, 3), dtype=r.dtype)
+
+        r_flat = r.to_value(u.km).reshape((-1, 3))
+        v_flat = v.to(u.km / u.s).reshape((-1, 3))
+        h_vec_flat = h_vec.reshape((-1, 3))
+
+        for idx in range(self.size):  # TODO replace with vector implementation
+            h_vec_flat[idx, :] = np.cross(r_flat[idx, :], v_flat[idx, :])
+
+        return h_vec * u.km**2 / u.s
+
+    @property
     def h_mag(self):
-        """Specific angular momentum."""
-        h_mag = norm(self.h_vec)
+        """Specific angular momentum array."""
+
+        h_vec = self.h_vec  # on demand
+        h_mag = np.zeros(self.shape, dtype=h_vec.dtype)
+
+        h_vec_flat = h_vec.reshape((-1, 3))
+        h_mag_flat = h_mag.reshape((-1,))
+
+        for idx in range(self.size):  # TODO replace with vector implementation
+            h_mag_flat[idx] = norm(h_vec_flat[idx, :])
+
         return h_mag
 
-    @cached_property
+    @property
     def arglat(self):
-        """Argument of latitude."""
+        """Argument of latitude array."""
         arglat = (self.argp + self.nu) % (360 * u.deg)
         return arglat
 
-    @cached_property
+    @property
     def t_p(self):
-        """Elapsed time since latest perifocal passage."""
-        return t_p(
-            self.nu,
-            self.ecc,
-            self.attractor.k,
-            self.r_p,
-        )
+        """Elapsed time since latest perifocal passage array."""
+
+        nu = self.nu  # on demand
+        ecc = self.ecc  # on demand
+        k = self.attractor.k
+        r_p = self.r_p  # on demand
+        tp = np.zeros(self.shape, dtype=nu.dtype)
+
+        nu_flat = nu.reshape((-1,))
+        ecc_flat = ecc.reshape((-1,))
+        r_p_flat = r_p.reshape((-1,))
+        tp_flat = tp.reshape((-1,))
+
+        for idx in range(self.size):  # TODO replace with vector implementation
+            tp_flat[idx] = t_p(
+                nu_flat[idx],
+                ecc_flat[idx],
+                k,
+                r_p_flat[idx],
+            )
+
+        return tp
 
     def get_frame(self):
         """Get equivalent reference frame of the orbit.
@@ -211,7 +298,9 @@ class Orbit(OrbitCreationMixin):
         .. versionadded:: 0.14.0
 
         """
-        return get_frame(self.attractor, self.plane, self.epoch)
+        raise NotImplementedError
+        # TODO returns object of subclass of `astropy.coordinates.BaseRADecFrame` - as dtype perhaps?
+        # return get_frame(self.attractor, self.plane, self.epoch)
 
     def change_attractor(self, new_attractor, force=False):
         """Changes orbit attractor.
@@ -231,45 +320,47 @@ class Orbit(OrbitCreationMixin):
             Orbit with new attractor
 
         """
-        if self.attractor == new_attractor:
-            return self
-        elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
-            r_soi = laplace_radius(new_attractor)
-            barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
-            # Transforming new_attractor's frame into frame of attractor
-            new_attractor_r = (
-                ICRS(barycentric_position)
-                .transform_to(self.get_frame())
-                .represent_as(CartesianRepresentation)
-                .xyz
-            )
-            distance = norm(self.r - new_attractor_r)
-        elif self.attractor.parent == new_attractor:  # "Earth -> Sun"
-            r_soi = laplace_radius(self.attractor)
-            distance = norm(self.r)
-        else:
-            raise ValueError("Cannot change to unrelated attractor")
-
-        if distance > r_soi and not force:
-            raise ValueError(
-                "Orbit is out of new attractor's SOI. If required, use 'force=True'."
-            )
-        elif self.ecc < 1.0 and not force:
-            raise ValueError("Orbit will never leave the SOI of its current attractor")
-        else:
-            warn(
-                "Leaving the SOI of the current attractor",
-                PatchedConicsWarning,
-                stacklevel=2,
-            )
-
-        new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
-        coords = self.get_frame().realize_frame(
-            self.represent_as(CartesianRepresentation, CartesianDifferential)
-        )
-        ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
-
-        return ss
+        raise NotImplementedError
+        # TODO could make sense for arrays, though it uses information from each individual orbit (?)
+        # if self.attractor == new_attractor:
+        #     return self
+        # elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
+        #     r_soi = laplace_radius(new_attractor)
+        #     barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
+        #     # Transforming new_attractor's frame into frame of attractor
+        #     new_attractor_r = (
+        #         ICRS(barycentric_position)
+        #         .transform_to(self.get_frame())
+        #         .represent_as(CartesianRepresentation)
+        #         .xyz
+        #     )
+        #     distance = norm(self.r - new_attractor_r)
+        # elif self.attractor.parent == new_attractor:  # "Earth -> Sun"
+        #     r_soi = laplace_radius(self.attractor)
+        #     distance = norm(self.r)
+        # else:
+        #     raise ValueError("Cannot change to unrelated attractor")
+        #
+        # if distance > r_soi and not force:
+        #     raise ValueError(
+        #         "Orbit is out of new attractor's SOI. If required, use 'force=True'."
+        #     )
+        # elif self.ecc < 1.0 and not force:
+        #     raise ValueError("Orbit will never leave the SOI of its current attractor")
+        # else:
+        #     warn(
+        #         "Leaving the SOI of the current attractor",
+        #         PatchedConicsWarning,
+        #         stacklevel=2,
+        #     )
+        #
+        # new_frame = get_frame(new_attractor, self.plane, obstime=self.epoch)
+        # coords = self.get_frame().realize_frame(
+        #     self.represent_as(CartesianRepresentation, CartesianDifferential)
+        # )
+        # ss = Orbit.from_coords(new_attractor, coords.transform_to(new_frame))
+        #
+        # return ss
 
     def change_plane(self, plane):
         """Changes fundamental plane.
@@ -280,19 +371,21 @@ class Orbit(OrbitCreationMixin):
             Fundamental plane of the frame.
 
         """
-        if plane is self.plane:
-            return self
-
-        coords_orig = self.get_frame().realize_frame(
-            self.represent_as(CartesianRepresentation, CartesianDifferential)
-        )
-
-        dest_frame = get_frame(self.attractor, plane, obstime=self.epoch)
-
-        coords_dest = coords_orig.transform_to(dest_frame)
-        coords_dest.representation_type = CartesianRepresentation
-
-        return Orbit.from_coords(self.attractor, coords_dest, plane=plane)
+        raise NotImplementedError
+        # TODO requires `OrbitArray.get_frame`, probably makes sense for an array
+        # if plane is self.plane:
+        #     return self
+        #
+        # coords_orig = self.get_frame().realize_frame(
+        #     self.represent_as(CartesianRepresentation, CartesianDifferential)
+        # )
+        #
+        # dest_frame = get_frame(self.attractor, plane, obstime=self.epoch)
+        #
+        # coords_dest = coords_orig.transform_to(dest_frame)
+        # coords_dest.representation_type = CartesianRepresentation
+        #
+        # return Orbit.from_coords(self.attractor, coords_dest, plane=plane)
 
     def represent_as(self, representation, differential_class=None):
         """Converts the orbit to a specific representation.
@@ -329,11 +422,13 @@ class Orbit(OrbitCreationMixin):
         # As we do not know the differentials, we first convert to cartesian,
         # then let the frame represent_as do the rest
         # TODO: Perhaps this should be public API as well?
-        cartesian = CartesianRepresentation(
-            *self.r, differentials=CartesianDifferential(*self.v)
-        )
-
-        return cartesian.represent_as(representation, differential_class)
+        raise NotImplementedError
+        # TODO array version most certainly makes sense. `CartesianRepresentation` needs investigation
+        # cartesian = CartesianRepresentation(
+        #     *self.r, differentials=CartesianDifferential(*self.v)
+        # )
+        #
+        # return cartesian.represent_as(representation, differential_class)
 
     def rv(self):
         """Position and velocity vectors."""
@@ -352,48 +447,33 @@ class Orbit(OrbitCreationMixin):
 
     def pqw(self):
         """Perifocal frame (PQW) vectors."""
-        warn(
-            "Orbit.pqw is deprecated and will be removed in a future release",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        if self.ecc < 1e-8:
-            if abs(self.inc.to_value(u.rad)) > 1e-8:
-                node = np.cross([0, 0, 1], self.h_vec) / norm(self.h_vec)
-                p_vec = node / norm(node)  # Circular inclined
-            else:
-                p_vec = [1, 0, 0] * u.one  # Circular equatorial
-        else:
-            p_vec = self.e_vec / self.ecc
-        w_vec = self.h_vec / norm(self.h_vec)
-        q_vec = np.cross(w_vec, p_vec) * u.one
-        return p_vec, q_vec, w_vec
+        raise NotImplementedError
+        # TODO already deprecated in `Orbit`
 
     def __str__(self):
-        if self.a > 1e7 * u.km:
+        if np.any(self.a > 1e7 * u.km):
             unit = u.au
         else:
             unit = u.km
 
         try:
-            return ORBIT_FORMAT.format(
+            return ORBITARRAY_FORMAT.format(
                 r_p=self.r_p.to_value(unit),
                 r_a=self.r_a.to(unit),
                 inc=self.inc.to(u.deg),
-                frame=self.get_frame().__class__.__name__,
+                frame=self.get_frame().__class__.__name__,  # TODO not implemented for array
                 body=self.attractor,
                 epoch=self.epoch,
                 scale=self.epoch.scale.upper(),
             )
         except NotImplementedError:
-            return ORBIT_NO_FRAME_FORMAT.format(
-                r_p=self.r_p.to_value(unit),
-                r_a=self.r_a.to(unit),
-                inc=self.inc.to(u.deg),
+            return ORBITARRAY_NO_FRAME_FORMAT.format(
+                r_p=repr(self.r_p.to_value(unit)),
+                r_a=repr(self.r_a.to(unit)),
+                inc=repr(self.inc.to(u.deg)),
                 body=self.attractor,
-                epoch=self.epoch,
-                scale=self.epoch.scale.upper(),
+                epoch=repr(self.epoch),
+                scale=repr(self.epoch.scale.upper()),
             )
 
     def __repr__(self):
