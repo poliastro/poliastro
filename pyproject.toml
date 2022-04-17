@@ -66,36 +66,37 @@ Funding = "https://opencollective.com/poliastro"
 [project.optional-dependencies]
 jupyter = ["notebook", "ipywidgets>=7.6"]
 cesium = ["czml3 ~=0.5.3"]
-dev = [
-    "black==21.12b0",
-    "coverage",
-    "hypothesis",
-    "import-linter",
+doc = [
+    "httpx",
     "ipython>=5.0",
     "ipywidgets>=7.6",
-    "isort",
     "jupyter-client",
     "jupytext",
-    "httpx",
-    "mypy>=0.740",
     "myst-parser>=0.13.1",
     "nbsphinx>=0.8.6",
     "nbconvert>=5.5",
-    "pycodestyle",
+    "sgp4",
+    "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
+    "sphinx-autoapi",
+    "sphinx-gallery<=0.7.0",  # Just to avoid the jupytext warning
+    "sphinx_rtd_theme~=1.0.0",
+    "sphinx-hoverxref==0.7b1",
+    "sphinx-notfound-page",
+    "sphinx-copybutton>0.2.9",
+    "sphinx-github-role~=0.1.0",
+]
+test = [
+    "coverage",
+    "hypothesis",
+    "import-linter[toml]",
+    "mypy>=0.740",
+    "pre-commit",
     "pytest>=3.2",
     "pytest-cov<2.6.0",  # https://github.com/pytest-dev/pytest-cov/issues/222
     "pytest-doctestplus>=0.8",  # https://github.com/astropy/pytest-doctestplus/issues/118
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
-    "sgp4",
-    "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
-    "sphinx-autoapi",
-    "sphinx-gallery<=0.7.0",  # Just to avoid the jupytext warning
-    "sphinx_rtd_theme~=1.0.0rc1",
-    "sphinx-hoverxref==0.7b1",
-    "sphinx-notfound-page",
-    "sphinx-copybutton>0.2.9",
 ]
 
 [tool.flit.sdist]
@@ -110,5 +111,47 @@ exclude = [
     "docs/"
 ]
 
+[tool.black]
+line-length = 79
+
 [tool.isort]
+combine_as_imports = true
+default_section = "THIRDPARTY"
+line_length = 79
 profile = "black"
+src_paths = ["docs", "src", "tests"]
+
+[tool.mypy]
+check_untyped_defs = true
+strict_optional = false
+ignore_missing_imports = true
+
+[tool.coverage.paths]
+source = "src"
+
+[tool.coverage.run]
+branch = true
+source = "src"
+
+[tool.coverage.report]
+omit = ["contrib/*"]
+
+[tool.importlinter]
+# Include Astropy to properly analyze external submodules,
+# see https://github.com/seddonym/import-linter/issues/111
+root_packages = ["poliastro", "astropy"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "poliastro.core does not import astropy.units"
+type = "forbidden"
+source_modules = ["poliastro.core"]
+forbidden_modules = ["astropy.units"]
+
+[tool.pytest.ini_options]
+norecursedirs = [".git", ".tox", "dist", "build", ".venv"]
+testpaths = ["src", "tests"]
+python_files ="test_*.py"
+doctest_plus = false
+addopts = ["--strict-markers"]
+markers = ["slow", "remote_data", "filterwarnings", "mpl_image_compare"]
