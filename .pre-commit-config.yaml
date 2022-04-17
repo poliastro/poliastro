@@ -21,21 +21,18 @@ repos:
   rev: 5.10.1
   hooks:
   - id: isort
-    args: ["--project=poliastro", "--section-default=THIRDPARTY"]
-    files: |
-      (?x)(
-        ^src/|
-        ^tests/|
-        ^contrib/
-      )
 
 - repo: https://github.com/psf/black
   rev: 22.3.0
   hooks:
-  - id: black-jupyter
-    files: |
-      (?x)(
-        ^src/|
-        ^tests/|
-        ^contrib/
-      )
+  - id: black
+
+- repo: https://github.com/PyCQA/flake8
+  rev: 4.0.1
+  hooks:
+  - id: flake8
+
+#- repo: https://github.com/PyCQA/pydocstyle
+#  rev: 6.1.1
+#  hooks:
+#  - id: pydocstyle
