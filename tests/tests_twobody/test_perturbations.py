@@ -50,7 +50,9 @@ def test_J2_propagation_Earth():
     k = Earth.k.to(u.km**3 / u.s**2).value
 
     _, _, _, raan0, argp0, _ = rv2coe(k, r0, v0)
-    _, _, _, raan, argp, _ = rv2coe(k, rr[0].to(u.km).value, vv[0].to(u.km / u.s).value)
+    _, _, _, raan, argp, _ = rv2coe(
+        k, rr[0].to(u.km).value, vv[0].to(u.km / u.s).value
+    )
 
     raan_variation_rate = (raan - raan0) / tofs[0].to(u.s).value  # type: ignore
     argp_variation_rate = (argp - argp0) / tofs[0].to(u.s).value  # type: ignore
@@ -58,8 +60,12 @@ def test_J2_propagation_Earth():
     raan_variation_rate = (raan_variation_rate * u.rad / u.s).to(u.deg / u.h)
     argp_variation_rate = (argp_variation_rate * u.rad / u.s).to(u.deg / u.h)
 
-    assert_quantity_allclose(raan_variation_rate, -0.172 * u.deg / u.h, rtol=1e-2)
-    assert_quantity_allclose(argp_variation_rate, 0.282 * u.deg / u.h, rtol=1e-2)
+    assert_quantity_allclose(
+        raan_variation_rate, -0.172 * u.deg / u.h, rtol=1e-2
+    )
+    assert_quantity_allclose(
+        argp_variation_rate, 0.282 * u.deg / u.h, rtol=1e-2
+    )
 
 
 @pytest.mark.slow
@@ -137,11 +143,15 @@ def test_J3_propagation_Earth(test_params):
         du_kep = func_twobody(t0, u_, k)
         ax, ay, az = J2_perturbation(
             t0, u_, k, J2=Earth.J2.value, R=Earth.R.to_value(u.km)
-        ) + J3_perturbation(t0, u_, k, J3=Earth.J3.value, R=Earth.R.to_value(u.km))
+        ) + J3_perturbation(
+            t0, u_, k, J3=Earth.J3.value, R=Earth.R.to_value(u.km)
+        )
         du_ad = np.array([0, 0, 0, ax, ay, az])
         return du_kep + du_ad
 
-    r_J3, v_J3 = cowell(Earth.k, orbit.r, orbit.v, tofs, rtol=1e-8, f=f_combined)
+    r_J3, v_J3 = cowell(
+        Earth.k, orbit.r, orbit.v, tofs, rtol=1e-8, f=f_combined
+    )
 
     a_values_J2 = np.array(
         [
@@ -185,8 +195,12 @@ def test_J3_propagation_Earth(test_params):
     )
     dinc_max = np.max(np.abs(inc_values_J2 - inc_values_J3))
 
-    assert_quantity_allclose(dinc_max, test_params["dinc_max"], rtol=1e-1, atol=1e-7)
-    assert_quantity_allclose(decc_max, test_params["decc_max"], rtol=1e-1, atol=1e-7)
+    assert_quantity_allclose(
+        dinc_max, test_params["dinc_max"], rtol=1e-1, atol=1e-7
+    )
+    assert_quantity_allclose(
+        decc_max, test_params["decc_max"], rtol=1e-1, atol=1e-7
+    )
     try:
         assert_quantity_allclose(da_max * u.km, test_params["da_max"])
     except AssertionError:
@@ -218,7 +232,9 @@ def test_atmospheric_drag_exponential():
     H0 = H0_earth.to(u.km).value  # km
     tof = 100000  # s
 
-    dr_expected = -B * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
+    dr_expected = (
+        -B * rho0 * np.exp(-(norm(r0) - R) / H0) * np.sqrt(k * norm(r0)) * tof
+    )
     # Assuming the atmospheric decay during tof is small,
     # dr_expected = F_r * tof (Newton's integration formula), where
     # F_r = -B rho(r) |r|^2 sqrt(k / |r|^3) = -B rho(r) sqrt(k |r|)
@@ -284,7 +300,9 @@ def test_atmospheric_demise():
         f=f,
     )
 
-    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # Below 1km
+    assert_quantity_allclose(
+        norm(rr[0].to(u.km).value), R, atol=1
+    )  # Below 1km
 
     assert_quantity_allclose(lithobrake_event.last_t, t_decay, rtol=1e-2)
 
@@ -353,7 +371,9 @@ def test_atmospheric_demise_coesa76():
         f=f,
     )
 
-    assert_quantity_allclose(norm(rr[0].to(u.km).value), R, atol=1)  # Below 1km
+    assert_quantity_allclose(
+        norm(rr[0].to(u.km).value), R, atol=1
+    )  # Below 1km
 
     assert_quantity_allclose(lithobrake_event.last_t, t_decay, rtol=1e-2)
 
@@ -369,7 +389,11 @@ def test_cowell_works_with_small_perturbations():
         -9852.66213692844394245185,
     ] * u.km
     v_expected = (
-        [2.78170542314378943516, 3.21596786944631274352, 0.16327165546278937791]
+        [
+            2.78170542314378943516,
+            3.21596786944631274352,
+            0.16327165546278937791,
+        ]
         * u.km
         / u.s
     )
@@ -605,7 +629,9 @@ def test_3rd_body_Curtis(test_params):
 def sun_r():
     j_date = 2_438_400.5 * u.day
     tof = 600 * u.day
-    return build_ephem_interpolant(Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2)
+    return build_ephem_interpolant(
+        Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2
+    )
 
 
 def normalize_to_Curtis(t0, sun_r):
@@ -631,7 +657,9 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
     tof = 600 * u.day
     epoch = Time(j_date, format="jd", scale="tdb")
 
-    with pytest.warns(UserWarning, match="Wrapping true anomaly to -π <= nu < π"):
+    with pytest.warns(
+        UserWarning, match="Wrapping true anomaly to -π <= nu < π"
+    ):
         initial = Orbit.from_classical(
             attractor=Earth,
             a=10085.44 * u.km,
@@ -673,7 +701,9 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
     for ri, vi in zip(rr.to(u.km).value, vv.to(u.km / u.s).value):
         orbit_params = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
         delta_eccs.append(orbit_params[1] - initial.ecc.value)
-        delta_incs.append((orbit_params[2] * u.rad).to(u.deg).value - initial.inc.value)
+        delta_incs.append(
+            (orbit_params[2] * u.rad).to(u.deg).value - initial.inc.value
+        )
         delta_raans.append(
             (orbit_params[3] * u.rad).to(u.deg).value - initial.raan.value
         )

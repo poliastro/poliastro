@@ -35,9 +35,7 @@ except ImportError:
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
 # Reference frame
-ORBIT_NO_FRAME_FORMAT = (
-    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
-)
+ORBIT_NO_FRAME_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 
 
 class Orbit(OrbitCreationMixin):
@@ -183,7 +181,11 @@ class Orbit(OrbitCreationMixin):
     @cached_property
     def h_vec(self):
         """Specific angular momentum vector."""
-        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km**2 / u.s
+        h_vec = (
+            np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s))
+            * u.km**2
+            / u.s
+        )
         return h_vec
 
     @cached_property
@@ -238,7 +240,9 @@ class Orbit(OrbitCreationMixin):
             return self
         elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
             r_soi = laplace_radius(new_attractor)
-            barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
+            barycentric_position = get_body_barycentric(
+                new_attractor.name, self.epoch
+            )
             # Transforming new_attractor's frame into frame of attractor
             new_attractor_r = (
                 ICRS(barycentric_position)
@@ -258,7 +262,9 @@ class Orbit(OrbitCreationMixin):
                 "Orbit is out of new attractor's SOI. If required, use 'force=True'."
             )
         elif self.ecc < 1.0 and not force:
-            raise ValueError("Orbit will never leave the SOI of its current attractor")
+            raise ValueError(
+                "Orbit will never leave the SOI of its current attractor"
+            )
         else:
             warn(
                 "Leaving the SOI of the current attractor",
@@ -425,13 +431,17 @@ class Orbit(OrbitCreationMixin):
             New orbit after propagation.
 
         """
-        if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
+        if isinstance(value, time.Time) and not isinstance(
+            value, time.TimeDelta
+        ):
             time_of_flight = value - self.epoch
         else:
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+        cartesian = propagate(
+            self, time_of_flight, method=method, rtol=rtol, **kwargs
+        )
         new_epoch = self.epoch + time_of_flight
 
         return self.from_vectors(
@@ -515,18 +525,28 @@ class Orbit(OrbitCreationMixin):
         # the arc cosine, which is in the range [0, 180)
         # Start from -nu_limit
         wrapped_nu = wrap_angle(self.nu)
-        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
+        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(
+            u.rad
+        )
 
         limits = [
-            min_anomaly.to_value(u.rad) if min_anomaly is not None else -nu_limit,
-            max_anomaly.to_value(u.rad) if max_anomaly is not None else nu_limit,
+            min_anomaly.to_value(u.rad)
+            if min_anomaly is not None
+            else -nu_limit,
+            max_anomaly.to_value(u.rad)
+            if max_anomaly is not None
+            else nu_limit,
         ] * u.rad  # type: u.Quantity
 
         # Now we check that none of the provided values
         # is outside of the hyperbolic range
         nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
         if not ((-nu_max <= limits).all() and (limits < nu_max).all()):
-            warn("anomaly outside range, clipping", OrbitSamplingWarning, stacklevel=2)
+            warn(
+                "anomaly outside range, clipping",
+                OrbitSamplingWarning,
+                stacklevel=2,
+            )
             limits = limits.clip(-nu_max, nu_max)
 
         nu_values = np.linspace(*limits, values)  # type: ignore
@@ -619,7 +639,11 @@ class Orbit(OrbitCreationMixin):
             r, v = orbit_new.rv()
             vnew = v + delta_v
             orbit_new = self.from_vectors(
-                attractor=attractor, r=r, v=vnew, epoch=orbit_new.epoch, plane=plane
+                attractor=attractor,
+                r=r,
+                v=vnew,
+                epoch=orbit_new.epoch,
+                plane=plane,
             )
             if intermediate:  # Avoid keeping them in memory.
                 states.append(orbit_new)

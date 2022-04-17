@@ -8,7 +8,9 @@ from poliastro.core.iod import izzo as izzo_fast
 kms = u.km / u.s
 
 
-def lambert(k, r0, r, tof, M=0, prograde=True, lowpath=True, numiter=35, rtol=1e-8):
+def lambert(
+    k, r0, r, tof, M=0, prograde=True, lowpath=True, numiter=35, rtol=1e-8
+):
     """Solves the Lambert problem using the Izzo algorithm.
 
     .. versionadded:: 0.5.0

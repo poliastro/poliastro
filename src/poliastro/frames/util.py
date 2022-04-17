@@ -16,7 +16,10 @@ from poliastro.bodies import (
     Venus,
 )
 from poliastro.constants import J2000
-from poliastro.frames.ecliptic import GeocentricMeanEcliptic, HeliocentricEclipticJ2000
+from poliastro.frames.ecliptic import (
+    GeocentricMeanEcliptic,
+    HeliocentricEclipticJ2000,
+)
 from poliastro.frames.enums import Planes
 from poliastro.frames.equatorial import (
     GCRS,
@@ -41,8 +44,14 @@ from poliastro.frames.fixed import (
 )
 
 _FRAME_MAPPING = {
-    Sun: {Planes.EARTH_EQUATOR: HCRS, Planes.EARTH_ECLIPTIC: HeliocentricEclipticJ2000},
-    Mercury: {Planes.EARTH_EQUATOR: MercuryICRS, Planes.BODY_FIXED: MercuryFixed},
+    Sun: {
+        Planes.EARTH_EQUATOR: HCRS,
+        Planes.EARTH_ECLIPTIC: HeliocentricEclipticJ2000,
+    },
+    Mercury: {
+        Planes.EARTH_EQUATOR: MercuryICRS,
+        Planes.BODY_FIXED: MercuryFixed,
+    },
     Venus: {Planes.EARTH_EQUATOR: VenusICRS, Planes.BODY_FIXED: VenusFixed},
     Earth: {
         Planes.EARTH_EQUATOR: GCRS,
@@ -50,10 +59,16 @@ _FRAME_MAPPING = {
         Planes.BODY_FIXED: ITRS,
     },
     Mars: {Planes.EARTH_EQUATOR: MarsICRS, Planes.BODY_FIXED: MarsFixed},
-    Jupiter: {Planes.EARTH_EQUATOR: JupiterICRS, Planes.BODY_FIXED: JupiterFixed},
+    Jupiter: {
+        Planes.EARTH_EQUATOR: JupiterICRS,
+        Planes.BODY_FIXED: JupiterFixed,
+    },
     Saturn: {Planes.EARTH_EQUATOR: SaturnICRS, Planes.BODY_FIXED: SaturnFixed},
     Uranus: {Planes.EARTH_EQUATOR: UranusICRS, Planes.BODY_FIXED: UranusFixed},
-    Neptune: {Planes.EARTH_EQUATOR: NeptuneICRS, Planes.BODY_FIXED: NeptuneFixed},
+    Neptune: {
+        Planes.EARTH_EQUATOR: NeptuneICRS,
+        Planes.BODY_FIXED: NeptuneFixed,
+    },
 }  # type: Dict[Union[Body, SolarSystemPlanet], Dict[Planes, BaseCoordinateFrame]]
 
 

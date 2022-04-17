@@ -1,6 +1,8 @@
 from astropy import units as u
 
-from poliastro.core.thrust.change_a_inc import change_a_inc as change_a_inc_fast
+from poliastro.core.thrust.change_a_inc import (
+    change_a_inc as change_a_inc_fast,
+)
 
 
 def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):

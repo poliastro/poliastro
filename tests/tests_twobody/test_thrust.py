@@ -86,7 +86,8 @@ def test_leo_geo_numerical_fast(inc_0):
 
 
 @pytest.mark.parametrize(
-    "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
+    "ecc_0,ecc_f",
+    [[0.0, 0.1245], [0.1245, 0.0]],  # Reverse-engineered from results
 )
 def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
     a_0 = Earth.R.to(u.km).value + 900  # km
@@ -110,7 +111,8 @@ def test_sso_disposal_time_and_delta_v(ecc_0, ecc_f):
 
 
 @pytest.mark.parametrize(
-    "ecc_0,ecc_f", [[0.0, 0.1245], [0.1245, 0.0]]  # Reverse-engineered from results
+    "ecc_0,ecc_f",
+    [[0.0, 0.1245], [0.1245, 0.0]],  # Reverse-engineered from results
 )
 def test_sso_disposal_numerical(ecc_0, ecc_f):
     a_0 = Earth.R.to(u.km).value + 900  # km
@@ -150,7 +152,9 @@ def test_sso_disposal_numerical(ecc_0, ecc_f):
         [0.8, 10.0, 16.304, 1.9799],
     ],
 )
-def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_V):
+def test_geo_cases_beta_dnd_delta_v(
+    ecc_0, inc_f, expected_beta, expected_delta_V
+):
     a = 42164  # km
     ecc_f = 0.0
     inc_0 = 0.0  # rad, baseline
@@ -173,7 +177,9 @@ def test_geo_cases_beta_dnd_delta_v(ecc_0, inc_f, expected_beta, expected_delta_
     beta = beta_change_ecc_inc(
         ecc_0=ecc_0, ecc_f=ecc_f, inc_0=inc_0, inc_f=inc_f, argp=argp
     )
-    _, delta_V, _ = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f * u.rad, f=f)
+    _, delta_V, _ = change_ecc_inc(
+        ss_0=s0, ecc_f=ecc_f, inc_f=inc_f * u.rad, f=f
+    )
 
     assert_allclose(delta_V.to_value(u.km / u.s), expected_delta_V, rtol=1e-2)
     assert_allclose(beta, expected_beta, rtol=1e-2)

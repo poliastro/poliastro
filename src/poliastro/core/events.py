@@ -50,7 +50,10 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
         ((R_primary**2) * (1 + ecc * np.cos(nu)) ** 2)
         + (p**2) * (cos_psi**2)
         - p**2
-        + pm * (2 * p * R_primary * cos_psi) * (1 + ecc * np.cos(nu)) * sin_delta_shadow
+        + pm
+        * (2 * p * R_primary * cos_psi)
+        * (1 + ecc * np.cos(nu))
+        * sin_delta_shadow
     )
 
     return shadow_function

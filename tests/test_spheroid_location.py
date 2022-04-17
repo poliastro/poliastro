@@ -92,7 +92,11 @@ def test_distance():
 def test_cartesian_conversion_approximate():
     el_cords = (0.670680 * u.rad, 0.7190227 * u.rad, 0 * u.m)
 
-    c_cords = [3764258.64785411 * u.m, 3295359.33856106 * u.m, 3942945.28570563 * u.m]
+    c_cords = [
+        3764258.64785411 * u.m,
+        3295359.33856106 * u.m,
+        3942945.28570563 * u.m,
+    ]
 
     p = SpheroidLocation(*el_cords, Earth)
 
@@ -106,7 +110,9 @@ def test_cartesian_conversion_approximate():
 
 @settings(deadline=None)
 @given(
-    lat=with_units(elements=st.floats(min_value=-1e-2, max_value=1e-2), unit=u.rad),
+    lat=with_units(
+        elements=st.floats(min_value=-1e-2, max_value=1e-2), unit=u.rad
+    ),
 )
 def test_h_calculation_near_lat_singularity(lat):
     body = Earth

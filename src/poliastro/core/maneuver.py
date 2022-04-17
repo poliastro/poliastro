@@ -122,7 +122,9 @@ def bielliptic(k, r_b, r_f, rv):
     a_trans2 = (r_b + r_f) / 2
 
     dv_a = np.sqrt(2 * k / r_i - k / a_trans1) - v_i
-    dv_b = np.sqrt(2 * k / r_b - k / a_trans2) - np.sqrt(2 * k / r_b - k / a_trans1)
+    dv_b = np.sqrt(2 * k / r_b - k / a_trans2) - np.sqrt(
+        2 * k / r_b - k / a_trans1
+    )
     dv_c = np.sqrt(k / r_f) - np.sqrt(2 * k / r_f - k / a_trans2)
 
     dv_a = np.array([0, dv_a, 0])

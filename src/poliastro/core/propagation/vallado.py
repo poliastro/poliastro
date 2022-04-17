@@ -91,7 +91,9 @@ def vallado(k, r0, v0, tof, numiter):
                 (-2 * k * alpha * tof)
                 / (
                     dot_r0v0
-                    + np.sign(tof) * np.sqrt(-k / alpha) * (1 - norm_r0 * alpha)
+                    + np.sign(tof)
+                    * np.sqrt(-k / alpha)
+                    * (1 - norm_r0 * alpha)
                 )
             )
         )

@@ -87,7 +87,9 @@ class TisserandPlotter:
 
         # Solving for non-dimensional a_sc and ecc_sc
         A_SC = 1 / np.abs(1 - V_INF**2 - 2 * V_INF * np.cos(ALPHA))
-        ECC_SC = np.sqrt(1 - 1 / A_SC * ((3 - 1 / A_SC - V_INF**2) / (2)) ** 2)
+        ECC_SC = np.sqrt(
+            1 - 1 / A_SC * ((3 - 1 / A_SC - V_INF**2) / (2)) ** 2
+        )
 
         # Compute main Tisserand variables
         RR_P = A_SC * R_body * (1 - ECC_SC)
@@ -187,7 +189,9 @@ class TisserandPlotter:
         """
 
         # Solve Tisserand parameters
-        RR_P, RR_A, EE, TT = self._solve_tisserand(body, vinf_span, num_contours)
+        RR_P, RR_A, EE, TT = self._solve_tisserand(
+            body, vinf_span, num_contours
+        )
 
         # Check if color defined
         if not color:
