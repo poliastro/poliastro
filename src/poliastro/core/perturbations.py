@@ -195,7 +195,10 @@ def third_body(t0, state, k, k_third, perturbation_body):
     """
     body_r = perturbation_body(t0)
     delta_r = body_r - state[:3]
-    return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
+    return (
+        k_third * delta_r / norm(delta_r) ** 3
+        - k_third * body_r / norm(body_r) ** 3
+    )
 
 
 def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):

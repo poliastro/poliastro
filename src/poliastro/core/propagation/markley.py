@@ -23,7 +23,9 @@ def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
     M = (M + np.pi) % (2 * np.pi) - np.pi
 
     # Equation (20)
-    alpha = (3 * np.pi**2 + 1.6 * (np.pi - np.abs(M)) / (1 + ecc)) / (np.pi**2 - 6)
+    alpha = (3 * np.pi**2 + 1.6 * (np.pi - np.abs(M)) / (1 + ecc)) / (
+        np.pi**2 - 6
+    )
 
     # Equation (5)
     d = 3 * (1 - ecc) + alpha * ecc
@@ -51,7 +53,10 @@ def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
     delta3 = -f0 / (f1 - 0.5 * f0 * f2 / f1)
     delta4 = -f0 / (f1 + 0.5 * delta3 * f2 + 1 / 6 * delta3**2 * f3)
     delta5 = -f0 / (
-        f1 + 0.5 * delta4 * f2 + 1 / 6 * delta4**2 * f3 + 1 / 24 * delta4**3 * f4
+        f1
+        + 0.5 * delta4 * f2
+        + 1 / 6 * delta4**2 * f3
+        + 1 / 24 * delta4**3 * f4
     )
 
     E += delta5

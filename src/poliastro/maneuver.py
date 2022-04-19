@@ -253,7 +253,9 @@ class Maneuver:
         ecc = orbit.ecc.value
         max_delta_r = max_delta_r.value
 
-        delta_t, vf_ = correct_pericenter_fast(k, R, J2, max_delta_r, v, a, inc, ecc)
+        delta_t, vf_ = correct_pericenter_fast(
+            k, R, J2, max_delta_r, v, a, inc, ecc
+        )
         delta_t = delta_t * u.s
         vf_ = vf_ * u.km / u.s
 

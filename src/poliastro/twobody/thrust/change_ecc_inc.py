@@ -1,6 +1,8 @@
 from astropy import units as u
 
-from poliastro.core.thrust.change_ecc_inc import change_ecc_inc as change_ecc_inc_fast
+from poliastro.core.thrust.change_ecc_inc import (
+    change_ecc_inc as change_ecc_inc_fast,
+)
 
 
 def change_ecc_inc(ss_0, ecc_f, inc_f, f):

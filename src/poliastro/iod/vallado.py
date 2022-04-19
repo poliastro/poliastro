@@ -8,7 +8,9 @@ from poliastro.core.iod import vallado as vallado_fast
 kms = u.km / u.s
 
 
-def lambert(k, r0, r, tof, M=0, prograde=True, lowpath=True, numiter=35, rtol=1e-8):
+def lambert(
+    k, r0, r, tof, M=0, prograde=True, lowpath=True, numiter=35, rtol=1e-8
+):
     """Solves the Lambert problem.
 
     .. versionadded:: 0.3.0
@@ -57,6 +59,8 @@ def lambert(k, r0, r, tof, M=0, prograde=True, lowpath=True, numiter=35, rtol=1e
     r_ = r.to_value(u.km)
     tof_ = tof.to_value(u.s)
 
-    v0, v = vallado_fast(k_, r0_, r_, tof_, M, prograde, lowpath, numiter, rtol)
+    v0, v = vallado_fast(
+        k_, r0_, r_, tof_, M, prograde, lowpath, numiter, rtol
+    )
 
     return v0 << kms, v << kms

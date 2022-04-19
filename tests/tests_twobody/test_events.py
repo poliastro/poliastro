@@ -156,7 +156,9 @@ def test_umbra_event_not_triggering_is_ok():
 
 
 def test_umbra_event_crossing():
-    expected_umbra_t = Time("2020-01-01 00:04:51.328", scale="utc")  # From Orekit.
+    expected_umbra_t = Time(
+        "2020-01-01 00:04:51.328", scale="utc"
+    )  # From Orekit.
     attractor = Earth
     tof = 2 * u.d
     epoch = Time("2020-01-01", scale="utc")
@@ -186,7 +188,9 @@ def test_umbra_event_crossing():
 
 
 def test_penumbra_event_crossing():
-    expected_penumbra_t = Time("2020-01-01 00:04:26.060", scale="utc")  # From Orekit.
+    expected_penumbra_t = Time(
+        "2020-01-01 00:04:26.060", scale="utc"
+    )  # From Orekit.
     attractor = Earth
     tof = 2 * u.d
     epoch = Time("2020-01-01", scale="utc")
@@ -212,7 +216,9 @@ def test_penumbra_event_crossing():
         events=events,
     )
 
-    assert expected_penumbra_t.isclose(epoch + penumbra_event.last_t, atol=1 * u.s)
+    assert expected_penumbra_t.isclose(
+        epoch + penumbra_event.last_t, atol=1 * u.s
+    )
 
 
 def test_node_cross_event():
@@ -263,7 +269,9 @@ def test_orbit_propagation_continues_if_events_terminal_is_False():
 
     thresh_lat = 60 * u.deg
     # Event occurs at ~1701.7 s.
-    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=False)
+    latitude_cross_event = LatitudeCrossEvent(
+        orbit, thresh_lat, terminal=False
+    )
     events = [latitude_cross_event]
 
     # The last two tofs are after the detection of the event.
@@ -301,7 +309,9 @@ def test_orbit_propagation_position_vector_does_not_repeat_if_events_terminal_is
     )
 
     # Check position vector doesn't repeat if terminal set to True.
-    assert len(rr) == 4  # From the 5th tof in tofs, position vector starts repeating.
+    assert (
+        len(rr) == 4
+    )  # From the 5th tof in tofs, position vector starts repeating.
 
 
 @pytest.mark.parametrize(
@@ -427,7 +437,21 @@ def test_LOS_event_with_lithobrake_event_raises_warning_when_satellite_cuts_attr
     orb = Orbit.from_vectors(Earth, r1, v1)
 
     los_event = LosEvent(Earth, pos_coords, terminal=True)
-    tofs = [0.003, 0.004, 0.01, 0.02, 0.03, 0.04, 0.07, 0.1, 0.2, 0.3, 0.4, 1, 3] << u.s
+    tofs = [
+        0.003,
+        0.004,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.07,
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        1,
+        3,
+    ] << u.s
 
     lithobrake_event = LithobrakeEvent(Earth.R.to_value(u.km))
     events = [lithobrake_event, los_event]

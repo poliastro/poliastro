@@ -60,8 +60,12 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
 
     # Transform into Orbit objects
     attractor = departure_body.parent
-    ss_dpt = Orbit.from_vectors(attractor, rr_dpt_body, vv_dpt_body, epoch=t_launch)
-    ss_arr = Orbit.from_vectors(attractor, rr_arr_body, vv_arr_body, epoch=t_arrival)
+    ss_dpt = Orbit.from_vectors(
+        attractor, rr_dpt_body, vv_dpt_body, epoch=t_launch
+    )
+    ss_arr = Orbit.from_vectors(
+        attractor, rr_arr_body, vv_arr_body, epoch=t_arrival
+    )
 
     # Define time of flight
     tof = ss_arr.epoch - ss_dpt.epoch
@@ -193,7 +197,9 @@ class PorkchopPlotter:
         else:
             fig = self.ax.figure
 
-        c3_levels = np.linspace(0, self.max_c3.to_value(u.km**2 / u.s**2), 30)
+        c3_levels = np.linspace(
+            0, self.max_c3.to_value(u.km**2 / u.s**2), 30
+        )
 
         c = self.ax.contourf(
             [D.to_datetime() for D in self.launch_span],
@@ -229,7 +235,9 @@ class PorkchopPlotter:
                 linewidths=3.5,
             )
 
-            self.ax.clabel(tfl_contour, inline=1, fmt="%1.1f", colors="r", fontsize=14)
+            self.ax.clabel(
+                tfl_contour, inline=1, fmt="%1.1f", colors="r", fontsize=14
+            )
 
         if self.vhp:
 

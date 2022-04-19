@@ -28,7 +28,9 @@ def sample_closed(min_nu, ecc, max_nu=None, num_values=100):
     # This linspace will always increase positively,
     # even though it might contain out of range values
     E_values = alinspace(
-        min_E, nu_to_E(max_nu, ecc) if max_nu is not None else None, num=num_values
+        min_E,
+        nu_to_E(max_nu, ecc) if max_nu is not None else None,
+        num=num_values,
     )
 
     # Because how E_to_nu works, we don't need to wrap the angles here!

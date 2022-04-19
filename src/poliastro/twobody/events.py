@@ -122,7 +122,9 @@ class LatitudeCrossEvent(Event):
     def __call__(self, t, u_, k):
         self._last_t = t
         pos_on_body = (u_[:3] / norm(u_[:3])) * self._R
-        lat_, _, _ = cartesian_to_ellipsoidal_fast(self._R, self._R_polar, *pos_on_body)
+        lat_, _, _ = cartesian_to_ellipsoidal_fast(
+            self._R, self._R_polar, *pos_on_body
+        )
 
         return np.rad2deg(lat_) - self._lat
 
@@ -278,7 +280,9 @@ class LosEvent(Event):
                 "The norm of the position vector of the primary body is less than the radius of the attractor."
             )
 
-        pos_coord = self._pos_coords.pop(0) if self._pos_coords else self._last_coord
+        pos_coord = (
+            self._pos_coords.pop(0) if self._pos_coords else self._last_coord
+        )
 
         # Need to cast `pos_coord` to array since `norm` inside numba only works for arrays, not lists.
         delta_angle = line_of_sight_fast(u_[:3], np.array(pos_coord), self._R)

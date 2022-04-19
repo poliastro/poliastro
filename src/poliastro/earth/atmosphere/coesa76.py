@@ -177,7 +177,9 @@ class COESA76(COESA):
         else:
             T10 = 360.0 * u.K
             _gamma = self.Lb_levels[9] / (Tinf - T10)
-            epsilon = (z - self.zb_levels[10]) * (r0 + self.zb_levels[10]) / (r0 + z)
+            epsilon = (
+                (z - self.zb_levels[10]) * (r0 + self.zb_levels[10]) / (r0 + z)
+            )
             T = Tinf - (Tinf - T10) * np.exp(-_gamma * epsilon)
 
         return T.to(u.K)

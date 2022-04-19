@@ -113,7 +113,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
             last_t = max(tofs)
         else:
             # Filter the event which triggered first
-            last_t = min(event.last_t for event in terminal_events).to_value(u.s)
+            last_t = min(event.last_t for event in terminal_events).to_value(
+                u.s
+            )
             tofs = [tof for tof in tofs if tof < last_t] + [last_t]
 
     rrs = []
@@ -206,7 +208,9 @@ def vallado(k, r, v, tofs, numiter=350, **kwargs):
     v0 = v.to_value(u.km / u.s)
     tofs = tofs.to_value(u.s)
 
-    results = np.array([_kepler(k, r0, v0, tof, numiter=numiter) for tof in tofs])
+    results = np.array(
+        [_kepler(k, r0, v0, tof, numiter=numiter) for tof in tofs]
+    )
     return (
         results[:, 0] << u.km,
         results[:, 1] << u.km / u.s,
@@ -391,7 +395,10 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
     tofs = tofs.to_value(u.s)
 
     results = np.array(
-        [gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
+        [
+            gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol)
+            for tof in tofs
+        ]
     )
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
@@ -472,12 +479,17 @@ def recseries(k, r, v, tofs, rtol=1e-8):
     tofs = tofs.to_value(u.s)
 
     results = np.array(
-        [recseries_fast(k, r0, v0, tof, method="rtol", rtol=rtol) for tof in tofs]
+        [
+            recseries_fast(k, r0, v0, tof, method="rtol", rtol=rtol)
+            for tof in tofs
+        ]
     )
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
-def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
+def propagate(
+    orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs
+):
     """Propagate an orbit some time and return the result.
 
     Parameters
@@ -540,7 +552,14 @@ ELLIPTIC_PROPAGATORS = [
     cowell,
     recseries,
 ]
-PARABOLIC_PROPAGATORS = [farnocchia, vallado, mikkola, pimienta, gooding, cowell]
+PARABOLIC_PROPAGATORS = [
+    farnocchia,
+    vallado,
+    mikkola,
+    pimienta,
+    gooding,
+    cowell,
+]
 HYPERBOLIC_PROPAGATORS = [
     farnocchia,
     vallado,

@@ -81,7 +81,9 @@ def test_spherical_to_cartesian():
     result = spherical_to_cartesian(
         np.array([[0.5, np.pi / 4, -np.pi / 4], [0.5, -np.pi / 4, np.pi / 4]])
     )
-    expected = np.array([[0.25, -0.25, 0.35355339], [-0.25, -0.25, 0.35355339]])
+    expected = np.array(
+        [[0.25, -0.25, 0.35355339], [-0.25, -0.25, 0.35355339]]
+    )
     assert np.allclose(expected, result)
 
 

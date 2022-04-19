@@ -45,7 +45,9 @@ class GeocentricSolarEcliptic(BaseEclipticFrame):
     obstime = TimeAttribute(default=DEFAULT_OBSTIME)
 
 
-@frame_transform_graph.transform(DynamicMatrixTransform, GCRS, GeocentricSolarEcliptic)
+@frame_transform_graph.transform(
+    DynamicMatrixTransform, GCRS, GeocentricSolarEcliptic
+)
 def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
 
     if not to_frame.obstime.isscalar:
@@ -54,7 +56,8 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
         )
 
     _earth_orbit_perpen_point_gcrs = UnitSphericalRepresentation(
-        lon=0 * u.deg, lat=(90 * u.deg - _obliquity_rotation_value(to_frame.obstime))
+        lon=0 * u.deg,
+        lat=(90 * u.deg - _obliquity_rotation_value(to_frame.obstime)),
     )
 
     _earth_detilt_matrix = _make_rotation_matrix_from_reprs(
@@ -75,7 +78,9 @@ def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
     return matrix_product(rot_matrix, _earth_detilt_matrix)
 
 
-@frame_transform_graph.transform(DynamicMatrixTransform, GeocentricSolarEcliptic, GCRS)
+@frame_transform_graph.transform(
+    DynamicMatrixTransform, GeocentricSolarEcliptic, GCRS
+)
 def geosolarecliptic_to_gcrs(from_coo, gcrs_frame):
     return matrix_transpose(gcrs_to_geosolarecliptic(gcrs_frame, from_coo))
 
@@ -103,5 +108,7 @@ def _make_rotation_matrix_from_reprs(start_representation, end_representation):
     )  # Negation is required
 
     # This line works around some input/output quirks of Astropy's rotation_matrix()
-    matrix = np.array(rotation_matrix(rotation_angle, rotation_axis.xyz.value.tolist()))
+    matrix = np.array(
+        rotation_matrix(rotation_angle, rotation_axis.xyz.value.tolist())
+    )
     return matrix

@@ -36,7 +36,10 @@ def state_from_vector(func):
     def wrapper(t, u_, k, *args, **kwargs):
         r, v = u_[:3], u_[3:]
         ss = RVState(
-            Body(None, k * u.km3s2, "_Dummy"), r * u.km, v * u.kms, Planes.EARTH_EQUATOR
+            Body(None, k * u.km3s2, "_Dummy"),
+            r * u.km,
+            v * u.kms,
+            Planes.EARTH_EQUATOR,
         )
 
         return func(t, ss, *args, **kwargs)

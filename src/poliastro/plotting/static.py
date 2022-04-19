@@ -146,7 +146,10 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         else:
             lines = self._ax.plot(
-                x.to_value(u.km), y.to_value(u.km), linestyle=linestyle, color=colors[0]
+                x.to_value(u.km),
+                y.to_value(u.km),
+                linestyle=linestyle,
+                color=colors[0],
             )
 
         self._ax.set_xlabel("$x$ (km)")
@@ -178,7 +181,9 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
             numpoints=1,
         )
 
-    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+    def plot_trajectory(
+        self, coordinates, *, label=None, color=None, trail=False
+    ):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
@@ -244,7 +249,10 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
         # Generate the legend labels in the same order as the maneuver impulses
         # are executed
         if label:
-            [self._set_legend(lines_label, *lines) for lines_label, lines in lines_list]
+            [
+                self._set_legend(lines_label, *lines)
+                for lines_label, lines in lines_list
+            ]
 
         return lines_list
 
@@ -311,7 +319,9 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
 
         return lines
 
-    def plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+    def plot_ephem(
+        self, ephem, epoch=None, *, label=None, color=None, trail=False
+    ):
         """Plots Ephem object over its sampling period.
 
         Parameters
@@ -334,7 +344,9 @@ class StaticOrbitPlotter(BaseOrbitPlotter, Mixin2D):
                 "set_orbit_frame(orbit) or plot(orbit)"
             )
 
-        lines = self._plot_ephem(ephem, epoch, label=label, color=color, trail=trail)
+        lines = self._plot_ephem(
+            ephem, epoch, label=label, color=color, trail=trail
+        )
 
         self._set_legend(self._trajectories[-1].label, *lines)
 

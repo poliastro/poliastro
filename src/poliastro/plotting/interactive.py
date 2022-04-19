@@ -35,7 +35,9 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         return [color]
 
-    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+    def plot_trajectory(
+        self, coordinates, *, label=None, color=None, trail=False
+    ):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
@@ -53,7 +55,9 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
 
         """
 
-        super().plot_trajectory(coordinates, label=label, color=color, trail=trail)
+        super().plot_trajectory(
+            coordinates, label=label, color=color, trail=trail
+        )
 
         if not self._figure._in_batch_mode:
             return self.show()
@@ -130,12 +134,16 @@ class _PlotlyOrbitPlotter(BaseOrbitPlotter):
             Fade the orbit trail, default to False.
 
         """
-        super().plot_body_orbit(body, epoch, label=label, color=color, trail=trail)
+        super().plot_body_orbit(
+            body, epoch, label=label, color=color, trail=trail
+        )
 
         if not self._figure._in_batch_mode:
             return self.show()
 
-    def plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+    def plot_ephem(
+        self, ephem, epoch=None, *, label=None, color=None, trail=False
+    ):
         """Plots Ephem object over its sampling period.
 
         Parameters
@@ -194,7 +202,11 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
     def _draw_impulse(self, color, name, center=None):
         marker_dict = dict(size=7, color=color, symbol="x")
         impulse = Scatter3d(
-            x=center[0], y=center[1], z=center[2], marker=marker_dict, name=name
+            x=center[0],
+            y=center[1],
+            z=center[2],
+            marker=marker_dict,
+            name=name,
         )
         self._figure.add_trace(impulse)
 
@@ -229,7 +241,9 @@ class OrbitPlotter3D(_PlotlyOrbitPlotter):
             y=coordinates.y.to_value(self._unit),
             z=coordinates.z.to_value(self._unit),
             name=label,
-            line=dict(color=colors[0], width=5, dash="dash" if dashed else "solid"),
+            line=dict(
+                color=colors[0], width=5, dash="dash" if dashed else "solid"
+            ),
             mode="lines",  # Boilerplate
         )
         self._figure.add_trace(trace)
@@ -299,9 +313,13 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         self._frame = None
 
     def _redraw(self):
-        raise NotImplementedError("OrbitPlotter2D does not support reprojecting yet")
+        raise NotImplementedError(
+            "OrbitPlotter2D does not support reprojecting yet"
+        )
 
-    def _draw_marker(self, symbol, size, color, name=None, center=[0, 0, 0] * u.km):
+    def _draw_marker(
+        self, symbol, size, color, name=None, center=[0, 0, 0] * u.km
+    ):
         x_center, y_center = self._project(
             center[None]
         )  # Indexing trick to add one extra dimension
@@ -325,7 +343,9 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
         return trace
 
     def _draw_point(self, radius, color, name, center=[0, 0, 0] * u.km):
-        trace = self._draw_marker("circle", 10, color, name=None, center=center)
+        trace = self._draw_marker(
+            "circle", 10, color, name=None, center=center
+        )
         return trace
 
     def _draw_sphere(self, radius, color, name, center=[0, 0, 0] * u.km):
@@ -364,7 +384,9 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             x=x.to_value(self._unit),
             y=y.to_value(self._unit),
             name=label,
-            line=dict(color=colors[0], width=2, dash="dash" if dashed else "solid"),
+            line=dict(
+                color=colors[0], width=2, dash="dash" if dashed else "solid"
+            ),
             hoverinfo="none",  # TODO: Review
             mode="lines",  # Boilerplate
         )
@@ -372,7 +394,9 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
 
         return trace
 
-    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+    def plot_trajectory(
+        self, coordinates, *, label=None, color=None, trail=False
+    ):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
@@ -399,7 +423,9 @@ class OrbitPlotter2D(_PlotlyOrbitPlotter, Mixin2D):
             coordinates, label=label, color=color, trail=trail
         )
 
-    def plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+    def plot_ephem(
+        self, ephem, epoch=None, *, label=None, color=None, trail=False
+    ):
         """Plots Ephem object over its sampling period.
 
         Parameters

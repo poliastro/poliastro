@@ -13,7 +13,11 @@ from poliastro.twobody.elements import (
     heliosynchronous,
 )
 from poliastro.twobody.mean_elements import get_mean_elements
-from poliastro.twobody.states import ClassicalState, ModifiedEquinoctialState, RVState
+from poliastro.twobody.states import (
+    ClassicalState,
+    ModifiedEquinoctialState,
+    RVState,
+)
 from poliastro.util import find_closest_value
 
 
@@ -27,7 +31,9 @@ class OrbitCreationMixin:
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
-    def from_vectors(cls, attractor, r, v, epoch=J2000, plane=Planes.EARTH_EQUATOR):
+    def from_vectors(
+        cls, attractor, r, v, epoch=J2000, plane=Planes.EARTH_EQUATOR
+    ):
         """Return `Orbit` from position and velocity vectors.
 
         Parameters
@@ -92,7 +98,9 @@ class OrbitCreationMixin:
 
         # Get an inertial reference frame parallel to ICRS and centered at
         # attractor
-        inertial_frame_at_body_centre = get_frame(attractor, plane, coord.obstime)
+        inertial_frame_at_body_centre = get_frame(
+            attractor, plane, coord.obstime
+        )
 
         if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
             coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
@@ -102,10 +110,14 @@ class OrbitCreationMixin:
         pos = coord_in_irf.cartesian.xyz
         vel = coord_in_irf.cartesian.differentials["s"].d_xyz
 
-        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime, plane=plane)
+        return cls.from_vectors(
+            attractor, pos, vel, epoch=coord.obstime, plane=plane
+        )
 
     @classmethod
-    @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
+    @u.quantity_input(
+        a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad
+    )
     def from_classical(
         cls,
         attractor,
@@ -147,7 +159,9 @@ class OrbitCreationMixin:
                 raise ValueError(f"Elements must be scalar, got {element}")
 
         if ecc == 1.0 * u.one:
-            raise ValueError("For parabolic orbits use Orbit.parabolic instead")
+            raise ValueError(
+                "For parabolic orbits use Orbit.parabolic instead"
+            )
 
         if not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
@@ -157,9 +171,9 @@ class OrbitCreationMixin:
 
         if not -np.pi * u.rad <= nu < np.pi * u.rad:
             warn("Wrapping true anomaly to -π <= nu < π", stacklevel=2)
-            nu = ((nu + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad).to(
-                nu.unit
-            )
+            nu = (
+                (nu + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
+            ).to(nu.unit)
 
         ss = ClassicalState(
             attractor, a * (1 - ecc**2), ecc, inc, raan, argp, nu, plane
@@ -169,7 +183,16 @@ class OrbitCreationMixin:
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
     def from_equinoctial(
-        cls, attractor, p, f, g, h, k, L, epoch=J2000, plane=Planes.EARTH_EQUATOR
+        cls,
+        attractor,
+        p,
+        f,
+        g,
+        h,
+        k,
+        L,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
     ):
         """Return `Orbit` from modified equinoctial elements.
 
@@ -215,7 +238,9 @@ class OrbitCreationMixin:
             Epoch to retrieve the osculating orbit at.
 
         """
-        return cls.from_vectors(attractor, *ephem.rv(epoch), epoch, ephem.plane)
+        return cls.from_vectors(
+            attractor, *ephem.rv(epoch), epoch, ephem.plane
+        )
 
     @classmethod
     def from_sbdb(cls, name, **kwargs):
@@ -390,7 +415,9 @@ class OrbitCreationMixin:
         nu = arglat - argp
         r_pericenter = (1 - ecc) * a_sync
         if r_pericenter < attractor.R:
-            raise ValueError("The orbit for the given parameters doesn't exist")
+            raise ValueError(
+                "The orbit for the given parameters doesn't exist"
+            )
 
         return cls.from_classical(
             attractor=attractor,
@@ -458,7 +485,8 @@ class OrbitCreationMixin:
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
-            np.sqrt(mean_elements.attractor.k / abs(mean_elements.a**3)) * u.one
+            np.sqrt(mean_elements.attractor.k / abs(mean_elements.a**3))
+            * u.one
         ).to(1 / u.s)
 
         try:
@@ -466,7 +494,9 @@ class OrbitCreationMixin:
                 attractor.k, attractor.R, attractor.J2, n_sunsync, a, ecc, inc
             )
         except FloatingPointError:
-            raise ValueError("No SSO orbit with given parameters can be found.")
+            raise ValueError(
+                "No SSO orbit with given parameters can be found."
+            )
 
         ss = cls.from_classical(
             attractor=attractor,
@@ -485,7 +515,15 @@ class OrbitCreationMixin:
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def parabolic(
-        cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR
+        cls,
+        attractor,
+        p,
+        inc,
+        raan,
+        argp,
+        nu,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
     ):
         """Return a parabolic `Orbit`.
 
@@ -509,7 +547,9 @@ class OrbitCreationMixin:
             Fundamental plane of the frame.
 
         """
-        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane)
+        ss = ClassicalState(
+            attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane
+        )
         return cls(ss, epoch)
 
     @classmethod
@@ -599,7 +639,10 @@ class OrbitCreationMixin:
             )
 
         critical_argps = [np.pi / 2, 3 * np.pi / 2] * u.rad
-        critical_inclinations = [63.4349 * np.pi / 180, 116.5651 * np.pi / 180] * u.rad
+        critical_inclinations = [
+            63.4349 * np.pi / 180,
+            116.5651 * np.pi / 180,
+        ] * u.rad
         try:
             if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
                 raise NotImplementedError(
@@ -640,7 +683,9 @@ class OrbitCreationMixin:
                 )
 
             inc = critical_inclinations[0] if inc is None else inc
-            critical_inclination = find_closest_value(inc, critical_inclinations)
+            critical_inclination = find_closest_value(
+                inc, critical_inclinations
+            )
             if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
                 ecc = get_eccentricity_critical_inc(ecc)
                 return cls.from_classical(

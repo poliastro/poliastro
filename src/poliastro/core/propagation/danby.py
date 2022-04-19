@@ -65,7 +65,9 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
         else:
             delta = -f / fp
             delta_star = -f / (fp + 0.5 * delta * fpp)
-            deltak = -f / (fp + 0.5 * delta_star * fpp + delta_star**2 * fppp / 6)
+            deltak = -f / (
+                fp + 0.5 * delta_star * fpp + delta_star**2 * fppp / 6
+            )
             E = E + deltak
             n += 1
     else:
