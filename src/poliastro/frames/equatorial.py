@@ -50,8 +50,12 @@ class _PlanetaryICRS(BaseRADecFrame):
     obstime = TimeAttribute(default=DEFAULT_OBSTIME)
 
     def __new__(cls, *args, **kwargs):
-        frame_transform_graph.transform(AffineTransform, cls, ICRS)(cls.to_icrs)
-        frame_transform_graph.transform(AffineTransform, ICRS, cls)(cls.from_icrs)
+        frame_transform_graph.transform(AffineTransform, cls, ICRS)(
+            cls.to_icrs
+        )
+        frame_transform_graph.transform(AffineTransform, ICRS, cls)(
+            cls.from_icrs
+        )
         frame_transform_graph.transform(
             FunctionTransformWithFiniteDifference, cls, cls
         )(cls.self_transform)
@@ -62,7 +66,9 @@ class _PlanetaryICRS(BaseRADecFrame):
     def to_icrs(planet_coo, _):
         # This is just an origin translation so without a distance it cannot go ahead
         if isinstance(planet_coo.data, UnitSphericalRepresentation):
-            raise u.UnitsError(_NEED_ORIGIN_HINT.format(planet_coo.__class__.__name__))
+            raise u.UnitsError(
+                _NEED_ORIGIN_HINT.format(planet_coo.__class__.__name__)
+            )
 
         if planet_coo.data.differentials:
             bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(
@@ -84,7 +90,9 @@ class _PlanetaryICRS(BaseRADecFrame):
     def from_icrs(icrs_coo, planet_frame):
         # This is just an origin translation so without a distance it cannot go ahead
         if isinstance(icrs_coo.data, UnitSphericalRepresentation):
-            raise u.UnitsError(_NEED_ORIGIN_HINT.format(icrs_coo.__class__.__name__))
+            raise u.UnitsError(
+                _NEED_ORIGIN_HINT.format(icrs_coo.__class__.__name__)
+            )
 
         if icrs_coo.data.differentials:
             bary_sun_pos, bary_sun_vel = get_body_barycentric_posvel(

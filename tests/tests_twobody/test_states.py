@@ -20,8 +20,10 @@ def test_classical_state_has_elements_given_in_constructor():
     raan = 49.562 * u.deg
     argp = 286.537 * u.deg
     nu = 23.33 * u.deg
-    ss = ClassicalState(Sun, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, None)
-    assert ss.p == a * (1 - ecc ** 2)
+    ss = ClassicalState(
+        Sun, a * (1 - ecc**2), ecc, inc, raan, argp, nu, None
+    )
+    assert ss.p == a * (1 - ecc**2)
     assert ss.ecc == ecc
     assert ss.inc == inc
     assert ss.raan == raan

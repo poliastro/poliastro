@@ -34,7 +34,9 @@ def test_max_and_min_ground_range(
 ):
 
     R = Earth.R.to(u.km)
-    lambda_min, lambda_max = min_and_max_ground_range(h, eta_fov, eta_center, R)
+    lambda_min, lambda_max = min_and_max_ground_range(
+        h, eta_fov, eta_center, R
+    )
     assert_quantity_allclose(lambda_max, expected_lambda_max)
     assert_quantity_allclose(lambda_min, expected_lambda_min)
 

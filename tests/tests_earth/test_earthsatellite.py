@@ -14,7 +14,7 @@ def test_earth_satellite_orbit():
     v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
     C_D = 2.2 * u.one  # Dimensionless (any value would do)
-    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2)
+    A = ((np.pi / 4.0) * (u.m**2)).to(u.km**2)
     m = 100 * u.kg
     spacecraft = Spacecraft(A, C_D, m)
     earth_satellite = EarthSatellite(ss, spacecraft)
@@ -26,7 +26,7 @@ def test_orbit_attractor():
     v = [-6.49780849, 3.24910291, 1.87521413] * u.km / u.s
     ss = Orbit.from_vectors(Mars, r, v)
     C_D = 2.2 * u.one  # Dimensionless (any value would do)
-    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2)
+    A = ((np.pi / 4.0) * (u.m**2)).to(u.km**2)
     m = 100 * u.kg
     spacecraft = Spacecraft(A, C_D, m)
     with pytest.raises(ValueError) as excinfo:
@@ -46,7 +46,7 @@ def test_propagate_instance():
         nu=80 * u.deg,
     )
     C_D = 2.2 * u.one  # Dimensionless (any value would do)
-    A = ((np.pi / 4.0) * (u.m ** 2)).to(u.km ** 2)
+    A = ((np.pi / 4.0) * (u.m**2)).to(u.km**2)
     m = 100 * u.kg
     spacecraft = Spacecraft(A, C_D, m)
     earth_satellite = EarthSatellite(ss0, spacecraft)

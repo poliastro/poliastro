@@ -212,7 +212,7 @@ def test_eccentric_to_true_range(E, ecc):
 
 
 def test_convert_between_coe_and_rv_is_transitive(classical):
-    k = Earth.k.to(u.km ** 3 / u.s ** 2).value  # u.km**3 / u.s**2
+    k = Earth.k.to(u.km**3 / u.s**2).value  # u.km**3 / u.s**2
     res = rv2coe(k, *coe2rv(k, *classical))
     assert_allclose(res, classical)
 
@@ -255,12 +255,16 @@ def test_raan_from_ltan_metopb():
 
     ltan = (21 + ((31 + 45 / 60) / 60)) * u.hourangle
     epoch = astropy.time.Time(
-        astropy.time.Time("2020-01-01 00:00").to_value("mjd") + 49.95408566 - 1,
+        astropy.time.Time("2020-01-01 00:00").to_value("mjd")
+        + 49.95408566
+        - 1,
         format="mjd",
     )
     expected_raan = 110.9899 * u.deg
     raan = raan_from_ltan(epoch, ltan)
-    assert_allclose(raan.wrap_at(360 * u.deg).to(u.deg), expected_raan, atol=0.3)
+    assert_allclose(
+        raan.wrap_at(360 * u.deg).to(u.deg), expected_raan, atol=0.3
+    )
 
 
 def test_raan_from_ltan_sentinel5p():
@@ -271,9 +275,13 @@ def test_raan_from_ltan_sentinel5p():
 
     ltan = (13 + (30 / 60)) * u.hourangle
     epoch = astropy.time.Time(
-        astropy.time.Time("2020-01-01 00:00").to_value("mjd") + 49.78099017 - 1,
+        astropy.time.Time("2020-01-01 00:00").to_value("mjd")
+        + 49.78099017
+        - 1,
         format="mjd",
     )
     expected_raan = 350.5997 * u.deg
     raan = raan_from_ltan(epoch, ltan)
-    assert_allclose(raan.wrap_at(360 * u.deg).to(u.deg), expected_raan, atol=0.3)
+    assert_allclose(
+        raan.wrap_at(360 * u.deg).to(u.deg), expected_raan, atol=0.3
+    )

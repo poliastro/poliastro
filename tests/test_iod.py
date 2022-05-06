@@ -118,7 +118,9 @@ def test_collinear_vectors_input(lambert):
 @pytest.mark.parametrize("M", [1, 2, 3])
 def test_minimum_time_of_flight_convergence(M):
     ll = -1
-    x_T_min_expected, T_min_expected = iod._compute_T_min(ll, M, numiter=10, rtol=1e-8)
+    x_T_min_expected, T_min_expected = iod._compute_T_min(
+        ll, M, numiter=10, rtol=1e-8
+    )
     y = iod._compute_y(x_T_min_expected, ll)
     T_min = iod._tof_equation_y(x_T_min_expected, y, 0.0, ll, M)
     assert T_min_expected == T_min
@@ -128,7 +130,7 @@ def test_minimum_time_of_flight_convergence(M):
     "lambert_vallado,lambert_izzo", [(vallado.lambert, izzo.lambert)]
 )
 def test_issue840(lambert_vallado, lambert_izzo):
-    k = c.GM_earth.to(u.km ** 3 / u.s ** 2)
+    k = c.GM_earth.to(u.km**3 / u.s**2)
     r0 = [10000.0, 0, 0] * u.km
     rf = [8000.0, -5000, 0] * u.km
     tof = 2 * u.hour
@@ -150,7 +152,7 @@ def test_issue840(lambert_vallado, lambert_izzo):
 )
 def test_issue1362(lambert_vallado, lambert_izzo):
 
-    k = 1.32712440018e11 * u.km ** 3 / u.s ** 2
+    k = 1.32712440018e11 * u.km**3 / u.s**2
     r0 = [-7.52669489e07, -3.72205805e08, -9.17950811e06] * u.km
     rf = [-6.15200041e06, -3.91985660e08, -5.06520860e05] * u.km
     tof = 3489390.108265222 * u.s

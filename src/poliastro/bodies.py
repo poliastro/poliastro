@@ -103,12 +103,14 @@ class Body(
         return self.__str__()
 
     @classmethod
-    @u.quantity_input(k=u.km ** 3 / u.s ** 2, R=u.km)
+    @u.quantity_input(k=u.km**3 / u.s**2, R=u.km)
     def from_parameters(cls, parent, k, name, symbol, R, **kwargs):
         return cls(parent, k, name, symbol, R, **kwargs)
 
     @classmethod
-    def from_relative(cls, reference, parent, k, name, symbol=None, R=0, **kwargs):
+    def from_relative(
+        cls, reference, parent, k, name, symbol=None, R=0, **kwargs
+    ):
         k = k * reference.k
         R = R * reference.R
         return cls(parent, k, name, symbol, R, **kwargs)
@@ -151,11 +153,15 @@ class SolarSystemPlanet(Body):
         elif use_3d:
             from poliastro.plotting.core import OrbitPlotter3D
 
-            return OrbitPlotter3D(plane=plane).plot_body_orbit(self, epoch, label=label)
+            return OrbitPlotter3D(plane=plane).plot_body_orbit(
+                self, epoch, label=label
+            )
         else:
             from poliastro.plotting.core import OrbitPlotter2D
 
-            return OrbitPlotter2D(plane=plane).plot_body_orbit(self, epoch, label=label)
+            return OrbitPlotter2D(plane=plane).plot_body_orbit(
+                self, epoch, label=label
+            )
 
 
 Sun = Body(

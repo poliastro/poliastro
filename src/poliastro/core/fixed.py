@@ -349,7 +349,7 @@ def moon_rot_elements_at_epoch(T, d):
     W = (
         38.3213
         + 13.17635815 * d
-        - 1.4e-12 * d ** 2
+        - 1.4e-12 * d**2
         + 3.5610 * np.sin(E1)
         + 0.1208 * np.sin(E2)
         - 0.0642 * np.sin(E3)

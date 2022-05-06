@@ -34,10 +34,10 @@ def compute_flyby(v_spacecraft, v_body, k, r_p, theta):
     v_inf_1 = v_spacecraft - v_body  # Hyperbolic excess velocity
     v_inf = norm(v_inf_1)
 
-    ecc = 1 + r_p * v_inf ** 2 / k  # Eccentricity of the entry hyperbola
+    ecc = 1 + r_p * v_inf**2 / k  # Eccentricity of the entry hyperbola
     delta = 2 * np.arcsin(1 / ecc)  # Turn angle
 
-    b = k / v_inf ** 2 * np.sqrt(ecc ** 2 - 1)  # Magnitude of the B vector
+    b = k / v_inf**2 * np.sqrt(ecc**2 - 1)  # Magnitude of the B vector
 
     # Now we compute the unit vectors in which to return the outbound hyperbolic excess velocity:
     # * S goes along the hyperbolic excess velocity and is perpendicular to the B-Plane,

@@ -4,17 +4,19 @@ from astropy import units as u
 from poliastro.core.util import circular_velocity as circular_velocity_fast
 
 u_kms = u.km / u.s
-u_km3s2 = u.km ** 3 / u.s ** 2
+u_km3s2 = u.km**3 / u.s**2
 
 
 def circular_velocity(k, a):
     """Circular velocity for a given body (k) and semimajor axis (a)."""
-    return circular_velocity_fast(k.to_value(u_km3s2), a.to_value(u.km)) * u_kms
+    return (
+        circular_velocity_fast(k.to_value(u_km3s2), a.to_value(u.km)) * u_kms
+    )
 
 
 def mean_motion(k, a):
     """Mean motion given body (k) and semimajor axis (a)."""
-    return np.sqrt(k / abs(a ** 3)).to(1 / u.s) * u.rad
+    return np.sqrt(k / abs(a**3)).to(1 / u.s) * u.rad
 
 
 def period(k, a):

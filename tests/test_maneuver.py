@@ -19,7 +19,9 @@ def test_maneuver_constructor_raises_error_if_invalid_delta_v():
     with pytest.raises(ValueError) as excinfo:
         with warnings.catch_warnings():
             # Different length numpy arrays generate a deprecation warning.
-            warnings.simplefilter("ignore", category=np.VisibleDeprecationWarning)
+            warnings.simplefilter(
+                "ignore", category=np.VisibleDeprecationWarning
+            )
             Maneuver((0 * u.s, dv1), (2 * u.s, dv2))
     assert "Delta-V must be three dimensions vectors" in excinfo.exconly()
 
@@ -82,7 +84,9 @@ def test_hohmann_maneuver(nu):
 
     man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
-    assert_quantity_allclose(man.get_total_time(), expected_total_time, rtol=1e-5)
+    assert_quantity_allclose(
+        man.get_total_time(), expected_total_time, rtol=1e-5
+    )
 
     assert_quantity_allclose(
         ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-14 * u.one
@@ -114,9 +118,13 @@ def test_bielliptic_maneuver(nu):
 
     man = Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_f)
 
-    assert_allclose(ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-12 * u.one)
+    assert_allclose(
+        ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-12 * u.one
+    )
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
-    assert_quantity_allclose(man.get_total_time(), expected_total_time, rtol=1e-6)
+    assert_quantity_allclose(
+        man.get_total_time(), expected_total_time, rtol=1e-6
+    )
 
 
 def test_apply_maneuver_correct_dimensions():
@@ -142,10 +150,17 @@ def test_repr_maneuver():
     alt_fi = 376310.0 * u.km
     ss_i = Orbit.from_vectors(Earth, r, v)
 
-    expected_hohmann_maneuver = "Number of impulses: 2, Total cost: 3.060548 km / s"
-    expected_bielliptic_maneuver = "Number of impulses: 3, Total cost: 3.122556 km / s"
+    expected_hohmann_maneuver = (
+        "Number of impulses: 2, Total cost: 3.060548 km / s"
+    )
+    expected_bielliptic_maneuver = (
+        "Number of impulses: 3, Total cost: 3.122556 km / s"
+    )
 
-    assert repr(Maneuver.hohmann(ss_i, Earth.R + alt_f)) == expected_hohmann_maneuver
+    assert (
+        repr(Maneuver.hohmann(ss_i, Earth.R + alt_f))
+        == expected_hohmann_maneuver
+    )
     assert (
         repr(Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_fi))
         == expected_bielliptic_maneuver
@@ -163,7 +178,8 @@ def test_repr_maneuver():
             0.001 * u.one,
             0.7855682278773197 * u.rad,
             2224141.03634 * u.s,
-            np.array([0, 0.0083290328315531, 0.00833186625871848]) * (u.km / u.s),
+            np.array([0, 0.0083290328315531, 0.00833186625871848])
+            * (u.km / u.s),
         ),
     ],
 )
@@ -182,7 +198,9 @@ def test_correct_pericenter(
 
     maneuver = Maneuver.correct_pericenter(ss0, max_delta_r)
     assert_quantity_allclose(maneuver[0][0], expected_t)
-    assert_quantity_allclose(maneuver[0][1].value.tolist(), expected_v.value.tolist())
+    assert_quantity_allclose(
+        maneuver[0][1].value.tolist(), expected_v.value.tolist()
+    )
 
 
 def test_correct_pericenter_J2_exception():

@@ -38,7 +38,9 @@ def test_laplace_radius(body, expected_r_SOI):
 @pytest.mark.parametrize(
     "body, expected_r_SOI",
     [
-        pytest.param(Mercury, 2.21e8 * u.m, marks=pytest.mark.xfail),  # Chebotarev
+        pytest.param(
+            Mercury, 2.21e8 * u.m, marks=pytest.mark.xfail
+        ),  # Chebotarev
         (Mercury, 1.75e8 * u.m),  # Our result
         (Venus, 1.03e9 * u.m),
         (Earth, 1.49e9 * u.m),

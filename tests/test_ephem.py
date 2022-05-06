@@ -22,12 +22,18 @@ AVAILABLE_INTERPOLATION_METHODS = InterpolationMethods.__members__.values()
 AVAILABLE_PLANES = Planes.__members__.values()
 
 
-def assert_coordinates_allclose(actual, desired, rtol=1e-7, atol_scale=None, **kwargs):
+def assert_coordinates_allclose(
+    actual, desired, rtol=1e-7, atol_scale=None, **kwargs
+):
     if atol_scale is None:
         atol_scale = 0
 
     assert_quantity_allclose(
-        actual.xyz, desired.xyz, rtol, atol=atol_scale * desired.xyz.unit, **kwargs
+        actual.xyz,
+        desired.xyz,
+        rtol,
+        atol=atol_scale * desired.xyz.unit,
+        **kwargs,
     )
     if "s" in desired.differentials:
         assert_quantity_allclose(
@@ -77,7 +83,8 @@ def test_ephem_fails_if_dimensions_are_not_correct(epochs, coordinates):
     with pytest.raises(ValueError) as excinfo:
         Ephem(epochs[0], coordinates, unused_plane)
     assert (
-        "Coordinates and epochs must have dimension 1, got 0 and 1" in excinfo.exconly()
+        "Coordinates and epochs must have dimension 1, got 0 and 1"
+        in excinfo.exconly()
     )
 
 
@@ -135,14 +142,18 @@ def test_ephem_sample_scalar_epoch_and_coordinates_returns_exactly_same_input(
 
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
-def test_ephem_sample_same_epochs_returns_same_input(epochs, coordinates, method):
+def test_ephem_sample_same_epochs_returns_same_input(
+    epochs, coordinates, method
+):
     unused_plane = Planes.EARTH_EQUATOR
     ephem = Ephem(coordinates, epochs, unused_plane)
 
     result_coordinates = ephem.sample(epochs, method=method)
 
     # TODO: Should it return exactly the same?
-    assert_coordinates_allclose(result_coordinates, coordinates, atol_scale=1e-17)
+    assert_coordinates_allclose(
+        result_coordinates, coordinates, atol_scale=1e-17
+    )
 
 
 @pytest.mark.parametrize("method", AVAILABLE_INTERPOLATION_METHODS)
@@ -155,7 +166,9 @@ def test_ephem_sample_existing_epochs_returns_corresponding_input(
     result_coordinates = ephem.sample(epochs[::2], method=method)
 
     # Exactly the same
-    assert_coordinates_allclose(result_coordinates, coordinates[::2], atol_scale=1e-17)
+    assert_coordinates_allclose(
+        result_coordinates, coordinates[::2], atol_scale=1e-17
+    )
 
 
 def test_rv_no_parameters_returns_input_vectors(coordinates, epochs):
@@ -192,9 +205,15 @@ def test_rv_scalar_epoch_returns_scalar_vectors(coordinates, epochs):
         (Planes.EARTH_ECLIPTIC, BarycentricMeanEcliptic, 1e-5),
     ],
 )
-def test_ephem_from_body_has_expected_properties(method, plane, FrameClass, rtol):
+def test_ephem_from_body_has_expected_properties(
+    method, plane, FrameClass, rtol
+):
     epochs = Time(
-        ["2020-03-01 12:00:00", "2020-03-17 00:00:00.000", "2020-04-01 12:00:00.000"],
+        [
+            "2020-03-01 12:00:00",
+            "2020-03-17 00:00:00.000",
+            "2020-04-01 12:00:00.000",
+        ],
         scale="tdb",
     )
     equatorial_coordinates = CartesianRepresentation(
@@ -250,7 +269,8 @@ def test_from_body_scalar_epoch_uses_reshaped_epochs():
 
 @mock.patch("poliastro.ephem.Horizons")
 @pytest.mark.parametrize(
-    "attractor,location_str", [(None, "@ssb"), (Earth, "500@399"), (Venus, "500@299")]
+    "attractor,location_str",
+    [(None, "@ssb"), (Earth, "500@399"), (Venus, "500@299")],
 )
 @pytest.mark.parametrize(
     "plane,refplane_str",
@@ -274,15 +294,24 @@ def test_ephem_from_horizons_calls_horizons_with_correct_parameters(
     expected_coordinates = CartesianRepresentation(
         [(1, 0, 0)] * u.au,
         xyz_axis=1,
-        differentials=CartesianDifferential([(0, 1, 0)] * (u.au / u.day), xyz_axis=1),
+        differentials=CartesianDifferential(
+            [(0, 1, 0)] * (u.au / u.day), xyz_axis=1
+        ),
     )
 
     ephem = Ephem.from_horizons(
-        unused_name, epochs, attractor=attractor, plane=plane, id_type=unused_id_type
+        unused_name,
+        epochs,
+        attractor=attractor,
+        plane=plane,
+        id_type=unused_id_type,
     )
 
     horizons_mock.assert_called_with(
-        id=unused_name, location=location_str, epochs=epochs.jd, id_type=unused_id_type
+        id=unused_name,
+        location=location_str,
+        epochs=epochs.jd,
+        id_type=unused_id_type,
     )
     horizons_mock().vectors.assert_called_once_with(refplane=refplane_str)
 

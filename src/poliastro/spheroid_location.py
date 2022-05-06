@@ -68,8 +68,14 @@ class SpheroidLocation:
     @property
     def N(self):
         """Normal vector of the ellipsoid at the given location."""
-        a, b, c = self._a.to_value(u.m), self._b.to_value(u.m), self._c.to_value(u.m)
-        cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
+        a, b, c = (
+            self._a.to_value(u.m),
+            self._b.to_value(u.m),
+            self._c.to_value(u.m),
+        )
+        cartesian_cords = np.array(
+            [coord.value for coord in self.cartesian_cords]
+        )
         return N_fast(a, b, c, cartesian_cords)
 
     @property
@@ -105,7 +111,9 @@ class SpheroidLocation:
 
         """
         px, py, pz = px.to_value(u.m), py.to_value(u.m), pz.to_value(u.m)
-        cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
+        cartesian_cords = np.array(
+            [coord.value for coord in self.cartesian_cords]
+        )
         return (
             distance_fast(cartesian_cords, px, py, pz) * u.m
         )  # body.R and body.R_polar has u.m as units
@@ -126,7 +134,9 @@ class SpheroidLocation:
 
         """
         px, py, pz = px.to_value(u.m), py.to_value(u.m), pz.to_value(u.m)
-        cartesian_cords = np.array([coord.value for coord in self.cartesian_cords])
+        cartesian_cords = np.array(
+            [coord.value for coord in self.cartesian_cords]
+        )
 
         return is_visible_fast(cartesian_cords, px, py, pz, self.N)
 

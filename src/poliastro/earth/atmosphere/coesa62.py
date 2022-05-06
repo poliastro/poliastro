@@ -66,7 +66,7 @@ r0 = 6356.766 * u.km
 p0 = 1.013250e5 * u.Pa
 rho0 = 1.2250 * u.K
 T0 = 288.15 * u.K
-g0 = 9.80665 * u.m / u.s ** 2
+g0 = 9.80665 * u.m / u.s**2
 S = 110.4 * u.K
 Ti = 273.15 * u.K
 beta = 1.458e-6 * u.kg / u.s / u.m / u.K ** (0.5)
@@ -181,7 +181,8 @@ class COESA62(COESA):
             # Putting g = (g0*(r0/(r0 +z))**2) in (g * dz / z - zb + Tb/Lb)
             # and integrating it.
             integrand = quad(
-                lambda x: (g0_v * (r0_v / (r0_v + x)) ** 2) / (x - zb_v + Tb_v / Lb_v),
+                lambda x: (g0_v * (r0_v / (r0_v + x)) ** 2)
+                / (x - zb_v + Tb_v / Lb_v),
                 zb_v,
                 z_v,
             )
@@ -215,7 +216,7 @@ class COESA62(COESA):
         p = self.pressure(z)
         rho = p / R_air / T
 
-        return rho.to(u.kg / u.m ** 3)
+        return rho.to(u.kg / u.m**3)
 
     def properties(self, alt, geometric=True):
         """Solves density at given height.
@@ -294,7 +295,7 @@ class COESA62(COESA):
             )
         T = self.temperature(alt, geometric).value
         # Using eqn-1.3.8-(1)
-        mu = (beta.value * T ** 1.5 / (T + S.value)) * (u.kg / u.m / u.s)
+        mu = (beta.value * T**1.5 / (T + S.value)) * (u.kg / u.m / u.s)
 
         return mu
 
@@ -323,7 +324,7 @@ class COESA62(COESA):
 
         T = self.temperature(alt, geometric=geometric).value
         # Using eqn-1.3.10-(1)
-        k = (6.325e-7 * T ** 1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
+        k = (6.325e-7 * T**1.5 / (T + 245.4 * (10 ** (-12.0 / T)))) * (
             imperial.kcal / u.m / u.s / u.K
         )
 

@@ -6,7 +6,7 @@ class Spacecraft:
     Class to represent a Spacecraft.
     """
 
-    @u.quantity_input(A=u.km ** 2, C_D=u.one, m=u.kg)
+    @u.quantity_input(A=u.km**2, C_D=u.one, m=u.kg)
     def __init__(self, A, C_D, m, **metadata):
         """
         Constructor

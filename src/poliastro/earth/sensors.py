@@ -34,7 +34,9 @@ def min_and_max_ground_range(h, eta_fov, eta_center, R):
     eta_fov = eta_fov.to_value(u.rad)
     eta_center = eta_center.to_value(u.rad)
     R = R.to_value(u.km)
-    lambda_min, lambda_max = min_and_max_ground_range_fast(h, eta_fov, eta_center, R)
+    lambda_min, lambda_max = min_and_max_ground_range_fast(
+        h, eta_fov, eta_center, R
+    )
 
     return lambda_min * u.rad, lambda_max * u.rad
 

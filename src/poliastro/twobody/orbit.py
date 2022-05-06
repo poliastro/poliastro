@@ -63,9 +63,7 @@ except ImportError:
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
 # Reference frame
-ORBIT_NO_FRAME_FORMAT = (
-    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
-)
+ORBIT_NO_FRAME_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 
 
 class Orbit:
@@ -202,20 +200,28 @@ class Orbit:
     @cached_property
     def energy(self):
         """Specific energy."""
-        return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(self.r.dot(self.r))
+        return self.v.dot(self.v) / 2 - self.attractor.k / np.sqrt(
+            self.r.dot(self.r)
+        )
 
     @cached_property
     def e_vec(self):
         """Eccentricity vector."""
         r, v = self.rv()
-        k = self.attractor.k.to_value(u.km ** 3 / u.s ** 2)
-        e_vec = eccentricity_vector(k, r.to_value(u.km), v.to_value(u.km / u.s))
+        k = self.attractor.k.to_value(u.km**3 / u.s**2)
+        e_vec = eccentricity_vector(
+            k, r.to_value(u.km), v.to_value(u.km / u.s)
+        )
         return e_vec * u.one
 
     @cached_property
     def h_vec(self):
         """Specific angular momentum vector."""
-        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km ** 2 / u.s
+        h_vec = (
+            np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s))
+            * u.km**2
+            / u.s
+        )
         return h_vec
 
     @cached_property
@@ -237,7 +243,7 @@ class Orbit:
             delta_t_from_nu_fast(
                 self.nu.to_value(u.rad),
                 self.ecc.value,
-                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+                self.attractor.k.to_value(u.km**3 / u.s**2),
                 self.r_p.to_value(u.km),
             )
             * u.s
@@ -246,7 +252,9 @@ class Orbit:
 
     @classmethod
     @u.quantity_input(r=u.m, v=u.m / u.s)
-    def from_vectors(cls, attractor, r, v, epoch=J2000, plane=Planes.EARTH_EQUATOR):
+    def from_vectors(
+        cls, attractor, r, v, epoch=J2000, plane=Planes.EARTH_EQUATOR
+    ):
         """Return `Orbit` from position and velocity vectors.
 
         Parameters
@@ -311,7 +319,9 @@ class Orbit:
 
         # Get an inertial reference frame parallel to ICRS and centered at
         # attractor
-        inertial_frame_at_body_centre = get_frame(attractor, plane, coord.obstime)
+        inertial_frame_at_body_centre = get_frame(
+            attractor, plane, coord.obstime
+        )
 
         if not coord.is_equivalent_frame(inertial_frame_at_body_centre):
             coord_in_irf = coord.transform_to(inertial_frame_at_body_centre)
@@ -321,10 +331,14 @@ class Orbit:
         pos = coord_in_irf.cartesian.xyz
         vel = coord_in_irf.cartesian.differentials["s"].d_xyz
 
-        return cls.from_vectors(attractor, pos, vel, epoch=coord.obstime, plane=plane)
+        return cls.from_vectors(
+            attractor, pos, vel, epoch=coord.obstime, plane=plane
+        )
 
     @classmethod
-    @u.quantity_input(a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
+    @u.quantity_input(
+        a=u.m, ecc=u.one, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad
+    )
     def from_classical(
         cls,
         attractor,
@@ -366,7 +380,9 @@ class Orbit:
                 raise ValueError(f"Elements must be scalar, got {element}")
 
         if ecc == 1.0 * u.one:
-            raise ValueError("For parabolic orbits use Orbit.parabolic instead")
+            raise ValueError(
+                "For parabolic orbits use Orbit.parabolic instead"
+            )
 
         if not 0 * u.deg <= inc <= 180 * u.deg:
             raise ValueError("Inclination must be between 0 and 180 degrees")
@@ -376,19 +392,28 @@ class Orbit:
 
         if not -np.pi * u.rad <= nu < np.pi * u.rad:
             warn("Wrapping true anomaly to -π <= nu < π", stacklevel=2)
-            nu = ((nu + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad).to(
-                nu.unit
-            )
+            nu = (
+                (nu + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
+            ).to(nu.unit)
 
         ss = ClassicalState(
-            attractor, a * (1 - ecc ** 2), ecc, inc, raan, argp, nu, plane
+            attractor, a * (1 - ecc**2), ecc, inc, raan, argp, nu, plane
         )
         return cls(ss, epoch)
 
     @classmethod
     @u.quantity_input(p=u.m, f=u.one, g=u.rad, h=u.rad, k=u.rad, L=u.rad)
     def from_equinoctial(
-        cls, attractor, p, f, g, h, k, L, epoch=J2000, plane=Planes.EARTH_EQUATOR
+        cls,
+        attractor,
+        p,
+        f,
+        g,
+        h,
+        k,
+        L,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
     ):
         """Return `Orbit` from modified equinoctial elements.
 
@@ -451,7 +476,9 @@ class Orbit:
             ) from exc
         if body == Moon:
             # TODO: The attractor is in fact the Earth-Moon Barycenter
-            icrs_cart = r.with_differentials(v.represent_as(CartesianDifferential))
+            icrs_cart = r.with_differentials(
+                v.represent_as(CartesianDifferential)
+            )
             gcrs_cart = (
                 ICRS(icrs_cart)
                 .transform_to(GCRS(obstime=epoch))
@@ -467,7 +494,9 @@ class Orbit:
         else:
             # TODO: The attractor is not really the Sun, but the Solar System
             # Barycenter
-            ss = cls.from_vectors(Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.d), epoch)
+            ss = cls.from_vectors(
+                Sun, r.xyz.to(u.km), v.xyz.to(u.km / u.d), epoch
+            )
             ss._frame = ICRS()  # Hack!
 
         return ss
@@ -489,7 +518,9 @@ class Orbit:
             Epoch to retrieve the osculating orbit at.
 
         """
-        return cls.from_vectors(attractor, *ephem.rv(epoch), epoch, ephem.plane)
+        return cls.from_vectors(
+            attractor, *ephem.rv(epoch), epoch, ephem.plane
+        )
 
     def get_frame(self):
         """Get equivalent reference frame of the orbit.
@@ -525,7 +556,9 @@ class Orbit:
             return self
         elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
             r_soi = laplace_radius(new_attractor)
-            barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
+            barycentric_position = get_body_barycentric(
+                new_attractor.name, self.epoch
+            )
             # Transforming new_attractor's frame into frame of attractor
             new_attractor_r = (
                 ICRS(barycentric_position)
@@ -545,7 +578,9 @@ class Orbit:
                 "Orbit is out of new attractor's SOI. If required, use 'force=True'."
             )
         elif self.ecc < 1.0 and not force:
-            raise ValueError("Orbit will never leave the SOI of its current attractor")
+            raise ValueError(
+                "Orbit will never leave the SOI of its current attractor"
+            )
         else:
             warn(
                 "Leaving the SOI of the current attractor",
@@ -619,7 +654,9 @@ class Orbit:
                 objects_name_in_str += i + "\n"
 
             raise ValueError(
-                str(obj["count"]) + " different objects found: \n" + objects_name_in_str
+                str(obj["count"])
+                + " different objects found: \n"
+                + objects_name_in_str
             )
 
         if "object" not in obj.keys():
@@ -809,7 +846,9 @@ class Orbit:
         nu = arglat - argp
         r_pericenter = (1 - ecc) * a_sync
         if r_pericenter < attractor.R:
-            raise ValueError("The orbit for the given parameters doesn't exist")
+            raise ValueError(
+                "The orbit for the given parameters doesn't exist"
+            )
 
         return cls.from_classical(
             attractor=attractor,
@@ -874,12 +913,15 @@ class Orbit:
         """
         # Temporary fix: raan_from_ltan works only for Earth
         if attractor.name.lower() != "earth":
-            raise NotImplementedError("Attractors other than Earth not supported yet")
+            raise NotImplementedError(
+                "Attractors other than Earth not supported yet"
+            )
 
         mean_elements = get_mean_elements(attractor)
 
         n_sunsync = (
-            np.sqrt(mean_elements.attractor.k / abs(mean_elements.a ** 3)) * u.one
+            np.sqrt(mean_elements.attractor.k / abs(mean_elements.a**3))
+            * u.one
         ).decompose()
         R_SSO = attractor.R
         k_SSO = attractor.k
@@ -896,17 +938,17 @@ class Orbit:
                     # Semi-major axis is the unknown variable
                     a = (
                         -3
-                        * R_SSO ** 2
+                        * R_SSO**2
                         * J2_SSO
                         * np.sqrt(k_SSO)
-                        / (2 * n_sunsync * (1 - ecc ** 2) ** 2)
+                        / (2 * n_sunsync * (1 - ecc**2) ** 2)
                         * np.cos(inc)
                     ) ** (2 / 7)
                 elif ecc is None and (a is not None) and (inc is not None):
                     # Eccentricity is the unknown variable
                     _ecc_0 = np.sqrt(
                         -3
-                        * R_SSO ** 2
+                        * R_SSO**2
                         * J2_SSO
                         * np.sqrt(k_SSO)
                         * np.cos(inc)
@@ -919,11 +961,13 @@ class Orbit:
                         -2
                         * a ** (7 / 2)
                         * n_sunsync
-                        * (1 - ecc ** 2) ** 2
-                        / (3 * R_SSO ** 2 * J2_SSO * np.sqrt(k_SSO))
+                        * (1 - ecc**2) ** 2
+                        / (3 * R_SSO**2 * J2_SSO * np.sqrt(k_SSO))
                     )
         except FloatingPointError:
-            raise ValueError("No SSO orbit with given parameters can be found.")
+            raise ValueError(
+                "No SSO orbit with given parameters can be found."
+            )
 
         raan = raan_from_ltan(epoch, ltan)
         ss = cls.from_classical(
@@ -943,7 +987,15 @@ class Orbit:
     @classmethod
     @u.quantity_input(p=u.m, inc=u.rad, raan=u.rad, argp=u.rad, nu=u.rad)
     def parabolic(
-        cls, attractor, p, inc, raan, argp, nu, epoch=J2000, plane=Planes.EARTH_EQUATOR
+        cls,
+        attractor,
+        p,
+        inc,
+        raan,
+        argp,
+        nu,
+        epoch=J2000,
+        plane=Planes.EARTH_EQUATOR,
     ):
         """Return a parabolic `Orbit`.
 
@@ -967,7 +1019,9 @@ class Orbit:
             Fundamental plane of the frame.
 
         """
-        ss = ClassicalState(attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane)
+        ss = ClassicalState(
+            attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane
+        )
         return cls(ss, epoch)
 
     @classmethod
@@ -1057,7 +1111,10 @@ class Orbit:
             )
 
         critical_argps = [np.pi / 2, 3 * np.pi / 2] * u.rad
-        critical_inclinations = [63.4349 * np.pi / 180, 116.5651 * np.pi / 180] * u.rad
+        critical_inclinations = [
+            63.4349 * np.pi / 180,
+            116.5651 * np.pi / 180,
+        ] * u.rad
         try:
             if 1 <= np.abs(attractor.J2 / attractor.J3) <= 10:
                 raise NotImplementedError(
@@ -1098,7 +1155,9 @@ class Orbit:
                 )
 
             inc = critical_inclinations[0] if inc is None else inc
-            critical_inclination = find_closest_value(inc, critical_inclinations)
+            critical_inclination = find_closest_value(
+                inc, critical_inclinations
+            )
             if np.isclose(inc, critical_inclination, 1e-8, 1e-5 * u.rad):
                 ecc = get_eccentricity_critical_inc(ecc)
                 return cls.from_classical(
@@ -1264,13 +1323,17 @@ class Orbit:
             New orbit after propagation.
 
         """
-        if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
+        if isinstance(value, time.Time) and not isinstance(
+            value, time.TimeDelta
+        ):
             time_of_flight = value - self.epoch
         else:
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+        cartesian = propagate(
+            self, time_of_flight, method=method, rtol=rtol, **kwargs
+        )
         new_epoch = self.epoch + time_of_flight
 
         return self.from_vectors(
@@ -1302,7 +1365,7 @@ class Orbit:
             delta_t_from_nu_fast(
                 nu.to_value(u.rad),
                 self.ecc.value,
-                self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+                self.attractor.k.to_value(u.km**3 / u.s**2),
                 self.r_p.to_value(u.km),
             )
             * u.s
@@ -1357,18 +1420,28 @@ class Orbit:
         # the arc cosine, which is in the range [0, 180)
         # Start from -nu_limit
         wrapped_nu = Angle(self.nu).wrap_at(180 * u.deg)
-        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
+        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(
+            u.rad
+        )
 
         limits = [
-            min_anomaly.to_value(u.rad) if min_anomaly is not None else -nu_limit,
-            max_anomaly.to_value(u.rad) if max_anomaly is not None else nu_limit,
+            min_anomaly.to_value(u.rad)
+            if min_anomaly is not None
+            else -nu_limit,
+            max_anomaly.to_value(u.rad)
+            if max_anomaly is not None
+            else nu_limit,
         ] * u.rad  # type: u.Quantity
 
         # Now we check that none of the provided values
         # is outside of the hyperbolic range
         nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
         if not Angle(limits).is_within_bounds(-nu_max, nu_max):
-            warn("anomaly outside range, clipping", OrbitSamplingWarning, stacklevel=2)
+            warn(
+                "anomaly outside range, clipping",
+                OrbitSamplingWarning,
+                stacklevel=2,
+            )
             limits = limits.clip(-nu_max, nu_max)
 
         nu_values = np.linspace(*limits, values)  # type: ignore
@@ -1423,7 +1496,7 @@ class Orbit:
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
-            np.full(n, self.attractor.k.to_value(u.m ** 3 / u.s ** 2)),
+            np.full(n, self.attractor.k.to_value(u.m**3 / u.s**2)),
             np.full(n, self.p.to_value(u.m)),
             np.full(n, self.ecc.value),
             np.full(n, self.inc.to_value(u.rad)),
@@ -1465,7 +1538,11 @@ class Orbit:
             r, v = orbit_new.rv()
             vnew = v + delta_v
             orbit_new = self.from_vectors(
-                attractor=attractor, r=r, v=vnew, epoch=orbit_new.epoch, plane=plane
+                attractor=attractor,
+                r=r,
+                v=vnew,
+                epoch=orbit_new.epoch,
+                plane=plane,
             )
             if intermediate:  # Avoid keeping them in memory.
                 states.append(orbit_new)

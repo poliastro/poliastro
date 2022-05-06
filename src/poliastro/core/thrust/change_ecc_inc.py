@@ -31,7 +31,11 @@ def beta(ecc_0, ecc_f, inc_0, inc_f, argp):
                 * (
                     ecc_0
                     - ecc_f
-                    + np.log((1 + ecc_f) * (-1 + ecc_0) / ((1 + ecc_0) * (-1 + ecc_f)))
+                    + np.log(
+                        (1 + ecc_f)
+                        * (-1 + ecc_0)
+                        / ((1 + ecc_0) * (-1 + ecc_f))
+                    )
                 )
             )
         )
@@ -41,7 +45,12 @@ def beta(ecc_0, ecc_f, inc_0, inc_f, argp):
 @jit
 def delta_V(V_0, ecc_0, ecc_f, beta_):
     """Compute required increment of velocity."""
-    return 2 * V_0 * np.abs(np.arcsin(ecc_0) - np.arcsin(ecc_f)) / (3 * np.cos(beta_))
+    return (
+        2
+        * V_0
+        * np.abs(np.arcsin(ecc_0) - np.arcsin(ecc_f))
+        / (3 * np.cos(beta_))
+    )
 
 
 @jit
