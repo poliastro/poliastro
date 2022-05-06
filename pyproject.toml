@@ -41,7 +41,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
 dependencies = [
-    "astropy >=3.2,<5",
+    "astropy >=3.2,<6",
     "astroquery >=0.3.9",
     "cached_property ; python_version<'3.8'",
     "jplephem",
