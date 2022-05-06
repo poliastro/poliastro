@@ -10,6 +10,8 @@ from astropy.coordinates import (
     get_body_barycentric,
 )
 
+from poliastro.bodies import Earth
+from poliastro.core.events import elevation_function as elevation_function_fast
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.elements import (
@@ -683,3 +685,41 @@ class Orbit(OrbitCreationMixin):
             from poliastro.plotting.interactive import OrbitPlotter2D
 
             return OrbitPlotter2D().plot(self, label=label)
+
+    def elevation(self, lat, theta, h):
+        """
+        lat: astropy.units.Quantity
+            Latitude of the observation point on the attractor.
+        theta: astropy.units.Quantity
+            Local sideral time of the observation point on the attractor.
+        h: astropy.units.Quantity
+            Height of the station above the attractor.
+        Returns
+        -------
+        elevation: astropy.units.Quantity
+            Elevation of the orbit with respect to a location on attractor, in units of radian.
+        Notes
+        -----
+        Local sideral time needs to be precomputed. If Earth is the attractor, it can
+        be computed using `poliastro.earth.util.get_local_sidereal_time`.
+        """
+        if self.attractor != Earth:
+            raise NotImplementedError(
+                "Elevation implementation is currently only supported for orbits having Earth as the attractor."
+            )
+
+        x, y, z = self.r.to_value(u.km)
+        vx, vy, vz = self.v.to_value(u.km / u.s)
+        u_ = np.array([x, y, z, vx, vy, vz])
+
+        elevation = elevation_function_fast(
+            self.attractor.k.to_value(u.km**3 / u.s**2),
+            u_,
+            lat.to_value(u.rad),
+            theta.to_value(u.rad),
+            self.attractor.R.to(u.km).value,
+            self.attractor.R_polar.to(u.km).value,
+            h.to_value(u.km),
+        )
+
+        return elevation << u.rad
