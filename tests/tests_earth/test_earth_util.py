@@ -2,7 +2,7 @@ from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 
-from poliastro.earth.util import raan_from_ltan
+from poliastro.earth.util import get_local_sidereal_time, raan_from_ltan
 
 
 def test_raan_from_ltan_metopb():
@@ -44,3 +44,14 @@ def test_raan_from_ltan_sentinel5p():
     assert_quantity_allclose(
         raan.wrap_at(360 * u.deg), expected_raan, atol=0.3 * u.deg
     )
+
+
+def test_local_sidereal_time():
+    # From Howard Curtis fourth edition example 5.6
+    time = Time("2004-03-03 04:30:00", scale="ut1")
+    lon = 139.80 << u.deg
+
+    lst = get_local_sidereal_time(lon, time)
+    expected_lst = 8.59 << u.deg
+
+    assert_quantity_allclose(expected_lst, lst, atol=1e-2 * u.deg)

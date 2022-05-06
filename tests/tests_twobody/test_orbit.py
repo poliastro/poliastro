@@ -1364,3 +1364,40 @@ def test_propagation_near_parabolic_orbits_does_not_hang(near_parabolic):
     assert_quantity_allclose(
         (orb_final.epoch - near_parabolic.epoch).to(u.s), near_parabolic.period
     )
+
+def test_orbit_elevation():
+    # From example 5.9 Howard Curtis fourth edition.
+    r = [-2032.4, 4591.2, -4544.8] << u.km
+    v = [100, 50, 100] << u.km / u.s  # Not relevant for elevation calculation.
+    epoch = Time("2022-01-01")  # Not relevant.
+    body = Earth
+    orbit = Orbit.from_vectors(body, r, v, epoch)
+
+    lat = -40 << u.deg
+    theta = 110 << u.deg  # Local sidereal time.
+    h = 0 * u.m
+    elevation = orbit.elevation(lat, theta, h)
+
+    expected_elevation = 41.41 << u.deg
+
+    assert_quantity_allclose(elevation, expected_elevation, atol=2e-4 * u.rad)
+
+
+def test_orbit_elevation_works_for_only_earth():
+    r = [-2032.4, 4591.2, -4544.8] << u.km
+    v = [100, 50, 100] << u.km / u.s
+    epoch = Time("2022-01-01")  # Not relevant.
+    body = Mars  # Body which is not Earth.
+    orbit = Orbit.from_vectors(body, r, v, epoch)
+
+    lat = -40 << u.deg
+    theta = 110 << u.deg  # Local sidereal time.
+    h = 0 * u.m
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        orbit.elevation(lat, theta, h)
+    assert excinfo.type == NotImplementedError
+    assert (
+        "Elevation implementation is currently only supported for orbits having Earth as the attractor."
+        in excinfo.exconly()
+    )
