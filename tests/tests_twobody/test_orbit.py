@@ -1365,6 +1365,7 @@ def test_propagation_near_parabolic_orbits_does_not_hang(near_parabolic):
         (orb_final.epoch - near_parabolic.epoch).to(u.s), near_parabolic.period
     )
 
+
 def test_orbit_elevation():
     # From example 5.9 Howard Curtis fourth edition.
     r = [-2032.4, 4591.2, -4544.8] << u.km
