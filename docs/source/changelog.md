@@ -1,5 +1,23 @@
 # What's new
 
+## poliastro 0.16.3 - 2022-05-09
+
+This release adds support for Astropy 5.0
+and fixes some dependency issues.
+
+### Bugs fixed
+
+- Cannot install poliastro on Python 3.10 ({github}`Issue #1496 <#1496>`)
+- Cannot import `poliastro.twobody.Orbit` ({github}`Issue #1493 <#1493>`)
+
+### Contributors
+
+This is the complete list of the people that contributed to this
+release, with a + sign indicating first contribution.
+
+- Jorge Martínez Garrido
+- Juan Luis Cano Rodríguez
+
 ## poliastro 0.16.2 - 2022-02-10
 
 Same as 0.16.1, but fixes the documentation building process.
