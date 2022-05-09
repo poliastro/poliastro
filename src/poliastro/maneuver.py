@@ -100,7 +100,7 @@ class Maneuver:
         rv = orbit_i.rv()
         rv = (rv[0].to_value(u.m), rv[-1].to_value(u.m / u.s))
 
-        k = k.to_value(u.m ** 3 / u.s ** 2)
+        k = k.to_value(u.m**3 / u.s**2)
         r_f = r_f.to_value(u.m)
 
         dv_a, dv_b, t_trans = hohmann_fast(k, rv, r_f)
@@ -138,7 +138,7 @@ class Maneuver:
         rv = orbit_i.rv()
         rv = (rv[0].to_value(u.m), rv[-1].to_value(u.m / u.s))
 
-        k = k.to_value(u.m ** 3 / u.s ** 2)
+        k = k.to_value(u.m**3 / u.s**2)
         r_b = r_b.to_value(u.m)
         r_f = r_f.to_value(u.m)
 
@@ -163,7 +163,9 @@ class Maneuver:
         )
 
     @classmethod
-    def lambert(cls, orbit_i, orbit_f, method=lambert_izzo, short=True, **kwargs):
+    def lambert(
+        cls, orbit_i, orbit_f, method=lambert_izzo, short=True, **kwargs
+    ):
         """Computes Lambert maneuver between two different points.
 
         Parameters
@@ -244,14 +246,16 @@ class Maneuver:
             )
 
         R = orbit.attractor.R.to_value(u.km)
-        k = orbit.attractor.k.to_value(u.km ** 3 / u.s ** 2)
+        k = orbit.attractor.k.to_value(u.km**3 / u.s**2)
         v = orbit.v.value
         a = orbit.a.value
         inc = orbit.inc.value
         ecc = orbit.ecc.value
         max_delta_r = max_delta_r.value
 
-        delta_t, vf_ = correct_pericenter_fast(k, R, J2, max_delta_r, v, a, inc, ecc)
+        delta_t, vf_ = correct_pericenter_fast(
+            k, R, J2, max_delta_r, v, a, inc, ecc
+        )
         delta_t = delta_t * u.s
         vf_ = vf_ * u.km / u.s
 

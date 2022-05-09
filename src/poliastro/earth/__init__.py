@@ -86,7 +86,10 @@ class EarthSatellite:
         def ad(t0, state, k, perturbations):
             if perturbations:
                 return np.sum(
-                    [f(t0=t0, state=state, k=k, **p) for f, p in perturbations.items()],
+                    [
+                        f(t0=t0, state=state, k=k, **p)
+                        for f, p in perturbations.items()
+                    ],
                     axis=0,
                 )
             else:

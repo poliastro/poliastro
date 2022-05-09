@@ -21,9 +21,7 @@ from poliastro.frames.util import get_frame
 from poliastro.twobody.propagation import propagate
 from poliastro.warnings import TimeScaleWarning
 
-EPHEM_FORMAT = (
-    "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
-)
+EPHEM_FORMAT = "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
 
 
 class InterpolationMethods(Enum):
@@ -64,7 +62,12 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
 
         r = get_body_barycentric(body.name, epoch)
         r = (
-            ICRS(x=r.x, y=r.y, z=r.z, representation_type=CartesianRepresentation)
+            ICRS(
+                x=r.x,
+                y=r.y,
+                z=r.z,
+                representation_type=CartesianRepresentation,
+            )
             .transform_to(GCRS(obstime=epoch))
             .represent_as(CartesianRepresentation)
         )
@@ -72,16 +75,22 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5):
         r_values[i] = r.xyz.to(u.km)
 
     t_values = ((t_values - t_span[0]) * u.day).to_value(u.s)
-    return interp1d(t_values, r_values, kind="cubic", axis=0, assume_sorted=True)
+    return interp1d(
+        t_values, r_values, kind="cubic", axis=0, assume_sorted=True
+    )
 
 
-def _interpolate_splines(epochs, reference_epochs, coordinates, *, kind="cubic"):
+def _interpolate_splines(
+    epochs, reference_epochs, coordinates, *, kind="cubic"
+):
     xyz_unit = coordinates.xyz.unit
     d_xyz_unit = coordinates.differentials["s"].d_xyz.unit
 
     # TODO: Avoid building interpolant every time?
     # Does it have a performance impact?
-    interpolant_xyz = interp1d(reference_epochs.jd, coordinates.xyz.value, kind=kind)
+    interpolant_xyz = interp1d(
+        reference_epochs.jd, coordinates.xyz.value, kind=kind
+    )
     interpolant_d_xyz = interp1d(
         reference_epochs.jd,
         coordinates.differentials["s"].d_xyz.value,
@@ -197,7 +206,9 @@ class Ephem:
         return self._plane
 
     @classmethod
-    def from_body(cls, body, epochs, *, attractor=None, plane=Planes.EARTH_EQUATOR):
+    def from_body(
+        cls, body, epochs, *, attractor=None, plane=Planes.EARTH_EQUATOR
+    ):
         """Return `Ephem` for a `SolarSystemPlanet` at certain epochs.
 
         Parameters
@@ -226,7 +237,9 @@ class Ephem:
             )
 
         r, v = get_body_barycentric_posvel(body.name, epochs)
-        coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
+        coordinates = r.with_differentials(
+            v.represent_as(CartesianDifferential)
+        )
 
         destination_frame = _get_destination_frame(attractor, plane, epochs)
 
@@ -335,7 +348,9 @@ class Ephem:
 
         return cls(coordinates, epochs, plane)
 
-    def sample(self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs):
+    def sample(
+        self, epochs=None, *, method=InterpolationMethods.SPLINES, **kwargs
+    ):
         """Returns coordinates at specified epochs.
 
         Parameters

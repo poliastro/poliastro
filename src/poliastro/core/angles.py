@@ -339,8 +339,8 @@ def M_to_D(M):
 
     """
     B = 3.0 * M / 2.0
-    A = (B + (1.0 + B ** 2) ** 0.5) ** (2.0 / 3.0)
-    D = 2 * A * B / (1 + A + A ** 2)
+    A = (B + (1.0 + B**2) ** 0.5) ** (2.0 / 3.0)
+    D = 2 * A * B / (1 + A + A**2)
     return D
 
 
@@ -441,7 +441,7 @@ def D_to_M(D):
     since it is by no means an angle.
 
     """
-    M = D + D ** 3 / 3
+    M = D + D**3 / 3
     return M
 
 

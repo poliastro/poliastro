@@ -21,7 +21,11 @@ def test_flyby_curtis(theta, expected_V_2_v):
 
     expected_delta = 103.6 * u.deg
 
-    V_2_v, delta = compute_flyby(V_1_v, V, Venus.k, Venus.R + periapsis_h, theta)
+    V_2_v, delta = compute_flyby(
+        V_1_v, V, Venus.k, Venus.R + periapsis_h, theta
+    )
 
-    assert_quantity_allclose(V_2_v, expected_V_2_v, rtol=1e-3, atol=1e-15 * u.km / u.s)
+    assert_quantity_allclose(
+        V_2_v, expected_V_2_v, rtol=1e-3, atol=1e-15 * u.km / u.s
+    )
     assert_quantity_allclose(delta, expected_delta, rtol=1e-3)

@@ -44,9 +44,7 @@ github_default_org_project = ("poliastro", "poliastro")
 
 # MathJax config
 # See https://github.com/spatialaudio/nbsphinx/issues/572#issuecomment-853389268
-mathjax_path = (
-    "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-)
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 mathjax2_config = {
     "tex2jax": {
         "inlineMath": [["$", "$"], ["\\(", "\\)"]],
@@ -120,7 +118,10 @@ html_theme = "sphinx_rtd_theme"
 html_context = {
     "sidebar_external_links_caption": "Links",
     "sidebar_external_links": [
-        ('<i class="fa fa-rss fa-fw"></i> Blog', "https://www.poliastro.space"),
+        (
+            '<i class="fa fa-rss fa-fw"></i> Blog',
+            "https://www.poliastro.space",
+        ),
         (
             '<i class="fa fa-github fa-fw"></i> Source code',
             "https://github.com/poliastro/poliastro",
@@ -133,7 +134,10 @@ html_context = {
             '<i class="fa fa-envelope fa-fw"></i> Mailing list',
             "https://groups.io/g/poliastro-dev",
         ),
-        ('<i class="fa fa-comments fa-fw"></i> Chat', "http://chat.poliastro.space"),
+        (
+            '<i class="fa fa-comments fa-fw"></i> Chat',
+            "http://chat.poliastro.space",
+        ),
         (
             '<i class="fa fa-file-text fa-fw"></i> Citation',
             "https://doi.org/10.5281/zenodo.593610",

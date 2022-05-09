@@ -121,7 +121,9 @@ class GroundtrackPlotter:
 
         # Build GCRS and ITRS coordinates
         gcrs_xyz = GCRS(
-            raw_xyz, obstime=raw_obstime, representation_type=CartesianRepresentation
+            raw_xyz,
+            obstime=raw_obstime,
+            representation_type=CartesianRepresentation,
         )
         itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=raw_obstime))
 
@@ -229,7 +231,9 @@ class GroundtrackPlotter:
         # Retrieve basic parameters and check for proper attractor
         ss = earth_ss.orbit
         if ss.attractor != Earth:
-            raise ValueError(f"Satellite should be orbiting Earth, not {ss.attractor}.")
+            raise ValueError(
+                f"Satellite should be orbiting Earth, not {ss.attractor}."
+            )
         else:
             t_deltas = t_span - ss.epoch
 

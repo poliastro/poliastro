@@ -80,7 +80,7 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
     (unless a terminal event is defined) and calculates the other values via dense output.
 
     """
-    k = k.to_value(u.km ** 3 / u.s ** 2)
+    k = k.to_value(u.km**3 / u.s**2)
     x, y, z = r.to_value(u.km)
     vx, vy, vz = v.to_value(u.km / u.s)
     tofs = tofs.to_value(u.s)
@@ -111,7 +111,9 @@ def cowell(k, r, v, tofs, rtol=1e-11, *, events=None, f=func_twobody):
             last_t = max(tofs)
         else:
             # Filter the event which triggered first
-            last_t = min(event.last_t for event in terminal_events).to_value(u.s)
+            last_t = min(event.last_t for event in terminal_events).to_value(
+                u.s
+            )
             tofs = [tof for tof in tofs if tof < last_t] + [last_t]
 
     rrs = []
@@ -147,7 +149,7 @@ def farnocchia(k, r, v, tofs, **kwargs):
         Propagated velocity vectors.
 
     """
-    k = k.to_value(u.km ** 3 / u.s ** 2)
+    k = k.to_value(u.km**3 / u.s**2)
     r0 = r.to_value(u.km)
     v0 = v.to_value(u.km / u.s)
     tofs = tofs.to_value(u.s)
@@ -195,12 +197,14 @@ def vallado(k, r, v, tofs, numiter=350, **kwargs):
     and 85 % faster.
 
     """
-    k = k.to_value(u.km ** 3 / u.s ** 2)
+    k = k.to_value(u.km**3 / u.s**2)
     r0 = r.to_value(u.km)
     v0 = v.to_value(u.km / u.s)
     tofs = tofs.to_value(u.s)
 
-    results = np.array([_kepler(k, r0, v0, tof, numiter=numiter) for tof in tofs])
+    results = np.array(
+        [_kepler(k, r0, v0, tof, numiter=numiter) for tof in tofs]
+    )
     return (
         results[:, 0] << u.km,
         results[:, 1] << u.km / u.s,
@@ -252,7 +256,7 @@ def mikkola(k, r, v, tofs, rtol=None):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -292,7 +296,7 @@ def markley(k, r, v, tofs, rtol=None):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -334,7 +338,7 @@ def pimienta(k, r, v, tofs, rtol=None):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -375,13 +379,16 @@ def gooding(k, r, v, tofs, numiter=150, rtol=1e-8):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
 
     results = np.array(
-        [gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol) for tof in tofs]
+        [
+            gooding_fast(k, r0, v0, tof, numiter=numiter, rtol=rtol)
+            for tof in tofs
+        ]
     )
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
@@ -417,7 +424,7 @@ def danby(k, r, v, tofs, rtol=1e-8):
 
     """
 
-    k = k.to_value(u.m ** 3 / u.s ** 2)
+    k = k.to_value(u.m**3 / u.s**2)
     r0 = r.to_value(u.m)
     v0 = v.to_value(u.m / u.s)
     tofs = tofs.to_value(u.s)
@@ -426,7 +433,9 @@ def danby(k, r, v, tofs, rtol=1e-8):
     return results[:, 0] << u.m, results[:, 1] << u.m / u.s
 
 
-def propagate(orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs):
+def propagate(
+    orbit, time_of_flight, *, method=farnocchia, rtol=1e-10, **kwargs
+):
     """Propagate an orbit some time and return the result.
 
     Parameters
@@ -486,7 +495,14 @@ ELLIPTIC_PROPAGATORS = [
     danby,
     cowell,
 ]
-PARABOLIC_PROPAGATORS = [farnocchia, vallado, mikkola, pimienta, gooding, cowell]
+PARABOLIC_PROPAGATORS = [
+    farnocchia,
+    vallado,
+    mikkola,
+    pimienta,
+    gooding,
+    cowell,
+]
 HYPERBOLIC_PROPAGATORS = [
     farnocchia,
     vallado,

@@ -114,7 +114,7 @@ class ClassicalState(BaseState):
     @property
     def a(self):
         """Semimajor axis."""
-        return self.p / (1 - self.ecc ** 2)
+        return self.p / (1 - self.ecc**2)
 
     @property
     def ecc(self):
@@ -144,7 +144,7 @@ class ClassicalState(BaseState):
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
         r, v = coe2rv(
-            self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+            self.attractor.k.to_value(u.km**3 / u.s**2),
             self.p.to_value(u.km),
             self.ecc.value,
             self.inc.to_value(u.rad),
@@ -221,7 +221,7 @@ class RVState(BaseState):
     def to_classical(self):
         """Converts to classical orbital elements representation."""
         (p, ecc, inc, raan, argp, nu) = rv2coe(
-            self.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+            self.attractor.k.to_value(u.km**3 / u.s**2),
             self.r.to_value(u.km),
             self.v.to_value(u.km / u.s),
         )

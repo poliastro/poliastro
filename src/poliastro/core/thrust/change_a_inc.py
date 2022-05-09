@@ -27,7 +27,8 @@ def beta_0(V_0, V_f, inc_0, inc_f):
     """Compute initial yaw angle (β) as a function of the problem parameters."""
     delta_i_f = abs(inc_f - inc_0)
     return np.arctan2(
-        np.sin(np.pi / 2 * delta_i_f), V_0 / V_f - np.cos(np.pi / 2 * delta_i_f)
+        np.sin(np.pi / 2 * delta_i_f),
+        V_0 / V_f - np.cos(np.pi / 2 * delta_i_f),
     )
 
 

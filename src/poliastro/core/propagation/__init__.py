@@ -53,7 +53,7 @@ def func_twobody(t0, u_, k):
 
     """
     x, y, z, vx, vy, vz = u_
-    r3 = (x ** 2 + y ** 2 + z ** 2) ** 1.5
+    r3 = (x**2 + y**2 + z**2) ** 1.5
 
     du = np.array([vx, vy, vz, -k * x / r3, -k * y / r3, -k * z / r3])
     return du
@@ -131,7 +131,7 @@ def vallado(k, r0, v0, tof, numiter):
     # Cache some results
     dot_r0v0 = np.dot(r0, v0)
     norm_r0 = np.dot(r0, r0) ** 0.5
-    sqrt_mu = k ** 0.5
+    sqrt_mu = k**0.5
     alpha = -np.dot(v0, v0) / k + 2 / norm_r0
 
     # First guess
@@ -147,7 +147,9 @@ def vallado(k, r0, v0, tof, numiter):
                 (-2 * k * alpha * tof)
                 / (
                     dot_r0v0
-                    + np.sign(tof) * np.sqrt(-k / alpha) * (1 - norm_r0 * alpha)
+                    + np.sign(tof)
+                    * np.sqrt(-k / alpha)
+                    * (1 - norm_r0 * alpha)
                 )
             )
         )
@@ -186,10 +188,10 @@ def vallado(k, r0, v0, tof, numiter):
         raise RuntimeError("Maximum number of iterations reached")
 
     # Compute Lagrange coefficients
-    f = 1 - xi ** 2 / norm_r0 * c2_psi
-    g = tof - xi ** 3 / sqrt_mu * c3_psi
+    f = 1 - xi**2 / norm_r0 * c2_psi
+    g = tof - xi**3 / sqrt_mu * c3_psi
 
-    gdot = 1 - xi ** 2 / norm_r * c2_psi
+    gdot = 1 - xi**2 / norm_r * c2_psi
     fdot = sqrt_mu / (norm_r * norm_r0) * xi * (psi * c3_psi - 1)
 
     return f, g, fdot, gdot
@@ -198,7 +200,7 @@ def vallado(k, r0, v0, tof, numiter):
 @jit
 def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
-    a = p / (1 - ecc ** 2)
+    a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(a) ** 3)
 
     # Solve for specific geometrical case
@@ -215,23 +217,23 @@ def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     # Equation (9b)
     if beta >= 0:
-        z = (beta + np.sqrt(beta ** 2 + alpha ** 3)) ** (1 / 3)
+        z = (beta + np.sqrt(beta**2 + alpha**3)) ** (1 / 3)
     else:
-        z = (beta - np.sqrt(beta ** 2 + alpha ** 3)) ** (1 / 3)
+        z = (beta - np.sqrt(beta**2 + alpha**3)) ** (1 / 3)
 
     s = z - alpha / z
 
     # Apply initial correction
     if ecc < 1.0:
-        ds = -0.078 * s ** 5 / (1 + ecc)
+        ds = -0.078 * s**5 / (1 + ecc)
     else:
-        ds = 0.071 * s ** 5 / (1 + 0.45 * s ** 2) / (1 + 4 * s ** 2) / ecc
+        ds = 0.071 * s**5 / (1 + 0.45 * s**2) / (1 + 4 * s**2) / ecc
 
     s += ds
 
     # Solving for the true anomaly
     if ecc < 1.0:
-        E = M + ecc * (3 * s - 4 * s ** 3)
+        E = M + ecc * (3 * s - 4 * s**3)
         f = E - ecc * np.sin(E) - M
         f1 = 1.0 - ecc * np.cos(E)
         f2 = ecc * np.sin(E)
@@ -239,7 +241,7 @@ def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
         f4 = -f2
         f5 = -f3
     else:
-        E = 3 * np.log(s + np.sqrt(1 + s ** 2))
+        E = 3 * np.log(s + np.sqrt(1 + s**2))
         f = -E + ecc * np.sinh(E) - M
         f1 = -1.0 + ecc * np.cosh(E)
         f2 = ecc * np.sinh(E)
@@ -250,9 +252,12 @@ def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
     # Apply Taylor expansion
     u1 = -f / f1
     u2 = -f / (f1 + 0.5 * f2 * u1)
-    u3 = -f / (f1 + 0.5 * f2 * u2 + (1.0 / 6.0) * f3 * u2 ** 2)
+    u3 = -f / (f1 + 0.5 * f2 * u2 + (1.0 / 6.0) * f3 * u2**2)
     u4 = -f / (
-        f1 + 0.5 * f2 * u3 + (1.0 / 6.0) * f3 * u3 ** 2 + (1.0 / 24.0) * f4 * (u3 ** 3)
+        f1
+        + 0.5 * f2 * u3
+        + (1.0 / 6.0) * f3 * u3**2
+        + (1.0 / 24.0) * f4 * (u3**3)
     )
     u5 = -f / (
         f1
@@ -316,30 +321,32 @@ def mikkola(k, r0, v0, tof, rtol=None):
 def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
-    a = p / (1 - ecc ** 2)
-    n = np.sqrt(k / a ** 3)
+    a = p / (1 - ecc**2)
+    n = np.sqrt(k / a**3)
     M = M0 + n * tof
 
     # Range between -pi and pi
     M = (M + np.pi) % (2 * np.pi) - np.pi
 
     # Equation (20)
-    alpha = (3 * np.pi ** 2 + 1.6 * (np.pi - np.abs(M)) / (1 + ecc)) / (np.pi ** 2 - 6)
+    alpha = (3 * np.pi**2 + 1.6 * (np.pi - np.abs(M)) / (1 + ecc)) / (
+        np.pi**2 - 6
+    )
 
     # Equation (5)
     d = 3 * (1 - ecc) + alpha * ecc
 
     # Equation (9)
-    q = 2 * alpha * d * (1 - ecc) - M ** 2
+    q = 2 * alpha * d * (1 - ecc) - M**2
 
     # Equation (10)
-    r = 3 * alpha * d * (d - 1 + ecc) * M + M ** 3
+    r = 3 * alpha * d * (d - 1 + ecc) * M + M**3
 
     # Equation (14)
-    w = (np.abs(r) + np.sqrt(q ** 3 + r ** 2)) ** (2 / 3)
+    w = (np.abs(r) + np.sqrt(q**3 + r**2)) ** (2 / 3)
 
     # Equation (15)
-    E = (2 * r * w / (w ** 2 + w * q + q ** 2) + M) / d
+    E = (2 * r * w / (w**2 + w * q + q**2) + M) / d
 
     # Equation (26)
     f0 = _kepler_equation(E, M, ecc)
@@ -350,9 +357,12 @@ def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     # Equation (22)
     delta3 = -f0 / (f1 - 0.5 * f0 * f2 / f1)
-    delta4 = -f0 / (f1 + 0.5 * delta3 * f2 + 1 / 6 * delta3 ** 2 * f3)
+    delta4 = -f0 / (f1 + 0.5 * delta3 * f2 + 1 / 6 * delta3**2 * f3)
     delta5 = -f0 / (
-        f1 + 0.5 * delta4 * f2 + 1 / 6 * delta4 ** 2 * f3 + 1 / 24 * delta4 ** 3 * f4
+        f1
+        + 0.5 * delta4 * f2
+        + 1 / 6 * delta4**2 * f3
+        + 1 / 24 * delta4**3 * f4
     )
 
     E += delta5
@@ -402,7 +412,7 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
     q = p / (1 + ecc)
 
     # TODO: Do something to increase parabolic accuracy?
-    n = np.sqrt(k * (1 - ecc) ** 3 / q ** 3)
+    n = np.sqrt(k * (1 - ecc) ** 3 / q**3)
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
 
     M = M0 + n * tof
@@ -411,7 +421,7 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
     c3 = 5 / 2 + 560 * ecc
     a = 15 * (1 - ecc) / c3
     b = -M / c3
-    y = np.sqrt(b ** 2 / 4 + a ** 3 / 27)
+    y = np.sqrt(b**2 / 4 + a**3 / 27)
 
     # Equation (33)
     x_bar = (-b / 2 + y) ** (1 / 3) - (b / 2 + y) ** (1 / 3)
@@ -425,7 +435,7 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
     c5 = 9 / 8 - 6048 * ecc
 
     # Precompute x_bar powers, equations (35a) to (35d)
-    x_bar2 = x_bar ** 2
+    x_bar2 = x_bar**2
     x_bar3 = x_bar2 * x_bar
     x_bar4 = x_bar3 * x_bar
     x_bar5 = x_bar4 * x_bar
@@ -527,7 +537,11 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
         + 1.0378368e9 * c13 * x_bar3
         + 39916800 * c11 * x_bar
     )
-    f11 = 5.4486432e10 * c15 * x_bar4 + 3.1135104e9 * c13 * x_bar2 + 39916800 * c11
+    f11 = (
+        5.4486432e10 * c15 * x_bar4
+        + 3.1135104e9 * c13 * x_bar2
+        + 39916800 * c11
+    )
     f12 = 2.17945728e11 * c15 * x_bar3 + 6.2270208e9 * c13 * x_bar
     f13 = 6.53837184 * c15 * x_bar2 + 6.2270208e9 * c13
     f14 = 1.307674368e13 * c15 * x_bar
@@ -555,173 +569,179 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
     h2 = f1 + g1 * u1 * f2
     u2 = -f / h2
 
-    h3 = f1 + g1 * u2 * f2 + g2 * u2 ** 2 * f3
+    h3 = f1 + g1 * u2 * f2 + g2 * u2**2 * f3
     u3 = -f / h3
 
-    h4 = f1 + g1 * u3 * f2 + g2 * u3 ** 2 * f3 + g3 * u3 ** 3 * f4
+    h4 = f1 + g1 * u3 * f2 + g2 * u3**2 * f3 + g3 * u3**3 * f4
     u4 = -f / h4
 
-    h5 = f1 + g1 * u4 * f2 + g2 * u4 ** 2 * f3 + g3 * u4 ** 3 * f4 + g4 * u4 ** 4 * f5
+    h5 = (
+        f1
+        + g1 * u4 * f2
+        + g2 * u4**2 * f3
+        + g3 * u4**3 * f4
+        + g4 * u4**4 * f5
+    )
     u5 = -f / h5
 
     h6 = (
         f1
         + g1 * u5 * f2
-        + g2 * u5 ** 2 * f3
-        + g3 * u5 ** 3 * f4
-        + g4 * u5 ** 4 * f5
-        + g5 * u5 ** 5 * f6
+        + g2 * u5**2 * f3
+        + g3 * u5**3 * f4
+        + g4 * u5**4 * f5
+        + g5 * u5**5 * f6
     )
     u6 = -f / h6
 
     h7 = (
         f1
         + g1 * u6 * f2
-        + g2 * u6 ** 2 * f3
-        + g3 * u6 ** 3 * f4
-        + g4 * u6 ** 4 * f5
-        + g5 * u6 ** 5 * f6
-        + g6 * u6 ** 6 * f7
+        + g2 * u6**2 * f3
+        + g3 * u6**3 * f4
+        + g4 * u6**4 * f5
+        + g5 * u6**5 * f6
+        + g6 * u6**6 * f7
     )
     u7 = -f / h7
 
     h8 = (
         f1
         + g1 * u7 * f2
-        + g2 * u7 ** 2 * f3
-        + g3 * u7 ** 3 * f4
-        + g4 * u7 ** 4 * f5
-        + g5 * u7 ** 5 * f6
-        + g6 * u7 ** 6 * f7
-        + g7 * u7 ** 7 * f8
+        + g2 * u7**2 * f3
+        + g3 * u7**3 * f4
+        + g4 * u7**4 * f5
+        + g5 * u7**5 * f6
+        + g6 * u7**6 * f7
+        + g7 * u7**7 * f8
     )
     u8 = -f / h8
 
     h9 = (
         f1
         + g1 * u8 * f2
-        + g2 * u8 ** 2 * f3
-        + g3 * u8 ** 3 * f4
-        + g4 * u8 ** 4 * f5
-        + g5 * u8 ** 5 * f6
-        + g6 * u8 ** 6 * f7
-        + g7 * u8 ** 7 * f8
-        + g8 * u8 ** 8 * f9
+        + g2 * u8**2 * f3
+        + g3 * u8**3 * f4
+        + g4 * u8**4 * f5
+        + g5 * u8**5 * f6
+        + g6 * u8**6 * f7
+        + g7 * u8**7 * f8
+        + g8 * u8**8 * f9
     )
     u9 = -f / h9
 
     h10 = (
         f1
         + g1 * u9 * f2
-        + g2 * u9 ** 2 * f3
-        + g3 * u9 ** 3 * f4
-        + g4 * u9 ** 4 * f5
-        + g5 * u9 ** 5 * f6
-        + g6 * u9 ** 6 * f7
-        + g7 * u9 ** 7 * f8
-        + g8 * u9 ** 8 * f9
-        + g9 * u9 ** 9 * f10
+        + g2 * u9**2 * f3
+        + g3 * u9**3 * f4
+        + g4 * u9**4 * f5
+        + g5 * u9**5 * f6
+        + g6 * u9**6 * f7
+        + g7 * u9**7 * f8
+        + g8 * u9**8 * f9
+        + g9 * u9**9 * f10
     )
     u10 = -f / h10
 
     h11 = (
         f1
         + g1 * u10 * f2
-        + g2 * u10 ** 2 * f3
-        + g3 * u10 ** 3 * f4
-        + g4 * u10 ** 4 * f5
-        + g5 * u10 ** 5 * f6
-        + g6 * u10 ** 6 * f7
-        + g7 * u10 ** 7 * f8
-        + g8 * u10 ** 8 * f9
-        + g9 * u10 ** 9 * f10
-        + g10 * u10 ** 10 * f11
+        + g2 * u10**2 * f3
+        + g3 * u10**3 * f4
+        + g4 * u10**4 * f5
+        + g5 * u10**5 * f6
+        + g6 * u10**6 * f7
+        + g7 * u10**7 * f8
+        + g8 * u10**8 * f9
+        + g9 * u10**9 * f10
+        + g10 * u10**10 * f11
     )
     u11 = -f / h11
 
     h12 = (
         f1
         + g1 * u11 * f2
-        + g2 * u11 ** 2 * f3
-        + g3 * u11 ** 3 * f4
-        + g4 * u11 ** 4 * f5
-        + g5 * u11 ** 5 * f6
-        + g6 * u11 ** 6 * f7
-        + g7 * u11 ** 7 * f8
-        + g8 * u11 ** 8 * f9
-        + g9 * u11 ** 9 * f10
-        + g10 * u11 ** 10 * f11
-        + g11 * u11 ** 11 * f12
+        + g2 * u11**2 * f3
+        + g3 * u11**3 * f4
+        + g4 * u11**4 * f5
+        + g5 * u11**5 * f6
+        + g6 * u11**6 * f7
+        + g7 * u11**7 * f8
+        + g8 * u11**8 * f9
+        + g9 * u11**9 * f10
+        + g10 * u11**10 * f11
+        + g11 * u11**11 * f12
     )
     u12 = -f / h12
 
     h13 = (
         f1
         + g1 * u12 * f2
-        + g2 * u12 ** 2 * f3
-        + g3 * u12 ** 3 * f4
-        + g4 * u12 ** 4 * f5
-        + g5 * u12 ** 5 * f6
-        + g6 * u12 ** 6 * f7
-        + g7 * u12 ** 7 * f8
-        + g8 * u12 ** 8 * f9
-        + g9 * u12 ** 9 * f10
-        + g10 * u12 ** 10 * f11
-        + g11 * u12 ** 11 * f12
-        + g12 * u12 ** 12 * f13
+        + g2 * u12**2 * f3
+        + g3 * u12**3 * f4
+        + g4 * u12**4 * f5
+        + g5 * u12**5 * f6
+        + g6 * u12**6 * f7
+        + g7 * u12**7 * f8
+        + g8 * u12**8 * f9
+        + g9 * u12**9 * f10
+        + g10 * u12**10 * f11
+        + g11 * u12**11 * f12
+        + g12 * u12**12 * f13
     )
     u13 = -f / h13
 
     h14 = (
         f1
         + g1 * u13 * f2
-        + g2 * u13 ** 2 * f3
-        + g3 * u13 ** 3 * f4
-        + g4 * u13 ** 4 * f5
-        + g5 * u13 ** 5 * f6
-        + g6 * u13 ** 6 * f7
-        + g7 * u13 ** 7 * f8
-        + g8 * u13 ** 8 * f9
-        + g9 * u13 ** 9 * f10
-        + g10 * u13 ** 10 * f11
-        + g11 * u13 ** 11 * f12
-        + g12 * u13 ** 12 * f13
-        + g13 * u13 ** 13 * f14
+        + g2 * u13**2 * f3
+        + g3 * u13**3 * f4
+        + g4 * u13**4 * f5
+        + g5 * u13**5 * f6
+        + g6 * u13**6 * f7
+        + g7 * u13**7 * f8
+        + g8 * u13**8 * f9
+        + g9 * u13**9 * f10
+        + g10 * u13**10 * f11
+        + g11 * u13**11 * f12
+        + g12 * u13**12 * f13
+        + g13 * u13**13 * f14
     )
     u14 = -f / h14
 
     h15 = (
         f1
         + g1 * u14 * f2
-        + g2 * u14 ** 2 * f3
-        + g3 * u14 ** 3 * f4
-        + g4 * u14 ** 4 * f5
-        + g5 * u14 ** 5 * f6
-        + g6 * u14 ** 6 * f7
-        + g7 * u14 ** 7 * f8
-        + g8 * u14 ** 8 * f9
-        + g9 * u14 ** 9 * f10
-        + g10 * u14 ** 10 * f11
-        + g11 * u14 ** 11 * f12
-        + g12 * u14 ** 12 * f13
-        + g13 * u14 ** 13 * f14
-        + g14 * u14 ** 14 * f15
+        + g2 * u14**2 * f3
+        + g3 * u14**3 * f4
+        + g4 * u14**4 * f5
+        + g5 * u14**5 * f6
+        + g6 * u14**6 * f7
+        + g7 * u14**7 * f8
+        + g8 * u14**8 * f9
+        + g9 * u14**9 * f10
+        + g10 * u14**10 * f11
+        + g11 * u14**11 * f12
+        + g12 * u14**12 * f13
+        + g13 * u14**13 * f14
+        + g14 * u14**14 * f15
     )
     u15 = -f / h15
 
     # Solving for x
     x = x_bar + u15
-    w = x - 0.01171875 * x ** 17 / (1 + ecc)
+    w = x - 0.01171875 * x**17 / (1 + ecc)
 
     # Solving for the true anomaly from eccentricity anomaly
     E = M + ecc * (
-        -16384 * w ** 15
-        + 61440 * w ** 13
-        - 92160 * w ** 11
-        + 70400 * w ** 9
-        - 28800 * w ** 7
-        + 6048 * w ** 5
-        - 560 * w ** 3
+        -16384 * w**15
+        + 61440 * w**13
+        - 92160 * w**11
+        + 70400 * w**9
+        - 28800 * w**7
+        + 6048 * w**5
+        - 560 * w**3
         + 15 * w
     )
 
@@ -776,7 +796,7 @@ def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=150, rtol=1e-8):
         )
 
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
-    semi_axis_a = p / (1 - ecc ** 2)
+    semi_axis_a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
     M = M0 + n * tof
 
@@ -784,15 +804,15 @@ def gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=150, rtol=1e-8):
     n = 0
     c = ecc * np.cos(M)
     s = ecc * np.sin(M)
-    psi = s / np.sqrt(1 - 2 * c + ecc ** 2)
+    psi = s / np.sqrt(1 - 2 * c + ecc**2)
     f = 1.0
-    while f ** 2 >= rtol and n <= numiter:
+    while f**2 >= rtol and n <= numiter:
         xi = np.cos(psi)
         eta = np.sin(psi)
         fd = (1 - c * xi) + s * eta
         fdd = c * eta + s * xi
         f = psi - fdd
-        psi = psi - f * fd / (fd ** 2 - 0.5 * f * fdd)
+        psi = psi - f * fd / (fd**2 - 0.5 * f * fdd)
         n += 1
 
     E = M + psi
@@ -841,7 +861,7 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
 @jit
 def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
 
-    semi_axis_a = p / (1 - ecc ** 2)
+    semi_axis_a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
 
     if ecc == 0:
@@ -887,10 +907,10 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
         if np.abs(f) <= rtol:
 
             if ecc < 1.0:
-                sta = np.sqrt(1 - ecc ** 2) * np.sin(E)
+                sta = np.sqrt(1 - ecc**2) * np.sin(E)
                 cta = np.cos(E) - ecc
             else:
-                sta = np.sqrt(ecc ** 2 - 1) * np.sinh(E)
+                sta = np.sqrt(ecc**2 - 1) * np.sinh(E)
                 cta = ecc - np.cosh(E)
 
             nu = np.arctan2(sta, cta)
@@ -898,7 +918,9 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
         else:
             delta = -f / fp
             delta_star = -f / (fp + 0.5 * delta * fpp)
-            deltak = -f / (fp + 0.5 * delta_star * fpp + delta_star ** 2 * fppp / 6)
+            deltak = -f / (
+                fp + 0.5 * delta_star * fpp + delta_star**2 * fppp / 6
+            )
             E = E + deltak
             n += 1
     else:

@@ -64,12 +64,12 @@ class _PlanetaryFixed(BaseRADecFrame):
     obstime = TimeAttribute(default=DEFAULT_OBSTIME)
 
     def __new__(cls, *args, **kwargs):
-        frame_transform_graph.transform(FunctionTransform, cls, cls.equatorial)(
-            cls.to_equatorial
-        )
-        frame_transform_graph.transform(FunctionTransform, cls.equatorial, cls)(
-            cls.from_equatorial
-        )
+        frame_transform_graph.transform(
+            FunctionTransform, cls, cls.equatorial
+        )(cls.to_equatorial)
+        frame_transform_graph.transform(
+            FunctionTransform, cls.equatorial, cls
+        )(cls.from_equatorial)
 
         return super().__new__(cls)
 
@@ -103,7 +103,9 @@ class _PlanetaryFixed(BaseRADecFrame):
             raise ValueError(
                 f"Equatorial coordinates must be of type `HCRS`, got `{type(equatorial_coo)}` instead."
             )
-        elif fixed_frame.body != Sun and equatorial_coo.body != fixed_frame.body:
+        elif (
+            fixed_frame.body != Sun and equatorial_coo.body != fixed_frame.body
+        ):
             raise ValueError(
                 "Fixed and equatorial coordinates must have the same body if the fixed frame body is not Sun"
             )

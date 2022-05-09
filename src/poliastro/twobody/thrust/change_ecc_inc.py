@@ -1,6 +1,8 @@
 from astropy import units as u
 
-from poliastro.core.thrust.change_ecc_inc import change_ecc_inc as change_ecc_inc_fast
+from poliastro.core.thrust.change_ecc_inc import (
+    change_ecc_inc as change_ecc_inc_fast,
+)
 
 
 def change_ecc_inc(ss_0, ecc_f, inc_f, f):
@@ -27,7 +29,7 @@ def change_ecc_inc(ss_0, ecc_f, inc_f, f):
     """
     r, v = ss_0.rv()
     a_d, delta_V, t_f = change_ecc_inc_fast(
-        k=ss_0.attractor.k.to_value(u.km ** 3 / u.s ** 2),
+        k=ss_0.attractor.k.to_value(u.km**3 / u.s**2),
         a=ss_0.a.to_value(u.km),
         ecc_0=ss_0.ecc.value,
         ecc_f=ecc_f,
@@ -36,6 +38,6 @@ def change_ecc_inc(ss_0, ecc_f, inc_f, f):
         argp=ss_0.argp.to_value(u.rad),
         r=r.to_value(u.km),
         v=v.to_value(u.km / u.s),
-        f=f.to_value(u.km / u.s ** 2),
+        f=f.to_value(u.km / u.s**2),
     )
     return a_d, delta_V << (u.km / u.s), t_f << u.s

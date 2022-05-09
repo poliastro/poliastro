@@ -69,9 +69,9 @@ def rv_pqw(k, p, ecc, nu):
     v = [-5753.30180931 -1328.66813933  0] [m]/[s]
 
     """
-    pqw = np.array([[cos(nu), sin(nu), 0], [-sin(nu), ecc + cos(nu), 0]]) * np.array(
-        [[p / (1 + ecc * cos(nu))], [sqrt(k / p)]]
-    )
+    pqw = np.array(
+        [[cos(nu), sin(nu), 0], [-sin(nu), ecc + cos(nu), 0]]
+    ) * np.array([[p / (1 + ecc * cos(nu))], [sqrt(k / p)]])
     return pqw
 
 
@@ -148,7 +148,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     return ijk
 
 
-@jit(parallel=sys.maxsize > 2 ** 31)
+@jit(parallel=sys.maxsize > 2**31)
 def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
 
     n = nu.shape[0]
@@ -156,7 +156,9 @@ def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
     vv = np.zeros((n, 3))
 
     for i in prange(n):
-        rr[i, :], vv[i, :] = coe2rv(k[i], p[i], ecc[i], inc[i], raan[i], argp[i], nu[i])
+        rr[i, :], vv[i, :] = coe2rv(
+            k[i], p[i], ecc[i], inc[i], raan[i], argp[i], nu[i]
+        )
 
     return rr, vv
 
@@ -362,7 +364,7 @@ def rv2coe(k, r, v, tol=1e-8):
         argp = 0
         nu = np.arctan2(r[1], r[0]) % (2 * np.pi)  # True longitude
     else:
-        a = p / (1 - (ecc ** 2))
+        a = p / (1 - (ecc**2))
         ka = k * a
         if a > 0:
             e_se = r.dot(v) / sqrt(ka)
@@ -438,8 +440,8 @@ def mee2coe(p, f, g, h, k, L):
     arguments.
 
     """
-    ecc = np.sqrt(f ** 2 + g ** 2)
-    inc = 2 * np.arctan(np.sqrt(h ** 2 + k ** 2))
+    ecc = np.sqrt(f**2 + g**2)
+    inc = 2 * np.arctan(np.sqrt(h**2 + k**2))
     lonper = np.arctan2(g, f)
     raan = np.arctan2(k, h) % (2 * np.pi)
     argp = (lonper - raan) % (2 * np.pi)

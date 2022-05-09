@@ -21,7 +21,9 @@ def norm(vec):
     return norm_np(vec.value) * vec.unit
 
 
-def time_range(start, *, periods=50, spacing=None, end=None, format=None, scale=None):
+def time_range(
+    start, *, periods=50, spacing=None, end=None, format=None, scale=None
+):
     """Generates range of astronomical times.
 
     .. versionadded:: 0.8.0
@@ -79,6 +81,8 @@ def alinspace(start, stop=None, *, num=50, endpoint=True):
         stop = start + 2 * np.pi * u.rad
 
     return (
-        alinspace_fast(start.to_value(u.rad), stop.to_value(u.rad), num, endpoint)
+        alinspace_fast(
+            start.to_value(u.rad), stop.to_value(u.rad), num, endpoint
+        )
         * u.rad
     )
