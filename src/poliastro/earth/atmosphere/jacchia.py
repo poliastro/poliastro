@@ -46,7 +46,7 @@ class Jacchia77:
             np.array(CHe) * 1e6 * (u.m) ** -3,
             np.array(CH) * 1e6 * (u.m) ** -3,
             np.array(CM) * 1e6 * (u.m) ** -3,
-            WM * (u.kg),
+            np.array(WM) * 1e-3 * (u.kg / u.mol),
         )
         return (
             self.Z,
@@ -144,5 +144,7 @@ class Jacchia77:
         P = self.pressure(alt)
 
         # using eqn(42) of COESA76
-        rho = P * alt_profile[9] / (R * alt_profile[1])
+        T = alt_profile[1]
+        M = alt_profile[9].to(u.kg / u.mol)
+        rho = P * M / (R * T)
         return rho
