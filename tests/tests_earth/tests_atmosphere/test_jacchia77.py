@@ -6,7 +6,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from poliastro.earth.atmosphere.jacchia import Jacchia77
 
 # SOLUTIONS DIRECTLY TAKEN FROM JACCHIA77 REPORT AND
-# https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/jacchia/jacchia-77/t1000.out
+# https://git.mysmce.com/ccmc-share/modelwebarchive/-/raw/main/Jacchi-Reference-Atmosphere/t1000.out
 jacchia77_solutions = {
     90
     * u.km: [
