@@ -210,14 +210,14 @@ jacchia77_solutions = {
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_jacchia77(z):
     #  Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM)
-    expected_CN2 = jacchia77_solutions[z][1] * (u.m) ** -3
-    expected_CO2 = jacchia77_solutions[z][2] * (u.m) ** -3
-    expected_CO = jacchia77_solutions[z][3] * (u.m) ** -3
-    expected_CAr = jacchia77_solutions[z][4] * (u.m) ** -3
-    expected_CHe = jacchia77_solutions[z][5] * (u.m) ** -3
-    expected_CH = jacchia77_solutions[z][6] * (u.m) ** -3
-    expected_CM = jacchia77_solutions[z][7] * (u.m) ** -3
-    expected_WM = jacchia77_solutions[z][8] * (u.kg)
+    expected_CN2 = jacchia77_solutions[z][1] << (u.m**-3)
+    expected_CO2 = jacchia77_solutions[z][2] << (u.m**-3)
+    expected_CO = jacchia77_solutions[z][3] << (u.m**-3)
+    expected_CAr = jacchia77_solutions[z][4] << (u.m**-3)
+    expected_CHe = jacchia77_solutions[z][5] << (u.m**-3)
+    expected_CH = jacchia77_solutions[z][6] << (u.m**-3)
+    expected_CM = jacchia77_solutions[z][7] << (u.m**-3)
+    expected_WM = jacchia77_solutions[z][8] << (u.kg / u.kmol)
 
     properties = Jacchia77(1000 * u.K).altitude_profile(z)
 
@@ -258,11 +258,9 @@ def test_pressure(z):
 
 @pytest.mark.parametrize("z", jacchia77_solutions.keys())
 def test_density(z):
-    expected_rho = jacchia77_solutions[z][10] * (
-        u.kg**2 * u.mol * u.K**-1 * u.m**-3
-    )
+    expected_rho = jacchia77_solutions[z][10] << (u.kg / u.m**3)
     density = Jacchia77(1000 * u.K).density(z)
-    rho = np.log10(density.value) * density.unit
+    rho = np.log10(density.value) << density.unit
 
     assert_quantity_allclose(rho, expected_rho, rtol=1e-2)
 
