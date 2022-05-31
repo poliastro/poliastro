@@ -151,7 +151,7 @@ def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
     A_over_m : float
         Frontal area/mass of the spacecraft (km^2/kg)
     rho : float
-        Air density at corresponding state (kg/m^3)
+        Air density at corresponding state (kg/km^3)
 
     Notes
     -----
