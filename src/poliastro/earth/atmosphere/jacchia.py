@@ -5,10 +5,17 @@ from poliastro.core.earth_atmosphere.jacchia import (
     _altitude_profile as _altitude_profile_fast,
     _H_correction as _H_correction_fast,
     _O_and_O2_correction as _O_and_O2_correction_fast,
+    wmAr,
+    wmH,
+    wmHe,
+    wmN2,
+    wmO,
+    wmO2,
 )
 
 R = 8314.32 * u.J / (u.K * u.kmol)
 k = 1.380622e-23 * u.J / u.K
+Na = R / k
 
 
 class Jacchia77:
@@ -140,11 +147,17 @@ class Jacchia77:
         rho: ~astropy.units.Quantity
             Density at given altitude and exospheric temperature.
         """
-        alt_profile = self.altitude_profile(alt)
-        P = self.pressure(alt)
+        (Z, T, CN2, CO2, CO, CAr, CHe, CH, CM, WM) = self.altitude_profile(alt)
 
-        # using eqn(42) of COESA76
-        T = alt_profile[1]
-        M = alt_profile[9].to(u.kg / u.mol)
-        rho = P * M / (R * T)
-        return rho
+        # using eqn(42) of COESA for multiple gases
+        M_i = [wmN2, wmO2, wmO, wmAr, wmHe, wmH] << (u.g / u.mol)
+        n_i = [
+            CN2.to_value(u.m**-3),
+            CO2.to_value(u.m**-3),
+            CO.to_value(u.m**-3),
+            CAr.to_value(u.m**-3),
+            CHe.to_value(u.m**-3),
+            CH.to_value(u.m**-3),
+        ] << (1 / u.m**3)
+        rho = (n_i @ M_i) / Na
+        return rho.to(u.kg / u.m**3)
