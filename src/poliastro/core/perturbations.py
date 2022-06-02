@@ -223,7 +223,7 @@ def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
     A_over_m : float
         Effective spacecraft area/mass of the spacecraft (km^2/kg).
     Wdivc_s : float
-        Total star emitted power divided by the speed of light (W * s / km).
+        Total star emitted power divided by the speed of light (kg km/s^2).
     star : callable
         A callable object returning the position of radiating star
         in the attractor frame.
