@@ -46,8 +46,8 @@ dependencies = [
     "cached_property ; python_version<'3.8'",
     "jplephem",
     "matplotlib >=2.0,!=3.0.1",
-    "numba >=0.46 ; python_version<'3.9'",
-    "numba >=0.53.0 ; python_version>='3.9'",
+    "numba >=0.46,!=0.55.2 ; python_version<'3.9'",  # https://github.com/poliastro/poliastro/pull/1512
+    "numba >=0.53.0,!=0.55.2 ; python_version>='3.9'",  # https://github.com/poliastro/poliastro/pull/1512
     "numpy",
     "pandas",
     "plotly >=4.0,<6",
