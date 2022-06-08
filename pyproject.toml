@@ -48,7 +48,7 @@ dependencies = [
     "matplotlib >=2.0,!=3.0.1",
     "numba >=0.46 ; python_version<'3.9'",
     "numba >=0.53.0 ; python_version>='3.9'",
-    "numpy",
+    "numpy <1.22",  # https://github.com/numba/numba/issues/8141
     "pandas",
     "plotly >=4.0,<6",
     "pyerfa",
