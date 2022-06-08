@@ -95,8 +95,8 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy-1.8.0/html-scipyorg/", None),
-    "matplotlib": ("https://matplotlib.org", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy-1.8.0/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
 }
 
 # Warning suppresses
