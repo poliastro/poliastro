@@ -1,6 +1,7 @@
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_sun
+from astropy.time import Time
 
 from poliastro import constants
 from poliastro.util import wrap_angle
@@ -66,3 +67,28 @@ def raan_from_ltan(epoch, ltan=12.0):
     # Use the mean sun local time calculate needed RAAN for given LTAN
     raan = smlt + alpha
     return raan
+
+
+def get_local_sidereal_time(lon, time):
+    """Gets the local sideral time from input location.
+
+    Parameters
+    ----------
+    lon: astropy.units.Quantity
+        East longitude of a point on a body.
+    time: astropy.time.Time
+        Time at which to calculate the local sidereal time.
+
+    Returns
+    -------
+    theta: astropy.units.Quantity
+        Local Sidereal Time (LST).
+    """
+    current_time = Time(time, scale="utc")
+
+    # Local sidereal time = Greenwich Mean Sidereal time + East longitude of station.
+    # theta must be in [0, 360] degree range.
+    theta = current_time.sidereal_time("mean", "greenwich") + lon
+    if theta < (0 << u.deg) or theta > (360 << u.deg):
+        theta = wrap_angle(theta, limit=360 << u.deg)
+    return theta
