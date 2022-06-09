@@ -688,16 +688,22 @@ class Orbit(OrbitCreationMixin):
 
     def elevation(self, lat, theta, h):
         """
+        Elevation
+
+        Parameters
+        ----------
         lat: astropy.units.Quantity
             Latitude of the observation point on the attractor.
         theta: astropy.units.Quantity
             Local sideral time of the observation point on the attractor.
         h: astropy.units.Quantity
             Height of the station above the attractor.
+
         Returns
         -------
         elevation: astropy.units.Quantity
             Elevation of the orbit with respect to a location on attractor, in units of radian.
+
         Notes
         -----
         Local sideral time needs to be precomputed. If Earth is the attractor, it can
