@@ -71,12 +71,14 @@ def raan_from_ltan(epoch, ltan=12.0):
 
 def get_local_sidereal_time(lon, time):
     """Gets the local sideral time from input location.
+
     Parameters
     ----------
     lon: astropy.units.Quantity
         East longitude of a point on a body.
     time: astropy.time.Time
         Time at which to calculate the local sidereal time.
+
     Returns
     -------
     theta: astropy.units.Quantity
