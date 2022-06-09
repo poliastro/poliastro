@@ -76,18 +76,21 @@ def spherical_to_cartesian(v):
 def planetocentric_to_AltAz(theta, phi):
     r"""Defines transformation matrix to convert from Planetocentric coordinate system
     to the Altitude-Azimuth system.
+
     .. math::
        t\_matrix = \begin{bmatrix}
        -\sin(theta) & \cos(theta) & 0\\
        -\sin(phi)\cdot\cos(theta) & -\sin(phi)\cdot\sin(theta) & \cos(phi)\\
        \cos(phi)\cdot\cos(theta) & \cos(phi)\cdot\sin(theta) & \sin(phi)
        \end{bmatrix}
+
     Parameters
     ----------
     theta: float
         Local sidereal time
     phi: float
         Planetodetic latitude
+
     Returns
     -------
     t_matrix: numpy.ndarray
