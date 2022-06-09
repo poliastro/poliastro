@@ -94,6 +94,7 @@ def line_of_sight(r1, r2, R):
 def elevation_function(k, u_, phi, theta, R, R_p, H):
     """Calculates the elevation angle of an object in orbit with respect to
     a location on attractor.
+
     Parameters
     ----------
     k: float
