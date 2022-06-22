@@ -24,10 +24,10 @@ from poliastro.twobody.elements import (
 )
 from poliastro.twobody.orbit.creation import OrbitCreationMixin
 from poliastro.twobody.propagation import farnocchia, propagate
-from poliastro.twobody.sampling import sample_closed
+from poliastro.twobody.sampling import sample_closed, sample_open
 from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
-from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
+from poliastro.warnings import PatchedConicsWarning
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
@@ -510,40 +510,6 @@ class Orbit(OrbitCreationMixin):
             plane=self.plane,
         )
 
-    def _sample_open(self, values, min_anomaly, max_anomaly):
-        # Select a sensible limiting value for non-closed orbits
-        # This corresponds to max(r = 3p, r = self.r)
-        # We have to wrap nu in [-180, 180) to compare it with the output of
-        # the arc cosine, which is in the range [0, 180)
-        # Start from -nu_limit
-        wrapped_nu = wrap_angle(self.nu)
-        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(
-            u.rad
-        )
-
-        limits = [
-            min_anomaly.to_value(u.rad)
-            if min_anomaly is not None
-            else -nu_limit,
-            max_anomaly.to_value(u.rad)
-            if max_anomaly is not None
-            else nu_limit,
-        ] * u.rad  # type: u.Quantity
-
-        # Now we check that none of the provided values
-        # is outside of the hyperbolic range
-        nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
-        if not ((-nu_max <= limits).all() and (limits < nu_max).all()):
-            warn(
-                "anomaly outside range, clipping",
-                OrbitSamplingWarning,
-                stacklevel=2,
-            )
-            limits = limits.clip(-nu_max, nu_max)
-
-        nu_values = np.linspace(*limits, values)  # type: ignore
-        return nu_values
-
     def sample(self, values=100, *, min_anomaly=None, max_anomaly=None):
         r"""Samples an orbit to some specified time values.
 
@@ -589,7 +555,19 @@ class Orbit(OrbitCreationMixin):
                 values,
             )
         else:
-            nu_values = self._sample_open(values, min_anomaly, max_anomaly)
+            # Select a sensible limiting value for non-closed orbits
+            # This corresponds to max(r = 3p, r = self.r)
+            # We have to wrap nu in [-180, 180) to compare it with the output of
+            # the arc cosine, which is in the range [0, 180)
+            # Start from -nu_limit
+            nu_limit = max(
+                hyp_nu_limit(self.ecc, 3.0), abs(wrap_angle(self.nu))
+            )
+
+            # Perform actual sampling
+            nu_values = sample_open(
+                min_anomaly, self.ecc, max_anomaly, values, nu_limit=nu_limit
+            )
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(
