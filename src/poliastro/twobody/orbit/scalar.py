@@ -23,7 +23,7 @@ from poliastro.twobody.elements import (
     t_p,
 )
 from poliastro.twobody.orbit.creation import OrbitCreationMixin
-from poliastro.twobody.propagation import farnocchia, propagate
+from poliastro.twobody.propagation import FarnocchiaPropagator, propagate
 from poliastro.twobody.sampling import sample_closed, sample_open
 from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
@@ -400,7 +400,7 @@ class Orbit(OrbitCreationMixin):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, value, method=farnocchia, rtol=1e-10, **kwargs):
+    def propagate(self, value, method=FarnocchiaPropagator()):
         """Propagates an orbit a specified time.
 
         If value is true anomaly, propagate orbit to this anomaly and return the result.
@@ -410,12 +410,8 @@ class Orbit(OrbitCreationMixin):
         ----------
         value : ~astropy.units.Quantity, ~astropy.time.Time, ~astropy.time.TimeDelta
             Scalar time to propagate.
-        rtol : float, optional
-            Relative tolerance for the propagation algorithm, default to 1e-10.
         method : function, optional
-            Method used for propagation
-        **kwargs
-            parameters used in perturbation models
+            Method used for propagation, default to farnocchia.
 
         Returns
         -------
@@ -431,18 +427,14 @@ class Orbit(OrbitCreationMixin):
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        cartesian = propagate(
-            self, time_of_flight, method=method, rtol=rtol, **kwargs
+        new_state = propagate(
+            self._state,
+            time_of_flight,
+            method=method,
         )
         new_epoch = self.epoch + time_of_flight
 
-        return self.from_vectors(
-            self.attractor,
-            cartesian[0].xyz,
-            cartesian[0].differentials["s"].d_xyz,
-            new_epoch,
-            plane=self.plane,
-        )
+        return self.__class__(new_state, new_epoch)
 
     @u.quantity_input(value=u.rad)
     def time_to_anomaly(self, value):

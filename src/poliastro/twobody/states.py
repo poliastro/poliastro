@@ -66,6 +66,9 @@ class BaseState:
             self.r_p,
         )
 
+    def to_tuple(self):
+        return self._elements
+
     def to_value(self):
         """Converts to raw values with appropriate units."""
         raise NotImplementedError

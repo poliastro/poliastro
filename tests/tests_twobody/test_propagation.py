@@ -19,16 +19,17 @@ from poliastro.twobody.propagation import (
     ELLIPTIC_PROPAGATORS,
     HYPERBOLIC_PROPAGATORS,
     PARABOLIC_PROPAGATORS,
-    cowell,
-    danby,
-    farnocchia,
-    gooding,
-    markley,
-    mikkola,
-    pimienta,
+    CowellPropagator,
+    DanbyPropagator,
+    FarnocchiaPropagator,
+    GoodingPropagator,
+    MarkleyPropagator,
+    MikkolaPropagator,
+    PimientaPropagator,
+    ValladoPropagator,
     propagate,
-    vallado,
 )
+from poliastro.twobody.propagation.cowell import cowell
 from poliastro.util import norm
 
 
@@ -45,7 +46,7 @@ def halley():
 @pytest.mark.parametrize("propagator", ELLIPTIC_PROPAGATORS)
 def test_elliptic_near_parabolic(ecc, propagator):
     # 'kepler fails if really close to parabolic'. Refer to issue #714.
-    if propagator in [vallado] and ecc > 0.99:
+    if propagator in [ValladoPropagator] and ecc > 0.99:
         pytest.xfail()
 
     _a = 0.0 * u.rad
@@ -60,8 +61,8 @@ def test_elliptic_near_parabolic(ecc, propagator):
         nu=1.0 * u.rad,
     )
 
-    ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_propagator = ss0.propagate(tof, method=propagator)
+    ss_cowell = ss0.propagate(tof, method=CowellPropagator())
+    ss_propagator = ss0.propagate(tof, method=propagator())
 
     assert_quantity_allclose(ss_propagator.r, ss_cowell.r)
     assert_quantity_allclose(ss_propagator.v, ss_cowell.v)
@@ -71,7 +72,7 @@ def test_elliptic_near_parabolic(ecc, propagator):
 @pytest.mark.parametrize("propagator", HYPERBOLIC_PROPAGATORS)
 def test_hyperbolic_near_parabolic(ecc, propagator):
     # Still not implemented. Refer to issue #714.
-    if propagator in [pimienta, gooding]:
+    if propagator in [PimientaPropagator, GoodingPropagator]:
         pytest.skip()
 
     _a = 0.0 * u.rad
@@ -86,22 +87,22 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
         nu=1.0 * u.rad,
     )
 
-    ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_propagator = ss0.propagate(tof, method=propagator)
+    ss_cowell = ss0.propagate(tof, method=CowellPropagator())
+    ss_propagator = ss0.propagate(tof, method=propagator())
 
     assert_quantity_allclose(ss_propagator.r, ss_cowell.r)
     assert_quantity_allclose(ss_propagator.v, ss_cowell.v)
 
 
-@pytest.mark.parametrize("propagator", [markley])
-def test_near_equatorial(propagator):
+@pytest.mark.parametrize("method", [MarkleyPropagator()])
+def test_near_equatorial(method):
     r = [8.0e3, 1.0e3, 0.0] * u.km
     v = [-0.5, -0.5, 0.0001] * u.km / u.s
     tof = 1.0 * u.h
     ss0 = Orbit.from_vectors(Earth, r, v)
 
-    ss_cowell = ss0.propagate(tof, method=cowell)
-    ss_propagator = ss0.propagate(tof, method=propagator)
+    ss_cowell = ss0.propagate(tof, method=CowellPropagator())
+    ss_propagator = ss0.propagate(tof, method=method)
 
     assert_quantity_allclose(ss_propagator.r, ss_cowell.r, rtol=1e-4)
     assert_quantity_allclose(ss_propagator.v, ss_cowell.v, rtol=1e-4)
@@ -117,7 +118,7 @@ def test_propagation(propagator):
 
     ss0 = Orbit.from_vectors(Earth, r0, v0)
     tof = 40 * u.min
-    ss1 = ss0.propagate(tof, method=propagator)
+    ss1 = ss0.propagate(tof, method=propagator())
 
     r, v = ss1.rv()
 
@@ -206,13 +207,13 @@ def test_propagation_hyperbolic():
 def test_propagation_parabolic(propagator):
     # Example from Howard Curtis (3rd edition), section 3.5, problem 3.15
     # TODO: add parabolic solver in some parabolic propagators, refer to #417
-    if propagator in [mikkola, gooding]:
+    if propagator in [MikkolaPropagator, GoodingPropagator]:
         pytest.skip()
 
     p = 2.0 * 6600 * u.km
     _a = 0.0 * u.deg
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
-    orbit = orbit.propagate(0.8897 / 2.0 * u.h, method=propagator)
+    orbit = orbit.propagate(0.8897 / 2.0 * u.h, method=propagator())
 
     _, _, _, _, _, nu0 = rv2coe(
         Earth.k.to(u.km**3 / u.s**2).value,
@@ -222,7 +223,7 @@ def test_propagation_parabolic(propagator):
     assert_quantity_allclose(nu0, np.deg2rad(90.0), rtol=1e-4)
 
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
-    orbit = orbit.propagate(36.0 * u.h, method=propagator)
+    orbit = orbit.propagate(36.0 * u.h, method=propagator())
     assert_quantity_allclose(norm(orbit.r), 304700.0 * u.km, rtol=1e-4)
 
 
@@ -351,12 +352,14 @@ def test_propagate_to_date_has_proper_epoch():
 
 
 @pytest.mark.filterwarnings("ignore::erfa.core.ErfaWarning")
-@pytest.mark.parametrize("propagator", [danby, markley, gooding])
-def test_propagate_long_times_keeps_geometry(propagator):
+@pytest.mark.parametrize(
+    "method", [DanbyPropagator(), MarkleyPropagator(), GoodingPropagator()]
+)
+def test_propagate_long_times_keeps_geometry(method):
     # See https://github.com/poliastro/poliastro/issues/265
     time_of_flight = 100 * u.year
 
-    res = iss.propagate(time_of_flight, method=propagator)
+    res = iss.propagate(time_of_flight, method=method)
 
     assert_quantity_allclose(iss.a, res.a)
     assert_quantity_allclose(iss.ecc, res.ecc)
@@ -372,8 +375,8 @@ def test_propagate_long_times_keeps_geometry(propagator):
 @pytest.mark.filterwarnings("ignore::erfa.core.ErfaWarning")
 def test_long_propagations_vallado_agrees_farnocchia():
     tof = 100 * u.year
-    r_mm, v_mm = iss.propagate(tof, method=farnocchia).rv()
-    r_k, v_k = iss.propagate(tof, method=vallado).rv()
+    r_mm, v_mm = iss.propagate(tof, method=FarnocchiaPropagator()).rv()
+    r_k, v_k = iss.propagate(tof, method=ValladoPropagator()).rv()
     assert_quantity_allclose(r_mm, r_k)
     assert_quantity_allclose(v_mm, v_k)
 
@@ -385,8 +388,8 @@ def test_long_propagations_vallado_agrees_farnocchia():
     v_halleys = [-49.95092305, -12.94843055, -4.29251577]  # km/s
     halleys = Orbit.from_vectors(Sun, r_halleys * u.km, v_halleys * u.km / u.s)
 
-    r_mm, v_mm = halleys.propagate(tof, method=farnocchia).rv()
-    r_k, v_k = halleys.propagate(tof, method=vallado).rv()
+    r_mm, v_mm = halleys.propagate(tof, method=FarnocchiaPropagator()).rv()
+    r_k, v_k = halleys.propagate(tof, method=ValladoPropagator()).rv()
     assert_quantity_allclose(r_mm, r_k)
     assert_quantity_allclose(v_mm, v_k)
 
@@ -418,7 +421,9 @@ def with_units(draw, elements, unit):
         unit=u.year,
     )
 )
-@pytest.mark.parametrize("method", [farnocchia, vallado])
+@pytest.mark.parametrize(
+    "method", [FarnocchiaPropagator(), ValladoPropagator()]
+)
 def test_long_propagation_preserves_orbit_elements(tof, method, halley):
     expected_slow_classical = halley.classical()[:-1]
 
@@ -466,29 +471,10 @@ def test_propagator_with_zero_eccentricity(propagator):
     altitude = 300 * u.km
     orbit = Orbit.circular(attractor, altitude)
     time_of_flight = 50 * u.s
-    res = orbit.propagate(time_of_flight, method=propagator)
+    res = orbit.propagate(time_of_flight, method=propagator())
 
     assert_quantity_allclose(orbit.a, res.a)
     assert_quantity_allclose(orbit.ecc, res.ecc, atol=1e-15)
     assert_quantity_allclose(orbit.inc, res.inc)
     assert_quantity_allclose(orbit.raan, res.raan)
     assert_quantity_allclose(orbit.argp, res.argp)
-
-
-@pytest.mark.parametrize("propagator", ALL_PROPAGATORS)
-def test_after_propagation_r_and_v_dimensions(propagator):
-    r0 = [111.340, -228.343, 2413.423] * u.km
-    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-    tof = time.TimeDelta(50 * u.s)
-    orbit = Orbit.from_vectors(Earth, r0, v0)
-
-    rr, vv = propagator(
-        orbit.attractor.k,
-        orbit.r,
-        orbit.v,
-        tof.reshape(-1).to(u.s),
-        rtol=1e-10,
-    )
-
-    assert rr.ndim == 2
-    assert vv.ndim == 2

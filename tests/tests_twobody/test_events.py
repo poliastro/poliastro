@@ -64,7 +64,7 @@ def test_altitude_crossing():
         f=f,
     )
 
-    assert_quantity_allclose(norm(rr[0].to(u.km).value) - thresh_alt, R)
+    assert_quantity_allclose(norm(rr[0].to_value(u.km)) - thresh_alt, R)
     assert_quantity_allclose(altitude_cross_event.last_t, t_flight, rtol=1e-2)
 
 
