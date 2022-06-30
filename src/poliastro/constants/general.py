@@ -649,8 +649,8 @@ rho0_earth = Constant(
 Wdivc_sun = Constant(
     "Wdivc_sun",
     "total radiation power of Sun divided by the speed of light",
-    1.0203759306204136e14,
-    "kg km / (s2)",
+    1.0203759306204136e20,
+    "W s / km",
     1,
     "Howard Curtis",
     system="si",
