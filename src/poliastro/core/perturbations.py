@@ -236,7 +236,7 @@ def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
     """
     r_star = star(t0)
     r_sat = state[:3]
-    P_s = Wdivc_s / (norm(r_star) ** 2)
+    P_s = Wdivc_s / 1e6 / (norm(r_star) ** 2)
 
     nu = float(line_of_sight_fast(r_sat, r_star, R) > 0)
     return -nu * P_s * (C_R * A_over_m) * r_star / norm(r_star)
