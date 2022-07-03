@@ -50,6 +50,7 @@ from poliastro.frames.equatorial import (
 from poliastro.frames.util import get_frame
 from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
+from poliastro.twobody.sampling import TrueAnomalyBounds
 from poliastro.warnings import PatchedConicsWarning
 
 
@@ -429,22 +430,6 @@ def test_sample_numpoints():
     assert len(positions) == 50
 
 
-@pytest.mark.parametrize("num_points", [3, 5, 7, 9, 11, 101])
-def test_sample_num_points(num_points):
-    # Data from Vallado, example 2.4
-    r0 = [1_131.340, -2_282.343, 6_672.423] * u.km
-    v0 = [-5.64305, 4.30333, 2.42879] * u.km / u.s
-    ss0 = Orbit.from_vectors(Earth, r0, v0)
-
-    # TODO: Test against the perigee and apogee
-    # expected_ss = ss0.propagate(ss0.period / 2)
-
-    rr = ss0.sample(num_points)
-
-    assert len(rr) == num_points
-    # assert_quantity_allclose(rr[num_points // 2].data.xyz, expected_ss.r)
-
-
 def test_sample_big_orbits():
     # See https://github.com/poliastro/poliastro/issues/265
     ss = Orbit.from_vectors(
@@ -474,18 +459,6 @@ def test_hyperbolic_modulus_wrapped_nu():
     positions = ss.sample(num_values)
 
     assert_quantity_allclose(positions[0].xyz, ss.r)
-
-
-@pytest.mark.parametrize("min_anomaly", [-30 * u.deg, -10 * u.deg])
-@pytest.mark.parametrize("max_anomaly", [10 * u.deg, 30 * u.deg])
-def test_sample_hyperbolic_limits(hyperbolic, min_anomaly, max_anomaly):
-    num_points = 50
-
-    coords = hyperbolic.sample(
-        num_points, min_anomaly=min_anomaly, max_anomaly=max_anomaly
-    )
-
-    assert len(coords) == num_points
 
 
 def test_orbit_is_pickable(hyperbolic):
@@ -1118,15 +1091,18 @@ def test_sample_with_out_of_range_anomaly_works():
     # From "Going to Jupiter with Python using Jupyter and poliastro.ipynb"
     ic1 = Orbit.from_vectors(
         Sun,
-        [1.02465527e08, -1.02313505e08, -4.43533465e07] * u.km,
-        [2198705.82621226, 1897186.74383856, 822370.88977487] * u.km / u.day,
+        [1.02465527e08, -1.02313505e08, -4.43533465e07] << u.km,
+        [2198705.82621226, 1897186.74383856, 822370.88977487]
+        << (u.km / u.day),
         Time("2011-08-05 16:26:06.183", scale="tdb"),
     )
-    coordinates = ic1.sample(3, max_anomaly=180.0 * u.deg)
+    coordinates = ic1.to_ephem(
+        TrueAnomalyBounds(max_nu=180.0 << u.deg, num_values=3)
+    ).sample()
 
     assert_quantity_allclose(coordinates[0].get_xyz(), ic1.r)
     assert_quantity_allclose(
-        coordinates[-1].get_xyz(), ic1.propagate_to_anomaly(180.0 * u.deg).r
+        coordinates[-1].get_xyz(), ic1.propagate_to_anomaly(180.0 << u.deg).r
     )
 
 

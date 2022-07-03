@@ -26,9 +26,7 @@ from poliastro.twobody.propagation import (
     MarkleyPropagator,
     RecseriesPropagator,
     ValladoPropagator,
-    propagate,
 )
-from poliastro.twobody.propagation.cowell import cowell
 from poliastro.util import norm
 
 
@@ -285,10 +283,11 @@ def test_cowell_propagation_with_zero_acceleration_equals_kepler():
     expected_r = np.array([-4219.7527, 4363.0292, -3958.7666]) * u.km
     expected_v = np.array([3.689866, -1.916735, -6.112511]) * u.km / u.s
 
-    r, v = cowell(Earth.k, orbit.r, orbit.v, tofs)
+    method = CowellPropagator()
+    rrs, vvs = method.propagate_many(orbit._state, tofs)
 
-    assert_quantity_allclose(r[0], expected_r, rtol=1e-5)
-    assert_quantity_allclose(v[0], expected_v, rtol=1e-4)
+    assert_quantity_allclose(rrs[0], expected_r, rtol=1e-5)
+    assert_quantity_allclose(vvs[0], expected_v, rtol=1e-4)
 
 
 def test_cowell_propagation_circle_to_circle():
@@ -310,9 +309,10 @@ def test_cowell_propagation_circle_to_circle():
     ss = Orbit.circular(Earth, 500 * u.km)
     tofs = [20] * ss.period
 
-    r, v = cowell(Earth.k, ss.r, ss.v, tofs, f=f)
+    method = CowellPropagator(f=f)
+    rrs, vvs = method.propagate_many(ss._state, tofs)
 
-    ss_final = Orbit.from_vectors(Earth, r[0], v[0])
+    ss_final = Orbit.from_vectors(Earth, rrs[0], vvs[0])
 
     da_a0 = (ss_final.a - ss.a) / ss.a
     dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
@@ -395,10 +395,11 @@ def test_farnocchia_propagation_very_high_ecc_does_not_fail():
     v = np.array([5021.38, -2900.7, 1000.354]) << u.km / u.s
     orbit = Orbit.from_vectors(Earth, r, v, epoch=time.Time("2020-01-01"))
 
-    tofs = [74] << u.s  # tof = 74s and above is the critical region.
-    coords = propagate(orbit, tofs)
+    tofs = [74] << u.s  # tof = 74s and above is the critical region
+    method = FarnocchiaPropagator()
+    coords, _ = method.propagate_many(orbit._state, tofs)
 
-    assert not np.isnan(coords.get_xyz()).any()
+    assert not np.isnan(coords).any()
 
 
 @st.composite

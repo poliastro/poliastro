@@ -46,3 +46,22 @@ class CowellPropagator:
 
         new_state = RVState(state.attractor, (r, v), state.plane)
         return new_state
+
+    def propagate_many(self, state, tofs):
+        state = state.to_vectors()
+
+        rrs, vvs = cowell(
+            state.attractor.k.to_value(u.km**3 / u.s**2),
+            *state.to_value(),
+            tofs.to_value(u.s),
+            self._rtol,
+            events=self._events,
+            f=self._f,
+        )
+
+        # TODO: This should probably return a RVStateArray instead,
+        # see discussion at https://github.com/poliastro/poliastro/pull/1492
+        return (
+            rrs << u.km,
+            vvs << (u.km / u.s),
+        )

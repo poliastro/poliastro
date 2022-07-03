@@ -10,6 +10,7 @@ from poliastro.ephem import Ephem
 from poliastro.frames import Planes
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.twobody.mean_elements import get_mean_elements
+from poliastro.twobody.sampling import EpochBounds
 from poliastro.util import norm, time_range
 
 
@@ -209,24 +210,14 @@ class BaseOrbitPlotter:
                 # Get the propagation time required before next impulse
                 time_to_next_impulse, _ = maneuver.impulses[ith_impulse + 1]
 
-                # Compute the minimum and maximum anomalies
-                min_nu = orbit_phase.nu
-                # High level, but inefficient way of solving the Kepler equation,
-                # which is what farnocchia_coe does:
-                # tp0 = delta_t_from_nu(nu, ecc, k, q)
-                # tp = tp0 + tof
-                # max_nu = nu_from_delta_t(tp, ecc, k, q)
-                max_nu = orbit_phase.propagate(time_to_next_impulse).nu
-
                 # Collect the coordinate points for the i-th orbit phase
-                # We use .sample rather than poliastro.twobody.propagation.propagate
-                # because the latter samples time uniformly
-                # and therefore generates a sharp curve close to the perigee,
-                # and that's also why I need to compute the anomalies outside,
-                # see https://github.com/poliastro/poliastro/issues/1364
-                phase_coordinates = orbit_phase.sample(
-                    min_anomaly=min_nu, max_anomaly=max_nu
-                )
+                # TODO: Remove `.sample()` to return Ephem and use `plot_ephem` instead?
+                phase_coordinates = orbit_phase.to_ephem(
+                    strategy=EpochBounds(
+                        min_epoch=orbit_phase.epoch,
+                        max_epoch=orbit_phase.epoch + time_to_next_impulse,
+                    )
+                ).sample()
 
                 # Plot the phase trajectory and collect its label and lines
                 trajectory_lines = self._plot_trajectory(

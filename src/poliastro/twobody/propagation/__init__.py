@@ -61,6 +61,11 @@ def propagate(
         Propagation coordinates.
     """
 
+    if time_of_flight.ndim != 0:
+        raise ValueError(
+            "propagate only accepts scalar values for time_of_flight"
+        )
+
     # Check if propagator fulfills orbit requirements
     # Note there's a potential conversion here purely for convenience that could be skipped
     ecc = state.to_classical().ecc
@@ -77,14 +82,26 @@ def propagate(
             "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
         )
 
-    if time_of_flight.ndim != 0:
-        raise ValueError(
-            "propagate only accepts scalar values for time_of_flight"
-        )
-
     new_state = method.propagate(state, time_of_flight)
 
     return new_state
+
+
+def propagate_many(
+    state,
+    times_of_flight,
+    *,
+    method=FarnocchiaPropagator(),
+):
+
+    if times_of_flight.ndim != 1:
+        raise ValueError(
+            "sample only accepts a 1D array of times for times_of_flight"
+        )
+
+    coords = method.propagate_many(state, times_of_flight)
+
+    return coords
 
 
 ALL_PROPAGATORS = [

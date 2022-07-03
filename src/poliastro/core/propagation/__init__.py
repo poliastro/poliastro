@@ -3,7 +3,10 @@
 from poliastro.core.propagation.base import func_twobody
 from poliastro.core.propagation.cowell import cowell
 from poliastro.core.propagation.danby import danby, danby_coe
-from poliastro.core.propagation.farnocchia import farnocchia, farnocchia_coe
+from poliastro.core.propagation.farnocchia import (
+    farnocchia_coe,
+    farnocchia_rv as farnocchia,
+)
 from poliastro.core.propagation.gooding import gooding, gooding_coe
 from poliastro.core.propagation.markley import markley, markley_coe
 from poliastro.core.propagation.mikkola import mikkola, mikkola_coe
