@@ -21,9 +21,9 @@ kernelspec:
 
 +++
 
-- The only public source of orbital data for non-amateur Earth artificial satellites is the 18th Space Control Squadron (18 SPCS) from the United States Space Force (https://www.space-track.org/ and https://celestrak.com/NORAD/).
+- The only public source of orbital data for non-amateur Earth artificial satellites is the 18th Space Control Squadron (18 SPCS) from the United States Space Force (https://www.space-track.org/ and https://celestrak.org/NORAD/).
 - The data is disseminated as _general perturbations_ (**GP**) orbital data following the _Simplified General Perturbations 4_ (**SGP4**) propagation model.
-- Such GP orbital data has traditionally been transmitted in _Two-Line Element Sets_ or **TLEs**, although [in May 2020](https://celestrak.com/NORAD/documentation/gp-data-formats.php) it started being published in CCSDS _Orbit Mean-Elements Message_ (**OMM**) format as well.
+- Such GP orbital data has traditionally been transmitted in _Two-Line Element Sets_ or **TLEs**, although [in May 2020](https://celestrak.org/NORAD/documentation/gp-data-formats.php) it started being published in CCSDS _Orbit Mean-Elements Message_ (**OMM**) format as well.
 - The advantage of SGP4 is that it's an _analytical model_ that includes the most important natural perturbations, and it's much faster than an equivalent _numerical model_. Therefore, it's good for initial orbit design based on low-precision requirements.
 
 +++
@@ -96,7 +96,7 @@ def _generate_url(catalog_number, international_designator, name):
     param_name = param_names[0]
     param_value = params[param_name]
     url = (
-        "https://celestrak.com/NORAD/elements/gp.php?"
+        "https://celestrak.org/NORAD/elements/gp.php?"
         f"{param_name}={param_value}"
         "&FORMAT=XML"
     )
@@ -134,7 +134,7 @@ def load_gp_from_celestrak(
     References
     ----------
     .. [1] Kelso, T.S. "A New Way to Obtain GP Data (aka TLEs)"
-       https://celestrak.com/NORAD/documentation/gp-data-formats.php
+       https://celestrak.org/NORAD/documentation/gp-data-formats.php
 
     """
     # Assemble query, raise an error if malformed
