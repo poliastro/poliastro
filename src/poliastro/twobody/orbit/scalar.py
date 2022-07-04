@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import List, Union
 from warnings import warn
 
@@ -27,12 +28,6 @@ from poliastro.twobody.sampling import sample_closed
 from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
-
-try:
-    from functools import cached_property  # type: ignore
-except ImportError:
-    from cached_property import cached_property  # type: ignore
-
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
