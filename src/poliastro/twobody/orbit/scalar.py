@@ -98,12 +98,12 @@ class Orbit(OrbitCreationMixin):
     @cached_property
     def r_p(self):
         """Radius of pericenter."""
-        return self.a * (1 - self.ecc)
+        return self._state.r_p
 
     @cached_property
     def r_a(self):
         """Radius of apocenter."""
-        return self.a * (1 + self.ecc)
+        return self._state.r_a
 
     @cached_property
     def ecc(self):
@@ -200,12 +200,7 @@ class Orbit(OrbitCreationMixin):
     @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage."""
-        return t_p(
-            self.nu,
-            self.ecc,
-            self.attractor.k,
-            self.r_p,
-        )
+        return self._state.t_p
 
     def get_frame(self):
         """Get equivalent reference frame of the orbit.
