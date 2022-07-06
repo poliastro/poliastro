@@ -149,7 +149,7 @@ forbidden_modules = ["astropy.units"]
 
 [tool.pytest.ini_options]
 norecursedirs = [".git", ".tox", "dist", "build", ".venv"]
-testpaths = ["src", "tests"]
+testpaths = ["tests"]
 python_files ="test_*.py"
 doctest_plus = false
 addopts = ["--strict-markers"]
