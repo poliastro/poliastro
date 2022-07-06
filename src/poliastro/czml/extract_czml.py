@@ -24,7 +24,6 @@ from poliastro.bodies import Earth
 from poliastro.core.czml_utils import (
     project_point_on_ellipsoid as project_point_on_ellipsoid_fast,
 )
-from poliastro.twobody.propagation import propagate
 
 PIC_SATELLITE = (
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAX"
@@ -137,13 +136,14 @@ class CZMLExtractor:
             rf += 1
 
         for k in range(self.orbits[i][1] + 2):
-            position = propagate(
-                self.orbits[i][0], TimeDelta(k * h), rtol=rtol
+            # FIXME: Unused rtol with default propagation method,
+            # should we just get rid of it?
+            cords = (
+                self.orbits[i][0]
+                .propagate(TimeDelta(k * h))
+                .r.to_value(u.m)[..., None]
             )
 
-            cords = position.represent_as(
-                CartesianRepresentation
-            ).xyz.to_value(u.m)
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
             # Flatten list
@@ -177,13 +177,14 @@ class CZMLExtractor:
         ellipsoid = self.cust_prop[0]
 
         for k in range(self.orbits[i][1] + 2):
-            position = propagate(
-                self.orbits[i][0], TimeDelta(k * h), rtol=rtol
+            # FIXME: Unused rtol with default propagation method,
+            # should we just get rid of it?
+            cords = (
+                self.orbits[i][0]
+                .propagate(TimeDelta(k * h))
+                .r.to_value(u.m)[..., None]
             )
 
-            cords = position.represent_as(
-                CartesianRepresentation
-            ).xyz.to_value(u.m)
             cords = np.insert(cords, 0, h.value * k, axis=0)
 
             # Flatten list
