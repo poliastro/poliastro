@@ -24,8 +24,7 @@ from poliastro.twobody.propagation import (
     FarnocchiaPropagator,
     GoodingPropagator,
     MarkleyPropagator,
-    MikkolaPropagator,
-    PimientaPropagator,
+    RecseriesPropagator,
     ValladoPropagator,
     propagate,
 )
@@ -45,9 +44,11 @@ def halley():
 @pytest.mark.parametrize("ecc", [0.9, 0.99, 0.999, 0.9999, 0.99999])
 @pytest.mark.parametrize("propagator", ELLIPTIC_PROPAGATORS)
 def test_elliptic_near_parabolic(ecc, propagator):
-    # 'kepler fails if really close to parabolic'. Refer to issue #714.
-    if propagator in [ValladoPropagator] and ecc > 0.99:
-        pytest.xfail()
+    rtol = 1e-7
+    if propagator in (RecseriesPropagator, ValladoPropagator):
+        rtol = 1e-6
+    if propagator is ValladoPropagator and ecc >= 0.99999:
+        rtol = 1e-5
 
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
@@ -64,17 +65,13 @@ def test_elliptic_near_parabolic(ecc, propagator):
     ss_cowell = ss0.propagate(tof, method=CowellPropagator())
     ss_propagator = ss0.propagate(tof, method=propagator())
 
-    assert_quantity_allclose(ss_propagator.r, ss_cowell.r)
-    assert_quantity_allclose(ss_propagator.v, ss_cowell.v)
+    assert_quantity_allclose(ss_propagator.r, ss_cowell.r, rtol=rtol)
+    assert_quantity_allclose(ss_propagator.v, ss_cowell.v, rtol=rtol)
 
 
 @pytest.mark.parametrize("ecc", [1.0001, 1.001, 1.01, 1.1])
 @pytest.mark.parametrize("propagator", HYPERBOLIC_PROPAGATORS)
 def test_hyperbolic_near_parabolic(ecc, propagator):
-    # Still not implemented. Refer to issue #714.
-    if propagator in [PimientaPropagator, GoodingPropagator]:
-        pytest.skip()
-
     _a = 0.0 * u.rad
     tof = 1.0 * u.min
     ss0 = Orbit.from_classical(
@@ -96,6 +93,7 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
 
 @pytest.mark.parametrize("method", [MarkleyPropagator()])
 def test_near_equatorial(method):
+    # TODO: Extend to other propagators?
     r = [8.0e3, 1.0e3, 0.0] * u.km
     v = [-0.5, -0.5, 0.0001] * u.km / u.s
     tof = 1.0 * u.h
@@ -206,10 +204,6 @@ def test_propagation_hyperbolic():
 @pytest.mark.parametrize("propagator", PARABOLIC_PROPAGATORS)
 def test_propagation_parabolic(propagator):
     # Example from Howard Curtis (3rd edition), section 3.5, problem 3.15
-    # TODO: add parabolic solver in some parabolic propagators, refer to #417
-    if propagator in [MikkolaPropagator, GoodingPropagator]:
-        pytest.skip()
-
     p = 2.0 * 6600 * u.km
     _a = 0.0 * u.deg
     orbit = Orbit.parabolic(Earth, p, _a, _a, _a, _a)
@@ -356,6 +350,7 @@ def test_propagate_to_date_has_proper_epoch():
     "method", [DanbyPropagator(), MarkleyPropagator(), GoodingPropagator()]
 )
 def test_propagate_long_times_keeps_geometry(method):
+    # TODO: Extend to other propagators?
     # See https://github.com/poliastro/poliastro/issues/265
     time_of_flight = 100 * u.year
 
