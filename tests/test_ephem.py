@@ -361,10 +361,10 @@ def test_from_orbit_scalar_epoch_uses_reshaped_epochs():
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     orb = Orbit.from_vectors(Earth, r, v)
     expected_epochs = Time(["2020-01-02 12:00:00"])
-    epochs = expected_epochs[0]
+    epoch = expected_epochs[0]
 
     unused_plane = Planes.EARTH_EQUATOR
-    ephem = Ephem.from_orbit(orbit=orb, epochs=epochs, plane=unused_plane)
+    ephem = Ephem.from_orbit(orbit=orb, epochs=epoch, plane=unused_plane)
 
     assert ephem.epochs == expected_epochs
 
