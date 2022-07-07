@@ -2,6 +2,7 @@ import numpy as np
 from astropy import units as u
 
 from poliastro.twobody.angles import E_to_nu, nu_to_E
+from poliastro.twobody.elements import hyp_nu_limit
 from poliastro.util import alinspace
 
 
@@ -39,3 +40,28 @@ def sample_closed(min_nu, ecc, max_nu=None, num_values=100):
 
     # We wrap the angles on return
     return (nu_values + np.pi * u.rad) % (2 * np.pi * u.rad) - np.pi * u.rad
+
+
+@u.quantity_input(min_nu=u.rad, ecc=u.one, max_nu=u.rad, nu_limit=u.rad)
+def sample_open(
+    min_nu=None,
+    ecc=1.0 << u.one,
+    max_nu=None,
+    num_values=100,
+    *,
+    nu_limit=None
+):
+    """Sample an open orbit."""
+    if nu_limit is None:
+        nu_limit = hyp_nu_limit(ecc)
+
+    min_nu = min_nu if min_nu is not None else -nu_limit
+    max_nu = max_nu if max_nu is not None else nu_limit
+
+    if not (-nu_limit) <= min_nu < max_nu <= nu_limit:
+        raise ValueError("Anomaly values out of range")
+
+    nu_values = alinspace(min_nu, max_nu, num=num_values)
+
+    # No need to wrap the angles
+    return nu_values

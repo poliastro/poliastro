@@ -50,7 +50,7 @@ from poliastro.frames.equatorial import (
 from poliastro.frames.util import get_frame
 from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
-from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
+from poliastro.warnings import PatchedConicsWarning
 
 
 @pytest.fixture()
@@ -486,18 +486,6 @@ def test_sample_hyperbolic_limits(hyperbolic, min_anomaly, max_anomaly):
     )
 
     assert len(coords) == num_points
-
-
-def test_sample_hyperbolic_outside_limits(hyperbolic):
-    with pytest.warns(
-        OrbitSamplingWarning, match="anomaly outside range, clipping"
-    ):
-        hyperbolic.sample(3, min_anomaly=-np.pi * u.rad)
-
-    with pytest.warns(
-        OrbitSamplingWarning, match="anomaly outside range, clipping"
-    ):
-        hyperbolic.sample(3, max_anomaly=np.pi * u.rad)
 
 
 def test_orbit_is_pickable(hyperbolic):

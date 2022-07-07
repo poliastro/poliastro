@@ -1,7 +1,9 @@
+from functools import cached_property
+
 from astropy import units as u
 
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
-from poliastro.twobody.elements import mean_motion, period
+from poliastro.twobody.elements import mean_motion, period, t_p
 
 
 class BaseState:
@@ -31,15 +33,35 @@ class BaseState:
         """Main attractor."""
         return self._attractor
 
-    @property
+    @cached_property
     def n(self):
         """Mean motion."""
         return mean_motion(self.attractor.k, self.to_classical().a)
 
-    @property
+    @cached_property
     def period(self):
         """Period of the orbit."""
         return period(self.attractor.k, self.to_classical().a)
+
+    @cached_property
+    def r_p(self):
+        """Radius of pericenter."""
+        return self.to_classical().a * (1 - self.to_classical().ecc)
+
+    @cached_property
+    def r_a(self):
+        """Radius of apocenter."""
+        return self.to_classical().a * (1 + self.to_classical().ecc)
+
+    @cached_property
+    def t_p(self):
+        """Elapsed time since latest perifocal passage."""
+        return t_p(
+            self.to_classical().nu,
+            self.to_classical().ecc,
+            self.attractor.k,
+            self.r_p,
+        )
 
     def to_vectors(self):
         """Converts to position and velocity vector representation.

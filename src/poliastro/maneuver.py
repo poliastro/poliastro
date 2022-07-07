@@ -185,7 +185,7 @@ class Maneuver:
 
         # Time of flight is solved by subtracting both orbit epochs
         tof = orbit_f.epoch - orbit_i.epoch
-        if tof < 0:
+        if tof.to_value(u.s) < 0:
             raise ValueError(
                 "Epoch of initial orbit greater than epoch of final orbit, "
                 "causing a negative time of flight"
