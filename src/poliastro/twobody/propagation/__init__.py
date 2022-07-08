@@ -24,7 +24,6 @@ different propagators available at poliastro:
 +-------------+------------+-----------------+-----------------+
 
 """
-# FIXME: Make submodules private, to avoid "module not callable" errors?
 from poliastro.twobody.propagation.cowell import CowellPropagator
 from poliastro.twobody.propagation.danby import DanbyPropagator
 from poliastro.twobody.propagation.enums import PropagatorKind
@@ -35,6 +34,8 @@ from poliastro.twobody.propagation.mikkola import MikkolaPropagator
 from poliastro.twobody.propagation.pimienta import PimientaPropagator
 from poliastro.twobody.propagation.recseries import RecseriesPropagator
 from poliastro.twobody.propagation.vallado import ValladoPropagator
+
+from ._compat import propagate
 
 ALL_PROPAGATORS = [
     CowellPropagator,
@@ -62,3 +63,6 @@ HYPERBOLIC_PROPAGATORS = [
     for propagator in ALL_PROPAGATORS
     if propagator.kind & PropagatorKind.HYPERBOLIC
 ]
+
+
+__all__ = ALL_PROPAGATORS + ["propagate"]

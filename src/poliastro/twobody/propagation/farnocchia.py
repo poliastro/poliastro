@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 from astropy import units as u
 
@@ -7,6 +9,10 @@ from poliastro.core.propagation.farnocchia import (
 )
 from poliastro.twobody.propagation.enums import PropagatorKind
 from poliastro.twobody.states import ClassicalState
+
+from ._compat import OldPropagatorModule
+
+sys.modules[__name__].__class__ = OldPropagatorModule
 
 
 class FarnocchiaPropagator:

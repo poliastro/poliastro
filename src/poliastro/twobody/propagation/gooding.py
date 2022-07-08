@@ -1,8 +1,14 @@
+import sys
+
 from astropy import units as u
 
 from poliastro.core.propagation import gooding_coe as gooding_fast
 from poliastro.twobody.propagation.enums import PropagatorKind
 from poliastro.twobody.states import ClassicalState
+
+from ._compat import OldPropagatorModule
+
+sys.modules[__name__].__class__ = OldPropagatorModule
 
 
 class GoodingPropagator:

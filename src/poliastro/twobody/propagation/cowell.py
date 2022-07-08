@@ -1,9 +1,15 @@
+import sys
+
 from astropy import units as u
 
 from poliastro.core.propagation import cowell
 from poliastro.core.propagation.base import func_twobody
 from poliastro.twobody.propagation.enums import PropagatorKind
 from poliastro.twobody.states import RVState
+
+from ._compat import OldPropagatorModule
+
+sys.modules[__name__].__class__ = OldPropagatorModule
 
 
 class CowellPropagator:
