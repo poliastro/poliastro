@@ -427,7 +427,7 @@ The determination of an orbit given two position vectors and the time of flight 
 The package {py:obj}`poliastro.iod` holds the different raw algorithms to solve Lambert's problem, provided the main attractor's gravitational constant, the two position vectors and the time of flight. As you can imagine, being able to compute the positions of the planets as we saw in the previous section is the
 perfect complement to this feature!
 
-Since poliastro version 0.13 it is possible to solve Lambert's problem by making use of the {py:obj}`poliastro.maneuver` module. We just need to pass as arguments the initial and final orbits and the output will be a {py:obj}`poliastro.maneuver.Maneuver` instance. Time of flight is computed internally since orbits epochs are known.
+Since poliastro version 0.13 it is possible to solve Lambert's problem by making use of the {py:obj}`poliastro.maneuver` module. You need to pass as arguments the initial and final orbits and the output will be a {py:obj}`poliastro.maneuver.Maneuver` instance. Time of flight is computed internally since orbits epochs are known.
 
 
 For instance, this is a simplified version of the example \"Going to
