@@ -4,7 +4,7 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.14.0
 kernelspec:
   display_name: Python 3
   language: python
@@ -26,7 +26,7 @@ For the moment, poliastro is only capable of creating these mission plots betwee
 ## Basic modules
 For creating a porkchop plot with poliastro, we need to import the `porkchop` function from the `poliastro.plotting.porkchop` module. Also, two `poliastro.bodies` are necessary for computing the targetting problem associated. Finally by making use of `time_range`, a very useful function available at `poliastro.utils` it is possible to define a span of launching and arrival dates for the problem:
 
-```{code-cell} ipython3
+```{code-cell}
 from astropy import units as u
 
 from poliastro.bodies import Earth, Mars
@@ -45,7 +45,7 @@ All that we must do is pass the two bodies, the two time spans and some extra pl
 * If we want poliastro to plot arrival velocity: `vhp=True/False`
 * The maximum value for C3 to be ploted: `max_c3=45 * u.km**2 / u.s**2` (by default)
 
-```{code-cell} ipython3
+```{code-cell}
 :tags: [nbsphinx-thumbnail]
 
 porkchop_plot = PorkchopPlotter(Earth, Mars, launch_span, arrival_span)
