@@ -17,7 +17,7 @@ from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
 from poliastro.twobody.elements import eccentricity_vector, energy, t_p
 from poliastro.twobody.orbit.creation import OrbitCreationMixin
-from poliastro.twobody.propagation import FarnocchiaPropagator, propagate
+from poliastro.twobody.propagation import FarnocchiaPropagator, PropagatorKind
 from poliastro.twobody.sampling import TrueAnomalyBounds
 from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
@@ -413,6 +413,11 @@ class Orbit(OrbitCreationMixin):
             New orbit after propagation.
 
         """
+        if value.ndim != 0:
+            raise ValueError(
+                "propagate only accepts scalar values for time of flight"
+            )
+
         if isinstance(value, time.Time) and not isinstance(
             value, time.TimeDelta
         ):
@@ -421,10 +426,24 @@ class Orbit(OrbitCreationMixin):
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        new_state = propagate(
+        # Check if propagator fulfills orbit requirements
+        # Note there's a potential conversion here purely for convenience that could be skipped
+        if self.ecc < 1.0 and not (method.kind & PropagatorKind.ELLIPTIC):
+            raise ValueError(
+                "Can not use an parabolic/hyperbolic propagator for elliptical/circular orbits."
+            )
+        elif self.ecc == 1.0 and not (method.kind & PropagatorKind.PARABOLIC):
+            raise ValueError(
+                "Can not use an elliptic/hyperbolic propagator for parabolic orbits."
+            )
+        elif self.ecc > 1.0 and not (method.kind & PropagatorKind.HYPERBOLIC):
+            raise ValueError(
+                "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
+            )
+
+        new_state = method.propagate(
             self._state,
             time_of_flight,
-            method=method,
         )
         new_epoch = self.epoch + time_of_flight
 
