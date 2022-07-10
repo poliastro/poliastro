@@ -1,24 +1,29 @@
+from functools import cached_property
+
 from astropy import units as u
 
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
-from poliastro.twobody.elements import mean_motion, period
+from poliastro.twobody.elements import mean_motion, period, t_p
 
 
 class BaseState:
     """Base State class, meant to be subclassed."""
 
-    def __init__(self, attractor, plane):
+    def __init__(self, attractor, elements, plane):
         """Constructor.
 
         Parameters
         ----------
         attractor : Body
             Main attractor.
+        elements : tuple
+            Six-tuple of orbital elements for this state.
         plane : ~poliastro.frames.enums.Planes
             Reference plane for the elements.
 
         """
         self._attractor = attractor
+        self._elements = elements
         self._plane = plane
 
     @property
@@ -31,15 +36,42 @@ class BaseState:
         """Main attractor."""
         return self._attractor
 
-    @property
+    @cached_property
     def n(self):
         """Mean motion."""
         return mean_motion(self.attractor.k, self.to_classical().a)
 
-    @property
+    @cached_property
     def period(self):
         """Period of the orbit."""
         return period(self.attractor.k, self.to_classical().a)
+
+    @cached_property
+    def r_p(self):
+        """Radius of pericenter."""
+        return self.to_classical().a * (1 - self.to_classical().ecc)
+
+    @cached_property
+    def r_a(self):
+        """Radius of apocenter."""
+        return self.to_classical().a * (1 + self.to_classical().ecc)
+
+    @cached_property
+    def t_p(self):
+        """Elapsed time since latest perifocal passage."""
+        return t_p(
+            self.to_classical().nu,
+            self.to_classical().ecc,
+            self.attractor.k,
+            self.r_p,
+        )
+
+    def to_tuple(self):
+        return self._elements
+
+    def to_value(self):
+        """Converts to raw values with appropriate units."""
+        raise NotImplementedError
 
     def to_vectors(self):
         """Converts to position and velocity vector representation.
@@ -73,43 +105,29 @@ class BaseState:
 
 
 class ClassicalState(BaseState):
-    """State defined by its classical orbital elements."""
+    """State defined by its classical orbital elements.
 
-    def __init__(self, attractor, p, ecc, inc, raan, argp, nu, plane):
-        """Constructor.
+    Orbital elements:
 
-        Parameters
-        ----------
-        attractor : Body
-            Main attractor.
-        p : ~astropy.units.Quantity
-            Semilatus rectum.
-        ecc : ~astropy.units.Quantity
-            Eccentricity.
-        inc : ~astropy.units.Quantity
-            Inclination.
-        raan : ~astropy.units.Quantity
-            Right ascension of the ascending node.
-        argp : ~astropy.units.Quantity
-            Argument of the perigee.
-        nu : ~astropy.units.Quantity
-            True anomaly.
-        plane : ~poliastro.frames.enums.Planes
-            Reference plane for the elements.
+    p : ~astropy.units.Quantity
+        Semilatus rectum.
+    ecc : ~astropy.units.Quantity
+        Eccentricity.
+    inc : ~astropy.units.Quantity
+        Inclination.
+    raan : ~astropy.units.Quantity
+        Right ascension of the ascending node.
+    argp : ~astropy.units.Quantity
+        Argument of the perigee.
+    nu : ~astropy.units.Quantity
+        True anomaly.
 
-        """
-        super().__init__(attractor, plane)
-        self._p = p
-        self._ecc = ecc
-        self._inc = inc
-        self._raan = raan
-        self._argp = argp
-        self._nu = nu
+    """
 
     @property
     def p(self):
         """Semilatus rectum."""
-        return self._p
+        return self._elements[0]
 
     @property
     def a(self):
@@ -119,32 +137,30 @@ class ClassicalState(BaseState):
     @property
     def ecc(self):
         """Eccentricity."""
-        return self._ecc
+        return self._elements[1]
 
     @property
     def inc(self):
         """Inclination."""
-        return self._inc
+        return self._elements[2]
 
     @property
     def raan(self):
         """Right ascension of the ascending node."""
-        return self._raan
+        return self._elements[3]
 
     @property
     def argp(self):
         """Argument of the perigee."""
-        return self._argp
+        return self._elements[4]
 
     @property
     def nu(self):
         """True anomaly."""
-        return self._nu
+        return self._elements[5]
 
-    def to_vectors(self):
-        """Converts to position and velocity vector representation."""
-        r, v = coe2rv(
-            self.attractor.k.to_value(u.km**3 / u.s**2),
+    def to_value(self):
+        return (
             self.p.to_value(u.km),
             self.ecc.value,
             self.inc.to_value(u.rad),
@@ -153,7 +169,15 @@ class ClassicalState(BaseState):
             self.nu.to_value(u.rad),
         )
 
-        return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)
+    def to_vectors(self):
+        """Converts to position and velocity vector representation."""
+        r, v = coe2rv(
+            self.attractor.k.to_value(u.km**3 / u.s**2), *self.to_value()
+        )
+
+        return RVState(
+            self.attractor, (r << u.km, v << u.km / u.s), self.plane
+        )
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
@@ -161,58 +185,49 @@ class ClassicalState(BaseState):
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
-        p, f, g, h, k, L = coe2mee(
-            self.p.to_value(u.km),
-            self.ecc.value,
-            self.inc.to_value(u.rad),
-            self.raan.to_value(u.rad),
-            self.argp.to_value(u.rad),
-            self.nu.to_value(u.rad),
-        )
+        p, f, g, h, k, L = coe2mee(*self.to_value())
 
         return ModifiedEquinoctialState(
             self.attractor,
-            p * u.km,
-            f * u.rad,
-            g * u.rad,
-            h * u.rad,
-            k * u.rad,
-            L * u.rad,
+            (
+                p << u.km,
+                f << u.rad,
+                g << u.rad,
+                h << u.rad,
+                k << u.rad,
+                L << u.rad,
+            ),
             self.plane,
         )
 
 
 class RVState(BaseState):
-    """State defined by its position and velocity vectors."""
+    """State defined by its position and velocity vectors.
 
-    def __init__(self, attractor, r, v, plane):
-        """Constructor.
+    Orbital elements:
 
-        Parameters
-        ----------
-        attractor : Body
-            Main attractor.
-        r : ~astropy.units.Quantity
-            Position vector wrt attractor center.
-        v : ~astropy.units.Quantity
-            Velocity vector.
-        plane : ~poliastro.frames.enums.Planes
-            Reference plane for the elements.
+    r : ~astropy.units.Quantity
+        Position vector wrt attractor center.
+    v : ~astropy.units.Quantity
+        Velocity vector.
 
-        """
-        super().__init__(attractor, plane)
-        self._r = r
-        self._v = v
+    """
 
     @property
     def r(self):
         """Position vector."""
-        return self._r
+        return self._elements[0]
 
     @property
     def v(self):
         """Velocity vector."""
-        return self._v
+        return self._elements[1]
+
+    def to_value(self):
+        return (
+            self.r.to_value(u.km),
+            self.v.to_value(u.km / u.s),
+        )
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
@@ -222,89 +237,75 @@ class RVState(BaseState):
         """Converts to classical orbital elements representation."""
         (p, ecc, inc, raan, argp, nu) = rv2coe(
             self.attractor.k.to_value(u.km**3 / u.s**2),
-            self.r.to_value(u.km),
-            self.v.to_value(u.km / u.s),
+            *self.to_value(),
         )
 
         return ClassicalState(
             self.attractor,
-            p * u.km,
-            ecc * u.one,
-            inc * u.rad,
-            raan * u.rad,
-            argp * u.rad,
-            nu * u.rad,
+            (
+                p << u.km,
+                ecc << u.one,
+                inc << u.rad,
+                raan << u.rad,
+                argp << u.rad,
+                nu << u.rad,
+            ),
             self.plane,
         )
 
 
 class ModifiedEquinoctialState(BaseState):
-    """State defined by modified equinoctial elements representation."""
+    """State defined by modified equinoctial elements representation.
 
-    def __init__(self, attractor, p, f, g, h, k, L, plane):
-        """Constructor.
+    Orbital elements:
 
-        Parameters
-        ----------
-        attractor : Body
-            Main attractor.
-        p : ~astropy.units.Quantity
-            Semilatus rectum.
-        f : ~astropy.units.Quantity
-            Second modified equinoctial element.
-        g : ~astropy.units.Quantity
-            Third modified equinoctial element.
-        h : ~astropy.units.Quantity
-            Fourth modified equinoctial element.
-        k : ~astropy.units.Quantity
-            Fifth modified equinoctial element.
-        L : ~astropy.units.Quantity
-            True longitude.
-        plane : ~poliastro.frames.enums.Planes
-            Reference plane for the elements.
+    p : ~astropy.units.Quantity
+        Semilatus rectum.
+    f : ~astropy.units.Quantity
+        Second modified equinoctial element.
+    g : ~astropy.units.Quantity
+        Third modified equinoctial element.
+    h : ~astropy.units.Quantity
+        Fourth modified equinoctial element.
+    k : ~astropy.units.Quantity
+        Fifth modified equinoctial element.
+    L : ~astropy.units.Quantity
+        True longitude.
 
-        """
-        super().__init__(attractor, plane)
-        self._p = p
-        self._f = f
-        self._g = g
-        self._h = h
-        self._k = k
-        self._L = L
+    """
 
     @property
     def p(self):
         """Semilatus rectum."""
-        return self._p
+        return self._elements[0]
 
     @property
     def f(self):
         """Second modified equinoctial element."""
-        return self._f
+        return self._elements[1]
 
     @property
     def g(self):
         """Third modified equinoctial element."""
-        return self._g
+        return self._elements[2]
 
     @property
     def h(self):
         """Fourth modified equinoctial element."""
-        return self._h
+        return self._elements[3]
 
     @property
     def k(self):
         """Fifth modified equinoctial element."""
-        return self._k
+        return self._elements[4]
 
     @property
     def L(self):
         """True longitude."""
-        return self._L
+        return self._elements[5]
 
-    def to_classical(self):
-        """Converts to classical orbital elements representation."""
-        p, ecc, inc, raan, argp, nu = mee2coe(
+    def to_value(self):
+        return (
             self.p.to_value(u.km),
             self.f.to_value(u.rad),
             self.g.to_value(u.rad),
@@ -313,25 +314,26 @@ class ModifiedEquinoctialState(BaseState):
             self.L.to_value(u.rad),
         )
 
+    def to_classical(self):
+        """Converts to classical orbital elements representation."""
+        p, ecc, inc, raan, argp, nu = mee2coe(*self.to_value())
+
         return ClassicalState(
             self.attractor,
-            p * u.km,
-            ecc * u.one,
-            inc * u.rad,
-            raan * u.rad,
-            argp * u.rad,
-            nu * u.rad,
+            (
+                p << u.km,
+                ecc << u.one,
+                inc << u.rad,
+                raan << u.rad,
+                argp << u.rad,
+                nu << u.rad,
+            ),
             self.plane,
         )
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
-        r, v = mee2rv(
-            self.p.to(u.km).value,
-            self.f.to(u.rad).value,
-            self.g.to(u.rad).value,
-            self.h.to(u.rad).value,
-            self.k.to(u.rad).value,
-            self.L.to(u.rad).value,
+        r, v = mee2rv(*self.to_value())
+        return RVState(
+            self.attractor, (r << u.km, v << u.km / u.s), self.plane
         )
-        return RVState(self.attractor, r * u.km, v * u.km / u.s, self.plane)

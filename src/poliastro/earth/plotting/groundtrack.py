@@ -5,13 +5,14 @@ from astropy import units as u
 from astropy.coordinates import (
     GCRS,
     ITRS,
+    CartesianDifferential,
     CartesianRepresentation,
     SphericalRepresentation,
 )
 
 from poliastro.bodies import Earth
 from poliastro.earth.plotting.utils import EARTH_PALETTE
-from poliastro.twobody.propagation import propagate
+from poliastro.twobody.sampling import EpochsArray
 
 
 class GroundtrackPlotter:
@@ -78,12 +79,12 @@ class GroundtrackPlotter:
 
         self.fig.add_trace(trace)
 
-    def _get_raw_coords(self, ss, t_deltas):
+    def _get_raw_coords(self, orb, t_deltas):
         """Generates raw orbit coordinates for given epochs
 
         Parameters
         ----------
-        ss : ~poliastro.twobody.orbit
+        orb : ~poliastro.twobody.Orbit
             Orbit to be propagated
         t_deltas : ~astropy.time.DeltaTime
             Desired observation time
@@ -91,14 +92,20 @@ class GroundtrackPlotter:
         Returns
         -------
         raw_xyz : numpy.ndarray
-            A collection of raw cartessian position vectors
+            A collection of raw cartesian position vectors
         raw_epochs : numpy.ndarray
             Associated epoch with previously raw coordinates
         """
 
         # Solve for raw coordinates and epochs
-        raw_xyz = propagate(ss, t_deltas)
-        raw_epochs = ss.epoch + t_deltas
+        ephem = orb.to_ephem(EpochsArray(orb.epoch + t_deltas))
+        rr, vv = ephem.rv()
+        raw_xyz = CartesianRepresentation(
+            rr,
+            xyz_axis=-1,
+            differentials=CartesianDifferential(vv, xyz_axis=-1),
+        )
+        raw_epochs = ephem.epochs
 
         return raw_xyz, raw_epochs
 
@@ -121,7 +128,9 @@ class GroundtrackPlotter:
 
         # Build GCRS and ITRS coordinates
         gcrs_xyz = GCRS(
-            raw_xyz, obstime=raw_obstime, representation_type=CartesianRepresentation
+            raw_xyz,
+            obstime=raw_obstime,
+            representation_type=CartesianRepresentation,
         )
         itrs_xyz = gcrs_xyz.transform_to(ITRS(obstime=raw_obstime))
 
@@ -231,7 +240,9 @@ class GroundtrackPlotter:
         # Retrieve basic parameters and check for proper attractor
         ss = earth_ss.orbit
         if ss.attractor != Earth:
-            raise ValueError(f"Satellite should be orbiting Earth, not {ss.attractor}.")
+            raise ValueError(
+                f"Satellite should be orbiting Earth, not {ss.attractor}."
+            )
         else:
             t_deltas = t_span - ss.epoch
 

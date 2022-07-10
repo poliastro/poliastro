@@ -4,7 +4,7 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.13.6
+    jupytext_version: 1.14.0
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -21,9 +21,9 @@ kernelspec:
 
 +++
 
-- The only public source of orbital data for non-amateur Earth artificial satellites is the 18th Space Control Squadron (18 SPCS) from the United States Space Force (https://www.space-track.org/ and https://celestrak.com/NORAD/).
+- The only public source of orbital data for non-amateur Earth artificial satellites is the 18th Space Control Squadron (18 SPCS) from the United States Space Force (https://www.space-track.org/ and https://celestrak.org/NORAD/).
 - The data is disseminated as _general perturbations_ (**GP**) orbital data following the _Simplified General Perturbations 4_ (**SGP4**) propagation model.
-- Such GP orbital data has traditionally been transmitted in _Two-Line Element Sets_ or **TLEs**, although [in May 2020](https://celestrak.com/NORAD/documentation/gp-data-formats.php) it started being published in CCSDS _Orbit Mean-Elements Message_ (**OMM**) format as well.
+- Such GP orbital data has traditionally been transmitted in _Two-Line Element Sets_ or **TLEs**, although [in May 2020](https://celestrak.org/NORAD/documentation/gp-data-formats.php) it started being published in CCSDS _Orbit Mean-Elements Message_ (**OMM**) format as well.
 - The advantage of SGP4 is that it's an _analytical model_ that includes the most important natural perturbations, and it's much faster than an equivalent _numerical model_. Therefore, it's good for initial orbit design based on low-precision requirements.
 
 +++
@@ -57,7 +57,7 @@ Therefore, the **correct** way of using GP data is:
 
 As explained in the [Orbit Mean-Elements Messages (OMMs) support assessment](https://opensatcom.org/2020/12/28/omm-assessment-sgp4-benchmarks/) deliverable of OpenSatCom, OMM input/output support in open source libraries is somewhat scattered. Luckily, [python-sgp4](https://pypi.org/project/sgp4/) supports reading OMM in CSV and XML format, as well as usual TLE and 3LE formats. On the other hand, Astropy has accurate transformations from TEME to other reference frames.
 
-```{code-cell} ipython3
+```{code-cell}
 # From https://github.com/poliastro/poliastro/blob/main/contrib/satgpio.py
 """
 Author: Juan Luis Cano Rodríguez
@@ -83,7 +83,11 @@ from sgp4.api import Satrec
 
 
 def _generate_url(catalog_number, international_designator, name):
-    params = {"CATNR": catalog_number, "INTDES": international_designator, "NAME": name}
+    params = {
+        "CATNR": catalog_number,
+        "INTDES": international_designator,
+        "NAME": name,
+    }
     param_names = [
         param_name
         for param_name, param_value in params.items()
@@ -96,7 +100,7 @@ def _generate_url(catalog_number, international_designator, name):
     param_name = param_names[0]
     param_value = params[param_name]
     url = (
-        "https://celestrak.com/NORAD/elements/gp.php?"
+        "https://celestrak.org/NORAD/elements/gp.php?"
         f"{param_name}={param_value}"
         "&FORMAT=XML"
     )
@@ -134,7 +138,7 @@ def load_gp_from_celestrak(
     References
     ----------
     .. [1] Kelso, T.S. "A New Way to Obtain GP Data (aka TLEs)"
-       https://celestrak.com/NORAD/documentation/gp-data-formats.php
+       https://celestrak.org/NORAD/documentation/gp-data-formats.php
 
     """
     # Assemble query, raise an error if malformed
@@ -154,14 +158,14 @@ def print_sat(sat, name):
     print(json.dumps(exporter.export_omm(sat, name), indent=2))
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 sat = list(load_gp_from_celestrak(name="ISS (Zarya)"))[0]
-print_sat(sat, 'ISS (Zarya)')
+print_sat(sat, "ISS (Zarya)")
 ```
 
 The generator `load_gp_from_celestrak` might yield more than one satellite:
 
-```{code-cell} ipython3
+```{code-cell}
 len(list(load_gp_from_celestrak(name="COSMOS 1408 DEB")))
 ```
 
@@ -169,32 +173,32 @@ len(list(load_gp_from_celestrak(name="COSMOS 1408 DEB")))
 
 Now that we know how to load GP data, let's propagate it using the SGP4 algorithm:
 
-```{code-cell} ipython3
+```{code-cell}
 from astropy import units as u
 from astropy.time import Time
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 now = Time.now()
 now.jd1, now.jd2
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 error, r, v = sat.sgp4(now.jd1, now.jd2)
 assert error == 0
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 r << u.km
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 v << (u.km / u.s)
 ```
 
 Note that `Satrec` also supports propagating for arrays of time values using the `.sgp4_array` method:
 
-```{code-cell} ipython3
+```{code-cell}
 import numpy as np
 
 from astropy.coordinates import CartesianRepresentation, CartesianDifferential
@@ -202,26 +206,26 @@ from astropy.coordinates import CartesianRepresentation, CartesianDifferential
 from poliastro.util import time_range
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 times = time_range(now, end=now + (1 << u.h), periods=3)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 errors, rs, vs = sat.sgp4_array(times.jd1, times.jd2)
 assert (errors == 0).all()
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 CartesianRepresentation(rs << u.km, xyz_axis=-1)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 CartesianDifferential(vs << (u.km / u.s), xyz_axis=-1)
 ```
 
 Mixing all together, and leveraging poliastro `Ephem` objects, we can compute ephemerides from GP orbital data:
 
-```{code-cell} ipython3
+```{code-cell}
 from warnings import warn
 
 from astropy.coordinates import TEME, GCRS
@@ -250,19 +254,23 @@ def ephem_from_gp(sat, times):
             xyz_axis=-1,
         ),
     )
-    cart_gcrs = TEME(cart_teme, obstime=times).transform_to(GCRS(obstime=times)).cartesian
+    cart_gcrs = (
+        TEME(cart_teme, obstime=times)
+        .transform_to(GCRS(obstime=times))
+        .cartesian
+    )
 
     return Ephem(cart_gcrs, times, plane=Planes.EARTH_EQUATOR)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 iss_ephem = ephem_from_gp(sat, time_range(now, end=now + (3 << u.h)))
 iss_ephem
 ```
 
 And plot it!
 
-```{code-cell} ipython3
+```{code-cell}
 from poliastro.bodies import Earth
 from poliastro.plotting import OrbitPlotter3D
 
@@ -275,7 +283,7 @@ plotter.show()
 
 We can also plot the trajectory of the ISS for 90 minutes, plus the trajectories of the first 25 debris fragments:
 
-```{code-cell} ipython3
+```{code-cell}
 from itertools import islice
 
 epochs = time_range(now, end=now + (90 << u.minute))
@@ -286,9 +294,13 @@ plotter = OrbitPlotter3D()
 plotter.set_attractor(Earth)
 plotter.plot_ephem(iss_ephem, color="#333", label="ISS", trail=True)
 
-for debris_fragment in islice(load_gp_from_celestrak(name="COSMOS 1408 DEB"), 25):
+for debris_fragment in islice(
+    load_gp_from_celestrak(name="COSMOS 1408 DEB"), 25
+):
     debris_ephem = ephem_from_gp(debris_fragment, epochs)
-    plotter.plot_ephem(debris_ephem, color="#666", label=debris_fragment.satnum, trail=True)
+    plotter.plot_ephem(
+        debris_ephem, color="#666", label=debris_fragment.satnum, trail=True
+    )
 
 plotter.show()
 ```

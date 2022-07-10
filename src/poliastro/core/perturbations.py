@@ -151,7 +151,7 @@ def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
     A_over_m : float
         Frontal area/mass of the spacecraft (km^2/kg)
     rho : float
-        Air density at corresponding state (kg/m^3)
+        Air density at corresponding state (kg/km^3)
 
     Notes
     -----
@@ -195,7 +195,10 @@ def third_body(t0, state, k, k_third, perturbation_body):
     """
     body_r = perturbation_body(t0)
     delta_r = body_r - state[:3]
-    return k_third * delta_r / norm(delta_r) ** 3 - k_third * body_r / norm(body_r) ** 3
+    return (
+        k_third * delta_r / norm(delta_r) ** 3
+        - k_third * body_r / norm(body_r) ** 3
+    )
 
 
 def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
@@ -220,7 +223,7 @@ def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
     A_over_m : float
         Effective spacecraft area/mass of the spacecraft (km^2/kg).
     Wdivc_s : float
-        Total star emitted power divided by the speed of light (W * s / km).
+        Total star emitted power divided by the speed of light (kg km/s^2).
     star : callable
         A callable object returning the position of radiating star
         in the attractor frame.

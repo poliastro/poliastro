@@ -141,10 +141,22 @@ def getUdiff_CR3BP(r_, mu):
 
     # computing the double derivates with position
     Uxx = 1 - (1 - mu) / r13**3 - mu / r23**3
-    +3 * (1 - mu) * (rx + mu) ** 2 / r13**5 + 3 * mu * (rx + mu - 1) ** 2 / r23**5
-    Uyy = 1 - (1 - mu) / r13**3 - mu / r23**3 + 3 * (1 - mu) * ry**2 / r13**5
+    (
+        +3 * (1 - mu) * (rx + mu) ** 2 / r13**5
+        + 3 * mu * (rx + mu - 1) ** 2 / r23**5
+    )
+    Uyy = (
+        1
+        - (1 - mu) / r13**3
+        - mu / r23**3
+        + 3 * (1 - mu) * ry**2 / r13**5
+    )
     +3 * mu * ry**2 / r23**5
-    Uzz = -(1 - mu) / r13**3 - mu / r23**3 + 3 * (1 - mu) * rz**2 / r13**5
+    Uzz = (
+        -(1 - mu) / r13**3
+        - mu / r23**3
+        + 3 * (1 - mu) * rz**2 / r13**5
+    )
     +3 * mu * rz**2 / r23**5
     Uxy = (
         3 * ry * (1 - mu) * (rx + mu) / r13**5

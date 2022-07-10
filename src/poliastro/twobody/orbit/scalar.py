@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import List, Union
 from warnings import warn
 
@@ -10,34 +11,22 @@ from astropy.coordinates import (
     get_body_barycentric,
 )
 
+from poliastro.bodies import Earth
+from poliastro.core.events import elevation_function as elevation_function_fast
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.elements import (
-    coe2rv_many,
-    eccentricity_vector,
-    energy,
-    hyp_nu_limit,
-    t_p,
-)
+from poliastro.twobody.elements import eccentricity_vector, energy, t_p
 from poliastro.twobody.orbit.creation import OrbitCreationMixin
-from poliastro.twobody.propagation import farnocchia, propagate
-from poliastro.twobody.sampling import sample_closed
+from poliastro.twobody.propagation import FarnocchiaPropagator, PropagatorKind
+from poliastro.twobody.sampling import TrueAnomalyBounds
 from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
-from poliastro.warnings import OrbitSamplingWarning, PatchedConicsWarning
-
-try:
-    from functools import cached_property  # type: ignore
-except ImportError:
-    from cached_property import cached_property  # type: ignore
-
+from poliastro.warnings import PatchedConicsWarning
 
 ORBIT_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} ({frame}) orbit around {body} at epoch {epoch} ({scale})"
 # String representation for orbits around bodies without predefined
 # Reference frame
-ORBIT_NO_FRAME_FORMAT = (
-    "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
-)
+ORBIT_NO_FRAME_FORMAT = "{r_p:.0f} x {r_a:.0f} x {inc:.1f} orbit around {body} at epoch {epoch} ({scale})"
 
 
 class Orbit(OrbitCreationMixin):
@@ -103,12 +92,12 @@ class Orbit(OrbitCreationMixin):
     @cached_property
     def r_p(self):
         """Radius of pericenter."""
-        return self.a * (1 - self.ecc)
+        return self._state.r_p
 
     @cached_property
     def r_a(self):
         """Radius of apocenter."""
-        return self.a * (1 + self.ecc)
+        return self._state.r_a
 
     @cached_property
     def ecc(self):
@@ -183,7 +172,11 @@ class Orbit(OrbitCreationMixin):
     @cached_property
     def h_vec(self):
         """Specific angular momentum vector."""
-        h_vec = np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s)) * u.km**2 / u.s
+        h_vec = (
+            np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s))
+            * u.km**2
+            / u.s
+        )
         return h_vec
 
     @cached_property
@@ -201,12 +194,7 @@ class Orbit(OrbitCreationMixin):
     @cached_property
     def t_p(self):
         """Elapsed time since latest perifocal passage."""
-        return t_p(
-            self.nu,
-            self.ecc,
-            self.attractor.k,
-            self.r_p,
-        )
+        return self._state.t_p
 
     def get_frame(self):
         """Get equivalent reference frame of the orbit.
@@ -238,7 +226,9 @@ class Orbit(OrbitCreationMixin):
             return self
         elif self.attractor == new_attractor.parent:  # "Sun -> Earth"
             r_soi = laplace_radius(new_attractor)
-            barycentric_position = get_body_barycentric(new_attractor.name, self.epoch)
+            barycentric_position = get_body_barycentric(
+                new_attractor.name, self.epoch
+            )
             # Transforming new_attractor's frame into frame of attractor
             new_attractor_r = (
                 ICRS(barycentric_position)
@@ -258,7 +248,9 @@ class Orbit(OrbitCreationMixin):
                 "Orbit is out of new attractor's SOI. If required, use 'force=True'."
             )
         elif self.ecc < 1.0 and not force:
-            raise ValueError("Orbit will never leave the SOI of its current attractor")
+            raise ValueError(
+                "Orbit will never leave the SOI of its current attractor"
+            )
         else:
             warn(
                 "Leaving the SOI of the current attractor",
@@ -402,7 +394,7 @@ class Orbit(OrbitCreationMixin):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, value, method=farnocchia, rtol=1e-10, **kwargs):
+    def propagate(self, value, method=FarnocchiaPropagator()):
         """Propagates an orbit a specified time.
 
         If value is true anomaly, propagate orbit to this anomaly and return the result.
@@ -412,12 +404,8 @@ class Orbit(OrbitCreationMixin):
         ----------
         value : ~astropy.units.Quantity, ~astropy.time.Time, ~astropy.time.TimeDelta
             Scalar time to propagate.
-        rtol : float, optional
-            Relative tolerance for the propagation algorithm, default to 1e-10.
         method : function, optional
-            Method used for propagation
-        **kwargs
-            parameters used in perturbation models
+            Method used for propagation, default to farnocchia.
 
         Returns
         -------
@@ -425,22 +413,41 @@ class Orbit(OrbitCreationMixin):
             New orbit after propagation.
 
         """
-        if isinstance(value, time.Time) and not isinstance(value, time.TimeDelta):
+        if value.ndim != 0:
+            raise ValueError(
+                "propagate only accepts scalar values for time of flight"
+            )
+
+        if isinstance(value, time.Time) and not isinstance(
+            value, time.TimeDelta
+        ):
             time_of_flight = value - self.epoch
         else:
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        cartesian = propagate(self, time_of_flight, method=method, rtol=rtol, **kwargs)
+        # Check if propagator fulfills orbit requirements
+        # Note there's a potential conversion here purely for convenience that could be skipped
+        if self.ecc < 1.0 and not (method.kind & PropagatorKind.ELLIPTIC):
+            raise ValueError(
+                "Can not use an parabolic/hyperbolic propagator for elliptical/circular orbits."
+            )
+        elif self.ecc == 1.0 and not (method.kind & PropagatorKind.PARABOLIC):
+            raise ValueError(
+                "Can not use an elliptic/hyperbolic propagator for parabolic orbits."
+            )
+        elif self.ecc > 1.0 and not (method.kind & PropagatorKind.HYPERBOLIC):
+            raise ValueError(
+                "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
+            )
+
+        new_state = method.propagate(
+            self._state,
+            time_of_flight,
+        )
         new_epoch = self.epoch + time_of_flight
 
-        return self.from_vectors(
-            self.attractor,
-            cartesian[0].xyz,
-            cartesian[0].differentials["s"].d_xyz,
-            new_epoch,
-            plane=self.plane,
-        )
+        return self.__class__(new_state, new_epoch)
 
     @u.quantity_input(value=u.rad)
     def time_to_anomaly(self, value):
@@ -508,29 +515,16 @@ class Orbit(OrbitCreationMixin):
             plane=self.plane,
         )
 
-    def _sample_open(self, values, min_anomaly, max_anomaly):
-        # Select a sensible limiting value for non-closed orbits
-        # This corresponds to max(r = 3p, r = self.r)
-        # We have to wrap nu in [-180, 180) to compare it with the output of
-        # the arc cosine, which is in the range [0, 180)
-        # Start from -nu_limit
-        wrapped_nu = wrap_angle(self.nu)
-        nu_limit = max(hyp_nu_limit(self.ecc, 3.0), abs(wrapped_nu)).to_value(u.rad)
+    def to_ephem(self, strategy=TrueAnomalyBounds()):
+        """Samples Orbit to return an ephemerides.
 
-        limits = [
-            min_anomaly.to_value(u.rad) if min_anomaly is not None else -nu_limit,
-            max_anomaly.to_value(u.rad) if max_anomaly is not None else nu_limit,
-        ] * u.rad  # type: u.Quantity
+        .. versionadded:: 0.17.0
 
-        # Now we check that none of the provided values
-        # is outside of the hyperbolic range
-        nu_max = hyp_nu_limit(self.ecc) - 1e-3 * u.rad  # Arbitrary delta
-        if not ((-nu_max <= limits).all() and (limits < nu_max).all()):
-            warn("anomaly outside range, clipping", OrbitSamplingWarning, stacklevel=2)
-            limits = limits.clip(-nu_max, nu_max)
+        """
+        from poliastro.ephem import Ephem
 
-        nu_values = np.linspace(*limits, values)  # type: ignore
-        return nu_values
+        coordinates, epochs = strategy.sample(self)
+        return Ephem(coordinates, epochs, self.plane)
 
     def sample(self, values=100, *, min_anomaly=None, max_anomaly=None):
         r"""Samples an orbit to some specified time values.
@@ -569,32 +563,24 @@ class Orbit(OrbitCreationMixin):
         <CartesianRepresentation (x, y, z) in km ...
 
         """
-        if self.ecc < 1:
-            nu_values = sample_closed(
-                min_anomaly if min_anomaly is not None else self.nu,
-                self.ecc,
-                max_anomaly,
-                values,
+        if min_anomaly is not None or max_anomaly is not None:
+            warn(
+                "Specifying min_anomaly and max_anomaly in method `sample` is deprecated "
+                "and will be removed in a future release, "
+                "use `Orbit.to_ephem(strategy=TrueAnomalyBounds(min_nu=..., max_nu=...))` instead",
+                DeprecationWarning,
+                stacklevel=2,
             )
-        else:
-            nu_values = self._sample_open(values, min_anomaly, max_anomaly)
 
-        n = nu_values.shape[0]
-        rr, vv = coe2rv_many(
-            np.tile(self.attractor.k, n),
-            np.tile(self.p, n),
-            np.tile(self.ecc, n),
-            np.tile(self.inc, n),
-            np.tile(self.raan, n),
-            np.tile(self.argp, n),
-            nu_values,
+        ephem = self.to_ephem(
+            strategy=TrueAnomalyBounds(
+                min_nu=min_anomaly,
+                max_nu=max_anomaly,
+                num_values=values,
+            ),
         )
-
-        cartesian = CartesianRepresentation(
-            rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
-        )
-
-        return cartesian
+        # We call .sample() at the end to retrieve the coordinates for the same epochs
+        return ephem.sample()
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.
@@ -619,7 +605,11 @@ class Orbit(OrbitCreationMixin):
             r, v = orbit_new.rv()
             vnew = v + delta_v
             orbit_new = self.from_vectors(
-                attractor=attractor, r=r, v=vnew, epoch=orbit_new.epoch, plane=plane
+                attractor=attractor,
+                r=r,
+                v=vnew,
+                epoch=orbit_new.epoch,
+                plane=plane,
             )
             if intermediate:  # Avoid keeping them in memory.
                 states.append(orbit_new)
@@ -659,3 +649,47 @@ class Orbit(OrbitCreationMixin):
             from poliastro.plotting.interactive import OrbitPlotter2D
 
             return OrbitPlotter2D().plot(self, label=label)
+
+    def elevation(self, lat, theta, h):
+        """
+        Elevation
+
+        Parameters
+        ----------
+        lat: astropy.units.Quantity
+            Latitude of the observation point on the attractor.
+        theta: astropy.units.Quantity
+            Local sideral time of the observation point on the attractor.
+        h: astropy.units.Quantity
+            Height of the station above the attractor.
+
+        Returns
+        -------
+        elevation: astropy.units.Quantity
+            Elevation of the orbit with respect to a location on attractor, in units of radian.
+
+        Notes
+        -----
+        Local sideral time needs to be precomputed. If Earth is the attractor, it can
+        be computed using `poliastro.earth.util.get_local_sidereal_time`.
+        """
+        if self.attractor != Earth:
+            raise NotImplementedError(
+                "Elevation implementation is currently only supported for orbits having Earth as the attractor."
+            )
+
+        x, y, z = self.r.to_value(u.km)
+        vx, vy, vz = self.v.to_value(u.km / u.s)
+        u_ = np.array([x, y, z, vx, vy, vz])
+
+        elevation = elevation_function_fast(
+            self.attractor.k.to_value(u.km**3 / u.s**2),
+            u_,
+            lat.to_value(u.rad),
+            theta.to_value(u.rad),
+            self.attractor.R.to(u.km).value,
+            self.attractor.R_polar.to(u.km).value,
+            h.to_value(u.km),
+        )
+
+        return elevation << u.rad

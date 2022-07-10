@@ -129,7 +129,9 @@ def rvel(r, v):
         x3thm1 = 3 * theta2 - 1
         x1mth2 = 1 - theta2
         x7thm1 = 7 * theta2 - 1
-        r = (rk - 0.5 * temp1 * x1mth2 * cos2u) / (1 - 1.5 * temp2 * betal * x3thm1)
+        r = (rk - 0.5 * temp1 * x1mth2 * cos2u) / (
+            1 - 1.5 * temp2 * betal * x3thm1
+        )
         u = uk + 0.25 * temp2 * x7thm1 * sin2u
         xnodeo = xnodek - 1.5 * temp2 * cosio * sin2u
         xincl = xinck - 1.5 * temp2 * cosio * sinio * cos2u

@@ -100,7 +100,11 @@ def ground_range_diff_at_azimuth(
     nadir_lon = nadir_lon.to_value(u.rad)
     R = R.to_value(u.km)
 
-    ground_range_diff, target_lat, target_lon = ground_range_diff_at_azimuth_fast(
+    (
+        ground_range_diff,
+        target_lat,
+        target_lon,
+    ) = ground_range_diff_at_azimuth_fast(
         altitude, fov, boresight, azimuth, nadir_lat, nadir_lon, R
     )
 

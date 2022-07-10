@@ -4,7 +4,7 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.13.6
+    jupytext_version: 1.14.0
 kernelspec:
   display_name: Python 3
   language: python
@@ -23,7 +23,7 @@ The Lambert's problem tries to solve for the orbit which passes trhough $\vec{r_
 
 There are two scenarios for solving Lambert's problem:
 
-* **Single revolution or direct-transfer arc.** This type of solution considers transfer angles which do not exceed $360$ degrees. Elliptic, parabolic and hyperbolic transfer solutions can be found within this scenario. 
+* **Single revolution or direct-transfer arc.** This type of solution considers transfer angles which do not exceed $360$ degrees. Elliptic, parabolic and hyperbolic transfer solutions can be found within this scenario.
 
 * **Multiple revolution arc.** This second case asumes transfer angles which exceed a single revolution (i.e. $>360$ degrees). Because multiple revolutions are required, transfer solutions need to be closed orbit and therefore, only elliptical orbits can be found in this scenario.
 
@@ -102,7 +102,7 @@ The minimum energy transfer orbit is used as a reference point by Lambert's prob
 
 Now, let us present how to use poliastro to solve for the multiple revolutions scenario. The idea is to compute all possible transfer orbits between Earth and Mars. Therefore, we need first to compute the initial position of the Earth and the final position of times for a given desired amount of time.
 
-```{code-cell} ipython3
+```{code-cell}
 from astropy import units as u
 from astropy.time import Time
 
@@ -114,7 +114,7 @@ from poliastro.util import time_range
 
 Computing the initial and final position orbits for each planet:
 
-```{code-cell} ipython3
+```{code-cell}
 # Departure and time of flight for the mission
 EPOCH_DPT = Time("2018-12-01", scale="tdb")
 EPOCH_ARR = EPOCH_DPT + 2 * u.year
@@ -131,40 +131,49 @@ mars_arrival = Orbit.from_ephem(Sun, mars, EPOCH_ARR)
 
 Let us generate all the possible combinations of prograde/retrograde and low/high path. We can take advantage of the `itertools` package:
 
-```{code-cell} ipython3
+```{code-cell}
 from itertools import product
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # Generate all possible combinations of type of motion and path
 type_of_motion_and_path = list(product([True, False], repeat=2))
 
 # Prograde orbits use blue color while retrograde ones are drawn in red
-colors_and_styles = [color + style for color in ['b', 'r'] for style in ['-','--']]
+colors_and_styles = [
+    color + style for color in ["b", "r"] for style in ["-", "--"]
+]
 ```
 
-We now define a function for solving all the possible solutions 
+We now define a function for solving all the possible solutions
 
-```{code-cell} ipython3
+```{code-cell}
 from poliastro.maneuver import Maneuver
+
 
 def lambert_solution_orbits(ss_departure, ss_arrival, M):
     """Computes all available solution orbits to the Lambert's problem."""
-    
+
     for (is_prograde, is_lowpath) in type_of_motion_and_path:
-        ss_sol = Maneuver.lambert(ss_departure, ss_arrival, M=M, prograde=is_prograde, lowpath=is_lowpath)
+        ss_sol = Maneuver.lambert(
+            ss_departure,
+            ss_arrival,
+            M=M,
+            prograde=is_prograde,
+            lowpath=is_lowpath,
+        )
         yield ss_sol
 ```
 
 Finally, we can plot all the different scenarios from $M=0$ up to $M=2$ revolutions:
 
-```{code-cell} ipython3
+```{code-cell}
 from matplotlib import pyplot as plt
 
 from poliastro.plotting import StaticOrbitPlotter
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # Generate a grid of 3x1 plots
 fig, axs = plt.subplots(3, 1, figsize=(8, 8))
 
@@ -172,12 +181,17 @@ for ith_case, M in enumerate(range(3)):
     # Plot the orbits of the Earth and Mars
     op = StaticOrbitPlotter(ax=axs[ith_case])
     axs[ith_case].set_title(f"{M = } scenario")
-    
+
     op.plot_body_orbit(Earth, EPOCH_DPT)
     op.plot_body_orbit(Mars, EPOCH_ARR)
 
-    for ss, colorstyle in zip(lambert_solution_orbits(earth_departure, mars_arrival, M=M), colors_and_styles):
-        ss_plot_traj = op.plot_maneuver(earth_departure, ss, color=colorstyle[0])
-        
+    for ss, colorstyle in zip(
+        lambert_solution_orbits(earth_departure, mars_arrival, M=M),
+        colors_and_styles,
+    ):
+        ss_plot_traj = op.plot_maneuver(
+            earth_departure, ss, color=colorstyle[0]
+        )
+
 plt.show()
 ```

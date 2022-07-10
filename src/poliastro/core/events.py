@@ -3,6 +3,7 @@ from numba import njit as jit
 
 from poliastro._math.linalg import norm
 from poliastro.core.elements import coe_rotation_matrix, rv2coe
+from poliastro.core.util import planetocentric_to_AltAz
 
 
 @jit
@@ -50,7 +51,10 @@ def eclipse_function(k, u_, r_sec, R_sec, R_primary, umbra=True):
         ((R_primary**2) * (1 + ecc * np.cos(nu)) ** 2)
         + (p**2) * (cos_psi**2)
         - p**2
-        + pm * (2 * p * R_primary * cos_psi) * (1 + ecc * np.cos(nu)) * sin_delta_shadow
+        + pm
+        * (2 * p * R_primary * cos_psi)
+        * (1 + ecc * np.cos(nu))
+        * sin_delta_shadow
     )
 
     return shadow_function
@@ -84,3 +88,50 @@ def line_of_sight(r1, r2, R):
     theta_2 = np.arccos(R / r2_norm)
 
     return (theta_1 + theta_2) - theta
+
+
+@jit
+def elevation_function(k, u_, phi, theta, R, R_p, H):
+    """Calculates the elevation angle of an object in orbit with respect to
+    a location on attractor.
+
+    Parameters
+    ----------
+    k: float
+        Standard gravitational parameter.
+    u_: numpy.ndarray
+        Satellite position and velocity vector with respect to the central attractor.
+    phi: float
+        Geodetic Latitude of the station.
+    theta: float
+        Local sidereal time at a particular instant.
+    R: float
+        Equatorial radius of the central attractor.
+    R_p: float
+        Polar radius of the central attractor.
+    H: float
+        Elevation, above the ellipsoidal surface.
+    """
+    ecc = np.sqrt(1 - (R_p / R) ** 2)
+    denom = np.sqrt(1 - ecc**2 * np.sin(phi) ** 2)
+    g1 = H + (R / denom)
+    g2 = H + (1 - ecc**2) * R / denom
+    # Coordinates of location on attractor.
+    coords = np.array(
+        [
+            g1 * np.cos(phi) * np.cos(theta),
+            g1 * np.cos(phi) * np.sin(theta),
+            g2 * np.sin(phi),
+        ]
+    )
+
+    # Position of satellite with respect to a point on attractor.
+    rho = np.subtract(u_[:3], coords)
+
+    rot_matrix = planetocentric_to_AltAz(theta, phi)
+
+    new_rho = rot_matrix @ rho
+    new_rho = new_rho / np.linalg.norm(new_rho)
+    el = np.arcsin(new_rho[-1])
+
+    return el

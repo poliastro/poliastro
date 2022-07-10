@@ -185,7 +185,7 @@ class Maneuver:
 
         # Time of flight is solved by subtracting both orbit epochs
         tof = orbit_f.epoch - orbit_i.epoch
-        if tof < 0:
+        if tof.to_value(u.s) < 0:
             raise ValueError(
                 "Epoch of initial orbit greater than epoch of final orbit, "
                 "causing a negative time of flight"
@@ -253,7 +253,9 @@ class Maneuver:
         ecc = orbit.ecc.value
         max_delta_r = max_delta_r.value
 
-        delta_t, vf_ = correct_pericenter_fast(k, R, J2, max_delta_r, v, a, inc, ecc)
+        delta_t, vf_ = correct_pericenter_fast(
+            k, R, J2, max_delta_r, v, a, inc, ecc
+        )
         delta_t = delta_t * u.s
         vf_ = vf_ * u.km / u.s
 
