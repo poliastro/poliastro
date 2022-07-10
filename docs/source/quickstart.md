@@ -1,9 +1,9 @@
 (quickstart)=
 # Quickstart
 
-## Defining the orbit: {py:class}`~poliastro.twobody.orbit.Orbit` objects
+## Defining the orbit: {{ Orbit }} objects
 
-The core of poliastro are the {py:class}`~poliastro.twobody.orbit.Orbit` objects
+The core of poliastro are the {{ Orbit }} objects
 inside the {py:class}`poliastro.twobody` module. They store all the required
 information to define an orbit:
 
@@ -23,10 +23,9 @@ from poliastro.twobody import Orbit
 
 ## From position and velocity
 
-There are several methods available to create
-{py:class}`~poliastro.twobody.orbit.Orbit` objects. For example, if you have the
-position and velocity vectors you can use
-{py:meth}`~poliastro.twobody.orbit.Orbit.from_vectors`:
+There are several methods available to create {{ Orbit }} objects.
+For example, if you have the position and velocity vectors you can use
+{py:meth}`~poliastro.twobody.orbit.scalar.Orbit.from_vectors`:
 
 ```python
 # Data from Curtis, example 4.3
@@ -58,8 +57,8 @@ And that's it! Notice a couple of things:
   '2000-01-01 12:00:00.000'
   ```
 
-- The reference frame of the orbit will be one pseudo-inertial frame around the
-  attractor. You can retrieve it using the {py:attr}`~poliastro.twobody.orbit.Orbit.frame` property:
+- The reference frame of the orbit will be one pseudo-inertial frame around the attractor.
+  You can retrieve it using the {py:attr}`~poliastro.twobody.orbit.scalar.Orbit.frame` property:
   ```python
   >>> orb.get_frame()
   <GCRS Frame (obstime=J2000.000, obsgeoloc=(0., 0., 0.) m, obsgeovel=(0., 0., 0.) m / s)>
@@ -95,9 +94,8 @@ To use the static interface based on matplotlib, which might be more useful for 
 
 ## From classical orbital elements
 
-You can also define an {py:class}`~poliastro.twobody.orbit.Orbit` using a set of
-six parameters called orbital elements. Although there are several of these element sets,
-each one with its advantages and drawbacks,
+You can also define an {{ Orbit }} using a set of six parameters called **orbital elements**.
+Although there are several of these element sets, each one with its advantages and drawbacks,
 right now poliastro supports the *classical orbital elements*:
 
 - Semimajor axis $(a)$.
@@ -122,7 +120,7 @@ nu = 23.33 << u.deg
 orb = Orbit.from_classical(Sun, a, ecc, inc, raan, argp, nu)
 ```
 
-Notice that whether you create an `Orbit` from $(r)$ and $(v)$ or from
+Notice that whether you create an {{ Orbit }} from $(r)$ and $(v)$ or from
 elements you can access many mathematical properties of the orbit:
 ```python
 >>> orb.period.to(u.day)
@@ -131,9 +129,7 @@ elements you can access many mathematical properties of the orbit:
 <Quantity [  1.16420211, 26.29603612,  0.52229379] km / s>
 ```
 
-To see a complete list of properties, check out the
-{py:class}`poliastro.twobody.orbit.Orbit` class on the API reference.
-
+To see a complete list of properties, check out the {{ Orbit }} class on the API reference.
 
 ## Moving forward in time: propagation
 
@@ -155,7 +151,7 @@ For example, start by importing an example orbit from the International Space St
 <Quantity 3.887010576192155 deg / min>
 ```
 
-Using the {py:meth}`~poliastro.twobody.orbit.Orbit.propagate` method
+Using the {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.propagate` method
 you can now retrieve the position of the ISS after some time:
 
 ```python
@@ -173,8 +169,8 @@ To explore different propagation algorithms, check out the
 
 The `propagate` method gives you the final orbit at the epoch you designated.
 To retrieve the whole trajectory instead, you can use
-{py:meth}`poliastro.twobody.Orbit.to_ephem`, which returns an
-{py:class}`~poliastro.ephem.Ephem` instance:
+{py:meth}`poliastro.twobody.orbit.scalar.Orbit.to_ephem`, which returns an
+{{ Ephem }} instance:
 
 ```python
 from poliastro.twobody.sampling import EpochsArray, TrueAnomalyBounds, EpochBounds
@@ -364,8 +360,8 @@ You can also retrieve the individual vectorial impulses:
 (<Quantity 15729.741535747102 s>, <Quantity [ 0.        , 1.41999995, 0.        ] km / s>)
 ```
 
-To actually retrieve the resulting `Orbit` after performing a maneuver, use
-the method {py:meth}`~poliastro.twobody.orbit.Orbit.apply_maneuver`:
+To actually retrieve the resulting {{ Orbit }} after performing a maneuver, use
+the method {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.apply_maneuver`:
 
 ```python
 >>> orb_f = orb_i.apply_maneuver(hoh)
@@ -375,13 +371,13 @@ the method {py:meth}`~poliastro.twobody.orbit.Orbit.apply_maneuver`:
 
 ### More advanced plotting: `OrbitPlotter*` objects
 
-You previously saw the {py:meth}`~poliastro.twobody.Orbit.plot` method to easily plot orbits.
+You previously saw the {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.plot` method to easily plot orbits.
 Now you might want to plot several orbits in one graph
 (for example, the maneuver you computed in the previous section).
 For this purpose, poliastro has `OrbitPlotter*` objects in the {py:mod}`~poliastro.plotting` module.
 
 These objects come in two flavors. {py:class}`~poliastro.plotting.OrbitPlotter2D`
-holds the perifocal plane of the first `Orbit` you plot in it,
+holds the perifocal plane of the first {{ Orbit }} you plot in it,
 projecting any further trajectories on this plane.
 On the other hand, {py:class}`~poliastro.plotting.OrbitPlotter3D`
 allows you to interactively rotate the three-dimensional view.
@@ -445,7 +441,7 @@ For more information, check out
 [Astropy documentation on ephemerides](https://docs.astropy.org/en/stable/coordinates/solarsystem.html).
 
 If you want to retrieve the **osculating orbit** at a given epoch,
-you can do so using {py:meth}`~poliastro.twobody.Orbit.from_ephem`:
+you can do so using {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.from_ephem`:
 
 ```python
 >>> Orbit.from_ephem(Sun, earth, epoch)
