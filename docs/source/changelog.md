@@ -1,6 +1,6 @@
 # What's new
 
-## poliastro 0.17.0 - To be released
+## poliastro 0.17.0 - 2022-07-10
 
 ### Highlights
 
