@@ -11,7 +11,7 @@ from poliastro.core.propagation import func_twobody
 from poliastro.earth.enums import EarthGravity
 from poliastro.spacecraft import Spacecraft
 from poliastro.twobody.orbit import Orbit
-from poliastro.twobody.propagation import cowell
+from poliastro.twobody.propagation import CowellPropagator
 
 
 class EarthSatellite:
@@ -113,5 +113,5 @@ class EarthSatellite:
             return du_kep + du_ad
 
         ad_kwargs.update(perturbations=perturbations)
-        new_orbit = self.orbit.propagate(value=tof, method=cowell, f=f)
+        new_orbit = self.orbit.propagate(tof, method=CowellPropagator(f=f))
         return EarthSatellite(new_orbit, self.spacecraft)

@@ -57,7 +57,7 @@ class OrbitCreationMixin:
                 f"Vectors must have dimension 1, got {r.ndim} and {v.ndim}"
             )
 
-        ss = RVState(attractor, r, v, plane)
+        ss = RVState(attractor, (r, v), plane)
         return cls(ss, epoch)
 
     @classmethod
@@ -176,7 +176,7 @@ class OrbitCreationMixin:
             ).to(nu.unit)
 
         ss = ClassicalState(
-            attractor, a * (1 - ecc**2), ecc, inc, raan, argp, nu, plane
+            attractor, (a * (1 - ecc**2), ecc, inc, raan, argp, nu), plane
         )
         return cls(ss, epoch)
 
@@ -218,7 +218,7 @@ class OrbitCreationMixin:
             Fundamental plane of the frame.
 
         """
-        ss = ModifiedEquinoctialState(attractor, p, f, g, h, k, L, plane)
+        ss = ModifiedEquinoctialState(attractor, (p, f, g, h, k, L), plane)
         return cls(ss, epoch)
 
     @classmethod
@@ -548,7 +548,7 @@ class OrbitCreationMixin:
 
         """
         ss = ClassicalState(
-            attractor, p, 1.0 * u.one, inc, raan, argp, nu, plane
+            attractor, (p, 1.0 * u.one, inc, raan, argp, nu), plane
         )
         return cls(ss, epoch)
 

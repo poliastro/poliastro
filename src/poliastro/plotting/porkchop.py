@@ -70,7 +70,7 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
     # Define time of flight
     tof = ss_arr.epoch - ss_dpt.epoch
 
-    if tof <= 0:
+    if tof.to_value(u.s) <= 0:
         return None, None, None, None, None
 
     try:

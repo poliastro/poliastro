@@ -15,16 +15,10 @@ from poliastro.bodies import Earth
 from poliastro.core.events import elevation_function as elevation_function_fast
 from poliastro.frames.util import get_frame
 from poliastro.threebody.soi import laplace_radius
-from poliastro.twobody.elements import (
-    coe2rv_many,
-    eccentricity_vector,
-    energy,
-    hyp_nu_limit,
-    t_p,
-)
+from poliastro.twobody.elements import eccentricity_vector, energy, t_p
 from poliastro.twobody.orbit.creation import OrbitCreationMixin
-from poliastro.twobody.propagation import farnocchia, propagate
-from poliastro.twobody.sampling import sample_closed, sample_open
+from poliastro.twobody.propagation import FarnocchiaPropagator, PropagatorKind
+from poliastro.twobody.sampling import TrueAnomalyBounds
 from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import PatchedConicsWarning
@@ -400,7 +394,7 @@ class Orbit(OrbitCreationMixin):
     def __repr__(self):
         return self.__str__()
 
-    def propagate(self, value, method=farnocchia, rtol=1e-10, **kwargs):
+    def propagate(self, value, method=FarnocchiaPropagator()):
         """Propagates an orbit a specified time.
 
         If value is true anomaly, propagate orbit to this anomaly and return the result.
@@ -410,12 +404,8 @@ class Orbit(OrbitCreationMixin):
         ----------
         value : ~astropy.units.Quantity, ~astropy.time.Time, ~astropy.time.TimeDelta
             Scalar time to propagate.
-        rtol : float, optional
-            Relative tolerance for the propagation algorithm, default to 1e-10.
         method : function, optional
-            Method used for propagation
-        **kwargs
-            parameters used in perturbation models
+            Method used for propagation, default to farnocchia.
 
         Returns
         -------
@@ -423,6 +413,11 @@ class Orbit(OrbitCreationMixin):
             New orbit after propagation.
 
         """
+        if value.ndim != 0:
+            raise ValueError(
+                "propagate only accepts scalar values for time of flight"
+            )
+
         if isinstance(value, time.Time) and not isinstance(
             value, time.TimeDelta
         ):
@@ -431,18 +426,28 @@ class Orbit(OrbitCreationMixin):
             # Works for both Quantity and TimeDelta objects
             time_of_flight = time.TimeDelta(value)
 
-        cartesian = propagate(
-            self, time_of_flight, method=method, rtol=rtol, **kwargs
+        # Check if propagator fulfills orbit requirements
+        # Note there's a potential conversion here purely for convenience that could be skipped
+        if self.ecc < 1.0 and not (method.kind & PropagatorKind.ELLIPTIC):
+            raise ValueError(
+                "Can not use an parabolic/hyperbolic propagator for elliptical/circular orbits."
+            )
+        elif self.ecc == 1.0 and not (method.kind & PropagatorKind.PARABOLIC):
+            raise ValueError(
+                "Can not use an elliptic/hyperbolic propagator for parabolic orbits."
+            )
+        elif self.ecc > 1.0 and not (method.kind & PropagatorKind.HYPERBOLIC):
+            raise ValueError(
+                "Can not use an elliptic/parabolic propagator for hyperbolic orbits."
+            )
+
+        new_state = method.propagate(
+            self._state,
+            time_of_flight,
         )
         new_epoch = self.epoch + time_of_flight
 
-        return self.from_vectors(
-            self.attractor,
-            cartesian[0].xyz,
-            cartesian[0].differentials["s"].d_xyz,
-            new_epoch,
-            plane=self.plane,
-        )
+        return self.__class__(new_state, new_epoch)
 
     @u.quantity_input(value=u.rad)
     def time_to_anomaly(self, value):
@@ -510,6 +515,17 @@ class Orbit(OrbitCreationMixin):
             plane=self.plane,
         )
 
+    def to_ephem(self, strategy=TrueAnomalyBounds()):
+        """Samples Orbit to return an ephemerides.
+
+        .. versionadded:: 0.17.0
+
+        """
+        from poliastro.ephem import Ephem
+
+        coordinates, epochs = strategy.sample(self)
+        return Ephem(coordinates, epochs, self.plane)
+
     def sample(self, values=100, *, min_anomaly=None, max_anomaly=None):
         r"""Samples an orbit to some specified time values.
 
@@ -547,44 +563,24 @@ class Orbit(OrbitCreationMixin):
         <CartesianRepresentation (x, y, z) in km ...
 
         """
-        if self.ecc < 1:
-            nu_values = sample_closed(
-                min_anomaly if min_anomaly is not None else self.nu,
-                self.ecc,
-                max_anomaly,
-                values,
-            )
-        else:
-            # Select a sensible limiting value for non-closed orbits
-            # This corresponds to max(r = 3p, r = self.r)
-            # We have to wrap nu in [-180, 180) to compare it with the output of
-            # the arc cosine, which is in the range [0, 180)
-            # Start from -nu_limit
-            nu_limit = max(
-                hyp_nu_limit(self.ecc, 3.0), abs(wrap_angle(self.nu))
+        if min_anomaly is not None or max_anomaly is not None:
+            warn(
+                "Specifying min_anomaly and max_anomaly in method `sample` is deprecated "
+                "and will be removed in a future release, "
+                "use `Orbit.to_ephem(strategy=TrueAnomalyBounds(min_nu=..., max_nu=...))` instead",
+                DeprecationWarning,
+                stacklevel=2,
             )
 
-            # Perform actual sampling
-            nu_values = sample_open(
-                min_anomaly, self.ecc, max_anomaly, values, nu_limit=nu_limit
-            )
-
-        n = nu_values.shape[0]
-        rr, vv = coe2rv_many(
-            np.tile(self.attractor.k, n),
-            np.tile(self.p, n),
-            np.tile(self.ecc, n),
-            np.tile(self.inc, n),
-            np.tile(self.raan, n),
-            np.tile(self.argp, n),
-            nu_values,
+        ephem = self.to_ephem(
+            strategy=TrueAnomalyBounds(
+                min_nu=min_anomaly,
+                max_nu=max_anomaly,
+                num_values=values,
+            ),
         )
-
-        cartesian = CartesianRepresentation(
-            rr, differentials=CartesianDifferential(vv, xyz_axis=1), xyz_axis=1
-        )
-
-        return cartesian
+        # We call .sample() at the end to retrieve the coordinates for the same epochs
+        return ephem.sample()
 
     def apply_maneuver(self, maneuver, intermediate=False):
         """Returns resulting `Orbit` after applying maneuver to self.

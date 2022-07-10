@@ -4,9 +4,9 @@ jupytext:
     extension: .mystnb
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.14.0
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -33,7 +33,7 @@ $$\ddot{\mathbb{r}} = -\frac{\mu}{|\mathbb{r}|^3} \mathbb{r} + \mathbb{a}_d$$
 
 Let's setup a very simple example with constant acceleration to visualize the effects on the orbit:
 
-```{code-cell} ipython3
+```{code-cell}
 from astropy import time
 from astropy import units as u
 
@@ -44,33 +44,35 @@ from poliastro.core.propagation import func_twobody
 from poliastro.examples import iss
 from poliastro.plotting import OrbitPlotter3D
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import propagate, cowell
+from poliastro.twobody.propagation import CowellPropagator
+from poliastro.twobody.sampling import EpochsArray
 from poliastro.util import norm
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # More info: https://plotly.com/python/renderers/
 import plotly.io as pio
+
 pio.renderers.default = "plotly_mimetype+notebook_connected"
 ```
 
 To provide an acceleration depending on an extra parameter, we can use **closures** like this one:
 
-```{code-cell} ipython3
+```{code-cell}
 accel = 2e-5
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 def constant_accel_factory(accel):
     def constant_accel(t0, u, k):
         v = u[3:]
-        norm_v = (v[0]**2 + v[1]**2 + v[2]**2)**.5
+        norm_v = (v[0] ** 2 + v[1] ** 2 + v[2] ** 2) ** 0.5
         return accel * v / norm_v
 
     return constant_accel
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 def f(t0, state, k):
     du_kep = func_twobody(t0, state, k)
     ax, ay, az = constant_accel_factory(accel)(t0, state, k)
@@ -79,83 +81,81 @@ def f(t0, state, k):
     return du_kep + du_ad
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 times = np.linspace(0, 10 * iss.period, 500)
 times
 ```
 
-```{code-cell} ipython3
-positions = propagate(
-    iss,
-    time.TimeDelta(times),
-    method=cowell,
-    rtol=1e-11,
-    f=f,
+```{code-cell}
+ephem = iss.to_ephem(
+    EpochsArray(iss.epoch + times, method=CowellPropagator(rtol=1e-11, f=f)),
 )
 ```
 
 And we plot the results:
 
-```{code-cell} ipython3
+```{code-cell}
 frame = OrbitPlotter3D()
 
 frame.set_attractor(Earth)
-frame.plot_trajectory(positions, label="ISS")
+frame.plot_ephem(ephem, label="ISS")
 ```
 
 ## Error checking
 
-```{code-cell} ipython3
+```{code-cell}
 def state_to_vector(ss):
     r, v = ss.rv()
-    x, y, z = r.to(u.km).value
-    vx, vy, vz = v.to(u.km / u.s).value
+    x, y, z = r.to_value(u.km)
+    vx, vy, vz = v.to_value(u.km / u.s)
     return np.array([x, y, z, vx, vy, vz])
 ```
 
-```{code-cell} ipython3
-k = Earth.k.to(u.km ** 3 / u.s ** 2).value
+```{code-cell}
+k = Earth.k.to(u.km**3 / u.s**2).value
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 rtol = 1e-13
 full_periods = 2
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 u0 = state_to_vector(iss)
-tf = ((2 * full_periods + 1) * iss.period / 2)
+tf = (2 * full_periods + 1) * iss.period / 2
 
 u0, tf
 ```
 
-```{code-cell} ipython3
-iss_f_kep = iss.propagate(tf, rtol=1e-18)
+```{code-cell}
+iss_f_kep = iss.propagate(tf)
 ```
 
-```{code-cell} ipython3
-r, v = cowell(iss.attractor.k, iss.r, iss.v, [tf] * u.s, rtol=rtol)
+```{code-cell}
+iss_f_num = iss.propagate(tf, method=CowellPropagator(rtol=rtol))
 ```
 
-```{code-cell} ipython3
-iss_f_num = Orbit.from_vectors(Earth, r[0], v[0], iss.epoch + tf)
-```
-
-```{code-cell} ipython3
+```{code-cell}
 iss_f_num.r, iss_f_kep.r
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 assert np.allclose(iss_f_num.r, iss_f_kep.r, rtol=rtol, atol=1e-08 * u.km)
-assert np.allclose(iss_f_num.v, iss_f_kep.v, rtol=rtol, atol=1e-08 * u.km / u.s)
+assert np.allclose(
+    iss_f_num.v, iss_f_kep.v, rtol=rtol, atol=1e-08 * u.km / u.s
+)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 assert np.allclose(iss_f_num.a, iss_f_kep.a, rtol=rtol, atol=1e-08 * u.km)
 assert np.allclose(iss_f_num.ecc, iss_f_kep.ecc, rtol=rtol)
 assert np.allclose(iss_f_num.inc, iss_f_kep.inc, rtol=rtol, atol=1e-08 * u.rad)
-assert np.allclose(iss_f_num.raan, iss_f_kep.raan, rtol=rtol, atol=1e-08 * u.rad)
-assert np.allclose(iss_f_num.argp, iss_f_kep.argp, rtol=rtol, atol=1e-08 * u.rad)
+assert np.allclose(
+    iss_f_num.raan, iss_f_kep.raan, rtol=rtol, atol=1e-08 * u.rad
+)
+assert np.allclose(
+    iss_f_num.argp, iss_f_kep.argp, rtol=rtol, atol=1e-08 * u.rad
+)
 assert np.allclose(iss_f_num.nu, iss_f_kep.nu, rtol=rtol, atol=1e-08 * u.rad)
 ```
 
@@ -167,11 +167,12 @@ $$\frac{\operatorname{d}\!a}{a_0} = 2 \frac{F}{m V_0}\operatorname{d}\!t, \qquad
 
 So let's create a new circular orbit and perform the necessary checks, assuming constant mass and thrust (i.e. constant acceleration):
 
-```{code-cell} ipython3
-ss = Orbit.circular(Earth, 500 * u.km)
-tof = 20 * ss.period
+```{code-cell}
+orb = Orbit.circular(Earth, 500 << u.km)
+tof = 20 * orb.period
 
 ad = constant_accel_factory(1e-7)
+
 
 def f(t0, state, k):
     du_kep = func_twobody(t0, state, k)
@@ -180,29 +181,28 @@ def f(t0, state, k):
 
     return du_kep + du_ad
 
-r, v = cowell(ss.attractor.k, ss.r, ss.v, [tof] * u.s, f=f)
 
-ss_final = Orbit.from_vectors(Earth, r[0], v[0], ss.epoch + tof)
+orb_final = orb.propagate(tof, method=CowellPropagator(f=f))
 ```
 
-```{code-cell} ipython3
-da_a0 = (ss_final.a - ss.a) / ss.a
+```{code-cell}
+da_a0 = (orb_final.a - orb.a) / orb.a
 da_a0
 ```
 
-```{code-cell} ipython3
-dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
+```{code-cell}
+dv_v0 = abs(norm(orb_final.v) - norm(orb.v)) / norm(orb.v)
 2 * dv_v0
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 np.allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 ```
 
 This means **we successfully validated the model against an extremely simple orbit transfer with an approximate analytical solution**. Notice that the final eccentricity, as originally noticed by Edelbaum, is nonzero:
 
-```{code-cell} ipython3
-ss_final.ecc
+```{code-cell}
+orb_final.ecc
 ```
 
 ## References

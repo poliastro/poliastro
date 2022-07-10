@@ -15,7 +15,7 @@ from poliastro._math.interpolate import interp1d, sinc_interp, spline_interp
 from poliastro.bodies import Earth
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
-from poliastro.twobody.propagation import propagate
+from poliastro.twobody.sampling import EpochsArray
 from poliastro.util import time_range
 from poliastro.warnings import TimeScaleWarning
 
@@ -323,10 +323,7 @@ class Ephem:
         if epochs.isscalar:
             epochs = epochs.reshape(1)
 
-        times_of_flight = epochs - orbit.epoch
-        coordinates = propagate(orbit, times_of_flight)
-
-        return cls(coordinates, epochs, plane)
+        return orbit.change_plane(plane).to_ephem(strategy=EpochsArray(epochs))
 
     def sample(self, epochs=None, *, interpolator=SplineInterpolator()):
         """Returns coordinates at specified epochs.

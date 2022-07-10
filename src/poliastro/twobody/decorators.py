@@ -37,8 +37,10 @@ def state_from_vector(func):
         r, v = u_[:3], u_[3:]
         ss = RVState(
             Body(None, k * u.km3s2, "_Dummy"),
-            r * u.km,
-            v * u.kms,
+            (
+                r * u.km,
+                v * u.kms,
+            ),
             Planes.EARTH_EQUATOR,
         )
 

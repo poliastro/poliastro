@@ -10,7 +10,7 @@ def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
     q = p / (1 + ecc)
 
-    # TODO: Do something to increase parabolic accuracy?
+    # TODO: Do something to allow parabolic and hyperbolic orbits?
     n = np.sqrt(k * (1 - ecc) ** 3 / q**3)
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
 

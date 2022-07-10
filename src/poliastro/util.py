@@ -10,16 +10,27 @@ from poliastro._math.linalg import norm as norm_fast
 from poliastro.core.util import alinspace as alinspace_fast
 
 
-def norm(vec):
+def norm(vec, axis=None):
     """Norm of a Quantity vector that respects units.
 
     Parameters
     ----------
     vec : ~astropy.units.Quantity
         Vector with units.
+    axis : int or None
+        Axis along which to compute the vector norms.
 
     """
-    return norm_fast(vec.value) * vec.unit
+    if axis is not None:
+        # axis keyword argument is not yet supported by numba,
+        # see https://github.com/numba/numba/issues/2558
+        from numpy.linalg import norm as norm_np
+
+        result = norm_np(vec.value, axis=axis)
+    else:
+        result = norm_fast(vec.value)
+
+    return result << vec.unit
 
 
 def time_range(

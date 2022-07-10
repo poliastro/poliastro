@@ -303,7 +303,7 @@ def farnocchia_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
 
 @jit
-def farnocchia(k, r0, v0, tof):
+def farnocchia_rv(k, r0, v0, tof):
     r"""Propagates orbit using mean motion.
 
     This algorithm depends on the geometric shape of the orbit.

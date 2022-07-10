@@ -40,5 +40,5 @@ def get_mean_elements(body, epoch=J2000):
         ) from e
 
     return RVState(
-        body.parent, r, v, plane=Planes.EARTH_ECLIPTIC
+        body.parent, (r, v), plane=Planes.EARTH_ECLIPTIC
     ).to_classical()
