@@ -169,6 +169,47 @@ you can now retrieve the position of the ISS after some time:
 To explore different propagation algorithms, check out the
 {py:mod}`poliastro.twobody.propagation` module.
 
+## Studying trajectories: {py:class}`~poliastro.ephem.Ephem` objects
+
+The `propagate` method gives you the final orbit at the epoch you designated.
+To retrieve the whole trajectory instead, you can use
+{py:meth}`poliastro.twobody.Orbit.to_ephem`, which returns an
+{py:class}`~poliastro.ephem.Ephem` instance:
+
+```python
+from poliastro.twobody.sampling import EpochsArray, TrueAnomalyBounds, EpochBounds
+from poliastro.util import time_range
+
+start_date = Time("2022-07-11 05:05", scale="utc")
+end_date = Time("2022-07-11 07:05", scale="utc")
+
+# One full revolution
+ephem1 = iss.to_ephem()
+
+# Explicit times given
+ephem2 = iss.to_ephem(strategy=EpochsArray(epochs=time_range(start_date, end_date)))
+
+# Automatic grid, true anomaly limits
+ephem3 = iss.to_ephem(strategy=TrueAnomalyBounds(min_nu=0 << u.deg, max_nu=180 << u.deg))
+
+# Automatic grid, epoch limits
+ephem4 = iss.to_ephem(strategy=EpochBounds(min_epoch=start_date, max_epoch=end_date))
+```
+
+`Ephem` objects contain the coordinates of an object sampled at specific times.
+You can access both:
+
+```python
+>>> ephem1.epochs[:3]
+<Time object: scale='utc' format='iso' value=['2013-03-18 12:23:55.155' '2013-03-18 12:24:51.237'
+ '2013-03-18 12:25:47.323']>
+>>> ephem1.sample(ephem1.epochs[:3])
+<CartesianRepresentation (x, y, z) in km
+    [( 859.07256   , -4137.20368   , 5295.56871   ),
+     (1270.55257535, -4012.16848983, 5309.55706958),
+     (1676.93829596, -3870.95571409, 5302.1480373 )]
+ (has differentials w.r.t.: 's')>
+```
 
 ## Studying non-keplerian orbits: perturbations
 
@@ -417,6 +458,21 @@ Notice that the position and velocity vectors are given with respect to the
 which means equatorial coordinates centered on the Sun.
 ```
 
+In addition, poliastro supports fetching orbital information from 2 online databases:
+Small Body Database Browser (SBDB) and JPL HORIZONS.
+
+HORIZONS can be used to generate ephemerides for solar-system bodies,
+while SBDB provides model orbits for all known asteroids and many comets.
+The data is fetched using the wrappers to these services provided by
+[astroquery](https://astroquery.readthedocs.io/):
+
+```python
+epoch = Time("2020-04-29 10:43")
+
+ephem_ceres = Ephem.from_horizons("Ceres", epoch)
+orbit_apophis = Orbit.from_sbdb("Apophis")
+```
+
 ## Traveling through space: solving the Lambert problem
 
 The determination of an orbit given two position vectors and the time of flight
@@ -458,25 +514,6 @@ align: center
 width: 350px
 alt: Plot of the orbit
 ---
-```
-
-## Fetching Orbits from external sources
-
-poliastro supports fetching orbits from 2 online databases
-from Jet Propulsion Laboratory: SBDB and Horizons.
-
-JPL Horizons can be used to generate ephemerides for solar-system
-bodies, while JPL SBDB (Small-Body Database Browser) provides model
-orbits for all known asteroids and many comets.
-
-The data is fetched using the wrappers to these services provided by
-[astroquery](https://astroquery.readthedocs.io/):
-
-```python
-epoch = Time("2020-04-29 10:43")
-
-ephem_ceres = Ephem.from_horizons("Ceres", epoch)
-orbit_apophis = Orbit.from_sbdb("Apophis")
 ```
 
 ## Creating a CZML document
