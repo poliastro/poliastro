@@ -56,6 +56,7 @@ def eccentricity_vector(k, r, v):
 @u.quantity_input(nu=u.rad, ecc=u.one, k=u_km3s2, r_p=u.km)
 def t_p(nu, ecc, k, r_p):
     """Elapsed time since latest perifocal passage."""
+    # TODO: Make this a propagator method
     t_p = (
         delta_t_from_nu_fast(
             nu.to_value(u.rad),

@@ -47,6 +47,14 @@ mathjax2_config = {
 }
 myst_update_mathjax = False
 
+myst_enable_extensions = [
+    "substitution",
+]
+myst_substitutions = {
+    "Ephem": "{py:class}`~poliastro.ephem.Ephem`",
+    "Orbit": "{py:class}`~poliastro.twobody.orbit.scalar.Orbit`",
+}
+
 # Hoverxref Extension
 hoverxref_auto_ref = True
 hoverxref_mathjax = True
@@ -167,8 +175,12 @@ autoapi_options = [
     "show-inheritance",
     "show-module-summary",
     "special-members",
+    "inherited-members",
 ]
 autoapi_add_toctree_entry = False
+autoapi_ignore = [
+    "*_compat*",  # To avoid WARNING: more than one target found for cross-reference '__class__'
+]
 
 exclude_patterns.extend(["autoapi/index.rst", "autoapi/poliastro/index.rst"])
 
