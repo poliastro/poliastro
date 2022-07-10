@@ -165,7 +165,11 @@ def npc_po_fam_cr3bp(
             # Use Line Search: Update Step size and recompute
             if line_search is True:
                 step_size = step_size * 0.8
-                print("Line search is used to update step size to:", step_size, "\n")
+                print(
+                    "Line search is used to update step size to:",
+                    step_size,
+                    "\n",
+                )
                 if param_conti_index < 6:
                     initial_guess[param_conti_index] -= step_size
                 elif param_continue == "t":
@@ -197,7 +201,13 @@ def npc_po_fam_cr3bp(
             targeted_po_char["ic"].append(copy.copy(results["states"][0, :]))
             targeted_po_char["tf"].append(copy.copy(results["t"][-1]))
             targeted_po_char["jc"].append(
-                copy.copy(JC(mu, results["states"][0, 0:3], results["states"][0, 3:6]))
+                copy.copy(
+                    JC(
+                        mu,
+                        results["states"][0, 0:3],
+                        results["states"][0, 3:6],
+                    )
+                )
             )
             targeted_po_char["monodromy"].append(results["stm"][:, :, -1])
             eigenvals, eigenvects = np.linalg.eig(results["stm"][:, :, -1])
@@ -331,7 +341,9 @@ def palc_po_fam_cr3bp(
         )
         free_vars_index = map_vars_index_cr3bp(free_vars)
         stm_col_index = [
-            free_vars_index[i] for i in range(len(free_vars)) if free_vars_index[i] < 6
+            free_vars_index[i]
+            for i in range(len(free_vars))
+            if free_vars_index[i] < 6
         ]
         palc_args["dx/dtheta"] = palc_args["dx/dtheta"][stm_col_index]
 
@@ -396,7 +408,11 @@ def palc_po_fam_cr3bp(
             # Use Line Search: Update Step size and recompute
             if line_search is True:
                 step_size = step_size * 0.8
-                print("Line search is used to update step size to:", step_size, "\n")
+                print(
+                    "Line search is used to update step size to:",
+                    step_size,
+                    "\n",
+                )
                 palc_args["delta_s"] = step_size
 
                 if abs(step_size) < abs(step_size0 * 0.1):
@@ -432,7 +448,9 @@ def palc_po_fam_cr3bp(
             palc_args["prev_conv_soln"] = results["states"][0, :]
             palc_args["delta_X*_prev"] = null_vec
 
-            _, _, _, ax, ay, az = ui_partials_acc_cr3bp(mu, results["states"][0, :])
+            _, _, _, ax, ay, az = ui_partials_acc_cr3bp(
+                mu, results["states"][0, :]
+            )
             palc_args["dx/dtheta"] = (
                 np.array(
                     [
@@ -459,7 +477,13 @@ def palc_po_fam_cr3bp(
             targeted_po_char["ic"].append(copy.copy(results["states"][0, :]))
             targeted_po_char["tf"].append(copy.copy(results["t"][-1]))
             targeted_po_char["jc"].append(
-                copy.copy(JC(mu, results["states"][0, 0:3], results["states"][0, 3:6]))
+                copy.copy(
+                    JC(
+                        mu,
+                        results["states"][0, 0:3],
+                        results["states"][0, 3:6],
+                    )
+                )
             )
             targeted_po_char["monodromy"].append(results["stm"][:, :, -1])
             eigenvals, eigenvects = np.linalg.eig(results["stm"][:, :, -1])

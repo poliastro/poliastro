@@ -244,7 +244,14 @@ def po_single_shooter_cr3bp(
         # Compute d(JC)/d(x)
         Ux_ic, Uy_ic, Uz_ic, _, _, _ = ui_partials_acc_cr3bp(mu, ic)
         dJC_dx = np.array(
-            [2 * Ux_ic, 2 * Uy_ic, 2 * Uz_ic, -2 * ic[3], -2 * ic[4], -2 * ic[5]]
+            [
+                2 * Ux_ic,
+                2 * Uy_ic,
+                2 * Uz_ic,
+                -2 * ic[3],
+                -2 * ic[4],
+                -2 * ic[5],
+            ]
         )
 
         # Extract required elements of the Monodromy matrix for the targeter setup
@@ -279,7 +286,9 @@ def po_single_shooter_cr3bp(
         else:
             ic[stm_col_index] = xfree
 
-        results_stm = prop_cr3bp(mu, ic, tf, stm_bool=1, tol=int_tol, xcross_cond=0)
+        results_stm = prop_cr3bp(
+            mu, ic, tf, stm_bool=1, tol=int_tol, xcross_cond=0
+        )
 
         # Update xconstraint
         if "jc" in constraints:
@@ -304,7 +313,8 @@ def po_single_shooter_cr3bp(
                 FX[:-2] = xconstraint - xdesired
                 # Phase Constraint
                 FX[-2] = np.dot(
-                    ic[stm_col_index] - palc_args["prev_conv_soln"][stm_col_index],
+                    ic[stm_col_index]
+                    - palc_args["prev_conv_soln"][stm_col_index],
                     palc_args["dx/dtheta"],
                 )
 
@@ -334,7 +344,12 @@ def po_single_shooter_cr3bp(
     # Use targeted states to generate targeted Periodic orbit
     print(tf, sym_period_targ)
     results_stm = prop_cr3bp(
-        mu, ic, tf * 1 / sym_period_targ, stm_bool=1, tol=int_tol, xcross_cond=0
+        mu,
+        ic,
+        tf * 1 / sym_period_targ,
+        stm_bool=1,
+        tol=int_tol,
+        xcross_cond=0,
     )
 
     # Compute Jacobian if retargeted orbit cannot meet while loop condition, priimarily used for Pseudo-Arc Length Continuation
@@ -506,7 +521,16 @@ def map_vars_index_cr3bp(var_names=None):
         Integer index code to represent the parameters
     """
 
-    variable_dict = {"x": 0, "y": 1, "z": 2, "vx": 3, "vy": 4, "vz": 5, "jc": 6, "t": 7}
+    variable_dict = {
+        "x": 0,
+        "y": 1,
+        "z": 2,
+        "vx": 3,
+        "vy": 4,
+        "vz": 5,
+        "jc": 6,
+        "t": 7,
+    }
     vars_index = []
 
     if var_names is not None:

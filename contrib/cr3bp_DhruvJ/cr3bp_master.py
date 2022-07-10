@@ -28,7 +28,9 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 
-def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP853"):
+def prop_cr3bp(
+    mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP853"
+):
     """Numerically Integrate Circular Restricted Three-Body Problem EOMs
     Dhruv Jain, Jan 8 2022
 
@@ -94,7 +96,9 @@ def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP
             (ic, np.identity(6).flatten())
         )  # Appends the IC for STM: I_6x6
     elif len(ic) == 42:
-        stm_bool = 1  # To make sure stm_boolis set to 1 if all 42 states are passed
+        stm_bool = (
+            1  # To make sure stm_boolis set to 1 if all 42 states are passed
+        )
     if len(ic) == 6:
         stm_bool == 0
     elif len(ic) != 6 and len(ic) != 42:
@@ -175,16 +179,30 @@ def prop_cr3bp(mu, ic, tf, tol=1e-12, stm_bool=0, xcross_cond=0, int_method="DOP
         xcross.terminal = False
         xcross.direction = 0
         fun = solve_ivp(
-            NDDE_STM, [t0, tf], ic, method=int_method, events=xcross, rtol=tol, atol=tol
+            NDDE_STM,
+            [t0, tf],
+            ic,
+            method=int_method,
+            events=xcross,
+            rtol=tol,
+            atol=tol,
         )
     elif xcross_cond == 2:  # Track events when crossing -y to +y region
         xcross.terminal = True
         xcross.direction = 1
         fun = solve_ivp(
-            NDDE_STM, [t0, tf], ic, method=int_method, events=xcross, rtol=tol, atol=tol
+            NDDE_STM,
+            [t0, tf],
+            ic,
+            method=int_method,
+            events=xcross,
+            rtol=tol,
+            atol=tol,
         )
     else:  # Does not track any events
-        fun = solve_ivp(NDDE_STM, [t0, tf], ic, method=int_method, rtol=tol, atol=tol)
+        fun = solve_ivp(
+            NDDE_STM, [t0, tf], ic, method=int_method, rtol=tol, atol=tol
+        )
 
     # Save data to dictionary
     results = save_prop_data_cr3p(fun, stm_bool, datatype)

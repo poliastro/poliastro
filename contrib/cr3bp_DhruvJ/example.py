@@ -36,7 +36,9 @@ pltnum = 1
 plt.figure(pltnum)
 ax = plt.axes(projection="3d")
 ax.set_title("CR3BP EM, trajectory, T = 10[nd], tol = 1e-12")
-ax.plot3D(results["states"][:, 0], results["states"][:, 1], results["states"][:, 2])
+ax.plot3D(
+    results["states"][:, 0], results["states"][:, 1], results["states"][:, 2]
+)
 ax.scatter(
     results["states"][0, 0],
     results["states"][0, 1],
@@ -47,7 +49,9 @@ ax.scatter(
 ax.scatter(li[:, 0], li[:, 1], li[:, 2], color="red", label="Li")
 ax.scatter(-mu, 0, 0, color="blue", label="Earth")
 ax.scatter(1 - mu, 0, 0, color="grey", label="Moon")
-ax.set_box_aspect([ub - lb for lb, ub in (getattr(ax, f"get_{a}lim")() for a in "xyz")])
+ax.set_box_aspect(
+    [ub - lb for lb, ub in (getattr(ax, f"get_{a}lim")() for a in "xyz")]
+)
 ax.set_ylabel("y [nd]")
 ax.set_xlabel("x [nd]")
 ax.set_zlabel("z [nd]")
