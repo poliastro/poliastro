@@ -178,6 +178,9 @@ autoapi_options = [
     "inherited-members",
 ]
 autoapi_add_toctree_entry = False
+autoapi_ignore = [
+    "*_compat*",  # To avoid WARNING: more than one target found for cross-reference '__class__'
+]
 
 exclude_patterns.extend(["autoapi/index.rst", "autoapi/poliastro/index.rst"])
 
