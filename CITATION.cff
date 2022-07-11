@@ -1,0 +1,29 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: poliastro
+message: Please cite this software using these metadata.
+type: software
+authors:
+  - given-names: Juan Luis
+    family-names: Cano Rodriguez
+    email: hello@juanlu.space
+    orcid: 'https://orcid.org/0000-0002-2187-161X'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.6817189
+    description: poliastro v0.17.0
+repository-code: 'https://github.com/poliastro/poliastro/'
+url: 'https://www.poliastro.space/'
+abstract: >-
+  poliastro is a pure Python library for interactive
+  astrodynamics.
+keywords:
+  - astrodynamics
+  - orbital mechanics
+  - physics
+  - celestial mechanics
+license: MIT
+version: v0.17.0
+date-released: '2022-07-10'
