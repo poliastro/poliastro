@@ -24,10 +24,10 @@ def cartesian_cords(a, c, lon, lat, h):
         Geodetic height
 
     """
-    
+
     e2 = 1 - (c / a) ** 2
     N = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
-    
+
     x = (N + h) * np.cos(lat) * np.cos(lon)
     y = (N + h) * np.cos(lat) * np.sin(lon)
     z = ((1 - e2) * N + h) * np.sin(lat)
