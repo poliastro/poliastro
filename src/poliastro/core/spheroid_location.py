@@ -7,45 +7,46 @@ from poliastro._math.linalg import norm
 
 
 @jit
-def cartesian_cords(_a, _c, _lon, _lat, _h):
+def cartesian_cords(a, c, lon, lat, h):
     """Calculates cartesian coordinates.
 
     Parameters
     ----------
-    _a : float
+    a : float
         Semi-major axis
-    _c : float
+    c : float
         Semi-minor axis
-    _lon : float
+    lon : float
         Geodetic longitude
-    _lat : float
+    lat : float
         Geodetic latitude
-    _h : float
+    h : float
         Geodetic height
 
     """
-    e2 = 1 - (_c / _a) ** 2
-    N = _a / np.sqrt(1 - e2 * np.sin(_lon) ** 2)
-
-    x = (N + _h) * np.cos(_lon) * np.cos(_lat)
-    y = (N + _h) * np.cos(_lon) * np.sin(_lat)
-    z = ((1 - e2) * N + _h) * np.sin(_lon)
+    
+    e2 = 1 - (c / a) ** 2
+    N = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
+    
+    x = (N + h) * np.cos(lat) * np.cos(lon)
+    y = (N + h) * np.cos(lat) * np.sin(lon)
+    z = ((1 - e2) * N + h) * np.sin(lat)
     return x, y, z
 
 
 @jit
-def f(_a, _c):
+def f(a, c):
     """Get first flattening.
 
     Parameters
     ----------
-    _a : float
+    a : float
         Semi-major axis
-    _c : float
+    c : float
         Semi-minor axis
 
     """
-    return 1 - _c / _a
+    return 1 - c / a
 
 
 @jit
@@ -89,21 +90,21 @@ def tangential_vecs(N):
 
 
 @jit
-def radius_of_curvature(_a, _c, _lat):
+def radius_of_curvature(a, c, lat):
     """Radius of curvature of the meridian at the latitude of the given location.
 
     Parameters
     ----------
-    _a : float
+    a : float
         Semi-major axis
-    _c : float
+    c : float
         Semi-minor axis
-    _lat : float
+    lat : float
         Geodetic latitude
 
     """
-    e2 = 1 - (_c / _a) ** 2
-    rc = _a * (1 - e2) / (1 - e2 * np.sin(_lat) ** 2) ** 1.5
+    e2 = 1 - (c / a) ** 2
+    rc = a * (1 - e2) / (1 - e2 * np.sin(lat) ** 2) ** 1.5
     return rc
 
 
@@ -156,7 +157,7 @@ def is_visible(cartesian_cords, px, py, pz, N):
 
 
 @jit
-def cartesian_to_ellipsoidal(_a, _c, x, y, z):
+def cartesian_to_ellipsoidal(a, c, x, y, z):
     """
     Converts cartesian coordinates to ellipsoidal coordinates for the given ellipsoid.
     Instead of the iterative formula, the function uses the approximation introduced in
@@ -164,9 +165,9 @@ def cartesian_to_ellipsoidal(_a, _c, x, y, z):
 
     Parameters
     ----------
-    _a : float
+    a : float
         Semi-major axis
-    _c : float
+    c : float
         Semi-minor axis
     x : float
         x coordinate
@@ -176,18 +177,18 @@ def cartesian_to_ellipsoidal(_a, _c, x, y, z):
         z coordinate
 
     """
-    e2 = 1 - (_c / _a) ** 2
+    e2 = 1 - (c / a) ** 2
     e2_ = e2 / (1 - e2)
     p = np.sqrt(x**2 + y**2)
-    th = np.arctan(z * _a / (p * _c))
+    th = np.arctan(z * a / (p * c))
     lon = np.arctan2(
         y, x
     )  # Use `arctan2` so that lon lies in the range: [-pi, +pi]
     lat = np.arctan(
-        (z + e2_ * _c * np.sin(th) ** 3) / (p - e2 * _a * np.cos(th) ** 3)
+        (z + e2_ * c * np.sin(th) ** 3) / (p - e2 * a * np.cos(th) ** 3)
     )
 
-    v = _a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
+    v = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
     h = x / np.cos(lat) - v if lat == 0.0 else z / np.sin(lat) - (1 - e2) * v
 
     return lat, lon, h
