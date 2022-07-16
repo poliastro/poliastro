@@ -13,7 +13,7 @@ kernelspec:
 
 # Going to Jupiter with Python using Jupyter and poliastro
 
-Let us recreate with real data the [Juno NASSA Mission](https://www.jpl.nasa.gov/news/preorb_kits/juno/overview/). The main objectives of Juno spacecraft is to study the Jupiter planet: how was its formation, its evolution along time, atmospheric characteristics...
+Let us recreate with real data the [Juno NASSA Mission](https://www.jpl.nasa.gov/news/press_kits/juno/overview/). The main objectives of Juno spacecraft is to study the Jupiter planet: how was its formation, its evolution along time, atmospheric characteristics...
 
 ![Juno Image](juno_spacecraft.png)
 
