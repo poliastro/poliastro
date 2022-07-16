@@ -226,6 +226,7 @@ CartesianDifferential(vs << (u.km / u.s), xyz_axis=-1)
 Mixing all together, and leveraging poliastro `Ephem` objects, we can compute ephemerides from GP orbital data:
 
 ```{code-cell}
+import logging
 from warnings import warn
 
 from astropy.coordinates import TEME, GCRS
@@ -254,6 +255,8 @@ def ephem_from_gp(sat, times):
             xyz_axis=-1,
         ),
     )
+    logging.debug("Times: %s", times)
+    logging.debug("Coordinates: %s", cart_teme)
     cart_gcrs = (
         TEME(cart_teme, obstime=times)
         .transform_to(GCRS(obstime=times))
@@ -261,6 +264,13 @@ def ephem_from_gp(sat, times):
     )
 
     return Ephem(cart_gcrs, times, plane=Planes.EARTH_EQUATOR)
+```
+
+```{code-cell}
+# https://github.com/poliastro/poliastro/issues/1535
+# import os
+# if os.environ.get("READTHEDOCS"):
+logging.basicConfig(level=logging.DEBUG)
 ```
 
 ```{code-cell}
