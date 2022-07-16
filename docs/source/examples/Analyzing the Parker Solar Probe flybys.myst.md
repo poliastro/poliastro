@@ -159,8 +159,8 @@ from poliastro.twobody import Orbit
 ```{code-cell}
 def func(theta):
     V_2_v, _ = compute_flyby(v1_pre, V, Venus.k, d_flyby_1, theta * u.rad)
-    ss_1 = Orbit.from_vectors(Sun, r1, V_2_v, epoch=flyby_1_time)
-    return (ss_1.period - T_ref).to(u.day).value
+    orb_1 = Orbit.from_vectors(Sun, r1, V_2_v, epoch=flyby_1_time)
+    return (orb_1.period - T_ref).to(u.day).value
 ```
 
 There are two solutions:
@@ -222,13 +222,13 @@ ss01
 The two solutions have different inclinations, so we still have to find out which is the good one. We can do this by computing the inclination over the ecliptic - however, as the original data was in the International Celestial Reference Frame (ICRF), whose fundamental plane is parallel to the Earth equator of a reference epoch, we have to change the plane to the Earth **ecliptic**, which is what the original reports use:
 
 ```{code-cell}
-ss_1_a = Orbit.from_vectors(Sun, r1, V_2_v_a, epoch=flyby_1_time)
-ss_1_a
+orb_1_a = Orbit.from_vectors(Sun, r1, V_2_v_a, epoch=flyby_1_time)
+orb_1_a
 ```
 
 ```{code-cell}
-ss_1_b = Orbit.from_vectors(Sun, r1, V_2_v_b, epoch=flyby_1_time)
-ss_1_b
+orb_1_b = Orbit.from_vectors(Sun, r1, V_2_v_b, epoch=flyby_1_time)
+orb_1_b
 ```
 
 ```{code-cell}
@@ -236,21 +236,21 @@ from poliastro.frames import Planes
 ```
 
 ```{code-cell}
-ss_1_a.change_plane(Planes.EARTH_ECLIPTIC)
+orb_1_a.change_plane(Planes.EARTH_ECLIPTIC)
 ```
 
 ```{code-cell}
-ss_1_b.change_plane(Planes.EARTH_ECLIPTIC)
+orb_1_b.change_plane(Planes.EARTH_ECLIPTIC)
 ```
 
 Therefore, **the correct option is the first one**:
 
 ```{code-cell}
-ss_1_a.period.to(u.day)
+orb_1_a.period.to(u.day)
 ```
 
 ```{code-cell}
-ss_1_a.a
+orb_1_a.a
 ```
 
 And, finally, we plot the solution:
@@ -265,5 +265,5 @@ frame = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
 frame.plot_body_orbit(Earth, d_launch)
 frame.plot_body_orbit(Venus, flyby_1_time)
 frame.plot(ss01, label="#0 to #1", color="C2")
-frame.plot(ss_1_a, label="#1 to #2", color="C3")
+frame.plot(orb_1_a, label="#1 to #2", color="C3")
 ```

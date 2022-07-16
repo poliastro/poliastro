@@ -60,22 +60,22 @@ def _targetting(departure_body, target_body, t_launch, t_arrival):
 
     # Transform into Orbit objects
     attractor = departure_body.parent
-    ss_dpt = Orbit.from_vectors(
+    orb_dpt = Orbit.from_vectors(
         attractor, rr_dpt_body, vv_dpt_body, epoch=t_launch
     )
-    ss_arr = Orbit.from_vectors(
+    orb_arr = Orbit.from_vectors(
         attractor, rr_arr_body, vv_arr_body, epoch=t_arrival
     )
 
     # Define time of flight
-    tof = ss_arr.epoch - ss_dpt.epoch
+    tof = orb_arr.epoch - orb_dpt.epoch
 
     if tof.to_value(u.s) <= 0:
         return None, None, None, None, None
 
     try:
         # Lambert is now a Maneuver object
-        man_lambert = Maneuver.lambert(ss_dpt, ss_arr)
+        man_lambert = Maneuver.lambert(orb_dpt, orb_arr)
 
         # Get norm delta velocities
         dv_dpt = norm(man_lambert.impulses[0][1])

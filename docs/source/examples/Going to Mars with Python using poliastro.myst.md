@@ -71,18 +71,18 @@ mars = Ephem.from_body(Mars, time_range(date_launch, end=date_arrival))
 
 ```{code-cell}
 # Solve for departure and target orbits
-ss_earth = Orbit.from_ephem(Sun, earth, date_launch)
-ss_mars = Orbit.from_ephem(Sun, mars, date_arrival)
+orb_earth = Orbit.from_ephem(Sun, earth, date_launch)
+orb_mars = Orbit.from_ephem(Sun, mars, date_arrival)
 ```
 
 We can now solve for the maneuver that will take us from Earth to Mars. After solving it, we just need to apply it to the departure orbit to solve for the transfer one:
 
 ```{code-cell}
 # Solve for the transfer maneuver
-man_lambert = Maneuver.lambert(ss_earth, ss_mars)
+man_lambert = Maneuver.lambert(orb_earth, orb_mars)
 
 # Get the transfer and final orbits
-ss_trans, ss_target = ss_earth.apply_maneuver(man_lambert, intermediate=True)
+orb_trans, orb_target = orb_earth.apply_maneuver(man_lambert, intermediate=True)
 ```
 
 Let's plot this transfer orbit in 3D!
@@ -98,7 +98,7 @@ plotter.set_attractor(Sun)
 plotter.plot_ephem(earth, date_launch, label="Earth at launch position")
 plotter.plot_ephem(mars, date_arrival, label="Mars at arrival position")
 plotter.plot_trajectory(
-    ss_trans.sample(max_anomaly=180 * u.deg),
+    orb_trans.sample(max_anomaly=180 * u.deg),
     color="black",
     label="Transfer orbit",
 )

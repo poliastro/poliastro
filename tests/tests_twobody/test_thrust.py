@@ -182,7 +182,7 @@ def test_geo_cases_beta_dnd_delta_v(
         ecc_0=ecc_0, ecc_f=ecc_f, inc_0=inc_0, inc_f=inc_f, argp=argp
     )
     _, delta_V, _ = change_ecc_inc(
-        ss_0=s0, ecc_f=ecc_f, inc_f=inc_f * u.rad, f=f
+        orb_0=s0, ecc_f=ecc_f, inc_f=inc_f * u.rad, f=f
     )
 
     assert_allclose(delta_V.to_value(u.km / u.s), expected_delta_V, rtol=1e-2)
@@ -207,7 +207,7 @@ def test_geo_cases_numerical(ecc_0, ecc_f):
         argp=argp * u.deg,
         nu=0 * u.deg,
     )
-    a_d, _, t_f = change_ecc_inc(ss_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
+    a_d, _, t_f = change_ecc_inc(orb_0=s0, ecc_f=ecc_f, inc_f=inc_f, f=f)
 
     # Propagate orbit
     def f_geo(t0, u_, k):
