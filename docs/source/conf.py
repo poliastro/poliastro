@@ -78,7 +78,11 @@ hoverxref_role_types = {
 # Other
 autodoc_member_order = "bysource"
 templates_path = ["_templates"]
-# source_suffix = ['.rst' , '.md']
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".myst.md": "jupyter_notebook",
+    ".md": "markdown",
+}
 
 project = "poliastro"
 copyright = "2013, Juan Luis Cano Rodríguez and the poliastro development team"
@@ -163,7 +167,7 @@ nbsphinx_thumbnails = {
 }
 
 nbsphinx_custom_formats = {
-    ".mystnb": ["jupytext.reads", {"fmt": "mystnb"}],
+    ".myst.md": ["jupytext.reads", {"fmt": "mystnb"}],
 }
 
 # sphinx-autoapi configuration
