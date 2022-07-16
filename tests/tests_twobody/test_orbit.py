@@ -463,11 +463,11 @@ def test_hyperbolic_modulus_wrapped_nu():
 
 def test_orbit_is_pickable(hyperbolic):
     pickled = pickle.dumps(hyperbolic)
-    ss_result = pickle.loads(pickled)
+    orb_result = pickle.loads(pickled)
 
-    assert_array_equal(hyperbolic.r, ss_result.r)
-    assert_array_equal(hyperbolic.v, ss_result.v)
-    assert ss_result.epoch == hyperbolic.epoch
+    assert_array_equal(hyperbolic.r, orb_result.r)
+    assert_array_equal(hyperbolic.v, orb_result.v)
+    assert orb_result.epoch == hyperbolic.epoch
 
 
 def test_orbit_plot_is_static():
@@ -1185,8 +1185,8 @@ def test_orbit_change_attractor_force():
     with pytest.warns(
         PatchedConicsWarning, match="Leaving the SOI of the current attractor"
     ):
-        ss_new_attractor = ss.change_attractor(Earth, force=True)
-    assert ss_new_attractor.attractor == Earth
+        orb_new_attractor = ss.change_attractor(Earth, force=True)
+    assert orb_new_attractor.attractor == Earth
 
 
 def test_orbit_change_attractor_unrelated_body():

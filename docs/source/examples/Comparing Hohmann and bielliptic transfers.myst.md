@@ -35,16 +35,16 @@ Rstar = [15.58, 40, 60, 100, 200, np.inf]
 hohmann_data = np.zeros_like(R)
 bielliptic_data = np.zeros((len(R), len(Rstar)))
 
-ss_i = Orbit.circular(Earth, 1.8 * u.km)
-r_i = ss_i.a
-v_i = np.sqrt(ss_i.v @ ss_i.v)
+orb_i = Orbit.circular(Earth, 1.8 * u.km)
+r_i = orb_i.a
+v_i = np.sqrt(orb_i.v @ orb_i.v)
 for ii, r in enumerate(R):
     r_f = r * r_i
-    man = Maneuver.hohmann(ss_i, r_f)
+    man = Maneuver.hohmann(orb_i, r_f)
     hohmann_data[ii] = (man.get_total_cost() / v_i).decompose().value
     for jj, rstar in enumerate(Rstar):
         r_b = rstar * r_i
-        man = Maneuver.bielliptic(ss_i, r_b, r_f)
+        man = Maneuver.bielliptic(orb_i, r_b, r_f)
         bielliptic_data[ii, jj] = (
             (man.get_total_cost() / v_i).decompose().value
         )

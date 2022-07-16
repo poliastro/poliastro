@@ -151,18 +151,18 @@ We now define a function for solving all the possible solutions
 from poliastro.maneuver import Maneuver
 
 
-def lambert_solution_orbits(ss_departure, ss_arrival, M):
+def lambert_solution_orbits(orb_departure, orb_arrival, M):
     """Computes all available solution orbits to the Lambert's problem."""
 
     for (is_prograde, is_lowpath) in type_of_motion_and_path:
-        ss_sol = Maneuver.lambert(
-            ss_departure,
-            ss_arrival,
+        orb_sol = Maneuver.lambert(
+            orb_departure,
+            orb_arrival,
             M=M,
             prograde=is_prograde,
             lowpath=is_lowpath,
         )
-        yield ss_sol
+        yield orb_sol
 ```
 
 Finally, we can plot all the different scenarios from $M=0$ up to $M=2$ revolutions:
@@ -189,7 +189,7 @@ for ith_case, M in enumerate(range(3)):
         lambert_solution_orbits(earth_departure, mars_arrival, M=M),
         colors_and_styles,
     ):
-        ss_plot_traj = op.plot_maneuver(
+        orb_plot_traj = op.plot_maneuver(
             earth_departure, ss, color=colorstyle[0]
         )
 

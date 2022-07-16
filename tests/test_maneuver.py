@@ -66,7 +66,7 @@ def test_hohmann_maneuver(nu):
     alt_i = 191.34411 * u.km
     alt_f = 35781.34857 * u.km
     _a = 0 * u.deg
-    ss_i = Orbit.from_classical(
+    orb_i = Orbit.from_classical(
         attractor=Earth,
         a=Earth.R + alt_i,
         ecc=0 * u.one,
@@ -78,18 +78,18 @@ def test_hohmann_maneuver(nu):
 
     # Expected output
     expected_dv = 3.935224 * u.km / u.s
-    expected_t_pericenter = ss_i.time_to_anomaly(0 * u.deg)
+    expected_t_pericenter = orb_i.time_to_anomaly(0 * u.deg)
     expected_t_trans = 5.256713 * u.h
     expected_total_time = expected_t_pericenter + expected_t_trans
 
-    man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
+    man = Maneuver.hohmann(orb_i, Earth.R + alt_f)
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
     assert_quantity_allclose(
         man.get_total_time(), expected_total_time, rtol=1e-5
     )
 
     assert_quantity_allclose(
-        ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-14 * u.one
+        orb_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-14 * u.one
     )
 
 
@@ -100,7 +100,7 @@ def test_bielliptic_maneuver(nu):
     alt_b = 503873.0 * u.km
     alt_f = 376310.0 * u.km
     _a = 0 * u.deg
-    ss_i = Orbit.from_classical(
+    orb_i = Orbit.from_classical(
         attractor=Earth,
         a=Earth.R + alt_i,
         ecc=0 * u.one,
@@ -112,14 +112,14 @@ def test_bielliptic_maneuver(nu):
 
     # Expected output
     expected_dv = 3.904057 * u.km / u.s
-    expected_t_pericenter = ss_i.time_to_anomaly(0 * u.deg)
+    expected_t_pericenter = orb_i.time_to_anomaly(0 * u.deg)
     expected_t_trans = 593.919803 * u.h
     expected_total_time = expected_t_pericenter + expected_t_trans
 
-    man = Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_f)
+    man = Maneuver.bielliptic(orb_i, Earth.R + alt_b, Earth.R + alt_f)
 
     assert_allclose(
-        ss_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-12 * u.one
+        orb_i.apply_maneuver(man).ecc, 0 * u.one, atol=1e-12 * u.one
     )
     assert_quantity_allclose(man.get_total_cost(), expected_dv, rtol=1e-5)
     assert_quantity_allclose(
@@ -148,7 +148,7 @@ def test_repr_maneuver():
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     alt_b = 503873.0 * u.km
     alt_fi = 376310.0 * u.km
-    ss_i = Orbit.from_vectors(Earth, r, v)
+    orb_i = Orbit.from_vectors(Earth, r, v)
 
     expected_hohmann_maneuver = (
         "Number of impulses: 2, Total cost: 3.060548 km / s"
@@ -158,11 +158,11 @@ def test_repr_maneuver():
     )
 
     assert (
-        repr(Maneuver.hohmann(ss_i, Earth.R + alt_f))
+        repr(Maneuver.hohmann(orb_i, Earth.R + alt_f))
         == expected_hohmann_maneuver
     )
     assert (
-        repr(Maneuver.bielliptic(ss_i, Earth.R + alt_b, Earth.R + alt_fi))
+        repr(Maneuver.bielliptic(orb_i, Earth.R + alt_b, Earth.R + alt_fi))
         == expected_bielliptic_maneuver
     )
 
@@ -253,7 +253,7 @@ def test_apply_manuever_correct_plane():
 
 
 def test_lambert_tof_exception():
-    ss_f = Orbit.circular(
+    orb_f = Orbit.circular(
         attractor=Earth,
         alt=36_000 * u.km,
         inc=0 * u.deg,
@@ -261,7 +261,7 @@ def test_lambert_tof_exception():
         arglat=0 * u.deg,
         epoch=Time("J2000"),
     )
-    ss_i = Orbit.circular(
+    orb_i = Orbit.circular(
         attractor=Earth,
         alt=36_000 * u.km,
         inc=0 * u.deg,
@@ -270,7 +270,7 @@ def test_lambert_tof_exception():
         epoch=Time("J2001"),
     )
     with pytest.raises(ValueError) as excinfo:
-        Maneuver.lambert(ss_i, ss_f)
+        Maneuver.lambert(orb_i, orb_f)
     assert excinfo.type == ValueError
     assert (
         str(excinfo.value)
