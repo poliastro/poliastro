@@ -13,7 +13,7 @@ kernelspec:
 
 # Going to Jupiter with Python using Jupyter and poliastro
 
-Let us recreate with real data the [Juno NASSA Mission](https://www.jpl.nasa.gov/news/press_kits/juno/overview/). The main objectives of Juno spacecraft is to study the Jupiter planet: how was its formation, its evolution along time, atmospheric characteristics...
+Let us recreate with real data the [Juno NASSA Mission](https://www.jpl.nasa.gov/news/preorb_kits/juno/overview/). The main objectives of Juno spacecraft is to study the Jupiter planet: how was its formation, its evolution along time, atmospheric characteristics...
 
 ![Juno Image](juno_spacecraft.png)
 
@@ -83,17 +83,17 @@ man = Maneuver.impulse(dv)
 If we now apply the previous maneuver to the Junos's initial orbit (assume it is the Earth's one for simplicity), we will obtain the orbit around the Sun for Juno. The first inner cruise maneuver is defined just till the ahelion orbit. While Juno is traveling around its new orbit, Earth is also moving. After Juno reaches the aphelion it will be necessary to apply a second maneuver so the flyby is performed around Earth. Once that is achieved a final maneuver will be made in order to benefit from the gravity assist. Let us first propagate Juno's orbit till the aphelion:
 
 ```{code-cell}
-ss_e0 = Orbit.from_ephem(Sun, earth, date_launch)
-ss_efly = Orbit.from_ephem(Sun, earth, date_flyby)
+orb_e0 = Orbit.from_ephem(Sun, earth, date_launch)
+orb_efly = Orbit.from_ephem(Sun, earth, date_flyby)
 
 # Inner Cruise 1
-ic1 = ss_e0.apply_maneuver(man)
+ic1 = orb_e0.apply_maneuver(man)
 ic1_end = ic1.propagate_to_anomaly(180.0 * u.deg)
 
 # We can check new bodies positions
 plotter = StaticOrbitPlotter()
 plotter.plot_body_orbit(Earth, ic1_end.epoch, label="Earth at end of flyby")
-plotter.plot_maneuver(ss_e0, man, color="C1", label="Initial impulse")
+plotter.plot_maneuver(orb_e0, man, color="C1", label="Initial impulse")
 plotter.plot_trajectory(
     ic1.sample(max_anomaly=180 * u.deg),
     label="Inner cruise 1",
@@ -111,7 +111,7 @@ Notice that in the previous plot that Earth's position is not the initial one si
 
 ```{code-cell}
 # Let's compute the Lambert solution to do the flyby of the Earth
-man_flyby = Maneuver.lambert(ic1_end, ss_efly)
+man_flyby = Maneuver.lambert(ic1_end, orb_efly)
 imp_a, imp_b = man_flyby.impulses
 
 print("Initial impulse:", imp_a)
@@ -128,7 +128,7 @@ We can now solve for the flyby orbit that will help Juno with the gravity assist
 
 ```{code-cell}
 # Let us apply the maneuver
-ic2, ss_flyby = ic1_end.apply_maneuver(man_flyby, intermediate=True)
+ic2, orb_flyby = ic1_end.apply_maneuver(man_flyby, intermediate=True)
 
 # We propagate the transfer orbit till the flyby occurs
 ic2_end = ic2.propagate(date_flyby)
@@ -136,11 +136,11 @@ ic2_end = ic2.propagate(date_flyby)
 plotter = StaticOrbitPlotter()
 plotter.plot_body_orbit(
     Earth,
-    ss_efly.epoch,
+    orb_efly.epoch,
     label="Earth's position at flyby",
     trail=True,
 )
-plotter.plot_maneuver(ss_e0, man, color="C1", label="Initial impulse")
+plotter.plot_maneuver(orb_e0, man, color="C1", label="Initial impulse")
 plotter.plot_trajectory(
     ic1.sample(max_anomaly=180 * u.deg), label="Inner cruise 1", color="C1"
 )
@@ -158,12 +158,12 @@ We can now start solving for the maneuver that will take Juno to Jupiter. Anothe
 # And now, go to Jupiter!
 jupiter = Ephem.from_body(Jupiter, time_range(date_launch, end=date_arrival))
 
-ss_j = Orbit.from_ephem(Sun, jupiter, date_arrival)
+orb_j = Orbit.from_ephem(Sun, jupiter, date_arrival)
 ```
 
 ```{code-cell}
 # Solving for maneuver to Jupiter
-man_jupiter = Maneuver.lambert(ic2_end, ss_j)
+man_jupiter = Maneuver.lambert(ic2_end, orb_j)
 imp_a, imp_b = man_jupiter.impulses
 
 print("Initial impulse:", imp_a)
@@ -174,7 +174,7 @@ Again, we apply the maneuver:
 
 ```{code-cell}
 # Apply the maneuver
-ic3, ss_target = ic2_end.apply_maneuver(man_jupiter, intermediate=True)
+ic3, orb_target = ic2_end.apply_maneuver(man_jupiter, intermediate=True)
 ic3_end = ic3.propagate(date_arrival)
 ```
 
@@ -191,7 +191,7 @@ plotter.plot_body_orbit(
     label="Earth's position at flyby",
     trail=True,
 )
-plotter.plot_maneuver(ss_e0, man, color="C1", label="Initial impulse")
+plotter.plot_maneuver(orb_e0, man, color="C1", label="Initial impulse")
 plotter.plot_trajectory(
     ic1.sample(max_anomaly=180 * u.deg), label="Inner cruise 1", color="C1"
 )

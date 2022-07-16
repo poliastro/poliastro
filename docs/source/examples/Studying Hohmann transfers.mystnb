@@ -30,17 +30,17 @@ Earth.k
 ```
 
 ```{code-cell}
-ss_i = Orbit.circular(Earth, alt=800 * u.km)
-ss_i
+orb_i = Orbit.circular(Earth, alt=800 * u.km)
+orb_i
 ```
 
 ```{code-cell}
-r_i = ss_i.a.to(u.km)
+r_i = orb_i.a.to(u.km)
 r_i
 ```
 
 ```{code-cell}
-v_i_vec = ss_i.v.to(u.km / u.s)
+v_i_vec = orb_i.v.to(u.km / u.s)
 v_i = norm(v_i_vec)
 v_i
 ```
@@ -51,7 +51,7 @@ dv_a_vector = np.zeros(N) * u.km / u.s
 dv_b_vector = dv_a_vector.copy()
 r_f_vector = r_i * np.linspace(1, 100, num=N)
 for ii, r_f in enumerate(r_f_vector):
-    man = Maneuver.hohmann(ss_i, r_f)
+    man = Maneuver.hohmann(orb_i, r_f)
     (_, dv_a), (_, dv_b) = man.impulses
     dv_a_vector[ii] = norm(dv_a)
     dv_b_vector[ii] = norm(dv_b)

@@ -263,7 +263,7 @@ def test_plot_maneuver():
     alt_i = 191.34411 * u.km
     alt_f = 35781.34857 * u.km
     _a = 0 * u.deg
-    ss_i = Orbit.from_classical(
+    orb_i = Orbit.from_classical(
         attractor=Earth,
         a=Earth.R + alt_i,
         ecc=0 * u.one,
@@ -274,12 +274,12 @@ def test_plot_maneuver():
     )
 
     # Create the maneuver
-    man = Maneuver.hohmann(ss_i, Earth.R + alt_f)
+    man = Maneuver.hohmann(orb_i, Earth.R + alt_f)
 
     # Plot the maneuver
     fig, ax = plt.subplots()
     plotter = StaticOrbitPlotter(ax=ax)
-    plotter.plot(ss_i, label="Initial orbit", color="blue")
-    plotter.plot_maneuver(ss_i, man, label="Hohmann maneuver", color="red")
+    plotter.plot(orb_i, label="Initial orbit", color="blue")
+    plotter.plot_maneuver(orb_i, man, label="Hohmann maneuver", color="red")
 
     return fig
