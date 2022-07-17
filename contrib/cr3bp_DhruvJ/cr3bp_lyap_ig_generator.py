@@ -20,23 +20,21 @@ These are some of the referneces that provide a comprehensive brackground and ha
 4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006
 """
 import numpy as np
-from cr3bp_lib_JC_calc import lib_pt_loc
-from cr3bp_master import rel_dist_cr3bp, uii_partials_cr3bp
+from cr3bp_lib_calc import lib_pt_loc
+from cr3bp_model_master import cr3bp_model
 
 
-def ig_lyap_orb_collinear_li_cr3bp(mu, pert_x, lib_num=1):
+def ig_lyap_orb_collinear_li_cr3bp(sys_chars_vals, pert_x, lib_num=1):
     """
     Calculate the linear inital guess of a lyapunov orbit by calculating the
     linear approximation of vy0 using step_off in x direction from Li
 
     Note: Typical value of pert_x in Earth-Moon CR3BP is 0.01 [nd]
 
-    Dhruv Jain, Feb 25 2022
-
     Parameters
     ----------
-    mu :  float, M2/(M1+M2)
-        M1 and M2 are mass of Primary Bodies and M2<M1
+    sys_chars_vals: object
+        Object of Class sys_char
     pert_x : float
         Step off from Li in x direction, CR3BP Barycentered frame
     lib_num : int, optional
@@ -48,21 +46,19 @@ def ig_lyap_orb_collinear_li_cr3bp(mu, pert_x, lib_num=1):
         Initial guess of a lyapunov orbit about a collinear libration point calculated
         using CR3BP in-plane linear variational equation
     """
-
     # Check if lib_num is valid
     if lib_num not in [1, 2, 3]:
         print("Function only works for collinear libration points: 1, 2 or 3")
         return 0
 
     # Calculate the 5 libration points
-    lib_loc = lib_pt_loc(mu)
+    lib_loc = lib_pt_loc(sys_chars_vals)
     li = lib_loc[lib_num - 1, :]  # 0 for L1, 1 for L2, 2 for L3
     li_state = np.array([li[0], 0, 0, 0, 0, 0])
 
-    d, r = rel_dist_cr3bp(mu, li_state)
-    Uxx, Uyy, Uzz, Uxy, Uxz, Uyz = uii_partials_cr3bp(
-        mu, li_state, d, r
-    )  # Hetian of  Pesudo-potenital of CR3BP
+    cr3bp_obj = cr3bp_model(sys_chars_vals,li_state)
+    d, r = cr3bp_obj.rel_dist_cr3bp()
+    Uxx, Uyy, Uzz, Uxy, Uxz, Uyz = cr3bp_obj.uii_partials_cr3bp()  # Hetian of  Pesudo-potenital of CR3BP
 
     # Compute roots of characteristic polynomial of In-plane Linear Variational Equation of CR3BP
     # Characteristic polynomial: Lam^4 + (4 -Uxx - Uyy)*Lam^2 + Uxx*Uyy = 0

@@ -8,28 +8,32 @@ This is an exmaple file to test the CR3BP functions
 """
 
 import matplotlib.pyplot as plt
-from cr3bp_char_quant import bodies_char
-from cr3bp_lib_JC_calc import JC, lib_pt_loc
-from cr3bp_master import prop_cr3bp
+from cr3bp_char_quant import sys_chars
+from cr3bp_lib_calc import lib_pt_loc
+from cr3bp_model_master import cr3bp_model
 
-mu, dist_e_m, tstar = bodies_char("Earth", "Moon")
+sys_p1p2 = sys_chars("Earth", "Moon")
+mu = sys_p1p2.mu
 print("Earth-Moon mu:", mu)
-print("Earth-Moon l*:", dist_e_m, "km")
-print("Earth-Moon t*:", tstar / 86400, "days")
+print("Earth-Moon l*:", sys_p1p2.lstar, "km")
+print("Earth-Moon t*:", sys_p1p2.tstar / 86400, "days")
 
 # Calculate the 5 libration points
-lib_loc = lib_pt_loc(mu)
+lib_loc = lib_pt_loc(sys_p1p2)
 li = lib_loc[:, :]  # 0 for L1 and  1 for L2....
 print("Earth-Moon Li:", li)
 
 # Arbitrary state
 ic = [1.05903, -0.067492, -0.103524, -0.170109, 0.0960234, -0.135279]
-JC0 = JC(mu, ic[0:3], ic[3:6])  # Compute Jacobi Constant
-print("Jacobi constant:", JC0)
 
 # Propagate the arbitrary state for time = 0 to tf
 tf = 10
-results = prop_cr3bp(mu, ic, tf, stm_bool=0, xcross_cond=1)
+cr3bp_obj = cr3bp_model(sys_p1p2,ic,tf)
+
+# Compute Jacobi Constant
+print("Jacobi constant:", cr3bp_obj.JC())
+
+results = cr3bp_obj.propagate()
 
 # Plot P1, P2, Libration points and configuration space state history of the arbirtray state
 pltnum = 1

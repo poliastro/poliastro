@@ -1,22 +1,22 @@
 # Dhruv Jain - Circular Restircted Three Body Problem 
 
-This is a first major update to the proposed contrib/cr3bp_DhruvJ
-
-Goal: To add the capability to Poliastro investiage the dynamical flows in CR3BP.
+Goal: To add the capability to investiage the dynamical flows in CR3BP to Poliastro.
 
 **Current Features:**
 1. Compute the characterisitic quantities of a system in CR3BP: mu,l*, t* => _cr3bp_char_quant.py_
-2. Computing the 5 libration points position and Jacobi Constant => _cr3bp_lib_JC_calc.py_
+2. Computing the 5 libration points position => _cr3bp_lib_calc.py_
 3. Numerical Integration of CR3BP EOMs (with the option of using events functions => _cr3bp_master.py_
-4. Numerical Integration of CR3BP + State Transition Matrix EOMs (with the option of using events functions) => _cr3bp_master.py_
-5. Computing the first derivative of pseudo potenial, second-derivative of pseudo potenial and acceleration terms => _cr3bp_master.py_
-6. Periodic Orbit Single Shooter Targeter => _cr3bp_PO_targeter.py_
+4. Numerical Integration of CR3BP + State Transition Matrix EOMs (with the option of using events functions) => _cr3bp_model_master.py_
+5. Compute Jacobi Cosntant => _cr3bp_model_master.py_
+6. Computing the first derivative of pseudo potenial, second-derivative of pseudo potenial and acceleration terms => _cr3bp_master.py_
+7. Periodic Orbit Single Shooter Targeter => _cr3bp_PO_master.py_
    * Target states, time, JC, pseudo-arc length constraint
    * Can exploit XZ plane symmetry, X-axis symmetry, Periodicity
    * Phase constraint for PALC with Periodicity Targeter
-7. Periodic Orbit Multiple Shooter node setup => _cr3bp_PO_targeter.py_
+   * Compute local and global manifolds of a periodic orbit
+9. Periodic Orbit Multiple Shooter node setup => _cr3bp_PO_master.py_
    * Place nodes after equal time intervals, or equal number of integrated time-steps
-8. Periodic Orbit Family Computation => _cr3bp_fam_continuation.py_
+10. Periodic Orbit Family Computation => _cr3bp_po_fam_continuation.py_
    a. Natural Parameter Continuation:  
    	* Use NPC to compute a family of Periodic Orbits
 	* line search: To update step size if targeter unable to converge with previous step size
@@ -24,28 +24,19 @@ Goal: To add the capability to Poliastro investiage the dynamical flows in CR3BP
    b. Pseudo-Arc Length Parameter Continuation:  
    	* Use PALC to compute a family of Periodic Orbits
 	* line search: To update step size if targeter unable to converge with previous step size
-9. Plots family of periodic orbtis => _cr3bp_plot_orbits.py_
+9. Plots family of periodic orbtis => _cr3bp_po_plot_orbits.py_
 
 There are multiple examples included in the PR. The examples are meant to showcase the various cases that the robust targeter and continuation methods can handle. 
 
 The current work requires the widely used numpy, scipy, plotly and matplotlib libraries. 
 
-## Next Update
-
-I will restructure the code to: 
-1. Exploit OOP principles
-2. Incorporate unit tests for regression testing
-3. Give access to users to change line search parameters
-4. Possibly breakdown _po_single_shooter_cr3bp_ function into multiple small functions to ease in any future debugging and to improve readability
-
 ## Future Work: 
 I hope to make a robuts setup for people to play with and understand periodic orbits and the general dynamical flows in CR3BP.
 
 1. Extend single shooter to be a multiple shooter
-2. Stability analysis: Sorting Eigenevalues and Eigenvectors of Monodromy matrix, Stability Index plots, Broucke Stability Diagram
-3. Manifold generation 
+2. Incorporate unit tests for regression testing 
+3. Stability analysis: Sorting Eigenevalues and Eigenvectors of Monodromy matrix, Stability Index plots, Broucke Stability Diagram
 4. Heteroclinic transfer design using Tau-Alpha method
-5. Method to transition and corret in N-body ephemeris model
 
 My long term goal is to build be a capable setup that can compute Quasi-Periodic Orbits(QPOs) in CR3BP, so that users can access the less investaged but more useful QPOs. 
 
