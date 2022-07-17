@@ -14,8 +14,8 @@ D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Pro
 import numpy as np
 import plotly.graph_objs as go
 from cr3bp_char_quant import sys_chars
-from cr3bp_lib_calc import lib_pt_loc
 from cr3bp_po_fam_continuation import periodic_orbit_fam_continuation
+from cr3bp_lib_calc import lib_pt_loc
 from cr3bp_po_plot_orbits import plot_orbits
 
 sys_p1p2 = sys_chars("Earth", "Moon")
@@ -31,51 +31,27 @@ orbit_results = []
 free_vars = ["x", "vy", "vz", "t"]
 constraints = ["y", "vx", "vz"]
 
-orb_fam_obj = periodic_orbit_fam_continuation(sys_p1p2, ig, tf=tf_guess)
+orb_fam_obj = periodic_orbit_fam_continuation(sys_p1p2, ig,tf=tf_guess)
 
 # Target Vertical orbit using Single Shooter Variable Time setup
 #        Exploits XZ plane symmetry and X-axis symmetry(sym_perioid_targ set to 1/4)
 #        Continue in 'x' using Natural Paramter Continuaton to compute 20 family members
-orb_fam_obj.npc_po_fam(
-    free_vars,
-    constraints,
-    sym_period_targ=1 / 4,
-    Nmax=20,
-    step_size=-1e-4,
-    num_fam_members=10,
-    param_continue="x",
-    line_search=True,
-)
+orb_fam_obj.npc_po_fam(free_vars, constraints,sym_period_targ=1 / 4, Nmax=20, 
+                    step_size=-1e-4, num_fam_members=10, param_continue="x", line_search=True)
 
 constraints = ["y", "x", "vz"]
 # Target Vertical orbit using Single Shooter Variable Time setup
 #        Exploits Periodcity(sym_perioid_targ set to 1)
 #        Continue in 'x' using Natural Paramter Continuaton to compute 20 family members
-orb_fam_obj.npc_po_fam(
-    free_vars,
-    constraints,
-    sym_period_targ=1,
-    Nmax=20,
-    step_size=-1e-4,
-    num_fam_members=10,
-    param_continue="x",
-    line_search=True,
-)
+orb_fam_obj.npc_po_fam(free_vars, constraints,sym_period_targ=1, Nmax=20, 
+                    step_size=-1e-4, num_fam_members=10, param_continue="x", line_search=True)
 
 constraints = ["y", "vx", "vz"]
 # Target Vertical orbit using Single Shooter Variable Time setup
 #        Exploits Periodcity(sym_perioid_targ set to 1)
 #        Continue in 'x' using Natural Paramter Continuaton to compute 20 family members
-orb_fam_obj.npc_po_fam(
-    free_vars,
-    constraints,
-    sym_period_targ=1 / 4,
-    Nmax=20,
-    step_size=-1e-2 * 8,
-    num_fam_members=40,
-    param_continue="jc",
-    line_search=True,
-)
+orb_fam_obj.npc_po_fam(free_vars, constraints,sym_period_targ=1/4, Nmax=20, 
+                    step_size=-1e-2*8, num_fam_members=40, param_continue="jc", line_search=True)
 
 
 """
@@ -93,14 +69,10 @@ data_trace.append(
 )
 # Add Earth
 data_trace.append(
-    go.Scatter3d(
-        x=[-sys_p1p2.mu], y=[0], z=[0], marker=dict(color="blue", size=10)
-    )
+    go.Scatter3d(x=[-sys_p1p2.mu], y=[0], z=[0], marker=dict(color="blue", size=10))
 )
 data_trace.append(
-    go.Scatter3d(
-        x=[1 - sys_p1p2.mu], y=[0], z=[0], marker=dict(color="grey", size=7)
-    )
+    go.Scatter3d(x=[1 - sys_p1p2.mu], y=[0], z=[0], marker=dict(color="grey", size=7))
 )
 
 

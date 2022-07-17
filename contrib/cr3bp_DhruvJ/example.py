@@ -28,7 +28,7 @@ ic = [1.05903, -0.067492, -0.103524, -0.170109, 0.0960234, -0.135279]
 
 # Propagate the arbitrary state for time = 0 to tf
 tf = 10
-cr3bp_obj = cr3bp_model(sys_p1p2, ic, tf)
+cr3bp_obj = cr3bp_model(sys_p1p2,ic,tf)
 
 # Compute Jacobi Constant
 print("Jacobi constant:", cr3bp_obj.JC())

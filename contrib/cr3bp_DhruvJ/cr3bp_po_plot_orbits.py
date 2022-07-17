@@ -65,9 +65,7 @@ def plot_orbits(
 
     colour_range = [min(colourby), max(colourby)]
     cmap = matplotlib.cm.get_cmap(colourmap)
-    norm = matplotlib.colors.Normalize(
-        vmin=colour_range[0], vmax=colour_range[1]
-    )
+    norm = matplotlib.colors.Normalize(vmin=colour_range[0], vmax=colour_range[1])
     colours = []
     for i in colourby:
         colours.append(cmap(norm(i)))
