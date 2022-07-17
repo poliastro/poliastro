@@ -14,10 +14,10 @@ def with_units(draw, elements, unit):
 
 def test_cartesian_coordinates():
     expected_cords = [
-            3764859.30127275 * u.m, 
-            2987201.67496698 * u.m, 
-            4179160.71540021 * u.m 
-            ]
+        3764859.30127275 * u.m,
+        2987201.67496698 * u.m,
+        4179160.71540021 * u.m,
+    ]
 
     el_cords = (38.43 * u.deg, 41.2 * u.deg, 0 * u.m)
 
