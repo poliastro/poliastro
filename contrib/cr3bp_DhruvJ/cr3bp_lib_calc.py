@@ -11,16 +11,16 @@ Objectve: Calculate the position [nd] of 5 libration points for a system in CR3B
 import numpy as np
 
 
-def lib_pt_loc(sys_chars_vals, tolerance = 1e-12):
+def lib_pt_loc(sys_chars_vals, tolerance=1e-12):
     """Computes Non-Dimensionalized Libration Points Location for P1-P2 system
     Parameters
     ----------
     sys_chars_vals: object
         Object of Class sys_char
-        
+
     tolerance: float
-        convergence tolerance for Newton-Raphson Method 
-        
+        convergence tolerance for Newton-Raphson Method
+
     Returns
     -------
     lib_loc: numpy ndarray (5x3)
@@ -29,8 +29,16 @@ def lib_pt_loc(sys_chars_vals, tolerance = 1e-12):
     mu = sys_chars_vals.mu
 
     lib_loc = np.zeros((5, 3))
-    lib_loc[3, :] = [0.5 - mu, 3**0.5 / 2, 0]  # L4, analytical_guessal solution known
-    lib_loc[4, :] = [0.5 - mu, -(3**0.5) / 2, 0]  # L5, analytical solution known
+    lib_loc[3, :] = [
+        0.5 - mu,
+        3**0.5 / 2,
+        0,
+    ]  # L4, analytical_guessal solution known
+    lib_loc[4, :] = [
+        0.5 - mu,
+        -(3**0.5) / 2,
+        0,
+    ]  # L5, analytical solution known
 
     # 5th degree polynomial of L1, L2 and L3
     f_lib = np.array(
@@ -40,7 +48,7 @@ def lib_pt_loc(sys_chars_vals, tolerance = 1e-12):
             [1, 2 + mu, 1 + 2 * mu, mu - 1, 2 * mu - 2, -1 + mu],
         ]
     )
-    
+
     # First-order derivative of the polyomial defined in f_lib
     fd_lib = np.array(
         [
