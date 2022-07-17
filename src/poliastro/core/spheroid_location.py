@@ -189,6 +189,6 @@ def cartesian_to_ellipsoidal(a, c, x, y, z):
     )
 
     v = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
-    h = x / np.cos(lat) - v if lat == 0.0 else z / np.sin(lat) - (1 - e2) * v
+    h = np.sqrt(x**2 + y**2) / np.cos(lat) - v if lat == 0.0 else z / np.sin(lat) - (1 - e2) * v
 
     return lat, lon, h
