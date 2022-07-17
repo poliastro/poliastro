@@ -39,7 +39,8 @@ from poliastro.examples import molniya
 molniya.plot()
 ```
 
-![Molniya orbit](https://github.com/poliastro/poliastro/raw/main/docs/source/examples/molniya.png)
+![Molniya orbit](https://raw.githubusercontent.com/jorgepiloto/poliastro/fix/molniya-plot/docs/source/_static/molniya.png)
+
 
 # Documentation
 
