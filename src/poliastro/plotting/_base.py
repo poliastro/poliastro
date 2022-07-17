@@ -10,11 +10,14 @@ from poliastro.ephem import Ephem
 from poliastro.frames import Planes
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.twobody.mean_elements import get_mean_elements
+from poliastro.twobody.sampling import EpochBounds
 from poliastro.util import norm, time_range
 
 
 class Trajectory(
-    namedtuple("Trajectory", ["coordinates", "position", "label", "colors", "dashed"])
+    namedtuple(
+        "Trajectory", ["coordinates", "position", "label", "colors", "dashed"]
+    )
 ):
     pass
 
@@ -65,7 +68,10 @@ class BaseOrbitPlotter:
         # Select a sensible value for the radius: realistic for low orbits,
         # visible for high and very high orbits
         min_distance = min(
-            [coordinates.norm().min() for coordinates, *_ in self._trajectories]
+            [
+                coordinates.norm().min()
+                for coordinates, *_ in self._trajectories
+            ]
             or [0 * u.m]
         )
         self._attractor_radius = max(
@@ -106,14 +112,17 @@ class BaseOrbitPlotter:
 
     def _plot_position(self, position, label, colors):
         radius = min(
-            self._attractor_radius * 0.5, (norm(position) - self._attractor.R) * 0.5
+            self._attractor_radius * 0.5,
+            (norm(position) - self._attractor.R) * 0.5,
         )  # Arbitrary thresholds
         self._draw_point(radius, colors[0], label, center=position)
 
     def __plot_coordinates_and_position(self, trajectory):
         coordinates, position, label, colors, dashed = trajectory
 
-        trace_coordinates = self._plot_coordinates(coordinates, label, colors, dashed)
+        trace_coordinates = self._plot_coordinates(
+            coordinates, label, colors, dashed
+        )
 
         if position is not None:
             trace_position = self._plot_position(position, label, colors)
@@ -122,19 +131,24 @@ class BaseOrbitPlotter:
 
         return trace_coordinates, trace_position
 
-    def __add_trajectory(self, coordinates, position=None, *, label, colors, dashed):
+    def __add_trajectory(
+        self, coordinates, position=None, *, label, colors, dashed
+    ):
         trajectory = Trajectory(coordinates, position, label, colors, dashed)
         self._trajectories.append(trajectory)
 
         self._redraw_attractor()
 
-        trace_coordinates, trace_position = self.__plot_coordinates_and_position(
-            trajectory
-        )
+        (
+            trace_coordinates,
+            trace_position,
+        ) = self.__plot_coordinates_and_position(trajectory)
 
         return trace_coordinates, trace_position
 
-    def _plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+    def _plot_trajectory(
+        self, coordinates, *, label=None, color=None, trail=False
+    ):
         if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
@@ -169,7 +183,9 @@ class BaseOrbitPlotter:
         if len(maneuver_phases) == 0:
             # For single-impulse maneuver only draw the impulse marker
             impulse_label = f"Impulse 1 - {label}"
-            impulse_lines = ([self._draw_impulse(color, impulse_label, final_phase.r)],)
+            impulse_lines = (
+                [self._draw_impulse(color, impulse_label, final_phase.r)],
+            )
             return [(impulse_label, impulse_lines)]
         else:
             # Declare for holding (label, lines) for each impulse and trajectory
@@ -187,29 +203,21 @@ class BaseOrbitPlotter:
 
                 # HACK: if no color is provided, get the one randomly generated
                 # for previous impulse lines
-                color = impulse_lines[0][0].get_color() if color is None else color
+                color = (
+                    impulse_lines[0][0].get_color() if color is None else color
+                )
 
                 # Get the propagation time required before next impulse
                 time_to_next_impulse, _ = maneuver.impulses[ith_impulse + 1]
 
-                # Compute the minimum and maximum anomalies
-                min_nu = orbit_phase.nu
-                # High level, but inefficient way of solving the Kepler equation,
-                # which is what farnocchia_coe does:
-                # tp0 = delta_t_from_nu(nu, ecc, k, q)
-                # tp = tp0 + tof
-                # max_nu = nu_from_delta_t(tp, ecc, k, q)
-                max_nu = orbit_phase.propagate(time_to_next_impulse).nu
-
                 # Collect the coordinate points for the i-th orbit phase
-                # We use .sample rather than poliastro.twobody.propagation.propagate
-                # because the latter samples time uniformly
-                # and therefore generates a sharp curve close to the perigee,
-                # and that's also why I need to compute the anomalies outside,
-                # see https://github.com/poliastro/poliastro/issues/1364
-                phase_coordinates = orbit_phase.sample(
-                    min_anomaly=min_nu, max_anomaly=max_nu
-                )
+                # TODO: Remove `.sample()` to return Ephem and use `plot_ephem` instead?
+                phase_coordinates = orbit_phase.to_ephem(
+                    strategy=EpochBounds(
+                        min_epoch=orbit_phase.epoch,
+                        max_epoch=orbit_phase.epoch + time_to_next_impulse,
+                    )
+                ).sample()
 
                 # Plot the phase trajectory and collect its label and lines
                 trajectory_lines = self._plot_trajectory(
@@ -219,7 +227,9 @@ class BaseOrbitPlotter:
 
             # Finally, draw the impulse at the very beginning of the final phase
             impulse_label = f"Impulse {ith_impulse + 2} - {label}"
-            impulse_lines = ([self._draw_impulse(color, impulse_label, final_phase.r)],)
+            impulse_lines = (
+                [self._draw_impulse(color, impulse_label, final_phase.r)],
+            )
             lines_list.append((impulse_label, impulse_lines))
 
         return lines_list
@@ -259,11 +269,17 @@ class BaseOrbitPlotter:
         epochs = time_range(
             epoch, periods=self._num_points, end=epoch + period, scale="tdb"
         )
-        ephem = Ephem.from_body(body, epochs, attractor=body.parent, plane=self.plane)
+        ephem = Ephem.from_body(
+            body, epochs, attractor=body.parent, plane=self.plane
+        )
 
-        return self._plot_ephem(ephem, epoch, label=label, color=color, trail=trail)
+        return self._plot_ephem(
+            ephem, epoch, label=label, color=color, trail=trail
+        )
 
-    def _plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+    def _plot_ephem(
+        self, ephem, epoch=None, *, label=None, color=None, trail=False
+    ):
         if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
@@ -290,7 +306,9 @@ class BaseOrbitPlotter:
             coordinates, r0, label=str(label), colors=colors, dashed=False
         )
 
-    def plot_trajectory(self, coordinates, *, label=None, color=None, trail=False):
+    def plot_trajectory(
+        self, coordinates, *, label=None, color=None, trail=False
+    ):
         """Plots a precomputed trajectory.
 
         An attractor must be set first.
@@ -309,7 +327,9 @@ class BaseOrbitPlotter:
         """
         # Do not return the result of self._plot
         # This behavior might be overriden by subclasses
-        self._plot_trajectory(coordinates, label=label, color=color, trail=trail)
+        self._plot_trajectory(
+            coordinates, label=label, color=color, trail=trail
+        )
 
     def plot_maneuver(
         self, initial_orbit, maneuver, label=None, color=None, trail=False
@@ -382,9 +402,13 @@ class BaseOrbitPlotter:
         """
         # Do not return the result of self._plot
         # This behavior might be overriden by subclasses
-        self._plot_body_orbit(body, epoch, label=label, color=color, trail=trail)
+        self._plot_body_orbit(
+            body, epoch, label=label, color=color, trail=trail
+        )
 
-    def plot_ephem(self, ephem, epoch=None, *, label=None, color=None, trail=False):
+    def plot_ephem(
+        self, ephem, epoch=None, *, label=None, color=None, trail=False
+    ):
         """Plots Ephem object over its sampling period.
 
         Parameters

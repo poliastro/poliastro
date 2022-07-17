@@ -8,22 +8,22 @@ the plotting utilities, insight on the {ref}`API <api-reference>` capabilities a
 ```{eval-rst}
 .. nbgallery::
 
-   /examples/Analyzing the Parker Solar Probe flybys.mystnb
-   /examples/Atmospheric models.mystnb
-   /examples/Catch that asteroid!.mystnb
-   /examples/Customising static orbit plots.mystnb
-   /examples/CZML Tutorial.mystnb
-   /examples/Exploring the New Horizons launch.mystnb
-   /examples/Going to Mars with Python using poliastro.mystnb
-   /examples/Going to Jupiter with Python using Jupyter and poliastro.mystnb
-   /examples/Generating orbit groundtracks.mystnb
-   /examples/Plotting in 3D.mystnb
-   /examples/Analyzing NEOs.mystnb
-   /examples/Visualizing the SpaceX Tesla Roadster trip to Mars.mystnb
-   /examples/Natural and artificial perturbations.mystnb
-   /examples/Porkchops with poliastro.mystnb
-   /examples/Tisserand.mystnb
-   /examples/Detecting Events.mystnb
-   /examples/Loading OMM and TLE satellite data.mystnb
+   /examples/Analyzing the Parker Solar Probe flybys.myst.md
+   /examples/Atmospheric models.myst.md
+   /examples/Catch that asteroid!.myst.md
+   /examples/Customising static orbit plots.myst.md
+   /examples/CZML Tutorial.myst.md
+   /examples/Exploring the New Horizons launch.myst.md
+   /examples/Going to Mars with Python using poliastro.myst.md
+   /examples/Going to Jupiter with Python using Jupyter and poliastro.myst.md
+   /examples/Generating orbit groundtracks.myst.md
+   /examples/Plotting in 3D.myst.md
+   /examples/Analyzing NEOs.myst.md
+   /examples/Visualizing the SpaceX Tesla Roadster trip to Mars.myst.md
+   /examples/Natural and artificial perturbations.myst.md
+   /examples/Porkchops with poliastro.myst.md
+   /examples/Tisserand.myst.md
+   /examples/Detecting Events.myst.md
+   /examples/Loading OMM and TLE satellite data.myst.md
    
 ```

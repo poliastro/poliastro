@@ -83,8 +83,8 @@ align: right
 width: 300px
 alt: Molniya Orbit
 ---
-Plot of a [Molniya orbit](https://en.wikipedia.org/wiki/Molniya_orbit) around the Earth\
- $(a = 26600\mathrm{km}, e = 0.75, i = 63.4\mathrm{^\circ}).$
+Plot of a [Molniya orbit](https://en.wikipedia.org/wiki/Molniya_orbit) around the Earth <br />
+({math}`a = 26600~\mathrm{km}, e = 0.75, i = 63.4\mathrm{^\circ}`).
 ```
 
 The [source code](https://github.com/poliastro/poliastro), [issue

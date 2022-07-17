@@ -19,7 +19,11 @@ from sgp4.api import Satrec
 
 
 def _generate_url(catalog_number, international_designator, name):
-    params = {"CATNR": catalog_number, "INTDES": international_designator, "NAME": name}
+    params = {
+        "CATNR": catalog_number,
+        "INTDES": international_designator,
+        "NAME": name,
+    }
     param_names = [
         param_name
         for param_name, param_value in params.items()

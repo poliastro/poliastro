@@ -7,7 +7,18 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 @jit
 def recseries_coe(
-    k, p, ecc, inc, raan, argp, nu, tof, method="rtol", order=8, numiter=100, rtol=1e-8
+    k,
+    p,
+    ecc,
+    inc,
+    raan,
+    argp,
+    nu,
+    tof,
+    method="rtol",
+    order=8,
+    numiter=100,
+    rtol=1e-8,
 ):
 
     # semi-major axis
@@ -43,7 +54,9 @@ def recseries_coe(
         elif method == "order":
             Niter = order
         else:
-            raise ValueError("Unknown recursion termination method ('rtol','order').")
+            raise ValueError(
+                "Unknown recursion termination method ('rtol','order')."
+            )
 
         # compute eccentric anomaly through recursive series
         E = M + ecc  # Using initial guess from vallado to improve convergence

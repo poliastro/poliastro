@@ -20,7 +20,7 @@ from poliastro.twobody.events import (
     PenumbraEvent,
     UmbraEvent,
 )
-from poliastro.twobody.propagation import cowell
+from poliastro.twobody.propagation import CowellPropagator
 
 
 @pytest.mark.slow
@@ -55,16 +55,13 @@ def test_altitude_crossing():
         du_ad = np.array([0, 0, 0, ax, ay, az])
         return du_kep + du_ad
 
-    rr, _ = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=events, f=f)
+    rr, _ = method.propagate_many(
+        orbit._state,
         tofs,
-        events=events,
-        f=f,
     )
 
-    assert_quantity_allclose(norm(rr[0].to(u.km).value) - thresh_alt, R)
+    assert_quantity_allclose(norm(rr[0].to_value(u.km)) - thresh_alt, R)
     assert_quantity_allclose(altitude_cross_event.last_t, t_flight, rtol=1e-2)
 
 
@@ -79,12 +76,10 @@ def test_altitude_cross_not_happening_is_ok():
     altitude_cross_event = AltitudeCrossEvent(thresh_alt, R)
     events = [altitude_cross_event]
 
-    rr, _ = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=events)
+    rr, _ = method.propagate_many(
+        orbit._state,
         tofs,
-        events=events,
     )
 
     assert altitude_cross_event.last_t == tofs[-1]
@@ -101,13 +96,10 @@ def test_latitude_cross_event():
 
     tofs = [5] * u.d
 
-    events = [latitude_cross_event]
-    rr, _ = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=[latitude_cross_event])
+    rr, _ = method.propagate_many(
+        orbit._state,
         tofs,
-        events=events,
     )
 
     assert_quantity_allclose(latitude_cross_event.last_t, t_lat)
@@ -121,14 +113,10 @@ def test_penumbra_event_not_triggering_is_ok():
     orbit = Orbit.from_vectors(attractor, r0 * u.km, v0 * u.km / u.s)
 
     penumbra_event = PenumbraEvent(orbit)
-    events = [penumbra_event]
-
-    rr, _ = cowell(
-        attractor.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=[penumbra_event])
+    rr, _ = method.propagate_many(
+        orbit._state,
         [tof] * u.s,
-        events=events,
     )
 
     assert penumbra_event.last_t == tof
@@ -142,21 +130,20 @@ def test_umbra_event_not_triggering_is_ok():
     orbit = Orbit.from_vectors(attractor, r0 * u.km, v0 * u.km / u.s)
 
     umbra_event = UmbraEvent(orbit)
-    events = [umbra_event]
 
-    rr, _ = cowell(
-        attractor.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=[umbra_event])
+    rr, _ = method.propagate_many(
+        orbit._state,
         [tof] * u.s,
-        events=events,
     )
 
     assert umbra_event.last_t == tof
 
 
 def test_umbra_event_crossing():
-    expected_umbra_t = Time("2020-01-01 00:04:51.328", scale="utc")  # From Orekit.
+    expected_umbra_t = Time(
+        "2020-01-01 00:04:51.328", scale="utc"
+    )  # From Orekit.
     attractor = Earth
     tof = 2 * u.d
     epoch = Time("2020-01-01", scale="utc")
@@ -172,21 +159,20 @@ def test_umbra_event_crossing():
     )
 
     umbra_event = UmbraEvent(orbit, terminal=True)
-    events = [umbra_event]
 
-    rr, _ = cowell(
-        attractor.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=[umbra_event])
+    rr, _ = method.propagate_many(
+        orbit._state,
         [tof] * u.s,
-        events=events,
     )
 
     assert expected_umbra_t.isclose(epoch + umbra_event.last_t, atol=1 * u.s)
 
 
 def test_penumbra_event_crossing():
-    expected_penumbra_t = Time("2020-01-01 00:04:26.060", scale="utc")  # From Orekit.
+    expected_penumbra_t = Time(
+        "2020-01-01 00:04:26.060", scale="utc"
+    )  # From Orekit.
     attractor = Earth
     tof = 2 * u.d
     epoch = Time("2020-01-01", scale="utc")
@@ -202,17 +188,15 @@ def test_penumbra_event_crossing():
     )
 
     penumbra_event = PenumbraEvent(orbit, terminal=True)
-    events = [penumbra_event]
-
-    rr, _ = cowell(
-        attractor.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=[penumbra_event])
+    rr, _ = method.propagate_many(
+        orbit._state,
         [tof] * u.s,
-        events=events,
     )
 
-    assert expected_penumbra_t.isclose(epoch + penumbra_event.last_t, atol=1 * u.s)
+    assert expected_penumbra_t.isclose(
+        epoch + penumbra_event.last_t, atol=1 * u.s
+    )
 
 
 def test_node_cross_event():
@@ -222,15 +206,11 @@ def test_node_cross_event():
     orbit = Orbit.from_vectors(Earth, r, v)
 
     node_event = NodeCrossEvent(terminal=True)
-    events = [node_event]
-
     tofs = [0.01, 0.1, 0.5, 0.8, 1, 3, 5, 6, 10, 15] << u.s
-    rr, vv = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=[node_event])
+    rr, vv = method.propagate_many(
+        orbit._state,
         tofs,
-        events=events,
     )
 
     assert_quantity_allclose(node_event.last_t, t_node)
@@ -245,12 +225,10 @@ def test_node_event_equatorial_orbit():
     orb = Orbit.from_vectors(Earth, r * u.km, v * u.km / u.s)
 
     tofs = [5, 10, 50] << u.s
-    rr, vv = cowell(
-        Earth.k,
-        orb.r,
-        orb.v,
+    method = CowellPropagator(events=events)
+    rr, vv = method.propagate_many(
+        orb._state,
         tofs,
-        events=events,
     )
 
     assert_quantity_allclose(node_event.last_t, 0.0 * u.s, atol=1e-1 * u.s)
@@ -263,17 +241,17 @@ def test_orbit_propagation_continues_if_events_terminal_is_False():
 
     thresh_lat = 60 * u.deg
     # Event occurs at ~1701.7 s.
-    latitude_cross_event = LatitudeCrossEvent(orbit, thresh_lat, terminal=False)
+    latitude_cross_event = LatitudeCrossEvent(
+        orbit, thresh_lat, terminal=False
+    )
     events = [latitude_cross_event]
 
     # The last two tofs are after the detection of the event.
     tofs = [1000, 1250, 1500, 1710, 2000] << u.s
-    rr, _ = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=events)
+    rr, _ = method.propagate_many(
+        orbit._state,
         tofs,
-        events=events,
     )
 
     # Check position vectors don't repeat during propagation.
@@ -292,16 +270,16 @@ def test_orbit_propagation_position_vector_does_not_repeat_if_events_terminal_is
 
     # The last two tofs are after the detection of the event.
     tofs = [1000, 1250, 1500, 1710, 2000] << u.s
-    rr, _ = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=events)
+    rr, _ = method.propagate_many(
+        orbit._state,
         tofs,
-        events=events,
     )
 
     # Check position vector doesn't repeat if terminal set to True.
-    assert len(rr) == 4  # From the 5th tof in tofs, position vector starts repeating.
+    assert (
+        len(rr) == 4
+    )  # From the 5th tof in tofs, position vector starts repeating.
 
 
 @pytest.mark.parametrize(
@@ -340,12 +318,10 @@ def test_propagation_stops_if_atleast_one_event_has_terminal_set_to_True(
     )
     events = [penumbra_event, latitude_cross_event]
 
-    rr, _ = cowell(
-        attractor.k,
-        orbit.r,
-        orbit.v,
+    method = CowellPropagator(events=events)
+    rr, _ = method.propagate_many(
+        orbit._state,
         tofs,
-        events=events,
     )
 
     assert len(rr) == rr_length
@@ -377,11 +353,10 @@ def test_LOS_event_raises_warning_if_norm_of_r1_less_than_attractor_radius_durin
     orbit = Orbit.from_vectors(Earth, r2, v2)
 
     tofs = [100, 500, 1000, 2000] << u.s
-    # Propagate the secondary body to generate its position coordinates.
-    rr, vv = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    # Propagate the secondary body to generate its position coordinates
+    method = CowellPropagator()
+    rr, vv = method.propagate_many(
+        orbit._state,
         tofs,
     )
     pos_coords = rr  # Trajectory of the secondary body.
@@ -397,12 +372,10 @@ def test_LOS_event_raises_warning_if_norm_of_r1_less_than_attractor_radius_durin
     tofs = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.5] << u.s
 
     with pytest.warns(UserWarning, match="The norm of the position vector"):
-        r, v = cowell(
-            Earth.k,
-            orb.r,
-            orb.v,
+        method = CowellPropagator(events=events)
+        r, v = method.propagate_many(
+            orb._state,
             tofs,
-            events=events,
         )
 
 
@@ -413,11 +386,10 @@ def test_LOS_event_with_lithobrake_event_raises_warning_when_satellite_cuts_attr
     orbit = Orbit.from_vectors(Earth, r2, v2)
 
     tofs = [100, 500, 1000, 2000] << u.s
-    # Propagate the secondary body to generate its position coordinates.
-    rr, vv = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    # Propagate the secondary body to generate its position coordinates
+    method = CowellPropagator()
+    rr, vv = method.propagate_many(
+        orbit._state,
         tofs,
     )
     pos_coords = rr  # Trajectory of the secondary body.
@@ -427,16 +399,27 @@ def test_LOS_event_with_lithobrake_event_raises_warning_when_satellite_cuts_attr
     orb = Orbit.from_vectors(Earth, r1, v1)
 
     los_event = LosEvent(Earth, pos_coords, terminal=True)
-    tofs = [0.003, 0.004, 0.01, 0.02, 0.03, 0.04, 0.07, 0.1, 0.2, 0.3, 0.4, 1, 3] << u.s
+    tofs = [
+        0.003,
+        0.004,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.07,
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        1,
+        3,
+    ] << u.s
 
     lithobrake_event = LithobrakeEvent(Earth.R.to_value(u.km))
-    events = [lithobrake_event, los_event]
-    r, v = cowell(
-        Earth.k,
-        orb.r,
-        orb.v,
+    method = CowellPropagator(events=[lithobrake_event, los_event])
+    r, v = method.propagate_many(
+        orb._state,
         tofs,
-        events=events,
     )
 
     assert lithobrake_event.last_t < los_event.last_t
@@ -449,11 +432,10 @@ def test_LOS_event():
     orbit = Orbit.from_vectors(Earth, r2, v2)
 
     tofs = [100, 500, 1000, 2000] << u.s
-    # Propagate the secondary body to generate its position coordinates.
-    rr, vv = cowell(
-        Earth.k,
-        orbit.r,
-        orbit.v,
+    # Propagate the secondary body to generate its position coordinates
+    method = CowellPropagator()
+    rr, vv = method.propagate_many(
+        orbit._state,
         tofs,
     )
     pos_coords = rr  # Trajectory of the secondary body.
@@ -472,12 +454,10 @@ def test_LOS_event():
     events = [los_event]
     tofs = [1, 5, 10, 100, 1000, 2000, 3000, 5000] << u.s
 
-    r, v = cowell(
-        Earth.k,
-        orb.r,
-        orb.v,
+    method = CowellPropagator(events=events)
+    r, v = method.propagate_many(
+        orb._state,
         tofs,
-        events=events,
     )
 
     assert_quantity_allclose(los_event.last_t, t_los)

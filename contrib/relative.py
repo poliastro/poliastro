@@ -277,7 +277,9 @@ class RelativeOrb:
         # need perform the 313 Euler angle rotation in the following sequence:
         # Right Angle of Ascending Node -> Inclination -> Argument of Latitude.
         # Now, let us get us the DCM that converts to the hill-frame.
-        DCM_HN = np.matmul(self._dcmZ(w), np.matmul(self._dcmX(i), self._dcmZ(R)))
+        DCM_HN = np.matmul(
+            self._dcmZ(w), np.matmul(self._dcmX(i), self._dcmZ(R))
+        )
 
         # Notice that the hill frame computation does not include a rotation
         # of the true anomaly, and that's because the true anomaly has already
@@ -297,7 +299,9 @@ class RelativeOrb:
         )
         vel = np.matmul(
             DCM_NH,
-            np.array([vel_X.to_value(u.km / u.s), vel_Y.to_value(u.km / u.s), 0.0]),
+            np.array(
+                [vel_X.to_value(u.km / u.s), vel_Y.to_value(u.km / u.s), 0.0]
+            ),
         )
 
         # Finally, let us not forget to compute the true anomaly.
@@ -507,13 +511,37 @@ class RelativeOrb:
                 # Plot the chief satellite as a tri-axial quiver in VVLH frame.
                 axOrbR0 = axOrbR_axes_span * 0.1
                 axOrbR.quiver(
-                    0, 0, 0, 1, 0, 0, length=axOrbR0, color="r", arrow_length_ratio=0.3
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    length=axOrbR0,
+                    color="r",
+                    arrow_length_ratio=0.3,
                 )
                 axOrbR.quiver(
-                    0, 0, 0, 0, 1, 0, length=axOrbR0, color="r", arrow_length_ratio=0.3
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    length=axOrbR0,
+                    color="r",
+                    arrow_length_ratio=0.3,
                 )
                 axOrbR.quiver(
-                    0, 0, 0, 0, 0, 1, length=axOrbR0, color="r", arrow_length_ratio=0.3
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    length=axOrbR0,
+                    color="r",
+                    arrow_length_ratio=0.3,
                 )
 
                 # Set tight layout.
@@ -581,13 +609,37 @@ class RelativeOrb:
                 # Plot the chief satellite in-track velocity quiver in VVLH.
                 axOrbV0 = axOrbV_axes_span * 0.1
                 axOrbV.quiver(
-                    0, 0, 0, 1, 0, 0, length=axOrbV0, color="r", arrow_length_ratio=0.3
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    length=axOrbV0,
+                    color="r",
+                    arrow_length_ratio=0.3,
                 )
                 axOrbV.quiver(
-                    0, 0, 0, 0, 1, 0, length=axOrbV0, color="r", arrow_length_ratio=0.3
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    length=axOrbV0,
+                    color="r",
+                    arrow_length_ratio=0.3,
                 )
                 axOrbV.quiver(
-                    0, 0, 0, 0, 0, 1, length=axOrbV0, color="r", arrow_length_ratio=0.3
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    length=axOrbV0,
+                    color="r",
+                    arrow_length_ratio=0.3,
                 )
 
                 # Set tight layout.

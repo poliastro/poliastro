@@ -70,3 +70,47 @@ def spherical_to_cartesian(v):
     y = np.asarray(vsin[..., 0] * vsin[..., 1])
     z = np.asarray(vcos[..., 0])
     return norm_vecs * np.stack((x, y, z), axis=-1)
+
+
+@jit
+def planetocentric_to_AltAz(theta, phi):
+    r"""Defines transformation matrix to convert from Planetocentric coordinate system
+    to the Altitude-Azimuth system.
+
+    .. math::
+       t\_matrix = \begin{bmatrix}
+       -\sin(theta) & \cos(theta) & 0\\
+       -\sin(phi)\cdot\cos(theta) & -\sin(phi)\cdot\sin(theta) & \cos(phi)\\
+       \cos(phi)\cdot\cos(theta) & \cos(phi)\cdot\sin(theta) & \sin(phi)
+       \end{bmatrix}
+
+    Parameters
+    ----------
+    theta: float
+        Local sidereal time
+    phi: float
+        Planetodetic latitude
+
+    Returns
+    -------
+    t_matrix: numpy.ndarray
+        Transformation matrix
+    """
+
+    # Transformation matrix for converting planetocentric equatorial coordinates to topocentric horizon system.
+    t_matrix = np.array(
+        [
+            [-np.sin(theta), np.cos(theta), 0],
+            [
+                -np.sin(phi) * np.cos(theta),
+                -np.sin(phi) * np.sin(theta),
+                np.cos(phi),
+            ],
+            [
+                np.cos(phi) * np.cos(theta),
+                np.cos(phi) * np.sin(theta),
+                np.sin(phi),
+            ],
+        ]
+    )
+    return t_matrix

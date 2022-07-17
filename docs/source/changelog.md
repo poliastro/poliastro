@@ -1,5 +1,146 @@
 # What's new
 
+## poliastro 0.17.0 - 2022-07-10
+
+### Highlights
+
+- **poliastro at SciPy US 2022**:
+  [Juan Luis](https://github.com/astrojuanlu/) and [Jorge](https://github.com/jorgepiloto/)
+  have co-authored [a scientific paper about poliastro] that will appear in the proceedings of
+  the 21st annual Scientific Computing with Python conference (SciPy US 2022).
+  In addition, Juan Luis will deliver a talk titled
+  "Per Python ad astra: interactive Astrodynamics with poliastro" at the conference.
+  After almost a decade of work, it will be the first time that
+  poliastro is presented at the most important conference about Scientific Python.
+- **Refactored propagators**:
+  Propagation methods are no longer plain functions and have become classes instead.
+  This allows them to share a common interface and perform more efficient calculations.
+  For most users of {{ Orbit }} objects this should be invisible, unless you were using
+  a custom propoagator: for example, to propagate using Cowell's method, you now have to write
+
+```python
+from poliastro.twobody.propagation import CowellPropagator
+
+new_orbit = orbit.propagate(1 << u.day, method=CowellPropagator())
+```
+
+- **New {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.to_ephem` to retrieve propagation time histories**:
+  The {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.propagate` method that allows users to
+  return a propagated {{ Orbit }} at a new epoch has been available in poliastro for a very long time.
+  However, many users were interested in retrieving the full time history of the propagation
+  in the intermediate time steps, and historically poliastro has struggled to provide a consistent API for it.
+  The new {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.to_ephem` aims to replace the old
+  `poliastro.twobody.propagation.propagate` function, which was difficult to discover and too low-level.
+
+[a scientific paper about poliastro]: https://github.com/scipy-conference/scipy_proceedings/blob/2022/papers/juanluis_cano_poliastro/juanluis_cano_poliastro.rst
+
+### New features
+
+- New {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.to_ephem` method
+  that generates an {{ Ephem }} instances from {{ Orbit }} objects using a variety of strategies
+  available in {py:mod}`poliastro.twobody.sampling`:
+  minimum and maximum anomalies with {py:class}`~poliastro.twobody.sampling.TrueAnomalyBounds`,
+  minimum and maximum epochs with {py:class}`~poliastro.twobody.sampling.EpochsBounds`,
+  or explicit array of epochs with {py:class}`~poliastro.twobody.sampling.EpochsArray`.
+- The Lambert problem algorithms in {py:mod}`poliastro.iod` now accept `prograde` and `lowpath`
+  parameters to disambiguate solutions.
+- New {py:class}`poliastro.plotting.gabbard.GabbardPlotter` to plot
+  [Gabbard diagrams](https://en.wiktionary.org/wiki/Gabbard_diagram):
+
+```{image} _static/gabbard.png
+---
+align: center
+---
+```
+
+- New recursive series Kepler solver for elliptical orbits
+  {py:class}`poliastro.twobody.propagation.RecseriesPropagator` based on Charls
+  "Recursive solution to Kepler’s problem for elliptical orbits -
+  application in robust Newton-Raphson and co-planar closest approach estimation".
+- New {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.elevation` of {{ Orbit }} objects
+  to determine the elevation of the object over a specific observation point on the attractor
+  defined by latitude `lat` and longitude `theta`.
+- New {py:meth}`poliastro.earth.util.get_local_sidereal_time`.
+
+In addition, we have new community-contributed scripts:
+
+- [Circular restricted three-body problem](https://github.com/poliastro/poliastro/blob/main/contrib/CR3BP/CR3BP.py)
+
+### Performance improvements
+
+- Propagation now performs fewer unnecessary element conversions,
+  and therefore should be slightly faster.
+
+### Bugs fixed
+
+- Compatibility with newer versions of astroquery ({github}`Issue #1405 <#1405>`)
+- {py:class}`poliastro.maneuver.Maneuver.lambert` sometimes generated negative times of flight
+  and crashed ({github}`Issue #1397 <#1397>`)
+- Attractor singletons now behave correctly upon pickling and unpickling
+  ({github}`Issue #1395 <#1395>`)
+- {py:meth}`poliastro.earth.atmosphere.jacchia.Jacchia77.density()` returned value
+  in incorrect units ({github}`Issue #1509 <#1509>`)
+- `atmospheric_drag` had incorrect units in its docstring ({github}`Issue #1513 <#1513>`)
+- `radiation_pressure` had incorrect units in its docstring ({github}`Issue #1515 <#1515>`)
+- Typo in `coesa76` table ({github}`Issue #1518 <#1518>`)
+- {py:class}`poliastro.maneuver.Maneuver.lambert` had lousy time comparisons.
+- {py:meth}`build_ephem_interpolant`
+
+### Backwards incompatible changes
+
+- The propagators in {py:mod}`poliastro.twobody.propagation` are no longer functions, but classes:
+  hence `cowell` becomes {py:class}`poliastro.twobody.propagation.CowellPropagator`,
+  `farnocchia` becomes {py:class}`poliastro.twobody.propagation.FarnocchiaPropagator`, and so forth.
+- The state classes in {py:mod}`poliastro.twobody.states` no longer accept elements as keyword arguments,
+  but instead they take 6-tuples.
+- Interpolation methods in {py:mod}`poliastro.ephem` are no longer enumeration values, but classes:
+  hence `ephem.sample(method=InterpolationMethods.SPLINES)` becomes `ephem.sample(interpolator=SplineInterpolator())`.
+- The Lambert problem methods in {py:mod}`poliastro.iod` do not yield pairs of velocities anymore,
+  and instead they always return departure and arrival velocity.
+- Module `poliastro.earth.sensors` was moved to {py:mod}`poliastro.sensors`.
+
+### Contributors
+
+This is the complete list of the people that contributed to this
+release, with a + sign indicating first contribution.
+
+- Abhishek K. M.
+- Andrew Mackie+
+- Anish+
+- Arnaud Muller+
+- Carlosbogo
+- Jero Bado
+- John Reinert+
+- Jorge Martínez Garrido
+- Juan Luis Cano Rodríguez
+- Kevin Charls+
+- Luis Grau
+- Ole Streicher
+- Sebastian M. Ernst
+- Tom Johnson+
+- Tommaso Pino+
+- TreshUp+
+- Varenyam Bhardwaj+
+- Yash Gondhalekar
+
+## poliastro 0.16.3 - 2022-05-09
+
+This release adds support for Astropy 5.0
+and fixes some dependency issues.
+
+### Bugs fixed
+
+- Cannot install poliastro on Python 3.10 ({github}`Issue #1496 <#1496>`)
+- Cannot import `poliastro.twobody.Orbit` ({github}`Issue #1493 <#1493>`)
+
+### Contributors
+
+This is the complete list of the people that contributed to this
+release, with a + sign indicating first contribution.
+
+- Jorge Martínez Garrido
+- Juan Luis Cano Rodríguez
+
 ## poliastro 0.16.2 - 2022-02-10
 
 Same as 0.16.1, but fixes the documentation building process.

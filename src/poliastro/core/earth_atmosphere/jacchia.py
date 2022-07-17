@@ -45,8 +45,12 @@ R = 8314.32  # Units: u.J / (u.kg * u.mol)
 @jit
 def _O_and_O2_correction(alt, Texo, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM):
     for iz in range(90, alt):
-        CO2[iz] = CO2[iz] * (10.0 ** (-0.07 * (1.0 + np.tanh(0.18 * (Z[iz] - 111.0)))))
-        CO[iz] = CO[iz] * (10.0 ** (-0.24 * np.exp(-0.009 * (Z[iz] - 97.7) ** 2)))
+        CO2[iz] = CO2[iz] * (
+            10.0 ** (-0.07 * (1.0 + np.tanh(0.18 * (Z[iz] - 111.0))))
+        )
+        CO[iz] = CO[iz] * (
+            10.0 ** (-0.24 * np.exp(-0.009 * (Z[iz] - 97.7) ** 2))
+        )
         CM[iz] = CN2[iz] + CO2[iz] + CO[iz] + CAr[iz] + CHe[iz] + CH[iz]
         WM[iz] = (
             wmN2 * CN2[iz]
@@ -108,9 +112,13 @@ def _H_correction(alt, Texo, x, y, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM, T):
 def _altitude_profile(alt, Texo, x, y, E5M, E6P):
     # Raise Value Error if alt < 90 km or alt > 2500 km.
     if alt < 90 or 2500 < alt:
-        raise ValueError("Jacchia77 has been implemented in range 90km - 2500km.")
+        raise ValueError(
+            "Jacchia77 has been implemented in range 90km - 2500km."
+        )
 
-    alt = int(alt + 1)  # in fortran the upper limits are included. in python are not.
+    alt = int(
+        alt + 1
+    )  # in fortran the upper limits are included. in python are not.
     Texo = int(Texo)
 
     Z = [0.0 for _ in range(alt)]
@@ -165,7 +173,10 @@ def _altitude_profile(alt, Texo, x, y, E5M, E6P):
                 G1 = (1 + Z[iz] / R0) ** (-2)
                 E6P[iz - 90] = E6P[iz - 91] * np.exp(
                     -0.5897446
-                    * (G1 * E5M[iz - 90] / T[iz] + G0 * E5M[iz - 91] / T[iz - 1])
+                    * (
+                        G1 * E5M[iz - 90] / T[iz]
+                        + G0 * E5M[iz - 91] / T[iz - 1]
+                    )
                 )
 
             x = E5M[iz - 90] / wm0
@@ -193,7 +204,9 @@ def _altitude_profile(alt, Texo, x, y, E5M, E6P):
     _O_and_O2_correction(alt, Texo, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM)
 
     if 500 <= alt:
-        _H_correction(alt, Texo, x, y, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM, T)
+        _H_correction(
+            alt, Texo, x, y, Z, CN2, CO2, CO, CAr, CHe, CH, CM, WM, T
+        )
 
     return (
         Z,

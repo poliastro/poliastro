@@ -4,7 +4,7 @@ ci:
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.1.0
+  rev: v4.3.0
   hooks:
   - id: check-added-large-files
   - id: check-case-conflict
@@ -21,21 +21,18 @@ repos:
   rev: 5.10.1
   hooks:
   - id: isort
-    args: ["--project=poliastro", "--section-default=THIRDPARTY"]
-    files: |
-      (?x)(
-        ^src/|
-        ^tests/|
-        ^contrib/
-      )
 
 - repo: https://github.com/psf/black
-  rev: 22.1.0
+  rev: 22.6.0
   hooks:
-  - id: black-jupyter
-    files: |
-      (?x)(
-        ^src/|
-        ^tests/|
-        ^contrib/
-      )
+  - id: black
+
+- repo: https://github.com/PyCQA/flake8
+  rev: 4.0.1
+  hooks:
+  - id: flake8
+
+#- repo: https://github.com/PyCQA/pydocstyle
+#  rev: 6.1.1
+#  hooks:
+#  - id: pydocstyle

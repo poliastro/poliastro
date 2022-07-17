@@ -40,6 +40,8 @@ def compute_flyby(v_spacecraft, v_body, k, r_p, theta=0 * u.deg):
     r_p = r_p.to_value(u.km)
     theta = theta.to_value(u.rad)
 
-    v_spacecraft_out, delta = compute_flyby_fast(v_spacecraft, v_body, k, r_p, theta)
+    v_spacecraft_out, delta = compute_flyby_fast(
+        v_spacecraft, v_body, k, r_p, theta
+    )
 
     return v_spacecraft_out * u.km / u.s, delta * u.rad

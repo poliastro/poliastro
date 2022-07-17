@@ -20,7 +20,7 @@ Here is a summarized reference of commonly used methods:
 
 ```{eval-rst}
 .. autoapiclass:: poliastro.twobody.Orbit
-   :members: from_classical, from_vectors, from_sbdb, propagate, sample
+   :members: from_classical, from_vectors, from_sbdb, propagate, to_ephem
    :noindex:
 
 .. autoapiclass:: poliastro.ephem.Ephem

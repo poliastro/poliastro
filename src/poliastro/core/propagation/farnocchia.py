@@ -28,7 +28,10 @@ def _kepler_equation_prime_near_parabolic(D, M, ecc):
     x = (ecc - 1.0) / (ecc + 1.0) * (D**2)
     assert abs(x) < 1
     S = dS_x_alt(ecc, x)
-    return np.sqrt(2.0 / (1.0 + ecc)) + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D**2) * S
+    return (
+        np.sqrt(2.0 / (1.0 + ecc))
+        + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D**2) * S
+    )
 
 
 @jit
@@ -85,7 +88,8 @@ def D_to_M_near_parabolic(D, ecc):
     assert abs(x) < 1
     S = S_x(ecc, x)
     return (
-        np.sqrt(2.0 / (1.0 + ecc)) * D + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D**3) * S
+        np.sqrt(2.0 / (1.0 + ecc)) * D
+        + np.sqrt(2.0 / (1.0 + ecc) ** 3) * (D**3) * S
     )
 
 
@@ -299,7 +303,7 @@ def farnocchia_coe(k, p, ecc, inc, raan, argp, nu, tof):
 
 
 @jit
-def farnocchia(k, r0, v0, tof):
+def farnocchia_rv(k, r0, v0, tof):
     r"""Propagates orbit using mean motion.
 
     This algorithm depends on the geometric shape of the orbit.

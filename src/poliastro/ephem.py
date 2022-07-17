@@ -15,13 +15,11 @@ from poliastro._math.interpolate import interp1d, sinc_interp, spline_interp
 from poliastro.bodies import Earth
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
-from poliastro.twobody.propagation import propagate
+from poliastro.twobody.sampling import EpochsArray
 from poliastro.util import time_range
 from poliastro.warnings import TimeScaleWarning
 
-EPHEM_FORMAT = (
-    "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
-)
+EPHEM_FORMAT = "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
 
 
 def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
@@ -51,7 +49,9 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
     epochs = time_range(
         Time(t_span[0], format="jd", scale="tdb"),
         end=Time(t_span[1], format="jd", scale="tdb"),
-        periods=int(((t_span[1] - t_span[0]) / (period * rtol)).to_value(u.one)),
+        periods=int(
+            ((t_span[1] - t_span[0]) / (period * rtol)).to_value(u.one)
+        ),
     )
     ephem = Ephem.from_body(body, epochs, attractor=attractor)
 
@@ -79,9 +79,15 @@ class SincInterpolator:
         y = _interp_1d(coordinates.y.value) << xyz_unit
         z = _interp_1d(coordinates.z.value) << xyz_unit
 
-        d_x = _interp_1d(coordinates.differentials["s"].d_x.value) << d_xyz_unit
-        d_y = _interp_1d(coordinates.differentials["s"].d_y.value) << d_xyz_unit
-        d_z = _interp_1d(coordinates.differentials["s"].d_z.value) << d_xyz_unit
+        d_x = (
+            _interp_1d(coordinates.differentials["s"].d_x.value) << d_xyz_unit
+        )
+        d_y = (
+            _interp_1d(coordinates.differentials["s"].d_y.value) << d_xyz_unit
+        )
+        d_z = (
+            _interp_1d(coordinates.differentials["s"].d_z.value) << d_xyz_unit
+        )
 
         return CartesianRepresentation(
             x, y, z, differentials=CartesianDifferential(d_x, d_y, d_z)
@@ -98,7 +104,10 @@ class SplineInterpolator:
 
         result_xyz = (
             spline_interp(
-                coordinates.xyz.value, reference_epochs.jd, epochs.jd, kind=self._kind
+                coordinates.xyz.value,
+                reference_epochs.jd,
+                epochs.jd,
+                kind=self._kind,
             )
             << xyz_unit
         )
@@ -177,7 +186,9 @@ class Ephem:
         return self._plane
 
     @classmethod
-    def from_body(cls, body, epochs, *, attractor=None, plane=Planes.EARTH_EQUATOR):
+    def from_body(
+        cls, body, epochs, *, attractor=None, plane=Planes.EARTH_EQUATOR
+    ):
         """Return `Ephem` for a `SolarSystemPlanet` at certain epochs.
 
         Parameters
@@ -206,7 +217,9 @@ class Ephem:
             )
 
         r, v = get_body_barycentric_posvel(body.name, epochs)
-        coordinates = r.with_differentials(v.represent_as(CartesianDifferential))
+        coordinates = r.with_differentials(
+            v.represent_as(CartesianDifferential)
+        )
 
         destination_frame = _get_destination_frame(attractor, plane, epochs)
 
@@ -310,10 +323,7 @@ class Ephem:
         if epochs.isscalar:
             epochs = epochs.reshape(1)
 
-        times_of_flight = epochs - orbit.epoch
-        coordinates = propagate(orbit, times_of_flight)
-
-        return cls(coordinates, epochs, plane)
+        return orbit.change_plane(plane).to_ephem(strategy=EpochsArray(epochs))
 
     def sample(self, epochs=None, *, interpolator=SplineInterpolator()):
         """Returns coordinates at specified epochs.

@@ -18,7 +18,9 @@ u_km3s2 = u.km**3 / u.s**2
 @u.quantity_input(k=u_km3s2, a=u.km)
 def circular_velocity(k, a):
     """Circular velocity for a given body (k) and semimajor axis (a)."""
-    return circular_velocity_fast(k.to_value(u_km3s2), a.to_value(u.km)) * u_kms
+    return (
+        circular_velocity_fast(k.to_value(u_km3s2), a.to_value(u.km)) * u_kms
+    )
 
 
 @u.quantity_input(k=u_km3s2, a=u.km)
@@ -54,6 +56,7 @@ def eccentricity_vector(k, r, v):
 @u.quantity_input(nu=u.rad, ecc=u.one, k=u_km3s2, r_p=u.km)
 def t_p(nu, ecc, k, r_p):
     """Elapsed time since latest perifocal passage."""
+    # TODO: Make this a propagator method
     t_p = (
         delta_t_from_nu_fast(
             nu.to_value(u.rad),
@@ -67,7 +70,13 @@ def t_p(nu, ecc, k, r_p):
 
 
 @u.quantity_input(
-    k=u_km3s2, R=u.km, J2=u.one, n_sunsync=1 / u.s, a=u.km, ecc=u.one, inc=u.rad
+    k=u_km3s2,
+    R=u.km,
+    J2=u.one,
+    n_sunsync=1 / u.s,
+    a=u.km,
+    ecc=u.one,
+    inc=u.rad,
 )
 def heliosynchronous(k, R, J2, n_sunsync, a=None, ecc=None, inc=None):
     with np.errstate(invalid="raise"):
