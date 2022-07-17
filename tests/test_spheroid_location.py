@@ -14,10 +14,10 @@ def with_units(draw, elements, unit):
 
 def test_cartesian_coordinates():
     expected_cords = [
-        3764258.64785411 * u.m,
-        3295359.33856106 * u.m,
-        3942945.28570563 * u.m,
-    ]
+            3764859.30127275 * u.m, 
+            2987201.67496698 * u.m, 
+            4179160.71540021 * u.m 
+            ]
 
     el_cords = (38.43 * u.deg, 41.2 * u.deg, 0 * u.m)
 
@@ -78,7 +78,7 @@ def test_radius_of_curvature():
 
 
 def test_distance():
-    expected_distance = 6369864.745418392 * u.m
+    expected_distance = 6368850.150294118 * u.m
     el_cords = (38.43 * u.deg, 41.2 * u.deg, 0 * u.m)
     point_cords = (10.5 * u.m, 35.5 * u.m, 45.5 * u.m)
 
