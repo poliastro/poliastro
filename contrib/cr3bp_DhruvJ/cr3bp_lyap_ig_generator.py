@@ -56,9 +56,16 @@ def ig_lyap_orb_collinear_li_cr3bp(sys_chars_vals, pert_x, lib_num=1):
     li = lib_loc[lib_num - 1, :]  # 0 for L1, 1 for L2, 2 for L3
     li_state = np.array([li[0], 0, 0, 0, 0, 0])
 
-    cr3bp_obj = cr3bp_model(sys_chars_vals,li_state)
+    cr3bp_obj = cr3bp_model(sys_chars_vals, li_state)
     d, r = cr3bp_obj.rel_dist_cr3bp()
-    Uxx, Uyy, Uzz, Uxy, Uxz, Uyz = cr3bp_obj.uii_partials_cr3bp()  # Hetian of  Pesudo-potenital of CR3BP
+    (
+        Uxx,
+        Uyy,
+        Uzz,
+        Uxy,
+        Uxz,
+        Uyz,
+    ) = cr3bp_obj.uii_partials_cr3bp()  # Hetian of  Pesudo-potenital of CR3BP
 
     # Compute roots of characteristic polynomial of In-plane Linear Variational Equation of CR3BP
     # Characteristic polynomial: Lam^4 + (4 -Uxx - Uyy)*Lam^2 + Uxx*Uyy = 0
