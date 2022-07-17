@@ -22,7 +22,9 @@ mu, dist_e_m, tstar = bodies_char("Earth", "Moon")
 lib_loc = lib_pt_loc(mu)
 li = lib_loc[1, :]  # 0 for L1 and  1 for L2
 
-ig = np.array([1.021881345465263, 0, 0.182000000000000, 0, -0.102950816739606, 0])
+ig = np.array(
+    [1.021881345465263, 0, 0.182000000000000, 0, -0.102950816739606, 0]
+)
 tf_guess = 1.509263667286943
 
 free_vars = ["x", "vy", "t"]
@@ -40,7 +42,9 @@ for i in range(20):
     print(ig)
     ig[2] += 0.0015
 
-results, iterflag = po_single_shooter_cr3bp(mu, ig, tf_guess, free_vars, constraints)
+results, iterflag = po_single_shooter_cr3bp(
+    mu, ig, tf_guess, free_vars, constraints
+)
 orbit_results.append(results)
 
 plt.figure(1)
@@ -54,7 +58,9 @@ for i in range(len(orbit_results)):
     )
 plt.plot(li[0], li[1], "ro", label="L1")
 ax.scatter(li[0], li[1], li[2], color="red")
-ax.set_box_aspect([ub - lb for lb, ub in (getattr(ax, f"get_{a}lim")() for a in "xyz")])
+ax.set_box_aspect(
+    [ub - lb for lb, ub in (getattr(ax, f"get_{a}lim")() for a in "xyz")]
+)
 ax.set_ylabel("y [nd]")
 ax.set_xlabel("x [nd]")
 ax.set_zlabel("z [nd]")
