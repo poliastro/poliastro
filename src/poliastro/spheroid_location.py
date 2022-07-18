@@ -146,11 +146,11 @@ class SpheroidLocation:
         Parameters
         ----------
         x : ~astropy.units.quantity.Quantity
-            x-coordinate 
+            x-coordinate
         y : ~astropy.units.quantity.Quantity
-            y-coordinate 
+            y-coordinate
         z : ~astropy.units.quantity.Quantity
-            z-coordinate 
+            z-coordinate
 
         """
         _a, _c = self._a.to_value(u.m), self._c.to_value(u.m)
