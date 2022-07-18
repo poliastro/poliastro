@@ -161,7 +161,7 @@ def cartesian_to_ellipsoidal(a, c, x, y, z):
     """
     Converts cartesian coordinates to ellipsoidal coordinates for the given ellipsoid.
     Instead of the iterative formula, the function uses the approximation introduced in
-    Bowring, B. R. (1976). TRANSFORMATION FROM SPATIAL TO GEOGRAPHICAL COORDINATES
+    Bowring, B. R. (1976). TRANSFORMATION FROM SPATIAL TO GEOGRAPHICAL COORDINATES.
 
     Parameters
     ----------
@@ -191,8 +191,8 @@ def cartesian_to_ellipsoidal(a, c, x, y, z):
     v = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
     h = (
         np.sqrt(x**2 + y**2) / np.cos(lat) - v
-        if lat < abs(1e-18)
+        if lat < abs(1e-18) # to avoid errors very close and at zero
         else z / np.sin(lat) - (1 - e2) * v
     )
 
-    return lat, lon, h
+    return lon, lat, h
