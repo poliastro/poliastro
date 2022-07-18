@@ -90,7 +90,7 @@ def test_distance():
 
 
 def test_cartesian_conversion_approximate():
-    el_cords = (0.670680 * u.rad, 0.7190227 * u.rad, 0 * u.m)
+    el_cords = (0.7190227 * u.rad, 0.670680 * u.rad, 0 * u.m)
 
     c_cords = [
         3764258.64785411 * u.m,
@@ -120,6 +120,6 @@ def test_h_calculation_near_lat_singularity(lat):
     h = 5 * u.m
     p = SpheroidLocation(lon, lat, h, body)
     cartesian_coords = p.cartesian_cords
-    lat_, lon_, h_ = p.cartesian_to_ellipsoidal(*cartesian_coords)
+    lon_, lat_, h_ = p.cartesian_to_ellipsoidal(*cartesian_coords)
 
     assert_quantity_allclose(h_, h)

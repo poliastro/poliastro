@@ -163,7 +163,7 @@ from poliastro.core.spheroid_location import cartesian_to_ellipsoidal
 latitudes = []
 for r in rr:
     position_on_body = (r / norm(r)) * Earth.R
-    lat, _, _ = cartesian_to_ellipsoidal(
+    _, lat, _ = cartesian_to_ellipsoidal(
         Earth.R, Earth.R_polar, *position_on_body
     )
     latitudes.append(np.rad2deg(lat))
