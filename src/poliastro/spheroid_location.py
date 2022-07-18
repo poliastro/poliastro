@@ -141,19 +141,19 @@ class SpheroidLocation:
 
     def cartesian_to_ellipsoidal(self, x, y, z):
         """
-        Converts ellipsoidal coordinates to the Cartesian coordinate system for the given ellipsoid.
+        Converts cartesian coordinates to ellipsoidal coordinates for this ellipsoid.
 
         Parameters
         ----------
         x : ~astropy.units.quantity.Quantity
-            x coordinate
+            x-coordinate
         y : ~astropy.units.quantity.Quantity
-            y coordinate
+            y-coordinate
         z : ~astropy.units.quantity.Quantity
-            z coordinate
+            z-coordinate
 
         """
         _a, _c = self._a.to_value(u.m), self._c.to_value(u.m)
         x, y, z = x.to_value(u.m), y.to_value(u.m), z.to_value(u.m)
-        lat, lon, h = cartesian_to_ellipsoidal_fast(_a, _c, x, y, z)
-        return lat * u.rad, lon * u.rad, h * u.m
+        lon, lat, h = cartesian_to_ellipsoidal_fast(_a, _c, x, y, z)
+        return lon * u.rad, lat * u.rad, h * u.m
