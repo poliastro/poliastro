@@ -562,7 +562,7 @@ def test_3rd_body_Curtis(test_params):
 
     epoch = Time(j_date, format="jd", scale="tdb")
     initial = Orbit.from_classical(Earth, *test_params["orbit"], epoch=epoch)
-    
+
     body_epochs = time_range(
         epoch,
         num_values=test_params["ephem_values"],
