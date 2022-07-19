@@ -560,15 +560,15 @@ def test_3rd_body_Curtis(test_params):
     j_date = 2454283.0 * u.day
     tof = (test_params["tof"]).to_value(u.s)
 
-    body_epochs = time_range(
-        j_date,
-        num_values=test_params["ephem_values"],
-        end=j_date + test_params["tof"],
-    )
-    body_r = build_ephem_interpolant(body, body_epochs)
-
     epoch = Time(j_date, format="jd", scale="tdb")
     initial = Orbit.from_classical(Earth, *test_params["orbit"], epoch=epoch)
+    
+    body_epochs = time_range(
+        epoch,
+        num_values=test_params["ephem_values"],
+        end=epoch + test_params["tof"],
+    )
+    body_r = build_ephem_interpolant(body, body_epochs)
 
     def f(t0, u_, k):
         du_kep = func_twobody(t0, u_, k)
@@ -620,7 +620,8 @@ def test_3rd_body_Curtis(test_params):
 def sun_r():
     j_date = 2_438_400.5 * u.day
     tof = 600 * u.day
-    ephem_epochs = time_range(j_date, num_values=164, end=j_date + tof)
+    epoch = Time(j_date, format="jd", scale="tdb")
+    ephem_epochs = time_range(epoch, num_values=164, end=epoch + tof)
     return build_ephem_interpolant(Sun, ephem_epochs)
 
 
