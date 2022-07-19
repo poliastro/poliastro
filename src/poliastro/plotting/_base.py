@@ -267,7 +267,7 @@ class BaseOrbitPlotter:
 
         label = generate_label(epoch, label or str(body))
         epochs = time_range(
-            epoch, periods=self._num_points, end=epoch + period, scale="tdb"
+            epoch, num_values=self._num_points, end=epoch + period, scale="tdb"
         )
         ephem = Ephem.from_body(
             body, epochs, attractor=body.parent, plane=self.plane

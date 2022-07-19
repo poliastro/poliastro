@@ -25,6 +25,7 @@ from poliastro.ephem import build_ephem_interpolant
 from poliastro.twobody import Orbit
 from poliastro.twobody.events import LithobrakeEvent
 from poliastro.twobody.propagation import CowellPropagator
+from poliastro.util import time_range
 
 
 @pytest.mark.slow
@@ -447,7 +448,7 @@ moon_heo = {
         -10.12921 * u.deg,
         0.0 * u.rad,
     ],
-    "period": 28 * u.day,
+    "ephem_values": 214,
 }
 
 moon_leo = {
@@ -464,7 +465,7 @@ moon_leo = {
         0.0 * u.deg,
         0.0 * u.rad,
     ],
-    "period": 28 * u.day,
+    "ephem_values": 214,
 }
 
 moon_geo = {
@@ -481,7 +482,7 @@ moon_geo = {
         0.0 * u.deg,
         0.0 * u.rad,
     ],
-    "period": 28 * u.day,
+    "ephem_values": 214,
 }
 
 sun_heo = {
@@ -498,7 +499,7 @@ sun_heo = {
         -10.12921 * u.deg,
         0.0 * u.rad,
     ],
-    "period": 365 * u.day,
+    "ephem_values": 54,
 }
 
 sun_leo = {
@@ -515,7 +516,7 @@ sun_leo = {
         0.0 * u.deg,
         0.0 * u.rad,
     ],
-    "period": 365 * u.day,
+    "ephem_values": 54,
 }
 
 sun_geo = {
@@ -532,7 +533,7 @@ sun_geo = {
         0.0 * u.deg,
         0.0 * u.rad,
     ],
-    "period": 365 * u.day,
+    "ephem_values": 54,
 }
 
 
@@ -558,12 +559,9 @@ def test_3rd_body_Curtis(test_params):
     body = test_params["body"]
     j_date = 2454283.0 * u.day
     tof = (test_params["tof"]).to_value(u.s)
-    body_r = build_ephem_interpolant(
-        body,
-        test_params["period"],
-        (j_date, j_date + test_params["tof"]),
-        rtol=1e-2,
-    )
+    
+    body_epochs = time_range(j_date, num_values=test_params["ephem_values"],end=j_date + test_params["tof"])
+    body_r = build_ephem_interpolant(body,body_epochs)
 
     epoch = Time(j_date, format="jd", scale="tdb")
     initial = Orbit.from_classical(Earth, *test_params["orbit"], epoch=epoch)
@@ -618,9 +616,8 @@ def test_3rd_body_Curtis(test_params):
 def sun_r():
     j_date = 2_438_400.5 * u.day
     tof = 600 * u.day
-    return build_ephem_interpolant(
-        Sun, 365 * u.day, (j_date, j_date + tof), rtol=1e-2
-    )
+    ephem_epochs = time_range(j_date, num_values=165, end=j_date + tof)
+    return build_ephem_interpolant(Sun, ephem_epochs)
 
 
 def normalize_to_Curtis(t0, sun_r):
