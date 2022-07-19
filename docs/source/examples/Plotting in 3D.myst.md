@@ -68,7 +68,7 @@ date_launch = Time("2011-11-26 15:02", scale="utc").tdb
 date_arrival = Time("2012-08-06 05:17", scale="utc").tdb
 
 earth = Ephem.from_body(
-    Earth, time_range(date_launch, end=date_arrival, periods=50)
+    Earth, time_range(date_launch, end=date_arrival, num_values=50)
 )
 ```
 

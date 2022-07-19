@@ -207,7 +207,7 @@ from poliastro.util import time_range
 ```
 
 ```{code-cell}
-times = time_range(now, end=now + (1 << u.h), periods=3)
+times = time_range(now, end=now + (1 << u.h), num_values=3)
 ```
 
 ```{code-cell}
