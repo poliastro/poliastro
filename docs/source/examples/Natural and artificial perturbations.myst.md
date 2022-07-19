@@ -193,7 +193,7 @@ epoch = Time(
 )  # setting the exact event date is important
 
 # create interpolant of 3rd body coordinates (calling in on every iteration will be just too slow)
-epochs_moon = time_range(epoch,num_values=60,end=epoch + 60*u.day)
+epochs_moon = time_range(epoch,num_values=214,end=epoch + 60*u.day)
 body_r = build_ephem_interpolant(
     Moon,
     epochs_moon

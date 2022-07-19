@@ -616,7 +616,7 @@ def test_3rd_body_Curtis(test_params):
 def sun_r():
     j_date = 2_438_400.5 * u.day
     tof = 600 * u.day
-    ephem_epochs = time_range(j_date, num_values=165, end=j_date + tof)
+    ephem_epochs = time_range(j_date, num_values=164, end=j_date + tof)
     return build_ephem_interpolant(Sun, ephem_epochs)
 
 
