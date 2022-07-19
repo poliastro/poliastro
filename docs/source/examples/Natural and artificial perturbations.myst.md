@@ -36,7 +36,7 @@ from poliastro.plotting import OrbitPlotter3D
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import CowellPropagator
 from poliastro.twobody.sampling import EpochsArray
-from poliastro.util import norm
+from poliastro.util import norm, time_range
 ```
 
 ```{code-cell}
