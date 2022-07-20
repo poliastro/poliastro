@@ -6,22 +6,22 @@ from astropy.time import Time
 from poliastro.util import time_range
 
 
-def test_time_range_spacing_periods():
+def test_time_range_spacing_num_values():
     start_time = "2017-10-12 00:00:00"
     end_time = "2017-10-12 00:04:00"
     spacing = 1 * u.minute
-    periods = 5
+    num_values = 5
 
     expected_scale = "utc"
     expected_duration = 4 * u.min
 
-    result_1 = time_range(start_time, spacing=spacing, periods=periods)
-    result_2 = time_range(start_time, end=end_time, periods=periods)
+    result_1 = time_range(start_time, spacing=spacing, num_values=num_values)
+    result_2 = time_range(start_time, end=end_time, num_values=num_values)
     result_3 = time_range(
-        Time(start_time), end=Time(end_time), periods=periods
+        Time(start_time), end=Time(end_time), num_values=num_values
     )
 
-    assert len(result_1) == len(result_2) == len(result_3) == periods
+    assert len(result_1) == len(result_2) == len(result_3) == num_values
     assert result_1.scale == result_2.scale == result_3.scale == expected_scale
 
     assert_quantity_allclose(
@@ -53,7 +53,7 @@ def test_time_range_raises_error_wrong_arguments():
         time_range("2017-10-12 00:00")
 
     with pytest.raises(ValueError) as excinfo_2:
-        time_range("2017-10-12 00:00", spacing=0, end=0, periods=0)
+        time_range("2017-10-12 00:00", spacing=0, end=0, num_values=0)
 
     assert exception_message in excinfo_1.exconly()
     assert exception_message in excinfo_2.exconly()

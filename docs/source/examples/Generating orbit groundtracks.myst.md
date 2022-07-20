@@ -58,7 +58,7 @@ the time vector and thus, the amount of values:
 # Build spacecraft instance
 iss_spacecraft = EarthSatellite(iss, None)
 t_span = time_range(
-    iss.epoch - 1.5 * u.h, periods=150, end=iss.epoch + 1.5 * u.h
+    iss.epoch - 1.5 * u.h, num_values=150, end=iss.epoch + 1.5 * u.h
 )
 ```
 

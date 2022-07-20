@@ -66,7 +66,7 @@ Since both Earth states have been obtained (initial and flyby) we can now solve 
 
 ```{code-cell}
 earth = Ephem.from_body(
-    Earth, time_range(date_launch, end=date_arrival, periods=500)
+    Earth, time_range(date_launch, end=date_arrival, num_values=500)
 )
 
 r_e0, v_e0 = earth.rv(date_launch)

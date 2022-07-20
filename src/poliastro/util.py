@@ -34,7 +34,7 @@ def norm(vec, axis=None):
 
 
 def time_range(
-    start, *, periods=50, spacing=None, end=None, format=None, scale=None
+    start, *, num_values=50, spacing=None, end=None, format=None, scale=None
 ):
     """Generates range of astronomical times.
 
@@ -44,8 +44,8 @@ def time_range(
     ----------
     start : ~astropy.time.Time or ~astropy.units.Quantity
         Start time.
-    periods : int, optional
-        Number of periods, default to 50.
+    num_values : int, optional
+        Number of equal spaced time values to be generated, default to 50.
     spacing : ~astropy.time.Time or ~astropy.units.Quantity, optional
         Spacing between periods, optional.
     end : ~astropy.time.Time or equivalent, optional
@@ -60,11 +60,11 @@ def time_range(
     start = Time(start, format=format, scale=scale)
 
     if spacing is not None and end is None:
-        result = start + spacing * np.arange(0, periods)
+        result = start + spacing * np.arange(0, num_values)
 
     elif end is not None and spacing is None:
         end = Time(end, format=format, scale=scale)
-        result = start + (end - start) * np.linspace(0, 1, periods)
+        result = start + (end - start) * np.linspace(0, 1, num_values)
 
     else:
         raise ValueError("Either 'end' or 'spacing' must be specified")
