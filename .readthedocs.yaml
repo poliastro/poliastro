@@ -5,6 +5,10 @@ build:
   tools:
     python: "3.9"
 
+formats:
+  - epub
+  - htmlzip
+
 python:
   install:
     - method: pip
