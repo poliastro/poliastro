@@ -683,44 +683,6 @@ contributors, which makes us extremely proud and thankful!
 .. _`base Cesium application`: https://github.com/poliastro/cesium-app
 .. _`the new propagators`: https://blog.poliastro.space/2019/07/16/2019-07-16-new-propagators/
 
-* **Export Orbit objects to CZML**: There is new experimental functionality to
-  export :py:class:`~poliastro.twobody.orbit.Orbit` to CZML, the JSON format used
-  by the Cesium visualization system. This complements poliastro capabilities
-  and allows users to produce gorgeous visualizations, like the one below.
-  We also kickstarted a new project called `czml3`_ a Python 3 interface to CZML,
-  to support all these new capabilities, and created a `base Cesium application`_
-  so you can quickly start experimenting. Let us know your thoughts!
-* **2D plots are static by default**: Getting Plotly properly installed is
-  a bit more difficult than just a :code:`pip install` nowadays, and
-  it turns out we alienated some of our non-Jupyter users by pushing it too soon
-  (especially those of you that use Spyder). We have tried hard in this release
-  to make the default plotting work everywhere by sticking again to matplotlib,
-  while allowing more proficient users to install all the necessary components
-  to have interactive visualizations going. If you still find issues, tell us!
-* **New Lambert maneuver**: After a long time, Lambert transfers are finally
-  a :py:class:`~poliastro.maneuver.Maneuver`, which means it shares the same API
-  as Hohmann and bielliptic transfers among others, making it easier to use.
-* **Lots of new propagators**: And when we say _lots_, we mean it! Lots of
-  authors claim their propagator is "universal", but to our knowledge this is
-  almost always a slight overstatement. To enrich poliastro with new propagation
-  methods and allow users to test them with all kinds of crazy orbits
-  (especially quasy-parabolic ones) we implemented a ton of new propagators,
-  all sharing the same API. You have more information in this article about
-  `the new propagators`_ in our blog.
-* **Python 3.6+ only**: Python 3.5 has done a great service and will still be
-  supported by Astropy a few more months, but we already wanted to move on
-  and embrace fixed-order dictionaries, f-strings, and decimal separators,
-  among others. This release of poliastro requires Python 3.6 or higher to work.
-  We are also getting ready for Python 3.8!
-
-.. image:: _static/cesium.gif
-   :width: 675px
-   :align: center
-
-.. _`czml3`: https://github.com/poliastro/czml3/
-.. _`base Cesium application`: https://github.com/poliastro/cesium-app
-.. _`the new propagators`: https://blog.poliastro.space/2019/07/16/2019-07-16-new-propagators/
-
 ```
 
 ### New features
