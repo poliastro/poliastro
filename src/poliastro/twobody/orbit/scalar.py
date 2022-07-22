@@ -40,7 +40,7 @@ class Orbit(OrbitCreationMixin):
 
     """
 
-    def __init__(self, state, epoch):
+    def __init__(self, state, epoch):  # pylint: disable=super-init-not-called
         """Constructor.
 
         Parameters
