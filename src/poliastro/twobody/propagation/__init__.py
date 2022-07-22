@@ -65,6 +65,4 @@ HYPERBOLIC_PROPAGATORS = [
 ]
 
 
-__all__ = [
-    item.__name__ for item in ALL_PROPAGATORS
-] + ["propagate"]
+__all__ = [item.__name__ for item in ALL_PROPAGATORS] + ["propagate"]
