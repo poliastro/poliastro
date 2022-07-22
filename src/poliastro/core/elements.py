@@ -197,7 +197,7 @@ def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
     rr = np.zeros((n, 3))
     vv = np.zeros((n, 3))
 
-    # Disabling pylint waring, see https://github.com/PyCQA/pylint/issues/2910
+    # Disabling pylint warning, see https://github.com/PyCQA/pylint/issues/2910
     for i in prange(n):  # pylint: disable=not-an-iterable
         rr[i, :], vv[i, :] = coe2rv(
             k[i], p[i], ecc[i], inc[i], raan[i], argp[i], nu[i]
