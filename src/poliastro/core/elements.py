@@ -189,12 +189,16 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
 
 @jit(parallel=sys.maxsize > 2**31)
 def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
+    """
+    Parallel version of coe2rv
+    """
 
     n = nu.shape[0]
     rr = np.zeros((n, 3))
     vv = np.zeros((n, 3))
 
-    for i in prange(n):
+    # Disabling pylint warning, see https://github.com/PyCQA/pylint/issues/2910
+    for i in prange(n):  # pylint: disable=not-an-iterable
         rr[i, :], vv[i, :] = coe2rv(
             k[i], p[i], ecc[i], inc[i], raan[i], argp[i], nu[i]
         )
