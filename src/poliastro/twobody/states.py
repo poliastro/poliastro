@@ -10,7 +10,7 @@ from poliastro.twobody.elements import mean_motion, period, t_p
 class BaseState(ABC):
     """Base State class, meant to be subclassed."""
 
-    def __init__(self, attractor, elements, plane):
+    def __init__(self, attractor, elements, plane, _units = True):
         """Constructor.
 
         Parameters
@@ -21,11 +21,13 @@ class BaseState(ABC):
             Six-tuple of orbital elements for this state.
         plane : ~poliastro.frames.enums.Planes
             Reference plane for the elements.
-
+        _units : bool
+            Set True if elements are quantities, i.e. are carrying units (default behavior).
+            Set to False if elements are raw values, i.e. not carrying units.
         """
 
         self._attractor = attractor
-        self._elements = self._import_elements(*elements)
+        self._elements = self._import_elements(*elements) if _units else elements
         self._plane = plane
 
     @abstractmethod
@@ -195,7 +197,7 @@ class ClassicalState(BaseState):
         )
 
         return RVState(
-            self.attractor, (r << u.km, v << u.km / u.s), self.plane
+            self.attractor, (r, v), self.plane, _units = False,
         )
 
     def to_classical(self):
@@ -209,14 +211,15 @@ class ClassicalState(BaseState):
         return ModifiedEquinoctialState(
             self.attractor,
             (
-                p << u.km,
-                f << u.rad,
-                g << u.rad,
-                h << u.rad,
-                k << u.rad,
-                L << u.rad,
+                p,
+                f,
+                g,
+                h,
+                k,
+                L,
             ),
             self.plane,
+            _units = False,
         )
 
 
@@ -270,14 +273,15 @@ class RVState(BaseState):
         return ClassicalState(
             self.attractor,
             (
-                p << u.km,
-                ecc << u.one,
-                inc << u.rad,
-                raan << u.rad,
-                argp << u.rad,
-                nu << u.rad,
+                p,
+                ecc,
+                inc,
+                raan,
+                argp,
+                nu,
             ),
             self.plane,
+            _units = False,
         )
 
 
@@ -360,19 +364,20 @@ class ModifiedEquinoctialState(BaseState):
         return ClassicalState(
             self.attractor,
             (
-                p << u.km,
-                ecc << u.one,
-                inc << u.rad,
-                raan << u.rad,
-                argp << u.rad,
-                nu << u.rad,
+                p,
+                ecc,
+                inc,
+                raan,
+                argp,
+                nu,
             ),
             self.plane,
+            _units = False,
         )
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
         r, v = mee2rv(*self.to_value())
         return RVState(
-            self.attractor, (r << u.km, v << u.km / u.s), self.plane
+            self.attractor, (r, v), self.plane, _units = False,
         )
