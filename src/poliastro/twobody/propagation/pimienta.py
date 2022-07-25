@@ -36,6 +36,9 @@ class PimientaPropagator:
         )
 
         new_state = ClassicalState(
-            state.attractor, state.to_value()[:5] + (nu,), state.plane, _units = False,
+            state.attractor,
+            state.to_value()[:5] + (nu,),
+            state.plane,
+            _units=False,
         )
         return new_state

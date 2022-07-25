@@ -10,7 +10,7 @@ from poliastro.twobody.elements import mean_motion, period, t_p
 class BaseState(ABC):
     """Base State class, meant to be subclassed."""
 
-    def __init__(self, attractor, elements, plane, _units = True):
+    def __init__(self, attractor, elements, plane, _units=True):
         """Constructor.
 
         Parameters
@@ -27,7 +27,9 @@ class BaseState(ABC):
         """
 
         self._attractor = attractor
-        self._elements = self._import_elements(*elements) if _units else elements
+        self._elements = (
+            self._import_elements(*elements) if _units else elements
+        )
         self._plane = plane
 
     @abstractmethod
@@ -152,7 +154,7 @@ class ClassicalState(BaseState):
     @property
     def a(self):
         """Semimajor axis."""
-        return self._elements[0] / (1 - self._elements[1]**2) << u.km
+        return self._elements[0] / (1 - self._elements[1] ** 2) << u.km
 
     @property
     def ecc(self):
@@ -197,7 +199,10 @@ class ClassicalState(BaseState):
         )
 
         return RVState(
-            self.attractor, (r, v), self.plane, _units = False,
+            self.attractor,
+            (r, v),
+            self.plane,
+            _units=False,
         )
 
     def to_classical(self):
@@ -219,7 +224,7 @@ class ClassicalState(BaseState):
                 L,
             ),
             self.plane,
-            _units = False,
+            _units=False,
         )
 
 
@@ -281,7 +286,7 @@ class RVState(BaseState):
                 nu,
             ),
             self.plane,
-            _units = False,
+            _units=False,
         )
 
 
@@ -372,12 +377,15 @@ class ModifiedEquinoctialState(BaseState):
                 nu,
             ),
             self.plane,
-            _units = False,
+            _units=False,
         )
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
         r, v = mee2rv(*self._elements)
         return RVState(
-            self.attractor, (r, v), self.plane, _units = False,
+            self.attractor,
+            (r, v),
+            self.plane,
+            _units=False,
         )

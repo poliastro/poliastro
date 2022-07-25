@@ -60,5 +60,10 @@ class ValladoPropagator:
         r = r_raw
         v = v_raw
 
-        new_state = RVState(state.attractor, (r, v), state.plane, _units = False,)
+        new_state = RVState(
+            state.attractor,
+            (r, v),
+            state.plane,
+            _units=False,
+        )
         return new_state

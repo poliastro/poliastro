@@ -693,13 +693,16 @@ def test_solar_pressure(t_days, deltas_expected, sun_r):
         orbit_params = rv2coe(Earth.k.to(u.km**3 / u.s**2).value, ri, vi)
         delta_eccs.append(orbit_params[1] - initial.ecc.value)
         delta_incs.append(
-            (orbit_params[2] * u.rad).to(u.deg).value - initial.inc.to_value(u.deg)
+            (orbit_params[2] * u.rad).to(u.deg).value
+            - initial.inc.to_value(u.deg)
         )
         delta_raans.append(
-            (orbit_params[3] * u.rad).to(u.deg).value - initial.raan.to_value(u.deg)
+            (orbit_params[3] * u.rad).to(u.deg).value
+            - initial.raan.to_value(u.deg)
         )
         delta_argps.append(
-            (orbit_params[4] * u.rad).to(u.deg).value - initial.argp.to_value(u.deg)
+            (orbit_params[4] * u.rad).to(u.deg).value
+            - initial.argp.to_value(u.deg)
         )
 
     # Averaging over 5 last values in the way Curtis does
