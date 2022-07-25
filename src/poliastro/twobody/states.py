@@ -152,7 +152,7 @@ class ClassicalState(BaseState):
     @property
     def a(self):
         """Semimajor axis."""
-        return self.p / (1 - self.ecc**2) << u.km
+        return self._elements[0] / (1 - self._elements[1]**2) << u.km
 
     @property
     def ecc(self):
