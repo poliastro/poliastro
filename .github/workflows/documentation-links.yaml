@@ -3,7 +3,6 @@ on:
   pull_request_target:
     types:
       - opened
-      - synchronize
 
 permissions:
   pull-requests: write
@@ -14,4 +13,4 @@ jobs:
     steps:
       - uses: readthedocs/readthedocs-preview@main
         with:
-          project-slug: "readthedocs-preview"
+          project-slug: "poliastro"
