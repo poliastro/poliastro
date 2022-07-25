@@ -75,7 +75,7 @@ doc = [
     "nbsphinx>=0.8.6",
     "nbconvert>=5.5",
     "sgp4",
-    "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
+    "sphinx!=3.5,!=4.0,<5.1",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery<=0.7.0",  # Just to avoid the jupytext warning
     "sphinx_rtd_theme~=1.0.0",
