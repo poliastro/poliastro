@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from functools import cached_property
 
 from astropy import units as u
-import numpy as np
 
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, mee2rv, rv2coe
 from poliastro.twobody.elements import mean_motion, period, t_p
@@ -31,7 +30,7 @@ class BaseState(ABC):
 
     @abstractmethod
     def _import_elements(self, *elements):
-        """Strip units from elements, put them into numpy.ndarray"""
+        """Strip units from elements"""
 
     @property
     def plane(self):
@@ -79,7 +78,7 @@ class BaseState(ABC):
 
     def to_value(self):
         """Expose tuple of values without units (raw)"""
-        return tuple(self._elements)
+        return self._elements
 
     def to_vectors(self):
         """Converts to position and velocity vector representation.
@@ -133,15 +132,15 @@ class ClassicalState(BaseState):
     """
 
     def _import_elements(self, *elements):
-        """Strip units from elements, put them into numpy.ndarray"""
-        return np.array([
+        """Strip units from elements"""
+        return (
             elements[0].to_value(u.km),  # p
             elements[1].value,  # ecc
             elements[2].to_value(u.rad),  # inc
             elements[3].to_value(u.rad),  # raan
             elements[4].to_value(u.rad),  # argp
             elements[5].to_value(u.rad),  # nu
-        ])
+        )
 
     @property
     def p(self):
@@ -234,11 +233,11 @@ class RVState(BaseState):
     """
 
     def _import_elements(self, *elements):
-        """Strip units from elements, put them into numpy.ndarray"""
-        return np.array([
+        """Strip units from elements"""
+        return (
             elements[0].to_value(u.km),  # r
             elements[1].to_value(u.km / u.s),  # v
-        ])
+        )
 
     @property
     def r(self):
@@ -303,15 +302,15 @@ class ModifiedEquinoctialState(BaseState):
     """
 
     def _import_elements(self, *elements):
-        """Strip units from elements, put them into numpy.ndarray"""
-        return np.array([
+        """Strip units from elements"""
+        return (
             elements[0].to_value(u.km),  # p
             elements[1].to_value(u.rad),  # f
             elements[2].to_value(u.rad),  # g
             elements[3].to_value(u.rad),  # h
             elements[4].to_value(u.rad),  # k
             elements[5].to_value(u.rad),  # L
-        ])
+        )
 
     @property
     def p(self):
