@@ -42,20 +42,17 @@ class RecseriesPropagator:
     def propagate(self, state, tof):
         state = state.to_classical()
 
-        nu = (
-            recseries_fast(
-                state.attractor.k.to_value(u.km**3 / u.s**2),
-                *state.to_value(),
-                tof.to_value(u.s),
-                method=self._method,
-                order=self._order,
-                numiter=self._numiter,
-                rtol=self._rtol,
-            )
-            << u.rad
+        nu = recseries_fast(
+            state.attractor.k.to_value(u.km**3 / u.s**2),
+            *state.to_value(),
+            tof.to_value(u.s),
+            method=self._method,
+            order=self._order,
+            numiter=self._numiter,
+            rtol=self._rtol,
         )
 
         new_state = ClassicalState(
-            state.attractor, state.to_tuple()[:5] + (nu,), state.plane
+            state.attractor, state.to_value()[:5] + (nu,), state.plane, _units = False,
         )
         return new_state

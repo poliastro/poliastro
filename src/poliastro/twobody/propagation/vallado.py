@@ -57,8 +57,8 @@ class ValladoPropagator:
             tof.to_value(u.s),
             numiter=self._numiter,
         )
-        r = r_raw << u.km
-        v = v_raw << (u.km / u.s)
+        r = r_raw
+        v = v_raw
 
-        new_state = RVState(state.attractor, (r, v), state.plane)
+        new_state = RVState(state.attractor, (r, v), state.plane, _units = False,)
         return new_state
