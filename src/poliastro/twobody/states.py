@@ -193,7 +193,7 @@ class ClassicalState(BaseState):
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
         r, v = coe2rv(
-            self.attractor.k.to_value(u.km**3 / u.s**2), *self.to_value()
+            self.attractor.k.to_value(u.km**3 / u.s**2), *self._elements
         )
 
         return RVState(
@@ -206,7 +206,7 @@ class ClassicalState(BaseState):
 
     def to_equinoctial(self):
         """Converts to modified equinoctial elements representation."""
-        p, f, g, h, k, L = coe2mee(*self.to_value())
+        p, f, g, h, k, L = coe2mee(*self._elements)
 
         return ModifiedEquinoctialState(
             self.attractor,
@@ -267,7 +267,7 @@ class RVState(BaseState):
         """Converts to classical orbital elements representation."""
         (p, ecc, inc, raan, argp, nu) = rv2coe(
             self.attractor.k.to_value(u.km**3 / u.s**2),
-            *self.to_value(),
+            *self._elements,
         )
 
         return ClassicalState(
@@ -359,7 +359,7 @@ class ModifiedEquinoctialState(BaseState):
 
     def to_classical(self):
         """Converts to classical orbital elements representation."""
-        p, ecc, inc, raan, argp, nu = mee2coe(*self.to_value())
+        p, ecc, inc, raan, argp, nu = mee2coe(*self._elements)
 
         return ClassicalState(
             self.attractor,
@@ -377,7 +377,7 @@ class ModifiedEquinoctialState(BaseState):
 
     def to_vectors(self):
         """Converts to position and velocity vector representation."""
-        r, v = mee2rv(*self.to_value())
+        r, v = mee2rv(*self._elements)
         return RVState(
             self.attractor, (r, v), self.plane, _units = False,
         )
