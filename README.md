@@ -177,7 +177,7 @@ such as GMAT and Orekit.
 Sure, we encourage you to [open an issue](https://github.com/poliastro/validation/issues/new)
 so we can discuss future feature additions!
 
-## What\'s the future of the project?
+## What's the future of the project?
 
 poliastro is actively maintained and receiving an influx of new
 contributors thanks to the generous sponsorship of Google and the
