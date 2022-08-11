@@ -22,10 +22,10 @@ All computed at J2000, except "Pluto - Charon" -> Epoch: 2020-01-01.5 TDB
 
 """
 
-from astropy.constants import Constant
 from astropy import units as u
+from astropy.constants import Constant
 
-__all__ = [ 
+__all__ = [
     "sunmercury",
     "sunvenus",
     "sunearth",
@@ -49,7 +49,7 @@ __all__ = [
 sunmercury = Constant(
     "sunmercury",
     "Mercury's orbit semimajor axis around Sun",
-    (0.38709927*u.au.to(u.km)),
+    (0.38709927 * u.au.to(u.km)),
     "km",
     0,
     "NASA Planetary Satellite Mean Elements",
@@ -59,7 +59,7 @@ sunmercury = Constant(
 sunvenus = Constant(
     "sunvenus",
     "Venus's orbit semimajor axis around Sun",
-    (0.72333566*u.au.to(u.km)),
+    (0.72333566 * u.au.to(u.km)),
     "km",
     0,
     "NASA Planetary Satellite Mean Elements",
@@ -69,7 +69,7 @@ sunvenus = Constant(
 sunearth = Constant(
     "sunearth",
     "Earth's orbit semimajor axis around Sun",
-    (1*u.au.to(u.km)),
+    (1 * u.au.to(u.km)),
     "km",
     0,
     "NASA Planetary Satellite Mean Elements",
@@ -79,7 +79,7 @@ sunearth = Constant(
 sunmars = Constant(
     "earthmoon",
     "Mars's orbit semimajor axis around Sun",
-    1.52371034*u.au.to(u.km),
+    1.52371034 * u.au.to(u.km),
     "km",
     0,
     "NASA Approximate Position of Planets",
@@ -89,7 +89,7 @@ sunmars = Constant(
 sunjupiter = Constant(
     "sunjupiter",
     "Jupiter's orbit semimajor axis around Sun",
-    (5.20288700*u.au.to(u.km)),
+    (5.20288700 * u.au.to(u.km)),
     "km",
     0,
     "NASA Planetary Satellite Mean Elements",
@@ -99,7 +99,7 @@ sunjupiter = Constant(
 sunsaturn = Constant(
     "sunsaturn",
     "Saturn's orbit semimajor axis around Sun",
-    (9.53667594*u.au.to(u.km)),
+    (9.53667594 * u.au.to(u.km)),
     "km",
     0,
     "NASA Planetary Satellite Mean Elements",
@@ -109,7 +109,7 @@ sunsaturn = Constant(
 sunuranus = Constant(
     "sunuranus",
     "Saturn's orbit semimajor axis around Sun",
-    (19.18916464*u.au.to(u.km)),
+    (19.18916464 * u.au.to(u.km)),
     "km",
     0,
     "NASA Planetary Satellite Mean Elements",
@@ -119,7 +119,7 @@ sunuranus = Constant(
 sunneptune = Constant(
     "sunneptune",
     "Neptune's orbit semimajor axis around Sun",
-    (30.06992276*u.au.to(u.km)),
+    (30.06992276 * u.au.to(u.km)),
     "km",
     0,
     "NASA Planetary Satellite Mean Elements",
