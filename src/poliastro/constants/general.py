@@ -49,6 +49,15 @@ __all__ = [
     "GM_neptune",
     "GM_pluto",
     "GM_moon",
+    "GM_phobos",
+    "GM_deimos",
+    "GM_europa",
+    "GM_ganymede",
+    "GM_enceladus",
+    "GM_titan",
+    "GM_titania",
+    "GM_triton",
+    "GM_charon",
     "M_earth",
     "M_jupiter",
     "M_sun",
@@ -236,6 +245,114 @@ GM_moon = Constant(
     "m3 / (s2)",
     0.00000774,
     "Journal of Geophysical Research: Planets 118.8 (2013)",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_phobos = Constant(
+    "GM_phobos",
+    "Phobos gravitational constant",
+    0.0007087,
+    "km3 / (s2)",
+    0.0000006,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_deimos = Constant(
+    "GM_deimos",
+    "Deimos gravitational constant",
+    0.0000962,
+    "km3 / (s2)",
+    0.0000028,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_europa = Constant(
+    "GM_europa",
+    "Europa gravitational constant",
+    3202.71210,
+    "km3 / (s2)",
+    0.00050,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_ganymede = Constant(
+    "GM_ganymede",
+    "Ganymede gravitational constant",
+    9887.83275,
+    "km3 / (s2)",
+    0.00017,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_enceladus = Constant(
+    "GM_enceladus",
+    "Enceladus gravitational constant",
+    7.21037,
+    "km3 / (s2)",
+    0.00009,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_titan = Constant(
+    "GM_titan",
+    "Titan gravitational constant",
+    8978.13710,
+    "km3 / (s2)",
+    0.00025,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_titania = Constant(
+    "GM_titania",
+    "Titania gravitational constant",
+    226.9,
+    "km3 / (s2)",
+    4.61,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_triton = Constant(
+    "GM_triton",
+    "Triton gravitational constant",
+    1428.49546,
+    "km3 / (s2)",
+    0.61603,
+    "NASA Planetary Satellite Physical Parameters",
+    system="si",
+)
+
+# NASA. (n.d.). Planetary satellite physical parameters. NASA.
+# from https://ssd.jpl.nasa.gov/sats/phys_par/sep.html
+GM_charon = Constant(
+    "GM_charon",
+    "Charon gravitational constant",
+    105.88,
+    "km3 / (s2)",
+    0.28,
+    "NASA Planetary Satellite Physical Parameters",
     system="si",
 )
 
