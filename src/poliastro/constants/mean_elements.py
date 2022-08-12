@@ -26,29 +26,29 @@ from astropy import units as u
 from astropy.constants import Constant
 
 __all__ = [
-    "sunmercury",
-    "sunvenus",
-    "sunearth",
-    "sunmars",
-    "sunjupiter",
-    "sunsaturn",
-    "sunuranus",
-    "sunneptune",
-    "earthmoon",
-    "marsphobos",
-    "marsdeimos",
-    "jupitereuropa",
-    "jupiterganymede",
-    "saturnenceladus",
-    "saturntitan",
-    "uranustitania",
-    "neptunetriton",
-    "plutocharon",
+    "mean_a_mercury",
+    "mean_a_venus",
+    "mean_a_earth",
+    "mean_a_mars",
+    "mean_a_jupiter",
+    "mean_a_saturn",
+    "mean_a_uranus",
+    "mean_a_neptune",
+    "mean_a_moon",
+    "mean_a_phobos",
+    "mean_a_deimos",
+    "mean_a_europa",
+    "mean_a_ganymede",
+    "mean_a_enceladus",
+    "mean_a_titan",
+    "mean_a_titania",
+    "mean_a_triton",
+    "mean_a_charon",
 ]
 
-sunmercury = Constant(
-    "sunmercury",
-    "Mercury's orbit semimajor axis around Sun",
+mean_a_mercury = Constant(
+    "mean_a_mercury",
+    "Mercury's orbit mean semimajor axis around Sun",
     (0.38709927 * u.au.to(u.km)),
     "km",
     0,
@@ -56,9 +56,9 @@ sunmercury = Constant(
     system="si",
 )
 
-sunvenus = Constant(
-    "sunvenus",
-    "Venus's orbit semimajor axis around Sun",
+mean_a_venus = Constant(
+    "mean_a_venus",
+    "Venus's orbit mean semimajor axis around Sun",
     (0.72333566 * u.au.to(u.km)),
     "km",
     0,
@@ -66,9 +66,9 @@ sunvenus = Constant(
     system="si",
 )
 
-sunearth = Constant(
-    "sunearth",
-    "Earth's orbit semimajor axis around Sun",
+mean_a_earth = Constant(
+    "mean_a_earth",
+    "Earth's orbit mean semimajor axis around Sun",
     (1 * u.au.to(u.km)),
     "km",
     0,
@@ -76,9 +76,9 @@ sunearth = Constant(
     system="si",
 )
 
-sunmars = Constant(
-    "earthmoon",
-    "Mars's orbit semimajor axis around Sun",
+mean_a_mars = Constant(
+    "mean_a_moon",
+    "Mars's orbit mean semimajor axis around Sun",
     1.52371034 * u.au.to(u.km),
     "km",
     0,
@@ -86,9 +86,9 @@ sunmars = Constant(
     system="si",
 )
 
-sunjupiter = Constant(
-    "sunjupiter",
-    "Jupiter's orbit semimajor axis around Sun",
+mean_a_jupiter = Constant(
+    "mean_a_jupiter",
+    "Jupiter's orbit mean semimajor axis around Sun",
     (5.20288700 * u.au.to(u.km)),
     "km",
     0,
@@ -96,9 +96,9 @@ sunjupiter = Constant(
     system="si",
 )
 
-sunsaturn = Constant(
-    "sunsaturn",
-    "Saturn's orbit semimajor axis around Sun",
+mean_a_saturn = Constant(
+    "mean_a_saturn",
+    "Saturn's orbit mean semimajor axis around Sun",
     (9.53667594 * u.au.to(u.km)),
     "km",
     0,
@@ -106,9 +106,9 @@ sunsaturn = Constant(
     system="si",
 )
 
-sunuranus = Constant(
-    "sunuranus",
-    "Saturn's orbit semimajor axis around Sun",
+mean_a_uranus = Constant(
+    "mean_a_uranus",
+    "Saturn's orbit mean semimajor axis around Sun",
     (19.18916464 * u.au.to(u.km)),
     "km",
     0,
@@ -116,9 +116,9 @@ sunuranus = Constant(
     system="si",
 )
 
-sunneptune = Constant(
-    "sunneptune",
-    "Neptune's orbit semimajor axis around Sun",
+mean_a_neptune = Constant(
+    "mean_a_neptune",
+    "Neptune's orbit mean semimajor axis around Sun",
     (30.06992276 * u.au.to(u.km)),
     "km",
     0,
@@ -126,9 +126,9 @@ sunneptune = Constant(
     system="si",
 )
 
-earthmoon = Constant(
-    "earthmoon",
-    "Moon's orbit semimajor axis around Earth",
+mean_a_moon = Constant(
+    "mean_a_moon",
+    "Moon's orbit mean semimajor axis around Earth",
     384400,
     "km",
     0,
@@ -136,9 +136,9 @@ earthmoon = Constant(
     system="si",
 )
 
-marsphobos = Constant(
-    "marsphobos",
-    "Phobos's orbit semimajor axis around Mars",
+mean_a_phobos = Constant(
+    "mean_a_phobos",
+    "Phobos's orbit mean semimajor axis around Mars",
     9400,
     "km",
     0,
@@ -146,9 +146,9 @@ marsphobos = Constant(
     system="si",
 )
 
-marsdeimos = Constant(
-    "marsdeimos",
-    "Deimos's orbit semimajor axis around Mars",
+mean_a_deimos = Constant(
+    "mean_a_deimos",
+    "Deimos's orbit mean semimajor axis around Mars",
     23500,
     "km",
     0,
@@ -156,9 +156,9 @@ marsdeimos = Constant(
     system="si",
 )
 
-jupitereuropa = Constant(
-    "jupitereuropa",
-    "Europa's orbit semimajor axis around Jupiter",
+mean_a_europa = Constant(
+    "mean_a_europa",
+    "Europa's orbit mean semimajor axis around Jupiter",
     671100,
     "km",
     0,
@@ -166,9 +166,9 @@ jupitereuropa = Constant(
     system="si",
 )
 
-jupiterganymede = Constant(
-    "jupiterganymede",
-    "Ganymede's orbit semimajor axis around Juputer",
+mean_a_ganymede = Constant(
+    "mean_a_ganymede",
+    "Ganymede's orbit mean semimajor axis around Juputer",
     1070400,
     "km",
     0,
@@ -176,9 +176,9 @@ jupiterganymede = Constant(
     system="si",
 )
 
-saturnenceladus = Constant(
-    "saturnenceladus",
-    "Enceladus's orbit semimajor axis around Saturn",
+mean_a_enceladus = Constant(
+    "mean_a_enceladus",
+    "Enceladus's orbit mean semimajor axis around Saturn",
     238400,
     "km",
     0,
@@ -186,9 +186,9 @@ saturnenceladus = Constant(
     system="si",
 )
 
-saturntitan = Constant(
-    "saturntitan",
-    "Titan's orbit semimajor axis around Saturn",
+mean_a_titan = Constant(
+    "mean_a_titan",
+    "Titan's orbit mean semimajor axis around Saturn",
     1221900,
     "km",
     0,
@@ -196,9 +196,9 @@ saturntitan = Constant(
     system="si",
 )
 
-uranustitania = Constant(
-    "uranustitania",
-    "Titania's orbit semimajor axis around Uranus",
+mean_a_titania = Constant(
+    "mean_a_titania",
+    "Titania's orbit mean semimajor axis around Uranus",
     436300,
     "km",
     0,
@@ -206,9 +206,9 @@ uranustitania = Constant(
     system="si",
 )
 
-neptunetriton = Constant(
-    "neptunetriton",
-    "Triton's orbit semimajor axis around Neptune",
+mean_a_triton = Constant(
+    "mean_a_triton",
+    "Triton's orbit mean semimajor axis around Neptune",
     354800,
     "km",
     0,
@@ -216,9 +216,9 @@ neptunetriton = Constant(
     system="si",
 )
 
-plutocharon = Constant(
-    "plutocharon",
-    "Charon's orbit semimajor axis around Pluto",
+mean_a_charon = Constant(
+    "mean_a_charon",
+    "Charon's orbit mean semimajor axis around Pluto",
     19600,
     "km",
     0,
