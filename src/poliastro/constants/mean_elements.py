@@ -108,7 +108,7 @@ mean_a_saturn = Constant(
 
 mean_a_uranus = Constant(
     "mean_a_uranus",
-    "Saturn's orbit mean semimajor axis around Sun",
+    "Uranus's orbit mean semimajor axis around Sun",
     (19.18916464 * u.au.to(u.km)),
     "km",
     0,
