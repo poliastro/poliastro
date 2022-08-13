@@ -11,16 +11,16 @@ Useful ideas:
 """
 from astropy import units as u
 
-
 import poliastro.constants.general as general
 import poliastro.constants.mean_elements as dist
 
+
 class SystemChars:
     """Computes and stores the properties (mu, l*, t*) of a CR3BP system
-        'mu': mass ratio of P1-P2 primary bodies
-        'l*': characterisitic lenght of P1-P2 primary bodies
-        't*': characterisitic time of P1-P2 primary bodies
-        If P2 is more massive than P1 then swap the Pi, so that P1 is the more massive body
+    'mu': mass ratio of P1-P2 primary bodies
+    'l*': characterisitic lenght of P1-P2 primary bodies
+    't*': characterisitic time of P1-P2 primary bodies
+    If P2 is more massive than P1 then swap the Pi, so that P1 is the more massive body
     """
 
     def __init__(self, p1="Earth", p2="Moon"):
@@ -34,11 +34,15 @@ class SystemChars:
         p2 : string
            'body_j'. The deafult is Moon
         """
-    
-        mu, lstar, tstar, p1, p2 = self.BodiesCharCompute(p1.lower(), p2.lower()) # lower() to ensure lowercase characters
-        units_nd = u.def_unit('[nd]') # Define custome units, [nd]: non-dimensional unit
-        
-        self._mu = mu*units_nd
+
+        mu, lstar, tstar, p1, p2 = self.BodiesCharCompute(
+            p1.lower(), p2.lower()
+        )  # lower() to ensure lowercase characters
+        units_nd = u.def_unit(
+            "[nd]"
+        )  # Define custome units, [nd]: non-dimensional unit
+
+        self._mu = mu * units_nd
         self._lstar = lstar
         self._tstar = tstar
         self._p1 = p1
@@ -99,9 +103,9 @@ class SystemChars:
         -------
         t*: float, sec
             Characterisitc time of P1-P2 system
-        
+
         .. math::
-            
+
             \sqrt{\frac{l*^3}{M1+M2}}
         """
         return (lstar**3 / (mu_pi[0] + mu_pi[1])) ** 0.5
@@ -109,7 +113,7 @@ class SystemChars:
     def BodiesCharCompute(self, p1, p2):
         """Calculates mu [nd], dist[km], t* [s] of the 'body_i - body_j system'
         Also, if M2>M1, then swaps p1 and p2, so that M1>M2
-        
+
         Parameters
         ----------
         p1 : string
@@ -143,11 +147,13 @@ class SystemChars:
                 )
                 return 0, 0, 0, temp1, temp2
         except KeyError:
-            print("KeyError-> Incorrect/Bodies Does Not Exist Input Bodies name")
+            print(
+                "KeyError-> Incorrect/Bodies Does Not Exist Input Bodies name"
+            )
             return 0, 0, 0, temp1, temp2
 
         # Sort P1 and P2 based on their mu values
-        if mu_body[p1] >= mu_body[p2]:  #if p1 is the bigger primary
+        if mu_body[p1] >= mu_body[p2]:  # if p1 is the bigger primary
             mu_pi.append(mu_body[p1])
             mu_pi.append(mu_body[p2])
             bodies = p1 + p2
@@ -185,27 +191,26 @@ class SystemChars:
         """
         # Body values, G*M_body
         mu_body = {}  # km^3 s^-2
-        mu_body["sun"] = general.GM_sun.to(u.km**3*u.s**-2)
-        mu_body["mercury"] = general.GM_mercury.to(u.km**3*u.s**-2)
-        mu_body["venus"] = general.GM_venus.to(u.km**3*u.s**-2)
-        mu_body["earth"] = general.GM_earth.to(u.km**3*u.s**-2)
-        mu_body["mars"] = general.GM_mars.to(u.km**3*u.s**-2)
-        mu_body["jupiter"] = general.GM_jupiter.to(u.km**3*u.s**-2)
-        mu_body["saturn"] = general.GM_saturn.to(u.km**3*u.s**-2)
-        mu_body["uranus"] = general.GM_uranus.to(u.km**3*u.s**-2)  
-        mu_body["neptune"] = general.GM_neptune.to(u.km**3*u.s**-2)  
-        mu_body["pluto"] = general.GM_pluto.to(u.km**3*u.s**-2)  
+        mu_body["sun"] = general.GM_sun.to(u.km**3 * u.s**-2)
+        mu_body["mercury"] = general.GM_mercury.to(u.km**3 * u.s**-2)
+        mu_body["venus"] = general.GM_venus.to(u.km**3 * u.s**-2)
+        mu_body["earth"] = general.GM_earth.to(u.km**3 * u.s**-2)
+        mu_body["mars"] = general.GM_mars.to(u.km**3 * u.s**-2)
+        mu_body["jupiter"] = general.GM_jupiter.to(u.km**3 * u.s**-2)
+        mu_body["saturn"] = general.GM_saturn.to(u.km**3 * u.s**-2)
+        mu_body["uranus"] = general.GM_uranus.to(u.km**3 * u.s**-2)
+        mu_body["neptune"] = general.GM_neptune.to(u.km**3 * u.s**-2)
+        mu_body["pluto"] = general.GM_pluto.to(u.km**3 * u.s**-2)
 
-        mu_body["moon"] = general.GM_moon.to(u.km**3*u.s**-2)
-        mu_body["phobos"] = general.GM_phobos.to(u.km**3*u.s**-2)
-        mu_body["deimos"] = general.GM_deimos.to(u.km**3*u.s**-2)
-        mu_body["europa"] = general.GM_europa.to(u.km**3*u.s**-2)
-        mu_body["ganymede"] = general.GM_ganymede.to(u.km**3*u.s**-2)
-        mu_body["enceladus"] = general.GM_enceladus.to(u.km**3*u.s**-2)
-        mu_body["titania"] = general.GM_titan.to(u.km**3*u.s**-2)
-        mu_body["triton"] = general.GM_triton.to(u.km**3*u.s**-2)
-        mu_body["charon"] = general.GM_charon.to(u.km**3*u.s**-2)
-    
+        mu_body["moon"] = general.GM_moon.to(u.km**3 * u.s**-2)
+        mu_body["phobos"] = general.GM_phobos.to(u.km**3 * u.s**-2)
+        mu_body["deimos"] = general.GM_deimos.to(u.km**3 * u.s**-2)
+        mu_body["europa"] = general.GM_europa.to(u.km**3 * u.s**-2)
+        mu_body["ganymede"] = general.GM_ganymede.to(u.km**3 * u.s**-2)
+        mu_body["enceladus"] = general.GM_enceladus.to(u.km**3 * u.s**-2)
+        mu_body["titania"] = general.GM_titan.to(u.km**3 * u.s**-2)
+        mu_body["triton"] = general.GM_triton.to(u.km**3 * u.s**-2)
+        mu_body["charon"] = general.GM_charon.to(u.km**3 * u.s**-2)
 
         distances = {}  # km, diistance between the two primaries
         distances["sunmercury"] = dist.mean_a_mercury
