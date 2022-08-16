@@ -1,7 +1,11 @@
 """
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
 """
-from poliastro.core.threebody.cr3bp_quantities_calculations import calculate_mu, calculate_tstar
+from poliastro.core.threebody.cr3bp_quantities_calculations import (
+    calculate_mu,
+    calculate_tstar,
+)
+
 
 class SystemChars:
     """Computes and stores the properties (mu, l*, t*) of a CR3BP system
@@ -27,7 +31,7 @@ class SystemChars:
             Characterisitc time of P1-P2 system
         """
         self.name = name
-        self._mu = mu 
+        self._mu = mu
         self._lstar = lstar
         self._tstar = tstar
 
@@ -37,13 +41,11 @@ class SystemChars:
         Computes and sets the characteristic quanitites based on p1 and p2 bodies
         Parameters
         ----------
-        p1: ~poliastro.bodies.Body 
+        p1: ~poliastro.bodies.Body
         p2: ~poliastro.bodies.Body
         """
-        
-        name, mu, lstar, tstar = cls.bodies_char_compute(
-            p1, p2
-        )  
+
+        name, mu, lstar, tstar = cls.bodies_char_compute(p1, p2)
         return cls(name, mu, lstar, tstar)
 
     @property
@@ -54,7 +56,7 @@ class SystemChars:
 
         Parameters
         ----------
-        p1: ~poliastro.bodies.Body 
+        p1: ~poliastro.bodies.Body
         p2: ~poliastro.bodies.Body
 
         Returns
@@ -69,17 +71,21 @@ class SystemChars:
             Characterisitc time of P1-P2 system
         """
 
-        assert (p1 == p2.parent or p2 == p1.parent) == True, 'P1 and P2 are not part of the same system. Recheck body.parent'
-        
+        assert (
+            p1 == p2.parent or p2 == p1.parent
+        ) == True, (
+            "P1 and P2 are not part of the same system. Recheck body.parent"
+        )
+
         if p1.k < p2.k:
             # swap p1 and p2, as p1 should be the more massive body
             p1, p2 = p2, p1
-               
-        name = p1.name+p2.name
+
+        name = p1.name + p2.name
         mu = calculate_mu(p1.k, p2.k)
         lstar = p2.mean_a
         tstar = calculate_tstar(p1.k, p2.k, lstar)
-                
+
         return name, mu, lstar, tstar
 
     # All the attributes are made private to make them constant and avoid being mistakenly changed

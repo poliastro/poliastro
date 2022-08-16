@@ -75,7 +75,7 @@ class Body(
         J2=0.0 * u.one,
         J3=0.0 * u.one,
         mass=None,
-        mean_a = 0.0 * u.km,
+        mean_a=0.0 * u.km,
     ):
         if mass is None:
             mass = k / G
@@ -306,7 +306,7 @@ Pluto = Body(
     R_mean=constants.R_mean_pluto,
     R_polar=constants.R_polar_pluto,
     rotational_period=constants.rotational_period_pluto,
-) # No mean_a_pluto as Pluto is officially not a planet around Sun
+)  # No mean_a_pluto as Pluto is officially not a planet around Sun
 
 
 Moon = Body(
@@ -318,7 +318,7 @@ Moon = Body(
     R_mean=constants.R_mean_moon,
     R_polar=constants.R_polar_moon,
     rotational_period=constants.rotational_period_moon,
-    mean_a=constants.mean_a_moon
+    mean_a=constants.mean_a_moon,
 )
 
 
@@ -376,7 +376,7 @@ Triton = Body(
     k=constants.GM_triton,
     name="Triton",
     mean_a=constants.mean_a_triton,
-)   
+)
 
 Charon = Body(
     parent=Pluto,
@@ -384,9 +384,3 @@ Charon = Body(
     name="charon",
     mean_a=constants.mean_a_charon,
 )
-
-
-
-
-
-

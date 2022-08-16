@@ -4,6 +4,7 @@
 
 from astropy import units as u
 
+
 def calculate_mu(mu1, mu2):
     """Calculate mu of CR3BP
     Parameters
@@ -19,6 +20,7 @@ def calculate_mu(mu1, mu2):
         mu2/(mu1+mu2), mu2<mu1
     """
     return (mu2 / (mu1 + mu2)) * u.one
+
 
 def calculate_tstar(mu1, mu2, lstar):
     """Calculate t* of CR3BP
