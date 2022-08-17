@@ -30,7 +30,7 @@ class SystemChars:
         tstar: float, sec
             Characterisitc time of P1-P2 system
         """
-        self.name = name
+        self._name = name
         self._mu = mu
         self._lstar = lstar
         self._tstar = tstar
@@ -39,6 +39,7 @@ class SystemChars:
     def from_primaries(cls, p1, p2):
         """
         Computes and sets the characteristic quanitites based on p1 and p2 bodies
+        
         Parameters
         ----------
         p1: ~poliastro.bodies.Body
@@ -48,10 +49,11 @@ class SystemChars:
         name, mu, lstar, tstar = cls.bodies_char_compute(p1, p2)
         return cls(name, mu, lstar, tstar)
 
-    @property
+    @classmethod
     def bodies_char_compute(self, p1, p2):
         """
         Calculates mu, lstar, and tstar of the 'p1' and 'p2' system
+        
         Also, if M2>M1, then swaps p1 and p2, so that M1>M2
 
         Parameters
@@ -73,7 +75,7 @@ class SystemChars:
 
         assert (
             p1 == p2.parent or p2 == p1.parent
-        ) == True, (
+        ) is True, (
             "P1 and P2 are not part of the same system. Recheck body.parent"
         )
 
@@ -90,16 +92,21 @@ class SystemChars:
 
     # All the attributes are made private to make them constant and avoid being mistakenly changed
     @property
+    def name(self):
+        """Name of P1-P2 system"""
+        return self._name
+    
+    @property
     def mu(self):
         """Mass ratio of P1-P2 primary bodies in CR3BP"""
         return self._mu
 
     @property
     def lstar(self):
-        """Characterisitc Length"""
+        """Characterisitc length of P1-P2 system"""
         return self._lstar
 
     @property
     def tstar(self):
-        """Characterisitc Time"""
+        """Characterisitc time of P1-P2 system"""
         return self._tstar

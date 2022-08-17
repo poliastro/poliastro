@@ -13,9 +13,15 @@ Contains some predefined bodies of the Solar System:
 * Uranus (⛢)
 * Neptune (♆)
 * Pluto (♇)
-
 Phobos
 Deimos
+Europa
+Ganyemede
+Enceladus
+Titan
+Titania
+Triton
+Charon
 
 
 and a way to define new bodies (:py:class:`~Body` class).
