@@ -39,7 +39,7 @@ class SystemChars:
     def from_primaries(cls, p1, p2):
         """
         Computes and sets the characteristic quanitites based on p1 and p2 bodies
-        
+
         Parameters
         ----------
         p1: ~poliastro.bodies.Body
@@ -53,7 +53,7 @@ class SystemChars:
     def bodies_char_compute(self, p1, p2):
         """
         Calculates mu, lstar, and tstar of the 'p1' and 'p2' system
-        
+
         Also, if M2>M1, then swaps p1 and p2, so that M1>M2
 
         Parameters
@@ -95,7 +95,7 @@ class SystemChars:
     def name(self):
         """Name of P1-P2 system"""
         return self._name
-    
+
     @property
     def mu(self):
         """Mass ratio of P1-P2 primary bodies in CR3BP"""
