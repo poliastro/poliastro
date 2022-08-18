@@ -24,7 +24,7 @@ def calculate_mu(mu1, mu2):
 
 
 def calculate_tstar(mu1, mu2, lstar):
-    """Calculate t* of CR3BP
+    r"""Calculate t* of CR3BP
 
     Parameters
     ----------
