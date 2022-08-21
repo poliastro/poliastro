@@ -5,11 +5,12 @@ import pytest
 from astropy.tests.helper import assert_quantity_allclose
 
 from poliastro.bodies import Earth, Moon
-from poliastro.threebody.cr3bp_char_quant import SystemChars
 from poliastro.core.threebody.cr3bp_quantities_calculations import (
     calculate_mu,
     calculate_tstar,
 )
+from poliastro.threebody.cr3bp_char_quant import SystemChars
+
 
 @pytest.mark.parametrize(
     "p1, p2, expected_mu",
@@ -23,6 +24,7 @@ def test_SystemChars_mu(p1, p2, expected_mu):
     Systemp1p2 = SystemChars.from_primaries(p1, p2)
 
     assert_quantity_allclose(Systemp1p2.mu, expected_mu, 1e-5)
+
 
 @pytest.mark.parametrize(
     "p1, p2, expected_lstar",
