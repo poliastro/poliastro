@@ -2,17 +2,14 @@
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
 """
 
-from astropy import units as u
-
-
 def calculate_mu(mu1, mu2):
     """Calculate mu of CR3BP
 
     Parameters
     ----------
-    mu1: float, km^3*s^-2 or m^3*s^-2
+    mu1: float, km^3*s^-2 
         mu of P1
-    mu1: float, km^3*s^-2 or m^3*s^-2
+    mu2: float, km^3*s^-2 
         mu of P2
 
     Returns
@@ -20,7 +17,7 @@ def calculate_mu(mu1, mu2):
     mu: float, dimensionless
         mu2/(mu1+mu2), mu2<mu1
     """
-    return (mu2 / (mu1 + mu2)) * u.one
+    return (mu2 / (mu1 + mu2))
 
 
 def calculate_tstar(mu1, mu2, lstar):
@@ -28,9 +25,9 @@ def calculate_tstar(mu1, mu2, lstar):
 
     Parameters
     ----------
-    mu1: float, km^3*s^-2 or m^3*s^-2
+    mu1: float, km^3*s^-2
         mu of P1
-    mu1: float, km^3*s^-2 or m^3*s^-2
+    mu2: float, km^3*s^-2
         mu of P2
     lstar: float, km
         Characterisitc length of P1 - P2 system
@@ -45,4 +42,4 @@ def calculate_tstar(mu1, mu2, lstar):
 
         \sqrt{\frac{l*^3}{M1+M2}}
     """
-    return ((lstar**3 / (mu1 + mu2)) ** 0.5).to(u.s)
+    return ((lstar**3 / (mu1 + mu2)) ** 0.5)
