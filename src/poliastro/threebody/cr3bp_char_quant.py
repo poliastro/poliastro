@@ -48,7 +48,7 @@ class SystemChars:
         p2: ~poliastro.bodies.Body
         """
 
-        name, mu, lstar, tstar = cls.bodies_char_compute(p1, p2)        
+        name, mu, lstar, tstar = cls.bodies_char_compute(p1, p2)
         return cls(name, mu, lstar, tstar)
 
     @classmethod
@@ -86,9 +86,15 @@ class SystemChars:
             p1, p2 = p2, p1
 
         name = p1.name + p2.name
-        mu = calculate_mu(p1.k.to(u.km**3*u.s**-2), p2.k.to(u.km**3*u.s**-2))
+        mu = calculate_mu(
+            p1.k.to(u.km**3 * u.s**-2), p2.k.to(u.km**3 * u.s**-2)
+        )
         lstar = p2.mean_a
-        tstar = calculate_tstar(p1.k.to(u.km**3*u.s**-2), p2.k.to(u.km**3*u.s**-2), lstar)
+        tstar = calculate_tstar(
+            p1.k.to(u.km**3 * u.s**-2),
+            p2.k.to(u.km**3 * u.s**-2),
+            lstar,
+        )
 
         return name, mu, lstar, tstar
 
