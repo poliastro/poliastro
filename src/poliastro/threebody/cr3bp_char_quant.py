@@ -47,7 +47,7 @@ class SystemChars:
         p1: ~poliastro.bodies.Body
         p2: ~poliastro.bodies.Body
         """
-        name, mu, lstar, tstar = cls.bodies_char_compute(p1, p2)        
+        name, mu, lstar, tstar = cls.bodies_char_compute(p1, p2)
         return cls(name, mu, lstar, tstar)
 
     @classmethod

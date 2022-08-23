@@ -2,6 +2,7 @@
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
 """
 
+
 def calculate_mu(mu1, mu2):
     """Calculate mu of CR3BP
 
@@ -43,4 +44,3 @@ def calculate_tstar(mu1, mu2, lstar):
         \sqrt{\frac{l*^3}{M1+M2}}
     """
     return (lstar**3 / (mu1 + mu2)) ** 0.5
-
