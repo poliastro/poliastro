@@ -114,6 +114,7 @@ J2000_TT = time.Time("J2000", scale="tt")
 J2000_TDB = time.Time("J2000", scale="tdb")
 J2000 = J2000_TT
 
+#: GM_sun: Heliocentric gravitational constant
 GM_sun = Constant(
     "GM_sun",
     "Heliocentric gravitational constant",
@@ -124,6 +125,7 @@ GM_sun = Constant(
     system="si",
 )
 
+#: GM_earth: Geocentric gravitational constant
 GM_earth = Constant(
     "GM_earth",
     "Geocentric gravitational constant",

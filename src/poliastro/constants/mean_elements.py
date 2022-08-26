@@ -46,6 +46,7 @@ __all__ = [
     "mean_a_charon",
 ]
 
+#: mean_a_mercury: Mercury's orbit mean semimajor axis around Sun
 mean_a_mercury = Constant(
     "mean_a_mercury",
     "Mercury's orbit mean semimajor axis around Sun",
@@ -66,6 +67,7 @@ mean_a_venus = Constant(
     system="si",
 )
 
+#: mean_a_earth: Earth's orbit mean semimajor axis around Sun
 mean_a_earth = Constant(
     "mean_a_earth",
     "Earth's orbit mean semimajor axis around Sun",
