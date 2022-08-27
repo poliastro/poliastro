@@ -1,4 +1,11 @@
-from poliastro.plotting.interactive import OrbitPlotter2D, OrbitPlotter3D
-from poliastro.plotting.static import StaticOrbitPlotter
+from poliastro.plotting.gabbard import GabbardPlotter
+from poliastro.plotting.orbit.plotter import OrbitPlotter
+from poliastro.plotting.porkchop import PorkchopPlotter
+from poliastro.plotting.tisserand import TisserandPlotter
 
-__all__ = ["OrbitPlotter2D", "OrbitPlotter3D", "StaticOrbitPlotter"]
+__all__ = [
+    "OrbitPlotter",
+    "GabbardPlotter",
+    "PorkchopPlotter",
+    "TisserandPlotter",
+]
