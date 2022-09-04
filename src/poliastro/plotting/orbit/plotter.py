@@ -253,6 +253,7 @@ class OrbitPlotter:
         if self.backend.is_2D:
             rr = coordinates.xyz.transpose()
             coordinates = self._project(rr)
+            position = np.asarray(self._project([position])).flatten() * u.km
 
         # Add the coordinates and the position to the scene
         trace_coordinates = self.backend.draw_coordinates(coordinates, color=colors)
