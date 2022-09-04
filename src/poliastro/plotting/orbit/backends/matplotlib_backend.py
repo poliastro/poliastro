@@ -19,7 +19,7 @@ def _segments_from_arrays(x, y):
 class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
     """An orbit plotter backend class based on Matplotlib."""
 
-    def __init__(self, scene=None):
+    def __init__(self, ax=None):
         """Initializes a backend instance.
 
         Parameters
@@ -28,7 +28,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An instance representing the canvas or scene.
 
         """
-        if not scene:
+        if not ax:
             _, ax = plt.subplots(figsize=(6, 6))
         super().__init__(ax, name="OrbitPlotterBackendMatplotlib2D")
 

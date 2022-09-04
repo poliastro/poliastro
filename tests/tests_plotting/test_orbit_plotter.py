@@ -1,10 +1,11 @@
 import sys
 
 import pytest
-from astropy import units as u
+from astropy import time, units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from astropy.time import Time
 from matplotlib import pyplot as plt
+
 
 from poliastro.bodies import Earth, Jupiter, Mars, Sun
 from poliastro.constants import J2000_TDB
@@ -12,14 +13,150 @@ from poliastro.ephem import Ephem
 from poliastro.examples import churi, iss, molniya
 from poliastro.frames import Planes
 from poliastro.maneuver import Maneuver
-from poliastro.plotting.static import StaticOrbitPlotter
 from poliastro.twobody import Orbit
+from poliastro.plotting import OrbitPlotter
 from poliastro.util import time_range
+
+
+@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
+def test_get_figure_has_expected_properties(plotter_class):
+    frame = plotter_class()
+    figure = frame.show()
+
+    assert figure.data == ()
+    assert figure.layout.autosize is True
+    assert "xaxis" in figure.layout
+    assert "yaxis" in figure.layout
+
+
+def test_get_3d_figure_has_expected_properties():
+    frame = OrbitPlotter3D()
+    figure = frame.show()
+
+    assert figure.data == ()
+    assert figure.layout.autosize is True
+    assert "xaxis" in figure.layout.scene
+    assert "yaxis" in figure.layout.scene
+    assert "zaxis" in figure.layout.scene
+    assert "aspectmode" in figure.layout.scene
+
+
+@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
+def test_set_different_attractor_raises_error(plotter_class):
+    body1 = Earth
+
+    body2 = Mars
+
+    frame = plotter_class()
+    frame.set_attractor(body1)
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        frame.set_attractor(body2)
+    assert "Attractor has already been set to Earth" in excinfo.exconly()
+
+
+@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
+def test_plot_sets_attractor(plotter_class):
+    frame = plotter_class()
+    assert frame._attractor is None
+
+    frame.plot(iss)
+    assert frame._attractor == iss.attractor
+
+
+@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
+def test_plot_appends_data(plotter_class):
+    frame = plotter_class()
+    assert len(frame.trajectories) == 0
+
+    frame.plot(iss)
+    assert len(frame.trajectories) == 1
+
+
+@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
+def test_plot_trajectory_without_attractor_raises_error(plotter_class):
+    frame = plotter_class()
+
+    with pytest.raises(ValueError) as excinfo:
+        frame._frame = 1  # Set it to something not None to skip frame check
+        frame.plot_trajectory({})
+    assert (
+        "An attractor must be set up first, please use "
+        "set_attractor(Major_Body) or plot(orbit)" in excinfo.exconly()
+    )
+
+
+def test_plot_2d_trajectory_without_frame_raises_error():
+    frame = OrbitPlotter2D()
+
+    with pytest.raises(ValueError) as excinfo:
+        frame.set_attractor(Sun)
+        frame.plot_trajectory({})
+    assert (
+        "A frame must be set up first, please use "
+        "set_orbit_frame(orbit) or plot(orbit)" in excinfo.exconly()
+    )
+
+
+def test_ephem_without_frame_raises_error():
+    epochs = time.Time("2020-04-29 10:43", scale="tdb")
+    earth = Ephem.from_body(Earth, epochs)
+    plotter = OrbitPlotter2D()
+
+    with pytest.raises(ValueError) as excinfo:
+        plotter.set_attractor(Sun)
+        plotter.plot_ephem(earth)
+    assert (
+        "A frame must be set up first, please use "
+        "set_orbit_frame(orbit) or plot(orbit)" in excinfo.exconly()
+    )
+
+
+def test_plot_3d_trajectory_plots_a_trajectory():
+    frame = OrbitPlotter3D()
+    assert len(frame.trajectories) == 0
+
+    trajectory = churi.sample()
+    frame.set_attractor(Sun)
+    frame.plot_trajectory(trajectory)
+
+    assert len(frame.trajectories) == 1
+    assert frame._attractor == Sun
+
+
+def test_plot_2d_trajectory_plots_a_trajectory():
+    frame = OrbitPlotter2D()
+    assert len(frame.trajectories) == 0
+
+    trajectory = churi.sample()
+    frame.set_attractor(Sun)
+    frame.set_orbit_frame(churi)
+    frame.plot_trajectory(trajectory)
+
+    assert len(frame.trajectories) == 1
+    assert frame._attractor == Sun
+
+
+def test_set_view():
+    frame = OrbitPlotter3D()
+    frame.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
+    figure = frame.show()
+
+    eye = figure["layout"]["scene"]["camera"]["eye"]
+    assert eye["x"] == 1
+    assert eye["y"] == 0
+    assert eye["z"] == 0
+
+
+def test_dark_theme():
+    frame = OrbitPlotter3D(dark=True)
+    assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
+
 
 
 def test_axes_labels_and_title():
     ax = plt.gca()
-    op = StaticOrbitPlotter(ax)
+    op = OrbitPlotter(ax)
     ss = iss
     op.plot(ss)
 
@@ -28,7 +165,7 @@ def test_axes_labels_and_title():
 
 
 def test_number_of_lines_for_osculating_orbit():
-    op1 = StaticOrbitPlotter()
+    op1 = OrbitPlotter(backend_name="matplotlib2D")
     ss = iss
 
     l1 = op1.plot(ss)
@@ -37,7 +174,7 @@ def test_number_of_lines_for_osculating_orbit():
 
 
 def test_legend():
-    op = StaticOrbitPlotter()
+    op = OrbitPlotter(backend_name="matplotlib2D")
     ss = iss
     op.plot(ss, label="ISS")
     legend = plt.gca().get_legend()
@@ -49,7 +186,7 @@ def test_legend():
 
 
 def test_color():
-    op = StaticOrbitPlotter()
+    op = OrbitPlotter(backend_name="matplotlib2D")
     ss = iss
     c = "#FF0000"
     op.plot(ss, label="ISS", color=c)
@@ -63,7 +200,7 @@ def test_color():
 def test_plot_trajectory_sets_label():
     expected_label = "67P"
 
-    op = StaticOrbitPlotter()
+    op = OrbitPlotter(backend_name="matplotlib2D")
     trajectory = churi.sample()
     op.plot_body_orbit(Mars, J2000_TDB, label="Mars")
 
@@ -78,20 +215,20 @@ def test_plot_trajectory_sets_label():
     [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))],
 )
 def test_dark_mode_plots_dark_plot(dark, expected_color):
-    op = StaticOrbitPlotter(dark=dark)
+    op = OrbitPlotter(dark=dark)
     assert op._ax.get_facecolor() == expected_color
 
 
 def test_redraw_makes_attractor_none():
     # TODO: Review
-    op = StaticOrbitPlotter()
+    op = OrbitPlotter(backend_name="matplotlib2D")
     op._redraw()
     assert op._attractor_radius is not None
 
 
 def test_set_frame_plots_same_colors():
     # TODO: Review
-    op = StaticOrbitPlotter()
+    op = OrbitPlotter(backend_name="matplotlib2D")
     op.plot_body_orbit(Jupiter, J2000_TDB)
     colors1 = [orb[2] for orb in op.trajectories]
     op.set_body_frame(Jupiter)
@@ -101,7 +238,7 @@ def test_set_frame_plots_same_colors():
 
 def test_redraw_keeps_trajectories():
     # See https://github.com/poliastro/poliastro/issues/518
-    op = StaticOrbitPlotter()
+    op = OrbitPlotter(backend_name="matplotlib2D")
     trajectory = churi.sample()
     op.plot_body_orbit(Mars, J2000_TDB, label="Mars")
     op.plot_trajectory(trajectory, label="67P")
@@ -123,7 +260,7 @@ def test_plot_ephem_different_plane_raises_error():
         ),
     )
 
-    op = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
+    op = OrbitPlotter(backend_name="matplotlib2D", plane=Planes.EARTH_ECLIPTIC)
     op.set_attractor(Sun)
     op.set_body_frame(Earth)
     with pytest.raises(ValueError) as excinfo:
@@ -140,7 +277,7 @@ def test_plot_ephem_different_plane_raises_error():
 @pytest.mark.mpl_image_compare
 def test_basic_plotting():
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax)
     plotter.plot(iss)
 
     return fig
@@ -149,7 +286,7 @@ def test_basic_plotting():
 @pytest.mark.mpl_image_compare
 def test_basic_trajectory_plotting():
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax)
     plotter.set_attractor(Earth)
     plotter.set_orbit_frame(iss)
     plotter.plot_trajectory(iss.sample())
@@ -160,7 +297,7 @@ def test_basic_trajectory_plotting():
 @pytest.mark.mpl_image_compare
 def test_basic_orbit_and_trajectory_plotting():
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax)
     plotter.plot(iss)
     plotter.plot_trajectory(molniya.sample(), label="Molniya")
 
@@ -170,7 +307,7 @@ def test_basic_orbit_and_trajectory_plotting():
 @pytest.mark.mpl_image_compare
 def test_trail_plotting():
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax)
     plotter.plot(iss, trail=True)
 
     return fig
@@ -179,7 +316,7 @@ def test_trail_plotting():
 @pytest.mark.mpl_image_compare
 def test_plot_different_planes():
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax)
     plotter.plot(iss)
     plotter.plot(molniya.change_plane(Planes.EARTH_ECLIPTIC))
 
@@ -206,7 +343,7 @@ def test_plot_ephem_epoch():
     )
 
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax)
     plotter.set_attractor(Earth)
     plotter.set_orbit_frame(Orbit.from_ephem(Earth, ephem, epoch))
 
@@ -228,7 +365,7 @@ def test_plot_ephem_no_epoch():
     )
 
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax)
     plotter.set_attractor(Earth)
     plotter.set_orbit_frame(Orbit.from_ephem(Earth, ephem, epoch))
 
@@ -246,7 +383,7 @@ def test_body_frame_raises_warning_if_time_is_not_tdb_with_proper_time(
     epoch = Time("2017-09-29 07:31:26", scale="utc")
     expected_epoch_string = "2017-09-29 07:32:35.182"  # epoch.tdb.value
 
-    op = StaticOrbitPlotter()
+    op = OrbitPlotter(backend_name="matplotlib2D")
     op.set_body_frame(body, epoch)
 
     w = recwarn.pop(TimeScaleWarning)
@@ -278,7 +415,7 @@ def test_plot_maneuver():
 
     # Plot the maneuver
     fig, ax = plt.subplots()
-    plotter = StaticOrbitPlotter(ax=ax)
+    plotter = OrbitPlotter(scene=ax, backend_name="matplotlib2D")
     plotter.plot(orb_i, label="Initial orbit", color="blue")
     plotter.plot_maneuver(orb_i, man, label="Hohmann maneuver", color="red")
 
