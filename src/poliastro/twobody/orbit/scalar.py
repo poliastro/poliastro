@@ -173,7 +173,7 @@ class Orbit(OrbitCreationMixin):
     def h_vec(self):
         """Specific angular momentum vector."""
         h_vec = (
-            np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s))
+            np.cross(self.r.to_value(u.km), self.v.to_value(u.km / u.s))
             * u.km**2
             / u.s
         )
