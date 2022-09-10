@@ -79,41 +79,46 @@ class _OrbitPlotterBackend:
         trail : bool
             ``True`` if orbit trail is desired, ``False`` if not desired.
 
+        Returns
+        -------
+        list[str]
+            A list of strings representing hexadecimal colors.
+
         """
         raise NotImplementedError(
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_marker(self, position, *, marker_symbol, size, color):
+    def draw_marker(self, position, *, color, marker_symbol, size):
         """Draws a point into the scene.
 
         Parameters
         ----------
         position : list[float, float, float]
             A list containing the x, y and z coordinates of the point.
+        color : str
+            A string representing the hexadecimal color for the point.
         marker_symbol : str
             The marker symbol to be used when drawing the point.
         size : float
             The size of the marker.
-        color : str
-            A string representing the hexadecimal color for the point.
 
         """
         raise NotImplementedError(
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_position(self, position, *, size, color):
+    def draw_position(self, position, *, color, size):
         """Draws the position of a body in the scene.
 
         Parameters
         ----------
         position : list[float, float, float]
             A list containing the x, y and z coordinates of the point.
-        size : float
-            The size of the marker.
         color : str
             A string representing the hexadecimal color for the marker.
+        size : float
+            The size of the marker.
 
         Returns
         -------
@@ -126,34 +131,34 @@ class _OrbitPlotterBackend:
         )
 
 
-    def draw_impulse(self, position, *, size, color):
+    def draw_impulse(self, position, *, color, size):
         """Draws an impulse into the scene.
 
         Parameters
         ----------
         position : list[float, float, float]
             A list containing the x, y and z coordinates of the impulse location.
-        size : float
-            The size of the marker for the impulse.
         color : str
             A string representing the hexadecimal color for the impulse marker.
+        size : float
+            The size of the marker for the impulse.
 
         """
         raise NotImplementedError(
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_sphere(self, position, *, size, color):
+    def draw_sphere(self, position, *, color, radius):
         """Draws an sphere into the scene.
 
         Parameters
         ----------
         position : list[float, float, float]
             A list containing the x, y and z coordinates of the sphere location.
-        size : float
-            The radius of the sphere.
         color : str
             A string representing the hexadecimal color for the sphere.
+        radius : float
+            The radius of the sphere.
 
         """
         raise NotImplementedError(
@@ -166,17 +171,17 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_coordinates(self, coordinates, *, size, color):
+    def draw_coordinates(self, coordinates, *, colors, size):
         """Draws desired coordinates into the scene.
 
         Parameters
         ----------
         position : list[list[float, float, float], ...]
             A set of lists containing the x, y and z coordinates of the sphere location.
+        colors : list[str]
+            A string representing the hexadecimal color for the coordinates.
         size : float
             The size of the marker for drawing the coordinates.
-        color : str
-            A string representing the hexadecimal color for the coordinates.
 
         """
         raise NotImplementedError(

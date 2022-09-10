@@ -4,6 +4,7 @@ from collections import namedtuple
 import warnings
 
 import astropy.units as u
+from astropy.coordinates import CartesianRepresentation
 import numpy as np
 
 from poliastro.frames import Planes
@@ -187,8 +188,8 @@ class OrbitPlotter:
 
         self.backend.draw_sphere(
             position=[0, 0, 0] * u.km,
-            size=self._attractor_radius,
             color=color,
+            radius=self._attractor_radius,
         )
 
     def _redraw(self):
@@ -256,22 +257,26 @@ class OrbitPlotter:
             position = np.asarray(self._project([position])).flatten() * u.km
 
         # Add the coordinates and the position to the scene
-        trace_coordinates = self.backend.draw_coordinates(coordinates, color=colors)
-        trace_position = self.backend.draw_position(position, color=colors)
+        trace_coordinates = self.backend.draw_coordinates(
+                coordinates, colors=colors, dashed=dashed, label=label
+        )
+        trace_position = self.backend.draw_position(
+                position, color=colors[0], size=None
+        )
 
         return trace_coordinates, trace_position
 
-    def plot(self, orbit, *, label=None, color=None, trail=False):
+    def plot(self, orbit, *, color=None, label=None, trail=False):
         """Plots state and osculating orbit in their plane.
 
         Parameters
         ----------
         orbit : ~poliastro.twobody.orbit.Orbit
             Orbit to plot.
-        label : str, optional
-            Label of the orbit.
         color : str, optional
             Color of the line and the position.
+        label : str, optional
+            Label of the orbit.
         trail : bool, optional
             Fade the orbit trail, default to False.
 
@@ -290,11 +295,12 @@ class OrbitPlotter:
         colors = self.backend._get_colors(color, trail)
         label = generate_label(orbit.epoch, label)
 
-        # Compute the coorindates representing the trajectory
+        # Compute the coorindates and body position alongs its orbit
         coordinates = orbit.sample(self._num_points)
+        position = orbit.r
 
         return self._add_trajectory(
-            coordinates, orbit.r, label=label, colors=colors, dashed=True
+            coordinates, position, label=label, colors=colors, dashed=True
         )
 
     def plot_body_orbit(
@@ -496,11 +502,12 @@ class OrbitPlotter:
                 "set_attractor(Major_Body) or plot(orbit)"
             )
 
-        colors = self._get_colors(color, trail)
+        # Get orbit colors and label
+        colors = self.backend._get_colors(color, trail)
         coordinates = coordinates.represent_as(CartesianRepresentation)
 
         return self._add_trajectory(
-            coordinates, None, label=str(label), colors=colors, dashed=False
+            coordinates, position=None, label=str(label), colors=colors, dashed=trail
         )
 
     def show(self):

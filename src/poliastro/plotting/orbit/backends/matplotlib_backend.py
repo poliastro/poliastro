@@ -4,6 +4,7 @@ from astropy import units as u
 from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
+import numpy as np
 
 from poliastro.plotting.orbit.backends.base_backend import _OrbitPlotterBackend
 
@@ -11,7 +12,7 @@ def _segments_from_arrays(x, y):
     # Copied pasted from
     # https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/multicolored_line.html
     # because this API is impossible to understand
-    points = np.column_stack([x.to_value(u.km), y.to_value(u.km)])[:, None, :]
+    points = np.column_stack([x, y])[:, None, :]
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     return segments
 
@@ -54,6 +55,11 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         trail : bool
             ``True`` if orbit trail is desired, ``False`` if not desired.
 
+        Returns
+        -------
+        list[str]
+            A list of strings representing hexadecimal colors.
+
         """
         if color is None:
             # HACK: https://stackoverflow.com/a/13831816/554319
@@ -62,19 +68,19 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         colors = [color, to_rgba(color, 0)] if trail else [color]
         return colors
 
-    def draw_marker(self, position, marker_symbol, *, color=None, size=None):
+    def draw_marker(self, position, *, color, marker_symbol, size):
         """Draws a marker into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the point.
-        marker_symbol : str
-            The marker symbol to be used when drawing the point.
         color : str, optional
             A string representing the hexadecimal color for the point.
+        marker_symbol : str
+            The marker symbol to be used when drawing the point.
         size : float, optional
-            The size of the marker for the dot.
+            Desired size for the marker.
 
         Returns
         -------
@@ -85,13 +91,13 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         return self.ax.plot(
             position[0].to_value(u.km),
             position[1].to_value(u.km),
+            color=color,
             marker=marker_symbol,
             markersize=size,
-            color=color,
         )
 
 
-    def draw_position(self, position, *, color=None, size=None):
+    def draw_position(self, position, *, color, size):
         """Draws the position of a body in the scene.
 
         Parameters
@@ -109,10 +115,9 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An object representing the trace of the coordinates in the scene.
 
         """
-        return self.draw_marker(position, "o", color=color[0], size=size)
+        return self.draw_marker(position, color=color, marker_symbol="o", size=size)
 
-
-    def draw_impulse(self, position, *, color=None, size=None):
+    def draw_impulse(self, position, *, color, size):
         """Draws an impulse into the scene.
 
         Parameters
@@ -132,7 +137,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         """
         return self.draw_marker(position, marker_symbol="x", color=color, size=size)
 
-    def draw_sphere(self, position, *, color=None, size=None):
+    def draw_sphere(self, position, *, color, radius):
         """Draws an sphere into the scene.
 
         Parameters
@@ -141,7 +146,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             A list containing the x and y coordinates of the sphere location.
         color : str, optional
             A string representing the hexadecimal color for the sphere.
-        size : float, optional
+        radius : float, optional
             The radius of the sphere.
 
         Returns
@@ -153,9 +158,9 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         return self.ax.add_patch(
             mpl_patches.Circle(
                 (position[0].to_value(u.km), position[1].to_value(u.km)),
-                size.to_value(u.km),
-                lw=0,
+                radius.to_value(u.km),
                 color=color,
+                linewidth=0,
             )
         )
 
@@ -164,19 +169,19 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         for attractor in self.ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
-    def draw_coordinates(self, coordinates, *, color=None, label=None, size=None):
+    def draw_coordinates(self, coordinates, *, colors, dashed, label):
         """Draws desired coordinates into the scene.
 
         Parameters
         ----------
-        position : list[list[float, float], ...]
+        position : list[list[float, float, float]]
             A set of lists containing the x and y coordinates of the sphere location.
-        color : str, optional
-            A string representing the hexadecimal color for the coordinates.
-        label : str, optional
+        colors : list[str]
+            A list of string representing the hexadecimal color for the coordinates.
+        dashed : bool
+            Whether to use a dashed or solid line style for the coordiantes.
+        label : str
             Label of the orbit, default to the name of the body.
-        size : float, optional
-            The size of the marker for drawing the coordinates.
 
         Returns
         -------
@@ -184,25 +189,32 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An object representing the trace of the coordinates in the scene.
 
         """
+        # Select the desired linestyle for the line representing the coordinates
+        linestyle = "dashed" if dashed else "solid"
+        
+        # Unpack coordinates
+        x, y, z = (coords.to_value(u.km) for coords in coordinates)
+
         # Generate the colors if coordinates trail is required
-        if len(color) > 1:
+        if len(colors) > 1:
             segments = _segments_from_arrays(x, y)
             cmap = LinearSegmentedColormap.from_list(
-                f"{colors[0]}_to_alpha", color  # Useless name
+                f"{colors[0]}_to_alpha", colors  # Useless name
             )
             lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
             lc.set_array(np.linspace(1, 0, len(x)))
 
             self.ax.add_collection(lc)
-            lines = [lc]
+            lines_coordinates = [lc]
 
         else:
             # Plot the coordinates in the scene
-            trace_coordinates = self.ax.plot(
-                coordinates[0].to_value(u.km),
-                coordinates[1].to_value(u.km),
-                color=color[0],
+            lines_coordinates = self.ax.plot(
+                x,
+                y,
+                color=colors[0],
                 label=label,
+                linestyle=linestyle,
             )
 
         # Update the axes labels and impose a 1:1 aspect ratio between them
@@ -210,7 +222,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         self.ax.set_ylabel("$y$ (km)")
         self.ax.set_aspect(1)
 
-        return trace_coordinates
+        return lines_coordinates
 
     def show(self):
         """Displays the scene."""
