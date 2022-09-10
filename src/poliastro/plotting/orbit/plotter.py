@@ -7,10 +7,13 @@ import astropy.units as u
 from astropy.coordinates import CartesianRepresentation
 import numpy as np
 
+from poliastro.ephem import Ephem
 from poliastro.frames import Planes
 from poliastro.plotting.orbit.backends import SUPPORTED_ORBIT_PLOTTER_BACKENDS
 from poliastro.plotting.util import BODY_COLORS, generate_label
-from poliastro.util import norm
+from poliastro.twobody.mean_elements import get_mean_elements
+from poliastro.twobody.sampling import EpochBounds
+from poliastro.util import norm, time_range
 
 
 class Trajectory(
@@ -117,7 +120,7 @@ class OrbitPlotter:
             )
 
     def set_orbit_frame(self, orbit):
-        """Sets perifocal frame based on an orbit.
+        """Set the perifocal frame based on an orbit.
 
         Parameters
         ----------
@@ -139,6 +142,44 @@ class OrbitPlotter:
 
             if self._trajectories:
                 self._redraw()
+
+    def set_body_frame(self, body, epoch=None):
+        """Sets perifocal frame based on the orbit of a body at a particular epoch if given.
+
+        Parameters
+        ----------
+        body : poliastro.bodies.SolarSystemPlanet
+            Body.
+        epoch : astropy.time.Time, optional
+            Epoch of current position.
+
+        """
+        from warnings import warn
+
+        from astropy import time
+
+        from poliastro.bodies import Sun
+        from poliastro.twobody import Orbit
+
+        from poliastro.warnings import TimeScaleWarning
+
+        if not epoch:
+            epoch = time.Time.now().tdb
+        elif epoch.scale != "tdb":
+            epoch = epoch.tdb
+            warn(
+                "Input time was converted to scale='tdb' with value "
+                f"{epoch.tdb.value}. Use Time(..., scale='tdb') instead.",
+                TimeScaleWarning,
+                stacklevel=2,
+            )
+
+        with warnings.catch_warnings():
+            ephem = Ephem.from_body(body, epoch, attractor=Sun, plane=self.plane)  # type: ignore
+            orbit = Orbit.from_ephem(Sun, ephem, epoch).change_plane(self.plane)  # type: ignore
+
+        self.set_orbit_frame(orbit)
+
 
     def _project(self, vec):
         """Project the vector into the frame of the orbit plotter.
@@ -254,15 +295,17 @@ class OrbitPlotter:
         if self.backend.is_2D:
             rr = coordinates.xyz.transpose()
             coordinates = self._project(rr)
-            position = np.asarray(self._project([position])).flatten() * u.km
+            if position is not None:
+                position = np.asarray(self._project([position.to_value(u.km)])).flatten() * u.km
 
         # Add the coordinates and the position to the scene
         trace_coordinates = self.backend.draw_coordinates(
                 coordinates, colors=colors, dashed=dashed, label=label
         )
-        trace_position = self.backend.draw_position(
-                position, color=colors[0], size=None
-        )
+        if position is not None:
+            trace_position = self.backend.draw_position(
+                    position, color=colors[0], size=None
+            )
 
         return trace_coordinates, trace_position
 
@@ -328,21 +371,22 @@ class OrbitPlotter:
             Fade the orbit trail, default to False.
 
         """
+        # Assign attractor if required
         self.set_attractor(body.parent)
 
-        if color is None:
-            color = BODY_COLORS.get(body.name)
-
-        # Get approximate, mean value for the period
+        # Get approximate, mean value for the period and generate ephemerides
         period = get_mean_elements(body, epoch).period
-
-        label = generate_label(epoch, label or str(body))
         epochs = time_range(
             epoch, num_values=self._num_points, end=epoch + period, scale="tdb"
         )
         ephem = Ephem.from_body(
             body, epochs, attractor=body.parent, plane=self.plane
         )
+
+        # Get body color and label
+        if color is None:
+            color = BODY_COLORS.get(body.name)
+        label = generate_label(epoch, label or str(body))
 
         return self.plot_ephem(
             ephem, epoch, label=label, color=color, trail=trail
@@ -385,13 +429,13 @@ class OrbitPlotter:
         coordinates = ephem.sample()
 
         # Get the location in the epehemerides associated with the desired epoch
-        r0 = ephem.rv(epoch)[0] if epoch else None
+        position = ephem.rv(epoch)[0] if epoch is not None else None
 
         # Get the list of colors for previous coordinate points
         colors = self.backend._get_colors(color, trail)
 
         return self._add_trajectory(
-            coordinates, r0, label=str(label), colors=colors, dashed=False
+            coordinates, position, label=str(label), colors=colors, dashed=False
         )
 
     def plot_maneuver(
