@@ -132,51 +132,31 @@ class Body(
 class SolarSystemPlanet(Body):
     def plot(
         self,
+        backend_name="matplotlib2D",
         epoch=None,
         label=None,
-        use_3d=False,
-        interactive=False,
         plane=Planes.EARTH_ECLIPTIC,
     ):
         """Plots the body orbit.
 
         Parameters
         ----------
+        backend_name : str
+            Name of the plotting backend to be used.
         epoch : astropy.time.Time, optional
             Epoch of current position.
         label : str, optional
             Label for the orbit, defaults to empty.
-        use_3d : bool, optional
-            Produce a 3D plot, default to False.
-        interactive : bool, optional
-            Produce an interactive (rather than static) image of the orbit, default to False.
-            This option requires Plotly properly installed and configured for your environment.
         plane : ~poliastro.frames.Planes
             Reference plane of the coordinates.
 
         """
-        if not interactive and use_3d:
-            raise ValueError(
-                "The static plotter does not support 3D, use `interactive=True`"
-            )
-        elif not interactive:
-            from poliastro.plotting.static import StaticOrbitPlotter
-
-            return StaticOrbitPlotter(plane=plane).plot_body_orbit(
-                self, epoch, label=label
-            )
-        elif use_3d:
-            from poliastro.plotting.interactive import OrbitPlotter3D
-
-            return OrbitPlotter3D(plane=plane).plot_body_orbit(
-                self, epoch, label=label
-            )
-        else:
-            from poliastro.plotting.interactive import OrbitPlotter2D
-
-            return OrbitPlotter2D(plane=plane).plot_body_orbit(
-                self, epoch, label=label
-            )
+        # HACK: import here the OrbitPlotter to avoid a circular depedency
+        # between bodies.py and misc.py
+        from poliastro.plotting.orbit.plotter import OrbitPlotter
+        return OrbitPlotter(backend_name=backend_name, plane=plane).plot_body_orbit(
+            self, epoch=epoch, label=label
+        )
 
 
 Sun = Body(

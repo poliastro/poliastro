@@ -18,7 +18,7 @@ from poliastro.util import norm, time_range
 
 class Trajectory(
     namedtuple(
-        "Trajectory", ["coordinates", "position", "label", "colors", "dashed"]
+        "Trajectory", ["coordinates", "position", "colors", "dashed", "label"]
     )
 ):
     """A class for collecting all information of a body within a plotter.
@@ -39,7 +39,7 @@ class OrbitPlotter:
         self,
         scene=None,
         backend_name="matplotlib2D",
-        backend_kargs=None,
+        use_dark_theme=False,
         num_points=150,
         *,
         plane=None,
@@ -67,7 +67,7 @@ class OrbitPlotter:
         # Verify selected backend is supported
         try:
             self._backend = SUPPORTED_ORBIT_PLOTTER_BACKENDS[backend_name](
-                scene,
+                scene, use_dark_theme=use_dark_theme,
             )
         except KeyError:
             raise ValueError(
@@ -235,7 +235,7 @@ class OrbitPlotter:
 
     def _redraw(self):
         for trajectory in self._trajectories:
-            self._plot_coordinates_and_position(trajectory)
+            self._add_trajectory(trajectory)
 
     def _plot_position(self, position, label, colors):
         radius = min(
@@ -244,24 +244,10 @@ class OrbitPlotter:
         )  # Arbitrary thresholds
         self.backend.draw_point(radius, colors[0], label, center=position)
 
-    def _plot_coordinates_and_position(self, trajectory):
-        coordinates, position, label, colors, dashed = trajectory
-
-        trace_coordinates = self._plot_coordinates(
-            coordinates, label, colors, dashed
-        )
-
-        if position is not None:
-            trace_position = self._plot_position(position, label, colors)
-        else:
-            trace_position = None
-
-        return trace_coordinates, trace_position
-
-    def _add_trajectory(
-        self, coordinates, position=None, *, colors=None, dashed=False, label=None,
+    def _create_trajectory(
+        self, coordinates, position, *, colors=None, dashed=False, label=None
     ):
-        """Add a new trajectory to the scene.
+        """Create a new ``Trajectory`` instance.
 
         Parameters
         ----------
@@ -278,18 +264,36 @@ class OrbitPlotter:
 
         Returns
         -------
+        Trajectory
+            An object for modeling trajectories.
+
+        """
+        # Instantiate the trajectory and append it to the internal list
+        trajectory = Trajectory(coordinates, position, colors, dashed, label)
+        self._trajectories.append(trajectory)
+        return trajectory
+
+    def _add_trajectory(self, trajectory):
+        """Add a new trajectory to the scene.
+
+        Parameters
+        ----------
+        trajectory : Trajectory
+            An object for modeling trajectories.
+
+        Returns
+        -------
         trace_coordinates : object
             An object representing the trace of the coordinates in the scene.
         trace_position : object
             An object representing the trace of the position in the scene.
 
         """
-        # Instantiate the trajectory and append it to the internal list
-        trajectory = Trajectory(coordinates, position, label, colors, dashed)
-        self._trajectories.append(trajectory)
-
         # Update the attractor appearance (if required) based on new scene trajectory
         self._plot_attractor()
+
+        # Unpack trajectory data
+        coordinates, position, colors, dashed, label = trajectory
 
         # Project the coordinates into desired frame for 2D backends
         if self.backend.is_2D:
@@ -304,10 +308,10 @@ class OrbitPlotter:
         )
         if position is not None:
             trace_position = self.backend.draw_position(
-                    position, color=colors[0], size=None
+                    position, color=colors[0], label=None, size=None
             )
 
-        return trace_coordinates, trace_position
+        return (trace_coordinates, trace_position) if position is not None else (trace_coordinates, None)
 
     def plot(self, orbit, *, color=None, label=None, trail=False):
         """Plots state and osculating orbit in their plane.
@@ -334,16 +338,15 @@ class OrbitPlotter:
         # Represent the orbit w.r.t. the derired plane
         orbit = orbit.change_plane(self.plane)
 
-        # Get orbit colors and label
-        colors = self.backend._get_colors(color, trail)
+        # Get orbit label
         label = generate_label(orbit.epoch, label)
 
         # Compute the coorindates and body position alongs its orbit
         coordinates = orbit.sample(self._num_points)
         position = orbit.r
 
-        return self._add_trajectory(
-            coordinates, position, label=label, colors=colors, dashed=True
+        return self.plot_coordinates(
+            coordinates, position=position, label=label, color=color, trail=trail
         )
 
     def plot_body_orbit(
@@ -371,6 +374,10 @@ class OrbitPlotter:
             Fade the orbit trail, default to False.
 
         """
+        # Assign frame if required
+        if self._frame is None:
+            self.set_body_frame(body, epoch)
+
         # Assign attractor if required
         self.set_attractor(body.parent)
 
@@ -411,6 +418,12 @@ class OrbitPlotter:
             Fade the orbit trail, default to False.
 
         """
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
         if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
@@ -431,11 +444,8 @@ class OrbitPlotter:
         # Get the location in the epehemerides associated with the desired epoch
         position = ephem.rv(epoch)[0] if epoch is not None else None
 
-        # Get the list of colors for previous coordinate points
-        colors = self.backend._get_colors(color, trail)
-
-        return self._add_trajectory(
-            coordinates, position, label=str(label), colors=colors, dashed=False
+        return self.plot_coordinates(
+            coordinates, position=position, label=str(label), color=color, trail=trail,
         )
 
     def plot_maneuver(
@@ -471,7 +481,14 @@ class OrbitPlotter:
             # For single-impulse maneuver only draw the impulse marker
             impulse_label = f"Impulse 1 - {label}"
             impulse_lines = (
-                [self._draw_impulse(color, impulse_label, final_phase.r)],
+                [
+                    self.backend.draw_impulse(
+                        position=final_phase.r,
+                        color=color,
+                        label=impulse_label, 
+                        size=None,
+                    )
+                ],
             )
             return [(impulse_label, impulse_lines)]
         else:
@@ -484,7 +501,14 @@ class OrbitPlotter:
                 # Plot the impulse marker and collect its label and lines
                 impulse_label = f"Impulse {ith_impulse + 1} - {label}"
                 impulse_lines = (
-                    [self._draw_impulse(color, impulse_label, orbit_phase.r)],
+                    [
+                        self.backend.draw_impulse(
+                            position=orbit_phase.r,
+                            color=color,
+                            label=impulse_label,
+                            size=None,
+                        )
+                    ],
                 )
                 lines_list.append((impulse_label, impulse_lines))
 
@@ -507,20 +531,27 @@ class OrbitPlotter:
                 ).sample()
 
                 # Plot the phase trajectory and collect its label and lines
-                trajectory_lines = self._plot_trajectory(
-                    phase_coordinates, label=label, color=color, trail=trail
+                trajectory_lines = self.plot_coordinates(
+                    phase_coordinates, position=None, color=color, label=label, trail=trail
                 )
                 lines_list.append((label, trajectory_lines))
 
             # Finally, draw the impulse at the very beginning of the final phase
             impulse_label = f"Impulse {ith_impulse + 2} - {label}"
             impulse_lines = (
-                [self._draw_impulse(color, impulse_label, final_phase.r)],
+                [
+                    self.backend.draw_impulse(
+                        position=final_phase.r,
+                        color=color,
+                        label=impulse_label,
+                        size=None,
+                    )
+                ],
             )
             lines_list.append((impulse_label, impulse_lines))
 
-    def plot_trajectory(
-        self, coordinates, *, label=None, color=None, trail=False
+    def plot_coordinates(
+        self, coordinates, *, position=None, label=None, color=None, trail=False
     ):
         """Plots a precomputed trajectory.
 
@@ -539,7 +570,13 @@ class OrbitPlotter:
         ------
         ValueError
             An attractor must be set first.
+
         """
+        # Check if the orbit plotter frame has been set
+        if not self._frame:
+            self.set_orbit_frame(orbit)
+
+        # Check if the attractor has been set
         if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
@@ -548,11 +585,15 @@ class OrbitPlotter:
 
         # Get orbit colors and label
         colors = self.backend._get_colors(color, trail)
+
+        # Force Cartesian representation for coordinates
         coordinates = coordinates.represent_as(CartesianRepresentation)
 
-        return self._add_trajectory(
-            coordinates, position=None, label=str(label), colors=colors, dashed=trail
+        # Generate the trajectory instance
+        trajectory = self._create_trajectory(
+            coordinates, position, colors=colors, dashed=trail, label=label, 
         )
+        return self._add_trajectory(trajectory)
 
     def show(self):
         """Render the plot."""

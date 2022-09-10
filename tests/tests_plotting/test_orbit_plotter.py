@@ -15,22 +15,27 @@ from poliastro.frames import Planes
 from poliastro.maneuver import Maneuver
 from poliastro.twobody import Orbit
 from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import (
+    SUPPORTED_ORBIT_PLOTTER_BACKENDS_2D,    
+    SUPPORTED_ORBIT_PLOTTER_BACKENDS_3D,    
+    SUPPORTED_ORBIT_PLOTTER_BACKENDS
+)
 from poliastro.util import time_range
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
-def test_get_figure_has_expected_properties(plotter_class):
-    frame = plotter_class()
-    figure = frame.show()
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+def test_get_figure_has_expected_properties(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
+    scene = plotter.show()
 
-    assert figure.data == ()
-    assert figure.layout.autosize is True
-    assert "xaxis" in figure.layout
-    assert "yaxis" in figure.layout
+    assert scene.data == ()
+    assert scene.layout.autosize is True
+    assert "xaxis" in scene.layout
+    assert "yaxis" in scene.layout
 
 
 def test_get_3d_figure_has_expected_properties():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter()
     figure = frame.show()
 
     assert figure.data == ()
@@ -41,21 +46,19 @@ def test_get_3d_figure_has_expected_properties():
     assert "aspectmode" in figure.layout.scene
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
-def test_set_different_attractor_raises_error(plotter_class):
-    body1 = Earth
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+def test_set_different_attractor_raises_error(backend_name):
+    body1, body2 = Earth, Mars
 
-    body2 = Mars
-
-    frame = plotter_class()
-    frame.set_attractor(body1)
+    plotter = OrbitPlotter(backend_name=backend_name)
+    plotter.set_attractor(body1)
 
     with pytest.raises(NotImplementedError) as excinfo:
-        frame.set_attractor(body2)
+        plotter.set_attractor(body2)
     assert "Attractor has already been set to Earth" in excinfo.exconly()
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
+@pytest.mark.parametrize("plotter_class", [OrbitPlotter, OrbitPlotter])
 def test_plot_sets_attractor(plotter_class):
     frame = plotter_class()
     assert frame._attractor is None
@@ -64,7 +67,7 @@ def test_plot_sets_attractor(plotter_class):
     assert frame._attractor == iss.attractor
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
+@pytest.mark.parametrize("plotter_class", [OrbitPlotter, OrbitPlotter])
 def test_plot_appends_data(plotter_class):
     frame = plotter_class()
     assert len(frame.trajectories) == 0
@@ -73,13 +76,13 @@ def test_plot_appends_data(plotter_class):
     assert len(frame.trajectories) == 1
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter2D, OrbitPlotter3D])
-def test_plot_trajectory_without_attractor_raises_error(plotter_class):
-    frame = plotter_class()
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+def test_plot_coordinates_without_attractor_raises_error(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
 
     with pytest.raises(ValueError) as excinfo:
-        frame._frame = 1  # Set it to something not None to skip frame check
-        frame.plot_trajectory({})
+        plotter._frame = 1  # Set it to something not None to skip frame check
+        plotter.plot_coordinates({})
     assert (
         "An attractor must be set up first, please use "
         "set_attractor(Major_Body) or plot(orbit)" in excinfo.exconly()
@@ -87,11 +90,11 @@ def test_plot_trajectory_without_attractor_raises_error(plotter_class):
 
 
 def test_plot_2d_trajectory_without_frame_raises_error():
-    frame = OrbitPlotter2D()
+    frame = OrbitPlotter()
 
     with pytest.raises(ValueError) as excinfo:
         frame.set_attractor(Sun)
-        frame.plot_trajectory({})
+        frame.plot_coordinates({})
     assert (
         "A frame must be set up first, please use "
         "set_orbit_frame(orbit) or plot(orbit)" in excinfo.exconly()
@@ -101,7 +104,7 @@ def test_plot_2d_trajectory_without_frame_raises_error():
 def test_ephem_without_frame_raises_error():
     epochs = time.Time("2020-04-29 10:43", scale="tdb")
     earth = Ephem.from_body(Earth, epochs)
-    plotter = OrbitPlotter2D()
+    plotter = OrbitPlotter()
 
     with pytest.raises(ValueError) as excinfo:
         plotter.set_attractor(Sun)
@@ -113,32 +116,32 @@ def test_ephem_without_frame_raises_error():
 
 
 def test_plot_3d_trajectory_plots_a_trajectory():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter()
     assert len(frame.trajectories) == 0
 
     trajectory = churi.sample()
     frame.set_attractor(Sun)
-    frame.plot_trajectory(trajectory)
+    frame.plot_coordinates(trajectory)
 
     assert len(frame.trajectories) == 1
     assert frame._attractor == Sun
 
 
 def test_plot_2d_trajectory_plots_a_trajectory():
-    frame = OrbitPlotter2D()
+    frame = OrbitPlotter()
     assert len(frame.trajectories) == 0
 
     trajectory = churi.sample()
     frame.set_attractor(Sun)
     frame.set_orbit_frame(churi)
-    frame.plot_trajectory(trajectory)
+    frame.plot_coordinates(trajectory)
 
     assert len(frame.trajectories) == 1
     assert frame._attractor == Sun
 
 
 def test_set_view():
-    frame = OrbitPlotter3D()
+    frame = OrbitPlotter()
     frame.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
     figure = frame.show()
 
@@ -149,7 +152,7 @@ def test_set_view():
 
 
 def test_dark_theme():
-    frame = OrbitPlotter3D(dark=True)
+    frame = OrbitPlotter(use_dark_theme=True)
     assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
 
 
@@ -197,26 +200,26 @@ def test_color():
         assert element.get_c() == c
 
 
-def test_plot_trajectory_sets_label():
+def test_plot_coordinates_sets_label():
     expected_label = "67P"
 
     op = OrbitPlotter(backend_name="matplotlib2D")
     trajectory = churi.sample()
     op.plot_body_orbit(Mars, J2000_TDB, label="Mars")
 
-    op.plot_trajectory(trajectory, label=expected_label)
+    op.plot_coordinates(trajectory, label=expected_label)
 
     legend = plt.gca().get_legend()
     assert legend.get_texts()[1].get_text() == expected_label
 
 
 @pytest.mark.parametrize(
-    "dark, expected_color",
+    "use_dark_theme, expected_color",
     [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))],
 )
-def test_dark_mode_plots_dark_plot(dark, expected_color):
-    op = OrbitPlotter(dark=dark)
-    assert op._ax.get_facecolor() == expected_color
+def test_dark_mode_plots_dark_plot(use_dark_theme, expected_color):
+    op = OrbitPlotter(backend_name="matplotlib2D", use_dark_theme=use_dark_theme)
+    assert op.backend.ax.get_facecolor() == expected_color
 
 
 def test_redraw_makes_attractor_none():
@@ -241,7 +244,7 @@ def test_redraw_keeps_trajectories():
     op = OrbitPlotter(backend_name="matplotlib2D")
     trajectory = churi.sample()
     op.plot_body_orbit(Mars, J2000_TDB, label="Mars")
-    op.plot_trajectory(trajectory, label="67P")
+    op.plot_coordinates(trajectory, label="67P")
 
     assert len(op.trajectories) == 2
 
@@ -289,7 +292,7 @@ def test_basic_trajectory_plotting():
     plotter = OrbitPlotter(scene=ax)
     plotter.set_attractor(Earth)
     plotter.set_orbit_frame(iss)
-    plotter.plot_trajectory(iss.sample())
+    plotter.plot_coordinates(iss.sample())
 
     return fig
 
@@ -299,7 +302,7 @@ def test_basic_orbit_and_trajectory_plotting():
     fig, ax = plt.subplots()
     plotter = OrbitPlotter(scene=ax)
     plotter.plot(iss)
-    plotter.plot_trajectory(molniya.sample(), label="Molniya")
+    plotter.plot_coordinates(molniya.sample(), label="Molniya")
 
     return fig
 
@@ -325,7 +328,7 @@ def test_plot_different_planes():
 
 @pytest.mark.mpl_image_compare
 def test_body_plotting(earth_perihelion):
-    Earth.plot(earth_perihelion)
+    Earth.plot(epoch=earth_perihelion)
 
     return plt.gcf()
 
@@ -395,7 +398,7 @@ def test_body_frame_raises_warning_if_time_is_not_tdb_with_proper_time(
     sys.maxsize < 2**32, reason="not supported for 32 bit systems"
 )
 @pytest.mark.mpl_image_compare
-def test_plot_maneuver():
+def test_plot_maneuver_using_matplotlib2D_backend():
     # Data from Vallado, example 6.1
     alt_i = 191.34411 * u.km
     alt_f = 35781.34857 * u.km

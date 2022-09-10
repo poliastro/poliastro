@@ -20,18 +20,25 @@ def _segments_from_arrays(x, y):
 class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
     """An orbit plotter backend class based on Matplotlib."""
 
-    def __init__(self, ax=None):
+    def __init__(self, ax=None, use_dark_theme=None):
         """Initializes a backend instance.
 
         Parameters
         ----------
         scene : object
             An instance representing the canvas or scene.
+        use_dark_theme : bool, optional
+            If ``True``, uses dark theme. If ``False``, uses light theme.
+            Default to ``False``.
 
         """
         if not ax:
-            _, ax = plt.subplots(figsize=(6, 6))
-        super().__init__(ax, name="OrbitPlotterBackendMatplotlib2D")
+            if use_dark_theme is True:
+                with plt.style.context("dark_background"):                                           
+                    _, ax = plt.subplots(figsize=(6, 6))                                       
+            else:                                                                                    
+                _, ax = plt.subplots(figsize=(6, 6))
+        super().__init__(ax, name=self.__class__.__name__)
 
     @property
     def ax(self):
@@ -68,7 +75,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         colors = [color, to_rgba(color, 0)] if trail else [color]
         return colors
 
-    def draw_marker(self, position, *, color, marker_symbol, size):
+    def draw_marker(self, position, *, color, marker_symbol, label, size):
         """Draws a marker into the scene.
 
         Parameters
@@ -79,6 +86,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             A string representing the hexadecimal color for the point.
         marker_symbol : str
             The marker symbol to be used when drawing the point.
+        label : str
+            A string containing tha message for the label.
         size : float, optional
             Desired size for the marker.
 
@@ -94,10 +103,11 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             color=color,
             marker=marker_symbol,
             markersize=size,
+            label=label,
         )
 
 
-    def draw_position(self, position, *, color, size):
+    def draw_position(self, position, *, color, label, size):
         """Draws the position of a body in the scene.
 
         Parameters
@@ -108,6 +118,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             A string representing the hexadecimal color for the marker.
         size : float, optional
             The size of the marker.
+        label : str
+            A string containing tha message for the label.
 
         Returns
         -------
@@ -115,9 +127,9 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An object representing the trace of the coordinates in the scene.
 
         """
-        return self.draw_marker(position, color=color, marker_symbol="o", size=size)
+        return self.draw_marker(position, color=color, marker_symbol="o", label=None, size=size)
 
-    def draw_impulse(self, position, *, color, size):
+    def draw_impulse(self, position, *, color, label, size):
         """Draws an impulse into the scene.
 
         Parameters
@@ -126,6 +138,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             A list containing the x and y coordinates of the impulse location.
         color : str, optional
             A string representing the hexadecimal color for the impulse marker.
+        label : str
+            A string containing tha message for the label.
         size : float, optional
             The size of the marker for the impulse.
 
@@ -135,7 +149,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An object representing the trace of the impulse in the scene.
 
         """
-        return self.draw_marker(position, marker_symbol="x", color=color, size=size)
+        return self.draw_marker(position, color=color, label=label, marker_symbol="x", size=size)
 
     def draw_sphere(self, position, *, color, radius):
         """Draws an sphere into the scene.
