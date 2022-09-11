@@ -122,7 +122,7 @@ profile = "black"
 src_paths = ["docs", "src", "tests"]
 
 [tool.mypy]
-python_version = 3.8
+python_version = 3.10  # See https://github.com/poliastro/poliastro/pull/1580
 check_untyped_defs = true
 strict_optional = false
 ignore_missing_imports = true
