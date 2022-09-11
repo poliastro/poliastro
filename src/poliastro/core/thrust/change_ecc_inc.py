@@ -85,7 +85,7 @@ def change_ecc_inc(k, a, ecc_0, ecc_f, inc_0, inc_f, argp, r, v, f):
             np.cos(nu)
         )  # The sign of ß reverses at minor axis crossings
 
-        w_ = cross(r_, v_) / norm(cross(r_, v_))
+        w_ = (cross(r_, v_) / norm(cross(r_, v_))) * np.sign(inc_f - inc_0)
         accel_v = f * (np.cos(beta_) * thrust_unit + np.sin(beta_) * w_)
         return accel_v
 
