@@ -1136,16 +1136,13 @@ def test_to_ephem_samples_correct_epochs_and_coordinates():
         Earth,
         r=[6045.0, 3490.0, -2500.0] * u.km,
         v=[-3.457, 6.618, 2.533] * u.km / u.s,
-        epoch=epoch
+        epoch=epoch,
     )
 
     ephem = orbit.to_ephem()
     assert ephem.epochs[0].value == orbit.epoch
 
-    ephem_initial_coordinates = [
-        coord[0]
-        for coord in ephem.sample(epoch).xyz
-    ]
+    ephem_initial_coordinates = [coord[0] for coord in ephem.sample(epoch).xyz]
 
     assert_quantity_allclose(ephem_initial_coordinates, orbit.r)
 
