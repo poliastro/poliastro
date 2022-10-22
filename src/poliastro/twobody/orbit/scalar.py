@@ -619,36 +619,26 @@ class Orbit(OrbitCreationMixin):
             res = orbit_new
         return res
 
-    def plot(self, label=None, use_3d=False, interactive=False):
+    def plot(self, backend_name="matplotlib2D", label=None):
         """Plots the orbit.
 
         Parameters
         ----------
+        backend_name : str
+            Name of the plotting backend to be used.
         label : str, optional
             Label for the orbit, defaults to empty.
-        use_3d : bool, optional
-            Produce a 3D plot, default to False.
-        interactive : bool, optional
-            Produce an interactive (rather than static) image of the orbit, default to False.
-            This option requires Plotly properly installed and configured for your environment.
+
+        Returns
+        -------
+        ~ poliastro.plotting.orbit.OrbitPlotter
+            An object for plotting orbits.
 
         """
-        if not interactive and use_3d:
-            raise ValueError(
-                "The static plotter does not support 3D, use `interactive=True`"
-            )
-        elif not interactive:
-            from poliastro.plotting.static import StaticOrbitPlotter
+        # HACK: avoid circular dependency
+        from poliastro.plotting.orbit.plotter import OrbitPlotter
 
-            return StaticOrbitPlotter().plot(self, label=label)
-        elif use_3d:
-            from poliastro.plotting.interactive import OrbitPlotter3D
-
-            return OrbitPlotter3D().plot(self, label=label)
-        else:
-            from poliastro.plotting.interactive import OrbitPlotter2D
-
-            return OrbitPlotter2D().plot(self, label=label)
+        return OrbitPlotter(backend_name=backend_name).plot(self, label=label)
 
     def elevation(self, lat, theta, h):
         """
