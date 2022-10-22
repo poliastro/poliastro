@@ -1,5 +1,4 @@
 import warnings
-from typing import Union
 
 import erfa
 from astropy.time import Time
@@ -18,7 +17,9 @@ from poliastro.frames import Planes
 from poliastro.plotting import OrbitPlotter
 
 
-def plot_solar_system(backend_name="matplotlib2D", epoch=None, labels=None, outer=True):
+def plot_solar_system(
+    backend_name="matplotlib2D", epoch=None, labels=None, outer=True
+):
     """
     Plots the whole solar system in one single call.
 
@@ -44,7 +45,7 @@ def plot_solar_system(backend_name="matplotlib2D", epoch=None, labels=None, oute
     # Compute current epoch if none is provided
     if epoch is None:
         epoch = Time.now().tdb
-    
+
     # Get a list of all bodies to be plotted in the scene
     bodies_list = [Mercury, Venus, Earth, Mars]
     if outer:

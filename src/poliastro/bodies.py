@@ -154,9 +154,10 @@ class SolarSystemPlanet(Body):
         # HACK: import here the OrbitPlotter to avoid a circular depedency
         # between bodies.py and misc.py
         from poliastro.plotting.orbit.plotter import OrbitPlotter
-        return OrbitPlotter(backend_name=backend_name, plane=plane).plot_body_orbit(
-            self, epoch=epoch, label=label
-        )
+
+        return OrbitPlotter(
+            backend_name=backend_name, plane=plane
+        ).plot_body_orbit(self, epoch=epoch, label=label)
 
 
 Sun = Body(

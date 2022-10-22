@@ -1,11 +1,12 @@
 """A module containing different orbit related plotters."""
 
-from collections import namedtuple
 import warnings
+from collections import namedtuple
+from typing import List
 
 import astropy.units as u
-from astropy.coordinates import CartesianRepresentation
 import numpy as np
+from astropy.coordinates import CartesianRepresentation
 
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
@@ -67,11 +68,12 @@ class OrbitPlotter:
         # Verify selected backend is supported
         try:
             self._backend = SUPPORTED_ORBIT_PLOTTER_BACKENDS[backend_name](
-                scene, use_dark_theme=use_dark_theme,
+                scene,
+                use_dark_theme=use_dark_theme,
             )
         except KeyError:
             raise ValueError(
-                f"Backend {desired_backend_name} is not supported. Available backends are {SUPPORTED_PLOTTING_BACKENDS.keys()}"
+                f"Backend {backend_name} is not supported. Available backends are {SUPPORTED_ORBIT_PLOTTER_BACKENDS.keys()}"
             )
 
         # Initialize the rest of the attributes
@@ -135,7 +137,9 @@ class OrbitPlotter:
 
             if not np.allclose([norm(v) for v in (p_vec, q_vec, w_vec)], 1):
                 raise ValueError("Vectors must be unit.")
-            elif not np.allclose([p_vec @ q_vec, q_vec @ w_vec, w_vec @ p_vec], 0):
+            elif not np.allclose(
+                [p_vec @ q_vec, q_vec @ w_vec, w_vec @ p_vec], 0
+            ):
                 raise ValueError("Vectors must be mutually orthogonal.")
             else:
                 self._frame = p_vec, q_vec, w_vec
@@ -160,7 +164,6 @@ class OrbitPlotter:
 
         from poliastro.bodies import Sun
         from poliastro.twobody import Orbit
-
         from poliastro.warnings import TimeScaleWarning
 
         if not epoch:
@@ -179,7 +182,6 @@ class OrbitPlotter:
             orbit = Orbit.from_ephem(Sun, ephem, epoch).change_plane(self.plane)  # type: ignore
 
         self.set_orbit_frame(orbit)
-
 
     def _project(self, vec):
         """Project the vector into the frame of the orbit plotter.
@@ -300,18 +302,27 @@ class OrbitPlotter:
             rr = coordinates.xyz.transpose()
             coordinates = self._project(rr)
             if position is not None:
-                position = np.asarray(self._project([position.to_value(u.km)])).flatten() * u.km
+                position = (
+                    np.asarray(
+                        self._project([position.to_value(u.km)])
+                    ).flatten()
+                    * u.km
+                )
 
         # Add the coordinates and the position to the scene
         trace_coordinates = self.backend.draw_coordinates(
-                coordinates, colors=colors, dashed=dashed, label=label
+            coordinates, colors=colors, dashed=dashed, label=label
         )
         if position is not None:
             trace_position = self.backend.draw_position(
-                    position, color=colors[0], label=None, size=None
+                position, color=colors[0], label=None, size=None
             )
 
-        return (trace_coordinates, trace_position) if position is not None else (trace_coordinates, None)
+        return (
+            (trace_coordinates, trace_position)
+            if position is not None
+            else (trace_coordinates, None)
+        )
 
     def plot(self, orbit, *, color=None, label=None, trail=False):
         """Plots state and osculating orbit in their plane.
@@ -346,7 +357,11 @@ class OrbitPlotter:
         position = orbit.r
 
         return self.plot_coordinates(
-            coordinates, position=position, label=label, color=color, trail=trail
+            coordinates,
+            position=position,
+            label=label,
+            color=color,
+            trail=trail,
         )
 
     def plot_body_orbit(
@@ -445,7 +460,11 @@ class OrbitPlotter:
         position = ephem.rv(epoch)[0] if epoch is not None else None
 
         return self.plot_coordinates(
-            coordinates, position=position, label=str(label), color=color, trail=trail,
+            coordinates,
+            position=position,
+            label=str(label),
+            color=color,
+            trail=trail,
         )
 
     def plot_maneuver(
@@ -485,7 +504,7 @@ class OrbitPlotter:
                     self.backend.draw_impulse(
                         position=final_phase.r,
                         color=color,
-                        label=impulse_label, 
+                        label=impulse_label,
                         size=None,
                     )
                 ],
@@ -532,7 +551,11 @@ class OrbitPlotter:
 
                 # Plot the phase trajectory and collect its label and lines
                 trajectory_lines = self.plot_coordinates(
-                    phase_coordinates, position=None, color=color, label=label, trail=trail
+                    phase_coordinates,
+                    position=None,
+                    color=color,
+                    label=label,
+                    trail=trail,
                 )
                 lines_list.append((label, trajectory_lines))
 
@@ -551,7 +574,13 @@ class OrbitPlotter:
             lines_list.append((impulse_label, impulse_lines))
 
     def plot_coordinates(
-        self, coordinates, *, position=None, label=None, color=None, trail=False
+        self,
+        coordinates,
+        *,
+        position=None,
+        label=None,
+        color=None,
+        trail=False,
     ):
         """Plots a precomputed trajectory.
 
@@ -572,12 +601,8 @@ class OrbitPlotter:
             An attractor must be set first.
 
         """
-        # Check if the orbit plotter frame has been set
-        if not self._frame:
-            self.set_orbit_frame(orbit)
-
-        # Check if the attractor has been set
-        if self._attractor is None:
+        # Check if the attractor and plotter frame have been set
+        if self._attractor is None or not self._frame:
             raise ValueError(
                 "An attractor must be set up first, please use "
                 "set_attractor(Major_Body) or plot(orbit)"
@@ -591,7 +616,11 @@ class OrbitPlotter:
 
         # Generate the trajectory instance
         trajectory = self._create_trajectory(
-            coordinates, position, colors=colors, dashed=trail, label=label, 
+            coordinates,
+            position,
+            colors=colors,
+            dashed=trail,
+            label=label,
         )
         return self._add_trajectory(trajectory)
 

@@ -6,20 +6,15 @@ from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from astropy.time import Time
 from matplotlib import pyplot as plt
 
-
 from poliastro.bodies import Earth, Jupiter, Mars, Sun
 from poliastro.constants import J2000_TDB
 from poliastro.ephem import Ephem
 from poliastro.examples import churi, iss, molniya
 from poliastro.frames import Planes
 from poliastro.maneuver import Maneuver
-from poliastro.twobody import Orbit
 from poliastro.plotting import OrbitPlotter
-from poliastro.plotting.orbit.backends import (
-    SUPPORTED_ORBIT_PLOTTER_BACKENDS_2D,    
-    SUPPORTED_ORBIT_PLOTTER_BACKENDS_3D,    
-    SUPPORTED_ORBIT_PLOTTER_BACKENDS
-)
+from poliastro.plotting.orbit.backends import SUPPORTED_ORBIT_PLOTTER_BACKENDS
+from poliastro.twobody import Orbit
 from poliastro.util import time_range
 
 
@@ -156,7 +151,6 @@ def test_dark_theme():
     assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
 
 
-
 def test_axes_labels_and_title():
     ax = plt.gca()
     op = OrbitPlotter(ax)
@@ -218,7 +212,9 @@ def test_plot_coordinates_sets_label():
     [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))],
 )
 def test_dark_mode_plots_dark_plot(use_dark_theme, expected_color):
-    op = OrbitPlotter(backend_name="matplotlib2D", use_dark_theme=use_dark_theme)
+    op = OrbitPlotter(
+        backend_name="matplotlib2D", use_dark_theme=use_dark_theme
+    )
     assert op.backend.ax.get_facecolor() == expected_color
 
 

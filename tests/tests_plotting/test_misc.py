@@ -1,11 +1,8 @@
 import pytest
 from matplotlib import pyplot as plt
 
-from poliastro.plotting import OrbitPlotter
-from poliastro.plotting.orbit.backends import (
-    SUPPORTED_ORBIT_PLOTTER_BACKENDS,
-)
 from poliastro.plotting.misc import plot_solar_system
+from poliastro.plotting.orbit.backends import SUPPORTED_ORBIT_PLOTTER_BACKENDS
 
 
 @pytest.mark.parametrize("outer, expected", [(True, 8), (False, 4)])
@@ -18,7 +15,7 @@ def test_plot_solar_system_uses_expected_orbitplotter(backend_name):
     print(backend_name)
     assert isinstance(
         plot_solar_system(backend_name=backend_name).backend,
-        SUPPORTED_ORBIT_PLOTTER_BACKENDS[backend_name]
+        SUPPORTED_ORBIT_PLOTTER_BACKENDS[backend_name],
     )
 
 

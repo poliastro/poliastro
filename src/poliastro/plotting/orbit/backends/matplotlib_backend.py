@@ -1,12 +1,13 @@
 """A module implementing orbit plotter backends based on Matplotlib."""
 
+import numpy as np
 from astropy import units as u
 from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
-import numpy as np
 
 from poliastro.plotting.orbit.backends.base_backend import _OrbitPlotterBackend
+
 
 def _segments_from_arrays(x, y):
     # Copied pasted from
@@ -34,9 +35,9 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         """
         if not ax:
             if use_dark_theme is True:
-                with plt.style.context("dark_background"):                                           
-                    _, ax = plt.subplots(figsize=(6, 6))                                       
-            else:                                                                                    
+                with plt.style.context("dark_background"):
+                    _, ax = plt.subplots(figsize=(6, 6))
+            else:
                 _, ax = plt.subplots(figsize=(6, 6))
         super().__init__(ax, name=self.__class__.__name__)
 
@@ -106,7 +107,6 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             label=label,
         )
 
-
     def draw_position(self, position, *, color, label, size):
         """Draws the position of a body in the scene.
 
@@ -127,7 +127,9 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An object representing the trace of the coordinates in the scene.
 
         """
-        return self.draw_marker(position, color=color, marker_symbol="o", label=None, size=size)
+        return self.draw_marker(
+            position, color=color, marker_symbol="o", label=None, size=size
+        )
 
     def draw_impulse(self, position, *, color, label, size):
         """Draws an impulse into the scene.
@@ -149,7 +151,9 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An object representing the trace of the impulse in the scene.
 
         """
-        return self.draw_marker(position, color=color, label=label, marker_symbol="x", size=size)
+        return self.draw_marker(
+            position, color=color, label=label, marker_symbol="x", size=size
+        )
 
     def draw_sphere(self, position, *, color, radius):
         """Draws an sphere into the scene.
@@ -205,7 +209,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         """
         # Select the desired linestyle for the line representing the coordinates
         linestyle = "dashed" if dashed else "solid"
-        
+
         # Unpack coordinates
         x, y, z = (coords.to_value(u.km) for coords in coordinates)
 

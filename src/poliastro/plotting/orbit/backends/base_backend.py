@@ -130,7 +130,6 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
-
     def draw_impulse(self, position, *, color, size):
         """Draws an impulse into the scene.
 
