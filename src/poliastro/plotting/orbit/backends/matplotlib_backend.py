@@ -76,6 +76,35 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         colors = [color, to_rgba(color, 0)] if trail else [color]
         return colors
 
+    def draw_label(self, label, trace_coordinates, trace_position):
+        """Draw the desired label in the figure's legend.
+
+        Parameters
+        ----------
+        label : str
+             A string representing the label name to be drawn in the legend.
+        trace_coordinates : object
+            An object representing the trace of the coordinates in the scene.
+        trace_position : object
+            An object representing the trace of the position in the scene.
+
+        """
+        if not self.ax.get_legend():
+            size = self.ax.figure.get_size_inches() + [8, 0]
+            self.ax.figure.set_size_inches(size)
+
+        # This will apply the label to either the point or the osculating
+        # orbit depending on the last plotted line
+        trace = trace_position or trace_coordinates
+        trace[0].set_label(label)
+
+        self.ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1.05, 1.015),
+            title="Names and epochs",
+            numpoints=1,
+        )
+
     def draw_marker(self, position, *, color, marker_symbol, label, size):
         """Draws a marker into the scene.
 
@@ -187,7 +216,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         for attractor in self.ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
-    def draw_coordinates(self, coordinates, *, colors, dashed, label):
+    def draw_coordinates(self, coordinates, *, colors, dashed):
         """Draws desired coordinates into the scene.
 
         Parameters
@@ -231,7 +260,6 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
                 x,
                 y,
                 color=colors[0],
-                label=label,
                 linestyle=linestyle,
             )
 

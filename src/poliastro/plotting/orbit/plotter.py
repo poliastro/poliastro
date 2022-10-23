@@ -311,12 +311,20 @@ class OrbitPlotter:
 
         # Add the coordinates and the position to the scene
         trace_coordinates = self.backend.draw_coordinates(
-            coordinates, colors=colors, dashed=dashed, label=label
+            coordinates,
+            colors=colors,
+            dashed=dashed,
         )
-        if position is not None:
-            trace_position = self.backend.draw_position(
+        trace_position = (
+            self.backend.draw_position(
                 position, color=colors[0], label=None, size=None
             )
+            if position is not None
+            else None
+        )
+
+        # Add the label and render the legend
+        self.backend.draw_label(label, trace_coordinates, trace_position)
 
         return (
             (trace_coordinates, trace_position)

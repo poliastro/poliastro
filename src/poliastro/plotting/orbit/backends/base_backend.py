@@ -89,8 +89,25 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
+    def draw_label(label):
+        """Draw the desired label in the figure's legend.
+
+        Parameters
+        ----------
+        label : str
+             A string representing the label name to be drawn in the legend.
+        trace_coordinates : object
+            An object representing the trace of the coordinates in the scene.
+        trace_position : object
+            An object representing the trace of the position in the scene.
+
+        """
+        raise NotImplementedError(
+            "This method is expected to be override by a plotting backend class."
+        )
+
     def draw_marker(self, position, *, color, marker_symbol, size):
-        """Draws a point into the scene.
+        """Draw a point into the scene.
 
         Parameters
         ----------
