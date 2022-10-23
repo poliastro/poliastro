@@ -324,7 +324,8 @@ class OrbitPlotter:
         )
 
         # Add the label and render the legend
-        self.backend.draw_label(label, trace_coordinates, trace_position)
+        if label is not None:
+            self.backend.draw_label(label, trace_coordinates, trace_position)
 
         return (
             (trace_coordinates, trace_position)
@@ -507,9 +508,9 @@ class OrbitPlotter:
             maneuver, intermediate=True
         )
 
-        if len(maneuver_phases) == 0:
+        if not len(maneuver_phases):
             # For single-impulse maneuver only draw the impulse marker
-            impulse_label = f"Impulse 1 - {label}"
+            impulse_label = f"Impulse - {label}"
             impulse_lines = (
                 [
                     self.backend.draw_impulse(
@@ -530,15 +531,16 @@ class OrbitPlotter:
 
                 # Plot the impulse marker and collect its label and lines
                 impulse_label = f"Impulse {ith_impulse + 1} - {label}"
-                impulse_lines = (
-                    [
-                        self.backend.draw_impulse(
-                            position=orbit_phase.r,
-                            color=color,
-                            label=impulse_label,
-                            size=None,
-                        )
-                    ],
+                impulse_lines = self.backend.draw_impulse(
+                    position=orbit_phase.r,
+                    color=color,
+                    label=impulse_label,
+                    size=None,
+                )
+                self.backend.draw_label(
+                    impulse_label,
+                    trace_position=impulse_lines,
+                    trace_coordinates=None,
                 )
                 lines_list.append((impulse_label, impulse_lines))
 
@@ -572,15 +574,16 @@ class OrbitPlotter:
 
             # Finally, draw the impulse at the very beginning of the final phase
             impulse_label = f"Impulse {ith_impulse + 2} - {label}"
-            impulse_lines = (
-                [
-                    self.backend.draw_impulse(
-                        position=final_phase.r,
-                        color=color,
-                        label=impulse_label,
-                        size=None,
-                    )
-                ],
+            impulse_lines = self.backend.draw_impulse(
+                position=final_phase.r,
+                color=color,
+                label=impulse_label,
+                size=None,
+            )
+            self.backend.draw_label(
+                impulse_label,
+                trace_position=impulse_lines,
+                trace_coordinates=None,
             )
             lines_list.append((impulse_label, impulse_lines))
 

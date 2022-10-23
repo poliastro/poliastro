@@ -134,6 +134,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             marker=marker_symbol,
             markersize=size,
             label=label,
+            linestyle="None",
         )
 
     def draw_position(self, position, *, color, label, size):
