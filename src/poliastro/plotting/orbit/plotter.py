@@ -260,7 +260,7 @@ class OrbitPlotter:
         colors : str, optional
             A list of colors for the points of the trajectory.
         dashed : bool, optional
-            Fade the orbit trail, default to False.
+            ``True`` to use a dashed line style. ``False`` otherwise.
         label : str, optional
             Label of the orbit.
 
@@ -324,7 +324,7 @@ class OrbitPlotter:
             else (trace_coordinates, None)
         )
 
-    def plot(self, orbit, *, color=None, label=None, trail=False):
+    def plot(self, orbit, *, color=None, label=None, trail=False, dashed=True):
         """Plots state and osculating orbit in their plane.
 
         Parameters
@@ -337,6 +337,8 @@ class OrbitPlotter:
             Label of the orbit.
         trail : bool, optional
             Fade the orbit trail, default to False.
+        dashed : bool, optional
+            ``True`` to use a dashed line style. ``False`` otherwise.
 
         """
         # Check if the orbit plotter frame has been set
@@ -362,6 +364,7 @@ class OrbitPlotter:
             label=label,
             color=color,
             trail=trail,
+            dashed=dashed,
         )
 
     def plot_body_orbit(
@@ -581,6 +584,7 @@ class OrbitPlotter:
         label=None,
         color=None,
         trail=False,
+        dashed=False,
     ):
         """Plots a precomputed trajectory.
 
@@ -594,6 +598,8 @@ class OrbitPlotter:
             Color of the trajectory.
         trail : bool, optional
             Fade the orbit trail, default to False.
+        dashed : bool, optional
+            ``True`` to use a dashed line style. ``False`` otherwise.
 
         Raises
         ------
@@ -619,7 +625,7 @@ class OrbitPlotter:
             coordinates,
             position,
             colors=colors,
-            dashed=trail,
+            dashed=dashed,
             label=label,
         )
         return self._add_trajectory(trajectory)
