@@ -13,7 +13,11 @@ from poliastro.examples import churi, iss, molniya
 from poliastro.frames import Planes
 from poliastro.maneuver import Maneuver
 from poliastro.plotting import OrbitPlotter
-from poliastro.plotting.orbit.backends import SUPPORTED_ORBIT_PLOTTER_BACKENDS
+from poliastro.plotting.orbit.backends import (
+    SUPPORTED_ORBIT_PLOTTER_BACKENDS,
+    SUPPORTED_ORBIT_PLOTTER_BACKENDS_2D,
+    SUPPORTED_ORBIT_PLOTTER_BACKENDS_3D,
+)
 from poliastro.twobody import Orbit
 from poliastro.util import time_range
 
@@ -53,22 +57,22 @@ def test_set_different_attractor_raises_error(backend_name):
     assert "Attractor has already been set to Earth" in excinfo.exconly()
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter, OrbitPlotter])
-def test_plot_sets_attractor(plotter_class):
-    frame = plotter_class()
-    assert frame._attractor is None
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+def test_plot_sets_attractor(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
+    assert plotter._attractor is None
 
-    frame.plot(iss)
-    assert frame._attractor == iss.attractor
+    plotter.plot(iss)
+    assert plotter._attractor == iss.attractor
 
 
-@pytest.mark.parametrize("plotter_class", [OrbitPlotter, OrbitPlotter])
-def test_plot_appends_data(plotter_class):
-    frame = plotter_class()
-    assert len(frame.trajectories) == 0
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+def test_plot_appends_data(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
+    assert len(plotter.trajectories) == 0
 
-    frame.plot(iss)
-    assert len(frame.trajectories) == 1
+    plotter.plot(iss)
+    assert len(plotter.trajectories) == 1
 
 
 @pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
@@ -84,12 +88,13 @@ def test_plot_coordinates_without_attractor_raises_error(backend_name):
     )
 
 
-def test_plot_2d_trajectory_without_frame_raises_error():
-    frame = OrbitPlotter()
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS_2D)
+def test_plot_2d_trajectory_without_frame_raises_error(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
 
     with pytest.raises(ValueError) as excinfo:
-        frame.set_attractor(Sun)
-        frame.plot_coordinates({})
+        plotter.set_attractor(Sun)
+        plotter.plot_coordinates({})
     assert (
         "A frame must be set up first, please use "
         "set_orbit_frame(orbit) or plot(orbit)" in excinfo.exconly()
@@ -110,35 +115,38 @@ def test_ephem_without_frame_raises_error():
     )
 
 
-def test_plot_3d_trajectory_plots_a_trajectory():
-    frame = OrbitPlotter()
-    assert len(frame.trajectories) == 0
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS_3D)
+def test_plot_3d_trajectory_plots_a_trajectory(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
+    assert len(plotter.trajectories) == 0
 
     trajectory = churi.sample()
-    frame.set_attractor(Sun)
-    frame.plot_coordinates(trajectory)
+    plotter.set_attractor(Sun)
+    plotter.plot_coordinates(trajectory)
 
-    assert len(frame.trajectories) == 1
-    assert frame._attractor == Sun
+    assert len(plotter.trajectories) == 1
+    assert plotter._attractor == Sun
 
 
-def test_plot_2d_trajectory_plots_a_trajectory():
-    frame = OrbitPlotter()
-    assert len(frame.trajectories) == 0
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS_2D)
+def test_plot_2d_trajectory_plots_a_trajectory(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
+    assert len(plotter.trajectories) == 0
 
     trajectory = churi.sample()
-    frame.set_attractor(Sun)
-    frame.set_orbit_frame(churi)
-    frame.plot_coordinates(trajectory)
+    plotter.set_attractor(Sun)
+    plotter.set_orbit_frame(churi)
+    plotter.plot_coordinates(trajectory)
 
-    assert len(frame.trajectories) == 1
-    assert frame._attractor == Sun
+    assert len(plotter.trajectories) == 1
+    assert plotter._attractor == Sun
 
 
-def test_set_view():
-    frame = OrbitPlotter()
-    frame.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
-    figure = frame.show()
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS_3D)
+def test_set_view(backend_name):
+    plotter = OrbitPlotter(backend_name=backend_name)
+    plotter.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
+    figure = plotter.show()
 
     eye = figure["layout"]["scene"]["camera"]["eye"]
     assert eye["x"] == 1
@@ -146,8 +154,9 @@ def test_set_view():
     assert eye["z"] == 0
 
 
-def test_dark_theme():
-    frame = OrbitPlotter(use_dark_theme=True)
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+def test_dark_theme(backend_name):
+    frame = OrbitPlotter(backend_name=backend_name, use_dark_theme=True)
     assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
 
 
