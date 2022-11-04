@@ -154,11 +154,11 @@ def test_set_view(backend_name):
     assert eye["z"] == 0
 
 
-@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
-def test_dark_theme(backend_name):
-    frame = OrbitPlotter(backend_name=backend_name, use_dark_theme=True)
-    assert frame._layout.template.layout.plot_bgcolor == "rgb(17,17,17)"
-
+@pytest.mark.parametrize("is_dark, expected_bg", [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))])
+@pytest.mark.parametrize("backend_name", ["matplotlib2D"])
+def test_dark_theme_backend_matplotlib(backend_name, is_dark, expected_bg):
+    plotter = OrbitPlotter(backend_name=backend_name, use_dark_theme=is_dark)
+    assert plotter.backend.scene.get_facecolor() == expected_bg
 
 def test_axes_labels_and_title():
     ax = plt.gca()
