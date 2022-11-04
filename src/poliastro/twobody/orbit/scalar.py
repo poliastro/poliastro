@@ -638,7 +638,9 @@ class Orbit(OrbitCreationMixin):
         # HACK: avoid circular dependency
         from poliastro.plotting.orbit.plotter import OrbitPlotter
 
-        return OrbitPlotter(backend_name=backend_name).plot(self, label=label)
+        plotter = OrbitPlotter(backend_name=backend_name)
+        plotter.plot(self, label=label)
+        return plotter
 
     def elevation(self, lat, theta, h):
         """

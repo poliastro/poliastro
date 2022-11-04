@@ -48,6 +48,7 @@ from poliastro.frames.equatorial import (
     VenusICRS,
 )
 from poliastro.frames.util import get_frame
+from poliastro.plotting.orbit.backends import SUPPORTED_ORBIT_PLOTTER_BACKENDS
 from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
 from poliastro.twobody.sampling import TrueAnomalyBounds
@@ -482,30 +483,23 @@ def test_orbit_plot_is_static():
     assert isinstance(plot[1], matplotlib.lines.Line2D)
 
 
-def test_orbit_plot_static_3d():
+@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+def test_orbit_plot_has_desired_backend(backend_name):
     # Data from Curtis, example 4.3
     r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-    with pytest.raises(
-        ValueError,
-        match="The static plotter does not support 3D, use `interactive=True`",
-    ):
-        ss.plot(use_3d=True)
+    plot = ss.plot(backend_name=backend_name)
+    
+    # Relate the graphics library with the expected scene type
+    graphics_lib_dict = {
+        "matplotlib": matplotlib.axes.Axes,
+    }
 
-
-@pytest.mark.parametrize("use_3d", [False, True])
-def test_orbit_plot_is_not_static(use_3d):
-    from plotly.graph_objects import Figure
-
-    # Data from Curtis, example 4.3
-    r = [-6_045, -3_490, 2_500] * u.km
-    v = [-3.457, 6.618, 2.533] * u.km / u.s
-    ss = Orbit.from_vectors(Earth, r, v)
-
-    plot = ss.plot(interactive=True, use_3d=use_3d)
-
-    assert isinstance(plot, Figure)
+    # Assert if the plotter scene is of expected type
+    for graphics_lib, expected_type in graphics_lib_dict.items():
+        if backend_name.startswith(graphics_lib):
+            assert isinstance(plot.backend.scene, expected_type)
 
 
 @pytest.mark.parametrize(
