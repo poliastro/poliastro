@@ -471,18 +471,6 @@ def test_orbit_is_pickable(hyperbolic):
     assert orb_result.epoch == hyperbolic.epoch
 
 
-def test_orbit_plot_is_static():
-    # Data from Curtis, example 4.3
-    r = [-6_045, -3_490, 2_500] * u.km
-    v = [-3.457, 6.618, 2.533] * u.km / u.s
-    ss = Orbit.from_vectors(Earth, r, v)
-
-    plot = ss.plot()
-
-    assert isinstance(plot[0], matplotlib.lines.Line2D)
-    assert isinstance(plot[1], matplotlib.lines.Line2D)
-
-
 @pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
 def test_orbit_plot_has_desired_backend(backend_name):
     # Data from Curtis, example 4.3
