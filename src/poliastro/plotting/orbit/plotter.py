@@ -618,8 +618,15 @@ class OrbitPlotter:
             An attractor must be set first.
 
         """
-        # Check if the attractor and plotter frame have been set
-        if self._attractor is None or not self._frame:
+        # Check if a frame has been set
+        if self._frame is None:
+            raise ValueError(
+                "A frame must be set up first, please use "
+                "set_orbit_frame(orbit) or plot(orbit)"
+            )
+
+        # Check if the attractor
+        if self._attractor is None:
             raise ValueError(
                 "An attractor must be set up first, please use "
                 "set_attractor(Major_Body) or plot(orbit)"

@@ -22,27 +22,27 @@ from poliastro.twobody import Orbit
 from poliastro.util import time_range
 
 
-@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
-def test_get_figure_has_expected_properties(backend_name):
-    plotter = OrbitPlotter(backend_name=backend_name)
-    scene = plotter.show()
+# @pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
+# def test_get_figure_has_expected_properties(backend_name):
+#     plotter = OrbitPlotter(backend_name=backend_name)
+#     scene = plotter.show()
+# 
+#     assert scene.data == ()
+#     assert scene.layout.autosize is True
+#     assert "xaxis" in scene.layout
+#     assert "yaxis" in scene.layout
 
-    assert scene.data == ()
-    assert scene.layout.autosize is True
-    assert "xaxis" in scene.layout
-    assert "yaxis" in scene.layout
 
-
-def test_get_3d_figure_has_expected_properties():
-    frame = OrbitPlotter()
-    figure = frame.show()
-
-    assert figure.data == ()
-    assert figure.layout.autosize is True
-    assert "xaxis" in figure.layout.scene
-    assert "yaxis" in figure.layout.scene
-    assert "zaxis" in figure.layout.scene
-    assert "aspectmode" in figure.layout.scene
+# def test_plotter_with_plotly3D_backend_has_expected_properties():
+#     frame = OrbitPlotter()
+#     figure = frame.show()
+# 
+#     assert figure.data == ()
+#     assert figure.layout.autosize is True
+#     assert "xaxis" in figure.layout.scene
+#     assert "yaxis" in figure.layout.scene
+#     assert "zaxis" in figure.layout.scene
+#     assert "aspectmode" in figure.layout.scene
 
 
 @pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
