@@ -132,10 +132,10 @@ class Body(
 class SolarSystemPlanet(Body):
     def plot(
         self,
-        backend_name="matplotlib2D",
         epoch=None,
         label=None,
         plane=Planes.EARTH_ECLIPTIC,
+        backend_name="matplotlib2D",
     ):
         """Plots the body orbit.
 

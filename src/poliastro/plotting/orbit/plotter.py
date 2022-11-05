@@ -508,13 +508,22 @@ class OrbitPlotter:
             maneuver, intermediate=True
         )
 
+        # Project the coordinates into desired frame for 2D backends
+        if self.backend.is_2D:
+            final_phase_position = (
+                np.asarray(
+                    self._project([final_phase.r.to_value(u.km)])
+                ).flatten()
+                * u.km
+            )
+
         if not len(maneuver_phases):
             # For single-impulse maneuver only draw the impulse marker
             impulse_label = f"Impulse - {label}"
             impulse_lines = (
                 [
                     self.backend.draw_impulse(
-                        position=final_phase.r,
+                        position=final_phase_position,
                         color=color,
                         label=impulse_label,
                         size=None,
@@ -529,10 +538,19 @@ class OrbitPlotter:
             # Collect the coordinates for the different maneuver phases
             for ith_impulse, orbit_phase in enumerate(maneuver_phases):
 
+                # Project the coordinates into desired frame for 2D backends
+                if self.backend.is_2D:
+                    orbit_phase_r = (
+                        np.asarray(
+                            self._project([orbit_phase.r.to_value(u.km)])
+                        ).flatten()
+                        * u.km
+                    )
+
                 # Plot the impulse marker and collect its label and lines
                 impulse_label = f"Impulse {ith_impulse + 1} - {label}"
                 impulse_lines = self.backend.draw_impulse(
-                    position=orbit_phase.r,
+                    position=orbit_phase_r,
                     color=color,
                     label=impulse_label,
                     size=None,
@@ -575,7 +593,7 @@ class OrbitPlotter:
             # Finally, draw the impulse at the very beginning of the final phase
             impulse_label = f"Impulse {ith_impulse + 2} - {label}"
             impulse_lines = self.backend.draw_impulse(
-                position=final_phase.r,
+                position=final_phase_position,
                 color=color,
                 label=impulse_label,
                 size=None,
@@ -647,6 +665,45 @@ class OrbitPlotter:
             label=label,
         )
         return self._add_trajectory(trajectory)
+
+    def plot_trajectory(
+        self,
+        coordinates,
+        *,
+        label=None,
+        color=None,
+        trail=False,
+        dashed=False,
+    ):
+        """Plots a precomputed trajectory.
+
+        Parameters
+        ----------
+        coordinates : ~astropy.coordinates.CartesianRepresentation
+            Trajectory to plot.
+        label : str, optional
+            Label of the trajectory.
+        color : str, optional
+            Color of the trajectory.
+        trail : bool, optional
+            Fade the orbit trail, default to False.
+        dashed : bool, optional
+            ``True`` to use a dashed line style. ``False`` otherwise.
+
+        Raises
+        ------
+        ValueError
+            An attractor must be set first.
+
+        """
+        return self.plot_coordinates(
+            coordinates,
+            position=None,
+            color=color,
+            label=label,
+            trail=trail,
+            dashed=dashed,
+        )
 
     def show(self):
         """Render the plot."""
