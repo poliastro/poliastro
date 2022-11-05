@@ -4,16 +4,16 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.0
+    jupytext_version: 1.14.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
 # Studying Hohmann transfers
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import units as u
 
 from matplotlib import pyplot as plt
@@ -25,27 +25,27 @@ from poliastro.twobody import Orbit
 from poliastro.util import norm
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 Earth.k
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 orb_i = Orbit.circular(Earth, alt=800 * u.km)
 orb_i
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 r_i = orb_i.a.to(u.km)
 r_i
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 v_i_vec = orb_i.v.to(u.km / u.s)
 v_i = norm(v_i_vec)
 v_i
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 N = 1000
 dv_a_vector = np.zeros(N) * u.km / u.s
 dv_b_vector = dv_a_vector.copy()
@@ -57,7 +57,7 @@ for ii, r_f in enumerate(r_f_vector):
     dv_b_vector[ii] = norm(dv_b)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 fig, ax = plt.subplots(figsize=(7, 7))

@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.0
+    jupytext_version: 1.14.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -28,7 +28,7 @@ In this notebook, we will show all the possibilities that the
 `GrountrackPlotter` class offers to poliastro's users. Let us start by importing
 some useful modules!
 
-```{code-cell}
+```{code-cell} ipython3
 # Useful for defining quantities
 from astropy import units as u
 
@@ -54,7 +54,7 @@ Furthermore, we will generate a desired time span for the next three hours since
 actual ISS epoch. Notice that the `periods` parameter controls the resolution of
 the time vector and thus, the amount of values:
 
-```{code-cell}
+```{code-cell} ipython3
 # Build spacecraft instance
 iss_spacecraft = EarthSatellite(iss, None)
 t_span = time_range(
@@ -71,7 +71,7 @@ refer to the [official
 documentation](https://plotly.com/python/reference/layout/geo/) for more
 information about it. Let us create a simple instance and start plotting:
 
-```{code-cell}
+```{code-cell} ipython3
 # Generate an instance of the plotter, add title and show latlon grid
 gp = GroundtrackPlotter()
 gp.update_layout(title="International Space Station groundtrack")
@@ -94,7 +94,7 @@ It is even possible to add other kind of information rather than
 `EarthSatellite`'s within previous figure. For example, we will show the actual
 location of Madrid city:
 
-```{code-cell}
+```{code-cell} ipython3
 # For building geo traces
 import plotly.graph_objects as go
 
@@ -118,7 +118,7 @@ projections](https://plotly.com/python/reference/layout/geo/#layout-geo-projecti
 Among the different possibilities, there is also one which holds 3D support:
 `orthographic`. You can simply switch the previous figure by simply running:
 
-```{code-cell}
+```{code-cell} ipython3
 # Switch to three dimensional representation
 gp.update_geos(projection_type="orthographic")
 gp.fig.show()

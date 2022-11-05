@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.0
+    jupytext_version: 1.14.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -102,7 +102,7 @@ The minimum energy transfer orbit is used as a reference point by Lambert's prob
 
 Now, let us present how to use poliastro to solve for the multiple revolutions scenario. The idea is to compute all possible transfer orbits between Earth and Mars. Therefore, we need first to compute the initial position of the Earth and the final position of times for a given desired amount of time.
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import units as u
 from astropy.time import Time
 
@@ -114,7 +114,7 @@ from poliastro.util import time_range
 
 Computing the initial and final position orbits for each planet:
 
-```{code-cell}
+```{code-cell} ipython3
 # Departure and time of flight for the mission
 EPOCH_DPT = Time("2018-12-01", scale="tdb")
 EPOCH_ARR = EPOCH_DPT + 2 * u.year
@@ -131,11 +131,11 @@ mars_arrival = Orbit.from_ephem(Sun, mars, EPOCH_ARR)
 
 Let us generate all the possible combinations of prograde/retrograde and low/high path. We can take advantage of the `itertools` package:
 
-```{code-cell}
+```{code-cell} ipython3
 from itertools import product
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # Generate all possible combinations of type of motion and path
 type_of_motion_and_path = list(product([True, False], repeat=2))
 
@@ -147,7 +147,7 @@ colors_and_styles = [
 
 We now define a function for solving all the possible solutions
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.maneuver import Maneuver
 
 
@@ -167,19 +167,19 @@ def lambert_solution_orbits(orb_departure, orb_arrival, M):
 
 Finally, we can plot all the different scenarios from $M=0$ up to $M=2$ revolutions:
 
-```{code-cell}
+```{code-cell} ipython3
 from matplotlib import pyplot as plt
 
-from poliastro.plotting import StaticOrbitPlotter
+from poliastro.plotting import OrbitPlotter
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # Generate a grid of 3x1 plots
 fig, axs = plt.subplots(3, 1, figsize=(8, 8))
 
 for ith_case, M in enumerate(range(3)):
     # Plot the orbits of the Earth and Mars
-    op = StaticOrbitPlotter(ax=axs[ith_case])
+    op = OrbitPlotter(scene=axs[ith_case])
     axs[ith_case].set_title(f"{M = } scenario")
 
     op.plot_body_orbit(Earth, EPOCH_DPT)
