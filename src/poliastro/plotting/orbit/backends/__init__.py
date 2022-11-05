@@ -4,9 +4,14 @@
 from poliastro.plotting.orbit.backends.matplotlib_backend import (
     OrbitPlotterBackendMatplotlib2D,
 )
+from poliastro.plotting.orbit.backends.plotly_backend import (
+    OrbitPlotterBackendPlotly2D,
+)
+
 
 SUPPORTED_ORBIT_PLOTTER_BACKENDS_2D = {
     "matplotlib2D": OrbitPlotterBackendMatplotlib2D,
+    "plotly2D": OrbitPlotterBackendPlotly2D,
 }
 """A dictionary relating 2D orbit plotter backends and their classes."""
 
