@@ -640,6 +640,7 @@ class Orbit(OrbitCreationMixin):
 
         plotter = OrbitPlotter(backend_name=backend_name)
         plotter.plot(self, label=label)
+        plotter.show()
         return plotter
 
     def elevation(self, lat, theta, h):

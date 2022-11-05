@@ -158,7 +158,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
 
         """
         return self.draw_marker(
-            position, color=color, marker_symbol="o", label=None, size=size
+            position, color=color, marker_symbol="o", label=None, size=None
         )
 
     def draw_impulse(self, position, *, color, label, size):

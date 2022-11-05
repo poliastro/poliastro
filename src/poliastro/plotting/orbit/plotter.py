@@ -239,13 +239,6 @@ class OrbitPlotter:
         for trajectory in self._trajectories:
             self._add_trajectory(trajectory)
 
-    def _plot_position(self, position, label, colors):
-        radius = min(
-            self._attractor_radius * 0.5,
-            (norm(position) - self._attractor.R) * 0.5,
-        )  # Arbitrary thresholds
-        self.backend.draw_point(radius, colors[0], label, center=position)
-
     def _create_trajectory(
         self, coordinates, position, *, colors=None, dashed=False, label=None
     ):
@@ -315,13 +308,20 @@ class OrbitPlotter:
             colors=colors,
             dashed=dashed,
         )
-        trace_position = (
-            self.backend.draw_position(
-                position, color=colors[0], label=None, size=None
+
+        if position is not None:
+            # Define an arbitrary threshold for the marker size
+            marker_size = min(
+                self._attractor_radius * 0.5,
+                (norm(position) - self._attractor.R) * 0.5,
             )
-            if position is not None
-            else None
-        )
+
+            # Generate the trace for the position
+            trace_position = self.backend.draw_position(
+                position, color=colors[0], label=None, size=marker_size
+            )
+        else:
+            trace_position = None
 
         # Add the label and render the legend
         if label is not None:
@@ -729,4 +729,4 @@ class OrbitPlotter:
 
     def show(self):
         """Render the plot."""
-        self._backend.show()
+        self.backend.show()

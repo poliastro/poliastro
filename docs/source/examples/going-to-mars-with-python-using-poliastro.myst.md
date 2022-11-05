@@ -89,10 +89,11 @@ Let's plot this transfer orbit in 3D!
 
 ```{code-cell} ipython3
 from poliastro.plotting import OrbitPlotter
+from poliastro.examples import iss
 ```
 
 ```{code-cell} ipython3
-plotter = OrbitPlotter(backend_name="plotly3D")
+plotter = OrbitPlotter(backend_name="plotly2D")
 plotter.set_attractor(Sun)
 
 plotter.plot_ephem(earth, date_launch, label="Earth at launch position")
