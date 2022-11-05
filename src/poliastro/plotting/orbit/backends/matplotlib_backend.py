@@ -76,36 +76,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         colors = [color, to_rgba(color, 0)] if trail else [color]
         return colors
 
-    def draw_label(self, label, trace_coordinates, trace_position):
-        """Draw the desired label in the figure's legend.
-
-        Parameters
-        ----------
-        label : str
-             A string representing the label name to be drawn in the legend.
-        trace_coordinates : object
-            An object representing the trace of the coordinates in the scene.
-        trace_position : object
-            An object representing the trace of the position in the scene.
-
-        """
-        if not self.ax.get_legend():
-            size = self.ax.figure.get_size_inches() + [8, 0]
-            self.ax.figure.set_size_inches(size)
-
-        # This will apply the label to either the point or the osculating
-        # orbit depending on the last plotted line
-        trace = trace_position or trace_coordinates
-        trace[0].set_label(label)
-
-        self.ax.legend(
-            loc="upper left",
-            bbox_to_anchor=(1.05, 1.015),
-            title="Names and epochs",
-            numpoints=1,
-        )
-
-    def draw_marker(self, position, *, color, marker_symbol, label, size):
+    def draw_marker(self, position, *, color, label, marker_symbol, size):
         """Draws a marker into the scene.
 
         Parameters
@@ -117,7 +88,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         marker_symbol : str
             The marker symbol to be used when drawing the point.
         label : str
-            A string containing tha message for the label.
+            The name to be used in the legend for the marker.
         size : float, optional
             Desired size for the marker.
 
@@ -146,10 +117,11 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             A list containing the x, y and z coordinates of the point.
         color : str, optional
             A string representing the hexadecimal color for the marker.
+        label : str
+            The name to be used to identify the position in the legend of the
+            figure.
         size : float, optional
             The size of the marker.
-        label : str
-            A string containing tha message for the label.
 
         Returns
         -------
@@ -158,7 +130,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
 
         """
         return self.draw_marker(
-            position, color=color, marker_symbol="o", label=None, size=None
+            position, color=color, marker_symbol="o", label=label, size=None
         )
 
     def draw_impulse(self, position, *, color, label, size):
@@ -171,7 +143,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         color : str, optional
             A string representing the hexadecimal color for the impulse marker.
         label : str
-            A string containing tha message for the label.
+            The name to be used to identify the position in the legend of the
+            figure.
         size : float, optional
             The size of the marker for the impulse.
 
@@ -185,7 +158,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             position, color=color, label=label, marker_symbol="x", size=size
         )
 
-    def draw_sphere(self, position, *, color, radius):
+    def draw_sphere(self, position, *, color, label, radius):
         """Draws an sphere into the scene.
 
         Parameters
@@ -194,6 +167,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             A list containing the x and y coordinates of the sphere location.
         color : str, optional
             A string representing the hexadecimal color for the sphere.
+        label : str
+            The name shown in the legend of the figure to identify the sphere.
         radius : float, optional
             The radius of the sphere.
 
@@ -209,6 +184,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
                 radius.to_value(u.km),
                 color=color,
                 linewidth=0,
+                label=label,
             )
         )
 
@@ -217,7 +193,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         for attractor in self.ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
-    def draw_coordinates(self, coordinates, *, colors, dashed):
+    def draw_coordinates(self, coordinates, *, colors, dashed, label):
         """Draws desired coordinates into the scene.
 
         Parameters
@@ -229,7 +205,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         dashed : bool
             Whether to use a dashed or solid line style for the coordiantes.
         label : str
-            Label of the orbit, default to the name of the body.
+            The name to be used to identify the coordinates in the legend of the
+            figure.
 
         Returns
         -------
@@ -249,7 +226,9 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             cmap = LinearSegmentedColormap.from_list(
                 f"{colors[0]}_to_alpha", colors  # Useless name
             )
-            lc = LineCollection(segments, linestyles=linestyle, cmap=cmap)
+            lc = LineCollection(
+                segments, linestyles=linestyle, cmap=cmap, label=label
+            )
             lc.set_array(np.linspace(1, 0, len(x)))
 
             self.ax.add_collection(lc)
@@ -261,6 +240,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
                 x,
                 y,
                 color=colors[0],
+                label=label,
                 linestyle=linestyle,
             )
 
@@ -270,6 +250,23 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         self.ax.set_aspect(1)
 
         return lines_coordinates
+
+    def generate_labels(self, label, has_coordinates, has_position):
+        return (None, label) if has_position else (label, None)
+
+    def update_legend(self):
+        """Update the legend of the scene."""
+        # Enable the legend (if required)
+        if not self.ax.get_legend():
+            size = self.ax.figure.get_size_inches() + [8, 0]
+            self.ax.figure.set_size_inches(size)
+
+        self.ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1.05, 1.015),
+            title="Names and epochs",
+            numpoints=1,
+        )
 
     def show(self):
         """Displays the scene."""

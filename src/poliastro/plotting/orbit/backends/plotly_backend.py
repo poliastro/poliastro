@@ -92,25 +92,6 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
         """Removes the attractor from the scene."""
         pass
 
-    def draw_label(self, label, trace_coordinates, trace_position):
-        """Draw the desired label in the figure's legend.
-
-        Parameters
-        ----------
-        label : str
-             A string representing the label name to be drawn in the legend.
-        trace_coordinates : object
-            An object representing the trace of the coordinates in the scene.
-        trace_position : object
-            An object representing the trace of the position in the scene.
-
-        """
-        # This will apply the label to either the point or the osculating
-        # orbit depending on the last plotted line
-        trace_id = -1 if trace_position is None else -2
-        self.figure["data"][trace_id]["showlegend"] = True
-        self.figure["data"][trace_id]["name"] = label
-
     def draw_position(self, position, *, color, label, size):
         """Draws the position of a body in the scene.
 
@@ -123,15 +104,17 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
         size : float, optional
             The size of the marker.
         label : str
-            A string containing tha message for the label.
+            The name shown in the figure legend to identify the position.
 
         Returns
         -------
-        ~matplotlib.lines.Line2D
+        [~plotly.graph_objects.Surface, ~plotly.graph_objects.Trace]
             An object representing the trace of the coordinates in the scene.
 
         """
-        return self.draw_sphere(position, color=color, radius=size)
+        return self.draw_sphere(
+            position, color=color, label=label, radius=size
+        )
 
     def draw_impulse(self, position, *, color, label, size):
         """Draws an impulse into the scene.
@@ -143,7 +126,7 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
         color : str, optional
             A string representing the hexadecimal color for the impulse marker.
         label : str
-            A string containing tha message for the label.
+            The name shown in the figure legend to identify the impulse.
         size : float, optional
             The size of the marker for the impulse.
 
@@ -156,6 +139,10 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
         return self.draw_marker(
             position, color=color, label=label, marker_symbol="x", size=size
         )
+
+    def update_legend(self):
+        """Update the legend of the scene."""
+        pass
 
     def show(self):
         """Displays the scene."""
@@ -191,7 +178,7 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
         )
         super().__init__(figure, layout)
 
-    def draw_marker(self, position, *, color, marker_symbol, label, size):
+    def draw_marker(self, position, *, color, label, marker_symbol, size):
         """Draws a marker into the scene.
 
         Parameters
@@ -200,10 +187,10 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
             A list containing the x and y coordinates of the point.
         color : str, optional
             A string representing the hexadecimal color for the point.
+        label : str
+            The name shown in the legend of the figure to identify the marker.
         marker_symbol : str
             The marker symbol to be used when drawing the point.
-        label : str
-            A string containing tha message for the label.
         size : float, optional
             Desired size for the marker.
 
@@ -213,18 +200,18 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
             An object representing the trace of the marker in the scene.
 
         """
-        marker = dict(size=size, color=color, symbol=marker_symbol)
+        marker_style = dict(size=size, color=color, symbol=marker_symbol)
         marker_trace = go.Scatter(
             x=position[0],
             y=position[1],
-            marker=marker,
+            marker=marker_style,
             name=label,
-            showlegend=True if label is not None else False,
+            showlegend=False if label is None else True,
         )
         self.figure.add_trace(marker_trace)
         return marker_trace
 
-    def draw_sphere(self, position, *, color, radius):
+    def draw_sphere(self, position, *, color, label, radius):
         """Draws an sphere into the scene.
 
         Parameters
@@ -233,16 +220,24 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
             A list containing the x and y coordinates of the sphere location.
         color : str, optional
             A string representing the hexadecimal color for the sphere.
+        label : str
+            Unuseful for this routine. See the ``Notes`` section.
         radius : float, optional
             The radius of the sphere.
 
+        Notes
+        -----
+        Plotting a sphere in a two-dimensional figure in plotly requires a shape
+        instead of a trace. Shapes do not accept a label, as the legend does not
+        support labels for shapes.
+
         Returns
         -------
-        ~matplotlib.patches.Patch
-            An object representing the trace of the sphere in the scene.
+        dict
+            A dictionary representing the shape of the sphere.
 
         """
-        return self.figure.add_shape(
+        shape = dict(
             type="circle",
             xref="x",
             yref="y",
@@ -251,11 +246,13 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
             x1=(position[0] + radius).to_value(u.km),
             y1=(position[1] + radius).to_value(u.km),
             fillcolor=color,
-            line_color=color,
+            line=dict(color=color),
             opacity=1,
         )
+        self.layout.shapes += (shape,)
+        return shape
 
-    def draw_coordinates(self, coordinates, *, colors, dashed):
+    def draw_coordinates(self, coordinates, *, colors, dashed, label):
         """Draws desired coordinates into the scene.
 
         Parameters
@@ -266,6 +263,8 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
             A list of string representing the hexadecimal color for the coordinates.
         dashed : bool
             Whether to use a dashed or solid line style for the coordiantes.
+        label : str
+            The name shown in the legend for identifying the coordinates.
 
         Returns
         -------
@@ -285,10 +284,14 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
             y=y,
             line=dict(color=colors[0], width=5, dash=linestyle),
             mode="lines",
-            showlegend=False,
+            name=label,
+            showlegend=False if label is None else True,
         )
         self.figure.add_trace(coordinates_trace)
         return coordinates_trace
+
+    def generate_labels(self, label, has_coordinates, has_position):
+        return (label, None)
 
 
 class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
@@ -334,7 +337,7 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
         marker_symbol : str
             The marker symbol to be used when drawing the point.
         label : str
-            A string containing tha message for the label.
+            The name shown in the legend of the figure to identify the marker.
         size : float, optional
             Desired size for the marker.
 
@@ -344,19 +347,19 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
             An object representing the trace of the marker in the scene.
 
         """
-        marker = dict(size=size, color=color, symbol=marker_symbol)
+        marker_style = dict(size=size, color=color, symbol=marker_symbol)
         marker_trace = go.Scatter3d(
             x=position[0],
             y=position[1],
             z=position[2],
-            marker=marker,
+            marker=marker_style,
             name=label,
-            showlegend=True if label is not None else False,
+            showlegend=False if label is None else True,
         )
         self.figure.add_trace(marker_trace)
         return marker_trace
 
-    def draw_sphere(self, position, *, color, radius):
+    def draw_sphere(self, position, *, color, label, radius):
         """Draws an sphere into the scene.
 
         Parameters
@@ -365,6 +368,8 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
             A list containing the x and y coordinates of the sphere location.
         color : str, optional
             A string representing the hexadecimal color for the sphere.
+        label : str
+            The name shown in the legend of the figure to identify the sphere.
         radius : float, optional
             The radius of the sphere.
 
@@ -384,11 +389,13 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
             cmin=1,
             cmax=1,
             showscale=False,
+            name=label,
+            showlegend=False if label is None else True,
         )
         self.figure.add_trace(sphere)
         return sphere
 
-    def draw_coordinates(self, coordinates, *, colors, dashed):
+    def draw_coordinates(self, coordinates, *, colors, dashed, label):
         """Draws desired coordinates into the scene.
 
         Parameters
@@ -399,6 +406,8 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
             A list of string representing the hexadecimal color for the coordinates.
         dashed : bool
             Whether to use a dashed or solid line style for the coordiantes.
+        label : str
+            The name shown in the legend of the figure to identify the coordinates.
 
         Returns
         -------
@@ -416,7 +425,8 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
             z=coordinates.z.to_value(u.km),
             line=dict(color=colors[0], width=5, dash=linestyle),
             mode="lines",
-            showlegend=False,
+            name=label,
+            showlegend=False if label is None else True,
         )
         self.figure.add_trace(coordinates_trace)
         return coordinates_trace
@@ -452,3 +462,6 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
                 }
             }
         )
+
+    def generate_labels(self, label, has_coordinates, has_position):
+        return (label, None)

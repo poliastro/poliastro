@@ -90,24 +90,7 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_label(label):
-        """Draw the desired label in the figure's legend.
-
-        Parameters
-        ----------
-        label : str
-             A string representing the label name to be drawn in the legend.
-        trace_coordinates : object
-            An object representing the trace of the coordinates in the scene.
-        trace_position : object
-            An object representing the trace of the position in the scene.
-
-        """
-        raise NotImplementedError(
-            "This method is expected to be override by a plotting backend class."
-        )
-
-    def draw_marker(self, position, *, color, marker_symbol, size):
+    def draw_marker(self, position, *, color, label, marker_symbol, size):
         """Draw a point into the scene.
 
         Parameters
@@ -116,6 +99,8 @@ class _OrbitPlotterBackend:
             A list containing the x, y and z coordinates of the point.
         color : str
             A string representing the hexadecimal color for the point.
+        label : str
+            The name to be used in the legend for the marker.
         marker_symbol : str
             The marker symbol to be used when drawing the point.
         size : float
@@ -126,7 +111,7 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_position(self, position, *, color, size):
+    def draw_position(self, position, *, color, label, size):
         """Draws the position of a body in the scene.
 
         Parameters
@@ -135,6 +120,8 @@ class _OrbitPlotterBackend:
             A list containing the x, y and z coordinates of the point.
         color : str
             A string representing the hexadecimal color for the marker.
+        label : str
+            The name to be used in the legend for the marker.
         size : float
             The size of the marker.
 
@@ -148,7 +135,7 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_impulse(self, position, *, color, size):
+    def draw_impulse(self, position, *, color, label, size):
         """Draws an impulse into the scene.
 
         Parameters
@@ -157,6 +144,8 @@ class _OrbitPlotterBackend:
             A list containing the x, y and z coordinates of the impulse location.
         color : str
             A string representing the hexadecimal color for the impulse marker.
+        label : str
+            The name to be used in the legend for the marker.
         size : float
             The size of the marker for the impulse.
 
@@ -165,7 +154,7 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_sphere(self, position, *, color, radius):
+    def draw_sphere(self, position, *, color, label, radius):
         """Draws an sphere into the scene.
 
         Parameters
@@ -174,6 +163,8 @@ class _OrbitPlotterBackend:
             A list containing the x, y and z coordinates of the sphere location.
         color : str
             A string representing the hexadecimal color for the sphere.
+        label : str
+            The name to be used in the legend for the marker.
         radius : float
             The radius of the sphere.
 
@@ -188,7 +179,7 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a plotting backend class."
         )
 
-    def draw_coordinates(self, coordinates, *, colors, size):
+    def draw_coordinates(self, coordinates, *, colors, label, size):
         """Draws desired coordinates into the scene.
 
         Parameters
@@ -197,10 +188,18 @@ class _OrbitPlotterBackend:
             A set of lists containing the x, y and z coordinates of the sphere location.
         colors : list[str]
             A string representing the hexadecimal color for the coordinates.
+        label : str
+            The name to be used in the legend for the marker.
         size : float
             The size of the marker for drawing the coordinates.
 
         """
+        raise NotImplementedError(
+            "This method is expected to be override by a specific plotting backend."
+        )
+
+    def update_legend(self):
+        """Update the legend of the scene."""
         raise NotImplementedError(
             "This method is expected to be override by a specific plotting backend."
         )

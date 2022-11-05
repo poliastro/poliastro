@@ -145,9 +145,9 @@ def test_plot_2d_trajectory_plots_a_trajectory(backend_name):
 def test_set_view(backend_name):
     plotter = OrbitPlotter(backend_name=backend_name)
     plotter.set_view(0 * u.deg, 0 * u.deg, 1000 * u.m)
-    figure = plotter.show()
+    plotter.show()
 
-    eye = figure["layout"]["scene"]["camera"]["eye"]
+    eye = plotter.backend.figure["layout"]["scene"]["camera"]["eye"]
     assert eye["x"] == 1
     assert eye["y"] == 0
     assert eye["z"] == 0

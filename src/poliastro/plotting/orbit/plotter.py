@@ -232,6 +232,7 @@ class OrbitPlotter:
         self.backend.draw_sphere(
             position=[0, 0, 0] * u.km,
             color=color,
+            label=None,
             radius=self._attractor_radius,
         )
 
@@ -290,6 +291,18 @@ class OrbitPlotter:
         # Unpack trajectory data
         coordinates, position, colors, dashed, label = trajectory
 
+        # HACK: the different backends manage legends in a different way. There
+        # are additional restrictions depending on the type of objects they
+        # provide for generating the coordinates and the positions. Some of
+        # these objects can not be rendered in the legend.
+        has_coordinates, has_position = (
+            coordinates is not None,
+            position is not None,
+        )
+        coordinates_label, position_label = self.backend.generate_labels(
+            label, has_coordinates, has_position
+        )
+
         # Project the coordinates into desired frame for 2D backends
         if self.backend.is_2D:
             rr = coordinates.xyz.transpose()
@@ -302,15 +315,17 @@ class OrbitPlotter:
                     * u.km
                 )
 
-        # Add the coordinates and the position to the scene
+        # Add the coordinates to the scene
         trace_coordinates = self.backend.draw_coordinates(
             coordinates,
             colors=colors,
             dashed=dashed,
+            label=coordinates_label,
         )
 
+        # Add the position to the scene
         if position is not None:
-            # Define an arbitrary threshold for the marker size
+            # Use a proper size for the position in the scene
             marker_size = min(
                 self._attractor_radius * 0.5,
                 (norm(position) - self._attractor.R) * 0.5,
@@ -318,14 +333,17 @@ class OrbitPlotter:
 
             # Generate the trace for the position
             trace_position = self.backend.draw_position(
-                position, color=colors[0], label=None, size=marker_size
+                position,
+                color=colors[0],
+                label=position_label,
+                size=marker_size,
             )
         else:
             trace_position = None
 
-        # Add the label and render the legend
-        if label is not None:
-            self.backend.draw_label(label, trace_coordinates, trace_position)
+        # Update the legend to reflect the new traces
+        if coordinates_label is not None or position_label is not None:
+            self.backend.update_legend()
 
         return (
             (trace_coordinates, trace_position)
@@ -559,11 +577,6 @@ class OrbitPlotter:
                     label=impulse_label,
                     size=None,
                 )
-                self.backend.draw_label(
-                    impulse_label,
-                    trace_position=impulse_lines,
-                    trace_coordinates=None,
-                )
                 lines_list.append((impulse_label, impulse_lines))
 
                 # HACK: if no color is provided, get the one randomly generated
@@ -602,12 +615,10 @@ class OrbitPlotter:
                 label=impulse_label,
                 size=None,
             )
-            self.backend.draw_label(
-                impulse_label,
-                trace_position=impulse_lines,
-                trace_coordinates=None,
-            )
             lines_list.append((impulse_label, impulse_lines))
+
+            # Update the legend to reflect all the traces
+            self.backend.update_legend()
 
     def plot_coordinates(
         self,

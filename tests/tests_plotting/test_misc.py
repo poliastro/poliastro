@@ -12,7 +12,6 @@ def test_plot_solar_system_has_expected_number_of_orbits(outer, expected):
 
 @pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
 def test_plot_solar_system_uses_expected_orbitplotter(backend_name):
-    print(backend_name)
     assert isinstance(
         plot_solar_system(backend_name=backend_name).backend,
         SUPPORTED_ORBIT_PLOTTER_BACKENDS[backend_name],
