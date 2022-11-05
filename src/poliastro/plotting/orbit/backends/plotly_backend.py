@@ -2,10 +2,9 @@
 
 from itertools import cycle
 
-import numpy as np
-from astropy import units as u
 import plotly
 import plotly.graph_objects as go
+from astropy import units as u
 
 from poliastro.plotting.orbit.backends.base_backend import _OrbitPlotterBackend
 
@@ -30,7 +29,7 @@ class OrbitPlotterBackendPlotly2D(_OrbitPlotterBackend):
 
         # Specify the desired color cycle
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
-        
+
         # Store the scene object
         scene = figure or go.Figure()
         super().__init__(scene, name=self.__class__.__name__)
@@ -104,7 +103,7 @@ class OrbitPlotterBackendPlotly2D(_OrbitPlotterBackend):
         """
         # This will apply the label to either the point or the osculating
         # orbit depending on the last plotted line
-        trace_id = -1 if trace_coordinates is not None else -2 
+        trace_id = -1 if trace_coordinates is not None else -2
         self.figure["data"][trace_id]["showlegend"] = True
         self.figure["data"][trace_id]["name"] = label
 
@@ -162,7 +161,11 @@ class OrbitPlotterBackendPlotly2D(_OrbitPlotterBackend):
 
         """
         return self.draw_marker(
-            position, color=color, marker_symbol="circle", label=None, size=size
+            position,
+            color=color,
+            marker_symbol="circle",
+            label=None,
+            size=size,
         )
 
     def draw_impulse(self, position, *, color, label, size):
@@ -208,16 +211,16 @@ class OrbitPlotterBackendPlotly2D(_OrbitPlotterBackend):
 
         """
         return self.figure.add_shape(
-                type="circle",
-                xref="x",
-                yref="y",
-                x0=(position[0] - radius).to_value(u.km),
-                y0=(position[1] - radius).to_value(u.km),
-                x1=(position[0] + radius).to_value(u.km),
-                y1=(position[1] + radius).to_value(u.km),
-                fillcolor=color,
-                line_color=color,
-                opacity=1,
+            type="circle",
+            xref="x",
+            yref="y",
+            x0=(position[0] - radius).to_value(u.km),
+            y0=(position[1] - radius).to_value(u.km),
+            x1=(position[0] + radius).to_value(u.km),
+            y1=(position[1] + radius).to_value(u.km),
+            fillcolor=color,
+            line_color=color,
+            opacity=1,
         )
 
     def undraw_attractor(self):

@@ -21,12 +21,11 @@ from poliastro.plotting.orbit.backends import (
 from poliastro.twobody import Orbit
 from poliastro.util import time_range
 
-
 # @pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
 # def test_get_figure_has_expected_properties(backend_name):
 #     plotter = OrbitPlotter(backend_name=backend_name)
 #     scene = plotter.show()
-# 
+#
 #     assert scene.data == ()
 #     assert scene.layout.autosize is True
 #     assert "xaxis" in scene.layout
@@ -36,7 +35,7 @@ from poliastro.util import time_range
 # def test_plotter_with_plotly3D_backend_has_expected_properties():
 #     frame = OrbitPlotter()
 #     figure = frame.show()
-# 
+#
 #     assert figure.data == ()
 #     assert figure.layout.autosize is True
 #     assert "xaxis" in figure.layout.scene
@@ -154,11 +153,15 @@ def test_set_view(backend_name):
     assert eye["z"] == 0
 
 
-@pytest.mark.parametrize("is_dark, expected_bg", [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))])
+@pytest.mark.parametrize(
+    "is_dark, expected_bg",
+    [(True, (0.0, 0.0, 0.0, 1.0)), (False, (1.0, 1.0, 1.0, 1))],
+)
 @pytest.mark.parametrize("backend_name", ["matplotlib2D"])
 def test_dark_theme_backend_matplotlib(backend_name, is_dark, expected_bg):
     plotter = OrbitPlotter(backend_name=backend_name, use_dark_theme=is_dark)
     assert plotter.backend.scene.get_facecolor() == expected_bg
+
 
 def test_axes_labels_and_title():
     ax = plt.gca()

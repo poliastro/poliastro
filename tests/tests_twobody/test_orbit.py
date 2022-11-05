@@ -478,7 +478,7 @@ def test_orbit_plot_has_desired_backend(backend_name):
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
     plot = ss.plot(backend_name=backend_name)
-    
+
     # Relate the graphics library with the expected scene type
     graphics_lib_dict = {
         "matplotlib": matplotlib.axes.Axes,
