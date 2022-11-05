@@ -88,11 +88,11 @@ orb_trans, orb_target = orb_earth.apply_maneuver(man_lambert, intermediate=True)
 Let's plot this transfer orbit in 3D!
 
 ```{code-cell} ipython3
-from poliastro.plotting import OrbitPlotter3D
+from poliastro.plotting import OrbitPlotter
 ```
 
 ```{code-cell} ipython3
-plotter = OrbitPlotter3D()
+plotter = OrbitPlotter(backend_name="plotly3D")
 plotter.set_attractor(Sun)
 
 plotter.plot_ephem(earth, date_launch, label="Earth at launch position")
@@ -103,6 +103,7 @@ plotter.plot_trajectory(
     label="Transfer orbit",
 )
 plotter.set_view(30 * u.deg, 260 * u.deg, distance=3 * u.km)
+plotter.show()
 ```
 
 Not bad! Let's celebrate with some music!

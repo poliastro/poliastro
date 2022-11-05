@@ -22,7 +22,8 @@ class _OrbitPlotterBackend:
 
         """
         # Verify backend name ends with '2D' or '3D'
-        if not name.endswith("2D") or name.endswith("3D"):
+        if name[-2:] not in ["2D", "3D"]:
+            print(f"Name was found to be {name[-2:] = }")
             raise ValueError("Backend name must end with '2D' or '3D'.")
 
         self._scene = scene

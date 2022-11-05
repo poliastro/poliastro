@@ -351,7 +351,7 @@ class OrbitPlotter:
 
         """
         # Check if the orbit plotter frame has been set
-        if not self._frame:
+        if self.backend.is_2D and self._frame is None:
             self.set_orbit_frame(orbit)
 
         # Assign attractor if required
@@ -402,7 +402,7 @@ class OrbitPlotter:
 
         """
         # Assign frame if required
-        if self._frame is None:
+        if self.backend.is_2D and self._frame is None:
             self.set_body_frame(body, epoch)
 
         # Assign attractor if required
@@ -445,7 +445,7 @@ class OrbitPlotter:
             Fade the orbit trail, default to False.
 
         """
-        if self._frame is None:
+        if self.backend.is_2D and self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
                 "set_orbit_frame(orbit) or plot(orbit)"
@@ -516,6 +516,8 @@ class OrbitPlotter:
                 ).flatten()
                 * u.km
             )
+        else:
+            final_phase_position = final_phase.r
 
         if not len(maneuver_phases):
             # For single-impulse maneuver only draw the impulse marker
@@ -546,6 +548,8 @@ class OrbitPlotter:
                         ).flatten()
                         * u.km
                     )
+                else:
+                    orbit_phase_r = orbit_phase.r
 
                 # Plot the impulse marker and collect its label and lines
                 impulse_label = f"Impulse {ith_impulse + 1} - {label}"
@@ -637,7 +641,7 @@ class OrbitPlotter:
 
         """
         # Check if a frame has been set
-        if self._frame is None:
+        if self.backend.is_2D and self._frame is None:
             raise ValueError(
                 "A frame must be set up first, please use "
                 "set_orbit_frame(orbit) or plot(orbit)"
@@ -704,6 +708,24 @@ class OrbitPlotter:
             trail=trail,
             dashed=dashed,
         )
+
+    @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
+    def set_view(self, elev, azim, distance=5 * u.km):
+        """Changes 3D view by setting the elevation, azimuth and distance.
+
+        Parameters
+        ----------
+        elev : ~astropy.units.Quantity
+            Desired elevation angle of the camera.
+        azim : ~astropy.units.Quantity
+            Desired azimuth angle of the camera.
+        distance : optional, ~astropy.units.Quantity
+            Desired distance of the camera to the scene.
+
+        """
+        if self.backend.is_2D:
+            raise AttributeError("View can only be in 3D backends.")
+        self.backend.set_view(elev, azim, distance)
 
     def show(self):
         """Render the plot."""
