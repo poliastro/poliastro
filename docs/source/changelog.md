@@ -1009,7 +1009,7 @@ frames are handled in poliastro.
   developed in the next release and transformations to arbitrary frames will be allowed.
   Check out the :py:mod:`poliastro.frames` module for more information.
 
-.. _`how to analyze parts of its trajectory using poliastro`: http://docs.poliastro.space/en/latest/examples/Analyzing%20the%20Parker%20Solar%20Probe%20flybys.html
+.. _`how to analyze parts of its trajectory using poliastro`: http://docs.poliastro.space/en/latest/examples/Analyzing%5fthe%5fParker%5fSolar%5fProbe%5fflybys.html
 ```
 
 ### Bugs fixed
