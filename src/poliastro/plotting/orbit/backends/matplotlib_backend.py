@@ -98,7 +98,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             An object representing the trace of the marker in the scene.
 
         """
-        return self.ax.plot(
+        (marker_trace,) = self.ax.plot(
             position[0].to_value(u.km),
             position[1].to_value(u.km),
             color=color,
@@ -107,6 +107,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             label=label,
             linestyle="None",
         )
+        return marker_trace
 
     def draw_position(self, position, *, color, label, size):
         """Draws the position of a body in the scene.
@@ -236,7 +237,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
 
         else:
             # Plot the coordinates in the scene
-            lines_coordinates = self.ax.plot(
+            (lines_coordinates,) = self.ax.plot(
                 x,
                 y,
                 color=colors[0],
