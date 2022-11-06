@@ -48,21 +48,19 @@ class OrbitPlotter:
     ):
         """Initializes the plotter instance.
 
-                Parameters
-                ----------
-                scene : object
-                    An instance representing the canvas or scene.
-                backend_name : str
-                    Name of the plotting backend to be used.
-                backend_kargs : dict, optional
-                    Additional configuration arguments for the backend.
-                num_points : int, optional
-                    Number of points to use when drawing trajectories. Default to 150.
-                plane : ~poliastro.frames.Plane, optional
-                    Reference plane to be used when drawing the scene. Default to
-                    `EARTH_EQUATOR`.
-                length_units : ~astropy.units.Unit
-                    Desired lenght units to be used when representing distances.
+        Parameters
+        ----------
+        scene : object
+            An instance representing the canvas or scene.
+        backend_name : str
+            Name of the plotting backend to be used.
+        num_points : int, optional
+            Number of points to use when drawing trajectories. Default to 150.
+        plane : ~poliastro.frames.Plane, optional
+            Reference plane to be used when drawing the scene. Default to
+            `EARTH_EQUATOR`.
+        length_units : ~astropy.units.Unit
+            Desired lenght units to be used when representing distances.
         _
         """
         # Verify selected backend is supported

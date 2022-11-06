@@ -133,7 +133,7 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
 
         Returns
         -------
-        ~matplotlib.lines.Line2D
+        object
             An object representing the trace of the impulse in the scene.
 
         """
@@ -199,7 +199,7 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
 
         Returns
         -------
-        ~matplotlib.lines.Line2D
+        object
             An object representing the trace of the marker in the scene.
 
         """
@@ -271,7 +271,7 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
 
         Returns
         -------
-        trace_coordinates : ~matplotlib.lines.Line2D
+        trace_coordinates : object
             An object representing the trace of the coordinates in the scene.
 
         """
@@ -348,7 +348,7 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
 
         Returns
         -------
-        ~matplotlib.lines.Line2D
+        object
             An object representing the trace of the marker in the scene.
 
         """
@@ -380,7 +380,7 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
 
         Returns
         -------
-        ~matplotlib.patches.Patch
+        object
             An object representing the trace of the sphere in the scene.
 
         """
@@ -416,7 +416,7 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
 
         Returns
         -------
-        trace_coordinates : ~matplotlib.lines.Line2D
+        trace_coordinates : object
             An object representing the trace of the coordinates in the scene.
 
         """
