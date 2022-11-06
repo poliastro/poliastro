@@ -355,6 +355,9 @@ class OrbitPlotter:
         if coordinates_label is not None or position_label is not None:
             self.backend.update_legend()
 
+        # Update the limits of the scene
+        self.backend.resize_limits()
+
         return (
             (trace_coordinates, trace_position)
             if position is not None

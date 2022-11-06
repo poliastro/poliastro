@@ -219,6 +219,12 @@ class _OrbitPlotterBackend:
             "This method is expected to be override by a specific plotting backend."
         )
 
+    def resize_limits(self):
+        """Resize the limits of the scene."""
+        raise NotImplementedError(
+            "This method is expected to be override by a specific plotting backend."
+        )
+
     def show(self):
         """Displays the scene."""
         raise NotImplementedError(

@@ -272,6 +272,11 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             numpoints=1,
         )
 
+    def resize_limits(self):
+        """Resize the limits of the scene."""
+        self.ax.relim()
+        self.ax.autoscale()
+
     def show(self):
         """Displays the scene."""
         plt.show()

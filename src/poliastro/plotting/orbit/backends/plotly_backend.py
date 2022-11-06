@@ -145,6 +145,10 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
         """Update the legend of the scene."""
         pass
 
+    def resize_limits(self):
+        """Resize the limits of the scene."""
+        pass
+
     def show(self):
         """Displays the scene."""
         self.update_layout(self._layout)
