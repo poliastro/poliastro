@@ -20,7 +20,7 @@ from astropy import units as u
 from poliastro.bodies import Earth, Mars, Sun
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
-from poliastro.plotting import OrbitPlotter3D
+from poliastro.plotting import OrbitPlotter
 from poliastro.util import time_range
 
 EPOCH = Time("2018-02-18 12:00:00", scale="tdb")
@@ -56,7 +56,7 @@ frame.plot_ephem(roadster, EPOCH, label="SpaceX Roadster", color="black")
 ```
 
 ```{code-cell}
-frame = OrbitPlotter3D(plane=Planes.EARTH_ECLIPTIC)
+frame = OrbitPlotter(backend_name="plotly3D", plane=Planes.EARTH_ECLIPTIC)
 
 frame.plot_body_orbit(Earth, EPOCH)
 frame.plot_body_orbit(Mars, EPOCH)

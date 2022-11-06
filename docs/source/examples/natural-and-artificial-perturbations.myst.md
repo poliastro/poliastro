@@ -32,7 +32,7 @@ from poliastro.core.perturbations import (
 )
 from poliastro.core.propagation import func_twobody
 from poliastro.ephem import build_ephem_interpolant
-from poliastro.plotting import OrbitPlotter3D
+from poliastro.plotting import OrbitPlotter
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import CowellPropagator
 from poliastro.twobody.sampling import EpochsArray
@@ -234,7 +234,7 @@ ephem = initial.to_ephem(
 ```
 
 ```{code-cell} ipython3
-frame = OrbitPlotter3D()
+frame = OrbitPlotter(backend_name="plotly3D")
 
 frame.set_attractor(Earth)
 frame.plot_ephem(ephem, label="orbit influenced by Moon")
@@ -289,7 +289,7 @@ ephem2 = orb0.to_ephem(
 ```
 
 ```{code-cell} ipython3
-frame = OrbitPlotter3D()
+frame = OrbitPlotter(backend_name="plotly3D")
 
 frame.set_attractor(Earth)
 frame.plot_ephem(ephem2, label="orbit with artificial thrust")

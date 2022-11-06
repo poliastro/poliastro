@@ -42,7 +42,7 @@ import numpy as np
 from poliastro.bodies import Earth
 from poliastro.core.propagation import func_twobody
 from poliastro.examples import iss
-from poliastro.plotting import OrbitPlotter3D
+from poliastro.plotting import OrbitPlotter
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import CowellPropagator
 from poliastro.twobody.sampling import EpochsArray
@@ -95,7 +95,7 @@ ephem = iss.to_ephem(
 And we plot the results:
 
 ```{code-cell} ipython3
-frame = OrbitPlotter3D()
+frame = OrbitPlotter(backend_name="plotly3D")
 
 frame.set_attractor(Earth)
 frame.plot_ephem(ephem, label="ISS")

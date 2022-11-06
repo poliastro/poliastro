@@ -258,9 +258,9 @@ And, finally, we plot the solution:
 ```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
-from poliastro.plotting import StaticOrbitPlotter
+from poliastro.plotting import OrbitPlotter
 
-frame = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
+frame = OrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
 
 frame.plot_body_orbit(Earth, d_launch)
 frame.plot_body_orbit(Venus, flyby_1_time)
