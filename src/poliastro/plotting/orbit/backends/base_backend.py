@@ -4,7 +4,7 @@
 class _OrbitPlotterBackend:
     """A base class for implementing new orbit plotter backends."""
 
-    def __init__(self, scene, name):
+    def __init__(self, scene, name, ref_units):
         """Initialize the orbit plotter backend.
 
         Parameters
@@ -13,6 +13,8 @@ class _OrbitPlotterBackend:
             An instance representing the canvas or scene.
         name : str
             Name of the backend.
+        ref_units : optional, ~astropy.units.Unit
+            The reference units to be used when drawing lenghts.
 
         Notes
         -----
@@ -28,6 +30,7 @@ class _OrbitPlotterBackend:
 
         self._scene = scene
         self._name = name
+        self._ref_units = ref_units
 
     @property
     def scene(self):
@@ -45,6 +48,18 @@ class _OrbitPlotterBackend:
 
         """
         return self._name
+
+    @property
+    def ref_units(self):
+        """Return the units of reference for drawing lenghts.
+
+        Returns
+        -------
+        ~astropy.units.Unit
+            The reference units to be used when drawing lenghts.
+
+        """
+        return self._ref_units
 
     @property
     def is_2D(self):

@@ -44,32 +44,33 @@ class OrbitPlotter:
         num_points=150,
         *,
         plane=None,
-        unit=u.km,
+        length_units=u.km,
     ):
         """Initializes the plotter instance.
 
-        Parameters
-        ----------
-        scene : object
-            An instance representing the canvas or scene.
-        backend_name : str
-            Name of the plotting backend to be used.
-        backend_kargs : dict, optional
-            Additional configuration arguments for the backend.
-        num_points : int, optional
-            Number of points to use when drawing trajectories. Default to 150.
-        plane : ~poliastro.frames.Plane, optional
-            Reference plane to be used when drawing the scene. Default to
-            `EARTH_EQUATOR`.
-        unit : ~astropy.units.Unit
-            Desired lenght unit to be used when representing distances.
-
+                Parameters
+                ----------
+                scene : object
+                    An instance representing the canvas or scene.
+                backend_name : str
+                    Name of the plotting backend to be used.
+                backend_kargs : dict, optional
+                    Additional configuration arguments for the backend.
+                num_points : int, optional
+                    Number of points to use when drawing trajectories. Default to 150.
+                plane : ~poliastro.frames.Plane, optional
+                    Reference plane to be used when drawing the scene. Default to
+                    `EARTH_EQUATOR`.
+                length_units : ~astropy.units.Unit
+                    Desired lenght units to be used when representing distances.
+        _
         """
         # Verify selected backend is supported
         try:
             self._backend = SUPPORTED_ORBIT_PLOTTER_BACKENDS[backend_name](
                 scene,
                 use_dark_theme=use_dark_theme,
+                ref_units=length_units,
             )
         except KeyError:
             raise ValueError(
@@ -83,7 +84,6 @@ class OrbitPlotter:
         self._plane = plane or Planes.EARTH_EQUATOR
         self._frame = None
         self._trajectories = []  # type: List[Trajectory]
-        self._unit = unit
 
     @property
     def backend(self):
@@ -99,6 +99,18 @@ class OrbitPlotter:
     def trajectories(self):
         """A list with all the `Trajectory` instances used in the plotter."""
         return self._trajectories
+
+    @property
+    def length_units(self):
+        """Return the units use for representing distances.
+
+        Returns
+        -------
+        length_units : ~astropy.units.Unit
+            Desired lenght units to be used when representing distances.
+
+        """
+        return self.backend.ref_units
 
     def set_attractor(self, attractor):
         """Set the desired plotting attractor.
@@ -310,7 +322,7 @@ class OrbitPlotter:
             if position is not None:
                 position = (
                     np.asarray(
-                        self._project([position.to_value(u.km)])
+                        self._project([position.to_value(self.length_units)])
                     ).flatten()
                     * u.km
                 )
@@ -530,7 +542,7 @@ class OrbitPlotter:
         if self.backend.is_2D:
             final_phase_position = (
                 np.asarray(
-                    self._project([final_phase.r.to_value(u.km)])
+                    self._project([final_phase.r.to_value(self.length_units)])
                 ).flatten()
                 * u.km
             )
@@ -562,7 +574,9 @@ class OrbitPlotter:
                 if self.backend.is_2D:
                     orbit_phase_r = (
                         np.asarray(
-                            self._project([orbit_phase.r.to_value(u.km)])
+                            self._project(
+                                [orbit_phase.r.to_value(self.length_units)]
+                            )
                         ).flatten()
                         * u.km
                     )

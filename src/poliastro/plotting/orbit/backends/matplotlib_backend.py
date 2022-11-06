@@ -1,7 +1,6 @@
 """A module implementing orbit plotter backends based on Matplotlib."""
 
 import numpy as np
-from astropy import units as u
 from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
@@ -21,7 +20,7 @@ def _segments_from_arrays(x, y):
 class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
     """An orbit plotter backend class based on Matplotlib."""
 
-    def __init__(self, ax=None, use_dark_theme=None):
+    def __init__(self, ax, use_dark_theme, ref_units):
         """Initializes a backend instance.
 
         Parameters
@@ -33,13 +32,13 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             Default to ``False``.
 
         """
-        if not ax:
+        if ax is None:
             if use_dark_theme is True:
                 with plt.style.context("dark_background"):
                     _, ax = plt.subplots(figsize=(6, 6))
             else:
                 _, ax = plt.subplots(figsize=(6, 6))
-        super().__init__(ax, name=self.__class__.__name__)
+        super().__init__(ax, self.__class__.__name__, ref_units)
 
     @property
     def ax(self):
@@ -99,8 +98,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
 
         """
         (marker_trace,) = self.ax.plot(
-            position[0].to_value(u.km),
-            position[1].to_value(u.km),
+            position[0].to_value(self.ref_units),
+            position[1].to_value(self.ref_units),
             color=color,
             marker=marker_symbol,
             markersize=size,
@@ -181,8 +180,11 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         """
         return self.ax.add_patch(
             mpl_patches.Circle(
-                (position[0].to_value(u.km), position[1].to_value(u.km)),
-                radius.to_value(u.km),
+                (
+                    position[0].to_value(self.ref_units),
+                    position[1].to_value(self.ref_units),
+                ),
+                radius.to_value(self.ref_units),
                 color=color,
                 linewidth=0,
                 label=label,
@@ -219,7 +221,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
         linestyle = "dashed" if dashed else "solid"
 
         # Unpack coordinates
-        x, y, z = (coords.to_value(u.km) for coords in coordinates)
+        x, y, z = (coords.to_value(self.ref_units) for coords in coordinates)
 
         # Generate the colors if coordinates trail is required
         if len(colors) > 1:
@@ -246,8 +248,8 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             )
 
         # Update the axes labels and impose a 1:1 aspect ratio between them
-        self.ax.set_xlabel("$x$ (km)")
-        self.ax.set_ylabel("$y$ (km)")
+        self.ax.set_xlabel(f"$x$ ({self.ref_units.name})")
+        self.ax.set_ylabel(f"$y$ ({self.ref_units.name})")
         self.ax.set_aspect(1)
 
         return lines_coordinates

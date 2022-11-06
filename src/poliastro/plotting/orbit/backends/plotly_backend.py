@@ -14,7 +14,7 @@ from poliastro.plotting.util import generate_sphere
 class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure=None, layout=None):
+    def __init__(self, figure, layout, ref_units):
         """Initializes a backend instance.
 
         Parameters
@@ -23,13 +23,15 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
             The plotly ``Figure`` to render the scene.
         ~plotly.graph_objects.Layout
             The plotly ``Layout`` object linked to the figure.
+        ref_units : ~astropy.units.Unit
+            Desired lenght units to be used when representing distances.
 
         """
         figure = figure or go.Figure()
-        super().__init__(figure, name=self.__class__.__name__)
+        super().__init__(figure, self.__class__.__name__, ref_units)
 
         self._layout = layout or go.Layout()
-        self.update_layout()
+        self.update_layout(self._layout)
 
         self._color_cycle = cycle(plotly.colors.DEFAULT_PLOTLY_COLORS)
 
@@ -57,7 +59,7 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
         """
         return self._layout
 
-    def update_layout(self, layout=None):
+    def update_layout(self, layout):
         """Update the layout of the figure scene.
 
         Parameters
@@ -66,7 +68,6 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
             The new plotly ``Layout`` to be used in the figure.
 
         """
-        layout = self.layout or layout
         self.figure.update_layout(layout)
 
     def _get_colors(self, color, trail):
@@ -146,7 +147,7 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
 
     def show(self):
         """Displays the scene."""
-        self.update_layout()
+        self.update_layout(self._layout)
         if not self.figure._in_batch_mode:
             return self.figure.show()
 
@@ -154,7 +155,7 @@ class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
 class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure=None, use_dark_theme=None):
+    def __init__(self, figure, use_dark_theme, ref_units):
         """Initializes a backend instance.
 
         Parameters
@@ -164,6 +165,8 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
             Default to ``False``.
+        ref_units : ~astropy.units.Unit
+            Desired lenght units to be used when representing distances.
 
         """
         # Apply the desired theme
@@ -172,11 +175,11 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
         # Declare the layout and attach it to the figure
         layout = go.Layout(
             autosize=True,
-            xaxis=dict(title=" x ({self._unit})", constrain="domain"),
-            yaxis=dict(title=" y ({self._unit})", scaleanchor="x"),
+            xaxis=dict(title=f" x ({ref_units.name})", constrain="domain"),
+            yaxis=dict(title=f" y ({ref_units.name})", scaleanchor="x"),
             template=theme,
         )
-        super().__init__(figure, layout)
+        super().__init__(figure, layout, ref_units)
 
     def draw_marker(self, position, *, color, label, marker_symbol, size):
         """Draws a marker into the scene.
@@ -241,10 +244,10 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
             type="circle",
             xref="x",
             yref="y",
-            x0=(position[0] - radius).to_value(u.km),
-            y0=(position[1] - radius).to_value(u.km),
-            x1=(position[0] + radius).to_value(u.km),
-            y1=(position[1] + radius).to_value(u.km),
+            x0=(position[0] - radius).to_value(self.ref_units),
+            y0=(position[1] - radius).to_value(self.ref_units),
+            x1=(position[0] + radius).to_value(self.ref_units),
+            y1=(position[1] + radius).to_value(self.ref_units),
             fillcolor=color,
             line=dict(color=color),
             opacity=1,
@@ -276,7 +279,7 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
         linestyle = "dash" if dashed else "solid"
 
         # Unpack coordinates
-        x, y, _ = (coords.to_value(u.km) for coords in coordinates)
+        x, y, _ = (coords.to_value(self.ref_units) for coords in coordinates)
 
         # Plot the coordinates in the scene
         coordinates_trace = go.Scatter(
@@ -297,7 +300,7 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
 class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure=None, use_dark_theme=None):
+    def __init__(self, figure, use_dark_theme, ref_units):
         """Initializes a backend instance.
 
         Parameters
@@ -307,6 +310,8 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
             Default to ``False``.
+        ref_units : ~astropy.units.Unit
+            Desired lenght unit to be used when representing distances.
 
         """
         # Apply the desired theme
@@ -316,14 +321,14 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
         layout = go.Layout(
             autosize=True,
             scene=dict(
-                xaxis=dict(title=" x ({self._unit})"),
-                yaxis=dict(title=" y ({self._unit})"),
-                zaxis=dict(title=" z ({self._unit})"),
+                xaxis=dict(title=f" x ({ref_units.name})"),
+                yaxis=dict(title=f" y ({ref_units.name})"),
+                zaxis=dict(title=f" z ({ref_units.name})"),
                 aspectmode="data",
             ),
             template=theme,
         )
-        super().__init__(figure, layout)
+        super().__init__(figure, layout, ref_units)
 
     def draw_marker(self, position, *, color, marker_symbol, label, size):
         """Draws a marker into the scene.
@@ -381,9 +386,9 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
         """
         xx, yy, zz = generate_sphere(radius, position)
         sphere = go.Surface(
-            x=xx.to_value(u.km),
-            y=yy.to_value(u.km),
-            z=zz.to_value(u.km),
+            x=xx.to_value(self.ref_units),
+            y=yy.to_value(self.ref_units),
+            z=zz.to_value(self.ref_units),
             colorscale=[[0, color], [1, color]],
             cauto=False,
             cmin=1,
@@ -420,9 +425,9 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
 
         # Plot the coordinates in the scene
         coordinates_trace = go.Scatter3d(
-            x=coordinates.x.to_value(u.km),
-            y=coordinates.y.to_value(u.km),
-            z=coordinates.z.to_value(u.km),
+            x=coordinates.x.to_value(self.ref_units),
+            y=coordinates.y.to_value(self.ref_units),
+            z=coordinates.z.to_value(self.ref_units),
             line=dict(color=colors[0], width=5, dash=linestyle),
             mode="lines",
             name=label,
@@ -454,8 +459,8 @@ class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
                 "scene": {
                     "camera": {
                         "eye": {
-                            "x": x.to_value(u.km),
-                            "y": y.to_value(u.km),
+                            "x": x.to_value(self.ref_units),
+                            "y": y.to_value(self.ref_units),
                             "z": z.to_value(u.km),
                         }
                     }
