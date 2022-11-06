@@ -10,7 +10,7 @@ the plotting utilities, insight on the {ref}`API <api-reference>` capabilities a
 
    /examples/analyzing-the-parker-solar-probe-flybys.myst.md
    /examples/atmospheric-models.myst.md
-   /examples/catch-that-asteroid!.myst.md
+   /examples/catch-that-asteroid.myst.md
    /examples/customising-static-orbit-plots.myst.md
    /examples/czml-tutorial.myst.md
    /examples/exploring-the-new-horizons-launch.myst.md
