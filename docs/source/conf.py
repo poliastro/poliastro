@@ -156,14 +156,14 @@ html_js_files = ["language_data.js"]
 
 # Thumbnail selection for nbsphinx gallery
 nbsphinx_thumbnails = {
-    "examples/Going to Mars with Python using poliastro": "_static/thumbnails/going_to_mars_thumbnail.png",
-    "examples/Plotting in 3D": "_static/thumbnails/3d_plotting_thumbnail.png",
-    "examples/Propagation using Cowells formulation": "_static/thumbnails/cowell_thumbnail.png",
-    "examples/CZML Tutorial": "_static/thumbnails/cesium_thumbnail.png",
-    "examples/Generating orbit groundtracks": "_static/thumbnails/groundtrack.png",
-    "examples/Detecting Events": "_static/thumbnails/eclipse.png",
-    "examples/Loading OMM and TLE satellite data": "_static/thumbnails/omm_debris.png",
-    "examples/Multirevolutions solution in Lamberts problem": "_static/thumbnails/lambert_paths.png",
+    "examples/going-to-mars-with-python-using-poliastro": "_static/thumbnails/going_to_mars_thumbnail.png",
+    "examples/plotting-in-3D": "_static/thumbnails/3d_plotting_thumbnail.png",
+    "examples/propagation-using-cowells-formulation": "_static/thumbnails/cowell_thumbnail.png",
+    "examples/czml-tutorial": "_static/thumbnails/cesium_thumbnail.png",
+    "examples/generating-orbit-groundtracks": "_static/thumbnails/groundtrack.png",
+    "examples/detecting-events": "_static/thumbnails/eclipse.png",
+    "examples/loading-OMM-and-TLE-satellite-data": "_static/thumbnails/omm_debris.png",
+    "examples/multirevolutions-solution-in-lamberts-problem": "_static/thumbnails/lambert_paths.png",
 }
 
 nbsphinx_custom_formats = {
