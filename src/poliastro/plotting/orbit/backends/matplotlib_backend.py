@@ -103,6 +103,7 @@ class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
             color=color,
             marker=marker_symbol,
             markersize=size,
+            markeredgecolor=color,
             label=label,
             linestyle="None",
         )
