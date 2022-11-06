@@ -3,7 +3,6 @@ from collections import OrderedDict
 from functools import partial
 from unittest import mock
 
-import matplotlib
 import numpy as np
 import pytest
 from astropy import units as u
@@ -472,22 +471,12 @@ def test_orbit_is_pickable(hyperbolic):
 
 
 @pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
-def test_orbit_plot_has_desired_backend(backend_name):
+def test_orbit_plot_raises_no_error(backend_name):
     # Data from Curtis, example 4.3
     r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-    plot = ss.plot(backend_name=backend_name)
-
-    # Relate the graphics library with the expected scene type
-    graphics_lib_dict = {
-        "matplotlib": matplotlib.axes.Axes,
-    }
-
-    # Assert if the plotter scene is of expected type
-    for graphics_lib, expected_type in graphics_lib_dict.items():
-        if backend_name.startswith(graphics_lib):
-            assert isinstance(plot.backend.scene, expected_type)
+    ss.plot(backend_name=backend_name)
 
 
 @pytest.mark.parametrize(

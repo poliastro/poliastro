@@ -619,7 +619,7 @@ class Orbit(OrbitCreationMixin):
             res = orbit_new
         return res
 
-    def plot(self, backend_name="matplotlib2D", label=None):
+    def plot(self, backend_name=None, label=None):
         """Plots the orbit.
 
         Parameters
@@ -631,17 +631,36 @@ class Orbit(OrbitCreationMixin):
 
         Returns
         -------
-        ~ poliastro.plotting.orbit.OrbitPlotter
+        ~poliastro.plotting.orbit.OrbitPlotter
             An object for plotting orbits.
 
         """
         # HACK: avoid circular dependency
         from poliastro.plotting.orbit.plotter import OrbitPlotter
 
+        # Select the best backend depending if it is an interactive or batch
+        # session
+        if backend_name is None:
+            try:
+                shell = get_ipython().__class__.__name__
+                if shell == "ZMQInteractiveShell":
+                    # Jupyter notebook or qtconsole
+                    is_interactive = True
+                elif shell == "TerminalInteractiveShell":
+                    # Terminal running IPython
+                    is_interactive = False
+                else:
+                    # Other type of shell
+                    is_interactive = False
+            except NameError:
+                # Standard Python interpreter
+                is_interactive = False
+            finally:
+                backend_name = "plotly2D" if is_interactive else "matplotlib2D"
+
         plotter = OrbitPlotter(backend_name=backend_name)
         plotter.plot(self, label=label)
         plotter.show()
-        return plotter
 
     def elevation(self, lat, theta, h):
         """
