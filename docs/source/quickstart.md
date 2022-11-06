@@ -88,8 +88,11 @@ This plot is made in the so called *perifocal frame*, which means:
 The dotted line represents the *osculating orbit*: the instantaneous Keplerian orbit at that point. This is relevant in the context of perturbations, when the object shall deviate from its Keplerian orbit.
 
 ```{note}
-This visualization uses Plotly under the hood and works best in a Jupyter notebook.
-To use the static interface based on matplotlib, which might be more useful for batch jobs and ublication-quality plots, check out the {py:class}`poliastro.plotting.static.StaticOrbitPlotter`.
+This visualization uses Plotly under interactive environments like Jupyter
+Noteook or Jupyter Lab while it switches to Matplotlib otherwise. Nevertheless,
+you can select the drawing backend. Check out the
+{py:class}`poliastro.plotting.orbit.OrbitPlotter` documentation for more
+information. 
 ```
 
 ## From classical orbital elements
@@ -369,29 +372,37 @@ the method {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.apply_maneuver`:
 36000 x 36000 km x 0.0 deg (GCRS) orbit around Earth (♁)
 ```
 
-### More advanced plotting: `OrbitPlotter*` objects
+### More advanced plotting: `OrbitPlotter` objects
 
-You previously saw the {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.plot` method to easily plot orbits.
-Now you might want to plot several orbits in one graph
-(for example, the maneuver you computed in the previous section).
-For this purpose, poliastro has `OrbitPlotter*` objects in the {py:mod}`~poliastro.plotting` module.
+You previously saw the {py:meth}`~poliastro.twobody.orbit.scalar.Orbit.plot`
+method to easily plot orbits. Now you might want to plot several orbits in one
+graph (for example, the maneuver you computed in the previous section). For this
+purpose, poliastro has an `OrbitPlotter` object in the
+{py:mod}`~poliastro.plotting` module.
 
-These objects come in two flavors. {py:class}`~poliastro.plotting.OrbitPlotter2D`
-holds the perifocal plane of the first {{ Orbit }} you plot in it,
-projecting any further trajectories on this plane.
-On the other hand, {py:class}`~poliastro.plotting.OrbitPlotter3D`
-allows you to interactively rotate the three-dimensional view.
+The advantage of this object is that it allows you to select the desired drawing
+backend. All the supported backends are specified in the dictionary
+{py:class}`~poliastro.plotting.orbit.backens.SUPPORTED_ORBIT_PLOTTER_BACKENDS`.
+
+If you would like to know which 2D check the
+{py:class}`~poliastro.plotting.orbit.backens.SUPPORTED_ORBIT_PLOTTER_BACKENDS_2D`.
+For 3D backends, refer to
+{py:class}`~poliastro.plotting.orbit.backens.SUPPORTED_ORBIT_PLOTTER_BACKENDS_3D`.
+
+Note that some backends are interactive, meaning that you can move the scene or
+even rotate the three-dimensional view in a dynamic way.
 
 To easily visualize several orbits in two dimensions, you can run this code:
 
 ```python
-from poliastro.plotting import OrbitPlotter2D
+from poliastro.plotting import OrbitPlotter
 
-op = OrbitPlotter2D()
+op = OrbitPlotter(backend_name="matplotlib2D")
 orb_a, orb_f = orb_i.apply_maneuver(hoh, intermediate=True)
 op.plot(orb_i, label="Initial orbit")
 op.plot(orb_a, label="Transfer orbit")
 op.plot(orb_f, label="Final orbit")
+op.show()
 ```
 
 which produces this beautiful plot:
