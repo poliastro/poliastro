@@ -181,7 +181,7 @@ orbit on Earth.
 ```{code-cell}
 from poliastro.earth import EarthSatellite
 from poliastro.earth.plotting import GroundtrackPlotter
-from poliastro.plotting import StaticOrbitPlotter
+from poliastro.plotting import OrbitPlotter
 
 es = EarthSatellite(orbit, None)
 
@@ -292,7 +292,7 @@ Earth.plot(
     label="Earth position at event instance",
 )
 
-plotter = StaticOrbitPlotter()
+plotter = OrbitPlotter()
 
 plotter.plot(orbit)
 plotter.set_orbit_frame(orbit)

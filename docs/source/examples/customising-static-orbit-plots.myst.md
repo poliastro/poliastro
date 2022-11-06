@@ -49,8 +49,8 @@ earth_plots_traj, earth_plots_pos = plotter.plot_body_orbit(
     Earth, epoch, label=Earth
 )
 
-earth_plots_traj[0].set_linestyle("-")  # solid line
-earth_plots_traj[0].set_linewidth(0.5)
+earth_plots_traj.set_linestyle("-")  # solid line
+earth_plots_traj.set_linewidth(0.5)
 earth_plots_pos.set_marker("H")  # Hexagon
 earth_plots_pos.set_markersize(15)
 
@@ -73,14 +73,14 @@ plotter = OrbitPlotter()
 earth_plots_t, earth_plots_p = plotter.plot_body_orbit(
     Earth, epoch, label=Earth
 )
-earth_plots_t[0].set_linestyle("-")  # solid line
-earth_plots_t[0].set_linewidth(0.5)
+earth_plots_t.set_linestyle("-")  # solid line
+earth_plots_t.set_linewidth(0.5)
 earth_plots_p.set_marker("H")  # Hexagon
 earth_plots_p.set_markersize(15)
 
 mars_plots_t, mars_plots_p = plotter.plot_body_orbit(Mars, epoch, label=Mars)
-mars_plots_t[0].set_dashes([0, 1, 0, 1, 1, 0])
-mars_plots_t[0].set_linewidth(2)
+mars_plots_t.set_dashes([0, 1, 0, 1, 1, 0])
+mars_plots_t.set_linewidth(2)
 mars_plots_p.set_marker("D")  # Diamond
 mars_plots_p.set_markersize(15)
 mars_plots_p.set_fillstyle("none")
@@ -90,7 +90,7 @@ mars_plots_p.set_markeredgewidth(1)
 jupiter_plots_t, jupiter_plots_p = plotter.plot_body_orbit(
     Jupiter, epoch, label=Jupiter
 )
-jupiter_plots_t[0].set_linestyle("")  # No line
+jupiter_plots_t.set_linestyle("")  # No line
 jupiter_plots_p.set_marker("*")  # star
 jupiter_plots_p.set_markersize(15)
 ```
