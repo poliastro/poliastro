@@ -151,7 +151,7 @@ class SolarSystemPlanet(Body):
             Reference plane of the coordinates.
 
         """
-        # HACK: import here the OrbitPlotter to avoid a circular depedency
+        # HACK: import here the OrbitPlotter to avoid a circular dependency
         # between bodies.py and misc.py
         from poliastro.plotting.orbit.plotter import OrbitPlotter
 
