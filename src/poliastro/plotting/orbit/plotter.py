@@ -172,6 +172,7 @@ class OrbitPlotter:
 
         from astropy import time
 
+        # HACK: avoid circular dependency with ``Body.plot()``
         from poliastro.bodies import Sun
         from poliastro.twobody import Orbit
         from poliastro.warnings import TimeScaleWarning
