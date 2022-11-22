@@ -7,11 +7,11 @@ import plotly
 import plotly.graph_objects as go
 from astropy import units as u
 
-from poliastro.plotting.orbit.backends.base_backend import _OrbitPlotterBackend
+from poliastro.plotting.orbit.backends._base import OrbitPlotterBackend
 from poliastro.plotting.util import generate_sphere
 
 
-class OrbitPlotterBackendPlotly(_OrbitPlotterBackend):
+class OrbitPlotterBackendPlotly(OrbitPlotterBackend):
     """An orbit plotter backend class based on Plotly."""
 
     def __init__(self, figure, layout, ref_units):

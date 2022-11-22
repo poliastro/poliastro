@@ -1,7 +1,7 @@
 """A module implementing the base class for a orbit plotter backend."""
 
 
-class _OrbitPlotterBackend:
+class OrbitPlotterBackend:
     """A base class for implementing new orbit plotter backends."""
 
     def __init__(self, scene, name, ref_units):

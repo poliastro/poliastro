@@ -5,7 +5,7 @@ from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
-from poliastro.plotting.orbit.backends.base_backend import _OrbitPlotterBackend
+from poliastro.plotting.orbit.backends._base import OrbitPlotterBackend
 
 
 def _segments_from_arrays(x, y):
@@ -17,7 +17,7 @@ def _segments_from_arrays(x, y):
     return segments
 
 
-class OrbitPlotterBackendMatplotlib2D(_OrbitPlotterBackend):
+class OrbitPlotterBackendMatplotlib2D(OrbitPlotterBackend):
     """An orbit plotter backend class based on Matplotlib."""
 
     def __init__(self, ax, use_dark_theme, ref_units):
