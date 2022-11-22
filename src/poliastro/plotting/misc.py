@@ -18,7 +18,10 @@ from poliastro.plotting import OrbitPlotter
 
 
 def plot_solar_system(
-    backend_name="matplotlib2D", epoch=None, labels=None, outer=True
+    epoch=None,
+    labels=None,
+    outer=True,
+    backend_name="matplotlib2D",
 ):
     """
     Plots the whole solar system in one single call.
@@ -27,14 +30,14 @@ def plot_solar_system(
 
     Parameters
     ----------
-    backend_name : str
-        Name of the plotting backend to be used.
     epoch : ~astropy.time.Time, optional
         Epoch value of the plot, default to J2000.
     labels : list[str]
         A list of strings containing the labels of the bodies.
     outer : bool, optional
         Whether to print the outer Solar System, default to True.
+    backend_name : str
+        Name of the plotting backend to be used.
 
     Returns
     -------

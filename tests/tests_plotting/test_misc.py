@@ -21,9 +21,9 @@ def test_plot_solar_system_uses_expected_orbitplotter(backend_name):
 @pytest.mark.mpl_image_compare
 def test_plot_inner_solar_system_using_matplotlib2D_backend(earth_perihelion):
     plot_solar_system(
-        backend_name="matplotlib2D",
         epoch=earth_perihelion,
         outer=False,
+        backend_name="matplotlib2D",
     )
     return plt.gcf()
 
@@ -31,8 +31,8 @@ def test_plot_inner_solar_system_using_matplotlib2D_backend(earth_perihelion):
 @pytest.mark.mpl_image_compare
 def test_plot_outer_solar_system_using_matplotlib2D_backend(earth_perihelion):
     plot_solar_system(
-        backend_name="matplotlib2D",
         epoch=earth_perihelion,
         outer=True,
+        backend_name="matplotlib2D",
     )
     return plt.gcf()
