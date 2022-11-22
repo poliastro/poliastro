@@ -21,7 +21,7 @@ class OrbitPlotterBackendPlotly(OrbitPlotterBackend):
         ----------
         figure : ~plotly.graph_objects.Figure
             The plotly ``Figure`` to render the scene.
-        ~plotly.graph_objects.Layout
+        layout : ~plotly.graph_objects.Layout
             The plotly ``Layout`` object linked to the figure.
         ref_units : ~astropy.units.Unit
             Desired lenght units to be used when representing distances.

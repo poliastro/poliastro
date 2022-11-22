@@ -25,11 +25,13 @@ class OrbitPlotterBackendMatplotlib2D(OrbitPlotterBackend):
 
         Parameters
         ----------
-        scene : object
-            An instance representing the canvas or scene.
+        ax: ~matplotlib.axes.Axes
+            An :ref:`~matplotlib.axes.Axes` instance representing the axes of the figure.
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
             Default to ``False``.
+        ref_units : ~astropy.units.Unit
+            Desired lenght units to be used when representing distances.
 
         """
         if ax is None:
