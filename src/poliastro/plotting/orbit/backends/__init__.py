@@ -1,10 +1,10 @@
 """A sub-package collecting all support orbit plotter backends."""
 
 
-from poliastro.plotting.orbit.backends.matplotlib_backend import (
+from poliastro.plotting.orbit.backends.matplotlib import (
     OrbitPlotterBackendMatplotlib2D,
 )
-from poliastro.plotting.orbit.backends.plotly_backend import (
+from poliastro.plotting.orbit.backends.plotly import (
     OrbitPlotterBackendPlotly2D,
     OrbitPlotterBackendPlotly3D,
 )
