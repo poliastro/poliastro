@@ -17,7 +17,7 @@ def _segments_from_arrays(x, y):
     return segments
 
 
-class OrbitPlotterBackendMatplotlib2D(OrbitPlotterBackend):
+class Matplotlib2D(OrbitPlotterBackend):
     """An orbit plotter backend class based on Matplotlib."""
 
     def __init__(self, ax, use_dark_theme, ref_units):

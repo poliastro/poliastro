@@ -11,7 +11,7 @@ from poliastro.plotting.orbit.backends._base import OrbitPlotterBackend
 from poliastro.plotting.util import generate_sphere
 
 
-class OrbitPlotterBackendPlotly(OrbitPlotterBackend):
+class BasePlotly(OrbitPlotterBackend):
     """An orbit plotter backend class based on Plotly."""
 
     def __init__(self, figure, layout, ref_units):
@@ -156,7 +156,7 @@ class OrbitPlotterBackendPlotly(OrbitPlotterBackend):
             return self.figure.show()
 
 
-class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
+class Plotly2D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
     def __init__(self, figure, use_dark_theme, ref_units):
@@ -301,7 +301,7 @@ class OrbitPlotterBackendPlotly2D(OrbitPlotterBackendPlotly):
         return (label, None)
 
 
-class OrbitPlotterBackendPlotly3D(OrbitPlotterBackendPlotly):
+class Plotly3D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
     def __init__(self, figure, use_dark_theme, ref_units):
