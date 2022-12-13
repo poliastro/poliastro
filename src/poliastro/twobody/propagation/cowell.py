@@ -47,10 +47,15 @@ class CowellPropagator:
             events=self._events,
             f=self._f,
         )
-        r = rrs[-1] << u.km
-        v = vvs[-1] << (u.km / u.s)
+        r = rrs[-1]
+        v = vvs[-1]
 
-        new_state = RVState(state.attractor, (r, v), state.plane)
+        new_state = RVState(
+            state.attractor,
+            (r, v),
+            state.plane,
+            _units=False,
+        )
         return new_state
 
     def propagate_many(self, state, tofs):
