@@ -153,6 +153,23 @@ class BasePlotly(OrbitPlotterBackend):
             return self.figure.show()
 
     def generate_labels(self, label, has_coordinates, has_position):
+        """Generates the labels for coordinates and position.
+
+        Parameters
+        ----------
+        label : str
+            A string representing the label.
+        has_coordinates : boolean
+            Whether the object has coordinates to plot or not.
+        has_position : boolean
+            Whether the object has a position to plot or not.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the coordinates and position labels.
+
+        """
         return (label, None)
 
 class Plotly2D(BasePlotly):

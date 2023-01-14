@@ -223,6 +223,23 @@ class OrbitPlotterBackend:
             "This method is expected to be override by a specific plotting backend."
         )
 
+    def generate_labels(self, label, has_coordinates, has_position):
+        """Generates the labels for coordinates and position.
+
+        Parameters
+        ----------
+        label : str
+            A string representing the label.
+        has_coordinates : boolean
+            Whether the object has coordinates to plot or not.
+        has_position : boolean
+            Whether the object has a position to plot or not.
+
+        """
+        raise NotImplementedError(
+            "This method is expected to be override by a specific plotting backend."
+        )
+
     def show(self):
         """Displays the scene."""
         raise NotImplementedError(

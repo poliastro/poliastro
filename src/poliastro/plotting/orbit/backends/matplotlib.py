@@ -263,7 +263,23 @@ class Matplotlib2D(OrbitPlotterBackend):
         return lines_coordinates
 
     def generate_labels(self, label, has_coordinates, has_position):
-        """Generate desired"""
+        """Generates the labels for coordinates and position.
+
+        Parameters
+        ----------
+        label : str
+            A string representing the label.
+        has_coordinates : boolean
+            Whether the object has coordinates to plot or not.
+        has_position : boolean
+            Whether the object has a position to plot or not.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the coordinates and position labels.
+
+        """
         return (None, label) if has_position else (label, None)
 
     def update_legend(self):
