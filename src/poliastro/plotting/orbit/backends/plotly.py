@@ -5,7 +5,6 @@ from itertools import cycle
 import numpy as np
 import plotly
 import plotly.graph_objects as go
-from astropy import units as u
 
 from poliastro.plotting.orbit.backends._base import OrbitPlotterBackend
 from poliastro.plotting.util import generate_sphere
@@ -14,7 +13,7 @@ from poliastro.plotting.util import generate_sphere
 class BasePlotly(OrbitPlotterBackend):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure, layout, ref_units):
+    def __init__(self, figure, layout):
         """Initializes a backend instance.
 
         Parameters
@@ -23,12 +22,10 @@ class BasePlotly(OrbitPlotterBackend):
             The plotly ``Figure`` to render the scene.
         layout : ~plotly.graph_objects.Layout
             The plotly ``Layout`` object linked to the figure.
-        ref_units : ~astropy.units.Unit
-            Desired lenght units to be used when representing distances.
 
         """
         figure = figure or go.Figure()
-        super().__init__(figure, self.__class__.__name__, ref_units)
+        super().__init__(figure, self.__class__.__name__)
 
         self._layout = layout or go.Layout()
         self.update_layout(self._layout)
@@ -155,11 +152,13 @@ class BasePlotly(OrbitPlotterBackend):
         if not self.figure._in_batch_mode:
             return self.figure.show()
 
+    def generate_labels(self, label, has_coordinates, has_position):
+        return (label, None)
 
 class Plotly2D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure, use_dark_theme, ref_units):
+    def __init__(self, figure, use_dark_theme):
         """Initializes a backend instance.
 
         Parameters
@@ -169,8 +168,6 @@ class Plotly2D(BasePlotly):
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
             Default to ``False``.
-        ref_units : ~astropy.units.Unit
-            Desired lenght units to be used when representing distances.
 
         """
         # Apply the desired theme
@@ -179,11 +176,11 @@ class Plotly2D(BasePlotly):
         # Declare the layout and attach it to the figure
         layout = go.Layout(
             autosize=True,
-            xaxis=dict(title=f" x ({ref_units.name})", constrain="domain"),
-            yaxis=dict(title=f" y ({ref_units.name})", scaleanchor="x"),
+            xaxis=dict(constrain="domain"),
+            yaxis=dict(scaleanchor="x"),
             template=theme,
         )
-        super().__init__(figure, layout, ref_units)
+        super().__init__(figure, layout)
 
     def draw_marker(self, position, *, color, label, marker_symbol, size):
         """Draws a marker into the scene.
@@ -248,10 +245,10 @@ class Plotly2D(BasePlotly):
             type="circle",
             xref="x",
             yref="y",
-            x0=(position[0] - radius).to_value(self.ref_units),
-            y0=(position[1] - radius).to_value(self.ref_units),
-            x1=(position[0] + radius).to_value(self.ref_units),
-            y1=(position[1] + radius).to_value(self.ref_units),
+            x0=(position[0] - radius),
+            y0=(position[1] - radius),
+            x1=(position[0] + radius),
+            y1=(position[1] + radius),
             fillcolor=color,
             line=dict(color=color),
             opacity=1,
@@ -283,7 +280,7 @@ class Plotly2D(BasePlotly):
         linestyle = "dash" if dashed else "solid"
 
         # Unpack coordinates
-        x, y, _ = (coords.to_value(self.ref_units) for coords in coordinates)
+        x, y, _ = coordinates
 
         # Plot the coordinates in the scene
         coordinates_trace = go.Scatter(
@@ -297,14 +294,26 @@ class Plotly2D(BasePlotly):
         self.figure.add_trace(coordinates_trace)
         return coordinates_trace
 
-    def generate_labels(self, label, has_coordinates, has_position):
-        return (label, None)
+    def draw_axes_labels_with_length_scale_units(self, length_scale_units):
+        """Draws the desired label into the specified axis.
 
+        Parameters
+        ----------
+        lenght_scale_units : ~astropy.units.Unit
+            Desired units of lenght used for representing distances.
+
+        """
+        # HACK: plotly does not show LaTeX symbols and \text. The usage of
+        # ASCII labels in plotly figures is used to avoid this issue
+        self.figure.update_layout(
+            xaxis_title=f"x ({length_scale_units.name})",
+            yaxis_title=f"y ({length_scale_units.name})"
+        )
 
 class Plotly3D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure, use_dark_theme, ref_units):
+    def __init__(self, figure, use_dark_theme):
         """Initializes a backend instance.
 
         Parameters
@@ -314,8 +323,6 @@ class Plotly3D(BasePlotly):
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
             Default to ``False``.
-        ref_units : ~astropy.units.Unit
-            Desired lenght unit to be used when representing distances.
 
         """
         # Apply the desired theme
@@ -325,14 +332,11 @@ class Plotly3D(BasePlotly):
         layout = go.Layout(
             autosize=True,
             scene=dict(
-                xaxis=dict(title=f" x ({ref_units.name})"),
-                yaxis=dict(title=f" y ({ref_units.name})"),
-                zaxis=dict(title=f" z ({ref_units.name})"),
                 aspectmode="data",
             ),
             template=theme,
         )
-        super().__init__(figure, layout, ref_units)
+        super().__init__(figure, layout)
 
     def draw_marker(self, position, *, color, marker_symbol, label, size):
         """Draws a marker into the scene.
@@ -390,9 +394,9 @@ class Plotly3D(BasePlotly):
         """
         xx, yy, zz = generate_sphere(radius, position)
         sphere = go.Surface(
-            x=xx.to_value(self.ref_units),
-            y=yy.to_value(self.ref_units),
-            z=zz.to_value(self.ref_units),
+            x=xx,
+            y=yy,
+            z=zz,
             colorscale=[[0, color], [1, color]],
             cauto=False,
             cmin=1,
@@ -426,12 +430,12 @@ class Plotly3D(BasePlotly):
         """
         # Select the desired linestyle for the line representing the coordinates
         linestyle = "dash" if dashed else "solid"
-
+        
         # Plot the coordinates in the scene
         coordinates_trace = go.Scatter3d(
-            x=coordinates.x.to_value(self.ref_units),
-            y=coordinates.y.to_value(self.ref_units),
-            z=coordinates.z.to_value(self.ref_units),
+            x=coordinates[0],
+            y=coordinates[1],
+            z=coordinates[2],
             line=dict(color=colors[0], width=5, dash=linestyle),
             mode="lines",
             name=label,
@@ -440,37 +444,19 @@ class Plotly3D(BasePlotly):
         self.figure.add_trace(coordinates_trace)
         return coordinates_trace
 
-    @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
-    def set_view(self, elev, azim, distance=5 * u.km):
-        """Changes 3D view by setting the elevation, azimuth and distance.
+    def draw_axes_labels_with_length_scale_units(self, length_scale_units):
+        """Draws the desired label into the specified axis.
 
         Parameters
         ----------
-        elev : ~astropy.units.Quantity
-            Desired elevation angle of the camera.
-        azim : ~astropy.units.Quantity
-            Desired azimuth angle of the camera.
-        distance : optional, ~astropy.units.Quantity
-            Desired distance of the camera to the scene.
+        lenght_scale_units : ~astropy.units.Unit
+            Desired units of lenght used for representing distances.
 
         """
-        x = distance * np.cos(elev) * np.cos(azim)
-        y = distance * np.cos(elev) * np.sin(azim)
-        z = distance * np.sin(elev)
-
-        self.layout.update(
-            {
-                "scene": {
-                    "camera": {
-                        "eye": {
-                            "x": x.to_value(self.ref_units),
-                            "y": y.to_value(self.ref_units),
-                            "z": z.to_value(u.km),
-                        }
-                    }
-                }
-            }
+        self.figure.update_layout(
+            scene = dict(
+                xaxis = dict(title=f"x ({length_scale_units.name})"),
+                yaxis = dict(title=f"y ({length_scale_units.name})"),
+                zaxis = dict(title=f"z ({length_scale_units.name})")
+            )
         )
-
-    def generate_labels(self, label, has_coordinates, has_position):
-        return (label, None)

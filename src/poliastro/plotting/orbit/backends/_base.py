@@ -4,7 +4,7 @@
 class OrbitPlotterBackend:
     """A base class for implementing new orbit plotter backends."""
 
-    def __init__(self, scene, name, ref_units):
+    def __init__(self, scene, name):
         """Initialize the orbit plotter backend.
 
         Parameters
@@ -13,8 +13,6 @@ class OrbitPlotterBackend:
             An instance representing the canvas or scene.
         name : str
             Name of the backend.
-        ref_units : optional, ~astropy.units.Unit
-            The reference units to be used when drawing lenghts.
 
         Notes
         -----
@@ -30,7 +28,6 @@ class OrbitPlotterBackend:
 
         self._scene = scene
         self._name = name
-        self._ref_units = ref_units
 
     @property
     def scene(self):
@@ -48,18 +45,6 @@ class OrbitPlotterBackend:
 
         """
         return self._name
-
-    @property
-    def ref_units(self):
-        """Return the units of reference for drawing lenghts.
-
-        Returns
-        -------
-        ~astropy.units.Unit
-            The reference units to be used when drawing lenghts.
-
-        """
-        return self._ref_units
 
     @property
     def is_2D(self):
@@ -207,6 +192,19 @@ class OrbitPlotterBackend:
             The name to be used in the legend for the marker.
         size : float
             The size of the marker for drawing the coordinates.
+
+        """
+        raise NotImplementedError(
+            "This method is expected to be override by a specific plotting backend."
+        )
+
+    def draw_axes_labels_with_length_scale_units(self, length_scale_units):
+        """Draws the desired label into the specified axis.
+
+        Parameters
+        ----------
+        lenght_scale_units : ~astropy.units.Unit
+            Desired units of lenght used for representing distances.
 
         """
         raise NotImplementedError(

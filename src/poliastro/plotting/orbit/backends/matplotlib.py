@@ -20,7 +20,7 @@ def _segments_from_arrays(x, y):
 class Matplotlib2D(OrbitPlotterBackend):
     """An orbit plotter backend class based on Matplotlib."""
 
-    def __init__(self, ax, use_dark_theme, ref_units):
+    def __init__(self, ax, use_dark_theme):
         """Initializes a backend instance.
 
         Parameters
@@ -30,8 +30,6 @@ class Matplotlib2D(OrbitPlotterBackend):
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
             Default to ``False``.
-        ref_units : ~astropy.units.Unit
-            Desired lenght units to be used when representing distances.
 
         """
         if ax is None:
@@ -40,7 +38,7 @@ class Matplotlib2D(OrbitPlotterBackend):
                     _, ax = plt.subplots(figsize=(6, 6))
             else:
                 _, ax = plt.subplots(figsize=(6, 6))
-        super().__init__(ax, self.__class__.__name__, ref_units)
+        super().__init__(ax, self.__class__.__name__)
 
     @property
     def ax(self):
@@ -100,8 +98,8 @@ class Matplotlib2D(OrbitPlotterBackend):
 
         """
         (marker_trace,) = self.ax.plot(
-            position[0].to_value(self.ref_units),
-            position[1].to_value(self.ref_units),
+            position[0],
+            position[1],
             color=color,
             marker=marker_symbol,
             markersize=size,
@@ -184,10 +182,10 @@ class Matplotlib2D(OrbitPlotterBackend):
         return self.ax.add_patch(
             mpl_patches.Circle(
                 (
-                    position[0].to_value(self.ref_units),
-                    position[1].to_value(self.ref_units),
+                    position[0],
+                    position[1],
                 ),
-                radius.to_value(self.ref_units),
+                radius,
                 color=color,
                 linewidth=0,
                 label=label,
@@ -199,13 +197,25 @@ class Matplotlib2D(OrbitPlotterBackend):
         for attractor in self.ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
+    def draw_axes_labels_with_length_scale_units(self, length_scale_units):
+        """Draws the desired label into the specified axis.
+
+        Parameters
+        ----------
+        lenght_scale_units : ~astropy.units.Unit
+            Desired units of lenght used for representing distances.
+
+        """
+        self.ax.set_xlabel(f"$x$ ({length_scale_units.name})")
+        self.ax.set_ylabel(f"$y$ ({length_scale_units.name})")
+
     def draw_coordinates(self, coordinates, *, colors, dashed, label):
         """Draws desired coordinates into the scene.
 
         Parameters
         ----------
-        position : list[list[float, float, float]]
-            A set of lists containing the x and y coordinates of the sphere location.
+        coordinates : list[list[float, float, float]]
+            A set of lists containing the x, y and z coordinates.
         colors : list[str]
             A list of string representing the hexadecimal color for the coordinates.
         dashed : bool
@@ -223,8 +233,8 @@ class Matplotlib2D(OrbitPlotterBackend):
         # Select the desired linestyle for the line representing the coordinates
         linestyle = "dashed" if dashed else "solid"
 
-        # Unpack coordinates
-        x, y, z = (coords.to_value(self.ref_units) for coords in coordinates)
+        # Unpack the x and y coordinates
+        x, y, _ = coordinates
 
         # Generate the colors if coordinates trail is required
         if len(colors) > 1:
@@ -250,14 +260,10 @@ class Matplotlib2D(OrbitPlotterBackend):
                 linestyle=linestyle,
             )
 
-        # Update the axes labels and impose a 1:1 aspect ratio between them
-        self.ax.set_xlabel(f"$x$ ({self.ref_units.name})")
-        self.ax.set_ylabel(f"$y$ ({self.ref_units.name})")
-        self.ax.set_aspect(1)
-
         return lines_coordinates
 
     def generate_labels(self, label, has_coordinates, has_position):
+        """Generate desired"""
         return (None, label) if has_position else (label, None)
 
     def update_legend(self):
@@ -278,6 +284,7 @@ class Matplotlib2D(OrbitPlotterBackend):
         """Resize the limits of the scene."""
         self.ax.relim()
         self.ax.autoscale()
+        self.ax.set_aspect(1)
 
     def show(self):
         """Displays the scene."""

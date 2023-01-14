@@ -10,7 +10,7 @@ from astropy.coordinates import CartesianRepresentation
 
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
-from poliastro.plotting.orbit.backends import SUPPORTED_ORBIT_PLOTTER_BACKENDS
+import poliastro.plotting.orbit.backends as orbit_plotter_backends
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.twobody.mean_elements import get_mean_elements
 from poliastro.twobody.sampling import EpochBounds
@@ -38,49 +38,41 @@ class OrbitPlotter:
 
     def __init__(
         self,
-        scene=None,
-        backend_name="matplotlib2D",
-        use_dark_theme=False,
+        backend=None,
         num_points=150,
         *,
         plane=None,
-        length_units=u.km,
+        length_scale_units=u.km,
     ):
         """Initializes the plotter instance.
 
         Parameters
         ----------
-        scene : object
-            An instance representing the canvas or scene.
-        backend_name : str
-            Name of the plotting backend to be used.
+        backend : ~poliastro.plotting.orbit.backends._base.OrbitPlotterBackend
+            An instance of ``OrbitPlotterBackend`` for rendendering the scene.
         num_points : int, optional
             Number of points to use when drawing trajectories. Default to 150.
         plane : ~poliastro.frames.Plane, optional
             Reference plane to be used when drawing the scene. Default to
             `EARTH_EQUATOR`.
-        length_units : ~astropy.units.Unit
-            Desired lenght units to be used when representing distances.
+        lenght_scale_units : ~astropy.units.Unit
+            Desired units of lenght used for representing distances.
         _
         """
-        # Verify selected backend is supported
-        try:
-            self._backend = SUPPORTED_ORBIT_PLOTTER_BACKENDS[backend_name](
-                scene,
-                use_dark_theme=use_dark_theme,
-                ref_units=length_units,
-            )
-        except KeyError:
-            raise ValueError(
-                f"Backend {backend_name} is not supported. Available backends are {SUPPORTED_ORBIT_PLOTTER_BACKENDS.keys()}"
-            )
-
-        # Initialize the rest of the attributes
-        self._attractor = None
-        self._attractor_radius = np.inf * u.km
+        # Initialize the backend, number of points and lenght scale
+        self._backend = backend or orbit_plotter_backends.Matplotlib2D(ax=None, use_dark_theme=False)
         self._num_points = num_points
+        self._length_scale_units = length_scale_units
+
+        # Initialize the attractor
+        self._attractor = None
+        self._attractor_radius = np.inf * length_scale_units
+
+        # Initialize the plane and frame used by the plotter
         self._plane = plane or Planes.EARTH_EQUATOR
         self._frame = None
+
+        # Initialize the list containing all the plotted trajectories
         self._trajectories = []  # type: List[Trajectory]
 
     @property
@@ -99,8 +91,8 @@ class OrbitPlotter:
         return self._trajectories
 
     @property
-    def length_units(self):
-        """Return the units use for representing distances.
+    def lenght_scale_units(self):
+        """Return the units of lenght used for representing distances.
 
         Returns
         -------
@@ -108,7 +100,7 @@ class OrbitPlotter:
             Desired lenght units to be used when representing distances.
 
         """
-        return self.backend.ref_units
+        return self._length_scale_units
 
     def set_attractor(self, attractor):
         """Set the desired plotting attractor.
@@ -225,15 +217,16 @@ class OrbitPlotter:
         attractor.
 
         """
+        ref_len_units = self.lenght_scale_units
         min_distance = min(
             [
-                coordinates.norm().min()
+                coordinates.norm().min().to(ref_len_units)
                 for coordinates, *_ in self._trajectories
             ]
-            or [0 * u.m]
+            or [0 * ref_len_units]
         )
         self._attractor_radius = max(
-            self._attractor.R.to(u.km), min_distance.to(u.km) * 0.15
+            self._attractor.R.to(ref_len_units), min_distance.to(ref_len_units) * 0.15
         )
 
         color = BODY_COLORS.get(self._attractor.name, "#999999")
@@ -241,10 +234,10 @@ class OrbitPlotter:
         self._unplot_attractor()
 
         self.backend.draw_sphere(
-            position=[0, 0, 0] * u.km,
+            position=[0, 0, 0],
             color=color,
             label=None,
-            radius=self._attractor_radius,
+            radius=self._attractor_radius.to_value(ref_len_units),
         )
 
     def _redraw(self):
@@ -321,14 +314,18 @@ class OrbitPlotter:
             if position is not None:
                 position = (
                     np.asarray(
-                        self._project([position.to_value(self.length_units)])
+                        self._project([position.to_value(self.lenght_scale_units)])
                     ).flatten()
-                    * u.km
+                    * self.lenght_scale_units
                 )
+        else:
+            coordinates = (
+                    coordinates.x, coordinates.y, coordinates.z,
+            )
 
         # Add the coordinates to the scene
         trace_coordinates = self.backend.draw_coordinates(
-            coordinates,
+            [coords.to_value(self.lenght_scale_units) for coords in coordinates],
             colors=colors,
             dashed=dashed,
             label=coordinates_label,
@@ -344,10 +341,10 @@ class OrbitPlotter:
 
             # Generate the trace for the position
             trace_position = self.backend.draw_position(
-                position,
+                position.to_value(self.lenght_scale_units),
                 color=colors[0],
                 label=position_label,
-                size=marker_size,
+                size=marker_size.to_value(self.lenght_scale_units),
             )
         else:
             trace_position = None
@@ -358,6 +355,9 @@ class OrbitPlotter:
 
         # Update the limits of the scene
         self.backend.resize_limits()
+
+        # Update the axis legends using the desired lenght scale
+        self.backend.draw_axes_labels_with_length_scale_units(self.lenght_scale_units)
 
         return (
             (trace_coordinates, trace_position)
@@ -395,7 +395,7 @@ class OrbitPlotter:
         # Get orbit label
         label = generate_label(orbit.epoch, label)
 
-        # Compute the coorindates and body position alongs its orbit
+        # Compute the coordinates and body position alongs its orbit
         coordinates = orbit.sample(self._num_points)
         position = orbit.r
 
@@ -546,7 +546,7 @@ class OrbitPlotter:
                 np.asarray(
                     self._project([final_phase.r.to_value(self.length_units)])
                 ).flatten()
-                * u.km
+                * self.lenght_scale_units
             )
         else:
             final_phase_position = final_phase.r
@@ -557,7 +557,7 @@ class OrbitPlotter:
             impulse_lines = (
                 [
                     self.backend.draw_impulse(
-                        position=final_phase_position,
+                        position=final_phase_position.to_value(self.lenght_scale_units),
                         color=color,
                         label=impulse_label,
                         size=None,
@@ -580,7 +580,7 @@ class OrbitPlotter:
                                 [orbit_phase.r.to_value(self.length_units)]
                             )
                         ).flatten()
-                        * u.km
+                        * self.lenght_scale_units
                     )
                 else:
                     orbit_phase_r = orbit_phase.r
@@ -588,7 +588,7 @@ class OrbitPlotter:
                 # Plot the impulse marker and collect its label and lines
                 impulse_label = f"Impulse {ith_impulse + 1} - {label}"
                 impulse_lines = self.backend.draw_impulse(
-                    position=orbit_phase_r,
+                    position=orbit_phase_r.to_value(self.lenght_scale_units),
                     color=color,
                     label=impulse_label,
                     size=None,
@@ -626,7 +626,7 @@ class OrbitPlotter:
             # Finally, draw the impulse at the very beginning of the final phase
             impulse_label = f"Impulse {ith_impulse + 2} - {label}"
             impulse_lines = self.backend.draw_impulse(
-                position=final_phase_position,
+                position=final_phase_position.to_value(self.lenght_scale_units),
                 color=color,
                 label=impulse_label,
                 size=None,
