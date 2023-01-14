@@ -2,7 +2,6 @@
 
 from itertools import cycle
 
-import numpy as np
 import plotly
 import plotly.graph_objects as go
 
@@ -172,6 +171,7 @@ class BasePlotly(OrbitPlotterBackend):
         """
         return (label, None)
 
+
 class Plotly2D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
@@ -324,8 +324,9 @@ class Plotly2D(BasePlotly):
         # ASCII labels in plotly figures is used to avoid this issue
         self.figure.update_layout(
             xaxis_title=f"x ({length_scale_units.name})",
-            yaxis_title=f"y ({length_scale_units.name})"
+            yaxis_title=f"y ({length_scale_units.name})",
         )
+
 
 class Plotly3D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
@@ -447,7 +448,7 @@ class Plotly3D(BasePlotly):
         """
         # Select the desired linestyle for the line representing the coordinates
         linestyle = "dash" if dashed else "solid"
-        
+
         # Plot the coordinates in the scene
         coordinates_trace = go.Scatter3d(
             x=coordinates[0],
@@ -471,9 +472,9 @@ class Plotly3D(BasePlotly):
 
         """
         self.figure.update_layout(
-            scene = dict(
-                xaxis = dict(title=f"x ({length_scale_units.name})"),
-                yaxis = dict(title=f"y ({length_scale_units.name})"),
-                zaxis = dict(title=f"z ({length_scale_units.name})")
+            scene=dict(
+                xaxis=dict(title=f"x ({length_scale_units.name})"),
+                yaxis=dict(title=f"y ({length_scale_units.name})"),
+                zaxis=dict(title=f"z ({length_scale_units.name})"),
             )
         )
