@@ -1,5 +1,6 @@
 import warnings
 
+import astropy.units as u
 import erfa
 from astropy.time import Time
 
@@ -21,7 +22,8 @@ def plot_solar_system(
     epoch=None,
     labels=None,
     outer=True,
-    backend_name="matplotlib2D",
+    backend=None,
+    length_scale_units=u.km,
 ):
     """
     Plots the whole solar system in one single call.
@@ -36,8 +38,10 @@ def plot_solar_system(
         A list of strings containing the labels of the bodies.
     outer : bool, optional
         Whether to print the outer Solar System, default to True.
-    backend_name : str
-        Name of the plotting backend to be used.
+    backend : ~poliastro.plotting.orbit.backends._base.OrbitPlotterBackend
+        An instance of ``OrbitPlotterBackend`` for rendendering the scene.
+    lenght_scale_units : ~astropy.units.Unit
+        Desired units of lenght used for representing distances.
 
     Returns
     -------
@@ -66,7 +70,9 @@ def plot_solar_system(
 
         # Instantiate the plotter and set the desired reference frame
         plotter = OrbitPlotter(
-            backend_name=backend_name, plane=Planes.EARTH_ECLIPTIC
+            backend=backend,
+            plane=Planes.EARTH_ECLIPTIC,
+            length_scale_units=length_scale_units,
         )
         plotter.set_body_frame(Earth, epoch)
 
