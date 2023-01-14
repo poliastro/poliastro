@@ -20,7 +20,7 @@ def _segments_from_arrays(x, y):
 class Matplotlib2D(OrbitPlotterBackend):
     """An orbit plotter backend class based on Matplotlib."""
 
-    def __init__(self, ax, use_dark_theme):
+    def __init__(self, ax=None, use_dark_theme=False):
         """Initializes a backend instance.
 
         Parameters

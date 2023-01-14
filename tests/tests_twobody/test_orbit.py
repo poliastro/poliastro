@@ -47,7 +47,7 @@ from poliastro.frames.equatorial import (
     VenusICRS,
 )
 from poliastro.frames.util import get_frame
-from poliastro.plotting.orbit.backends import SUPPORTED_ORBIT_PLOTTER_BACKENDS
+from poliastro.plotting.orbit.backends import DEFAULT_ORBIT_PLOTTER_BACKENDS
 from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
 from poliastro.twobody.sampling import TrueAnomalyBounds
@@ -470,13 +470,13 @@ def test_orbit_is_pickable(hyperbolic):
     assert orb_result.epoch == hyperbolic.epoch
 
 
-@pytest.mark.parametrize("backend_name", SUPPORTED_ORBIT_PLOTTER_BACKENDS)
-def test_orbit_plot_raises_no_error(backend_name):
+@pytest.mark.parametrize("Backend", DEFAULT_ORBIT_PLOTTER_BACKENDS.values())
+def test_orbit_plot_raises_no_error(Backend):
     # Data from Curtis, example 4.3
     r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-    ss.plot(backend_name=backend_name)
+    ss.plot(backend=Backend())
 
 
 @pytest.mark.parametrize(

@@ -175,7 +175,7 @@ class BasePlotly(OrbitPlotterBackend):
 class Plotly2D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure, use_dark_theme):
+    def __init__(self, figure=None, use_dark_theme=False):
         """Initializes a backend instance.
 
         Parameters
@@ -331,7 +331,7 @@ class Plotly2D(BasePlotly):
 class Plotly3D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
-    def __init__(self, figure, use_dark_theme):
+    def __init__(self, figure=None, use_dark_theme=False):
         """Initializes a backend instance.
 
         Parameters

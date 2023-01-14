@@ -619,13 +619,13 @@ class Orbit(OrbitCreationMixin):
             res = orbit_new
         return res
 
-    def plot(self, backend_name=None, label=None):
+    def plot(self, backend=None, label=None):
         """Plots the orbit.
 
         Parameters
         ----------
-        backend_name : str
-            Name of the plotting backend to be used.
+        backend : ~poliastro.plotting.orbit.backends._base.OrbitPlotterBackend
+            An instance of ``OrbitPlotterBackend`` for rendendering the scene.
         label : str, optional
             Label for the orbit, defaults to empty.
 
@@ -636,11 +636,12 @@ class Orbit(OrbitCreationMixin):
 
         """
         # HACK: avoid circular dependency
+        from poliastro.plotting.orbit.backends import Matplotlib2D, Plotly2D
         from poliastro.plotting.orbit.plotter import OrbitPlotter
 
         # Select the best backend depending if it is an interactive or batch
         # session
-        if backend_name is None:
+        if backend is None:
             try:
                 shell = get_ipython().__class__.__name__
                 if shell == "ZMQInteractiveShell":
@@ -656,9 +657,9 @@ class Orbit(OrbitCreationMixin):
                 # Standard Python interpreter
                 is_interactive = False
             finally:
-                backend_name = "plotly2D" if is_interactive else "matplotlib2D"
+                backend = Plotly2D() if is_interactive else Matplotlib2D()
 
-        plotter = OrbitPlotter(backend_name=backend_name)
+        plotter = OrbitPlotter(backend=backend)
         plotter.plot(self, label=label)
         plotter.show()
 

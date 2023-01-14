@@ -135,29 +135,29 @@ class SolarSystemPlanet(Body):
         epoch=None,
         label=None,
         plane=Planes.EARTH_ECLIPTIC,
-        backend_name="matplotlib2D",
+        backend=None,
     ):
         """Plots the body orbit.
 
         Parameters
         ----------
-        backend_name : str
-            Name of the plotting backend to be used.
         epoch : astropy.time.Time, optional
             Epoch of current position.
         label : str, optional
             Label for the orbit, defaults to empty.
         plane : ~poliastro.frames.Planes
             Reference plane of the coordinates.
+        backend : ~poliastro.plotting.orbit.backends._base.OrbitPlotterBackend
+            An instance of ``OrbitPlotterBackend`` for rendendering the scene.
 
         """
         # HACK: import here the OrbitPlotter to avoid a circular dependency
         # between bodies.py and misc.py
         from poliastro.plotting.orbit.plotter import OrbitPlotter
 
-        return OrbitPlotter(
-            backend_name=backend_name, plane=plane
-        ).plot_body_orbit(self, epoch=epoch, label=label)
+        return OrbitPlotter(backend=backend, plane=plane).plot_body_orbit(
+            self, epoch=epoch, label=label
+        )
 
 
 Sun = Body(
