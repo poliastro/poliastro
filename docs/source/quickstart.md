@@ -89,7 +89,7 @@ The dotted line represents the *osculating orbit*: the instantaneous Keplerian o
 
 ```{note}
 This visualization uses Plotly under interactive environments like Jupyter
-Noteook or Jupyter Lab while it switches to Matplotlib otherwise. Nevertheless,
+Notebook or Jupyter Lab while it switches to Matplotlib otherwise. Nevertheless,
 you can select the drawing backend. Check out the
 {py:class}`poliastro.plotting.orbit.OrbitPlotter` documentation for more
 information. 

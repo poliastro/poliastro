@@ -40,7 +40,7 @@ def plot_solar_system(
         Whether to print the outer Solar System, default to True.
     backend : ~poliastro.plotting.orbit.backends._base.OrbitPlotterBackend
         An instance of ``OrbitPlotterBackend`` for rendendering the scene.
-    lenght_scale_units : ~astropy.units.Unit
+    length_scale_units : ~astropy.units.Unit
         Desired units of lenght used for representing distances.
 
     Returns
