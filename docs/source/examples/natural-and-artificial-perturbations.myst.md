@@ -40,13 +40,6 @@ from poliastro.twobody.sampling import EpochsArray
 from poliastro.util import norm, time_range
 ```
 
-```{code-cell} ipython3
-# More info: https://plotly.com/python/renderers/
-import plotly.io as pio
-
-pio.renderers.default = "plotly_mimetype+notebook_connected"
-```
-
 ## Atmospheric drag ##
 The poliastro package now has several commonly used natural perturbations. One of them is atmospheric drag! See how one can monitor decay of the near-Earth orbit over time using our new module `poliastro.twobody.perturbations`!
 

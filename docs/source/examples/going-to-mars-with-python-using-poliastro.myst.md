@@ -37,13 +37,6 @@ from poliastro.twobody import Orbit
 from poliastro.util import time_range
 ```
 
-```{code-cell} ipython3
-# More info: https://plotly.com/python/renderers/
-import plotly.io as pio
-
-pio.renderers.default = "plotly_mimetype+notebook_connected"
-```
-
 We need a binary file from NASA called *SPICE kernel* to compute the position and velocities of the planets. Astropy downloads it for us:
 
 ```{code-cell} ipython3

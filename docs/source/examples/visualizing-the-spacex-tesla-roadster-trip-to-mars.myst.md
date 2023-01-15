@@ -28,13 +28,6 @@ EPOCH = Time("2018-02-18 12:00:00", scale="tdb")
 ```
 
 ```{code-cell}
-# More info: https://plotly.com/python/renderers/
-import plotly.io as pio
-
-pio.renderers.default = "plotly_mimetype+notebook_connected"
-```
-
-```{code-cell}
 roadster = Ephem.from_horizons(
     "SpaceX Roadster",
     epochs=time_range(EPOCH, end=EPOCH + 360 * u.day),

@@ -25,13 +25,6 @@ from poliastro.twobody import Orbit
 ```
 
 ```{code-cell} ipython3
-# More info: https://plotly.com/python/renderers/
-import plotly.io as pio
-
-pio.renderers.default = "plotly_mimetype+notebook_connected"
-```
-
-```{code-cell} ipython3
 churi.plot(backend=Plotly3D())
 ```
 
