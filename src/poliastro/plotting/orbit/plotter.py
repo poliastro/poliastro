@@ -761,14 +761,14 @@ class OrbitPlotter:
         )
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
-    def set_view(self, elev, azim, distance=5 * u.km):
+    def set_view(self, elevation_angle, azimuth_angle, distance=5 * u.km):
         """Changes 3D view by setting the elevation, azimuth and distance.
 
         Parameters
         ----------
-        elev : ~astropy.units.Quantity
+        elevation_angle : ~astropy.units.Quantity
             Desired elevation angle of the camera.
-        azim : ~astropy.units.Quantity
+        azimuth_angle : ~astropy.units.Quantity
             Desired azimuth angle of the camera.
         distance : optional, ~astropy.units.Quantity
             Desired distance of the camera to the scene.
@@ -776,7 +776,11 @@ class OrbitPlotter:
         """
         if self.backend.is_2D:
             raise AttributeError("View can only be in 3D backends.")
-        self.backend.set_view(elev, azim, distance)
+        self.backend.set_view(
+            elevation_angle.to_value(u.rad),
+            azimuth_angle.to_value(u.rad),
+            distance.to_value(self.length_scale_units),
+        )
 
     def show(self):
         """Render the plot."""

@@ -2,6 +2,7 @@
 
 from itertools import cycle
 
+import numpy as np
 import plotly
 import plotly.graph_objects as go
 
@@ -477,4 +478,35 @@ class Plotly3D(BasePlotly):
                 yaxis=dict(title=f"y ({length_scale_units.name})"),
                 zaxis=dict(title=f"z ({length_scale_units.name})"),
             )
+        )
+
+    def set_view(self, elevation_angle, azimuth_angle, distance):
+        """Changes 3D view.
+
+        Parameters
+        ----------
+        elevation_angle : float
+            Desired elevation angle in radians.
+        azimuth_angle : float
+            Desired azimuth angle in radians.
+        distance : float
+            Desired distance of the camera.
+
+        """
+        x = distance * np.cos(elevation_angle) * np.cos(azimuth_angle)
+        y = distance * np.cos(elevation_angle) * np.sin(azimuth_angle)
+        z = distance * np.sin(elevation_angle)
+
+        self.layout.update(
+            {
+                "scene": {
+                    "camera": {
+                        "eye": {
+                            "x": x,
+                            "y": y,
+                            "z": z,
+                        }
+                    }
+                }
+            }
         )
