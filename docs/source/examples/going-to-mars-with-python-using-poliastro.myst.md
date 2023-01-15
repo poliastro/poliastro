@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.14.4
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -89,11 +89,11 @@ Let's plot this transfer orbit in 3D!
 
 ```{code-cell} ipython3
 from poliastro.plotting import OrbitPlotter
-from poliastro.examples import iss
+from poliastro.plotting.orbit.backends import Plotly3D
 ```
 
 ```{code-cell} ipython3
-plotter = OrbitPlotter(backend_name="plotly3D")
+plotter = OrbitPlotter(backend=Plotly3D())
 plotter.set_attractor(Sun)
 
 plotter.plot_ephem(earth, date_launch, label="Earth at launch position")
@@ -103,7 +103,7 @@ plotter.plot_trajectory(
     color="black",
     label="Transfer orbit",
 )
-plotter.set_view(30 * u.deg, 260 * u.deg, distance=3 * u.km)
+#plotter.set_view(30 * u.deg, 260 * u.deg, distance=3 * u.km)
 plotter.show()
 ```
 

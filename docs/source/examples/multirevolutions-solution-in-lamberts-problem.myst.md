@@ -171,6 +171,7 @@ Finally, we can plot all the different scenarios from $M=0$ up to $M=2$ revoluti
 from matplotlib import pyplot as plt
 
 from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Matplotlib2D
 ```
 
 ```{code-cell} ipython3
@@ -179,7 +180,8 @@ fig, axs = plt.subplots(3, 1, figsize=(8, 8))
 
 for ith_case, M in enumerate(range(3)):
     # Plot the orbits of the Earth and Mars
-    op = OrbitPlotter(scene=axs[ith_case])
+    backend=Matplotlib2D(ax=axs[ith_case])
+    op = OrbitPlotter(backend=backend)
     axs[ith_case].set_title(f"{M = } scenario")
 
     op.plot_body_orbit(Earth, EPOCH_DPT)

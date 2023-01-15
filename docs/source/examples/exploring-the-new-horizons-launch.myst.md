@@ -25,6 +25,7 @@ from poliastro.bodies import Sun, Earth, Jupiter
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
 from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Matplotlib2D
 from poliastro.twobody import Orbit
 from poliastro.util import norm
 ```
@@ -116,7 +117,8 @@ So it stays within the same order of magnitude. Which is reasonable, because rea
 from matplotlib import pyplot as plt
 
 fig, ax = plt.subplots(figsize=(8, 8))
-op = OrbitPlotter(scene=ax)
+backend = Matplotlib2D(ax=ax)
+op = OrbitPlotter(backend=backend)
 
 op.plot(parking)
 op.plot(exit)

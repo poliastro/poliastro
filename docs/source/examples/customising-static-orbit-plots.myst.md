@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.14.4
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -27,6 +27,7 @@ from matplotlib import pyplot as plt
 from poliastro.bodies import Earth, Mars, Jupiter, Sun
 from poliastro.frames import Planes
 from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Matplotlib2D
 from poliastro.twobody import Orbit
 ```
 
@@ -108,7 +109,8 @@ ax.grid(True)
 ax.set_title("Earth, Mars, and Jupiter")
 ax.set_facecolor("None")
 
-plotter = OrbitPlotter(scene=ax)
+backend = Matplotlib2D(ax=ax)
+plotter = OrbitPlotter(backend=backend)
 
 plotter.plot_body_orbit(Earth, epoch, label=Earth)
 plotter.plot_body_orbit(Mars, epoch, label=Mars)

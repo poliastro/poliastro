@@ -20,6 +20,7 @@ from poliastro.bodies import Earth, Sun
 from poliastro.constants import J2000
 from poliastro.examples import churi, iss, molniya
 from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Plotly3D
 from poliastro.twobody import Orbit
 ```
 
@@ -31,11 +32,11 @@ pio.renderers.default = "plotly_mimetype+notebook_connected"
 ```
 
 ```{code-cell} ipython3
-churi.plot(backend_name="plotly3D")
+churi.plot(backend=Plotly3D())
 ```
 
 ```{code-cell} ipython3
-frame = OrbitPlotter(backend_name="plotly3D")
+frame = OrbitPlotter(backend=Plotly3D())
 
 frame.plot(churi)
 frame.plot_body_orbit(Earth, J2000)
@@ -43,7 +44,7 @@ frame.show()
 ```
 
 ```{code-cell} ipython3
-frame = OrbitPlotter(backend_name="plotly3D")
+frame = OrbitPlotter(backend=Plotly3D())
 
 frame.plot(molniya)
 frame.plot(iss)
@@ -53,7 +54,7 @@ frame.show()
 ```{code-cell} ipython3
 eros = Orbit.from_sbdb("eros")
 
-frame = OrbitPlotter(backend_name="plotly3D")
+frame = OrbitPlotter(backend=Plotly3D())
 
 frame.plot_body_orbit(Earth, J2000)
 frame.plot(eros, label="eros")
@@ -76,7 +77,7 @@ earth = Ephem.from_body(
 ```
 
 ```{code-cell} ipython3
-frame = OrbitPlotter(backend_name="plotly3D")
+frame = OrbitPlotter(backend=Plotly3D())
 frame.set_attractor(Sun)
 
 frame.plot_body_orbit(Earth, J2000, label=Earth)
@@ -85,7 +86,7 @@ frame.show()
 ```
 
 ```{code-cell} ipython3
-frame = OrbitPlotter(backend_name="plotly3D")
+frame = OrbitPlotter(backend=Plotly3D())
 
 frame.plot(eros, label="eros")
 frame.plot_trajectory(earth.sample(), label=str(Earth))

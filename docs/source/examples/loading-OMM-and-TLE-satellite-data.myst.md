@@ -273,8 +273,9 @@ And plot it!
 ```{code-cell} ipython3
 from poliastro.bodies import Earth
 from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Plotly3D
 
-plotter = OrbitPlotter(backend_name="plotly3D")
+plotter = OrbitPlotter(backend=Plotly3D())
 plotter.set_attractor(Earth)
 plotter.plot_ephem(iss_ephem, color="#333", label="ISS", trail=True)
 
@@ -290,7 +291,7 @@ epochs = time_range(now, end=now + (90 << u.minute))
 
 iss_ephem = ephem_from_gp(sat, epochs)
 
-plotter = OrbitPlotter(backend_name="plotly3D")
+plotter = OrbitPlotter(backend=Plotly3D())
 plotter.set_attractor(Earth)
 plotter.plot_ephem(iss_ephem, color="#333", label="ISS", trail=True)
 
