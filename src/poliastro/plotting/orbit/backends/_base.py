@@ -18,7 +18,7 @@ class OrbitPlotterBackend:
         -----
         An orbit plotter backend instance gets initialized from a scene. This
         can be a :ref:`~matplotlib.Axes`, :ref:`~plotly.Figure` or any other
-        object that acts as a canvas for rendering the scene.
+        object acting as canvas for rendering the scene.
 
         """
         # Verify backend name ends with '2D' or '3D'
@@ -91,7 +91,7 @@ class OrbitPlotterBackend:
         )
 
     def draw_marker(self, position, *, color, label, marker_symbol, size):
-        """Draw a point into the scene.
+        """Draw desired marker into the scene.
 
         Parameters
         ----------
@@ -112,7 +112,7 @@ class OrbitPlotterBackend:
         )
 
     def draw_position(self, position, *, color, label, size):
-        """Draws the position of a body in the scene.
+        """Draw the position of a body in the scene.
 
         Parameters
         ----------
@@ -136,7 +136,7 @@ class OrbitPlotterBackend:
         )
 
     def draw_impulse(self, position, *, color, label, size):
-        """Draws an impulse into the scene.
+        """Draw an impulse into the scene.
 
         Parameters
         ----------
@@ -155,7 +155,7 @@ class OrbitPlotterBackend:
         )
 
     def draw_sphere(self, position, *, color, label, radius):
-        """Draws an sphere into the scene.
+        """Draw an sphere into the scene.
 
         Parameters
         ----------
@@ -174,13 +174,13 @@ class OrbitPlotterBackend:
         )
 
     def undraw_attractor(self):
-        """Removes the attractor from the scene."""
+        """Remove the attractor from the scene."""
         raise NotImplementedError(
             "This method is expected to be override by a plotting backend class."
         )
 
     def draw_coordinates(self, coordinates, *, colors, label, size):
-        """Draws desired coordinates into the scene.
+        """Draw desired coordinates into the scene.
 
         Parameters
         ----------
@@ -199,7 +199,7 @@ class OrbitPlotterBackend:
         )
 
     def draw_axes_labels_with_length_scale_units(self, length_scale_units):
-        """Draws the desired label into the specified axis.
+        """Draw the desired label into the specified axis.
 
         Parameters
         ----------
@@ -224,7 +224,7 @@ class OrbitPlotterBackend:
         )
 
     def generate_labels(self, label, has_coordinates, has_position):
-        """Generates the labels for coordinates and position.
+        """Generate the labels for coordinates and position.
 
         Parameters
         ----------
@@ -241,7 +241,7 @@ class OrbitPlotterBackend:
         )
 
     def show(self):
-        """Displays the scene."""
+        """Display the scene."""
         raise NotImplementedError(
             "This method is expected to be override by a specific plotting backend."
         )

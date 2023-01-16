@@ -55,7 +55,7 @@ class OrbitPlotter:
         plane : ~poliastro.frames.Plane, optional
             Reference plane to be used when drawing the scene. Default to
             `EARTH_EQUATOR`.
-        length_scale_units : ~astropy.units.Unit
+        length_scale_units : ~astropy.units.Unit, optional
             Desired units of length used for representing distances.
         _
         """
@@ -79,22 +79,43 @@ class OrbitPlotter:
 
     @property
     def backend(self):
-        """Backend instance used by the plotter."""
+        """Backend instance used by the plotter.
+
+        Returns
+        -------
+        ~poliastro.plotting.orbit.backends._base.OrbitPlotterBackend
+            An instance of ``OrbitPlotterBackend`` used for rendendering the scene.
+
+        """
         return self._backend
 
     @property
     def plane(self):
-        """Reference plane to be used when drawing the scene."""
+        """Reference plane to be used when drawing the scene.
+
+        Returns
+        -------
+        ~poliastro.frames.Plane, optional
+            Reference plane to be used when drawing the scene. Default to
+
+        """
         return self._plane
 
     @property
     def trajectories(self):
-        """A list with all the `Trajectory` instances used in the plotter."""
+        """List with all the `Trajectory` instances used in the plotter.
+
+        Returns
+        -------
+        List[Trajectory]
+            A list containing all the trajectories rendered in the scene.
+
+        """
         return self._trajectories
 
     @property
     def length_scale_units(self):
-        """Return the units of length used for representing distances.
+        """Units of length used for representing distances.
 
         Returns
         -------
@@ -152,7 +173,7 @@ class OrbitPlotter:
                 self._redraw()
 
     def set_body_frame(self, body, epoch=None):
-        """Sets perifocal frame based on the orbit of a body at a particular epoch if given.
+        """Set perifocal frame based on the orbit of a body at a particular epoch if given.
 
         Parameters
         ----------
@@ -207,7 +228,7 @@ class OrbitPlotter:
         return [vec_proj @ self._frame[i] for i in range(3)]
 
     def _unplot_attractor(self):
-        """Removes the attractor from the scene."""
+        """Remove the attractor from the scene."""
         self._backend.undraw_attractor()
 
     def _plot_attractor(self):
@@ -244,6 +265,7 @@ class OrbitPlotter:
         )
 
     def _redraw(self):
+        """Redraw the the whole scene."""
         for trajectory in self._trajectories:
             self._add_trajectory(trajectory)
 
@@ -378,7 +400,7 @@ class OrbitPlotter:
         )
 
     def plot(self, orbit, *, color=None, label=None, trail=False, dashed=True):
-        """Plots state and osculating orbit in their plane.
+        """Plot state and osculating orbit in their plane.
 
         Parameters
         ----------
@@ -429,7 +451,7 @@ class OrbitPlotter:
         color=None,
         trail=False,
     ):
-        """Plots complete revolution of body and current position.
+        """Plot complete revolution of body and current position.
 
         Parameters
         ----------
@@ -473,7 +495,7 @@ class OrbitPlotter:
     def plot_ephem(
         self, ephem, epoch=None, *, label=None, color=None, trail=False
     ):
-        """Plots Ephem object over its sampling period.
+        """Plot ``Ephem`` object over its sampling period.
 
         Parameters
         ----------
@@ -526,7 +548,7 @@ class OrbitPlotter:
     def plot_maneuver(
         self, initial_orbit, maneuver, label=None, color=None, trail=False
     ):
-        """Plots the maneuver trajectory applied to the provided initial orbit.
+        """Plot the maneuver trajectory applied to the provided initial orbit.
 
         Parameters
         ----------
@@ -670,7 +692,7 @@ class OrbitPlotter:
         trail=False,
         dashed=False,
     ):
-        """Plots a precomputed trajectory.
+        """Plot a precomputed trajectory.
 
         Parameters
         ----------
@@ -730,7 +752,7 @@ class OrbitPlotter:
         trail=False,
         dashed=False,
     ):
-        """Plots a precomputed trajectory.
+        """Plot a precomputed trajectory.
 
         Parameters
         ----------
@@ -762,7 +784,7 @@ class OrbitPlotter:
 
     @u.quantity_input(elev=u.rad, azim=u.rad, distance=u.km)
     def set_view(self, elevation_angle, azimuth_angle, distance=5 * u.km):
-        """Changes 3D view by setting the elevation, azimuth and distance.
+        """Change 3D view by setting the elevation, azimuth and distance.
 
         Parameters
         ----------

@@ -42,7 +42,7 @@ class Matplotlib2D(OrbitPlotterBackend):
 
     @property
     def ax(self):
-        """Return the Matplotlib axes were the scene is rendered.
+        """The matplotlib axes were the scene is rendered.
 
         Returns
         -------
@@ -76,19 +76,19 @@ class Matplotlib2D(OrbitPlotterBackend):
         return colors
 
     def draw_marker(self, position, *, color, label, marker_symbol, size):
-        """Draws a marker into the scene.
+        """Draw a marker into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the point.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the point.
-        marker_symbol : str
-            The marker symbol to be used when drawing the point.
         label : str
             The name to be used in the legend for the marker.
-        size : float, optional
+        marker_symbol : str
+            The marker symbol to be used when drawing the point.
+        size : float
             Desired size for the marker.
 
         Returns
@@ -110,18 +110,18 @@ class Matplotlib2D(OrbitPlotterBackend):
         return marker_trace
 
     def draw_position(self, position, *, color, label, size):
-        """Draws the position of a body in the scene.
+        """Draw the position of a body in the scene.
 
         Parameters
         ----------
         position : list[float, float, float]
             A list containing the x, y and z coordinates of the point.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the marker.
         label : str
             The name to be used to identify the position in the legend of the
             figure.
-        size : float, optional
+        size : float
             The size of the marker.
 
         Returns
@@ -135,18 +135,18 @@ class Matplotlib2D(OrbitPlotterBackend):
         )
 
     def draw_impulse(self, position, *, color, label, size):
-        """Draws an impulse into the scene.
+        """Draw an impulse into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the impulse location.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the impulse marker.
         label : str
             The name to be used to identify the position in the legend of the
             figure.
-        size : float, optional
+        size : float
             The size of the marker for the impulse.
 
         Returns
@@ -160,17 +160,17 @@ class Matplotlib2D(OrbitPlotterBackend):
         )
 
     def draw_sphere(self, position, *, color, label, radius):
-        """Draws an sphere into the scene.
+        """Draw an sphere into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the sphere location.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the sphere.
         label : str
             The name shown in the legend of the figure to identify the sphere.
-        radius : float, optional
+        radius : float
             The radius of the sphere.
 
         Returns
@@ -193,12 +193,12 @@ class Matplotlib2D(OrbitPlotterBackend):
         )
 
     def undraw_attractor(self):
-        """Removes the attractor from the scene."""
+        """Remove the attractor from the scene."""
         for attractor in self.ax.findobj(match=mpl_patches.Circle):
             attractor.remove()
 
     def draw_axes_labels_with_length_scale_units(self, length_scale_units):
-        """Draws the desired label into the specified axis.
+        """Draw the desired label into the specified axis.
 
         Parameters
         ----------
@@ -210,7 +210,7 @@ class Matplotlib2D(OrbitPlotterBackend):
         self.ax.set_ylabel(f"$y$ ({length_scale_units.name})")
 
     def draw_coordinates(self, coordinates, *, colors, dashed, label):
-        """Draws desired coordinates into the scene.
+        """Draw desired coordinates into the scene.
 
         Parameters
         ----------
@@ -263,7 +263,7 @@ class Matplotlib2D(OrbitPlotterBackend):
         return lines_coordinates
 
     def generate_labels(self, label, has_coordinates, has_position):
-        """Generates the labels for coordinates and position.
+        """Generate the labels for coordinates and position.
 
         Parameters
         ----------
@@ -303,5 +303,5 @@ class Matplotlib2D(OrbitPlotterBackend):
         self.ax.set_aspect(1)
 
     def show(self):
-        """Displays the scene."""
+        """Display the scene."""
         plt.show()

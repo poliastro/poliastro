@@ -34,7 +34,7 @@ class BasePlotly(OrbitPlotterBackend):
 
     @property
     def figure(self):
-        """Return the Matplotlib axes were the scene is rendered.
+        """The plotly figure use to render the scene.
 
         Returns
         -------
@@ -46,7 +46,7 @@ class BasePlotly(OrbitPlotterBackend):
 
     @property
     def layout(self):
-        """Return the layout of the figure.
+        """The plotly layout of the figure.
 
         Returns
         -------
@@ -79,7 +79,7 @@ class BasePlotly(OrbitPlotterBackend):
 
         Returns
         -------
-        list[str]
+        List[str]
             A list of strings representing hexadecimal colors.
 
         """
@@ -91,18 +91,18 @@ class BasePlotly(OrbitPlotterBackend):
         pass
 
     def draw_position(self, position, *, color, label, size):
-        """Draws the position of a body in the scene.
+        """Draw the position of a body in the scene.
 
         Parameters
         ----------
         position : list[float, float, float]
             A list containing the x, y and z coordinates of the point.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the marker.
-        size : float, optional
-            The size of the marker.
         label : str
             The name shown in the figure legend to identify the position.
+        size : float
+            The size of the marker.
 
         Returns
         -------
@@ -115,17 +115,17 @@ class BasePlotly(OrbitPlotterBackend):
         )
 
     def draw_impulse(self, position, *, color, label, size):
-        """Draws an impulse into the scene.
+        """Draw an impulse into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the impulse location.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the impulse marker.
         label : str
             The name shown in the figure legend to identify the impulse.
-        size : float, optional
+        size : float
             The size of the marker for the impulse.
 
         Returns
@@ -147,13 +147,13 @@ class BasePlotly(OrbitPlotterBackend):
         pass
 
     def show(self):
-        """Displays the scene."""
+        """Display the scene."""
         self.update_layout(self._layout)
         if not self.figure._in_batch_mode:
             return self.figure.show()
 
     def generate_labels(self, label, has_coordinates, has_position):
-        """Generates the labels for coordinates and position.
+        """Generate the labels for coordinates and position.
 
         Parameters
         ----------
@@ -181,7 +181,7 @@ class Plotly2D(BasePlotly):
 
         Parameters
         ----------
-        figure : ~plotly.graph_objects.Figure
+        figure : ~plotly.graph_objects.Figure, optional
             The plotly ``Figure`` to render the scene.
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
@@ -201,19 +201,19 @@ class Plotly2D(BasePlotly):
         super().__init__(figure, layout)
 
     def draw_marker(self, position, *, color, label, marker_symbol, size):
-        """Draws a marker into the scene.
+        """Draw a marker into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the point.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the point.
         label : str
             The name shown in the legend of the figure to identify the marker.
         marker_symbol : str
             The marker symbol to be used when drawing the point.
-        size : float, optional
+        size : float
             Desired size for the marker.
 
         Returns
@@ -234,17 +234,17 @@ class Plotly2D(BasePlotly):
         return marker_trace
 
     def draw_sphere(self, position, *, color, label, radius):
-        """Draws an sphere into the scene.
+        """Draw an sphere into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the sphere location.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the sphere.
         label : str
             Unuseful for this routine. See the ``Notes`` section.
-        radius : float, optional
+        radius : float
             The radius of the sphere.
 
         Notes
@@ -275,7 +275,7 @@ class Plotly2D(BasePlotly):
         return shape
 
     def draw_coordinates(self, coordinates, *, colors, dashed, label):
-        """Draws desired coordinates into the scene.
+        """Draw desired coordinates into the scene.
 
         Parameters
         ----------
@@ -313,7 +313,7 @@ class Plotly2D(BasePlotly):
         return coordinates_trace
 
     def draw_axes_labels_with_length_scale_units(self, length_scale_units):
-        """Draws the desired label into the specified axis.
+        """Draw the desired label into the specified axis.
 
         Parameters
         ----------
@@ -333,11 +333,11 @@ class Plotly3D(BasePlotly):
     """An orbit plotter backend class based on Plotly."""
 
     def __init__(self, figure=None, use_dark_theme=False):
-        """Initializes a backend instance.
+        """Initialize a backend instance.
 
         Parameters
         ----------
-        figure : ~plotly.graph_objects.Figure
+        figure : ~plotly.graph_objects.Figure, optional
             The plotly ``Figure`` to render the scene.
         use_dark_theme : bool, optional
             If ``True``, uses dark theme. If ``False``, uses light theme.
@@ -358,19 +358,19 @@ class Plotly3D(BasePlotly):
         super().__init__(figure, layout)
 
     def draw_marker(self, position, *, color, marker_symbol, label, size):
-        """Draws a marker into the scene.
+        """Draw a marker into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the point.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the point.
         marker_symbol : str
             The marker symbol to be used when drawing the point.
         label : str
             The name shown in the legend of the figure to identify the marker.
-        size : float, optional
+        size : float
             Desired size for the marker.
 
         Returns
@@ -392,17 +392,17 @@ class Plotly3D(BasePlotly):
         return marker_trace
 
     def draw_sphere(self, position, *, color, label, radius):
-        """Draws an sphere into the scene.
+        """Draw an sphere into the scene.
 
         Parameters
         ----------
         position : list[float, float]
             A list containing the x and y coordinates of the sphere location.
-        color : str, optional
+        color : str
             A string representing the hexadecimal color for the sphere.
         label : str
             The name shown in the legend of the figure to identify the sphere.
-        radius : float, optional
+        radius : float
             The radius of the sphere.
 
         Returns
@@ -428,7 +428,7 @@ class Plotly3D(BasePlotly):
         return sphere
 
     def draw_coordinates(self, coordinates, *, colors, dashed, label):
-        """Draws desired coordinates into the scene.
+        """Draw desired coordinates into the scene.
 
         Parameters
         ----------
@@ -464,7 +464,7 @@ class Plotly3D(BasePlotly):
         return coordinates_trace
 
     def draw_axes_labels_with_length_scale_units(self, length_scale_units):
-        """Draws the desired label into the specified axis.
+        """Draw the desired label into the specified axis.
 
         Parameters
         ----------
@@ -481,7 +481,7 @@ class Plotly3D(BasePlotly):
         )
 
     def set_view(self, elevation_angle, azimuth_angle, distance):
-        """Changes 3D view.
+        """Change 3D view.
 
         Parameters
         ----------
