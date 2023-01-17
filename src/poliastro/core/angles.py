@@ -382,7 +382,7 @@ def E_to_M(E, ecc):
 
 @jit
 def F_to_M(F, ecc):
-    r"""Mean anomaly from eccentric anomaly.
+    r"""Mean anomaly from hyperbolic anomaly.
 
     Parameters
     ----------
@@ -401,7 +401,7 @@ def F_to_M(F, ecc):
     As noted in [5]_, by manipulating
     the parametric equations of the hyperbola
     we can derive a quantity that is equivalent
-    to the eccentric anomaly in the elliptic case:
+    to the mean anomaly in the elliptic case:
 
     .. math::
 
