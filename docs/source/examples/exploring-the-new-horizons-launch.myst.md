@@ -4,9 +4,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.0
+    jupytext_version: 1.14.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -15,7 +15,7 @@ kernelspec:
 
 Main data source: Guo & Farquhar "New Horizons Mission Design" http://www.boulder.swri.edu/pkb/ssr/ssr-mission-design.pdf
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import time
 from astropy import units as u
 
@@ -24,7 +24,8 @@ from poliastro import iod
 from poliastro.bodies import Sun, Earth, Jupiter
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
-from poliastro.plotting import StaticOrbitPlotter
+from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Matplotlib2D
 from poliastro.twobody import Orbit
 from poliastro.util import norm
 ```
@@ -36,7 +37,7 @@ Quoting from "New Horizons Mission Design":
 > It was first inserted into an elliptical Earth parking orbit
 of **perigee altitude 165 km** and **apogee altitude 215 km**. [Emphasis mine]
 
-```{code-cell}
+```{code-cell} ipython3
 r_p = Earth.R + 165 * u.km
 r_a = Earth.R + 215 * u.km
 
@@ -70,7 +71,7 @@ $$ v^2 = v_e^2 + v_{\infty}^2 $$
 
 ### Option a): Insert $C_3$ from report, check $v_e$ at parking perigee:
 
-```{code-cell}
+```{code-cell} ipython3
 C_3_A = 157.6561 * u.km**2 / u.s**2  # Designed
 
 a_exit = -(Earth.k / C_3_A).to(u.km)
@@ -98,7 +99,7 @@ stage. At the Star 48B burnout, the New Horizons spacecraft reached the highest
 Earth departure speed, **estimated at 16.2 km/s**, becoming the fastest spacecraft
 ever launched from Earth.  [Emphasis mine]
 
-```{code-cell}
+```{code-cell} ipython3
 v_estimated = 16.2 * u.km / u.s
 
 print(
@@ -110,13 +111,14 @@ print(
 
 So it stays within the same order of magnitude. Which is reasonable, because real life burns are not instantaneous.
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 from matplotlib import pyplot as plt
 
 fig, ax = plt.subplots(figsize=(8, 8))
-op = StaticOrbitPlotter(ax=ax)
+backend = Matplotlib2D(ax=ax)
+op = OrbitPlotter(backend=backend)
 
 op.plot(parking)
 op.plot(exit)
@@ -129,7 +131,7 @@ ax.set_ylim(-20000, 20000)
 
 According to Wikipedia, the closest approach occurred at 05:43:40 UTC. We can use this data to compute the solution of the Lambert problem between the Earth and Jupiter:
 
-```{code-cell}
+```{code-cell} ipython3
 nh_date = time.Time("2006-01-19 19:00", scale="utc").tdb
 nh_flyby_date = time.Time("2007-02-28 05:43:40", scale="utc").tdb
 nh_tof = nh_flyby_date - nh_date
@@ -142,12 +144,12 @@ nh_v_0, nh_v_f = iod.lambert(Sun.k, nh_r_0, nh_r_f, nh_tof)
 
 The hyperbolic excess velocity is measured with respect to the Earth:
 
-```{code-cell}
+```{code-cell} ipython3
 C_3_lambert = (norm(nh_v_0 - v_earth)).to(u.km / u.s) ** 2
 C_3_lambert
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 print("Relative error of {:.2f} %".format((C_3_lambert - C_3_A) / C_3_A * 100))
 ```
 
@@ -157,10 +159,10 @@ Which again, stays within the same order of magnitude of the figure given to the
 
 ## From Earth to Jupiter
 
-```{code-cell}
+```{code-cell} ipython3
 nh = Orbit.from_vectors(Sun, nh_r_0, nh_v_0, nh_date)
 
-op = StaticOrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
+op = OrbitPlotter(plane=Planes.EARTH_ECLIPTIC)
 
 op.plot_body_orbit(Jupiter, nh_flyby_date)
 op.plot_body_orbit(Earth, nh_date)

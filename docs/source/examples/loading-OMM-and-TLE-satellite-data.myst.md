@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.0
+    jupytext_version: 1.14.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -57,7 +57,7 @@ Therefore, the **correct** way of using GP data is:
 
 As explained in the [Orbit Mean-Elements Messages (OMMs) support assessment](https://opensatcom.org/2020/12/28/omm-assessment-sgp4-benchmarks/) deliverable of OpenSatCom, OMM input/output support in open source libraries is somewhat scattered. Luckily, [python-sgp4](https://pypi.org/project/sgp4/) supports reading OMM in CSV and XML format, as well as usual TLE and 3LE formats. On the other hand, Astropy has accurate transformations from TEME to other reference frames.
 
-```{code-cell}
+```{code-cell} ipython3
 # From https://github.com/poliastro/poliastro/blob/main/contrib/satgpio.py
 """
 Author: Juan Luis Cano Rodríguez
@@ -158,14 +158,14 @@ def print_sat(sat, name):
     print(json.dumps(exporter.export_omm(sat, name), indent=2))
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 sat = list(load_gp_from_celestrak(name="ISS (Zarya)"))[0]
 print_sat(sat, "ISS (Zarya)")
 ```
 
 The generator `load_gp_from_celestrak` might yield more than one satellite:
 
-```{code-cell}
+```{code-cell} ipython3
 len(list(load_gp_from_celestrak(name="COSMOS 1408 DEB")))
 ```
 
@@ -173,32 +173,32 @@ len(list(load_gp_from_celestrak(name="COSMOS 1408 DEB")))
 
 Now that we know how to load GP data, let's propagate it using the SGP4 algorithm:
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import units as u
 from astropy.time import Time
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 now = Time.now()
 now.jd1, now.jd2
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 error, r, v = sat.sgp4(now.jd1, now.jd2)
 assert error == 0
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 r << u.km
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 v << (u.km / u.s)
 ```
 
 Note that `Satrec` also supports propagating for arrays of time values using the `.sgp4_array` method:
 
-```{code-cell}
+```{code-cell} ipython3
 import numpy as np
 
 from astropy.coordinates import CartesianRepresentation, CartesianDifferential
@@ -206,26 +206,26 @@ from astropy.coordinates import CartesianRepresentation, CartesianDifferential
 from poliastro.util import time_range
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 times = time_range(now, end=now + (1 << u.h), num_values=3)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 errors, rs, vs = sat.sgp4_array(times.jd1, times.jd2)
 assert (errors == 0).all()
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 CartesianRepresentation(rs << u.km, xyz_axis=-1)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 CartesianDifferential(vs << (u.km / u.s), xyz_axis=-1)
 ```
 
 Mixing all together, and leveraging poliastro `Ephem` objects, we can compute ephemerides from GP orbital data:
 
-```{code-cell}
+```{code-cell} ipython3
 from warnings import warn
 
 from astropy.coordinates import TEME, GCRS
@@ -263,18 +263,19 @@ def ephem_from_gp(sat, times):
     return Ephem(cart_gcrs, times, plane=Planes.EARTH_EQUATOR)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 iss_ephem = ephem_from_gp(sat, time_range(now, end=now + (3 << u.h)))
 iss_ephem
 ```
 
 And plot it!
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.bodies import Earth
-from poliastro.plotting import OrbitPlotter3D
+from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Plotly3D
 
-plotter = OrbitPlotter3D()
+plotter = OrbitPlotter(backend=Plotly3D())
 plotter.set_attractor(Earth)
 plotter.plot_ephem(iss_ephem, color="#333", label="ISS", trail=True)
 
@@ -283,14 +284,14 @@ plotter.show()
 
 We can also plot the trajectory of the ISS for 90 minutes, plus the trajectories of the first 25 debris fragments:
 
-```{code-cell}
+```{code-cell} ipython3
 from itertools import islice
 
 epochs = time_range(now, end=now + (90 << u.minute))
 
 iss_ephem = ephem_from_gp(sat, epochs)
 
-plotter = OrbitPlotter3D()
+plotter = OrbitPlotter(backend=Plotly3D())
 plotter.set_attractor(Earth)
 plotter.plot_ephem(iss_ephem, color="#333", label="ISS", trail=True)
 

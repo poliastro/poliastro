@@ -4,19 +4,21 @@
 This module complements constants defined in `astropy.constants` with
 mean distances between sun-planet and planet-moon systems
 
-Mean distances between the two bodies are required for CR3BP model
-CR3BP model's goal is to approximate the behavior of a satellite in an
-ephemeris model. Thus, it is reasonable to us low precision mean distances values as
-for more comprehensive mission designs, the CR3BP trajectories are differentially
+Mean distances between the two bodies are required for CR3BP model CR3BP
+model's goal is to approximate the behavior of a satellite in an ephemeris
+model. Thus, it is reasonable to us low precision mean distances values as for
+more comprehensive mission designs, the CR3BP trajectories are differentially
 corrected in an ephemeris model with high precision mean distances.
 
 Low precision mean distance between sun-planet were obtained from:
-* NASA. (n.d.). Approximate positions of the planets. NASA.,
-  from https://ssd.jpl.nasa.gov/planets/approx_pos.html
+
+* NASA. (n.d.). Approximate positions of the planets. NASA., from
+  https://ssd.jpl.nasa.gov/planets/approx_pos.html
 
 Low precision mean distance between planet-moon were obtained from:
-* NASA. (n.d.). Planetary satellite mean elements. NASA.
-  from https://ssd.jpl.nasa.gov/sats/elem/sep.html
+
+* NASA. (n.d.). Planetary satellite mean elements. NASA. from
+  https://ssd.jpl.nasa.gov/sats/elem/sep.html
 
 All computed at J2000, except "Pluto - Charon" -> Epoch: 2020-01-01.5 TDB
 

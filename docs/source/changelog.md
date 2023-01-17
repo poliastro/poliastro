@@ -195,12 +195,12 @@ as well as the results from Google Summer of Code 2021.
 - **New event detectors**
   Yash wrote a number of event detectors meant for our numerical propagator
   as part of his Google Summer of Code 2021.
-  Have a look at {doc}`/examples/Detecting Events` guide to learn more.
+  Have a look at {doc}`/examples/detecting-events` guide to learn more.
 - **New ``.plot_maneuver`` method**
   The interactive orbit plotters {py:class}`~poliastro.plotting.OrbitPlotter2D`
   and {py:class}`~poliastro.plotting.OrbitPlotter3D`
   now have a new method to easily display impulsive burns.
-  See {doc}`/examples/Going to Jupiter with Python using Jupyter and poliastro`
+  See {doc}`/examples/going-to-jupiter-with-python-using-jupyter-and-poliastro`
   for an example.
 - **Many performance improvements**
   Several contributors have helped accelerate more algorithms

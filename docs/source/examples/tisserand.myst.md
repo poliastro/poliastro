@@ -57,7 +57,7 @@ import numpy as np
 
 from poliastro.bodies import Venus, Earth, Mars
 from poliastro.plotting.tisserand import TisserandPlotter, TisserandKind
-from poliastro.plotting._base import BODY_COLORS
+from poliastro.plotting.util import BODY_COLORS
 ```
 
 Notice that we imported the `TisserandKind` class, which will help us to indicate the kind of Tisserand plot we want to generate:

@@ -3,7 +3,6 @@ from collections import OrderedDict
 from functools import partial
 from unittest import mock
 
-import matplotlib
 import numpy as np
 import pytest
 from astropy import units as u
@@ -48,6 +47,7 @@ from poliastro.frames.equatorial import (
     VenusICRS,
 )
 from poliastro.frames.util import get_frame
+from poliastro.plotting.orbit.backends import DEFAULT_ORBIT_PLOTTER_BACKENDS
 from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
 from poliastro.twobody.sampling import TrueAnomalyBounds
@@ -470,42 +470,13 @@ def test_orbit_is_pickable(hyperbolic):
     assert orb_result.epoch == hyperbolic.epoch
 
 
-def test_orbit_plot_is_static():
+@pytest.mark.parametrize("Backend", DEFAULT_ORBIT_PLOTTER_BACKENDS.values())
+def test_orbit_plot_raises_no_error(Backend):
     # Data from Curtis, example 4.3
     r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-
-    plot = ss.plot()
-
-    assert isinstance(plot[0], matplotlib.lines.Line2D)
-    assert isinstance(plot[1], matplotlib.lines.Line2D)
-
-
-def test_orbit_plot_static_3d():
-    # Data from Curtis, example 4.3
-    r = [-6_045, -3_490, 2_500] * u.km
-    v = [-3.457, 6.618, 2.533] * u.km / u.s
-    ss = Orbit.from_vectors(Earth, r, v)
-    with pytest.raises(
-        ValueError,
-        match="The static plotter does not support 3D, use `interactive=True`",
-    ):
-        ss.plot(use_3d=True)
-
-
-@pytest.mark.parametrize("use_3d", [False, True])
-def test_orbit_plot_is_not_static(use_3d):
-    from plotly.graph_objects import Figure
-
-    # Data from Curtis, example 4.3
-    r = [-6_045, -3_490, 2_500] * u.km
-    v = [-3.457, 6.618, 2.533] * u.km / u.s
-    ss = Orbit.from_vectors(Earth, r, v)
-
-    plot = ss.plot(interactive=True, use_3d=use_3d)
-
-    assert isinstance(plot, Figure)
+    ss.plot(backend=Backend())
 
 
 @pytest.mark.parametrize(

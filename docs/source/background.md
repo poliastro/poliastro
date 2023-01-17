@@ -8,10 +8,10 @@ have a look at the books we recommend in the {ref}`bibliography`.
 ```{eval-rst}
 .. nbgallery::
 
-   /examples/Comparing Hohmann and bielliptic transfers.mystnb
-   /examples/Propagation using Cowells formulation.mystnb
-   /examples/Revisiting Lamberts problem in Python.mystnb
-   /examples/Studying Hohmann transfers.mystnb
-   /examples/Multirevolutions solution in Lamberts problem.mystnb
+   /examples/comparing-hohmann-and-bielliptic-transfers.myst.md
+   /examples/propagation-using-cowells-formulation.myst.md
+   /examples/revisiting-lamberts-problem-in-python.myst.md
+   /examples/studying-hohmann-transfers.myst.md
+   /examples/multirevolutions-solution-in-lamberts-problem.myst.md
 
 ```

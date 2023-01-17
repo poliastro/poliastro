@@ -135,6 +135,7 @@ source = ["src"]
 
 [tool.coverage.report]
 omit = ["contrib/*"]
+show_missing = true
 
 [tool.importlinter]
 # Include Astropy to properly analyze external submodules,

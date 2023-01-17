@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.0
+    jupytext_version: 1.14.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -13,7 +13,7 @@ kernelspec:
 
 # Natural and artificial perturbations
 
-```{code-cell}
+```{code-cell} ipython3
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -32,24 +32,18 @@ from poliastro.core.perturbations import (
 )
 from poliastro.core.propagation import func_twobody
 from poliastro.ephem import build_ephem_interpolant
-from poliastro.plotting import OrbitPlotter3D
+from poliastro.plotting import OrbitPlotter
+from poliastro.plotting.orbit.backends import Plotly3D
 from poliastro.twobody import Orbit
 from poliastro.twobody.propagation import CowellPropagator
 from poliastro.twobody.sampling import EpochsArray
 from poliastro.util import norm, time_range
 ```
 
-```{code-cell}
-# More info: https://plotly.com/python/renderers/
-import plotly.io as pio
-
-pio.renderers.default = "plotly_mimetype+notebook_connected"
-```
-
 ## Atmospheric drag ##
 The poliastro package now has several commonly used natural perturbations. One of them is atmospheric drag! See how one can monitor decay of the near-Earth orbit over time using our new module `poliastro.twobody.perturbations`!
 
-```{code-cell}
+```{code-cell} ipython3
 R = Earth.R.to(u.km).value
 k = Earth.k.to(u.km**3 / u.s**2).value
 
@@ -93,7 +87,7 @@ rr, _ = orbit.to_ephem(
 ).rv()
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 plt.ylabel("h(t)")
 plt.xlabel("t, days")
 plt.plot(tofs.value, norm(rr, axis=1) - Earth.R)
@@ -109,7 +103,7 @@ Please note that you will likely want to use a more sophisticated
 atmosphere model than the one in `atmospheric_drag` for these sorts
 of computations.
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.twobody.events import LithobrakeEvent
 
 orbit = Orbit.circular(
@@ -131,7 +125,7 @@ print(
 )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 plt.ylabel("h(t)")
@@ -143,7 +137,7 @@ plt.plot(tofs[: len(rr)].value, norm(rr, axis=1) - Earth.R)
 
 We can also see how the J2 perturbation changes RAAN over time!
 
-```{code-cell}
+```{code-cell} ipython3
 r0 = np.array([-2384.46, 5729.01, 3050.46]) * u.km
 v0 = np.array([-7.36138, -2.98997, 1.64354]) * u.km / u.s
 
@@ -174,7 +168,7 @@ raans = [
 ]
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 plt.ylabel("RAAN(t)")
 plt.xlabel("t, h")
 plt.plot(tofs.value, raans)
@@ -184,7 +178,7 @@ plt.plot(tofs.value, raans)
 
 Apart from time-independent perturbations such as atmospheric drag, J2/J3, we have time-dependent perturbations. Let's see how the Moon changes the orbit of GEO satellite over time!
 
-```{code-cell}
+```{code-cell} ipython3
 # database keeping positions of bodies in Solar system over time
 solar_system_ephemeris.set("de432s")
 
@@ -233,8 +227,8 @@ ephem = initial.to_ephem(
 )
 ```
 
-```{code-cell}
-frame = OrbitPlotter3D()
+```{code-cell} ipython3
+frame = OrbitPlotter(backend=Plotly3D())
 
 frame.set_attractor(Earth)
 frame.plot_ephem(ephem, label="orbit influenced by Moon")
@@ -244,7 +238,7 @@ frame.plot_ephem(ephem, label="orbit influenced by Moon")
 
 Apart from natural perturbations, there are artificial thrusts aimed at intentional change of orbit parameters. One of such changes is simultaneous change of eccentricity and inclination:
 
-```{code-cell}
+```{code-cell} ipython3
 from poliastro.twobody.thrust import change_ecc_inc
 
 ecc_0, ecc_f = 0.4, 0.0
@@ -288,8 +282,8 @@ ephem2 = orb0.to_ephem(
 )
 ```
 
-```{code-cell}
-frame = OrbitPlotter3D()
+```{code-cell} ipython3
+frame = OrbitPlotter(backend=Plotly3D())
 
 frame.set_attractor(Earth)
 frame.plot_ephem(ephem2, label="orbit with artificial thrust")
@@ -299,7 +293,7 @@ frame.plot_ephem(ephem2, label="orbit with artificial thrust")
 
 It might be of interest to determine what effect multiple perturbations have on a single object. In order to add multiple perturbations we can create a custom function that adds them up:
 
-```{code-cell}
+```{code-cell} ipython3
 from numba import njit as jit
 
 # Add @jit for speed!
@@ -310,7 +304,7 @@ def a_d(t0, state, k, J2, R, C_D, A_over_m, H0, rho0):
     )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # propagation times of flight and orbit
 tofs = TimeDelta(np.linspace(0, 10 * u.day, num=10 * 500))
 orbit = Orbit.circular(Earth, 250 * u.km)  # recall orbit from drag example
@@ -363,7 +357,7 @@ rr4, _ = orbit.to_ephem(
 ).rv()
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 fig, (axes1, axes2) = plt.subplots(nrows=2, sharex=True, figsize=(15, 6))
 
 axes1.plot(tofs.value, norm(rr3, axis=1) - Earth.R)

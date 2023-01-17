@@ -5,7 +5,7 @@ import numpy as np
 from astropy import units as u
 from matplotlib import pyplot as plt
 
-from poliastro.plotting._base import BODY_COLORS
+from poliastro.plotting.util import BODY_COLORS
 from poliastro.twobody.mean_elements import get_mean_elements
 from poliastro.util import norm
 

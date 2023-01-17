@@ -4,16 +4,16 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.0
+    jupytext_version: 1.14.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
 # Comparing Hohmann and bielliptic transfers
 
-```{code-cell}
+```{code-cell} ipython3
 from astropy import units as u
 
 from matplotlib import pyplot as plt
@@ -26,7 +26,7 @@ from poliastro.maneuver import Maneuver
 from poliastro.twobody import Orbit
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ZOOM = True
 
 R = np.linspace(2, 75, num=100)
@@ -54,7 +54,7 @@ idx_max = np.argmax(hohmann_data)
 ylims = (0.35, 0.6)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 :tags: [nbsphinx-thumbnail]
 
 fig, ax = plt.subplots(figsize=(8, 6))
