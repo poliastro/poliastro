@@ -15,7 +15,6 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 @jit
 def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
-
     a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(a) ** 3)
 

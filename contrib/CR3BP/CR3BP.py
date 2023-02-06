@@ -255,7 +255,6 @@ def func_CR3BP(t, u_, mu):
 
 @jit
 def func_STM(t, u_, mu):
-
     # extract STM from dynamics vector 6:42 elements
     STM = u_[6:].reshape(6, 6)  # reshaped to a 6x6 matrix
 

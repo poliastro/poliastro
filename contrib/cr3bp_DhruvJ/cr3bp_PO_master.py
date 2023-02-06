@@ -847,7 +847,6 @@ class periodic_orbit(cr3bp_model):
         global_manifold_states = np.zeros((num_po_states, teval_len, 6))
 
         for count_po_states in range(num_po_states):
-
             # Obtain states at dififerent times along PO and STM(tf,0)
             int_method_orig = self.int_method
             self.int_method = "boost"

@@ -611,7 +611,6 @@ class OrbitPlotter:
 
             # Collect the coordinates for the different maneuver phases
             for ith_impulse, orbit_phase in enumerate(maneuver_phases):
-
                 # Project the coordinates into desired frame for 2D backends
                 if self.backend.is_2D:
                     orbit_phase_r = (

@@ -7,7 +7,6 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 @jit
 def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
-
     semi_axis_a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(semi_axis_a) ** 3)
 
@@ -35,7 +34,6 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
     # Iterations begin
     n = 0
     while n <= numiter:
-
         if ecc < 1.0:
             s = ecc * np.sin(E)
             c = ecc * np.cos(E)
@@ -52,7 +50,6 @@ def danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter=20, rtol=1e-8):
             fppp = c
 
         if np.abs(f) <= rtol:
-
             if ecc < 1.0:
                 sta = np.sqrt(1 - ecc**2) * np.sin(E)
                 cta = np.cos(E) - ecc

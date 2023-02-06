@@ -295,7 +295,6 @@ def rv2el(rr, vv, epoch):
 
 
 if __name__ == "__main__":
-
     # Display some initial data
     print(f" Orbit: {iss}")
     print(" State vector [poliastro]")

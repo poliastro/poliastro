@@ -85,7 +85,6 @@ from poliastro.twobody.angles import E_to_M, nu_to_E
 # Let us define a relative orbits class that can be defined by two orbits!
 class RelativeOrb:
     def __init__(self, satC, satD):
-
         """
 
         When this class is initialized, it requires two poliastro twobody
@@ -159,7 +158,6 @@ class RelativeOrb:
 
     # Method to return a list of the computed eccentricity vector separation.
     def get_eccentricity_separation(self):
-
         """
         Returns the eccentricity separation vector [ex, ey] (dimensionless)
         """
@@ -168,7 +166,6 @@ class RelativeOrb:
 
     # Method to return a list of the computed inclination vector separation.
     def get_inclination_separation(self):
-
         """
         Returns the inclination separation vector [ix, iy] (dimensionless)
         """
@@ -177,7 +174,6 @@ class RelativeOrb:
 
     # Internal method to return a direction cosine matrix about the X-axis
     def _dcmX(self, t):
-
         """
         Input theta is the scalar angle (in radians, non Astropy unit).
         Output is a 3x3 direction cosine matrix.
@@ -195,7 +191,6 @@ class RelativeOrb:
 
     # Internal method to return a direction cosine matrix about the Z-axis
     def _dcmZ(self, t):
-
         """
         Input theta is the scalar angle (in radians, non Astropy unit).
         Output is a 3x3 direction cosine matrix.
@@ -213,7 +208,6 @@ class RelativeOrb:
 
     # Internal method to solve Kepler's equation for eccentric anomaly.
     def _solve_kepler(self, M, ecc):
-
         """
         Input a float mean anomaly (rad) and eccentricity, and solves for
         the eccentric anomaly.
@@ -224,7 +218,6 @@ class RelativeOrb:
         residual = 1.0  # Initialise convergence residual
 
         while residual >= 0.000001:
-
             fn = E1 - (e * np.sin(E1)) - M.to_value(u.rad)
             fd = 1 - (e * np.cos(E1))
             E2 = E1 - (fn / fd)
@@ -236,7 +229,6 @@ class RelativeOrb:
     # Method to solve for the orbit position, velocity and true anomaly.
     # (Requires the _dcmZ, _dcmX, and _solve_kepler internal methods)
     def _solve_posn(self, a, e, i, w, R, M, mu):
-
         """
         Inputs: Keplerian elements and gravitational constant (Astropy units).
                 - a        -> Semi-major axis (u.km)
@@ -312,7 +304,6 @@ class RelativeOrb:
 
     # Propagate method, that must be called in order to store values for plots.
     def propagate(self, duration=43200, step=60):
-
         """
         Core method for relative trajectory generation. Inputs duration and
         time step (integers), and updates the six state arrays of the object
@@ -329,7 +320,6 @@ class RelativeOrb:
 
         # Check if the orbit is an ellipse (closed)
         if self.satC.ecc < 1 and self.satD.ecc < 1:
-
             # Get the initial mean anomaly of the chief.
             mC = E_to_M(nu_to_E(self.satC.nu, self.satC.ecc), self.satC.ecc)
 
@@ -357,7 +347,6 @@ class RelativeOrb:
 
             # For each sample...
             for t in range(0, duration, step):
-
                 # Update the mean anomaly of the chief (loop over pi).
                 mC = ((mC + pi + (nC * ts)) % (2 * pi)) - pi
 
@@ -447,7 +436,6 @@ class RelativeOrb:
             return self
 
     def plot(self):
-
         """
         Function to plot the relative trajectory. You must run the propagate()
         method of the instance before the plot() method works.
@@ -460,9 +448,7 @@ class RelativeOrb:
 
         # Else, proceed with the propagation!
         else:
-
             with quantity_support():
-
                 # Initialise the matplotlib frame object.
                 figMain = plt.figure()
                 axOrbR = figMain.add_subplot(1, 1, 1, projection="3d")
@@ -549,7 +535,6 @@ class RelativeOrb:
                 plt.show()
 
     def plot_v(self):
-
         """
         Function to plot the relative velocity. You must run the propagate()
         method of the instance before the plot_v() method works.
@@ -562,9 +547,7 @@ class RelativeOrb:
 
         # Else, proceed with the propagation!
         else:
-
             with quantity_support():
-
                 # Initialise the matplotlib frame object.
                 figMain = plt.figure()
                 axOrbV = figMain.add_subplot(1, 1, 1, projection="3d")
@@ -658,7 +641,6 @@ class RelativeOrb:
 # The 'if __name__ == "__main__" statement allows others to import the
 # RelativeOrb class without calling the rest of the script below:
 if __name__ == "__main__":
-
     # Initialize an example Satellite A as the chief spacecraft.
     satC = Orbit.from_classical(
         attractor=Earth,

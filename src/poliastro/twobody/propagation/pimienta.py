@@ -33,7 +33,7 @@ class PimientaPropagator:
             pimienta_fast(
                 state.attractor.k.to_value(u.km**3 / u.s**2),
                 *state.to_value(),
-                tof.to_value(u.s)
+                tof.to_value(u.s),
             )
             << u.rad
         )

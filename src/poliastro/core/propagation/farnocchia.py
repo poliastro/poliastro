@@ -293,7 +293,6 @@ def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
 
 @jit
 def farnocchia_coe(k, p, ecc, inc, raan, argp, nu, tof):
-
     q = p / (1 + ecc)
 
     delta_t0 = delta_t_from_nu(nu, ecc, k, q)
