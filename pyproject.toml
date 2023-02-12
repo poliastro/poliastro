@@ -117,7 +117,7 @@ line-length = 79
 [tool.ruff]
 select = [
     "E",  # pycodestyle, see https://github.com/charliermarsh/ruff#pycodestyle-e-w
-    "D",  # pydocstyle, see https://github.com/charliermarsh/ruff#pydocstyle-d
+#    "D",  # pydocstyle, see https://github.com/charliermarsh/ruff#pydocstyle-d
     "F",  # pyflakes, see https://github.com/charliermarsh/ruff#pyflakes-f
     "I"   # isort, see https://github.com/charliermarsh/ruff#isort-i
 ]

@@ -1,6 +1,4 @@
-"""
-@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
-"""
+"""@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University."""
 from astropy import units as u
 
 from poliastro.core.threebody.cr3bp_quantities_calculations import (
@@ -14,12 +12,11 @@ class SystemChars:
     'mu': mass ratio of P1-P2 primary bodies
     'l*': characterisitic lenght of P1-P2 system
     't*': characterisitic time of P1-P2 system
-    If P2 is more massive than P1 then swap the Pi, so that P1 is the more massive body
+    If P2 is more massive than P1 then swap the Pi, so that P1 is the more massive body.
     """
 
     def __init__(self, name, mu, lstar, tstar):
-        """
-        Constructor
+        """Constructor.
 
         Parameters
         ----------
@@ -39,8 +36,7 @@ class SystemChars:
 
     @classmethod
     def from_primaries(cls, p1, p2):
-        """
-        Computes and sets the characteristic quanitites based on p1 and p2 bodies
+        """Computes and sets the characteristic quanitites based on p1 and p2 bodies.
 
         Parameters
         ----------
@@ -52,8 +48,7 @@ class SystemChars:
 
     @classmethod
     def bodies_char_compute(self, p1, p2):
-        """
-        Calculates mu, lstar, and tstar of the 'p1' and 'p2' system
+        """Calculates mu, lstar, and tstar of the 'p1' and 'p2' system.
 
         Also, if M2>M1, then swaps p1 and p2, so that M1>M2
 
@@ -73,7 +68,6 @@ class SystemChars:
         tstar: float, sec
             Characterisitc time of P1-P2 system
         """
-
         assert (
             p1 == p2.parent or p2 == p1.parent
         ) is True, (
@@ -101,20 +95,20 @@ class SystemChars:
     # All the attributes are made private to make them constant and avoid being mistakenly changed
     @property
     def name(self):
-        """Name of P1-P2 system"""
+        """Name of P1-P2 system."""
         return self._name
 
     @property
     def mu(self):
-        """Mass ratio of P1-P2 primary bodies in CR3BP"""
+        """Mass ratio of P1-P2 primary bodies in CR3BP."""
         return self._mu
 
     @property
     def lstar(self):
-        """Characterisitc length of P1-P2 system"""
+        """Characterisitc length of P1-P2 system."""
         return self._lstar
 
     @property
     def tstar(self):
-        """Characterisitc time of P1-P2 system"""
+        """Characterisitc time of P1-P2 system."""
         return self._tstar

@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro.core.angles import E_to_M, F_to_M, nu_to_E, nu_to_F
 from poliastro.core.elements import coe2rv, rv2coe
@@ -108,7 +108,6 @@ def danby(k, r0, v0, tof, numiter=20, rtol=1e-8):
     This algorithm was developed by Danby in his paper *The solution of Kepler
     Equation* with DOI: https://doi.org/10.1007/BF01686811
     """
-
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     nu = danby_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)

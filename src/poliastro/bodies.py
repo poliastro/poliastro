@@ -28,8 +28,8 @@ and a way to define new bodies (:py:class:`~Body` class).
 
 Data references can be found in :py:mod:`~poliastro.constants`
 """
-import math
 from collections import namedtuple
+import math
 
 from astropy import units as u
 from astropy.constants import G

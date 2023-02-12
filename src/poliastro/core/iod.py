@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 from numpy import cross, pi
 
 from poliastro._math.linalg import norm
@@ -101,7 +101,6 @@ def vallado(k, r0, r, tof, M, prograde, lowpath, numiter, rtol):
     in the same book under name Example 5.2.
 
     """
-
     # TODO: expand for the multi-revolution case.
     # Issue: https://github.com/poliastro/poliastro/issues/858
     if M > 0:
@@ -207,7 +206,6 @@ def izzo(k, r1, r2, tof, M, prograde, lowpath, numiter, rtol):
         Final velocity vector
 
     """
-
     # Check preconditions
     assert tof > 0
     assert k > 0

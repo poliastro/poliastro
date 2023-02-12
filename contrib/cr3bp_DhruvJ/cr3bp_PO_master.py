@@ -1,5 +1,4 @@
-"""
-Created on 20 Mar 2022
+"""Created on 20 Mar 2022.
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
@@ -25,13 +24,13 @@ These are some of the referneces that provide a comprehensive brackground and ha
 """
 import copy
 
-import numpy as np
 from cr3bp_model_master import cr3bp_model
+import numpy as np
 
 
 # Inherit attributes and methods of cr3bp_model
 class periodic_orbit(cr3bp_model):
-    """Child class of cr3bp_model; focuss on periodic orbit computation"""
+    """Child class of cr3bp_model; focuss on periodic orbit computation."""
 
     def __init__(
         self,
@@ -43,8 +42,7 @@ class periodic_orbit(cr3bp_model):
         xcross_cond=0,
         int_method="DOP853",
     ):
-        """
-        Constructor
+        """Constructor
         Parameters
         ----------
         sys_chars_vals : object
@@ -108,7 +106,7 @@ class periodic_orbit(cr3bp_model):
         Nmax=50,
     ):
         """Single shooter targeter for a Periodic Orbit defined in the CR3BP model
-        Dhruv Jain, 26 Feb 2022
+        Dhruv Jain, 26 Feb 2022.
 
         Parameters
         ----------
@@ -155,7 +153,6 @@ class periodic_orbit(cr3bp_model):
             None: Targeter Setup is incorrect
             False: Succesfully targeted
         """
-
         # Initialization
         self.sym_period_targ = sym_period_targ
         iterflag = None
@@ -284,15 +281,13 @@ class periodic_orbit(cr3bp_model):
         return results_stm, iterflag
 
     def __events_func_ycrossing_check(self, free_vars):
-        """
-        If symmetry is to be used to target then use events function to get "tf" till next y-axis crossinng
+        """If symmetry is to be used to target then use events function to get "tf" till next y-axis crossinng
         Parameters
         ----------
         free_vars : list of strings
             Describes the parameters set as free variables
-            Possible paramters: ['x','y','z','vx','vy','vz','t']
+            Possible paramters: ['x','y','z','vx','vy','vz','t'].
         """
-
         # Use events function to compute y-crossing if symmetry is to be used for targeter
         if "t" in free_vars and self.sym_period_targ != 1:
             self.xcross_cond = 1
@@ -306,8 +301,7 @@ class periodic_orbit(cr3bp_model):
             self.tf = self.tf * self.sym_period_targ
 
     def __free_vars_setup_update(self, free_vars, purpose="update"):
-        """
-        Computes intial Free Variable Vector and Updates IC and tf after computing a new xfree
+        """Computes intial Free Variable Vector and Updates IC and tf after computing a new xfree
         Parameters
         ----------
         free_vars : list of strings
@@ -352,8 +346,7 @@ class periodic_orbit(cr3bp_model):
     def __constraints_setup_update(
         self, constraints, results_stm, purpose="update"
     ):
-        """
-        Computes intial xconstraint and xdesired Vector and Updates the two after computing a new xfree
+        """Computes intial xconstraint and xdesired Vector and Updates the two after computing a new xfree
         Parameters
         ----------
         constraints : list of strings
@@ -368,7 +361,6 @@ class periodic_orbit(cr3bp_model):
         purpose : string, optional
             to check the purpose for which the function is to be used - to 'setup' or 'update'. The default is 'update'.
         """
-
         if purpose != "setup" and purpose != "update":
             print("Incorrect purpose passed")
             self.ic = 0
@@ -416,8 +408,7 @@ class periodic_orbit(cr3bp_model):
         return identity_temp
 
     def __FX_setup_update(self, palc_args):
-        """
-        Computes the Constraint vector = F(x) = xconstraint-xdesired
+        """Computes the Constraint vector = F(x) = xconstraint-xdesired
         Parameters
         ----------
         palc_args : dictionary containting information for Pseudo-Arc Length Continuation, optional
@@ -426,7 +417,7 @@ class periodic_orbit(cr3bp_model):
             'delta_X*_prev': Null-Vector of DF of previously converged  orbit
             'prev_conv_soln': targeted IC of the previously converged orbit
             'dx/dtheta': phase constraint
-            The default is None
+            The default is None.
 
         Returns
         -------
@@ -476,8 +467,7 @@ class periodic_orbit(cr3bp_model):
         return DF, DG
 
     def compute_dxf_dt(self, results_stm):
-        """
-        Computes the time derivative of states @ t = tf
+        """Computes the time derivative of states @ t = tf
         Parameters
         ----------
         result_stm: Dictionary
@@ -489,9 +479,8 @@ class periodic_orbit(cr3bp_model):
         Returns
         -------
         dxf_dt : numpy ndarray (6x1)
-            d[xf, yf, zf, vxf, vyf, vzf]/dt
+            d[xf, yf, zf, vxf, vyf, vzf]/dt.
         """
-
         states_final = results_stm["states"][-1, :]
         Ux, Uy, Uz, ax, ay, az = self.ui_partials_acc_cr3bp(states_final)
         dxf_dt = np.array(
@@ -500,12 +489,11 @@ class periodic_orbit(cr3bp_model):
         return dxf_dt
 
     def compute_dJC_dxi(self):
-        """
-        Computes the analytical elements of Jacobian for "dJC/dstate"
+        """Computes the analytical elements of Jacobian for "dJC/dstate"
         Returns
         -------
         dJC_dx : numpy ndarray (6x1), float
-            dJC/d[x,y,z,vx,vy,vz]
+            dJC/d[x,y,z,vx,vy,vz].
         """
         # Compute d(JC)/d(x)
         Ux_ic, Uy_ic, Uz_ic, _, _, _ = self.ui_partials_acc_cr3bp(self.ic)
@@ -524,8 +512,7 @@ class periodic_orbit(cr3bp_model):
     def __compute_DF(
         self, free_vars, constraints, results_stm, identity_temp, palc_args
     ):
-        """
-        Computes the Analytical Jacobian Matrix, "DF", for a PO targeter
+        """Computes the Analytical Jacobian Matrix, "DF", for a PO targeter
         Parameters
         ----------
         free_vars : list of strings
@@ -542,7 +529,7 @@ class periodic_orbit(cr3bp_model):
             'delta_s': step-size
             'free_var_prev': Free variables of the previously converged orbit
             'delta_X*_prev': Null-Vector of DF of previously converged solution
-            The default is None
+            The default is None.
         """
         dxf_dt = self.compute_dxf_dt(results_stm)
         dJC_dx = self.compute_dJC_dxi()
@@ -568,8 +555,7 @@ class periodic_orbit(cr3bp_model):
                 ]
 
     def newton_raphson_update(self, xfree, FX, DG):
-        """
-        Multi-dimensional Newton-Raphson Method to update inital guess
+        """Multi-dimensional Newton-Raphson Method to update inital guess.
 
         Parameters
         ----------
@@ -596,8 +582,7 @@ class periodic_orbit(cr3bp_model):
         return xfree
 
     def map_vars_index_cr3bp(self, var_names=None):
-        """
-        Map variables defined in free variables or constraints to numerical index
+        """Map variables defined in free variables or constraints to numerical index.
 
         Parameters
         ----------
@@ -609,7 +594,6 @@ class periodic_orbit(cr3bp_model):
         vars_index : list of int
             Integer index code to represent the parameters
         """
-
         variable_dict = {
             "x": 0,
             "y": 1,
@@ -638,14 +622,13 @@ class periodic_orbit(cr3bp_model):
         return vars_index
 
     def multi_shooter_nodes_setup_cr3bp(self, n_node, node_place_opt="time"):
-        """
-        Calculate states of n_nodes and time between each node
+        """Calculate states of n_nodes and time between each node
         Patch point placement strategy:
             1) Computes the n_nodes placed after NEARLY equal time intervals
             2) Computes the n_nodes placed after NEARLY equal time history INDEX
                 (This might be better as more integration steps are taken in sensitive
                   regions and placing the nodes by using index will place more points
-                  in the sensitive regions)
+                  in the sensitive regions).
 
         First Node = I.C. of trajectory
         If symmetry is to be leverage to target a P.O.: last Node propagated by time 't' reaches the vicinity of the desired final state
@@ -666,7 +649,6 @@ class periodic_orbit(cr3bp_model):
         t_node : list, float
             Stores the time from one node to the next, t_node[-1]: time to reach the desired state (somekind of corrsing)
         """
-
         if node_place_opt != "time" and node_place_opt != "index":
             print(
                 "Incorrect node placement option passed. Allowable options: time and index"
@@ -720,9 +702,8 @@ class periodic_orbit(cr3bp_model):
         return ic_node, t_node
 
     def propagate_po_n_rev(self, po_ic=None, n_rev=1):
-        """
-        Since the results may be changed when  propagate() for t != n*tf is called, so use this func to get data after n revs
-        Assumes that ic are that of targeted PO
+        """Since the results may be changed when  propagate() for t != n*tf is called, so use this func to get data after n revs
+        Assumes that ic are that of targeted PO.
 
         Parameters
         ----------
@@ -747,8 +728,7 @@ class periodic_orbit(cr3bp_model):
         po_ic=None,
         get_initial_states=False,
     ):
-        """
-        Computes local manifold of a PO
+        """Computes local manifold of a PO.
 
         Parameters
         ----------
@@ -811,11 +791,10 @@ class periodic_orbit(cr3bp_model):
         start_time=0,
         stop_time=None,
     ):
-        """
-        Computes the global manifold in a certain direction (+ or -) of a certain type(stable or unstable) of a QPO
+        """Computes the global manifold in a certain direction (+ or -) of a certain type(stable or unstable) of a QPO
             - Change the sign of dist to get the other hald of the manifold
             - Change the eigenvect_manifold to get the other type of manifold
-                and make sure that the sign of prop_time is appropriate
+                and make sure that the sign of prop_time is appropriate.
 
         Parameters
         ----------

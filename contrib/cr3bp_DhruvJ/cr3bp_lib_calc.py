@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Created on 7 Jan 22 12:24:03
-Updated 20 Mar 2022
+"""Created on 7 Jan 22 12:24:03
+Updated 20 Mar 2022.
 
 @author: Dhruv Jain, Multi-Body Dynaminitial_guesss Research Group, MSAAE Purdue University
         dhruvj9922@gmail.com
@@ -16,7 +15,7 @@ def lib_pt_loc(sys_chars_vals, tolerance=1e-12):
     Parameters
     ----------
     sys_chars_vals: object
-        Object of Class sys_char
+        Object of Class sys_char.
 
     tolerance: float
         convergence tolerance for Newton-Raphson Method

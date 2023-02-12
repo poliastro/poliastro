@@ -1,6 +1,5 @@
-"""
-@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
-        dhruvj9922@gmail.com
+"""@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
+        dhruvj9922@gmail.com.
 
 Objective: Plot 3D family of orbits with a colorbar using Plotly
 """
@@ -21,9 +20,8 @@ def plot_orbits(
     data_trace=None,
     save=False,
 ):
-    """
-    Plot 3D family of orbits with a colorbar
-    Dhruv Jain, 2 March 2022
+    """Plot 3D family of orbits with a colorbar
+    Dhruv Jain, 2 March 2022.
 
     Parameters
     ----------
@@ -44,7 +42,6 @@ def plot_orbits(
     save : boolean, optional
         Choose if save the plot or not. The default is False.
     """
-
     layout = go.Layout(autosize=True)
     layout.scene = dict(
         xaxis=dict(

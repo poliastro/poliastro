@@ -1,10 +1,10 @@
-import numpy as np
-import pytest
 from astropy import time, units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
 from hypothesis import given, settings, strategies as st
+import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 from pytest import approx
 
 from poliastro.bodies import Earth, Moon, Sun

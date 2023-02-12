@@ -36,7 +36,7 @@ class GabbardPlotter:
         return apogees, perigees, periods
 
     def _static_gabbard_plot(self, orbits):
-        """Plots a Static Gabbard Plot given a list of Orbits
+        """Plots a Static Gabbard Plot given a list of Orbits.
 
         Parameters
         ----------

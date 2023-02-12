@@ -1,7 +1,7 @@
-""" Low level maneuver implementations """
+"""Low level maneuver implementations."""
 
-import numpy as np
 from numba import njit as jit
+import numpy as np
 from numpy import cross
 
 from poliastro._math.linalg import norm
@@ -68,7 +68,7 @@ def hohmann(k, rv, r_f):
 
 @jit
 def bielliptic(k, r_b, r_f, rv):
-    r"""Calculate the increments in the velocities and the time of flight of the maneuver
+    r"""Calculate the increments in the velocities and the time of flight of the maneuver.
 
     The bielliptic maneuver employs two Hohmann transfers, therefore two
     intermediate orbits are established. We define the different radius

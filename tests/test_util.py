@@ -1,7 +1,7 @@
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+import pytest
 
 from poliastro.util import time_range
 

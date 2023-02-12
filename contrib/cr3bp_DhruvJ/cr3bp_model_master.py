@@ -1,6 +1,5 @@
-"""
-Created on Jan 8 21:42:49 2022
-Updated 20 Mar 2022
+"""Created on Jan 8 21:42:49 2022
+Updated 20 Mar 2022.
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
@@ -17,6 +16,7 @@ Objective: This file contains a Class that will serve as the Base Class for any 
         6. Compute Jacobi Constant [nd]
 
 References
+----------
 ____________
 This work heavily relies on the work done by the various past and current members of the Multi-Body Dynamics Research Group and Prof. Kathleen C. Howell
 These are some of the referneces that provide a comprehensive brackground and have been the foundation for the work:
@@ -30,7 +30,7 @@ from scipy.integrate import solve_ivp
 
 
 class cr3bp_model:
-    """Base class to investigate dynamics in CR3BP -> EOM propagator, JC calculation"""
+    """Base class to investigate dynamics in CR3BP -> EOM propagator, JC calculation."""
 
     def __init__(
         self,
@@ -44,8 +44,7 @@ class cr3bp_model:
         int_method="DOP853",
         custom_events_func=None,
     ):
-        """
-        Constructor
+        """Constructor.
 
         Parameters
         ----------
@@ -102,7 +101,7 @@ class cr3bp_model:
         teval=None,
         use_custom_events_func=False,
     ):
-        """Numerically Integrate Circular Restricted Three-Body Problem EOMs
+        """Numerically Integrate Circular Restricted Three-Body Problem EOMs.
 
         Paramter
         -------
@@ -170,7 +169,7 @@ class cr3bp_model:
         t0 = 0  # By default set initial integration time
 
         def xcross(t, y):
-            """Track y position state for events function during integration"""
+            """Track y position state for events function during integration."""
             return y[1]
 
         if (
@@ -230,8 +229,7 @@ class cr3bp_model:
 
     # Skeleton function for CR3BP + STM Numerical Integration
     def __Nondim_DE_CR3BP_STM(self, t, state_stm):
-        """
-        Describes the CR3BP EOM + STM and fed into a numerical integrator
+        """Describes the CR3BP EOM + STM and fed into a numerical integrator.
 
         Parameters
         ----------
@@ -244,7 +242,6 @@ class cr3bp_model:
         dstate_stm : numpy ndarray (6x1) or (42x1), float64/complex 128
             Time derivative of 6 states + 36 elements of 6x6 STM
         """
-
         dstate_stm = np.empty((len(state_stm),), dtype=self.datatype)
 
         dist_p1_p3, dist_p2_p3 = self.rel_dist_cr3bp(
@@ -292,7 +289,7 @@ class cr3bp_model:
         return dstate_stm
 
     def __save_prop_data_cr3p(self, fun, stm_bool, datatype):
-        """Saves Numerical Integration results to a dictionary
+        """Saves Numerical Integration results to a dictionary.
 
         Parameters
         ----------
@@ -358,7 +355,7 @@ class cr3bp_model:
 
     def rel_dist_cr3bp(self, state=None):
         """Compute distance between a satellite(P3) defined in P1-P2 barycenter
-            to P1 and P2 in CR3BP
+            to P1 and P2 in CR3BP.
 
         Parameters
         ----------
@@ -385,7 +382,7 @@ class cr3bp_model:
         return dist_p1_p3, dist_p2_p3
 
     def uii_partials_cr3bp(self, state=None):
-        """Compute second-derivate of the pseudo-potenital of the CR3BP EOMs
+        """Compute second-derivate of the pseudo-potenital of the CR3BP EOMs.
 
         Parameters
         ----------
@@ -448,7 +445,7 @@ class cr3bp_model:
         return Uxx, Uyy, Uzz, Uxy, Uxz, Uyz
 
     def ui_partials_acc_cr3bp(self, state=None):
-        """Compute first-derivateive of pseudo-potenital terms of the CR3BP EOMs and acceleration terms
+        """Compute first-derivateive of pseudo-potenital terms of the CR3BP EOMs and acceleration terms.
 
         Parameters
         ----------
@@ -495,7 +492,7 @@ class cr3bp_model:
 
     def JC(self, state=None):
         """Computes Jacobi Constant/Jacobi Integral [nd], CR3BP integral constant
-        Can handle COMPLEX inputs
+        Can handle COMPLEX inputs.
 
         Parameters
         ----------
@@ -506,7 +503,6 @@ class cr3bp_model:
         -------
             JC: Jacobi Constant, [nd]
         """
-
         if state is None:
             state = self.ic
 

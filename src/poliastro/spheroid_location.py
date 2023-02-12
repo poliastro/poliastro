@@ -17,8 +17,7 @@ class SpheroidLocation:
     """Class representing a ground station on an oblate ellipsoid."""
 
     def __init__(self, lon, lat, h, body):
-        """
-        Parameters
+        """Parameters
         ----------
         lon : ~astropy.units.quantity.Quantity
             Geodetic longitude
@@ -96,8 +95,7 @@ class SpheroidLocation:
         )  # Need to convert units to u.rad and then take value because numpy expects angles in radians if unit is not given.
 
     def distance(self, px, py, pz):
-        """
-        Calculates the distance from an arbitrary point to the given location (Cartesian coordinates).
+        """Calculates the distance from an arbitrary point to the given location (Cartesian coordinates).
 
         Parameters
         ----------
@@ -118,8 +116,7 @@ class SpheroidLocation:
         )  # body.R and body.R_polar has u.m as units
 
     def is_visible(self, px, py, pz):
-        """
-        Determines whether an object located at a given point is visible from the given location.
+        """Determines whether an object located at a given point is visible from the given location.
         Returns true if true, false otherwise.
 
         Parameters
@@ -140,8 +137,7 @@ class SpheroidLocation:
         return is_visible_fast(cartesian_cords, px, py, pz, self.N)
 
     def cartesian_to_ellipsoidal(self, x, y, z):
-        """
-        Converts cartesian coordinates to ellipsoidal coordinates for this ellipsoid.
+        """Converts cartesian coordinates to ellipsoidal coordinates for this ellipsoid.
 
         Parameters
         ----------

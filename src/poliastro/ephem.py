@@ -21,7 +21,7 @@ EPHEM_FORMAT = "Ephemerides at {num} epochs from {start} ({start_scale}) to {end
 
 
 def build_ephem_interpolant(body, epochs, attractor=Earth):
-    """Interpolates ephemerides data
+    """Interpolates ephemerides data.
 
     Parameters
     ----------

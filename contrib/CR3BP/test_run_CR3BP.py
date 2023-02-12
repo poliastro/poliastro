@@ -1,7 +1,6 @@
-"""
-********************************************************************
+"""********************************************************************
       Test file for implementation check of CR3BP library.
-********************************************************************
+********************************************************************.
 
 Last update: 21/01/2022
 
@@ -18,10 +17,10 @@ The orbits currently found in test file include:
 
 # Testing CR3BP implementation
 
-import matplotlib.pyplot as plt
-import numpy as np
 from astropy import units as u
 from CR3BP import getChar_CR3BP, propagate, propagateSTM
+import matplotlib.pyplot as plt
+import numpy as np
 
 from poliastro.bodies import Earth, Moon
 

@@ -6,9 +6,9 @@ References
   Elliptical Orbit Transfers", 1997.
 
 """
-import numpy as np
 from astropy import units as u
 from numba import njit
+import numpy as np
 from numpy import cross
 
 from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities

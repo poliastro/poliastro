@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 from numpy import cross
 
 from poliastro._math.linalg import norm
@@ -90,7 +90,6 @@ def change_a_inc(k, a_0, a_f, inc_0, inc_f, f):
     * Kéchichian, J. A. "Reformulation of Edelbaum's Low-Thrust
       Transfer Problem Using Optimal Control Theory", 1997.
     """
-
     V_0, V_f, beta_0_ = compute_parameters(k, a_0, a_f, inc_0, inc_f)
 
     @jit

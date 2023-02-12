@@ -1,7 +1,7 @@
-""" Low level calculations for oblate spheroid locations """
+"""Low level calculations for oblate spheroid locations."""
 
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro._math.linalg import norm
 
@@ -24,7 +24,6 @@ def cartesian_cords(a, c, lon, lat, h):
         Geodetic height
 
     """
-
     e2 = 1 - (c / a) ** 2
     N = a / np.sqrt(1 - e2 * np.sin(lat) ** 2)
 
@@ -158,8 +157,7 @@ def is_visible(cartesian_cords, px, py, pz, N):
 
 @jit
 def cartesian_to_ellipsoidal(a, c, x, y, z):
-    """
-    Converts cartesian coordinates to ellipsoidal coordinates for the given ellipsoid.
+    """Converts cartesian coordinates to ellipsoidal coordinates for the given ellipsoid.
     Instead of the iterative formula, the function uses the approximation introduced in
     Bowring, B. R. (1976). TRANSFORMATION FROM SPATIAL TO GEOGRAPHICAL COORDINATES.
 

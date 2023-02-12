@@ -1,8 +1,8 @@
 from warnings import warn
 
-import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
+import numpy as np
 
 from poliastro._math.linalg import norm
 from poliastro.core.events import (

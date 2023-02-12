@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro._math.linalg import norm
 from poliastro.core.events import line_of_sight as line_of_sight_fast
@@ -7,7 +7,7 @@ from poliastro.core.events import line_of_sight as line_of_sight_fast
 
 @jit
 def J2_perturbation(t0, state, k, J2, R):
-    r"""Calculates J2_perturbation acceleration (km/s2)
+    r"""Calculates J2_perturbation acceleration (km/s2).
 
     .. math::
 
@@ -47,7 +47,7 @@ def J2_perturbation(t0, state, k, J2, R):
 
 @jit
 def J3_perturbation(t0, state, k, J3, R):
-    r"""Calculates J3_perturbation acceleration (km/s2)
+    r"""Calculates J3_perturbation acceleration (km/s2).
 
     Parameters
     ----------
@@ -83,7 +83,7 @@ def J3_perturbation(t0, state, k, J3, R):
 
 @jit
 def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
-    r"""Calculates atmospheric drag acceleration (km/s2)
+    r"""Calculates atmospheric drag acceleration (km/s2).
 
     .. math::
 
@@ -130,7 +130,7 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
 
 @jit
 def atmospheric_drag(t0, state, k, C_D, A_over_m, rho):
-    r"""Calculates atmospheric drag acceleration (km/s2)
+    r"""Calculates atmospheric drag acceleration (km/s2).
 
     .. math::
 
@@ -202,7 +202,7 @@ def third_body(t0, state, k, k_third, perturbation_body):
 
 
 def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
-    r"""Calculates radiation pressure acceleration (km/s2)
+    r"""Calculates radiation pressure acceleration (km/s2).
 
     .. math::
 

@@ -1,5 +1,4 @@
-"""
-Created on Mon Feb 21 20:37:16 2022
+"""Created on Mon Feb 21 20:37:16 2022.
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
     dhruvj9922@gmail.com
@@ -12,6 +11,7 @@ Objective: This file contains a Class that inherits most of the properties of th
         2. Pseduo-Arc Length Continuation (palc)
 
 References
+----------
 ____________
 This work heavily relies on the work done by the various past and current members of the Multi-Body Dynamics Research Group and Prof. Kathleen C. Howell
 These are some of the referneces that provide a comprehensive brackground and have been the foundation for the work:
@@ -23,14 +23,14 @@ These are some of the referneces that provide a comprehensive brackground and ha
 import copy
 import pickle as pickle
 
+from cr3bp_PO_master import periodic_orbit
 import numpy as np
 import scipy as sci
-from cr3bp_PO_master import periodic_orbit
 
 
 # Inherit attributes and methods of periodic_orbits
 class periodic_orbit_fam_continuation(periodic_orbit):
-    """Child class of periodic_orbot class; focuses on numerical continuation to compute family of Periodic orbits"""
+    """Child class of periodic_orbot class; focuses on numerical continuation to compute family of Periodic orbits."""
 
     def __init__(
         self,
@@ -42,8 +42,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         xcross_cond=0,
         int_method="DOP853",
     ):
-        """
-        Constructor
+        """Constructor
         Parameters
         ----------
         sys_chars_vals : object
@@ -109,9 +108,8 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         line_search=False,
         line_search_params=None,
     ):
-        """
-        Use Natural Parameter Continuation to compute family of periodic orbit
-        => Saves data to targeted_po_char and targeted_po_fam
+        """Use Natural Parameter Continuation to compute family of periodic orbit
+        => Saves data to targeted_po_char and targeted_po_fam.
 
         Parameters
         ----------
@@ -216,8 +214,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
     def npc_po_logic_check_continueparam_update(
         self, free_vars, constraints, param_continue
     ):
-        """
-        Perform logical checks for Natural Parameter Continuation function and update free_vars and constraint based on param_continue
+        """Perform logical checks for Natural Parameter Continuation function and update free_vars and constraint based on param_continue.
 
         Parameters
         ----------
@@ -267,8 +264,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         return 0, free_vars, constraints
 
     def npc_po_update(self, results, step_size, param_continue):
-        """
-        Update parameter to be continued in with the current step size
+        """Update parameter to be continued in with the current step size
         Parameters
         ----------
         results: Dictionary
@@ -306,9 +302,8 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         line_search=False,
         line_search_params=None,
     ):
-        """
-        Use Pseudo-arc length Continuation to compute family of periodic orbit
-        => Saves data to targeted_po_char and targeted_po_fam
+        """Use Pseudo-arc length Continuation to compute family of periodic orbit
+        => Saves data to targeted_po_char and targeted_po_fam.
 
         Parameters
         ----------
@@ -344,7 +339,6 @@ class periodic_orbit_fam_continuation(periodic_orbit):
             'lower_lim_factor' = fraction of the initial step size till which the step size will be decreased
             The default is None.
         """
-
         check_logic_val = self.palc_po_logic_check(
             free_vars, constraints, sym_period_targ
         )
@@ -444,8 +438,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         return self.targeted_po_fam, self.targeted_po_char
 
     def palc_po_logic_check(self, free_vars, constraints, sym_period_targ):
-        """
-        Performs logical check for PALC setup
+        """Performs logical check for PALC setup
         Parameters
         ----------
         free_vars : list of strings
@@ -458,7 +451,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
             Describes the fraction of period to be targeted. The default is 1/2.
             1/4: Usually use for vertical orbits to use XZ plane AND X-axis symmetry to target states after Period/4
             1/2: Usually use for lyapunov, halo, axial to leverage XZ plane OR X-axis symmetry to target states after Period/2
-            1: Usually use to target orbits that do not have XZ plane OR X-axis symmetry, target orbit periodicity
+            1: Usually use to target orbits that do not have XZ plane OR X-axis symmetry, target orbit periodicity.
 
         Returns
         -------
@@ -467,7 +460,6 @@ class periodic_orbit_fam_continuation(periodic_orbit):
             None -> NO
 
         """
-
         print(
             "\nAssumes the details of the orbit passed are that of a targeted Periodic Orbit\n"
         )
@@ -488,8 +480,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         return 0
 
     def palc_null_vect_update(self, free_vars, results, null_vec, palc_args):
-        """
-        Computes the Null vector and other components for PALC constraint
+        """Computes the Null vector and other components for PALC constraint
         Parameters
         ----------
         free_vars : list of strings
@@ -509,7 +500,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
             'delta_X*_prev': Null-Vector of DF of previously converged  orbit
             'prev_conv_soln': targeted IC of the previously converged orbit
             'dx/dtheta': phase constraint
-            The default is None
+            The default is None.
 
         Returns
         -------
@@ -546,8 +537,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         return palc_args, null_vec
 
     def palc_po_phase_constraint(self, free_vars, results, palc_args):
-        """
-        Computes the phase constraint for a periodic orbit
+        """Computes the phase constraint for a periodic orbit.
 
         Parameters
         ----------
@@ -614,8 +604,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         line_search_params,
         palc_args=None,
     ):
-        """
-        Updates the step size based on the given attentuation factor, till the step size is bigger than a given fraction of the initial step size
+        """Updates the step size based on the given attentuation factor, till the step size is bigger than a given fraction of the initial step size.
 
         Parameters
         ----------
@@ -651,7 +640,6 @@ class periodic_orbit_fam_continuation(periodic_orbit):
             Updated value of step size that was passed as an argument to the function
 
         """
-
         # Reset continuation parameter to be the last converged value, NEGATIVE STEP SIZE
         if palc_args is None:  # Works only for NPC
             self.npc_po_update(results, -step_size, param_continue)
@@ -681,8 +669,7 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         return iterflag, step_size
 
     def save_targeted_po_char(self, results):
-        """
-        Appends the key characterisitcs of a newly targeted periodic orbit family member to "targeted_po_char"
+        """Appends the key characterisitcs of a newly targeted periodic orbit family member to "targeted_po_char".
 
         Parameters
         ----------
@@ -693,7 +680,6 @@ class periodic_orbit_fam_continuation(periodic_orbit):
             'tevents': time stamp of yevents, [nd]
             'stm': STM element history, [:,:,i] => STM @ t = t_i
         """
-
         # Save key characterisitcs
         self.targeted_po_char["conv_tol"] = self.conv_tol
         self.targeted_po_char["int_tol"] = self.int_tol

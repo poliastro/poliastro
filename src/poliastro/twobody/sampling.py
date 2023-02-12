@@ -1,6 +1,6 @@
-import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
+import numpy as np
 
 from poliastro.twobody.angles import E_to_nu, nu_to_E
 from poliastro.twobody.elements import coe2rv_many, hyp_nu_limit, t_p

@@ -1,6 +1,6 @@
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+import pytest
 
 from poliastro.bodies import Earth, Moon
 from poliastro.core.threebody.cr3bp_quantities_calculations import (

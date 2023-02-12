@@ -1,8 +1,6 @@
 from functools import cached_property
-from typing import List, Union
 from warnings import warn
 
-import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
     ICRS,
@@ -10,6 +8,7 @@ from astropy.coordinates import (
     CartesianRepresentation,
     get_body_barycentric,
 )
+import numpy as np
 
 from poliastro.bodies import Earth
 from poliastro.core.events import elevation_function as elevation_function_fast
@@ -19,7 +18,6 @@ from poliastro.twobody.elements import eccentricity_vector, energy, t_p
 from poliastro.twobody.orbit.creation import OrbitCreationMixin
 from poliastro.twobody.propagation import FarnocchiaPropagator, PropagatorKind
 from poliastro.twobody.sampling import TrueAnomalyBounds
-from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import PatchedConicsWarning
 
@@ -664,8 +662,7 @@ class Orbit(OrbitCreationMixin):
         plotter.show()
 
     def elevation(self, lat, theta, h):
-        """
-        Elevation
+        """Elevation.
 
         Parameters
         ----------

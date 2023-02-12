@@ -1,7 +1,7 @@
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+import numpy as np
+import pytest
 
 from poliastro.bodies import Earth, Sun
 from poliastro.twobody.states import ClassicalState, RVState

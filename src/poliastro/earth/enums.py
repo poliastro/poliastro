@@ -1,6 +1,4 @@
-""" Earth Gravity perturbations.
-
-"""
+"""Earth Gravity perturbations."""
 
 from enum import Enum, auto
 

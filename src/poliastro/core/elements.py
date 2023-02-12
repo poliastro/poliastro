@@ -4,8 +4,8 @@ convert between different elements that define the orbit of a body.
 
 import sys
 
-import numpy as np
 from numba import njit as jit, prange
+import numpy as np
 from numpy import cos, cross, sin, sqrt
 
 from poliastro._math.linalg import norm
@@ -117,7 +117,7 @@ def rv_pqw(k, p, ecc, nu):
 
 @jit
 def coe_rotation_matrix(inc, raan, argp):
-    """Create a rotation matrix for coe transformation"""
+    """Create a rotation matrix for coe transformation."""
     r = rotation_matrix(raan, 2)
     r = r @ rotation_matrix(inc, 0)
     r = r @ rotation_matrix(argp, 2)
@@ -189,10 +189,7 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
 
 @jit(parallel=sys.maxsize > 2**31)
 def coe2rv_many(k, p, ecc, inc, raan, argp, nu):
-    """
-    Parallel version of coe2rv
-    """
-
+    """Parallel version of coe2rv."""
     n = nu.shape[0]
     rr = np.zeros((n, 3))
     vv = np.zeros((n, 3))
@@ -383,7 +380,6 @@ def rv2coe(k, r, v, tol=1e-8):
     nu: 28.445804984192122 [deg]
 
     """
-
     h = cross(r, v)
     n = cross([0, 0, 1], h)
     e = ((v @ v - k / norm(r)) * r - (r @ v) * v) / k

@@ -1,12 +1,12 @@
 import functools
 
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.coordinates import Angle
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+import numpy as np
 from numpy.linalg import norm
+import pytest
 
 from poliastro.bodies import Earth, Moon, Sun
 from poliastro.constants import H0_earth, Wdivc_sun, rho0_earth

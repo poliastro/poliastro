@@ -1,8 +1,8 @@
 import warnings
 
+from astropy.time import Time
 import astropy.units as u
 import erfa
-from astropy.time import Time
 
 from poliastro.bodies import (
     Earth,
@@ -25,8 +25,7 @@ def plot_solar_system(
     backend=None,
     length_scale_units=u.km,
 ):
-    """
-    Plots the whole solar system in one single call.
+    """Plots the whole solar system in one single call.
 
     .. versionadded:: 0.9.0
 

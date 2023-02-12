@@ -8,8 +8,7 @@ from poliastro.core.sensors import (
 
 @u.quantity_input(altitude=u.km, fov=u.rad, boresight=u.rad, R=u.km)
 def min_and_max_ground_range(altitude, fov, boresight, R):
-    """
-    Calculate the minimum and maximum values of ground-range angles.
+    """Calculate the minimum and maximum values of ground-range angles.
 
     Parameters
     ----------
@@ -53,8 +52,7 @@ def min_and_max_ground_range(altitude, fov, boresight, R):
 def ground_range_diff_at_azimuth(
     altitude, fov, boresight, azimuth, nadir_lat, nadir_lon, R
 ):
-    """
-    Calculate the difference in ground-range angles.
+    """Calculate the difference in ground-range angles.
 
     Use the boresight angle, the latitude and longitude of the target,
     and the desired azimuth (which directs where the sensor is looking).

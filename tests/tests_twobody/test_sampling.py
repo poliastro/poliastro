@@ -1,10 +1,10 @@
 from functools import partial
 
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from hypothesis import example, given, settings, strategies as st
+import numpy as np
+import pytest
 
 from poliastro.examples import iss
 from poliastro.twobody.sampling import TrueAnomalyBounds, sample_closed

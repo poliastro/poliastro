@@ -1,4 +1,4 @@
-""" Holds different classes to model atmospheric models """
+"""Holds different classes to model atmospheric models."""
 
 import astropy.units as u
 
@@ -20,7 +20,6 @@ class COESA:
             Different tables that define the atmosphere.
 
         """
-
         self.tables = tables
 
     @property

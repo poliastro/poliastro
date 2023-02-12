@@ -1,7 +1,7 @@
 import sys
 
-import numpy as np
 from astropy import units as u
+import numpy as np
 
 from poliastro.core.propagation.farnocchia import (
     farnocchia_coe as farnocchia_coe_fast,

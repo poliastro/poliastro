@@ -13,8 +13,7 @@ sys.modules[__name__].__class__ = OldPropagatorModule
 
 
 class CowellPropagator:
-    """
-    Propagates orbit using Cowell's formulation.
+    """Propagates orbit using Cowell's formulation.
 
     Notes
     -----

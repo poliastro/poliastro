@@ -1,6 +1,6 @@
-import pytest
 from astropy import constants as c, units as u
 from astropy.tests.helper import assert_quantity_allclose
+import pytest
 
 from poliastro.bodies import Earth
 from poliastro.core import iod

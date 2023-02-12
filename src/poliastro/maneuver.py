@@ -1,6 +1,4 @@
-"""Orbital maneuvers.
-
-"""
+"""Orbital maneuvers."""
 from astropy import units as u
 
 from poliastro.core.maneuver import (
@@ -37,7 +35,6 @@ class Maneuver:
             List of pairs (delta_time, delta_velocity)
 
         """
-
         self.impulses = args
         # HACK: Change API or validation code
         _dts, _dvs = zip(*args)
@@ -72,7 +69,6 @@ class Maneuver:
             Velocity components of the impulse.
 
         """
-
         return cls((0 * u.s, dv))
 
     @classmethod
@@ -87,7 +83,6 @@ class Maneuver:
             Final orbital radius
 
         """
-
         # Propagate till periapsis
         if orbit_i.nu != 0 * u.deg:
             t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
@@ -125,7 +120,6 @@ class Maneuver:
             Final orbital radius
 
         """
-
         # Propagate till periapsis
         if orbit_i.nu != 0 * u.deg:
             t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
@@ -177,7 +171,6 @@ class Maneuver:
         **kwargs
             Extra kwargs for Lambert method.
         """
-
         # Get initial algorithm conditions
         k = orbit_i.attractor.k
         r_i = orbit_i.r

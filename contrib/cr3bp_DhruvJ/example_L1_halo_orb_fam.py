@@ -1,6 +1,5 @@
-"""
-@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
-        dhruvj9922@gmail.com
+"""@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
+        dhruvj9922@gmail.com.
 
 Obj: To compute family of L1 Halo Orbit
     Single Shooter Variabl Time Setup
@@ -10,12 +9,12 @@ Obj: To compute family of L1 Halo Orbit
 Initial Condition obtained from:
 D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Problem with Applications to Lunar South Pole Coverage," M.S., May 2006.
 """
-import numpy as np
-import plotly.graph_objs as go
 from cr3bp_char_quant import sys_chars
 from cr3bp_lib_calc import lib_pt_loc
 from cr3bp_po_fam_continuation import periodic_orbit_fam_continuation
 from cr3bp_po_plot_orbits import plot_orbits
+import numpy as np
+import plotly.graph_objs as go
 
 sys_p1p2 = sys_chars("Earth", "Moon")
 mu = sys_p1p2.mu

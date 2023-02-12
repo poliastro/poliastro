@@ -1,4 +1,4 @@
-""" Holds utilities related with Earth plotting """
+"""Holds utilities related with Earth plotting."""
 
 EARTH_PALETTE = {
     "land_color": "#9fc164",

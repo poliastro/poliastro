@@ -12,8 +12,7 @@ sys.modules[__name__].__class__ = OldPropagatorModule
 
 
 class MarkleyPropagator:
-    """
-    Elliptical Kepler Equation solver based on a fifth-order
+    """Elliptical Kepler Equation solver based on a fifth-order
     refinement of the solution of a cubic equation.
 
     Notes

@@ -1,10 +1,8 @@
-"""
-@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
-"""
+"""@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University."""
 
 
 def calculate_mu(mu1, mu2):
-    """Calculate mu of CR3BP
+    """Calculate mu of CR3BP.
 
     Parameters
     ----------
@@ -22,7 +20,7 @@ def calculate_mu(mu1, mu2):
 
 
 def calculate_tstar(mu1, mu2, lstar):
-    r"""Calculate t* of CR3BP
+    r"""Calculate t* of CR3BP.
 
     Parameters
     ----------

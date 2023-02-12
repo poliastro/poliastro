@@ -1,9 +1,7 @@
-"""
-This is the implementation of porkchop plot
-"""
-import numpy as np
+"""This is the implementation of porkchop plot."""
 from astropy import coordinates as coord, units as u
 from matplotlib import pyplot as plt
+import numpy as np
 
 from poliastro.bodies import (
     Earth,
@@ -25,7 +23,6 @@ from poliastro.util import norm
 
 def _get_state(body, time):
     """Computes the position of a body for a given time."""
-
     solar_system_bodies = [
         Sun,
         Mercury,
@@ -53,7 +50,6 @@ def _get_state(body, time):
 
 def _targetting(departure_body, target_body, t_launch, t_arrival):
     """This function returns the increment in departure and arrival velocities."""
-
     # Get position and velocities for departure and arrival
     rr_dpt_body, vv_dpt_body = _get_state(departure_body, t_launch)
     rr_arr_body, vv_arr_body = _get_state(target_body, t_arrival)
@@ -106,9 +102,7 @@ targetting_vec = np.vectorize(
 
 
 class PorkchopPlotter:
-
-    """
-    Class Implementation for Porkchop Plot
+    """Class Implementation for Porkchop Plot.
 
     Parameters
     ----------
@@ -182,7 +176,6 @@ class PorkchopPlotter:
         >>> dv_launch, dev_dpt, c3dpt, c3arr, tof = porkchop_plot.porkchop()
 
         """
-
         dv_launch, dv_arrival, c3_launch, c3_arrival, tof = targetting_vec(
             self.departure_body,
             self.target_body,
