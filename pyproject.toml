@@ -114,12 +114,33 @@ exclude = [
 [tool.black]
 line-length = 79
 
-[tool.isort]
-combine_as_imports = true
-default_section = "THIRDPARTY"
-line_length = 79
-profile = "black"
-src_paths = ["docs", "src", "tests"]
+[tool.ruff]
+select = [
+    "E",  # pycodestyle, see https://github.com/charliermarsh/ruff#pycodestyle-e-w
+    "D",  # pydocstyle, see https://github.com/charliermarsh/ruff#pydocstyle-d
+    "F",  # pyflakes, see https://github.com/charliermarsh/ruff#pyflakes-f
+    "I"   # isort, see https://github.com/charliermarsh/ruff#isort-i
+]
+
+ignore = [
+    "E501",  # Line too long. Ignoring this so "black" manages line length.
+]
+
+exclude = [
+    ".git",
+    ".tox",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+known-first-party = ["poliastro"]
+
+[tool.ruff.mccabe]
+max-complexity = 18
 
 [tool.mypy]
 check_untyped_defs = true
