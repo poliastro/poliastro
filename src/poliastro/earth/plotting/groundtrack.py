@@ -1,6 +1,5 @@
-""" Holds ground-track plotter for Earth satellites """
+"""Holds ground-track plotter for Earth satellites."""
 
-import plotly.graph_objects as go
 from astropy import units as u
 from astropy.coordinates import (
     GCRS,
@@ -9,6 +8,7 @@ from astropy.coordinates import (
     CartesianRepresentation,
     SphericalRepresentation,
 )
+import plotly.graph_objects as go
 
 from poliastro.bodies import Earth
 from poliastro.earth.plotting.utils import EARTH_PALETTE
@@ -16,10 +16,10 @@ from poliastro.twobody.sampling import EpochsArray
 
 
 class GroundtrackPlotter:
-    """Generates two-dimensional ground-track"""
+    """Generates two-dimensional ground-track."""
 
     def __init__(self, fig=None, color_palette=EARTH_PALETTE):
-        """Initializes the ground-track
+        """Initializes the ground-track.
 
         Parameters
         ----------
@@ -29,7 +29,6 @@ class GroundtrackPlotter:
             A color palette for background map
 
         """
-
         # Generate custom figure if required
         if not fig:
             self.fig = go.Figure(go.Scattergeo())
@@ -51,7 +50,7 @@ class GroundtrackPlotter:
         )
 
     def update_geos(self, **config):
-        """Enables user to customize geo figure
+        """Enables user to customize geo figure.
 
         Parameters
         ----------
@@ -63,7 +62,7 @@ class GroundtrackPlotter:
         return self.fig
 
     def update_layout(self, **config):
-        """Enables user to customize figure layout
+        """Enables user to customize figure layout.
 
         Parameters
         ----------
@@ -75,12 +74,11 @@ class GroundtrackPlotter:
         return self.fig
 
     def add_trace(self, trace):
-        """Adds trace to custom figure"""
-
+        """Adds trace to custom figure."""
         self.fig.add_trace(trace)
 
     def _get_raw_coords(self, orb, t_deltas):
-        """Generates raw orbit coordinates for given epochs
+        """Generates raw orbit coordinates for given epochs.
 
         Parameters
         ----------
@@ -96,7 +94,6 @@ class GroundtrackPlotter:
         raw_epochs : numpy.ndarray
             Associated epoch with previously raw coordinates
         """
-
         # Solve for raw coordinates and epochs
         ephem = orb.to_ephem(EpochsArray(orb.epoch + t_deltas))
         rr, vv = ephem.rv()
@@ -110,7 +107,7 @@ class GroundtrackPlotter:
         return raw_xyz, raw_epochs
 
     def _from_raw_to_ITRS(self, raw_xyz, raw_obstime):
-        """Converts raw coordinates to ITRS ones
+        """Converts raw coordinates to ITRS ones.
 
         Parameters
         ----------
@@ -125,7 +122,6 @@ class GroundtrackPlotter:
             A collection of coordinates in ITRS frame
 
         """
-
         # Build GCRS and ITRS coordinates
         gcrs_xyz = GCRS(
             raw_xyz,
@@ -137,7 +133,7 @@ class GroundtrackPlotter:
         return itrs_xyz
 
     def _trace_groundtrack(self, orb, t_deltas, label, line_style):
-        """Generates a trace for EarthSatellite's orbit grountrack
+        """Generates a trace for EarthSatellite's orbit grountrack.
 
         Parameters
         ----------
@@ -156,7 +152,6 @@ class GroundtrackPlotter:
             Trace associated to grountrack
 
         """
-
         # Compute predicted grountrack positions
         raw_xyz, raw_obstime = self._get_raw_coords(orb, t_deltas)
         itrs_xyz = self._from_raw_to_ITRS(raw_xyz, raw_obstime)
@@ -174,7 +169,7 @@ class GroundtrackPlotter:
         return gnd_trace
 
     def _trace_position(self, ss, label, marker):
-        """Adds marker trace to self figure showing current position
+        """Adds marker trace to self figure showing current position.
 
         Parameters
         ----------
@@ -191,7 +186,6 @@ class GroundtrackPlotter:
             Scattergeo trace for current position
 
         """
-
         # Check if marker available
         if not marker:
             marker = {"size": 5}
@@ -236,7 +230,6 @@ class GroundtrackPlotter:
             Output figure
 
         """
-
         # Retrieve basic parameters and check for proper attractor
         orb = earth_orb.orbit
         if orb.attractor != Earth:

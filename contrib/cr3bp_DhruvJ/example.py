@@ -1,5 +1,4 @@
-"""
-Created on Tue Feb  8 22:13:15 2022
+"""Created on Tue Feb  8 22:13:15 2022.
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
@@ -7,10 +6,10 @@ Created on Tue Feb  8 22:13:15 2022
 This is an exmaple file to test the CR3BP functions
 """
 
-import matplotlib.pyplot as plt
 from cr3bp_char_quant import sys_chars
 from cr3bp_lib_calc import lib_pt_loc
 from cr3bp_model_master import cr3bp_model
+import matplotlib.pyplot as plt
 
 sys_p1p2 = sys_chars("Earth", "Moon")
 mu = sys_p1p2.mu

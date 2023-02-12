@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro.core.angles import E_to_M, E_to_nu, nu_to_E
 from poliastro.core.elements import coe2rv, rv2coe
@@ -68,7 +68,6 @@ def gooding(k, r0, v0, tof, numiter=150, rtol=1e-8):
     ----
     Original paper for the algorithm: https://doi.org/10.1007/BF01238923
     """
-
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     nu = gooding_coe(k, p, ecc, inc, raan, argp, nu, tof, numiter, rtol)

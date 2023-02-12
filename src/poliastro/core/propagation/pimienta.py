@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro.core.angles import E_to_M, E_to_nu, nu_to_E
 from poliastro.core.elements import coe2rv, rv2coe
@@ -7,7 +7,6 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 @jit
 def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
-
     q = p / (1 + ecc)
 
     # TODO: Do something to allow parabolic and hyperbolic orbits?
@@ -376,7 +375,6 @@ def pimienta(k, r0, v0, tof):
     Pimienta-Peñalver, A. & Crassidis, John. (2013). Accurate Kepler equation
     solver without transcendental function evaluations. Advances in the Astronautical Sciences. 147. 233-247.
     """
-
     # TODO: implement hyperbolic case
 
     # Solve first for eccentricity and mean anomaly

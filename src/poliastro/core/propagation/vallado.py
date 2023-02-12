@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro._math.linalg import norm
 from poliastro._math.special import stumpff_c2 as c2, stumpff_c3 as c3
@@ -71,7 +71,6 @@ def vallado(k, r0, v0, tof, numiter):
     deep detail. For analytical example, check in the same book for example 3.6.
 
     """
-
     # Cache some results
     dot_r0v0 = r0 @ v0
     norm_r0 = norm(r0)

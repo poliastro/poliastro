@@ -1,16 +1,15 @@
 """A module containing different orbit related plotters."""
 
-import warnings
 from collections import namedtuple
-from typing import List
+import warnings
 
+from astropy.coordinates import CartesianRepresentation
 import astropy.units as u
 import numpy as np
-from astropy.coordinates import CartesianRepresentation
 
-import poliastro.plotting.orbit.backends as orbit_plotter_backends
 from poliastro.ephem import Ephem
 from poliastro.frames import Planes
+import poliastro.plotting.orbit.backends as orbit_plotter_backends
 from poliastro.plotting.util import BODY_COLORS, generate_label
 from poliastro.twobody.mean_elements import get_mean_elements
 from poliastro.twobody.sampling import EpochBounds
@@ -611,7 +610,6 @@ class OrbitPlotter:
 
             # Collect the coordinates for the different maneuver phases
             for ith_impulse, orbit_phase in enumerate(maneuver_phases):
-
                 # Project the coordinates into desired frame for 2D backends
                 if self.backend.is_2D:
                     orbit_phase_r = (

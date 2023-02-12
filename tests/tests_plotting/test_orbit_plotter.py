@@ -1,10 +1,10 @@
 import sys
 
-import pytest
 from astropy import time, units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
 from astropy.time import Time
 from matplotlib import pyplot as plt
+import pytest
 
 from poliastro.bodies import Earth, Jupiter, Mars, Sun
 from poliastro.constants import J2000_TDB

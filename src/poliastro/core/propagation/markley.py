@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro.core.angles import (
     E_to_M,
@@ -13,7 +13,6 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 @jit
 def markley_coe(k, p, ecc, inc, raan, argp, nu, tof):
-
     M0 = E_to_M(nu_to_E(nu, ecc), ecc)
     a = p / (1 - ecc**2)
     n = np.sqrt(k / a**3)

@@ -1,7 +1,5 @@
 from unittest import mock
 
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.coordinates import (
     ICRS,
@@ -11,6 +9,8 @@ from astropy.coordinates import (
 )
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+import numpy as np
+import pytest
 
 from poliastro.bodies import Earth, Venus
 from poliastro.ephem import Ephem, SincInterpolator, SplineInterpolator

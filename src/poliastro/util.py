@@ -1,10 +1,8 @@
-"""Function helpers.
-
-"""
-import numpy as np
+"""Function helpers."""
 from astropy import units as u
 from astropy.coordinates import Angle
 from astropy.time import Time
+import numpy as np
 
 from poliastro._math.linalg import norm as norm_fast
 from poliastro.core.util import alinspace as alinspace_fast

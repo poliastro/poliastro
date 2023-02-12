@@ -1,8 +1,8 @@
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 
 from poliastro.bodies import Earth
 from poliastro.core.elements import coe2mee, coe2rv, mee2coe, rv2coe

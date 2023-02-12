@@ -1,7 +1,7 @@
-"""
-Low level ra, dec, and W calculations for bodies.
+"""Low level ra, dec, and W calculations for bodies.
 
-REFERENCES:
+References
+----------
 The values for all bodies except the Moon have been taken from: Archinal, B., \
 Acton, C., A’Hearn, M., Conrad, A., Consolmagno, G., & Duxbury, T. et al. \
 (2018). Report of the IAU Working Group on Cartographic Coordinates and \
@@ -15,8 +15,8 @@ Celestial Mechanics And Dynamical Astronomy, 109(2), 101-135. doi: 10.1007/s1056
 
 """
 
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 
 @jit

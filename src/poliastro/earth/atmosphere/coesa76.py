@@ -1,4 +1,4 @@
-""" The U.S. Standard Atmosphere 1976 is an idealized, steady-state model of
+"""The U.S. Standard Atmosphere 1976 is an idealized, steady-state model of
 mean annual conditions of Earth's atmosphere from the surface to 1000 km at
 latitude 45N, as it is assumed to exist during a period with moderate solar
 activity. The defining meteorological elements are sea-level temperature and
@@ -43,10 +43,10 @@ values were used.
 
 """
 
-import numpy as np
 from astropy import units as u
 from astropy.io import ascii
 from astropy.utils.data import get_pkg_data_filename
+import numpy as np
 
 from poliastro.earth.atmosphere.base import COESA
 
@@ -122,7 +122,6 @@ class COESA76(COESA):
         coeff_list: list
             List of corresponding coefficients
         """
-
         # Get corresponding coefficients
         i = self._get_index(z, z_coeff)
         coeff_list = []
@@ -146,7 +145,6 @@ class COESA76(COESA):
         T: ~astropy.units.Quantity
             Kinetic temeperature.
         """
-
         # Test if altitude is inside valid range
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 

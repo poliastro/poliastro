@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 
 @jit
@@ -69,7 +69,6 @@ def D_to_nu(D):
         \nu = 2 \arctan{D}
 
     """
-
     return 2.0 * np.arctan(D)
 
 

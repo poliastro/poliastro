@@ -1,5 +1,5 @@
-import pytest
 from matplotlib import pyplot as plt
+import pytest
 
 from poliastro.bodies import Earth, Mars
 from poliastro.plotting.porkchop import PorkchopPlotter

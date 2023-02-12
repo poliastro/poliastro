@@ -1,5 +1,4 @@
-"""
-@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
+"""@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University.
 
 This module complements constants defined in `astropy.constants` with
 mean distances between sun-planet and planet-moon systems

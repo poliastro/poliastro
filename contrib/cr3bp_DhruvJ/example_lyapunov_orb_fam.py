@@ -1,6 +1,5 @@
-"""
-@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
-        dhruvj9922@gmail.com
+"""@author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
+        dhruvj9922@gmail.com.
 
 Obj: To compute family of L1 Lyapunov Orbit
     Test linear initial guess for Lyapunov Orbit
@@ -13,12 +12,12 @@ Obj: To compute family of L1 Lyapunov Orbit
 Note: If the step size is too big and targeting periodicity with FX = ['y','vx']then the may converge
 to states at next XZ plane corssing instead of targeting states after 1 period
 """
-import plotly.graph_objs as go
 from cr3bp_char_quant import sys_chars
 from cr3bp_lib_calc import lib_pt_loc
 from cr3bp_lyap_ig_generator import ig_lyap_orb_collinear_li_cr3bp
 from cr3bp_po_fam_continuation import periodic_orbit_fam_continuation
 from cr3bp_po_plot_orbits import plot_orbits
+import plotly.graph_objs as go
 
 sys_p1p2 = sys_chars("Earth", "Moon")
 mu = sys_p1p2.mu

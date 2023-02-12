@@ -1,6 +1,5 @@
-"""
-Created on 10 Nov 2021 22:43:38 2022
-Updaed on 20 Mar 2022
+"""Created on 10 Nov 2021 22:43:38 2022
+Updaed on 20 Mar 2022.
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
@@ -27,12 +26,11 @@ Physical Qunatities obtained from: JPL’s ephemerides file de405.spk and https:
 
 class sys_chars:
     """Computes and stores the properties(mu, l*, t*) of a CR3BP system
-    Can be extended to compute properties for BCR4BP model, HR4BP model etc
+    Can be extended to compute properties for BCR4BP model, HR4BP model etc.
     """
 
     def __init__(self, p1="Earth", p2="Moon"):
-        """
-        Constructor
+        """Constructor.
 
         Parameters
         ----------
@@ -41,7 +39,6 @@ class sys_chars:
         p2 : string
            'body_j'. The deafult is Moon
         """
-
         mu, lstar, tstar = self.bodies_char_compute(p1, p2)
         self._mu = mu
         self._lstar = lstar
@@ -52,27 +49,27 @@ class sys_chars:
     # All the attributes are made private to make the constant and not be mistakenly changed
     @property
     def mu(self):
-        """Mass ration of P1-P2 primary bodies in CR3BP"""
+        """Mass ration of P1-P2 primary bodies in CR3BP."""
         return self._mu
 
     @property
     def lstar(self):
-        """Characterisitc Length"""
+        """Characterisitc Length."""
         return self._lstar
 
     @property
     def tstar(self):
-        """Characterisitc Time"""
+        """Characterisitc Time."""
         return self._tstar
 
     @property
     def p1(self):
-        """Primary body P1"""
+        """Primary body P1."""
         return self._p1
 
     @property
     def p2(self):
-        """Primary body P2"""
+        """Primary body P2."""
         return self._p2
 
     def __mu_calc(self, mu_pi):
@@ -81,7 +78,7 @@ class sys_chars:
         ----------
         mu_pi : ndarray, float
             mu_pi[0] = mu of P1
-            mu_pi[1] = mu of P2
+            mu_pi[1] = mu of P2.
 
         Returns
         -------
@@ -98,7 +95,7 @@ class sys_chars:
             Non-dimensional distance between P1 and P2
         mu_pi: ndarray, float
             mu_pi[0] = mu of P1
-            mu_pi[1] = mu of P2
+            mu_pi[1] = mu of P2.
 
         Returns
         -------
@@ -115,7 +112,7 @@ class sys_chars:
         p1 : string
            'body_i'
         p2 : string
-           'body_j'
+           'body_j'.
 
         Returns
         -------
@@ -127,7 +124,6 @@ class sys_chars:
             sqrt(dist^3/m*)
             Non-dimensional time of P1-P2 system
         """
-
         mu_pi = []
         mu_body, distances = self.__bodies_char()
 
@@ -169,7 +165,7 @@ class sys_chars:
             return mu, dist, tstar
 
     def __bodies_char(self):
-        """Returns mu value of various celestial bodies and distance between P1-P2 systems
+        """Returns mu value of various celestial bodies and distance between P1-P2 systems.
 
         Returns
         -------

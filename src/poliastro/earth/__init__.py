@@ -1,24 +1,20 @@
-""" Earth focused orbital mechanics routines """
+"""Earth focused orbital mechanics routines."""
 
 from typing import Dict
 
-import numpy as np
 from astropy import units as u
+import numpy as np
 
 from poliastro.bodies import Earth
 from poliastro.core.perturbations import J2_perturbation
 from poliastro.core.propagation import func_twobody
 from poliastro.earth.enums import EarthGravity
-from poliastro.spacecraft import Spacecraft
-from poliastro.twobody.orbit import Orbit
 from poliastro.twobody.propagation import CowellPropagator
 
 
 class EarthSatellite:
-
-    """
-    Position and velocity of a body with respect to Earth
-    at a given time
+    """Position and velocity of a body with respect to Earth
+    at a given time.
     """
 
     def __init__(self, orbit, spacecraft):
@@ -37,7 +33,6 @@ class EarthSatellite:
             If the orbit's attractor is not Earth
 
         """
-
         if orbit.attractor is not Earth:
             raise ValueError("The attractor must be Earth")
 
@@ -78,7 +73,6 @@ class EarthSatellite:
             A new EarthSatellite with the propagated Orbit
 
         """
-
         ad_kwargs: Dict[object, dict] = {}
         perturbations: Dict[object, dict] = {}
 

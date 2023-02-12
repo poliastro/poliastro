@@ -1,10 +1,11 @@
 import sys
 
-# TODO: Should we have way to handle this configuration without importing numba?
-import pytest
 from astropy import units as u
 from astropy.coordinates.representation import CartesianRepresentation
 from astropy.time import Time
+
+# TODO: Should we have way to handle this configuration without importing numba?
+import pytest
 
 from poliastro.bodies import Mars
 from poliastro.examples import iss, molniya
@@ -501,7 +502,6 @@ def test_czml_raises_error_if_length_of_points_and_epochs_not_same():
 
 
 def test_czml_groundtrack():
-
     start_epoch = molniya.epoch
     end_epoch = molniya.epoch + molniya.period
 
@@ -827,12 +827,10 @@ def test_czml_ground_station():
 
 
 def test_czml_preamble():
-    """
-    This test checks the basic preamble (preamble is the only mandatory
+    """This test checks the basic preamble (preamble is the only mandatory
     packet in CZML format. It's a kind of header that defines the scope of the
     whole CZML.
     """
-
     # We're not using the orbit, just its epoch and period. The sample_points are not used
     # either, as there's no orbit to sample.
     start_epoch = molniya.epoch

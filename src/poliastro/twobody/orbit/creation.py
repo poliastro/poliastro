@@ -1,7 +1,7 @@
 from warnings import warn
 
-import numpy as np
 from astropy import units as u
+import numpy as np
 
 from poliastro.constants import J2000
 from poliastro.frames import Planes
@@ -22,9 +22,7 @@ from poliastro.util import find_closest_value
 
 
 class OrbitCreationMixin:
-    """
-    Mixin-class containing class-methods to create Orbit objects
-    """
+    """Mixin-class containing class-methods to create Orbit objects."""
 
     def __init__(self, *_, **__):  # HACK stub to make mypy happy
         ...
@@ -356,7 +354,7 @@ class OrbitCreationMixin:
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
     ):
-        r""" Returns an orbit where the orbital period equals the rotation rate
+        r"""Returns an orbit where the orbital period equals the rotation rate
         of the orbited body.  The synchronous altitude for any central body can
         directly be obtained from Kepler's Third Law by setting the orbit period
         P\ :sub:`sync`, equal to the rotation period of the central body
@@ -568,7 +566,7 @@ class OrbitCreationMixin:
         epoch=J2000,
         plane=Planes.EARTH_EQUATOR,
     ):
-        r"""Return a frozen Orbit. If any of the given arguments results in an impossibility, some values will be overwritten
+        r"""Return a frozen Orbit. If any of the given arguments results in an impossibility, some values will be overwritten.
 
         To achieve frozen orbit these two equations have to be set to zero.
 

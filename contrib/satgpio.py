@@ -1,5 +1,4 @@
-"""
-Author: Juan Luis Cano Rodríguez
+"""Author: Juan Luis Cano Rodríguez.
 
 Code to read GP data from Celestrak using the HTTP API and python-sgp4.
 

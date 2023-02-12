@@ -1,6 +1,6 @@
-import erfa
 from astropy import units as u
 from astropy.coordinates.solar_system import PLAN94_BODY_NAME_TO_PLANET_INDEX
+import erfa
 
 from poliastro.constants import J2000
 from poliastro.frames import Planes

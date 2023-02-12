@@ -1,5 +1,4 @@
-"""
-Created on Mon Feb 21 20:37:16 2022
+"""Created on Mon Feb 21 20:37:16 2022.
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
     dhruvj9922@gmail.com
@@ -11,6 +10,7 @@ Objective: This file contains functions required to target a Periodic Orbit in t
        1. Compute inital guess for L1, L2, L3 Lyapunov orbits using linear approximation
 
 References
+----------
 ____________
 This work heavily relies on the work done by the various past and current members of the Multi-Body Dynamics Research Group and Prof. Kathleen C. Howell
 These are some of the referneces that provide a comprehensive brackground and have been the foundation for the work:
@@ -19,15 +19,14 @@ These are some of the referneces that provide a comprehensive brackground and ha
 3. V. Szebehely, "Theory of Orbits: The Restricted Problem of Three Bodies", 1967
 4. W. Koon, M. Lo, J. Marsden, S. Ross, "Dynamical Systems, The Three-Body Problem, and Space Mission Design", 2006
 """
-import numpy as np
 from cr3bp_lib_calc import lib_pt_loc
 from cr3bp_model_master import cr3bp_model
+import numpy as np
 
 
 def ig_lyap_orb_collinear_li_cr3bp(sys_chars_vals, pert_x, lib_num=1):
-    """
-    Calculate the linear inital guess of a lyapunov orbit by calculating the
-    linear approximation of vy0 using step_off in x direction from Li
+    """Calculate the linear inital guess of a lyapunov orbit by calculating the
+    linear approximation of vy0 using step_off in x direction from Li.
 
     Note: Typical value of pert_x in Earth-Moon CR3BP is 0.01 [nd]
 

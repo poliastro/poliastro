@@ -1,9 +1,9 @@
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.coordinates import CartesianRepresentation, get_body_barycentric
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+import numpy as np
+import pytest
 
 from poliastro.bodies import (
     Earth,

@@ -1,9 +1,9 @@
 """A module implementing orbit plotter backends based on Matplotlib."""
 
-import numpy as np
 from matplotlib import patches as mpl_patches, pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
+import numpy as np
 
 from poliastro.plotting.orbit.backends._base import OrbitPlotterBackend
 

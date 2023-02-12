@@ -1,7 +1,7 @@
-import numpy as np
-import pytest
 from astropy import units as u
+import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 
 from poliastro.bodies import Earth
 from poliastro.core.propagation import func_twobody

@@ -2,14 +2,11 @@ from astropy import units as u
 
 
 class Spacecraft:
-    """
-    Class to represent a Spacecraft.
-    """
+    """Class to represent a Spacecraft."""
 
     @u.quantity_input(A=u.km**2, C_D=u.one, m=u.kg)
     def __init__(self, A, C_D, m, **metadata):
-        """
-        Constructor
+        """Constructor.
 
         Parameters
         ----------
@@ -23,7 +20,6 @@ class Spacecraft:
             Optional keyword arguments to Spacecraft
 
         """
-
         self._A = A
         self._C_D = C_D
         self._m = m
@@ -31,22 +27,22 @@ class Spacecraft:
 
     @property
     def A(self):
-        """Returns A, the area of the spacecraft"""
+        """Returns A, the area of the spacecraft."""
         return self._A
 
     @property
     def C_D(self):
-        """Returns C_D, the drag coefficient"""
+        """Returns C_D, the drag coefficient."""
         return self._C_D
 
     @property
     def m(self):
-        """Returns m, the mass of the spacecraft"""
+        """Returns m, the mass of the spacecraft."""
         return self._m
 
     @property
     def ballistic_coefficient(self):
-        r"""Calculates the Ballistic coefficient (km^2/kg)
+        r"""Calculates the Ballistic coefficient (km^2/kg).
 
         Returns
         -------
@@ -63,6 +59,5 @@ class Spacecraft:
             \frac{m}{C_D A}
 
         """
-
         B = self._C_D * (self._A / self._m)
         return B

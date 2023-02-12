@@ -1,5 +1,4 @@
-"""
-Created on Sat Feb 26 23:09:08 2022
+"""Created on Sat Feb 26 23:09:08 2022.
 
 @author: Dhruv Jain, Multi-Body Dynamics Research Group, Purdue University
         dhruvj9922@gmail.com
@@ -12,11 +11,11 @@ D. Grebow, "Generating Periodic Orbits in the Circular Restricted Three-Body Pro
 
 import copy
 
-import matplotlib.pyplot as plt
-import numpy as np
 from cr3bp_char_quant import sys_chars
 from cr3bp_lib_calc import lib_pt_loc
 from cr3bp_PO_master import periodic_orbit
+import matplotlib.pyplot as plt
+import numpy as np
 
 sys_p1p2 = sys_chars("Earth", "Moon")
 mu = sys_p1p2.mu

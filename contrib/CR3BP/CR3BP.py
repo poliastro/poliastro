@@ -1,7 +1,6 @@
-"""
-********************************************************************
+"""********************************************************************
        Circular Restricted Three-Body Problem (CR3BP) Library
-********************************************************************
+********************************************************************.
 
 Last update: 21/01/2022
 
@@ -14,7 +13,7 @@ provides the following functionality:
     * CR3BP State Transition Matrix propagation
 
 References
------------
+----------
 Most of the equations implemented can be found in a wide range of litrature
 on celestial mechancis. But a major portion of the work was directly refered
 from Daniel Grebow's master and PhD thesis works. They are listed below.
@@ -30,8 +29,8 @@ A Matlab version of the original library developed can be found in link below.
 CR3BP MATLAB Library : https://github.com/JackCrusoe47/CR3BP_MATLAB_Library
 """
 
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro._math.ivp import DOP853, solve_ivp
 
@@ -64,7 +63,6 @@ def getChar_CR3BP(k1, k2, r12):
     nstr : float
         Characterisitc angular velocity.
     """
-
     # characteristic gravitational parameter
     kstr = k1 + k2
 
@@ -130,7 +128,6 @@ def getUdiff_CR3BP(r_, mu):
     mu : float
         CR3BP mass ratio (m2/(m1+m2))
     """
-
     # extracting components of position
     rx, ry, rz = r_
 
@@ -191,7 +188,6 @@ def getA_CR3BP(r_, mu):
     mu : float
         CR3BP mass ratio (m2/(m1+m2))
     """
-
     # Compute Hetian of psuedo-potential function(U)
     Udiff = getUdiff_CR3BP(r_, mu)
 
@@ -225,7 +221,6 @@ def func_CR3BP(t, u_, mu):
     mu : float
         CR3BP mass ratio (m2/(m1+m2))
     """
-
     # extracting states
     rx, ry, rz, vx, vy, vz = u_
 
@@ -255,7 +250,6 @@ def func_CR3BP(t, u_, mu):
 
 @jit
 def func_STM(t, u_, mu):
-
     # extract STM from dynamics vector 6:42 elements
     STM = u_[6:].reshape(6, 6)  # reshaped to a 6x6 matrix
 
@@ -286,7 +280,6 @@ def func_CR3BP_STM(t, u_, mu):
     mu : float
         CR3BP mass ratio (m2/(m1+m2))
     """
-
     # compute CR3BP state dynamics
     du_state = func_CR3BP(t, u_[0:6], mu)
 
@@ -324,7 +317,6 @@ def propagate(mu, r0, v0, tofs, rtol=1e-11, f=func_CR3BP):
     vv : numpy.ndarray
         Propagated velocity vectors (nd).
     """
-
     u0 = np.append(r0, v0)
 
     result = solve_ivp(
@@ -381,7 +373,6 @@ def propagateSTM(mu, r0, v0, STM0, tofs, rtol=1e-11, f=func_CR3BP_STM):
     STM : numpy.ndarray
         Propagated STM matrix (nd)
     """
-
     u0 = np.append(r0, v0)
     u0 = np.append(u0, STM0.reshape(1, 36))
 

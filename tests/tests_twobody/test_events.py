@@ -1,9 +1,9 @@
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
+import numpy as np
 from numpy.linalg import norm
+import pytest
 
 from poliastro.bodies import Earth
 from poliastro.constants import H0_earth, rho0_earth
