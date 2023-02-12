@@ -13,7 +13,7 @@
     <tr>
       <td>poliastro</td>
       <td><a href="https://www.poliastro.space">https://www.poliastro.space</a></td>
-      <td>Juan Luis Cano Rodríguez</td>
+      <td><a href="https://github.com/astrojuanlu">Juan Luis Cano Rodríguez</a></td>
       <td>0.18.dev0</td>
     </tr>
   </tbody>
@@ -123,8 +123,30 @@ talks in some of the most popular conferences about scientific software:
 poliastro is released under the MIT license, hence allowing commercial use of
 the library. Please refer to the [COPYING] file.
 
+    The MIT License (MIT)
+    
+    Copyright (c) 2012-2023 Juan Luis Cano Rodríguez and the poliastro development team
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
 If you are planning to use poliastro with commercial purposes consider
-[sponsoring the project](##Backers and sponsors).
+[sponsoring the project](#Backers-and-sponsors).
 
 
 ## Problems and suggestions
@@ -157,8 +179,15 @@ subscription among others.
 If you would like to support poliastro, consider [becoming a backer] or
 [becoming a sponsor]. 
 
+**Thanks to all our backers!**
+
 [![Backers](https://opencollective.com/poliastro/backers.svg?width=890)](https://opencollective.com/poliastro#backer)
 
+
+**Thanks to all our sponsors!**
+
+[![Sponsors](https://opencollective.com/poliastro/sponsor/0/avatar.svg)](https://opencollective.com/poliastro/sponsor/0/website)
+[![Sponsors](https://opencollective.com/poliastro/sponsor/1/avatar.svg)](https://opencollective.com/poliastro/sponsor/0/website)
 
 
 
