@@ -32,7 +32,6 @@ from poliastro.sensors import (
 def test_max_and_min_ground_range(
     altitude, fov, boresight, expected_lat_lon_max, expected_lat_lon_min
 ):
-
     R = Earth.R.to(u.km)
     lat_lon_min, lat_lon_max = min_and_max_ground_range(
         altitude, fov, boresight, R
@@ -69,7 +68,6 @@ def test_ground_range_diff_at_azimuth(
     expected_target_lat,
     expected_target_lon,
 ):
-
     R = Earth.R.to(u.km)
     ground_range_diff, target_lat, target_lon = ground_range_diff_at_azimuth(
         altitude, fov, boresight, azimuth, nadir_lat, nadir_lon, R
@@ -103,7 +101,6 @@ def test_exception_ground_range_diff_at_azimuth(
     nadir_lat,
     nadir_lon,
 ):
-
     R = Earth.R.to(u.km)
     with pytest.raises(ValueError) as excinfo:
         ground_range_diff_at_azimuth(

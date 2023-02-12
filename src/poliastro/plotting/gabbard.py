@@ -10,7 +10,6 @@ class GabbardPlotter:
     def __init__(
         self, ax=None, dark=False, altitude_unit=u.km, period_unit=u.min
     ):
-
         self._ax = ax
         if not self._ax:
             if dark:

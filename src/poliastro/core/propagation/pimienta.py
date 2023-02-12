@@ -7,7 +7,6 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 @jit
 def pimienta_coe(k, p, ecc, inc, raan, argp, nu, tof):
-
     q = p / (1 + ecc)
 
     # TODO: Do something to allow parabolic and hyperbolic orbits?

@@ -464,7 +464,6 @@ class CZMLExtractor:
         self.packets.append(pckt)
 
         if groundtrack_show:
-
             groundtrack_color = path_color
 
             groundtrack_cords = self._init_groundtrack_packet_cords_(

@@ -172,7 +172,6 @@ class periodic_orbit_fam_continuation(periodic_orbit):
 
         # While loop to compute family members
         while count_fam_member < num_fam_members and iterflag is False:
-
             results, iterflag = self.single_shooter(
                 free_vars,
                 constraints,
@@ -392,7 +391,6 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         iterflag = False
         count_fam_member = 0
         while count_fam_member < num_fam_members and iterflag is False:
-
             results, iterflag = self.single_shooter(
                 free_vars,
                 constraints,
@@ -697,13 +695,11 @@ class periodic_orbit_fam_continuation(periodic_orbit):
         self.targeted_po_char["eigenvectors"].append(eigenvects)
 
     def pickle_orbit_values(self, filename):
-
         po_data = self.targeted_po_fam
         with open(filename + ".pickle", "wb") as f:
             pickle.dump(po_data, f, pickle.HIGHEST_PROTOCOL)
 
     def pickle_orbit_char(self, filename):
-
         po_char = self.targeted_po_char
         with open(filename + ".pickle", "wb") as f:
             pickle.dump(po_char, f, pickle.HIGHEST_PROTOCOL)

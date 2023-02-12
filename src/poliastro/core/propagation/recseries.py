@@ -20,7 +20,6 @@ def recseries_coe(
     numiter=100,
     rtol=1e-8,
 ):
-
     # semi-major axis
     semi_axis_a = p / (1 - ecc**2)
     # mean angular motion

@@ -48,7 +48,6 @@ class GeocentricSolarEcliptic(BaseEclipticFrame):
     DynamicMatrixTransform, GCRS, GeocentricSolarEcliptic
 )
 def gcrs_to_geosolarecliptic(gcrs_coo, to_frame):
-
     if not to_frame.obstime.isscalar:
         raise ValueError(
             "To perform this transformation the obstime Attribute must be a scalar."

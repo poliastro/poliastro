@@ -502,7 +502,6 @@ def test_czml_raises_error_if_length_of_points_and_epochs_not_same():
 
 
 def test_czml_groundtrack():
-
     start_epoch = molniya.epoch
     end_epoch = molniya.epoch + molniya.period
 

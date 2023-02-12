@@ -202,7 +202,6 @@ class RelativeOrb:
         residual = 1.0  # Initialise convergence residual
 
         while residual >= 0.000001:
-
             fn = E1 - (e * np.sin(E1)) - M.to_value(u.rad)
             fd = 1 - (e * np.cos(E1))
             E2 = E1 - (fn / fd)
@@ -301,7 +300,6 @@ class RelativeOrb:
         """
         # Check if the orbit is an ellipse (closed)
         if self.satC.ecc < 1 and self.satD.ecc < 1:
-
             # Get the initial mean anomaly of the chief.
             mC = E_to_M(nu_to_E(self.satC.nu, self.satC.ecc), self.satC.ecc)
 
@@ -329,7 +327,6 @@ class RelativeOrb:
 
             # For each sample...
             for t in range(0, duration, step):
-
                 # Update the mean anomaly of the chief (loop over pi).
                 mC = ((mC + pi + (nC * ts)) % (2 * pi)) - pi
 
@@ -429,9 +426,7 @@ class RelativeOrb:
 
         # Else, proceed with the propagation!
         else:
-
             with quantity_support():
-
                 # Initialise the matplotlib frame object.
                 figMain = plt.figure()
                 axOrbR = figMain.add_subplot(1, 1, 1, projection="3d")
@@ -528,9 +523,7 @@ class RelativeOrb:
 
         # Else, proceed with the propagation!
         else:
-
             with quantity_support():
-
                 # Initialise the matplotlib frame object.
                 figMain = plt.figure()
                 axOrbV = figMain.add_subplot(1, 1, 1, projection="3d")
@@ -624,7 +617,6 @@ class RelativeOrb:
 # The 'if __name__ == "__main__" statement allows others to import the
 # RelativeOrb class without calling the rest of the script below:
 if __name__ == "__main__":
-
     # Initialize an example Satellite A as the chief spacecraft.
     satC = Orbit.from_classical(
         attractor=Earth,

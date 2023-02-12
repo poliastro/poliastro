@@ -215,7 +215,6 @@ class PorkchopPlotter:
         self.ax.clabel(line, inline=1, fmt="%1.1f", colors="k", fontsize=10)
 
         if self.tfl:
-
             time_levels = np.linspace(100, 500, 5)
 
             tfl_contour = self.ax.contour(
@@ -233,7 +232,6 @@ class PorkchopPlotter:
             )
 
         if self.vhp:
-
             vhp_levels = np.linspace(0, self.max_vhp.to_value(u.km / u.s), 5)
 
             vhp_contour = self.ax.contour(

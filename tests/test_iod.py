@@ -152,7 +152,6 @@ def test_issue840(lambert_vallado, lambert_izzo):
     "lambert_vallado,lambert_izzo", [(vallado.lambert, izzo.lambert)]
 )
 def test_issue1362(lambert_vallado, lambert_izzo):
-
     k = 1.32712440018e11 * u.km**3 / u.s**2
     r0 = [-7.52669489e07, -3.72205805e08, -9.17950811e06] * u.km
     rf = [-6.15200041e06, -3.91985660e08, -5.06520860e05] * u.km
