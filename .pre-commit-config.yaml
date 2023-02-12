@@ -1,5 +1,5 @@
 ci:
-  autoupdate_commit_msg: "chore: [pre-commit.ci] pre-commit autoupdate"
+  autoupdate_commit_msg: "MAINT: update pre-commit hooks"
   autoupdate_schedule: monthly
 
 repos:
@@ -17,22 +17,13 @@ repos:
   - id: debug-statements
   - id: mixed-line-ending
 
-- repo: https://github.com/PyCQA/isort
-  rev: 5.10.1
-  hooks:
-  - id: isort
-
 - repo: https://github.com/psf/black
   rev: 22.10.0
   hooks:
   - id: black
 
-- repo: https://github.com/PyCQA/flake8
-  rev: 5.0.4
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: 'v0.0.241'
   hooks:
-  - id: flake8
-
-#- repo: https://github.com/PyCQA/pydocstyle
-#  rev: 6.1.1
-#  hooks:
-#  - id: pydocstyle
+    - id: ruff
+      args: [--fix]
