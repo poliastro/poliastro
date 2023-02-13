@@ -1,4 +1,4 @@
-[![poliastro Logo](https://raw.githubusercontent.com/jorgepiloto/poliastro/fix/molniya-plot/docs/source/logo/logo_text.svg)](https://docs.poliastro.space/en/stable/)
+[![poliastro Logo](https://raw.githubusercontent.com/poliastro/poliastro/main/docs/source/logo/logo_text.svg)](https://docs.poliastro.space/en/stable/)
 
 |  **Name**  |                        **Website**                        |                            **Author**                             |                                      **Maintainers**                                      |                          **Version**                          |
 |:----------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:-------------------------------------------------------------:|
@@ -37,10 +37,7 @@ poliastro in your publications:
 
     Juan Luis Cano Rodríguez et al.. (2023). poliastro: poliastro 0.17.0. Zenodo. 10.5281/zenodo.6817189
 
-
-<div align="center">
-  <img src="https://github.com/jorgepiloto/poliastro/raw/fix/molniya-plot/docs/source/_static/examples.png">
-</div>
+![Multiple examples image](https://github.com/jorgepiloto/poliastro/raw/fix/molniya-plot/docs/source/_static/examples.png)
 
 
 ## Requirements
