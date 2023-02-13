@@ -61,6 +61,7 @@ Documentation = "https://docs.poliastro.space"
 Source = "https://github.com/poliastro/poliastro"
 Tracker = "https://github.com/poliastro/poliastro/issues"
 Funding = "https://opencollective.com/poliastro"
+Changelog = "https://docs.poliastro.space/en/stable/changelog.html"
 
 [project.optional-dependencies]
 jupyter = ["notebook", "ipywidgets>=7.6"]
