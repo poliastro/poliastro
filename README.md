@@ -109,28 +109,11 @@ poliastro. Examples can be accessed in various ways:
 poliastro is also promoted through conferences and talks. These are the latest
 talks in some of the most popular conferences about scientific software:
 
-<div align="center">
-  <table>
-  <thead>
-    <tr>
-      <th ><span style="font-weight:bold">Conference</span></th>
-      <th ><span style="font-weight:bold">Talk</span></th>
-      <th ><span style="font-weight:bold">Thumbnail</span></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>SciPy 2022</td>
-      <td><a href="https://www.youtube.com/watch?v=0GqdIRdDe9c">Per Python ad astra: Interactive Astrodynamics with poliastro</a></td>
-      <td align="center"><img src="https://i.ytimg.com/vi/0GqdIRdDe9c/maxresdefault.jpg"></td>
-    </tr>
-    <tr>
-      <td>OSCW 2019</td>
-      <td><a href="https://www.youtube.com/watch?v=x3PP1ej_emY">Interplanetary mission analysis with poliastro</a></td>
-      <td align="center"><img src="https://i.ytimg.com/vi/x3PP1ej_emY/maxresdefault.jpg"></td>
-  </tbody>
-  </table>
-</div>
+| **Conference** |                                                   **Talk**                                                   |
+|:--------------:|:------------------------------------------------------------------------------------------------------------:|
+|   SciPy 2022   | [Per Python ad astra: Interactive Astrodynamics with poliastro](https://www.youtube.com/watch?v=0GqdIRdDe9c) |
+|   OSCW  2019   |        [Interplanetary mission analysis with poliastro](https://www.youtube.com/watch?v=0GqdIRdDe9c)         |
+
 
 ## License
 
