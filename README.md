@@ -1,5 +1,6 @@
+[![poliastro Logo](https://raw.githubusercontent.com/jorgepiloto/poliastro/fix/molniya-plot/docs/source/logo/logo_text.svg)](https://docs.poliastro.space/en/stable/)
+
 <div align="center">
-  <a href="https://www.poliastro.space/"><img src="https://www.poliastro.space/images/logo_text.png"></a>
   <table>
   <thead>
     <tr>
