@@ -2,7 +2,7 @@
 
 |  **Name**  |                        **Website**                        |                            **Author**                             |                                      **Maintainers**                                      |                          **Version**                          |
 |:----------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:-------------------------------------------------------------:|
-| poliastro  | [https://www.polistro.space](https://www.poliastro.space) | [Juan Luis Cano Rodriguez](https://orcid.org/0000-0002-2187-161X) | [poliastro development team](https://github.com/poliastro/poliastro/blob/main/AUTHORS.md) | [0.18.dev0](https://github.com/poliastro/poliastro/blob/main) |
+| poliastro  | [https://www.polistro.space](https://www.poliastro.space) | [Juan Luis Cano Rodriguez](https://orcid.org/0000-0002-2187-161X) | [poliastro development team](https://github.com/poliastro/poliastro/blob/main/AUTHORS.md) |     [0.18.dev0](https://github.com/poliastro/poliastro/)      |
 
 [![poliastro_badge]](https://github.com/poliastro/poliastro)
 [![ci_badge]](https://circleci.com/gh/poliastro/poliastro/?branch=main)
