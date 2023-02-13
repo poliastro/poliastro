@@ -1,25 +1,8 @@
 [![poliastro Logo](https://raw.githubusercontent.com/jorgepiloto/poliastro/fix/molniya-plot/docs/source/logo/logo_text.svg)](https://docs.poliastro.space/en/stable/)
 
-<div align="center">
-  <table>
-  <thead>
-    <tr>
-      <th><span style="font-weight:bold">Name</span></th>
-      <th><span style="font-weight:bold">Website</span></th>
-      <th><span style="font-weight:bold">Author</span></th>
-      <th><span style="font-weight:bold">Version</span></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>poliastro</td>
-      <td><a href="https://www.poliastro.space">https://www.poliastro.space</a></td>
-      <td><a href="https://github.com/astrojuanlu">Juan Luis Cano Rodríguez</a></td>
-      <td>0.18.dev0</td>
-    </tr>
-  </tbody>
-  </table>
-</div>
+|  **Name**  |                        **Website**                        |                            **Author**                             |                                      **Maintainers**                                      |                          **Version**                          |
+|:----------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:-------------------------------------------------------------:|
+| poliastro  | [https://www.polistro.space](https://www.poliastro.space) | [Juan Luis Cano Rodriguez](https://orcid.org/0000-0002-2187-161X) | [poliastro development team](https://github.com/poliastro/poliastro/blob/main/AUTHORS.md) | [0.18.dev0](https://github.com/poliastro/poliastro/blob/main) |
 
 [![poliastro_badge]](https://github.com/poliastro/poliastro)
 [![ci_badge]](https://circleci.com/gh/poliastro/poliastro/?branch=main)
