@@ -1,4 +1,4 @@
-[![poliastro Logo](https://raw.githubusercontent.com/poliastro/poliastro/main/docs/source/logo/logo_text.svg)](https://docs.poliastro.space/en/stable/)
+[![poliastro Logo](https://raw.githubusercontent.com/jorgepiloto/poliastro/fix/molniya-plot/docs/source/_static/logo_readme.png)](https://docs.poliastro.space/en/stable/)
 
 |  **Name**  |                        **Website**                        |                            **Author**                             |                                      **Maintainers**                                      |                          **Version**                          |
 |:----------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:-------------------------------------------------------------:|
