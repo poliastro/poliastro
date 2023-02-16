@@ -1,8 +1,8 @@
 [![poliastro Logo](https://raw.githubusercontent.com/poliastro/poliastro/main/docs/source/_static/logo_readme.png)](https://docs.poliastro.space/en/stable/)
 
-|  **Name**  |                        **Website**                        |                            **Author**                             |                                      **Maintainers**                                      |                          **Version**                          |
-|:----------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:-------------------------------------------------------------:|
-| poliastro  | [https://www.poliastro.space](https://www.poliastro.space) | [Juan Luis Cano Rodriguez](https://orcid.org/0000-0002-2187-161X) | [poliastro development team](https://github.com/poliastro/poliastro/blob/main/AUTHORS.md) |     [0.18.dev0](https://github.com/poliastro/poliastro/)      |
+| **Name**  |                        **Website**                         |                                                         **Authors**                                                       |                                      **Maintainers**                                      |                     **Version**                      |
+|:---------:|:----------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:----------------------------------------------------:|
+| poliastro | [https://www.poliastro.space](https://www.poliastro.space) | [Juan Luis Cano Rodriguez](https://orcid.org/0000-0002-2187-161X) [Jorge Martinez](https://orcid.org/0000-0001-9622-2369) | [poliastro development team](https://github.com/poliastro/poliastro/blob/main/AUTHORS.md) | [0.18.dev0](https://github.com/poliastro/poliastro/) |
 
 [![poliastro_badge]](https://github.com/poliastro/poliastro)
 [![ci_badge]](https://circleci.com/gh/poliastro/poliastro/?branch=main)
@@ -35,7 +35,7 @@ but can also be used to analyze artificial satellites in Low-Earth Orbit (LEO).
 If you use poliastro on your project, please [let us know]. Use the DOI to cite
 poliastro in your publications:
 
-    Juan Luis Cano Rodríguez et al.. (2023). poliastro: poliastro 0.17.0. Zenodo. 10.5281/zenodo.6817189
+    Juan Luis Cano Rodríguez, Jorge Martinez, et al.. (2023). poliastro: poliastro 0.17.0. Zenodo. 10.5281/zenodo.6817189
 
 ![Multiple examples image](https://github.com/poliastro/poliastro/raw/main/docs/source/_static/examples.png)
 
@@ -89,10 +89,12 @@ poliastro. Examples can be accessed in various ways:
 poliastro is also promoted through conferences and talks. These are the latest
 talks in some of the most popular conferences about scientific software:
 
-| **Conference** |                                                   **Talk**                                                   |
-|:--------------:|:------------------------------------------------------------------------------------------------------------:|
-|   SciPy 2022   | [Per Python ad astra: Interactive Astrodynamics with poliastro](https://www.youtube.com/watch?v=0GqdIRdDe9c) |
-|   OSCW  2019   |        [Interplanetary mission analysis with poliastro](https://www.youtube.com/watch?v=0GqdIRdDe9c)         |
+| **Conference**  |                                                                                                  **Talk**                                                                                                   |
+|:---------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|   SciPy 2022    |                                                [Per Python ad astra: Interactive Astrodynamics with poliastro](https://www.youtube.com/watch?v=0GqdIRdDe9c)                                                 |
+|   OSCW  2019    |                                                        [Interplanetary mission analysis with poliastro](https://www.youtube.com/watch?v=0GqdIRdDe9c)                                                        |
+| EuroSciPy 2019  | [Can we make Python fast without sacrificing readability? numba for Astrodynamics](https://pyvideo.org/euroscipy-2019/can-we-make-python-fast-without-sacrificing-readability-numba-for-astrodynamics.html) |
+| EuroPython 2016 |                                                             [Per Python ad Astra](https://pyvideo.org/europython-2016/per-python-ad-astra.html)                                                             |
 
 
 ## License
@@ -167,16 +169,12 @@ If you would like to support poliastro, consider [becoming a backer] or
 [![Sponsors](https://opencollective.com/poliastro/sponsor/1/avatar.svg)](https://opencollective.com/poliastro/sponsor/0/website)
 
 
-
-
 ## Frequently asked questions
 
 * **What's up with the name?**
 
-  poliastro comes from Polimi, which is the shortened name of the
-  Politecnico di Milano, the Italian university where I was studying while
-  writing this software. It's my tiny tribute to a place I came to love.
-  *Grazie mille!*
+  poliastro comes from Polimi, which is the shortened name of the Politecnico di
+  Milano, see the [acknowledgement from the original author]. *Grazie mille!*
 
 * **Is poliastro validated?**
 
@@ -191,15 +189,15 @@ If you would like to support poliastro, consider [becoming a backer] or
 
 * **What's the future of the project?**
 
-  poliastro is actively maintained and receiving an influx of new
-  contributors thanks to the generous sponsorship of Google and the
-  European Space Agency. The best way to get an idea of the roadmap is to
-  see the [milestones] of the project.
+  poliastro is actively maintained and receiving an influx of new contributors
+  thanks to the generous sponsorship of Google, the European Space Agency, and
+  NumFOCUS. The best way to get an idea of the roadmap is to see the
+  [milestones] of the project.
 
 
 <!-- LINKS AND REFERENCES -->
 
-[quickstart guide]: https://docs.poliastro.space/en/latest/quickstart.html
+[quickstart guide]: https://docs.poliastro.space/en/stable/quickstart.html
 [API reference]: https://docs.poliastro.space/en/latest/api.html
 [Read the docs]: https://readthedocs.org
 [binder]: https://mybinder.org/
@@ -222,7 +220,7 @@ If you would like to support poliastro, consider [becoming a backer] or
 [gallery of examples]: https://docs.poliastro.space/en/latest/gallery.html
 [becoming a backer]: https://opencollective.com/poliastro#backer
 [becoming a sponsor]: https://opencollective.com/poliastro#sponsor
-
+[acknowledgement from the original author]: https://docs.poliastro.space/en/stable/history.html#acknowledgement-from-the-original-author
 
 
 <!-- Badges -->
