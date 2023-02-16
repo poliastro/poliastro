@@ -1,8 +1,8 @@
-[![poliastro Logo](https://raw.githubusercontent.com/jorgepiloto/poliastro/fix/molniya-plot/docs/source/_static/logo_readme.png)](https://docs.poliastro.space/en/stable/)
+[![poliastro Logo](https://raw.githubusercontent.com/poliastro/poliastro/main/docs/source/_static/logo_readme.png)](https://docs.poliastro.space/en/stable/)
 
 |  **Name**  |                        **Website**                        |                            **Author**                             |                                      **Maintainers**                                      |                          **Version**                          |
 |:----------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:-------------------------------------------------------------:|
-| poliastro  | [https://www.polistro.space](https://www.poliastro.space) | [Juan Luis Cano Rodriguez](https://orcid.org/0000-0002-2187-161X) | [poliastro development team](https://github.com/poliastro/poliastro/blob/main/AUTHORS.md) |     [0.18.dev0](https://github.com/poliastro/poliastro/)      |
+| poliastro  | [https://www.poliastro.space](https://www.poliastro.space) | [Juan Luis Cano Rodriguez](https://orcid.org/0000-0002-2187-161X) | [poliastro development team](https://github.com/poliastro/poliastro/blob/main/AUTHORS.md) |     [0.18.dev0](https://github.com/poliastro/poliastro/)      |
 
 [![poliastro_badge]](https://github.com/poliastro/poliastro)
 [![ci_badge]](https://circleci.com/gh/poliastro/poliastro/?branch=main)
@@ -37,7 +37,7 @@ poliastro in your publications:
 
     Juan Luis Cano Rodríguez et al.. (2023). poliastro: poliastro 0.17.0. Zenodo. 10.5281/zenodo.6817189
 
-![Multiple examples image](https://github.com/jorgepiloto/poliastro/raw/fix/molniya-plot/docs/source/_static/examples.png)
+![Multiple examples image](https://github.com/poliastro/poliastro/raw/main/docs/source/_static/examples.png)
 
 
 ## Requirements
@@ -102,7 +102,7 @@ the library. Please refer to the [COPYING] file.
 
     The MIT License (MIT)
     
-    Copyright (c) 2012-2023 Juan Luis Cano Rodríguez and the poliastro development team
+    Copyright (c) 2012-2023 Juan Luis Cano Rodríguez, Jorge Martínez Garrido, and the poliastro development team
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
