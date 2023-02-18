@@ -197,15 +197,15 @@ class PorkchopPlotter:
         c = self.ax.contourf(
             [D.to_datetime() for D in self.launch_span],
             [A.to_datetime() for A in self.arrival_span],
-            c3_launch,
-            c3_levels,
+            c3_launch.astype("float64"),
+            c3_levels.astype("float64"),
         )
 
         line = self.ax.contour(
             [D.to_datetime() for D in self.launch_span],
             [A.to_datetime() for A in self.arrival_span],
-            c3_launch,
-            c3_levels,
+            c3_launch.astype("float64"),
+            c3_levels.astype("float64"),
             colors="black",
             linestyles="solid",
         )
@@ -220,8 +220,8 @@ class PorkchopPlotter:
             tfl_contour = self.ax.contour(
                 [D.to_datetime() for D in self.launch_span],
                 [A.to_datetime() for A in self.arrival_span],
-                tof,
-                time_levels,
+                tof.astype("float64"),
+                time_levels.astype("float64"),
                 colors="red",
                 linestyles="dashed",
                 linewidths=3.5,
@@ -237,8 +237,8 @@ class PorkchopPlotter:
             vhp_contour = self.ax.contour(
                 [D.to_datetime() for D in self.launch_span],
                 [A.to_datetime() for A in self.arrival_span],
-                dv_arrival,
-                vhp_levels,
+                dv_arrival.astype("float64"),
+                vhp_levels.astype("float64"),
                 colors="navy",
                 linewidths=2.0,
             )
