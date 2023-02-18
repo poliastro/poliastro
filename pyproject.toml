@@ -14,6 +14,10 @@ license = {file = "COPYING"}
 authors = [
     {name = "Juan Luis Cano Rodríguez", email = "hello@juanlu.space"}
 ]
+maintainers = [
+    {name = "Juan Luis Cano Rodríguez", email = "hello@juanlu.space"},
+    {name = "Jorge Martinez Garrido", email = "contact@jorgemartinez.space"}
+]
 keywords = [
     "aero",
     "aerospace",
