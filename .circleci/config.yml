@@ -57,6 +57,13 @@ jobs:
     environment:
       TOXENV: py310
 
+  py311:
+    <<: *test-template
+    docker:
+      - image: python:3.11
+    environment:
+      TOXENV: py311
+
 workflows:
   version: 2
   build_and_test:
@@ -81,5 +88,8 @@ workflows:
           requires:
             - quality
       - py310:
+          requires:
+            - quality
+      - py311:
           requires:
             - quality
