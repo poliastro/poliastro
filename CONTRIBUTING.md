@@ -190,11 +190,11 @@ Apart from all the steps described above, you need to have these extra things in
 1. Add tests to your code. You have lots of examples in the `tests/` directory
    to get inspiration from. All new features and fixes should be tested,
    and in the ideal case the coverage rate should increase or stay the same.
-2. To check if your code is correct, run `tox -e reformat,check,py39-fast`
-   (`py39` stands for Python 3.9, you can replace it by `py38`).
+2. To check if your code is correct, run `tox`. This command runs the code
+   style, the tests and build the documentation of the project.
 3. Notice that you can run a subset of the tests by
    passing extra arguments to pytest, for example running
-   `tox -e py39-fast -- -k "anomaly"`
+   `tox -e tests-fast -- -k "anomaly"`
 
 Automatic services will ensure your code works
 on all the supported operating systems and Python versions.
