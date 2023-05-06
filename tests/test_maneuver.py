@@ -27,12 +27,23 @@ def test_maneuver_constructor_raises_error_if_invalid_delta_v():
 
 
 def test_maneuver_raises_error_if_units_are_wrong():
-    wrong_dt = 1.0
+    wrong_dt = 1.0 * u.km
     _v = np.zeros(3) * u.km / u.s  # Unused velocity
     with pytest.raises(u.UnitsError) as excinfo:
         Maneuver([wrong_dt, _v])
     assert (
-        "Argument 'dts' to function '_initialize' must be in units convertible to 's'."
+        "Argument 'dts' to function 'impulse_has_valid_units' must be in units convertible to 's'."
+        in excinfo.exconly()
+    )
+
+
+def test_maneuver_raises_error_if_units_are_missing():
+    wrong_dt = 1.0
+    _v = np.zeros(3) * u.km / u.s  # Unused velocity
+    with pytest.raises(TypeError) as excinfo:
+        Maneuver([wrong_dt, _v])
+    assert (
+        "Argument 'dts' to function 'impulse_has_valid_units' has no 'unit' attribute. You should pass in an astropy Quantity instead."
         in excinfo.exconly()
     )
 
