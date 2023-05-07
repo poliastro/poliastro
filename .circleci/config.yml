@@ -117,16 +117,14 @@ workflows:
             - quality
       - release:
           requires:
-            - quality
-          #requires:
-          #  - tests38-fast
-          #  - tests38-online
-          #  - tests38-slow
-          #  - tests38-images
-          #  - tests38-coverage
-          #  - tests39
-          #  - tests310
-          #  - tests311
-          #filters:
-          #  tags:
-          #    only: /^v\d+.\d+.\d+$/
+            - tests38-fast
+            - tests38-online
+            - tests38-slow
+            - tests38-images
+            - tests38-coverage
+            - tests39
+            - tests310
+            - tests311
+          filters:
+            tags:
+              only: /^v\d+.\d+.\d+$/
