@@ -73,6 +73,19 @@ jobs:
     environment:
       TOXENV: tests311
 
+  release:
+    docker:
+      - image: curlimages/curl:7.72.0
+    steps:
+      - run: |
+          curl -sSL \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token $GITHUB_WORKFLOW_DISPATCH_TOKEN" \
+            -d '{"event_type": "release"' \
+            "https://api.github.com/repos/polistro/polistro/actions/workflows/release.yml/dispatches"
+
 workflows:
   version: 2
   build_and_test:
@@ -102,3 +115,18 @@ workflows:
       - tests311:
           requires:
             - quality
+      - release:
+          requires:
+            - quality
+          #requires:
+          #  - tests38-fast
+          #  - tests38-online
+          #  - tests38-slow
+          #  - tests38-images
+          #  - tests38-coverage
+          #  - tests39
+          #  - tests310
+          #  - tests311
+          #filters:
+          #  tags:
+          #    only: /^v\d+.\d+.\d+$/
