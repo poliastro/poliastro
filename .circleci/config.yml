@@ -83,8 +83,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GITHUB_WORKFLOW_DISPATCH_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/poliastro/poliastro/actions/workflows/release.yml/dispatches \
-            -d '{"ref":"ci/release"}'
+            https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/actions/workflows/release.yml/dispatches \
+            -d '{"ref":"'$CIRCLE_BRANCH'"}'
 
 workflows:
   version: 2
