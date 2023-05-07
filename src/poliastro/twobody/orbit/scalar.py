@@ -1,8 +1,6 @@
 from functools import cached_property
-from typing import List, Union
 from warnings import warn
 
-import numpy as np
 from astropy import time, units as u
 from astropy.coordinates import (
     ICRS,
@@ -10,6 +8,7 @@ from astropy.coordinates import (
     CartesianRepresentation,
     get_body_barycentric,
 )
+import numpy as np
 
 from poliastro.bodies import Earth
 from poliastro.core.events import elevation_function as elevation_function_fast
@@ -19,7 +18,6 @@ from poliastro.twobody.elements import eccentricity_vector, energy, t_p
 from poliastro.twobody.orbit.creation import OrbitCreationMixin
 from poliastro.twobody.propagation import FarnocchiaPropagator, PropagatorKind
 from poliastro.twobody.sampling import TrueAnomalyBounds
-from poliastro.twobody.states import BaseState
 from poliastro.util import norm, wrap_angle
 from poliastro.warnings import PatchedConicsWarning
 
@@ -173,7 +171,7 @@ class Orbit(OrbitCreationMixin):
     def h_vec(self):
         """Specific angular momentum vector."""
         h_vec = (
-            np.cross(self.r.to_value(u.km), self.v.to(u.km / u.s))
+            np.cross(self.r.to_value(u.km), self.v.to_value(u.km / u.s))
             * u.km**2
             / u.s
         )
@@ -619,40 +617,52 @@ class Orbit(OrbitCreationMixin):
             res = orbit_new
         return res
 
-    def plot(self, label=None, use_3d=False, interactive=False):
+    def plot(self, backend=None, label=None):
         """Plots the orbit.
 
         Parameters
         ----------
+        backend : ~poliastro.plotting.orbit.backends._base.OrbitPlotterBackend
+            An instance of ``OrbitPlotterBackend`` for rendendering the scene.
         label : str, optional
             Label for the orbit, defaults to empty.
-        use_3d : bool, optional
-            Produce a 3D plot, default to False.
-        interactive : bool, optional
-            Produce an interactive (rather than static) image of the orbit, default to False.
-            This option requires Plotly properly installed and configured for your environment.
+
+        Returns
+        -------
+        ~poliastro.plotting.orbit.OrbitPlotter
+            An object for plotting orbits.
 
         """
-        if not interactive and use_3d:
-            raise ValueError(
-                "The static plotter does not support 3D, use `interactive=True`"
-            )
-        elif not interactive:
-            from poliastro.plotting.static import StaticOrbitPlotter
+        # HACK: avoid circular dependency
+        from poliastro.plotting.orbit.backends import Matplotlib2D, Plotly2D
+        from poliastro.plotting.orbit.plotter import OrbitPlotter
 
-            return StaticOrbitPlotter().plot(self, label=label)
-        elif use_3d:
-            from poliastro.plotting.interactive import OrbitPlotter3D
+        # Select the best backend depending if it is an interactive or batch
+        # session
+        if backend is None:
+            try:
+                shell = get_ipython().__class__.__name__
+                if shell == "ZMQInteractiveShell":
+                    # Jupyter notebook or qtconsole
+                    is_interactive = True
+                elif shell == "TerminalInteractiveShell":
+                    # Terminal running IPython
+                    is_interactive = False
+                else:
+                    # Other type of shell
+                    is_interactive = False
+            except NameError:
+                # Standard Python interpreter
+                is_interactive = False
+            finally:
+                backend = Plotly2D() if is_interactive else Matplotlib2D()
 
-            return OrbitPlotter3D().plot(self, label=label)
-        else:
-            from poliastro.plotting.interactive import OrbitPlotter2D
-
-            return OrbitPlotter2D().plot(self, label=label)
+        plotter = OrbitPlotter(backend=backend)
+        plotter.plot(self, label=label)
+        plotter.show()
 
     def elevation(self, lat, theta, h):
-        """
-        Elevation
+        """Elevation.
 
         Parameters
         ----------

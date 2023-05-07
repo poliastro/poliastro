@@ -1,10 +1,10 @@
 from functools import partial
 
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from hypothesis import example, given, settings, strategies as st
+import numpy as np
+import pytest
 
 from poliastro.examples import iss
 from poliastro.twobody.sampling import TrueAnomalyBounds, sample_closed
@@ -86,7 +86,6 @@ def test_sample_closed_starts_and_ends_at_min_anomaly_if_in_range_and_no_max_giv
 
 @pytest.mark.parametrize("num_values", [3, 5, 7, 9, 11, 101])
 def test_sample_num_points(num_values, elliptic):
-
     # TODO: Test against the perigee and apogee
     # expected_ss = ss0.propagate(ss0.period / 2)
 

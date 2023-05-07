@@ -2,6 +2,7 @@ version: 2.1
 
 jobs:
   quality: &test-template
+    description: Code style
     docker:
       - image: python:3.8
     environment:
@@ -13,73 +14,91 @@ jobs:
       - run: python -m pip install tox
       - run: tox
 
-  py38-fast:
+  tests38-fast:
     <<: *test-template
+    description: Tests fast - Python 3.8
     environment:
-      TOXENV: py38-fast
+      TOXENV: tests38-fast
 
-  py38-online:
+  tests38-online:
     <<: *test-template
+    description: Tests online - Python 3.8
     environment:
-      TOXENV: py38-online
+      TOXENV: tests38-online
 
-  py38-slow:
+  tests38-slow:
     <<: *test-template
+    description: Tests slow - Python 3.8
     environment:
-      TOXENV: py38-slow
+      TOXENV: tests38-slow
 
-  py38-images:
+  tests38-images:
     <<: *test-template
+    description: Tests images - Python 3.8
     environment:
-      TOXENV: py38-images
+      TOXENV: tests38-images
 
-  py38-coverage:
+  tests38-coverage:
     <<: *test-template
+    description: Tests coverage - Python 3.8
     environment:
-      TOXENV: py38-coverage
+      TOXENV: tests38-coverage
     steps:
       - checkout
       - run: python -m pip install tox
       - run: tox
       - run: python -m pip install codecov && codecov
 
-  py39:
+  tests39:
     <<: *test-template
+    description: Tests - Python 3.9
     docker:
       - image: python:3.9
     environment:
-      TOXENV: py39
+      TOXENV: tests39
 
-  py310:
+  tests310:
     <<: *test-template
+    description: Tests - Python 3.10
     docker:
       - image: python:3.10
     environment:
-      TOXENV: py310
+      TOXENV: tests310
+
+  tests311:
+    <<: *test-template
+    description: Tests - Python 3.11
+    docker:
+      - image: python:3.11
+    environment:
+      TOXENV: tests311
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - quality
-      - py38-fast:
+      - tests38-fast:
           requires:
             - quality
-      - py38-online:
+      - tests38-online:
           requires:
             - quality
-      - py38-slow:
+      - tests38-slow:
           requires:
             - quality
-      - py38-images:
+      - tests38-images:
           requires:
             - quality
-      - py38-coverage:
+      - tests38-coverage:
           requires:
             - quality
-      - py39:
+      - tests39:
           requires:
             - quality
-      - py310:
+      - tests310:
+          requires:
+            - quality
+      - tests311:
           requires:
             - quality

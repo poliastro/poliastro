@@ -1,5 +1,4 @@
-"""
-Author: jtegedor
+"""Author: jtegedor.
 
 Python implementation of RV2TLE program for computation of mean orbital elements
 from state vector, for an Earth-orbitting satellite
@@ -12,10 +11,10 @@ Variables names have been kept similar to the original implementation, for easie
 
 import math
 
-import numpy as np
 from astropy import coordinates as coord, units as u
 from astropy.coordinates import TEME
 from astropy.time import Time
+import numpy as np
 from sgp4.api import SGP4_ERRORS, WGS84, Satrec
 
 from poliastro.bodies import Earth
@@ -24,16 +23,13 @@ from poliastro.twobody import Orbit, angles
 
 
 def unitv(v):
-    """
-    Compute unitary vector of numpy array v
-    """
+    """Compute unitary vector of numpy array v."""
     return v / np.linalg.norm(v)
 
 
 def acose(x):
-    """
-    Custom implementation of numpy.acose
-    Returns either 0 or math.pi if input value out of [-1, 1]
+    """Custom implementation of numpy.acose
+    Returns either 0 or math.pi if input value out of [-1, 1].
     """
     result = 0.0
     if x > 1:
@@ -46,9 +42,8 @@ def acose(x):
 
 
 def fmod2p(x):
-    """
-    Custom implementation of math.fmod
-    Returns a value between 0 and 2 * math.pi
+    """Custom implementation of math.fmod
+    Returns a value between 0 and 2 * math.pi.
     """
     rval = math.fmod(x, 2 * math.pi)
     if rval < 0:
@@ -57,10 +52,7 @@ def fmod2p(x):
 
 
 def rvel(r, v):
-    """
-    Convert state vector to mean orbital elements
-    """
-
+    """Convert state vector to mean orbital elements."""
     # Needed constants
     XJ3 = -2.53881e-6
     XKE = 0.0743669161331734132  # = (G*M)^(1/2)*(er/min)^(3/2) where G
@@ -219,10 +211,7 @@ def rvel(r, v):
 
 
 def el2rv(inc, raan, ecc, argp, mean_anomaly, mean_motion, epoch):
-    """
-    Converts mean orbital elements to state vector
-    """
-
+    """Converts mean orbital elements to state vector."""
     time_tle = epoch.jd - 2433281.5
     sat = Satrec()
     sat.sgp4init(
@@ -257,10 +246,7 @@ def el2rv(inc, raan, ecc, argp, mean_anomaly, mean_motion, epoch):
 
 
 def rv2el(rr, vv, epoch):
-    """
-    Computes mean orbital elements from state vector
-    """
-
+    """Computes mean orbital elements from state vector."""
     epoch_time = Time(epoch, format="datetime", scale="utc")
 
     # SPG4 k-elements from state vector
@@ -295,7 +281,6 @@ def rv2el(rr, vv, epoch):
 
 
 if __name__ == "__main__":
-
     # Display some initial data
     print(f" Orbit: {iss}")
     print(" State vector [poliastro]")

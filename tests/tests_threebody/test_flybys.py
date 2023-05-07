@@ -1,6 +1,6 @@
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+import pytest
 
 from poliastro.bodies import Venus
 from poliastro.threebody.flybys import compute_flyby

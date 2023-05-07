@@ -6,23 +6,23 @@ References
   Elliptical Orbit Transfers", 1997.
 
 """
-import numpy as np
 from astropy import units as u
 from numba import njit
+import numpy as np
 from numpy import cross
 
 from poliastro.core.thrust.change_ecc_quasioptimal import extra_quantities
 from poliastro.util import norm
 
 
-def change_ecc_quasioptimal(ss_0, ecc_f, f):
+def change_ecc_quasioptimal(orb_0, ecc_f, f):
     """Guidance law from the model.
     Thrust is aligned with an inertially fixed direction perpendicular to the
     semimajor axis of the orbit.
 
     Parameters
     ----------
-    ss_0 : Orbit
+    orb_0 : Orbit
         Initial orbit, containing all the information.
     ecc_f : float
         Final eccentricity.
@@ -30,15 +30,15 @@ def change_ecc_quasioptimal(ss_0, ecc_f, f):
         Magnitude of constant acceleration
     """
     # We fix the inertial direction at the beginning
-    k = ss_0.attractor.k.to(u.km**3 / u.s**2).value
-    a = ss_0.a.to(u.km).value
-    ecc_0 = ss_0.ecc.value
+    k = orb_0.attractor.k.to(u.km**3 / u.s**2).value
+    a = orb_0.a.to(u.km).value
+    ecc_0 = orb_0.ecc.value
     if ecc_0 > 0.001:  # Arbitrary tolerance
-        ref_vec = ss_0.e_vec / ecc_0
+        ref_vec = orb_0.e_vec / ecc_0
     else:
-        ref_vec = ss_0.r / norm(ss_0.r)
+        ref_vec = orb_0.r / norm(orb_0.r)
 
-    h_unit = ss_0.h_vec / norm(ss_0.h_vec)
+    h_unit = orb_0.h_vec / norm(orb_0.h_vec)
     thrust_unit = cross(h_unit, ref_vec) * np.sign(ecc_f - ecc_0)
 
     @njit

@@ -1,8 +1,8 @@
 from warnings import warn
 
-import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_body_barycentric_posvel
+import numpy as np
 
 from poliastro._math.linalg import norm
 from poliastro.core.events import (
@@ -122,7 +122,7 @@ class LatitudeCrossEvent(Event):
     def __call__(self, t, u_, k):
         self._last_t = t
         pos_on_body = (u_[:3] / norm(u_[:3])) * self._R
-        lat_, _, _ = cartesian_to_ellipsoidal_fast(
+        _, lat_, _ = cartesian_to_ellipsoidal_fast(
             self._R, self._R_polar, *pos_on_body
         )
 

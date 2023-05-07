@@ -1,6 +1,4 @@
-"""Orbital maneuvers.
-
-"""
+"""Orbital maneuvers."""
 from astropy import units as u
 
 from poliastro.core.maneuver import (
@@ -28,7 +26,7 @@ class Maneuver:
 
     """
 
-    def __init__(self, *args):
+    def __init__(self, *impulses):
         r"""Constructor.
 
         Parameters
@@ -37,30 +35,31 @@ class Maneuver:
             List of pairs (delta_time, delta_velocity)
 
         """
+        # Validate units of the impulses provided
+        self.impulses = [
+            self.impulse_has_valid_units(*impulse) for impulse in impulses
+        ]
+        self._dts, self._dvs = zip(*self.impulses)
 
-        self.impulses = args
-        # HACK: Change API or validation code
-        _dts, _dvs = zip(*args)
-
+        # Validate that all delta-V are three-dimensional vectors. Note that the
+        # input delta-V may not even be an iterable. This is why the 'TypeError'
+        # exception is forced
         try:
-            self._dts, self._dvs = self._initialize(
-                [(_dt * u.one).value for _dt in _dts] * (_dts[0] * u.one).unit,
-                [(_dv * u.one).value for _dv in _dvs] * (_dvs[0] * u.one).unit,
-            )
-            if not all(len(dv) == 3 for dv in _dvs):
-                raise TypeError
-        except TypeError:
+            if not all(len(dv) == 3 for dv in self._dvs):
+                raise ValueError
+        except (TypeError, ValueError):
             raise ValueError("Delta-V must be three dimensions vectors")
 
     def __repr__(self):
         return f"Number of impulses: {len(self.impulses)}, Total cost: {self.get_total_cost():.6f}"
 
-    @u.quantity_input(dts=u.s, dvs=u.m / u.s)
-    def _initialize(self, dts, dvs):
-        return dts, dvs
-
     def __getitem__(self, key):
         return self.impulses[key]
+
+    @staticmethod
+    @u.quantity_input(dts=u.s, dvs=u.m / u.s)
+    def impulse_has_valid_units(dts, dvs):
+        return dts, dvs
 
     @classmethod
     def impulse(cls, dv):
@@ -72,7 +71,6 @@ class Maneuver:
             Velocity components of the impulse.
 
         """
-
         return cls((0 * u.s, dv))
 
     @classmethod
@@ -87,7 +85,6 @@ class Maneuver:
             Final orbital radius
 
         """
-
         # Propagate till periapsis
         if orbit_i.nu != 0 * u.deg:
             t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
@@ -125,7 +122,6 @@ class Maneuver:
             Final orbital radius
 
         """
-
         # Propagate till periapsis
         if orbit_i.nu != 0 * u.deg:
             t_pericenter = orbit_i.time_to_anomaly(0 * u.deg)
@@ -177,7 +173,6 @@ class Maneuver:
         **kwargs
             Extra kwargs for Lambert method.
         """
-
         # Get initial algorithm conditions
         k = orbit_i.attractor.k
         r_i = orbit_i.r

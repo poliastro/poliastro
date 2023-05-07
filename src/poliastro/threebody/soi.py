@@ -1,4 +1,4 @@
-"""Sphere of Influence
+"""Sphere of Influence.
 
 Contains methods to compute radius of sphere of influence.
 

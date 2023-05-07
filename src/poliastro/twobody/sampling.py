@@ -1,6 +1,6 @@
-import numpy as np
 from astropy import units as u
 from astropy.coordinates import CartesianDifferential, CartesianRepresentation
+import numpy as np
 
 from poliastro.twobody.angles import E_to_nu, nu_to_E
 from poliastro.twobody.elements import coe2rv_many, hyp_nu_limit, t_p
@@ -147,7 +147,7 @@ class TrueAnomalyBounds(SamplingStrategy):
         delta_ts = (
             np.unwrap(delta_ts, period=orbit.period.to_value(u.s)) << u.s
         )
-        epochs = orbit.epoch + (orbit.t_p + delta_ts)
+        epochs = orbit.epoch + (delta_ts - orbit.t_p)
 
         n = nu_values.shape[0]
         rr, vv = coe2rv_many(

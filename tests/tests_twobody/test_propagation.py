@@ -1,10 +1,10 @@
-import numpy as np
-import pytest
 from astropy import time, units as u
 from astropy.coordinates import CartesianRepresentation
 from astropy.tests.helper import assert_quantity_allclose
 from hypothesis import given, settings, strategies as st
+import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 from pytest import approx
 
 from poliastro.bodies import Earth, Moon, Sun
@@ -60,11 +60,11 @@ def test_elliptic_near_parabolic(ecc, propagator):
         nu=1.0 * u.rad,
     )
 
-    ss_cowell = ss0.propagate(tof, method=CowellPropagator())
-    ss_propagator = ss0.propagate(tof, method=propagator())
+    orb_cowell = ss0.propagate(tof, method=CowellPropagator())
+    orb_propagator = ss0.propagate(tof, method=propagator())
 
-    assert_quantity_allclose(ss_propagator.r, ss_cowell.r, rtol=rtol)
-    assert_quantity_allclose(ss_propagator.v, ss_cowell.v, rtol=rtol)
+    assert_quantity_allclose(orb_propagator.r, orb_cowell.r, rtol=rtol)
+    assert_quantity_allclose(orb_propagator.v, orb_cowell.v, rtol=rtol)
 
 
 @pytest.mark.parametrize("ecc", [1.0001, 1.001, 1.01, 1.1])
@@ -82,11 +82,11 @@ def test_hyperbolic_near_parabolic(ecc, propagator):
         nu=1.0 * u.rad,
     )
 
-    ss_cowell = ss0.propagate(tof, method=CowellPropagator())
-    ss_propagator = ss0.propagate(tof, method=propagator())
+    orb_cowell = ss0.propagate(tof, method=CowellPropagator())
+    orb_propagator = ss0.propagate(tof, method=propagator())
 
-    assert_quantity_allclose(ss_propagator.r, ss_cowell.r)
-    assert_quantity_allclose(ss_propagator.v, ss_cowell.v)
+    assert_quantity_allclose(orb_propagator.r, orb_cowell.r)
+    assert_quantity_allclose(orb_propagator.v, orb_cowell.v)
 
 
 @pytest.mark.parametrize("method", [MarkleyPropagator()])
@@ -97,11 +97,11 @@ def test_near_equatorial(method):
     tof = 1.0 * u.h
     ss0 = Orbit.from_vectors(Earth, r, v)
 
-    ss_cowell = ss0.propagate(tof, method=CowellPropagator())
-    ss_propagator = ss0.propagate(tof, method=method)
+    orb_cowell = ss0.propagate(tof, method=CowellPropagator())
+    orb_propagator = ss0.propagate(tof, method=method)
 
-    assert_quantity_allclose(ss_propagator.r, ss_cowell.r, rtol=1e-4)
-    assert_quantity_allclose(ss_propagator.v, ss_cowell.v, rtol=1e-4)
+    assert_quantity_allclose(orb_propagator.r, orb_cowell.r, rtol=1e-4)
+    assert_quantity_allclose(orb_propagator.v, orb_cowell.v, rtol=1e-4)
 
 
 @pytest.mark.parametrize("propagator", ALL_PROPAGATORS)
@@ -312,13 +312,13 @@ def test_cowell_propagation_circle_to_circle():
     method = CowellPropagator(f=f)
     rrs, vvs = method.propagate_many(ss._state, tofs)
 
-    ss_final = Orbit.from_vectors(Earth, rrs[0], vvs[0])
+    orb_final = Orbit.from_vectors(Earth, rrs[0], vvs[0])
 
-    da_a0 = (ss_final.a - ss.a) / ss.a
-    dv_v0 = abs(norm(ss_final.v) - norm(ss.v)) / norm(ss.v)
+    da_a0 = (orb_final.a - ss.a) / ss.a
+    dv_v0 = abs(norm(orb_final.v) - norm(ss.v)) / norm(ss.v)
     assert_quantity_allclose(da_a0, 2 * dv_v0, rtol=1e-2)
 
-    dv = abs(norm(ss_final.v) - norm(ss.v))
+    dv = abs(norm(orb_final.v) - norm(ss.v))
     accel_dt = accel * u.km / u.s**2 * tofs[0]
     assert_quantity_allclose(dv, accel_dt, rtol=1e-2)
 

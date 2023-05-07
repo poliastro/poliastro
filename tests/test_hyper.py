@@ -1,6 +1,6 @@
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 from scipy import special
 
 from poliastro._math.special import hyp2f1b as hyp2f1

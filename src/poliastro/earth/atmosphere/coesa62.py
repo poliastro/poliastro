@@ -1,4 +1,4 @@
-""" The U.S. Standard Atmosphere 1966 depicts idealized middle-latitude
+"""The U.S. Standard Atmosphere 1966 depicts idealized middle-latitude
 year-round mean conditions for the range of solar activity that occurs between
 sunspot minimum and sunspot maximum.
 
@@ -52,11 +52,11 @@ sunspot minimum and sunspot maximum.
 
 """
 
-import numpy as np
 from astropy import units as u
 from astropy.io import ascii
 from astropy.units import imperial
 from astropy.utils.data import get_pkg_data_filename
+import numpy as np
 
 from poliastro._math.integrate import quad
 from poliastro.earth.atmosphere.base import COESA
@@ -112,7 +112,6 @@ class COESA62(COESA):
         T: ~astropy.units.Quantity
             Kinetic temeperature.
         """
-
         # Test if altitude is inside valid range
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
@@ -146,7 +145,6 @@ class COESA62(COESA):
         p: ~astropy.units.Quantity
             Pressure at given altitude.
         """
-
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
@@ -207,7 +205,6 @@ class COESA62(COESA):
         rho: ~astropy.units.Quantity
             Density at given altitude.
         """
-
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 

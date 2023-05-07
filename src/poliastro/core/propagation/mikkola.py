@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro.core.angles import (
     D_to_nu,
@@ -15,7 +15,6 @@ from poliastro.core.elements import coe2rv, rv2coe
 
 @jit
 def mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof):
-
     a = p / (1 - ecc**2)
     n = np.sqrt(k / np.abs(a) ** 3)
 
@@ -125,7 +124,6 @@ def mikkola(k, r0, v0, tof, rtol=None):
     ----
     Original paper: https://doi.org/10.1007/BF01235850
     """
-
     # Solving for the classical elements
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     nu = mikkola_coe(k, p, ecc, inc, raan, argp, nu, tof)

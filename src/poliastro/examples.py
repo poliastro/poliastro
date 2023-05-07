@@ -1,6 +1,4 @@
-"""Example data.
-
-"""
+"""Example data."""
 from astropy import time, units as u
 
 from poliastro.bodies import Earth, Sun

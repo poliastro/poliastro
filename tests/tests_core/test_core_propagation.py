@@ -1,6 +1,6 @@
-import pytest
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
+import pytest
 
 from poliastro.core.propagation import (
     danby_coe,
@@ -25,7 +25,6 @@ from poliastro.examples import iss
     ],
 )
 def test_propagate_with_coe(propagator_coe):
-
     period = iss.period
     a, ecc, inc, raan, argp, nu = iss.classical()
     p = a * (1 - ecc**2)

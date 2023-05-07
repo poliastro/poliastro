@@ -1,11 +1,8 @@
-import pickle
 from collections import OrderedDict
 from functools import partial
+import pickle
 from unittest import mock
 
-import matplotlib
-import numpy as np
-import pytest
 from astropy import units as u
 from astropy.coordinates import (
     ITRS,
@@ -16,7 +13,9 @@ from astropy.coordinates import (
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.time import Time
 from hypothesis import example, given, settings, strategies as st
+import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
+import pytest
 
 from poliastro.bodies import (
     Body,
@@ -48,6 +47,7 @@ from poliastro.frames.equatorial import (
     VenusICRS,
 )
 from poliastro.frames.util import get_frame
+from poliastro.plotting.orbit.backends import DEFAULT_ORBIT_PLOTTER_BACKENDS
 from poliastro.twobody.angles import E_to_M, nu_to_E
 from poliastro.twobody.orbit import Orbit
 from poliastro.twobody.sampling import TrueAnomalyBounds
@@ -463,49 +463,20 @@ def test_hyperbolic_modulus_wrapped_nu():
 
 def test_orbit_is_pickable(hyperbolic):
     pickled = pickle.dumps(hyperbolic)
-    ss_result = pickle.loads(pickled)
+    orb_result = pickle.loads(pickled)
 
-    assert_array_equal(hyperbolic.r, ss_result.r)
-    assert_array_equal(hyperbolic.v, ss_result.v)
-    assert ss_result.epoch == hyperbolic.epoch
+    assert_array_equal(hyperbolic.r, orb_result.r)
+    assert_array_equal(hyperbolic.v, orb_result.v)
+    assert orb_result.epoch == hyperbolic.epoch
 
 
-def test_orbit_plot_is_static():
+@pytest.mark.parametrize("Backend", DEFAULT_ORBIT_PLOTTER_BACKENDS.values())
+def test_orbit_plot_raises_no_error(Backend):
     # Data from Curtis, example 4.3
     r = [-6_045, -3_490, 2_500] * u.km
     v = [-3.457, 6.618, 2.533] * u.km / u.s
     ss = Orbit.from_vectors(Earth, r, v)
-
-    plot = ss.plot()
-
-    assert isinstance(plot[0], matplotlib.lines.Line2D)
-    assert isinstance(plot[1], matplotlib.lines.Line2D)
-
-
-def test_orbit_plot_static_3d():
-    # Data from Curtis, example 4.3
-    r = [-6_045, -3_490, 2_500] * u.km
-    v = [-3.457, 6.618, 2.533] * u.km / u.s
-    ss = Orbit.from_vectors(Earth, r, v)
-    with pytest.raises(
-        ValueError,
-        match="The static plotter does not support 3D, use `interactive=True`",
-    ):
-        ss.plot(use_3d=True)
-
-
-@pytest.mark.parametrize("use_3d", [False, True])
-def test_orbit_plot_is_not_static(use_3d):
-    from plotly.graph_objects import Figure
-
-    # Data from Curtis, example 4.3
-    r = [-6_045, -3_490, 2_500] * u.km
-    v = [-3.457, 6.618, 2.533] * u.km / u.s
-    ss = Orbit.from_vectors(Earth, r, v)
-
-    plot = ss.plot(interactive=True, use_3d=use_3d)
-
-    assert isinstance(plot, Figure)
+    ss.plot(backend=Backend())
 
 
 @pytest.mark.parametrize(
@@ -1130,6 +1101,23 @@ def test_from_ephem_has_expected_properties():
     assert_quantity_allclose(ss.v, expected_v)
 
 
+def test_to_ephem_samples_correct_epochs_and_coordinates():
+    epoch = Time("2022-2-3 1:42:0")
+    orbit = Orbit.from_vectors(
+        Earth,
+        r=[6045.0, 3490.0, -2500.0] * u.km,
+        v=[-3.457, 6.618, 2.533] * u.km / u.s,
+        epoch=epoch,
+    )
+
+    ephem = orbit.to_ephem()
+    assert ephem.epochs[0].value == orbit.epoch
+
+    ephem_initial_coordinates = [coord[0] for coord in ephem.sample(epoch).xyz]
+
+    assert_quantity_allclose(ephem_initial_coordinates, orbit.r)
+
+
 def test_from_vectors_wrong_dimensions_fails():
     bad_r = [[1000, 0, 0]] * u.km
     bad_v = [[[0, 10, 0]]] * u.km / u.s
@@ -1185,8 +1173,8 @@ def test_orbit_change_attractor_force():
     with pytest.warns(
         PatchedConicsWarning, match="Leaving the SOI of the current attractor"
     ):
-        ss_new_attractor = ss.change_attractor(Earth, force=True)
-    assert ss_new_attractor.attractor == Earth
+        orb_new_attractor = ss.change_attractor(Earth, force=True)
+    assert orb_new_attractor.attractor == Earth
 
 
 def test_orbit_change_attractor_unrelated_body():

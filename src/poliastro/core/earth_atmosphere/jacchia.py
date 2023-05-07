@@ -10,8 +10,8 @@ Jacchia [Ja77].  H-atom densities are returned as non-zero
 for altitudes of 150 km and above if the maximum altitude
 requested is 500 km or more.
 
-REFERENCES:
-
+References
+----------
 Ja77    L. G. Jacchia, "Thermospheric Temperature, Density
         and Composition: New Models," SAO Special Report No.
         375 (Smithsonian Institution Astrophysical
@@ -22,8 +22,8 @@ https://ccmc.gsfc.nasa.gov/pub/modelweb/atmospheric/jacchia/jacchia-77/
 
 """
 
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 # Following constants have been taken from the fortran implementation
 pi2 = np.pi / 2

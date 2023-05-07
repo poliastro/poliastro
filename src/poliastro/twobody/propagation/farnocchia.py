@@ -1,7 +1,7 @@
 import sys
 
-import numpy as np
 from astropy import units as u
+import numpy as np
 
 from poliastro.core.propagation.farnocchia import (
     farnocchia_coe as farnocchia_coe_fast,
@@ -39,7 +39,7 @@ class FarnocchiaPropagator:
             farnocchia_coe_fast(
                 state.attractor.k.to_value(u.km**3 / u.s**2),
                 *state.to_value(),
-                tof.to_value(u.s)
+                tof.to_value(u.s),
             )
             << u.rad
         )

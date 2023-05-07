@@ -9,10 +9,14 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "poliastro"
 readme = "README.md"
-requires-python = ">=3.8,<3.11"
+requires-python = ">=3.8"
 license = {file = "COPYING"}
 authors = [
     {name = "Juan Luis Cano Rodríguez", email = "hello@juanlu.space"}
+]
+maintainers = [
+    {name = "Juan Luis Cano Rodríguez", email = "hello@juanlu.space"},
+    {name = "Jorge Martinez Garrido", email = "contact@jorgemartinez.space"}
 ]
 keywords = [
     "aero",
@@ -35,6 +39,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
@@ -61,6 +66,7 @@ Documentation = "https://docs.poliastro.space"
 Source = "https://github.com/poliastro/poliastro"
 Tracker = "https://github.com/poliastro/poliastro/issues"
 Funding = "https://opencollective.com/poliastro"
+Changelog = "https://docs.poliastro.space/en/stable/changelog.html"
 
 [project.optional-dependencies]
 jupyter = ["notebook", "ipywidgets>=7.6"]
@@ -75,7 +81,7 @@ doc = [
     "nbsphinx>=0.8.6",
     "nbconvert>=5.5",
     "sgp4",
-    "sphinx!=3.5,!=4.0",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
+    "sphinx!=3.5,!=4.0,<5.1",  # https://github.com/readthedocs/sphinx-hoverxref/issues/119
     "sphinx-autoapi",
     "sphinx-gallery<=0.7.0",  # Just to avoid the jupytext warning
     "sphinx_rtd_theme~=1.0.0",
@@ -96,6 +102,7 @@ test = [
     "pytest-mpl",
     "pytest-mypy",
     "pytest-remotedata",
+    "tox",
 ]
 
 [tool.flit.sdist]
@@ -113,12 +120,33 @@ exclude = [
 [tool.black]
 line-length = 79
 
-[tool.isort]
-combine_as_imports = true
-default_section = "THIRDPARTY"
-line_length = 79
-profile = "black"
-src_paths = ["docs", "src", "tests"]
+[tool.ruff]
+select = [
+    "E",  # pycodestyle, see https://github.com/charliermarsh/ruff#pycodestyle-e-w
+#    "D",  # pydocstyle, see https://github.com/charliermarsh/ruff#pydocstyle-d
+    "F",  # pyflakes, see https://github.com/charliermarsh/ruff#pyflakes-f
+    "I"   # isort, see https://github.com/charliermarsh/ruff#isort-i
+]
+
+ignore = [
+    "E501",  # Line too long. Ignoring this so "black" manages line length.
+]
+
+exclude = [
+    ".git",
+    ".tox",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+known-first-party = ["poliastro"]
+
+[tool.ruff.mccabe]
+max-complexity = 18
 
 [tool.mypy]
 check_untyped_defs = true
@@ -134,6 +162,7 @@ source = ["src"]
 
 [tool.coverage.report]
 omit = ["contrib/*"]
+show_missing = true
 
 [tool.importlinter]
 # Include Astropy to properly analyze external submodules,

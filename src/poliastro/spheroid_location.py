@@ -17,8 +17,7 @@ class SpheroidLocation:
     """Class representing a ground station on an oblate ellipsoid."""
 
     def __init__(self, lon, lat, h, body):
-        """
-        Parameters
+        """Parameters
         ----------
         lon : ~astropy.units.quantity.Quantity
             Geodetic longitude
@@ -96,8 +95,7 @@ class SpheroidLocation:
         )  # Need to convert units to u.rad and then take value because numpy expects angles in radians if unit is not given.
 
     def distance(self, px, py, pz):
-        """
-        Calculates the distance from an arbitrary point to the given location (Cartesian coordinates).
+        """Calculates the distance from an arbitrary point to the given location (Cartesian coordinates).
 
         Parameters
         ----------
@@ -118,8 +116,7 @@ class SpheroidLocation:
         )  # body.R and body.R_polar has u.m as units
 
     def is_visible(self, px, py, pz):
-        """
-        Determines whether an object located at a given point is visible from the given location.
+        """Determines whether an object located at a given point is visible from the given location.
         Returns true if true, false otherwise.
 
         Parameters
@@ -140,20 +137,19 @@ class SpheroidLocation:
         return is_visible_fast(cartesian_cords, px, py, pz, self.N)
 
     def cartesian_to_ellipsoidal(self, x, y, z):
-        """
-        Converts ellipsoidal coordinates to the Cartesian coordinate system for the given ellipsoid.
+        """Converts cartesian coordinates to ellipsoidal coordinates for this ellipsoid.
 
         Parameters
         ----------
         x : ~astropy.units.quantity.Quantity
-            x coordinate
+            x-coordinate
         y : ~astropy.units.quantity.Quantity
-            y coordinate
+            y-coordinate
         z : ~astropy.units.quantity.Quantity
-            z coordinate
+            z-coordinate
 
         """
         _a, _c = self._a.to_value(u.m), self._c.to_value(u.m)
         x, y, z = x.to_value(u.m), y.to_value(u.m), z.to_value(u.m)
-        lat, lon, h = cartesian_to_ellipsoidal_fast(_a, _c, x, y, z)
-        return lat * u.rad, lon * u.rad, h * u.m
+        lon, lat, h = cartesian_to_ellipsoidal_fast(_a, _c, x, y, z)
+        return lon * u.rad, lat * u.rad, h * u.m

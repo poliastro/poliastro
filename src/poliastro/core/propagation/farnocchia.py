@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro.core.angles import (
     D_to_M,
@@ -293,7 +293,6 @@ def nu_from_delta_t(delta_t, ecc, k=1.0, q=1.0, delta=1e-2):
 
 @jit
 def farnocchia_coe(k, p, ecc, inc, raan, argp, nu, tof):
-
     q = p / (1 + ecc)
 
     delta_t0 = delta_t_from_nu(nu, ecc, k, q)
@@ -333,7 +332,6 @@ def farnocchia_rv(k, r0, v0, tof):
     The logic is based on formulae (4), (6) and (7) from http://dx.doi.org/10.1007/s10569-013-9476-9
 
     """
-
     # get the initial true anomaly and orbit parameters that are constant over time
     p, ecc, inc, raan, argp, nu0 = rv2coe(k, r0, v0)
     nu = farnocchia_coe(k, p, ecc, inc, raan, argp, nu0, tof)

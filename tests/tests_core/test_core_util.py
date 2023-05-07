@@ -1,12 +1,12 @@
 from functools import partial
 
-import numpy as np
-import pytest
 from astropy.coordinates.matrix_utilities import (
     rotation_matrix as rotation_matrix_astropy,
 )
 from hypothesis import given, settings, strategies as st
+import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
+import pytest
 
 from poliastro.core.util import (
     alinspace,

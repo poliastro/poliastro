@@ -1,6 +1,6 @@
-import pytest
 from astropy import units as u
 from matplotlib import pyplot as plt
+import pytest
 
 from poliastro.bodies import Earth
 from poliastro.examples import iss

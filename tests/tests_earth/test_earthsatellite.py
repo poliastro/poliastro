@@ -1,6 +1,6 @@
+from astropy import units as u
 import numpy as np
 import pytest
-from astropy import units as u
 
 from poliastro.bodies import Earth, Mars
 from poliastro.earth import EarthSatellite

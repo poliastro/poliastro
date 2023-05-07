@@ -53,16 +53,15 @@
 ##############################################################################
 
 # Import matplotlib (possibly change to plotly for poliastro?)
-import matplotlib.pyplot as plt
-
-# Import numpy.
-import numpy as np
-
 # Import the relevant AstroPy libraries.
 from astropy import units as u
 
 # In order to plot astropy quantities, this library needs to be turned on.
 from astropy.visualization import quantity_support
+import matplotlib.pyplot as plt
+
+# Import numpy.
+import numpy as np
 
 # Import the relevant PoliAstro libraries
 from poliastro.bodies import Earth
@@ -85,10 +84,7 @@ from poliastro.twobody.angles import E_to_M, nu_to_E
 # Let us define a relative orbits class that can be defined by two orbits!
 class RelativeOrb:
     def __init__(self, satC, satD):
-
-        """
-
-        When this class is initialized, it requires two poliastro twobody
+        """When this class is initialized, it requires two poliastro twobody
         objects: a chief orbiter (satC) and a deputy orbiter (satD). After
         initialisation, a number of computations must be made.
 
@@ -122,7 +118,6 @@ class RelativeOrb:
         - M  --> Linearized relative motion state transition matrix
 
         """
-
         # Initialize the chief and deputy satellites that were class inputs.
         self.satC = satC
         self.satD = satD
@@ -159,30 +154,19 @@ class RelativeOrb:
 
     # Method to return a list of the computed eccentricity vector separation.
     def get_eccentricity_separation(self):
-
-        """
-        Returns the eccentricity separation vector [ex, ey] (dimensionless)
-        """
-
+        """Returns the eccentricity separation vector [ex, ey] (dimensionless)."""
         return [self.ex, self.ey]
 
     # Method to return a list of the computed inclination vector separation.
     def get_inclination_separation(self):
-
-        """
-        Returns the inclination separation vector [ix, iy] (dimensionless)
-        """
-
+        """Returns the inclination separation vector [ix, iy] (dimensionless)."""
         return [self.ix, self.iy]
 
     # Internal method to return a direction cosine matrix about the X-axis
     def _dcmX(self, t):
-
-        """
-        Input theta is the scalar angle (in radians, non Astropy unit).
+        """Input theta is the scalar angle (in radians, non Astropy unit).
         Output is a 3x3 direction cosine matrix.
         """
-
         dcm = np.array(
             [
                 [1.0, 0.0, 0.0],
@@ -195,12 +179,9 @@ class RelativeOrb:
 
     # Internal method to return a direction cosine matrix about the Z-axis
     def _dcmZ(self, t):
-
-        """
-        Input theta is the scalar angle (in radians, non Astropy unit).
+        """Input theta is the scalar angle (in radians, non Astropy unit).
         Output is a 3x3 direction cosine matrix.
         """
-
         dcm = np.array(
             [
                 [np.cos(t), np.sin(t), 0.0],
@@ -213,18 +194,14 @@ class RelativeOrb:
 
     # Internal method to solve Kepler's equation for eccentric anomaly.
     def _solve_kepler(self, M, ecc):
-
-        """
-        Input a float mean anomaly (rad) and eccentricity, and solves for
+        """Input a float mean anomaly (rad) and eccentricity, and solves for
         the eccentric anomaly.
         """
-
         E1 = M.to_value(u.rad)  # Initialise eccentric anomaly
         e = ecc.to_value(u.one)  # Initialise the float eccentricity
         residual = 1.0  # Initialise convergence residual
 
         while residual >= 0.000001:
-
             fn = E1 - (e * np.sin(E1)) - M.to_value(u.rad)
             fd = 1 - (e * np.cos(E1))
             E2 = E1 - (fn / fd)
@@ -236,23 +213,20 @@ class RelativeOrb:
     # Method to solve for the orbit position, velocity and true anomaly.
     # (Requires the _dcmZ, _dcmX, and _solve_kepler internal methods)
     def _solve_posn(self, a, e, i, w, R, M, mu):
-
-        """
-        Inputs: Keplerian elements and gravitational constant (Astropy units).
+        """Inputs: Keplerian elements and gravitational constant (Astropy units).
                 - a        -> Semi-major axis (u.km)
                 - e        -> Eccentricity (u.one)
                 - i        -> Inclination (u.deg)
                 - w        -> Argument of Perigee (u.deg)
                 - R        -> Right Angle of Asc Node (u.deg)
                 - M        -> Mean Anomaly (u.deg)
-                - mu       -> Gravitational constant (u.m^3 / u.s^2)
+                - mu       -> Gravitational constant (u.m^3 / u.s^2).
 
         Output: Inertial position vector, velocity vector, and true anomaly
                 - pos      -> inertial position (1x3 vector, u.km)
                 - vel      -> inertial velocity (1x3 vector, u.km/u.s)
                 - trueAnom -> true anomaly (float, u.rad)
         """
-
         # Ensure the conversion of the attractor's gravitational constant.
         mu = mu.to(u.km**3 / u.s**2)
 
@@ -312,9 +286,7 @@ class RelativeOrb:
 
     # Propagate method, that must be called in order to store values for plots.
     def propagate(self, duration=43200, step=60):
-
-        """
-        Core method for relative trajectory generation. Inputs duration and
+        """Core method for relative trajectory generation. Inputs duration and
         time step (integers), and updates the six state arrays of the object
         (XYZ position and XYZ velocity) for N samples.
 
@@ -326,10 +298,8 @@ class RelativeOrb:
         - Nx3 matrix of all position vectors
         - Nx3 matrix of all velocity vector
         """
-
         # Check if the orbit is an ellipse (closed)
         if self.satC.ecc < 1 and self.satD.ecc < 1:
-
             # Get the initial mean anomaly of the chief.
             mC = E_to_M(nu_to_E(self.satC.nu, self.satC.ecc), self.satC.ecc)
 
@@ -357,7 +327,6 @@ class RelativeOrb:
 
             # For each sample...
             for t in range(0, duration, step):
-
                 # Update the mean anomaly of the chief (loop over pi).
                 mC = ((mC + pi + (nC * ts)) % (2 * pi)) - pi
 
@@ -447,12 +416,9 @@ class RelativeOrb:
             return self
 
     def plot(self):
-
-        """
-        Function to plot the relative trajectory. You must run the propagate()
+        """Function to plot the relative trajectory. You must run the propagate()
         method of the instance before the plot() method works.
         """
-
         # Check if the user has propagated the relative orbit
         if len(self.relPosArrayX) == 0 or len(self.relVelArrayX) == 0:
             print("The relative trajectories have not been propagated yet!")
@@ -460,9 +426,7 @@ class RelativeOrb:
 
         # Else, proceed with the propagation!
         else:
-
             with quantity_support():
-
                 # Initialise the matplotlib frame object.
                 figMain = plt.figure()
                 axOrbR = figMain.add_subplot(1, 1, 1, projection="3d")
@@ -549,12 +513,9 @@ class RelativeOrb:
                 plt.show()
 
     def plot_v(self):
-
-        """
-        Function to plot the relative velocity. You must run the propagate()
+        """Function to plot the relative velocity. You must run the propagate()
         method of the instance before the plot_v() method works.
         """
-
         # Check if the user has propagated the relative orbit
         if len(self.relPosArrayX) == 0 or len(self.relVelArrayX) == 0:
             print("The relative trajectories have not been propagated yet!")
@@ -562,9 +523,7 @@ class RelativeOrb:
 
         # Else, proceed with the propagation!
         else:
-
             with quantity_support():
-
                 # Initialise the matplotlib frame object.
                 figMain = plt.figure()
                 axOrbV = figMain.add_subplot(1, 1, 1, projection="3d")
@@ -658,7 +617,6 @@ class RelativeOrb:
 # The 'if __name__ == "__main__" statement allows others to import the
 # RelativeOrb class without calling the rest of the script below:
 if __name__ == "__main__":
-
     # Initialize an example Satellite A as the chief spacecraft.
     satC = Orbit.from_classical(
         attractor=Earth,

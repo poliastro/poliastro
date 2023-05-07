@@ -8,7 +8,6 @@ from poliastro.threebody.restricted import lagrange_points_vec
 
 
 def test_lagrange_points_vec():
-
     # Figure 2.36 from Curtis
 
     deg60 = 60 * pi / 180

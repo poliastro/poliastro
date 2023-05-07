@@ -1,4 +1,4 @@
-""" Plotting routines focused on Earth capabilities """
+"""Plotting routines focused on Earth capabilities."""
 
 from poliastro.earth.plotting.groundtrack import GroundtrackPlotter
 

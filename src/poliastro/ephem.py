@@ -8,7 +8,6 @@ from astropy.coordinates import (
     CartesianRepresentation,
     get_body_barycentric_posvel,
 )
-from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 
 from poliastro._math.interpolate import interp1d, sinc_interp, spline_interp
@@ -16,26 +15,20 @@ from poliastro.bodies import Earth
 from poliastro.frames import Planes
 from poliastro.frames.util import get_frame
 from poliastro.twobody.sampling import EpochsArray
-from poliastro.util import time_range
 from poliastro.warnings import TimeScaleWarning
 
 EPHEM_FORMAT = "Ephemerides at {num} epochs from {start} ({start_scale}) to {end} ({end_scale})"
 
 
-def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
-    """Interpolates ephemerides data
+def build_ephem_interpolant(body, epochs, attractor=Earth):
+    """Interpolates ephemerides data.
 
     Parameters
     ----------
     body : Body
         Source body.
-    period : ~astropy.units.Quantity
-        Orbital period.
-    t_span : list(~astropy.units.Quantity)
-        Initial and final epochs.
-    rtol : float, optional
-        Relative tolerance. Controls the number of sampled data points,
-        defaults to 1e-5.
+    epochs : ~astropy.time.Time
+        Array of time values, can be generated with poliastro.util.time_range.
     attractor : ~poliastro.bodies.Body, optional
         Attractor, default to Earth.
 
@@ -46,13 +39,6 @@ def build_ephem_interpolant(body, period, t_span, rtol=1e-5, attractor=Earth):
         since the initial epoch.
 
     """
-    epochs = time_range(
-        Time(t_span[0], format="jd", scale="tdb"),
-        end=Time(t_span[1], format="jd", scale="tdb"),
-        periods=int(
-            ((t_span[1] - t_span[0]) / (period * rtol)).to_value(u.one)
-        ),
-    )
     ephem = Ephem.from_body(body, epochs, attractor=attractor)
 
     interpolant = interp1d(

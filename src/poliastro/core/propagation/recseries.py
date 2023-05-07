@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 from poliastro.core.angles import E_to_M, E_to_nu, nu_to_E
 from poliastro.core.elements import coe2rv, rv2coe
@@ -20,7 +20,6 @@ def recseries_coe(
     numiter=100,
     rtol=1e-8,
 ):
-
     # semi-major axis
     semi_axis_a = p / (1 - ecc**2)
     # mean angular motion
@@ -114,7 +113,6 @@ def recseries(k, r0, v0, tof, method="rtol", order=8, numiter=100, rtol=1e-8):
     Newton-Raphson and co-planar closest approach estimation*
     with DOI: http://dx.doi.org/10.13140/RG.2.2.18578.58563/1
     """
-
     # Solve first for eccentricity and mean anomaly
     p, ecc, inc, raan, argp, nu = rv2coe(k, r0, v0)
     nu = recseries_coe(

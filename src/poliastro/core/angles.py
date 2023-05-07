@@ -1,5 +1,5 @@
-import numpy as np
 from numba import njit as jit
+import numpy as np
 
 
 @jit
@@ -69,7 +69,6 @@ def D_to_nu(D):
         \nu = 2 \arctan{D}
 
     """
-
     return 2.0 * np.arctan(D)
 
 
@@ -382,7 +381,7 @@ def E_to_M(E, ecc):
 
 @jit
 def F_to_M(F, ecc):
-    r"""Mean anomaly from eccentric anomaly.
+    r"""Mean anomaly from hyperbolic anomaly.
 
     Parameters
     ----------
@@ -401,7 +400,7 @@ def F_to_M(F, ecc):
     As noted in [5]_, by manipulating
     the parametric equations of the hyperbola
     we can derive a quantity that is equivalent
-    to the eccentric anomaly in the elliptic case:
+    to the mean anomaly in the elliptic case:
 
     .. math::
 

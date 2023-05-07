@@ -1,11 +1,11 @@
-"""Circular Restricted 3-Body Problem (CR3BP)
+"""Circular Restricted 3-Body Problem (CR3BP).
 
-    Includes the computation of Lagrange points
+Includes the computation of Lagrange points
 """
 
 
-import numpy as np
 from astropy import units as u
+import numpy as np
 
 from poliastro._math.optimize import brentq
 from poliastro.util import norm
@@ -35,7 +35,6 @@ def lagrange_points(r12, m1, m2):
         Distance of the Lagrangian points to the main body,
         projected on the axis main body - secondary body
     """
-
     pi2 = (m2 / (m1 + m2)).value
 
     def eq_L123(xi):
@@ -96,7 +95,6 @@ def lagrange_points_vec(m1, r1, m2, r2, n):
         Position of the Lagrange points: [L1, L2, L3, L4, L5]
         The positions are of type ~astropy.units.Quantity
     """
-
     # Check Body 1 is the main body
     assert (
         m1 > m2

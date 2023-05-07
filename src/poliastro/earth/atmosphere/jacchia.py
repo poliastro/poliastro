@@ -1,5 +1,5 @@
-import numpy as np
 from astropy import units as u
+import numpy as np
 
 from poliastro.core.earth_atmosphere.jacchia import (
     _altitude_profile as _altitude_profile_fast,
@@ -69,11 +69,11 @@ class Jacchia77:
         )
 
     def _H_correction(self, alt):
-        """Calculate [H] from Jacchia 1977 formulas"""
+        """Calculate [H] from Jacchia 1977 formulas."""
         _H_correction_fast(alt, self.Texo)
 
     def _O_and_O2_correction(self, alt):
-        """Add Jacchia 1977 empirical corrections to [O] and [O2]"""
+        """Add Jacchia 1977 empirical corrections to [O] and [O2]."""
         _O_and_O2_correction_fast(alt, self.Texo)
 
     def altitude_profile(self, alt):

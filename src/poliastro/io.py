@@ -1,7 +1,7 @@
-import numpy as np
 from astropy import units as u
 from astropy.time import Time
 from astroquery.jplsbdb import SBDB
+import numpy as np
 
 from poliastro.bodies import Sun
 from poliastro.frames import Planes

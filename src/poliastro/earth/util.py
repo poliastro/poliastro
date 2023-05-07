@@ -1,7 +1,7 @@
-import numpy as np
 from astropy import units as u
 from astropy.coordinates import get_sun
 from astropy.time import Time
+import numpy as np
 
 from poliastro import constants
 from poliastro.util import wrap_angle
@@ -9,7 +9,7 @@ from poliastro.util import wrap_angle
 
 @u.quantity_input(ltan=u.hourangle)
 def raan_from_ltan(epoch, ltan=12.0):
-    """RAAN angle from LTAN for SSO around the earth
+    """RAAN angle from LTAN for SSO around the earth.
 
     Parameters
     ----------
@@ -29,7 +29,6 @@ def raan_from_ltan(epoch, ltan=12.0):
     follow "Fundamentals of Astrodynamics and Applications"
     Fourth edition by Vallado, David A.
     """
-
     T_UT1 = ((epoch.ut1 - constants.J2000).value / 36525.0) * u.deg
     T_TDB = ((epoch.tdb - constants.J2000).value / 36525.0) * u.deg
 

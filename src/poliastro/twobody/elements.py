@@ -1,5 +1,5 @@
-import numpy as np
 from astropy import units as u
+import numpy as np
 
 from poliastro.core.elements import (
     circular_velocity as circular_velocity_fast,
