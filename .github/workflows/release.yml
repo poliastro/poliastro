@@ -1,7 +1,6 @@
 name: "Release"
 on:
-  repository_dispatch:
-    types: release
+  workflow_dispatch:
 
 jobs:
 
