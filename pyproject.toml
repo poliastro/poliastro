@@ -85,7 +85,7 @@ doc = [
     "sphinx-autoapi",
     "sphinx-gallery<=0.7.0",  # Just to avoid the jupytext warning
     "sphinx_rtd_theme~=1.0.0",
-    "sphinx-hoverxref==0.7b1",
+    "sphinx-hoverxref",
     "sphinx-notfound-page",
     "sphinx-copybutton>0.2.9",
     "sphinx-github-role~=0.1.0",
