@@ -1,3 +1,11 @@
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
+> _poliastro is archived and will not be developed any further, see https://github.com/poliastro/poliastro/issues/1640 for more context._
+> _Forks welcome, please respect the license by retaining attribution, and consider rebranding your fork if you intend to develop it in the long run._
+> _If you still use poliastro in your work, see below how to cite it._
+> _For a more complete background of the project, see https://conference.scipy.org/proceedings/scipy2022/juanluis_cano_poliastro.html._
+> Per Python ad astra!
+
 [![poliastro Logo](https://raw.githubusercontent.com/poliastro/poliastro/main/docs/source/_static/logo_readme.png)](https://docs.poliastro.space/en/stable/)
 
 | **Name**  |                        **Website**                         |                                                         **Authors**                                                       |                                      **Maintainers**                                      |                     **Version**                      |
