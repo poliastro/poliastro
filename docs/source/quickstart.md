@@ -417,9 +417,8 @@ Plot of a Hohmann transfer.
 
 ### Where are the planets? Computing celestial ephemerides
 
-```{eval-rst}
-.. versionadded:: 0.14.0
-```
+**Version Added:** 0.14.0
+
 
 Thanks to Astropy and jplephem, poliastro can read Satellite Planet Kernel (SPK) files,
 part of NASA's SPICE toolkit. This means that you can query the position and velocity

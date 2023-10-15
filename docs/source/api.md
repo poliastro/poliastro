@@ -18,20 +18,28 @@ The most important high level objects and methods are
 {py:class}`poliastro.maneuver.Maneuver`.
 Here is a summarized reference of commonly used methods:
 
-```{eval-rst}
-.. autoapiclass:: poliastro.twobody.Orbit
-   :members: from_classical, from_vectors, from_sbdb, propagate, to_ephem
-   :noindex:
+#### `poliastro.twobody.Orbit`
 
-.. autoapiclass:: poliastro.ephem.Ephem
-   :members: from_body, from_orbit, from_horizons, sample, rv
-   :noindex:
+- `from_classical`
+- `from_vectors`
+- `from_sbdb`
+- `propagate`
+- `to_ephem`
 
-.. autoapiclass:: poliastro.maneuver.Maneuver
-   :members: impulse, hohmann, bielliptic, lambert
-   :noindex:
+#### `poliastro.ephem.Ephem`
 
-```
+- `from_body`
+- `from_orbit`
+- `from_horizons`
+- `sample`
+- `rv`
+
+#### `poliastro.maneuver.Maneuver`
+
+- `impulse`
+- `hohmann`
+- `bielliptic`
+- `lambert`
 
 You can read the complete reference of the high level API here:
 
